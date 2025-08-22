@@ -38,6 +38,7 @@ jobs:
         contains(github.event.pull_request.changed_files.*.filename, 'src/') ||
         contains(github.event.pull_request.changed_files.*.filename, 'scripts/') ||
         contains(github.event.pull_request.changed_files.*.filename, 'docs/') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'TLDL/') ||
         contains(github.event.pull_request.changed_files.*.filename, '.github/')
       ))
     steps:
@@ -91,21 +92,125 @@ jobs:
           echo "GITHUB_TOKEN scopes: repo, workflow (read-only where possible)"
           echo "⚠️  Manual verification required: Ensure tokens have minimal required scopes"
           
+  # 🎮 Unity test runner for MetVanDAMN - Edit mode, Play mode tests  
+  unity-tests:
+    runs-on: ubuntu-latest
+    needs: structure-preflight
+    # Only run on changes to Unity assets, packages, or assemblies
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && (
+        contains(github.event.pull_request.changed_files.*.filename, 'Assets/') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'Packages/') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'ProjectSettings/') ||
+        contains(github.event.pull_request.changed_files.*.filename, '.asmdef')
+      ))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: Library-${{ runner.os }}-
+
+      # Unity Edit Mode Tests
+      - name: Run Unity Edit Mode Tests
+        uses: game-ci/unity-test-runner@v4
+        id: editModeTests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: .
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          testMode: EditMode
+          checkName: Unity Edit Mode Tests
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
+
+      # Unity Play Mode Tests  
+      - name: Run Unity Play Mode Tests
+        uses: game-ci/unity-test-runner@v4
+        id: playModeTests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: .
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          testMode: PlayMode
+          checkName: Unity Play Mode Tests
+          coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
+
+      # Upload test results
+      - name: Upload Unity Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unity-test-results
+          path: |
+            artifacts/editmode-results.xml
+            artifacts/playmode-results.xml
+            CodeCoverage/
+          retention-days: 30
+
+      # Archive coverage reports
+      - name: Upload Coverage Reports  
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unity-coverage-reports
+          path: CodeCoverage/
+          retention-days: 30
+
   # 🛡️ Final checkpoint job to certify validation success and log summary
   buttsafe-certification:
     runs-on: ubuntu-latest
-    needs: validate  # Only depends on core validation, not advisory jobs
+    needs: [validate, unity-tests]  # Wait for both validation and Unity tests
+    if: always()  # Run even if Unity tests are skipped
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
+      - name: Check job statuses
+        run: |
+          echo "📊 Job Status Summary:"
+          echo "Validation: ${{ needs.validate.result }}"
+          echo "Unity Tests: ${{ needs.unity-tests.result }}"
+          
+          if [[ "${{ needs.validate.result }}" == "success" ]]; then
+            echo "✅ Core validation passed"
+          else
+            echo "❌ Core validation failed"
+          fi
+          
+          if [[ "${{ needs.unity-tests.result }}" == "success" ]]; then
+            echo "✅ Unity tests passed"
+          elif [[ "${{ needs.unity-tests.result }}" == "skipped" ]]; then
+            echo "⏭️ Unity tests skipped (no Unity changes)"
+          else
+            echo "❌ Unity tests failed"
+          fi
+
       - name: Confirm validation success
         run: |
-          echo "✅ All required validation jobs completed successfully."
-          echo "🛡️ Buttsafe Certification Achieved."
-          echo "This marks the final checkpoint before merge or deployment."
+          if [[ "${{ needs.validate.result }}" == "success" ]]; then
+            echo "✅ All required validation jobs completed successfully."
+            echo "🛡️ Buttsafe Certification Achieved."
+            echo "This marks the final checkpoint before merge or deployment."
+          else
+            echo "❌ Validation failed. Please check the logs above."
+            exit 1
+          fi
 
       - name: Display recent commit info
         run: |

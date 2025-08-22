@@ -41,6 +41,8 @@ cover/
 *.mo
 *.pot
 *.log
+pip-log.txt
+=*
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
