@@ -48,7 +48,7 @@ jobs:
 
       # Set up Python with dependency caching
       - name: Set up Python
-        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v5.3.2
+        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.3.2
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -226,7 +226,7 @@ jobs:
           fetch-depth: 1
 
       - name: Set up Python (cached)
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -285,7 +285,7 @@ jobs:
           fetch-depth: 1
       
       - name: Setup Python (cached)
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: '3.11'
           cache: 'pip'

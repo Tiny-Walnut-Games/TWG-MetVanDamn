@@ -30,7 +30,7 @@ jobs:
       - name: Setup Node and Python
         uses: actions/setup-node@v4
         with: { node-version: 18 }
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5.6.0
         with: { python-version: '3.11' }
 
       - name: Install deps for analyzers
