@@ -38,7 +38,7 @@ jobs:
     continue-on-error: true  # Advisory - don't block merges on security scan issues
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1  # Shallow clone for speed
 
@@ -100,7 +100,7 @@ jobs:
     continue-on-error: true  # Advisory - don't block merges on secret detection
     steps:
       - name: Checkout repository
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.3.5
         with:
           fetch-depth: 0  # Full history needed for secret scanning
 
@@ -126,7 +126,7 @@ jobs:
       security-events: ${{ github.ref == 'refs/heads/main' || github.event_name == 'schedule' && 'write' || 'read' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1  # Shallow clone for speed
 
@@ -156,7 +156,7 @@ jobs:
     continue-on-error: true  # Advisory - don't block merges on MCP validation
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1  # Shallow clone for speed
 
@@ -200,7 +200,7 @@ jobs:
       contents: write  # Needed for TLDL commit on scheduled runs
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
 
