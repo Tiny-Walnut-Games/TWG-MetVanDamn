@@ -42,8 +42,10 @@ except ImportError:
     QUOTE_ENGINE_AVAILABLE = False
 
 class TLDLValidator:
-    def __init__(self, tldl_path: str = "docs/"):
+    def __init__(self, tldl_path: str = "docs/", config_path: str = None):
         self.tldl_path = Path(tldl_path)
+        # For MetVanDAMN structure: DevTimeTravel config is in docs/, TLDL files in TLDL/entries/
+        self.config_path = Path(config_path) if config_path else Path("docs")
         self.errors = []
         self.warnings = []
         
@@ -121,7 +123,7 @@ class TLDLValidator:
     
     def validate_devtimetravel_config(self) -> Dict[str, Any]:
         """Validate DevTimeTravel configuration file"""
-        config_path = self.tldl_path / "devtimetravel_snapshot.yaml"
+        config_path = self.config_path / "devtimetravel_snapshot.yaml"
         result = {
             "file": str(config_path),
             "valid": True,
@@ -355,12 +357,13 @@ class TLDLValidator:
 def main():
     parser = argparse.ArgumentParser(description="Validate TLDL entries and documentation")
     parser.add_argument("--tldl-path", default="docs/", help="Path to TLDL documentation")
+    parser.add_argument("--config-path", help="Path to DevTimeTravel config (defaults to docs/)")
     parser.add_argument("--output-format", choices=["text", "json"], default="text", help="Output format")
     parser.add_argument("--output-file", help="Output file (default: stdout)")
     parser.add_argument("--skip-quotes", action="store_true", help="Skip scroll quote validation")
     args = parser.parse_args()
     
-    validator = TLDLValidator(args.tldl_path)
+    validator = TLDLValidator(args.tldl_path, args.config_path)
     
     # Validate TLDL entries
     tldl_results = validator.validate_all_tldl_entries()
