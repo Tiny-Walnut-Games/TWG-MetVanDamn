@@ -70,7 +70,7 @@ jobs:
           fetch-depth: 0
 
       - name: 🐍 Prepare the Scrolls (Setup Python)
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: '3.11'
 
