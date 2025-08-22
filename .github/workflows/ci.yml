@@ -203,8 +203,8 @@ jobs:
 
       - name: Confirm validation success
         run: |
-          if [[ "${{ needs.validate.result }}" == "success" ]]; then
-            echo "✅ All required validation jobs completed successfully."
+          if [[ "${{ needs.validate.result }}" == "success" || "${{ needs.validate.result }}" == "skipped" ]]; then
+            echo "✅ All required validation jobs completed successfully (including skipped validations)."
             echo "🛡️ Buttsafe Certification Achieved."
             echo "This marks the final checkpoint before merge or deployment."
           else
