@@ -38,12 +38,12 @@ jobs:
     continue-on-error: true  # Advisory - don't block merges on security scan issues
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1  # Shallow clone for speed
 
       - name: Set up Python (cached)
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -126,7 +126,7 @@ jobs:
       security-events: ${{ github.ref == 'refs/heads/main' || github.event_name == 'schedule' && 'write' || 'read' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1  # Shallow clone for speed
 
@@ -156,12 +156,12 @@ jobs:
     continue-on-error: true  # Advisory - don't block merges on MCP validation
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1  # Shallow clone for speed
 
       - name: Set up Python (cached)
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -200,7 +200,7 @@ jobs:
       contents: write  # Needed for TLDL commit on scheduled runs
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1
 

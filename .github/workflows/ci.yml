@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Shallow checkout for structure check
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1
 
@@ -43,7 +43,7 @@ jobs:
       ))
     steps:
       - name: Checkout repository 
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1  # Shallow clone for speed
 
@@ -107,13 +107,13 @@ jobs:
       ))
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4
         with:
           fetch-depth: 1
           lfs: true
 
       - name: Cache Unity Library
-        uses: actions/cache@v4
+        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
         with:
           path: Library
           key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
@@ -121,7 +121,7 @@ jobs:
 
       # Unity Edit Mode Tests
       - name: Run Unity Edit Mode Tests
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@d4c8dea0ae32a2cb4a9e27c2b7b8a9c2fda66f8d # v4
         id: editModeTests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -136,7 +136,7 @@ jobs:
 
       # Unity Play Mode Tests  
       - name: Run Unity Play Mode Tests
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@d4c8dea0ae32a2cb4a9e27c2b7b8a9c2fda66f8d # v4
         id: playModeTests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -151,7 +151,7 @@ jobs:
 
       # Upload test results
       - name: Upload Unity Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: unity-test-results
@@ -163,7 +163,7 @@ jobs:
 
       # Archive coverage reports
       - name: Upload Coverage Reports  
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: unity-coverage-reports
@@ -177,7 +177,7 @@ jobs:
     if: always()  # Run even if Unity tests are skipped
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1
 
@@ -233,7 +233,7 @@ jobs:
       ))
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1
 
@@ -253,7 +253,7 @@ jobs:
 
       # Archive detailed results for review
       - name: Archive structure validation results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: structure-validation-results
@@ -280,7 +280,7 @@ jobs:
       ))
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1
 
@@ -302,7 +302,7 @@ jobs:
 
       # Archive IDE compatibility results
       - name: Archive IDE compatibility results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: ide-compatibility-${{ matrix.ide }}-results
@@ -326,12 +326,12 @@ jobs:
       ))
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1
 
       - name: Set up Python (cached)
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -361,7 +361,7 @@ jobs:
 
       # Archive CLI test results
       - name: Archive CLI test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: cli-test-results
@@ -385,12 +385,12 @@ jobs:
       ))
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 1
       
       - name: Setup Python (cached)
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -416,7 +416,7 @@ jobs:
 
       # Archive agent profile test results
       - name: Archive agent profile test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: agent-profile-test-results
