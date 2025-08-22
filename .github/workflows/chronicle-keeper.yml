@@ -592,7 +592,7 @@ jobs:
           
           # Run existing validation if available
           if [[ -f src/SymbolicLinter/validate_docs.py ]]; then
-            python3 src/SymbolicLinter/validate_docs.py --tldl-path TLDL/ || echo "⚠️ Some validation issues detected"
+            python3 src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/ --config-path docs/ || echo "⚠️ Some validation issues detected"
           fi
           
           # 🔒 Validate MCP configuration for security compliance (addresses issue #50)

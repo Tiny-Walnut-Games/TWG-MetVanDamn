@@ -76,7 +76,7 @@ jobs:
       - name: Run validation checks (Guarded Pass)
         run: |
           chmod +x scripts/guarded-pass.sh
-          ./scripts/guarded-pass.sh "docs-validator" python src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/
+          ./scripts/guarded-pass.sh "docs-validator" python src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/ --config-path docs/
           python src/SymbolicLinter/symbolic_linter.py --path src/
           python src/DebugOverlayValidation/debug_overlay_validator.py --path src/DebugOverlayValidation/
           
@@ -245,7 +245,7 @@ jobs:
       - name: Run document validation with Guarded Pass
         run: |
           chmod +x scripts/guarded-pass.sh  
-          ./scripts/guarded-pass.sh "docs-validator" python src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/
+          ./scripts/guarded-pass.sh "docs-validator" python src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/ --config-path docs/
 
       - name: Run system linting
         run: |
