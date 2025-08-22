@@ -31,10 +31,10 @@ jobs:
     
     steps:
       - name: 🏛️ Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
 
       - name: 🐍 Set up Python
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with:
           python-version: "3.x"
 
@@ -103,7 +103,7 @@ jobs:
           echo "📊 Bandit scan completed"
 
       - name: 🟢 Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398 # v4
         with:
           node-version: "20"
 
@@ -300,7 +300,7 @@ jobs:
           echo "📊 Node.js dependency audit completed"
 
       - name: 📊 Upload SARIF results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@cc18fa8621ebc2961c68a319279dcf9e91aa5791 # v3
         if: always()
         with:
           sarif_file: |
@@ -415,7 +415,7 @@ jobs:
           echo "high_issues=$HIGH_ISSUES" >> $GITHUB_OUTPUT
 
       - name: 📦 Upload security reports as artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: overlord-sentinel-security-reports
@@ -444,7 +444,7 @@ jobs:
     
     steps:
       - name: 🏛️ Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         
       - name: 📜 Log Sentinel Verdict in Chronicles
         run: |

@@ -63,19 +63,19 @@ jobs:
     
     steps:
       - name: 🧙‍♂️ Summon the Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           # Need write access to create TLDL entries
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: 🐍 Prepare the Scrolls (Setup Python)
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with:
           python-version: '3.11'
 
       - name: 🟢 Prepare the Chronicles (Setup Node.js)
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398 # v4
         with:
           node-version: '18'
 
@@ -603,7 +603,7 @@ jobs:
 
       - name: 📦 Upload Generated TLDL as Artifact
         if: steps.generate-scroll.outputs.scroll-generated == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: chronicle-keeper-tldl-entry
           path: |
@@ -615,7 +615,7 @@ jobs:
 
       - name: 📤 Commit TLDL Chronicle
         if: steps.generate-scroll.outputs.scroll-generated == 'true' || steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@917f9af49ac20b51c69c1be66de3ba2b4c6b5dd0 # v6
         with:
           commit_message: "📜 Chronicle Keeper: Auto-generated TLDL entry and Daily Ledger"
           commit_author: "Chronicle Keeper <chronicle-keeper@living-dev-agent.local>"
@@ -624,7 +624,7 @@ jobs:
 
       - name: 🧠📜 Commit Capsule Scroll
         if: steps.generate-capsule-scroll.outputs.capsule-generated == 'true'
-        uses: stefanzweifel/git-auto-commit-action@v6
+        uses: stefanzweifel/git-auto-commit-action@917f9af49ac20b51c69c1be66de3ba2b4c6b5dd0 # v6
         with:
           commit_message: "🧠📜 Archive Wall Capsule: Auto-generated context preservation scroll"
           commit_author: "Chronicle Keeper <chronicle-keeper@living-dev-agent.local>"

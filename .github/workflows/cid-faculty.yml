@@ -34,14 +34,14 @@ jobs:
             role_desc: "Future Sight"
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
         with:
           fetch-depth: 0
 
       - name: Setup Node and Python
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398 # v4
         with: { node-version: 18 }
-      - uses: actions/setup-python@v5.6.0
+      - uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with: { python-version: '3.11' }
 
       - name: Install dependencies
@@ -273,7 +273,7 @@ jobs:
 
       - name: Upload Faculty Artifacts
         if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: cid-faculty-${{ matrix.faculty }}-artifacts
           path: |
