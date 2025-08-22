@@ -1,0 +1,78 @@
+# Dependabot configuration for automated dependency updates
+# This addresses the CID Schoolhouse Report recommendation for dependency security scanning
+
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "jmeyer1980"
+    labels:
+      - "dependencies"
+      - "security"
+      - "python"
+    commit-message:
+      prefix: "🔒"
+      include: "scope"
+    # Group minor and patch updates
+    groups:
+      python-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly" 
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "jmeyer1980"
+    labels:
+      - "dependencies"
+      - "security"
+      - "github-actions"
+    commit-message:
+      prefix: "🔒"
+      include: "scope"
+
+  # Node.js dependencies (if package.json exists)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "jmeyer1980"
+    labels:
+      - "dependencies"
+      - "security"
+      - "javascript"
+    commit-message:
+      prefix: "🔒"
+      include: "scope"
+    # Group minor and patch updates
+    groups:
+      npm-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Ignore specific packages that might break the MCP setup
+    ignore:
+      - dependency-name: "@playwright/mcp"
+        update-types: ["version-update:semver-major"]

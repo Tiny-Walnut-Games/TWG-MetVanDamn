@@ -1,0 +1,106 @@
+# Lore Reflection Comment Template
+# For capturing general insights, learnings, and development wisdom
+name: lore_reflection
+title: "💭 Lore Reflection"
+description: "Template for documenting insights, learnings, and development wisdom"
+category: reflection
+triggers: ["📜", "TLDL:"]
+buttsafe_certified: true
+
+template: |
+  ## 📜 Lore Reflection
+  
+  **Trigger:** Reflection on {{ reflection_topic }}
+  
+  **Discovery (The Insight):**
+  - **Context:** {{ situational_context }}
+  - **What I learned:** {{ main_insight }}
+  - **Why it matters:** {{ significance }}
+  - **When this applies:** {{ applicability }}
+  
+  **Lore (Deep Understanding):**
+  - **The pattern:** {{ underlying_pattern }}
+  - **Root principles:** {{ fundamental_principles }}
+  - **Trade-offs involved:** {{ trade_offs }}
+  - **Broader implications:** {{ wider_impact }}
+  
+  **Lessons (Practical Wisdom):**
+  - **For future decision-making:** {{ decision_guidance }}
+  - **Red flags to watch for:** {{ warning_signs }}
+  - **Best practices discovered:** {{ good_practices }}
+  - **Common pitfalls to avoid:** {{ pitfalls }}
+  
+  **Chronicle Keeper Notes:**
+  This reflection is scroll-worthy because {{ wisdom_value }}
+  
+  **Knowledge Transfer:**
+  - **Who else should know this:** {{ target_audience }}
+  - **Related documentation to update:** {{ docs_to_update }}
+  - **Future scenarios where this applies:** {{ future_applications }}
+  
+  ---
+  *🍑 Wisdom preserved for the protection of future developer butts*
+
+placeholders:
+  reflection_topic:
+    description: "Main topic or theme of the reflection"
+    default: "code review practices and team dynamics"
+  situational_context:
+    description: "The situation or context that led to this insight"
+    default: "Working on a complex feature with multiple team members"
+  main_insight:
+    description: "The key insight or learning"
+    default: "Early collaboration prevents late-stage architectural conflicts"
+  significance:
+    description: "Why this insight is important"
+    default: "Reduces rework and improves code quality while maintaining team harmony"
+  applicability:
+    description: "When or where this insight applies"
+    default: "Any multi-developer feature work or major architectural changes"
+  underlying_pattern:
+    description: "The deeper pattern or principle at work"
+    default: "Communication overhead decreases exponentially with early alignment"
+  fundamental_principles:
+    description: "Core principles that support this insight"
+    default: "Conway's Law, Brooks' Law, the value of shared mental models"
+  trade_offs:
+    description: "What trade-offs or compromises are involved"
+    default: "Upfront time investment vs. reduced integration complexity"
+  wider_impact:
+    description: "How this applies beyond the immediate context"
+    default: "Applies to API design, system architecture, and product planning"
+  decision_guidance:
+    description: "How this should influence future decisions"
+    default: "Invest in design sessions before starting complex features"
+  warning_signs:
+    description: "Indicators that suggest this insight is relevant"
+    default: "Multiple developers working in same codebase, frequent merge conflicts"
+  good_practices:
+    description: "Best practices that emerged from this insight"
+    default: "Architecture decision records, design review meetings, shared documentation"
+  pitfalls:
+    description: "Common mistakes or problems to avoid"
+    default: "Assuming everyone has the same mental model, skipping design discussions"
+  wisdom_value:
+    description: "Why this reflection deserves preservation"
+    default: "it captures team dynamics patterns that affect all future development"
+  target_audience:
+    description: "Who would benefit from knowing this"
+    default: "Team leads, new developers, anyone working on collaborative features"
+  docs_to_update:
+    description: "Documentation that should be updated with this knowledge"
+    default: "Development guidelines, onboarding materials, code review checklist"
+  future_applications:
+    description: "Future situations where this insight will be valuable"
+    default: "Team expansion, major refactoring projects, cross-team collaborations"
+
+usage_examples:
+  - "Capture insights about development processes and team dynamics"
+  - "Document architectural learnings and design principles"
+  - "Share broader patterns and principles discovered during development"
+  - "Reflect on project outcomes and extract transferable wisdom"
+
+related_templates:
+  - debugging_ritual
+  - bug_discovery
+  - ci_failure_analysis

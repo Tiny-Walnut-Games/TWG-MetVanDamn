@@ -1,0 +1,205 @@
+# Chronicle Keeper Configuration
+# Defines parsing rules, lore tags, and agent personality alignment
+
+scribe:
+  name: "Chronicle Keeper"
+  personality: "Lore-preserving, adventure-narrating, slightly sarcastic"
+  motto: "Every commit tells a story, but the Chronicle remembers the epic."
+
+# Parsing rules for GitHub content
+parsing:
+  # Events that trigger TLDL generation
+  trigger_events:
+    - issue_opened
+    - issue_closed
+    - issue_edited
+    - comment_added
+    - pull_request_opened
+    - pull_request_merged
+    - pull_request_closed
+    - workflow_run_completed
+    - workflow_run_failed
+
+  # Keywords that indicate lore-worthy content
+  lore_keywords:
+    - "🧠" # Brain emoji for feature requests
+    - "🪶" # Feather for scrolls/documentation
+    - "🍑" # Cheek preservation
+    - "📜" # Scroll
+    - "🧙‍♂️" # Wizard/agent
+    - "🎯" # Goals/achievements
+    - "🛡️" # Protection/certification
+    - "🧠📜" # Archive Wall Continuity trigger
+    - "adventure"
+    - "quest"
+    - "scroll"
+    - "lore"
+    - "epic"
+    - "chronicle"
+    - "wisdom"
+    - "buttsafe"
+    - "cheekdom"
+    - "archive wall"
+    - "continuity"
+    - "capsule"
+    - "ghost"
+    - "re-entry spell"
+
+  # XML/Comment tags for different languages
+  language_tags:
+    javascript:
+      - "<!-- TLDL:"
+      - "// TLDL:"
+      - "/* TLDL:"
+    python:
+      - "# TLDL:"
+      - '"""TLDL:'
+    bash:
+      - "# TLDL:"
+    csharp:
+      - "// TLDL:"
+      - "/* TLDL:"
+    cpp:
+      - "// TLDL:"
+      - "/* TLDL:"
+    yaml:
+      - "# TLDL:"
+
+# Content classification rules
+classification:
+  # Minimum content length for TLDL worthiness
+  min_content_length: 50
+  
+  # Categories for automatic classification
+  categories:
+    feature_request:
+      keywords: ["feature", "enhancement", "🧠", "request"]
+      priority: "high"
+    bug_report:
+      keywords: ["bug", "issue", "error", "problem", "fix"]
+      priority: "medium"  
+    documentation:
+      keywords: ["docs", "documentation", "📜", "scroll", "guide"]
+      priority: "medium"
+    workflow:
+      keywords: ["workflow", "ci", "pipeline", "automation"]
+      priority: "medium"
+    lore:
+      keywords: ["lore", "wisdom", "cheekdom", "🧙‍♂️", "epic"]
+      priority: "high"
+    archive_wall:
+      keywords: ["archive wall", "continuity", "🧠📜", "capsule", "ghost", "re-entry spell"]
+      priority: "critical"
+
+# TLDL entry generation settings
+entry_generation:
+  # Template for new entries
+  template_path: "docs/tldl_template.yaml"
+  
+  # Output directory for entries
+  output_dir: "TLDL/entries"
+  
+  # Naming convention: YYYY-MM-DD-title.md
+  filename_format: "{date}-{title}.md"
+  
+  # Maximum title length for filenames
+  max_title_length: 50
+  
+  # Default author for automated entries
+  default_author: "@chronicle-keeper"
+
+# Integration with existing systems
+integration:
+  # ScrollQuoteEngine settings
+  quote_engine:
+    enabled: true
+    context_mapping:
+      feature_request: "development"
+      bug_report: "debugging"
+      documentation: "documentation"
+      workflow: "ci_cd"
+      lore: "lore"
+      archive_wall: "continuity"
+  
+  # Archive Wall Continuity System
+  archive_wall:
+    enabled: true
+    # Automatic Capsule Scroll generation triggers
+    capsule_triggers:
+      - "🧠📜" # Combined brain+scroll emoji
+      - "archive wall"
+      - "continuity crisis"
+      - "context preservation"
+    # Capsule Scroll generation command
+    capsule_command: "python3 scripts/capsule_scroll_generator.py --from-issue {issue_id}"
+    # Daily Ledger integration
+    daily_ledger:
+      enabled: true
+      auto_generate: true
+      command: "python3 scripts/daily_ledger_generator.py --generate-today"
+    # Ghost sweep integration  
+    ghost_sweep:
+      enabled: true
+      trigger_frequency: "weekly"
+      command: "scripts/archive-wall ghost-sweep --update"
+  
+  # Validation integration
+  validation:
+    enabled: true
+    run_on_generation: true
+    command: "python3 src/SymbolicLinter/validate_docs.py --tldl-path TLDL/"
+
+# GitHub API settings
+github:
+  # Rate limiting
+  requests_per_hour: 100
+  
+  # Content extraction settings
+  max_comment_length: 2000
+  max_issue_length: 5000
+  
+  # User mapping for @mentions
+  bot_users:
+    - "github-actions"
+    - "dependabot"
+    - "chronicle-keeper"
+
+# Lore preservation rules
+lore_preservation:
+  # Agent personality traits to maintain
+  personality_traits:
+    - "dry_humor"
+    - "adventure_narrative" 
+    - "rpg_terminology"
+    - "cheek_preservation"
+    - "scroll_wisdom"
+  
+  # Terminology to preserve/translate
+  terminology:
+    "bug": "dragon"
+    "error": "curse" 
+    "fix": "enchantment"
+    "refactor": "transmutation"
+    "deploy": "quest_completion"
+    "merge": "scroll_binding"
+    "commit": "chronicle_entry"
+
+# Chronicle Keeper behavioral settings
+behavior:
+  # Automatic vs manual entry creation
+  auto_generate: true
+  
+  # Require manual review before publication
+  require_review: false
+  
+  # Generate quotes for all entries
+  include_quotes: true
+  
+  # Update index after each entry
+  update_index: true
+  
+  # Notification settings
+  notifications:
+    enabled: true
+    mention_author: true
+    add_labels: ["tldl-generated", "chronicle-keeper"]

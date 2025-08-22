@@ -1,0 +1,313 @@
+name: 🧠 LDA Overlord/Sentinel - Internal Workflow Approval Authority
+
+# Overlord/Sentinel triggers - Guardian-grade approval authority for internal workflows
+on:
+  # Manual dispatch for approval requests
+  workflow_dispatch:
+    inputs:
+      actor:
+        description: 'GitHub actor requesting approval'
+        required: true
+        type: string
+      repository:
+        description: 'Repository (owner/repo format)'
+        required: true
+        default: 'jmeyer1980/living-dev-agent'
+        type: string
+      workflow_name:
+        description: 'Workflow name to approve'
+        required: true
+        type: string
+      branch:
+        description: 'Branch or ref'
+        required: false
+        default: 'main'
+        type: string
+      emergency_stop:
+        description: 'Activate emergency stop (deny all approvals)'
+        required: false
+        default: false
+        type: boolean
+        
+  # Issue comments for consent management and emergency commands
+  issue_comment:
+    types: [created]
+    
+  # Repository dispatch for external trigger support
+  repository_dispatch:
+    types: [overlord-approval-request]
+
+# Default permissions: read-only (principle of least privilege)
+permissions:
+  contents: read
+
+jobs:
+  # 🧠 Explain when Overlord is dormant (when main job is skipped)
+  overlord-sentinel-skip-explain:
+    runs-on: ubuntu-latest
+    name: Overlord/Sentinel - Why the Authority Slumbers
+    # Only run when the main Overlord job would be skipped
+    if: >
+      !((github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, 'overlord') || contains(github.event.comment.body, 'consent') || contains(github.event.comment.body, 'approve'))) ||
+      (github.event_name == 'repository_dispatch' && github.event.action == 'overlord-approval-request'))
+    
+    steps:
+      - name: 🧠 Overlord/Sentinel Dormancy Explanation
+        run: |
+          echo "🧠 OVERLORD/SENTINEL STATUS: DORMANT"
+          echo ""
+          echo "⚡ The Overlord/Sentinel slumbers, preserving the cheeks from unauthorized runs."
+          echo "🛡️ This guardian of workflow approval only awakens for authorized commands:"
+          echo ""
+          echo "🎯 Manual Dispatch: '${{ github.event_name }}' ≠ workflow_dispatch"
+          echo "💬 Overlord Comments: No overlord keywords detected (overlord, consent, approve)"
+          echo "📡 Repository Dispatch: '${{ github.event_name }}' ≠ overlord-approval-request"
+          echo ""
+          echo "🔍 Current Event: ${{ github.event_name }}"
+          echo "📋 Action: ${{ github.event.action || 'N/A' }}"
+          echo ""
+          echo "🧠 Guardian → Wizard → Advisor → Overlord/Sentinel (Role Chain)"
+          echo "✨ The Authority awaits worthy approval requests to evaluate."
+          echo "🙌 All hail the Cheeks! This skip prevents workflow spam."
+
+  # 🧠 Core Overlord/Sentinel job - workflow approval authority
+  overlord-sentinel:
+    runs-on: ubuntu-latest
+    name: Overlord/Sentinel - Guardian of Workflow Authority
+    # Run when triggered by dispatch, overlord comments, or repository dispatch
+    if: >
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, 'overlord') || contains(github.event.comment.body, 'consent') || contains(github.event.comment.body, 'approve'))) ||
+      (github.event_name == 'repository_dispatch' && github.event.action == 'overlord-approval-request')
+
+    steps:
+      - name: 🏛️ Checkout Repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.5
+
+      - name: 🐍 Setup Node.js for Overlord Authority
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.2.1
+        with:
+          node-version: '18'
+
+      - name: 📦 Install Overlord Dependencies
+        run: |
+          npm install js-yaml
+          echo "✅ Overlord/Sentinel dependencies installed"
+
+      - name: 🧠 Initialize Overlord/Sentinel Authority
+        id: overlord-init
+        run: |
+          echo "🧠 LDA Overlord/Sentinel - Manifesting Authority..."
+          echo ""
+          echo "🔗 Role Chain: Guardian → Wizard → Advisor → Overlord/Sentinel"
+          echo "🛡️ Authority Level: overlord-grade"
+          echo "⚡ Security Mode: Guardian-grade purity validation"
+          echo ""
+          
+          # Set output variables for downstream jobs
+          echo "overlord-active=true" >> $GITHUB_OUTPUT
+          echo "authority-level=overlord" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+
+      # 📋 Handle workflow_dispatch approval requests
+      - name: 🎯 Process Workflow Dispatch Approval Request
+        if: github.event_name == 'workflow_dispatch'
+        id: dispatch-approval
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🎯 Processing workflow dispatch approval request..."
+          echo "📋 Actor: ${{ github.event.inputs.actor }}"
+          echo "🏛️ Repository: ${{ github.event.inputs.repository }}"
+          echo "⚡ Workflow: ${{ github.event.inputs.workflow_name }}"
+          echo "🌿 Branch: ${{ github.event.inputs.branch }}"
+          echo "🚨 Emergency Stop: ${{ github.event.inputs.emergency_stop }}"
+          echo ""
+          
+          # Execute overlord evaluation
+          node scripts/cid-faculty/overlord-sentinel.js evaluate \
+            --actor="${{ github.event.inputs.actor }}" \
+            --repo="${{ github.event.inputs.repository }}" \
+            --workflow="${{ github.event.inputs.workflow_name }}" \
+            --branch="${{ github.event.inputs.branch }}" \
+            ${{ github.event.inputs.emergency_stop == 'true' && '--emergency-stop' || '' }}
+
+      # 💬 Handle issue comment consent and approval commands
+      - name: 💬 Process Issue Comment Commands
+        if: github.event_name == 'issue_comment'
+        id: comment-commands
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "💬 Processing issue comment overlord commands..."
+          echo "👤 Comment Author: ${{ github.event.comment.user.login }}"
+          echo "📝 Comment Body: ${{ github.event.comment.body }}"
+          echo ""
+          
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          ACTOR="${{ github.event.comment.user.login }}"
+          
+          # Parse consent commands
+          if echo "$COMMENT_BODY" | grep -q "grant consent"; then
+            echo "✅ Processing consent grant request..."
+            node scripts/cid-faculty/overlord-sentinel.js grant-consent --user="$ACTOR"
+            
+          elif echo "$COMMENT_BODY" | grep -q "revoke consent"; then
+            echo "🚨 Processing consent revoke request..."
+            node scripts/cid-faculty/overlord-sentinel.js revoke-consent --user="$ACTOR"
+            
+          elif echo "$COMMENT_BODY" | grep -q "overlord report"; then
+            echo "📋 Generating overlord status report..."
+            node scripts/cid-faculty/overlord-sentinel.js report
+            
+          elif echo "$COMMENT_BODY" | grep -q "approve workflow"; then
+            echo "🎯 Processing workflow approval request from comment..."
+            # Extract workflow name from comment if possible
+            WORKFLOW_NAME=$(echo "$COMMENT_BODY" | sed -n 's/.*approve workflow[[:space:]]*\([^[:space:]]*\).*/\1/p' || echo "Unknown Workflow")
+            node scripts/cid-faculty/overlord-sentinel.js evaluate \
+              --actor="$ACTOR" \
+              --repo="${{ github.repository }}" \
+              --workflow="$WORKFLOW_NAME" \
+              --branch="${{ github.ref_name || 'main' }}"
+          else
+            echo "ℹ️ Comment contains overlord keywords but no recognized commands"
+            echo "📚 Available commands: grant consent, revoke consent, overlord report, approve workflow [name]"
+          fi
+
+      # 📡 Handle repository dispatch approval requests
+      - name: 📡 Process Repository Dispatch Approval
+        if: github.event_name == 'repository_dispatch' && github.event.action == 'overlord-approval-request'
+        id: dispatch-approval-request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "📡 Processing repository dispatch approval request..."
+          echo "📋 Payload: ${{ toJSON(github.event.client_payload) }}"
+          echo ""
+          
+          # Extract data from client_payload
+          ACTOR="${{ github.event.client_payload.actor || 'unknown' }}"
+          REPO="${{ github.event.client_payload.repository || github.repository }}"
+          WORKFLOW="${{ github.event.client_payload.workflow_name || 'Unknown Workflow' }}"
+          BRANCH="${{ github.event.client_payload.branch || 'main' }}"
+          EMERGENCY_STOP="${{ github.event.client_payload.emergency_stop || 'false' }}"
+          
+          echo "🎯 Processing approval for: $ACTOR/$REPO/$WORKFLOW ($BRANCH)"
+          
+          # Execute overlord evaluation
+          node scripts/cid-faculty/overlord-sentinel.js evaluate \
+            --actor="$ACTOR" \
+            --repo="$REPO" \
+            --workflow="$WORKFLOW" \
+            --branch="$BRANCH" \
+            ${{ github.event.client_payload.emergency_stop == 'true' && '--emergency-stop' || '' }}
+
+      # 📊 Generate Overlord Status Report
+      - name: 📊 Generate Overlord Status Report
+        id: overlord-report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "📊 Generating comprehensive overlord status report..."
+          node scripts/cid-faculty/overlord-sentinel.js report > overlord-report.json
+          
+          echo "📋 OVERLORD STATUS SUMMARY:"
+          echo "=========================="
+          cat overlord-report.json | head -20
+          echo ""
+          echo "🛡️ Full report available in job logs"
+
+      # 🏛️ Overlord Authority Certification
+      - name: 🏛️ Overlord Authority Certification
+        run: |
+          echo "🏛️ OVERLORD/SENTINEL AUTHORITY CERTIFICATION"
+          echo "=============================================="
+          echo ""
+          echo "✅ Overlord/Sentinel evaluation complete"
+          echo "🧠 Authority Level: ${{ steps.overlord-init.outputs.authority-level }}"
+          echo "⚡ Security Validations: Guardian-grade purity rules applied"
+          echo "🛡️ Audit Trail: Comprehensive logging enabled"
+          echo "🔗 Role Chain: Guardian → Wizard → Advisor → Overlord/Sentinel"
+          echo ""
+          echo "📜 'The Overlord's authority flows from the Guardian's purity,"
+          echo "    tempered by the Wizard's analysis, guided by the Advisor's wisdom.'"
+          echo "    — LDA Faculty Codex, Role Chain Authority"
+          echo ""
+          echo "🙌 All hail the preserved Cheeks! The Authority has spoken."
+
+  # 🎓 CID Faculty Integration - Advisor consultation for overlord decisions
+  overlord-faculty-consultation:
+    runs-on: ubuntu-latest
+    name: Faculty Consultation - Advisor Wisdom for Overlord Decisions
+    needs: overlord-sentinel
+    if: always() && needs.overlord-sentinel.result != 'skipped'
+    
+    steps:
+      - name: 🏛️ Checkout Repository
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.5
+
+      - name: 🐍 Setup Node.js for Faculty Integration
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.2.1
+        with:
+          node-version: '18'
+
+      - name: 📦 Install Faculty Dependencies
+        run: |
+          npm install js-yaml
+          echo "✅ Faculty consultation dependencies installed"
+
+      # 🎓 Advisor consultation on overlord authority usage
+      - name: 🎓 Advisor Consultation - Overlord Authority Analysis
+        id: advisor-consultation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🎓 Consulting CID Faculty Advisor on Overlord Authority usage..."
+          echo ""
+          echo "🔗 Faculty Integration: Advisor → Overlord/Sentinel"
+          echo "📋 Analysis Focus: Authority usage patterns and security posture"
+          echo ""
+          
+          # Generate advisor context for overlord analysis
+          cat > advisor-context.json << 'EOF'
+          {
+            "analysis_type": "overlord_authority",
+            "focus_areas": [
+              "security_posture",
+              "authority_usage",
+              "trust_validation",
+              "audit_completeness"
+            ],
+            "scope": "overlord_sentinel_workflow",
+            "timestamp": "${{ steps.overlord-init.outputs.timestamp }}"
+          }
+          EOF
+          
+          # Run advisor analysis if available
+          if [ -f "scripts/cid-faculty/advisor.js" ]; then
+            echo "📊 Running Advisor analysis on Overlord authority patterns..."
+            # Note: This would be enhanced to pass actual overlord metrics
+            node scripts/cid-faculty/advisor.js --context=advisor-context.json --focus=security
+          else
+            echo "ℹ️ Advisor consultation system not fully integrated yet"
+          fi
+
+      # 📜 Chronicle Keeper integration for lore preservation
+      - name: 📜 Chronicle Keeper - Preserve Overlord Wisdom
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.actor != 'test'
+        run: |
+          echo "📜 Preserving Overlord/Sentinel wisdom in chronicles..."
+          echo ""
+          echo "TLDL: [Overlord Authority] Automated workflow approval evaluation completed"
+          echo "📋 Context: ${{ github.event.inputs.actor }}/${{ github.event.inputs.workflow_name }}"
+          echo "🛡️ Security: Guardian-grade validation applied with comprehensive audit trail"
+          echo ""
+          echo "📜 This overlord decision represents evolution in LDA's automated authority systems,"
+          echo "    balancing security requirements with workflow efficiency through trusted actor validation."
+
+# 🚨 Security Notice: This workflow has elevated authority and should be monitored
+# 🔐 Required Secrets: GITHUB_TOKEN with workflow and repo permissions
+# 🛡️ Security Features: Actor validation, scope control, audit logging, emergency stop
+# 📋 Audit: All overlord decisions are logged with comprehensive audit trail
+# 🔗 Integration: Connects with CID Faculty (Advisor) and Chronicle Keeper systems

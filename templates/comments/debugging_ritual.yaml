@@ -1,0 +1,109 @@
+# Debugging Ritual Comment Template
+# For documenting debugging sessions and problem-solving approaches
+name: debugging_ritual
+title: "🔍 Debugging Ritual Chronicle"
+description: "Template for preserving debugging methodologies and insights"
+category: debugging
+triggers: ["📜", "TLDL:"]
+buttsafe_certified: true
+
+template: |
+  ## 📜 Debugging Ritual Lore
+  
+  **Trigger:** Deep debugging session for {{ problem_description }}
+  
+  **The Quest (Problem Definition):**
+  - **Symptom:** {{ main_symptom }}
+  - **Impact:** {{ business_impact }}
+  - **Context:** {{ when_it_happens }}
+  - **Initial hypothesis:** {{ first_guess }}
+  
+  **The Journey (Investigation Process):**
+  - **Tools used:** {{ debugging_tools }}
+  - **Evidence gathered:** {{ evidence_collected }}
+  - **Dead ends explored:** {{ false_leads }}
+  - **Breakthrough moment:** {{ eureka_moment }}
+  
+  **Lore (Understanding):**
+  - **True root cause:** {{ actual_cause }}
+  - **Why initial hypothesis was wrong:** {{ hypothesis_correction }}
+  - **System behavior learned:** {{ system_insights }}
+  - **Dependencies revealed:** {{ dependency_discoveries }}
+  
+  **Lessons (Wisdom for Future Adventurers):**
+  - **Debugging technique that worked:** {{ effective_technique }}
+  - **Warning signs to watch for:** {{ red_flags }}
+  - **Tools/commands that saved the day:** {{ useful_commands }}
+  - **Mental model corrections:** {{ conceptual_fixes }}
+  
+  **Chronicle Keeper Notes:** 
+  This debugging session deserves preservation because {{ why_chronicle_worthy }}
+  
+  ---
+  *🍑 Future butts saved through documented problem-solving wisdom*
+
+placeholders:
+  problem_description:
+    description: "Brief description of the problem being debugged"
+    default: "intermittent API timeout issues"
+  main_symptom:
+    description: "The main observable symptom or error"
+    default: "API calls randomly timing out after 30 seconds"
+  business_impact:
+    description: "How this problem affects users or the business"
+    default: "Users unable to save their work, leading to data loss"
+  when_it_happens:
+    description: "Conditions or timing when the problem occurs"
+    default: "Occurs during peak hours, more frequent on Mondays"
+  first_guess:
+    description: "Your initial hypothesis about the cause"
+    default: "Suspected database connection pool exhaustion"
+  debugging_tools:
+    description: "Tools, debuggers, or monitoring used"
+    default: "Application Insights, SQL Profiler, network packet capture"
+  evidence_collected:
+    description: "Data, logs, metrics that were gathered"
+    default: "Connection pool metrics, query execution times, network latency data"
+  false_leads:
+    description: "Theories that were investigated but proved wrong"
+    default: "Database performance was fine, connection pools had capacity"
+  eureka_moment:
+    description: "The moment or clue that led to the breakthrough"
+    default: "Noticed correlation with deployment times and DNS cache TTL"
+  actual_cause:
+    description: "The real root cause once discovered"
+    default: "Load balancer health check was causing service restarts during DNS updates"
+  hypothesis_correction:
+    description: "Why the initial guess was off"
+    default: "Focused on database layer when the issue was in infrastructure layer"
+  system_insights:
+    description: "How the system actually works vs what was assumed"
+    default: "DNS cache updates trigger health check failures which cascade to service restarts"
+  dependency_discoveries:
+    description: "Hidden dependencies or connections revealed"
+    default: "Load balancer configuration affects application startup sequence"
+  effective_technique:
+    description: "The debugging approach or technique that worked"
+    default: "Correlating multiple monitoring systems' timelines revealed the pattern"
+  red_flags:
+    description: "Warning signs that indicate this problem might be occurring"
+    default: "API timeouts during scheduled DNS updates, pattern of Monday morning issues"
+  useful_commands:
+    description: "Specific commands, queries, or tools that were helpful"
+    default: "kubectl logs --since=1h, netstat -an | grep TIME_WAIT, dig +trace domain.com"
+  conceptual_fixes:
+    description: "How understanding of the system changed"
+    default: "Infrastructure changes can have subtle application-level effects"
+  why_chronicle_worthy:
+    description: "Why this debugging session deserves preservation"
+    default: "it reveals subtle infrastructure dependencies that are easy to miss"
+
+usage_examples:
+  - "Document complex debugging sessions with non-obvious solutions"
+  - "Preserve problem-solving methodologies that worked well"
+  - "Share insights about system behavior and hidden dependencies"
+
+related_templates:
+  - bug_discovery
+  - ci_failure_analysis
+  - lore_reflection

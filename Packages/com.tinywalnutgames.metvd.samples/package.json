@@ -1,0 +1,23 @@
+{
+  "name": "com.tinywalnutgames.metvd.samples",
+  "version": "1.0.0",
+  "displayName": "MetVanDAMN Samples",
+  "description": "Sample scenes and demo content for MetVanDAMN procedural Metroidvania engine. Includes smoke-test scene for immediate 'hit Play -> see map' experience.",
+  "unity": "6000.2",
+  "dependencies": {
+    "com.tinywalnutgames.metvd.core": "1.0.0",
+    "com.tinywalnutgames.metvd.graph": "1.0.0",
+    "com.tinywalnutgames.metvd.biome": "1.0.0",
+    "com.unity.entities": "1.2.0"
+  },
+  "keywords": [
+    "metroidvania",
+    "procedural",
+    "samples",
+    "demo"
+  ],
+  "author": {
+    "name": "Tiny Walnut Games",
+    "url": "https://github.com/jmeyer1980/MetVanDAMN"
+  }
+}

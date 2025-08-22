@@ -1,0 +1,101 @@
+version: '1.0'
+registry_name: Chronicle Keeper Comment Templates
+description: Auto-quills template system for structured Chronicle Keeper comments
+categories:
+  debugging:
+    name: Debugging & Investigation
+    description: Templates for bug discovery and debugging sessions
+    icon: "\U0001F41B"
+  ci_cd:
+    name: CI/CD & Build Systems
+    description: Templates for build failures and deployment issues
+    icon: "\U0001F6A8"
+  reflection:
+    name: Lore & Reflection
+    description: Templates for insights and development wisdom
+    icon: "\U0001F4AD"
+  general:
+    name: General Chronicles
+    description: General-purpose Chronicle Keeper templates
+    icon: "\U0001F4DC"
+templates:
+  bug_discovery:
+    file: bug_discovery.yaml
+    category: debugging
+    title: "\U0001F41B Bug Discovery Ritual"
+    short_description: Document interesting bugs found during development
+    use_cases:
+    - Complex bugs with non-obvious solutions
+    - Bugs that reveal systemic issues
+    - Interesting edge cases worth sharing
+    Chronicle_keeper_triggers:
+    - "\U0001F4DC"
+    - 'TLDL:'
+    estimated_time: 5-10 minutes
+  debugging_ritual:
+    file: debugging_ritual.yaml
+    category: debugging
+    title: "\U0001F50D Debugging Ritual Chronicle"
+    short_description: Preserve debugging methodologies and problem-solving approaches
+    use_cases:
+    - Deep debugging sessions
+    - Complex problem-solving processes
+    - Methodological insights
+    Chronicle_keeper_triggers:
+    - "\U0001F4DC"
+    - 'TLDL:'
+    estimated_time: 10-15 minutes
+  ci_failure_analysis:
+    file: ci_failure_analysis.yaml
+    category: ci_cd
+    title: "\U0001F6A8 CI Failure Analysis"
+    short_description: Analyze CI/CD failures and build system issues
+    use_cases:
+    - Complex CI/CD failures
+    - Build system troubleshooting
+    - Infrastructure-related issues
+    Chronicle_keeper_triggers:
+    - "\U0001F4DC"
+    - 'TLDL:'
+    estimated_time: 10-15 minutes
+  lore_reflection:
+    file: lore_reflection.yaml
+    category: reflection
+    title: "\U0001F4AD Lore Reflection"
+    short_description: Capture insights, learnings, and development wisdom
+    use_cases:
+    - General development insights
+    - Process improvements
+    - Team dynamics observations
+    - Architectural learnings
+    Chronicle_keeper_triggers:
+    - "\U0001F4DC"
+    - 'TLDL:'
+    estimated_time: 5-10 minutes
+default_settings:
+  buttsafe_certified: true
+  include_footer: true
+  auto_trigger_detection: true
+footer_template: "---\n*\U0001F351 Butts saved through proper documentation and knowledge\
+  \ sharing*\n"
+chronicle_keeper:
+  supported_triggers:
+  - "\U0001F4DC"
+  - 'TLDL:'
+  - chronicle
+  - lore
+  auto_detection: true
+  template_attribution: true
+statistics:
+  total_templates: 4
+  most_used_template: bug_discovery
+  usage_count:
+    bug_discovery: 7
+    debugging_ritual: 4
+    ci_failure_analysis: 2
+    lore_reflection: 3
+  last_updated: '2025-08-07T12:46:16.827468Z'
+expansion:
+  custom_template_dir: custom/
+  user_template_support: true
+  template_validation: true

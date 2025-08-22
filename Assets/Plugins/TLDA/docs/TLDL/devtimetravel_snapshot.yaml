@@ -1,0 +1,68 @@
+# DevTimeTravel Configuration for TLDL
+# Snapshot settings for Chronicle Keeper's TLDL system
+
+project_info:
+  name: "Living Dev Agent - Chronicle Keeper"
+  version: "1.0.0"
+  description: "Chronicle Keeper TLDL system for preserving development lore"
+  repository_url: "https://github.com/jmeyer1980/living-dev-agent"
+  
+snapshot_config:
+  frequency: "on_commit"
+  include_patterns:
+    - "TLDL/**/*"
+    - "scripts/chronicle-keeper/**/*"
+    - "src/ScrollQuoteEngine/**/*"
+    - "*.md"
+    - "*.yaml"
+    - "*.yml"
+  exclude_patterns:
+    - "node_modules/**"
+    - "*.tmp"
+    - "*.log"
+    - ".git/**"
+    
+context_capture:
+  git_metadata: true
+  file_checksums: true
+  dependency_graph: true
+  build_artifacts: false
+  environment_vars: false
+  active_branch: true
+  uncommitted_changes: true
+  recent_commits: 5
+
+snapshot_storage:
+  local_path: "TLDL/.snapshots"
+  compress: true
+  max_snapshots: 50
+  cleanup_after_days: 30
+  remote_storage:
+    enabled: false
+    
+integration:
+  ci_enabled: true
+  ci_on_pr: true
+  ci_on_merge: true
+  pre_commit_hook: false
+  post_commit_hook: false
+  vscode_extension: true
+  jetbrains_plugin: true
+  
+advanced:
+  max_file_size_mb: 10
+  parallel_processing: true
+  sanitize_secrets: true
+  encryption_enabled: false
+  timeline_view: true
+  diff_tracking: true
+  code_evolution: true
+
+triggers:
+  custom_commands:
+    - name: "chronicle_entry"
+      description: "Capture snapshot when TLDL entry is created"
+      command: "scripts/chronicle-keeper/tldl-writer.sh snapshot"
+  file_patterns:
+    - pattern: "TLDL/entries/*.md"
+      description: "TLDL entry additions"

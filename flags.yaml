@@ -1,0 +1,189 @@
+# Living Dev Agent Flags Registry
+# Defines available flags for CLI and IDE integration
+
+flags:
+  # Core operation flags
+  dry_run:
+    description: "Show what would be done without making changes"
+    type: "boolean"
+    default: false
+    cli_short: "-n"
+    cli_long: "--dry-run"
+    env_var: "LDA_DRY_RUN"
+    
+  context:
+    description: "Include context information in operations"
+    type: "boolean"
+    default: true
+    cli_short: "-c"
+    cli_long: "--context"
+    env_var: "LDA_CONTEXT"
+    
+  verbose:
+    description: "Enable verbose output"
+    type: "boolean"
+    default: false
+    cli_short: "-v"
+    cli_long: "--verbose"
+    env_var: "LDA_VERBOSE"
+    
+  quiet:
+    description: "Suppress non-essential output"
+    type: "boolean"
+    default: false
+    cli_short: "-q"
+    cli_long: "--quiet"
+    env_var: "LDA_QUIET"
+    
+  # Snapshot and validation flags
+  snapshot_id:
+    description: "Specify snapshot identifier"
+    type: "string"
+    default: null
+    cli_long: "--snapshot-id"
+    env_var: "LDA_SNAPSHOT_ID"
+    
+  auto_snapshot:
+    description: "Automatically create snapshots on significant events"
+    type: "boolean"
+    default: true
+    cli_long: "--auto-snapshot"
+    env_var: "LDA_AUTO_SNAPSHOT"
+    
+  validate_on_save:
+    description: "Run validation on file save"
+    type: "boolean"
+    default: true
+    cli_long: "--validate-on-save"
+    env_var: "LDA_VALIDATE_ON_SAVE"
+    
+  strict_validation:
+    description: "Use strict validation rules"
+    type: "boolean"
+    default: false
+    cli_long: "--strict"
+    env_var: "LDA_STRICT"
+    
+  # Pipeline and rendering flags
+  pipeline:
+    description: "Target rendering pipeline (URP, HDRP, BRP, SRP)"
+    type: "string"
+    default: "auto"
+    cli_long: "--pipeline"
+    env_var: "LDA_PIPELINE"
+    values: ["auto", "URP", "HDRP", "BRP", "SRP"]
+    
+  detect_pipeline:
+    description: "Auto-detect rendering pipeline from project"
+    type: "boolean"
+    default: true
+    cli_long: "--detect-pipeline"
+    env_var: "LDA_DETECT_PIPELINE"
+    
+  # Profile and behavior flags
+  profile:
+    description: "Agent profile to use"
+    type: "string"
+    default: "default"
+    cli_short: "-p"
+    cli_long: "--profile"
+    env_var: "LDA_PROFILE"
+    
+  tone:
+    description: "Agent communication tone"
+    type: "string"
+    default: "helpful"
+    cli_long: "--tone"
+    env_var: "LDA_TONE"
+    values: ["formal", "friendly", "helpful", "concise", "detailed"]
+    
+  # Output and formatting flags
+  format:
+    description: "Output format"
+    type: "string"
+    default: "text"
+    cli_short: "-f"
+    cli_long: "--format"
+    env_var: "LDA_FORMAT"
+    values: ["text", "json", "yaml", "markdown"]
+    
+  color:
+    description: "Enable colored output"
+    type: "boolean"
+    default: true
+    cli_long: "--color"
+    env_var: "LDA_COLOR"
+    
+  # Development and debugging flags
+  debug:
+    description: "Enable debug mode"
+    type: "boolean"
+    default: false
+    cli_long: "--debug"
+    env_var: "LDA_DEBUG"
+    
+  trace:
+    description: "Enable trace logging"
+    type: "boolean"
+    default: false
+    cli_long: "--trace"
+    env_var: "LDA_TRACE"
+    
+  # Integration flags
+  git_integration:
+    description: "Enable Git integration features"
+    type: "boolean"
+    default: true
+    cli_long: "--git"
+    env_var: "LDA_GIT_INTEGRATION"
+    
+  ci_mode:
+    description: "Enable CI/CD integration mode"
+    type: "boolean"
+    default: false
+    cli_long: "--ci"
+    env_var: "LDA_CI_MODE"
+
+# Flag groups for easier management
+flag_groups:
+  essential:
+    - "dry_run"
+    - "context"
+    - "verbose"
+    - "profile"
+    
+  validation:
+    - "validate_on_save"
+    - "strict_validation"
+    - "auto_snapshot"
+    
+  pipeline:
+    - "pipeline"
+    - "detect_pipeline"
+    
+  output:
+    - "format"
+    - "color"
+    - "quiet"
+    
+  development:
+    - "debug"
+    - "trace"
+    
+  integration:
+    - "git_integration"
+    - "ci_mode"
+
+# IDE-specific flag mappings
+ide_mappings:
+  vscode:
+    settings_path: ".vscode/settings.json"
+    flag_prefix: "livingDevAgent"
+    
+  jetbrains:
+    settings_path: ".idea/livingDevAgent.xml"
+    flag_prefix: "lda"
+    
+  omnisharp:
+    settings_path: "omnisharp.json"
+    flag_prefix: "LivingDevAgent"

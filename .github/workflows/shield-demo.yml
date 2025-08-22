@@ -1,0 +1,262 @@
+name: 🛡 Pass-by-Fail Shield Demonstration
+
+# Demonstration workflow showing Pass-by-Fail Shield Indicator system
+# This workflow intentionally includes expected failures to test shield detection
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_scenario:
+        description: 'Shield test scenario'
+        required: false
+        default: 'keeper-shield'
+        type: choice
+        options:
+          - keeper-shield
+          - bug-of-honor
+          - buttsafe-triggered
+          - guarded-pass
+      issue_number:
+        description: 'Issue number for shield status reporting'
+        required: false
+        type: string
+
+jobs:
+  # 🛡 Keeper's Shield - Expected defensive failure
+  keeper-shield-test:
+    runs-on: ubuntu-latest
+    name: 🛡 Keeper's Shield - Archive Integrity Guard
+    if: github.event.inputs.test_scenario == 'keeper-shield' || github.event.inputs.test_scenario == ''
+    continue-on-error: false  # Let it fail naturally for shield detection
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: 🛡 Execute Keeper's Shield Guard Logic
+        id: keeper-guard
+        run: |
+          echo "🛡 KEEPER'S SHIELD ACTIVATION"
+          echo "=============================="
+          echo ""
+          echo "⚡ Initiating archive integrity tripwire..."
+          echo "🔍 Scanning for unauthorized scroll modifications..."
+          echo ""
+          
+          # Simulate archive integrity check that finds "issues" (expected)
+          echo "📜 Analyzing scroll lineage preservation..."
+          sleep 2
+          
+          # This is an EXPECTED FAILURE - the guard is working as designed
+          echo "🚨 GUARD TRIPWIRE ACTIVATED: Unauthorized modification detected!"
+          echo "🛡 Archive integrity preserved through defensive fail mechanism"
+          echo ""
+          echo "📋 SHIELD STATUS: Expected protective fail - feature working as designed"
+          echo "🧙‍♂️ 'This is not a bug, but a feature wearing a bug coat.'"
+          
+          # Deliberately fail to demonstrate shield indicator
+          exit 1
+
+      - name: 🛡 Apply Shield Indicators
+        if: always() && steps.keeper-guard.conclusion == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🛡 Applying Pass-by-Fail Shield Indicators..."
+          
+          # Create workflow context for shield analysis
+          cat > workflow-context.json << 'EOF'
+          {
+            "workflow_name": "${{ github.workflow }}",
+            "job_name": "${{ github.job }}",
+            "step_name": "Execute Keeper's Shield Guard Logic",
+            "conclusion": "failure",
+            "logs": "Guard tripwire activated - archive integrity preserved",
+            "repository": "${{ github.repository }}",
+            "actor": "${{ github.actor }}"
+          }
+          EOF
+          
+          # Apply shield indicators if issue number provided
+          if [ -n "${{ github.event.inputs.issue_number }}" ]; then
+            node scripts/cid-schoolhouse/shield-indicators.js \
+              --issue=${{ github.event.inputs.issue_number }} \
+              --workflow-context=workflow-context.json
+          else
+            echo "ℹ️ No issue number provided, shield analysis only:"
+            node scripts/cid-schoolhouse/shield-indicators.js \
+              --issue=0 \
+              --workflow-context=workflow-context.json || true
+          fi
+
+  # 🛡 Bug of Honor - Feature wearing a bug coat
+  bug-of-honor-test:
+    runs-on: ubuntu-latest  
+    name: 🛡 Bug of Honor - Feature Wearing Bug Coat
+    if: github.event.inputs.test_scenario == 'bug-of-honor'
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛡 Execute Bug of Honor Logic
+        id: bug-honor
+        run: |
+          echo "🛡 BUG OF HONOR ACTIVATION"
+          echo "========================="
+          echo ""
+          echo "🎭 Demonstrating feature wearing a bug coat..."
+          echo "🧙‍♂️ 'Sometimes the best defense is a strategic offense'"
+          echo ""
+          
+          # This "bug" is actually a feature - expected behavior
+          echo "🚨 INTENTIONAL BUG: This failure is by design"
+          echo "🛡 Bug of Honor status: Protecting system through controlled failure"
+          echo ""
+          echo "📋 SHIELD STATUS: This is not a real bug but a protective mechanism"
+          
+          # Fail intentionally to demonstrate Bug of Honor
+          exit 1
+
+      - name: 🛡 Apply Bug of Honor Shield
+        if: always() && steps.bug-honor.conclusion == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > workflow-context.json << 'EOF'
+          {
+            "workflow_name": "${{ github.workflow }}",
+            "job_name": "${{ github.job }}",
+            "step_name": "Execute Bug of Honor Logic",
+            "conclusion": "failure",
+            "logs": "Bug of Honor - feature wearing bug coat activated",
+            "repository": "${{ github.repository }}",
+            "actor": "${{ github.actor }}"
+          }
+          EOF
+          
+          if [ -n "${{ github.event.inputs.issue_number }}" ]; then
+            node scripts/cid-schoolhouse/shield-indicators.js \
+              --issue=${{ github.event.inputs.issue_number }} \
+              --workflow-context=workflow-context.json
+          fi
+
+  # 🛡 Buttsafe Triggered - Cheek preservation activated
+  buttsafe-triggered-test:
+    runs-on: ubuntu-latest
+    name: 🛡 Buttsafe Triggered - Cheek Preservation
+    if: github.event.inputs.test_scenario == 'buttsafe-triggered'
+    continue-on-error: false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛡 Execute Buttsafe Protection
+        id: buttsafe-guard
+        run: |
+          echo "🛡 BUTTSAFE PROTOCOL ACTIVATION"
+          echo "==============================="
+          echo ""
+          echo "🍑 Initiating cheek preservation protocol..."
+          echo "📜 Scroll lineage under threat - defensive measures engaged"
+          echo ""
+          
+          # Simulate cheek-threatening situation that triggers buttsafe protocol
+          echo "🚨 BUTTSAFE TRIGGERED: Potential cheek compromise detected!"
+          echo "🛡 Emergency preservation protocol engaged"
+          echo "🍑 All cheeks successfully preserved through protective fail"
+          echo ""
+          echo "📋 SHIELD STATUS: Buttsafe mechanism functioning perfectly"
+          
+          # Fail to preserve the cheeks (expected behavior)
+          exit 1
+
+      - name: 🛡 Apply Buttsafe Shield  
+        if: always() && steps.buttsafe-guard.conclusion == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > workflow-context.json << 'EOF'
+          {
+            "workflow_name": "${{ github.workflow }}",
+            "job_name": "${{ github.job }}",
+            "step_name": "Execute Buttsafe Protection",
+            "conclusion": "failure", 
+            "logs": "Buttsafe triggered - cheek preservation protocol activated",
+            "repository": "${{ github.repository }}",
+            "actor": "${{ github.actor }}"
+          }
+          EOF
+          
+          if [ -n "${{ github.event.inputs.issue_number }}" ]; then
+            node scripts/cid-schoolhouse/shield-indicators.js \
+              --issue=${{ github.event.inputs.issue_number }} \
+              --workflow-context=workflow-context.json
+          fi
+
+  # 🛡 Shield System Summary
+  shield-system-summary:
+    runs-on: ubuntu-latest
+    name: 🛡 Shield System Demonstration Summary
+    needs: [keeper-shield-test, bug-of-honor-test, buttsafe-triggered-test]
+    if: always()
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛡 Generate Shield Demonstration Report
+        run: |
+          echo "🛡 PASS-BY-FAIL SHIELD DEMONSTRATION COMPLETE"
+          echo "=============================================="
+          echo ""
+          echo "📊 Demonstration Results:"
+          echo "  🛡 Keeper's Shield: ${{ needs.keeper-shield-test.result || 'skipped' }}"
+          echo "  🛡 Bug of Honor: ${{ needs.bug-of-honor-test.result || 'skipped' }}" 
+          echo "  🛡 Buttsafe Triggered: ${{ needs.buttsafe-triggered-test.result || 'skipped' }}"
+          echo ""
+          echo "🧙‍♂️ Shield Lore:"
+          echo '  "Refactoring is not a sign of failure; it'"'"'s a sign of growth.'
+          echo '   Like molting, but for code."'
+          echo "   — Code Evolution Theory, Vol. III"
+          echo ""
+          echo "✨ Key Features Demonstrated:"
+          echo "  • Visual shield indicators (🛡) for expected failures"
+          echo "  • Preservation of fail status for CI logic"
+          echo "  • Support for sub-labeling (Guarded Pass, Bug of Honor, etc.)"
+          echo "  • Integration with existing badge and workflow systems"
+          echo ""
+          echo "🔍 Integration Points:"
+          echo "  • Badge system enhancement with shield emojis"
+          echo "  • Workflow context analysis for shield detection"
+          echo "  • GitHub issue/PR comment integration"
+          echo "  • Chronicle Keeper compatibility for lore preservation"
+          echo ""
+          echo "🍑 Buttsafe Status: All cheeks preserved through demonstration!"
+
+      - name: 📜 Chronicle Keeper Integration
+        if: github.event.inputs.issue_number
+        run: |
+          echo "📜 CHRONICLE KEEPER INTEGRATION"
+          echo "==============================="
+          echo ""
+          echo "TLDL: [Pass-by-Fail Shield] Demonstration of expected protective fail indicators"
+          echo "🛡 Context: Showed how failures can be marked as features when they guard system integrity"
+          echo "⚡ Innovation: Visual distinction between actual bugs and protective mechanisms"
+          echo ""
+          echo "📜 This demonstration represents evolution in how we communicate system behavior,"
+          echo "    transforming confusing 'red X failures' into clear 'shield protection indicators'"
+          echo "    while maintaining all underlying CI logic and safety mechanisms."
+
+# 🛡 Workflow Security Notes:
+# - All failures in this workflow are INTENTIONAL and EXPECTED
+# - Shield indicators help distinguish protective fails from actual problems  
+# - CI logic remains unchanged - failures still block merges when appropriate
+# - Chronicle Keeper integration preserves the wisdom of this architectural decision

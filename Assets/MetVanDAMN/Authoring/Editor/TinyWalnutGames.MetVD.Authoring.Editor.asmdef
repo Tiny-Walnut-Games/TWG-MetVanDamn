@@ -1,0 +1,28 @@
+{
+    "name": "TinyWalnutGames.MetVD.Authoring.Editor",
+    "rootNamespace": "TinyWalnutGames.MetVD.Authoring.Editor",
+    "references": [
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Mathematics",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Entities.Editor",
+        "TinyWalnutGames.MetVD.Authoring",
+        "TinyWalnutGames.MetVD.Core",
+        "TinyWalnutGames.MetVD.Graph",
+        "TinyWalnutGames.MetVD.Biome",
+        "TinyWalnutGames.MetVD.Utility"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

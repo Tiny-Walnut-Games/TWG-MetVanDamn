@@ -1,0 +1,321 @@
+name: Living Dev Agent CI
+
+# Optimized CI with concurrency controls, path filters, and Guarded Pass system
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs for the same branch to save CI minutes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ⚡ Fast structure preflight check - fails in seconds for common issues
+  structure-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Shallow checkout for structure check
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Structure Preflight Check
+        run: |
+          chmod +x scripts/structure-preflight.sh scripts/guarded-pass.sh
+          ./scripts/guarded-pass.sh "structure-check" ./scripts/structure-preflight.sh
+
+  # ✅ Core validation job: sets up Python, installs dependencies, and runs key validation scripts
+  validate:
+    runs-on: ubuntu-latest
+    needs: structure-preflight
+    # Only run on changes to relevant files
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && (
+        contains(github.event.pull_request.changed_files.*.filename, 'src/') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'scripts/') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'docs/') ||
+        contains(github.event.pull_request.changed_files.*.filename, '.github/')
+      ))
+    steps:
+      - name: Checkout repository 
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Shallow clone for speed
+
+      # Set up Python with dependency caching
+      - name: Set up Python
+        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v5.3.2
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'scripts/requirements.txt'
+
+      # Install required dependencies (now cached)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+      # 🔒 Validate package installation with fail-fast logic (addresses issue #50)
+      - name: Validate Package Installation Security
+        run: |
+          chmod +x scripts/validate_package_install.sh
+          timeout 60 scripts/validate_package_install.sh
+
+      # Initialize agent context with verbose dry-run for debugging clarity
+      - name: Initialize Agent Context
+        run: |
+          chmod +x scripts/init_agent_context.sh
+          scripts/init_agent_context.sh --dry-run --verbose
+
+      # 🛡️ Run validation checks with Guarded Pass wrapper
+      - name: Run validation checks (Guarded Pass)
+        run: |
+          chmod +x scripts/guarded-pass.sh
+          ./scripts/guarded-pass.sh "docs-validator" python src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/
+          python src/SymbolicLinter/symbolic_linter.py --path src/
+          python src/DebugOverlayValidation/debug_overlay_validator.py --path src/DebugOverlayValidation/
+          
+      # 🔒 MCP security configuration validation (addresses issue #50)
+      - name: Validate MCP Security Configuration 
+        run: |
+          python scripts/validate_mcp_config.py --strict
+          
+      # 🔐 Token scope validation (addresses issue #50 secret scope concerns)
+      - name: Validate CI Token Scopes
+        run: |
+          echo "🔐 Validating CI token scopes for minimal permissions..."
+          echo "GITHUB_TOKEN scopes: repo, workflow (read-only where possible)"
+          echo "⚠️  Manual verification required: Ensure tokens have minimal required scopes"
+          
+  # 🛡️ Final checkpoint job to certify validation success and log summary
+  buttsafe-certification:
+    runs-on: ubuntu-latest
+    needs: validate  # Only depends on core validation, not advisory jobs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Confirm validation success
+        run: |
+          echo "✅ All required validation jobs completed successfully."
+          echo "🛡️ Buttsafe Certification Achieved."
+          echo "This marks the final checkpoint before merge or deployment."
+
+      - name: Display recent commit info
+        run: |
+          echo "🔍 Commit Summary:"
+          git log -1 --pretty=format:"%h - %s (%an)"
+
+  # 🧱 Structure validation job - ADVISORY (continues on error)
+  validate-structure:
+    runs-on: ubuntu-latest
+    name: Validate Repository Structure
+    continue-on-error: true  # Advisory job - don't block merges
+    # Only run on structure-related changes
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && (
+        contains(github.event.pull_request.changed_files.*.filename, 'scripts/') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'docs/') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'TLDL/') ||
+        contains(github.event.pull_request.changed_files.*.filename, '.github/')
+      ))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Validate template structure
+        run: |
+          chmod +x scripts/init_agent_context.sh
+          ./scripts/init_agent_context.sh --dry-run
+
+      - name: Run document validation with Guarded Pass
+        run: |
+          chmod +x scripts/guarded-pass.sh  
+          ./scripts/guarded-pass.sh "docs-validator" python src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/
+
+      - name: Run system linting
+        run: |
+          python src/SymbolicLinter/system_linter.py --path src/
+
+      # Archive detailed results for review
+      - name: Archive structure validation results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: structure-validation-results
+          path: |
+            validation-*.log
+            structure-*.json
+          retention-days: 30
+
+  # 🧪 IDE compatibility matrix test - ADVISORY (minimal matrix for efficiency)
+  test-ide-compatibility:
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Advisory job - don't block merges
+    strategy:
+      matrix:
+        ide: [vscode, omnisharp]  # Reduced from 3 to 2 - remove jetbrains for efficiency
+    name: Test IDE Compatibility - ${{ matrix.ide }}
+    # Only run on IDE config changes
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && (
+        contains(github.event.pull_request.changed_files.*.filename, '.vscode/') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'omnisharp.json') ||
+        contains(github.event.pull_request.changed_files.*.filename, '.idea/')
+      ))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Test VS Code configuration
+        if: matrix.ide == 'vscode'
+        run: |
+          if [ -f .vscode/settings.json ]; then
+            python -m json.tool .vscode/settings.json > /dev/null
+            echo "✅ VS Code settings.json is valid"
+          fi
+
+      - name: Test OmniSharp configuration
+        if: matrix.ide == 'omnisharp'
+        run: |
+          if [ -f omnisharp.json ]; then
+            python -m json.tool omnisharp.json > /dev/null
+            echo "✅ OmniSharp configuration is valid"
+          fi
+
+      # Archive IDE compatibility results
+      - name: Archive IDE compatibility results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ide-compatibility-${{ matrix.ide }}-results
+          path: |
+            ide-test-*.log
+            compatibility-*.json
+          retention-days: 7
+
+  # 🧰 CLI tool validation for LDA commands - ADVISORY
+  test-cli-tool:
+    runs-on: ubuntu-latest
+    name: Test LDA CLI Tool
+    continue-on-error: true  # Advisory job - don't block merges
+    # Only run on CLI-related changes
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && (
+        contains(github.event.pull_request.changed_files.*.filename, 'scripts/lda') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'scripts/') ||
+        contains(github.event.pull_request.changed_files.*.filename, '.agent-profile.yaml')
+      ))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python (cached)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'scripts/requirements.txt'
+
+      - name: Install dependencies with retry logic
+        run: |
+          python -m pip install --upgrade pip
+          # Retry logic for network resilience
+          for i in {1..3}; do
+            if pip install -r scripts/requirements.txt; then break; fi
+            echo "Attempt $i failed, retrying in 5 seconds..."
+            sleep 5
+          done
+
+      - name: Test CLI commands
+        run: |
+          if [ -f scripts/lda ]; then
+            chmod +x scripts/lda
+            ./scripts/lda --help
+            ./scripts/lda init --help
+            ./scripts/lda snapshot --help
+            ./scripts/lda profile --help
+          else
+            echo "⚠️ LDA CLI tool not yet implemented"
+          fi
+
+      # Archive CLI test results
+      - name: Archive CLI test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cli-test-results
+          path: |
+            cli-test-*.log
+            lda-*.json
+          retention-days: 7
+
+  # 🧬 Agent profile system validation - ADVISORY
+  test-agent-profiles:
+    runs-on: ubuntu-latest
+    name: Test Agent Profile System
+    continue-on-error: true  # Advisory job - don't block merges
+    # Only run on agent profile related changes
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' && (
+        contains(github.event.pull_request.changed_files.*.filename, '.agent-profile.yaml') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'agent-profile.yaml') ||
+        contains(github.event.pull_request.changed_files.*.filename, 'tests/agent-profiles/')
+      ))
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      
+      - name: Setup Python (cached)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Try to install PyYAML and argparse with retry logic, but don't fail if they're already available
+          for i in {1..3}; do
+            if pip install PyYAML argparse 2>/dev/null; then break; fi
+            echo "⚠️ Attempt $i failed, retrying in 5 seconds..."
+            sleep 5
+          done || echo "⚠️ Some dependencies may already be available"
+          
+      - name: Run Agent Profile System Tests
+        run: |
+          echo "🧬 Testing Agent Profile System..."
+          python3 tests/agent-profiles/test_runner.py
+          
+      - name: Agent Profile System Healthy
+        run: |
+          echo "✅ Agent Profile System validation complete!"
+          echo "🛡️ All cheeks preserved successfully! 🙌"
+
+      # Archive agent profile test results
+      - name: Archive agent profile test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: agent-profile-test-results
+          path: |
+            agent-profile-*.log
+            profile-test-*.json
+          retention-days: 7

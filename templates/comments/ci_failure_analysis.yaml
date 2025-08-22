@@ -1,0 +1,123 @@
+# CI Failure Analysis Comment Template
+# For documenting CI/CD failures and build system insights
+name: ci_failure_analysis
+title: "🚨 CI Failure Analysis"
+description: "Template for analyzing continuous integration failures and build issues"
+category: ci_cd
+triggers: ["📜", "TLDL:"]
+buttsafe_certified: true
+
+template: |
+  ## 📜 CI Failure Chronicle
+  
+  **Trigger:** CI/CD failure analysis for {{ pipeline_name }}
+  
+  **The Incident:**
+  - **Pipeline/Job:** {{ failed_pipeline }}
+  - **Failure type:** {{ failure_category }}
+  - **When it failed:** {{ failure_timing }}
+  - **Error message:** {{ primary_error_message }}
+  
+  **Discovery (Investigation):**
+  - **Logs examined:** {{ logs_reviewed }}
+  - **Failure pattern:** {{ failure_pattern }}
+  - **Environment factors:** {{ environment_conditions }}
+  - **Recent changes:** {{ recent_changes }}
+  
+  **Lore (Root Cause):**
+  - **Actual cause:** {{ true_cause }}
+  - **Why it wasn't caught earlier:** {{ detection_gap }}
+  - **System behavior revealed:** {{ system_learning }}
+  - **Dependencies involved:** {{ dependency_chain }}
+  
+  **Lessons (Prevention & Recovery):**
+  - **Immediate fix applied:** {{ quick_fix }}
+  - **Long-term solution:** {{ permanent_solution }}
+  - **Detection improvements:** {{ better_monitoring }}
+  - **Process improvements:** {{ workflow_enhancements }}
+  
+  **Future Adventurer Guidance:**
+  - **How to recognize this pattern:** {{ recognition_guide }}
+  - **Quick diagnostic steps:** {{ diagnostic_checklist }}
+  - **Emergency workarounds:** {{ emergency_procedures }}
+  
+  **Chronicle Keeper Notes:** 
+  This CI failure analysis is preservation-worthy because {{ why_preserve }}
+  
+  ---
+  *🍑 Build system butts protected through documented failure patterns*
+
+placeholders:
+  pipeline_name:
+    description: "Name of the CI/CD pipeline that failed"
+    default: "Production Deployment Pipeline"
+  failed_pipeline:
+    description: "Specific pipeline or job that failed"
+    default: "Deploy-to-Production / Docker Build"
+  failure_category:
+    description: "Type of failure (build, test, deployment, infrastructure)"
+    default: "Docker image build failure"
+  failure_timing:
+    description: "When the failure occurred (frequency, conditions)"
+    default: "Every deployment attempt since yesterday"
+  primary_error_message:
+    description: "Main error message from the failure"
+    default: "ERROR: failed to solve: executor failed running [/bin/sh -c apt-get update]: exit code: 100"
+  logs_reviewed:
+    description: "Which logs or outputs were examined"
+    default: "Docker build logs, GitHub Actions runner logs, npm install output"
+  failure_pattern:
+    description: "Pattern or consistency in the failures"
+    default: "Fails consistently at package installation step"
+  environment_conditions:
+    description: "Environment factors that might be relevant"
+    default: "New runner image, updated base dependencies"
+  recent_changes:
+    description: "Recent changes that might be related"
+    default: "Updated Dockerfile base image from node:16 to node:18"
+  true_cause:
+    description: "The actual root cause once identified"
+    default: "Node 18 has different SSL requirements that broke apt-get in the container"
+  detection_gap:
+    description: "Why this wasn't caught in development or testing"
+    default: "Local development uses different Docker setup, staging environment not updated yet"
+  system_learning:
+    description: "What was learned about how the system works"
+    default: "Base image updates can have cascading effects on package installation"
+  dependency_chain:
+    description: "Dependencies or connections that were involved"
+    default: "Node version -> OpenSSL version -> apt SSL certificates -> package installation"
+  quick_fix:
+    description: "Immediate workaround or fix that was applied"
+    default: "Rolled back to node:16 base image temporarily"
+  permanent_solution:
+    description: "Long-term fix for the root cause"
+    default: "Updated Dockerfile to install ca-certificates before package updates"
+  better_monitoring:
+    description: "Improvements to catch this earlier next time"
+    default: "Added base image update testing to staging environment"
+  workflow_enhancements:
+    description: "Process or workflow improvements"
+    default: "Base image updates now require staging validation first"
+  recognition_guide:
+    description: "How to recognize this pattern in the future"
+    default: "Package installation failures after base image updates"
+  diagnostic_checklist:
+    description: "Quick steps to diagnose similar issues"
+    default: "1. Check base image changes 2. Test package installation locally 3. Compare SSL configurations"
+  emergency_procedures:
+    description: "What to do if this happens again"
+    default: "Rollback base image version, notify team, create hotfix PR"
+  why_preserve:
+    description: "Why this failure analysis deserves documentation"
+    default: "it shows how seemingly simple updates can have complex downstream effects"
+
+usage_examples:
+  - "Document complex CI failures with non-obvious causes"
+  - "Preserve build system troubleshooting knowledge"
+  - "Share deployment and infrastructure insights"
+
+related_templates:
+  - debugging_ritual
+  - bug_discovery
+  - lore_reflection

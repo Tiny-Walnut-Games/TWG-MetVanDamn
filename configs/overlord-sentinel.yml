@@ -1,0 +1,87 @@
+overlord:
+  identity:
+    name: LDA Overlord/Sentinel
+    role: Internal Workflow Guardian
+    authority_level: overlord
+    version: 1.0.0
+  security:
+    require_user_consent: true
+    max_daily_approvals: 50
+    sensitive_workflow_patterns:
+      - '*deploy*'
+      - '*prod*'
+      - '*release*'
+      - '*publish*'
+      - '*secret*'
+    validate_actor_identity: true
+    validate_repo_origin: true
+    validate_branch_trust: true
+  trusted_actors:
+    users:
+      - jmeyer1980
+      - copilot
+    service_accounts:
+      - github-actions[bot]
+      - dependabot[bot]
+    organizations: []
+  trusted_sources:
+    repositories:
+      - jmeyer1980/living-dev-agent
+    trusted_branches:
+      - main
+      - develop
+      - copilot/*
+      - fix/*
+      - feature/*
+    untrusted_branches:
+      - external/*
+      - fork/*
+      - untrusted/*
+  workflow_scopes:
+    auto_approvable:
+      - Living Dev Agent CI
+      - Chronicle Keeper - TLDL Scribe System
+      - CID Faculty - Wisdom Consultation
+      - CID Schoolhouse - Educational Validation
+      - Validate Repository Structure
+    manual_approval_required:
+      - '*deploy*'
+      - '*release*'
+      - '*publish*'
+      - '*security*'
+  audit:
+    enabled: true
+    retention_days: 90
+    log_decision_factors: true
+    destinations:
+      - github_comments
+      - workflow_logs
+  integrations:
+    cid_faculty:
+      enabled: true
+      notify_advisor: true
+      notify_oracle: false
+    chronicle_keeper:
+      enabled: true
+      log_approvals: true
+      create_tldl_on_significant: true
+    guardian:
+      enabled: true
+      validate_against_purity_rules: true
+      escalate_violations: true
+  emergency:
+    emergency_stop: false
+    manual_override_enabled: false
+    override_require_justification: true
+    emergency_contacts:
+      - '@jmeyer1980'
+      - '@copilot'
+user_consent:
+  copilot:
+    granted: true
+    timestamp: '2025-08-18T10:27:25.393Z'
+    version: 1.0.0
+  jmeyer1980:
+    granted: true
+    timestamp: '2025-08-18T10:34:31.050Z'
+    version: 1.0.0

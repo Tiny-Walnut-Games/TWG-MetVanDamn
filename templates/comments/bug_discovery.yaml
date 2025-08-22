@@ -1,0 +1,96 @@
+# Bug Discovery Comment Template
+# For when you discover an interesting bug worth preserving in the scrolls
+name: bug_discovery
+title: "🐛 Bug Discovery Ritual"
+description: "Template for documenting interesting bugs found during development"
+category: debugging
+triggers: ["📜", "TLDL:"]
+buttsafe_certified: true
+
+template: |
+  ## 📜 Bug Discovery Lore
+  
+  **Trigger:** Found unexpected behavior in {{ component_or_area }}
+  
+  **Discovery:**
+  - **What happened:** {{ what_went_wrong }}
+  - **Expected vs Actual:** {{ expected_vs_actual }}
+  - **Environment:** {{ environment_details }}
+  - **Reproduction steps:**
+    1. {{ step_1 }}
+    2. {{ step_2 }}
+    3. {{ step_3 }}
+  
+  **Lore (Root Cause Analysis):**
+  - **Investigation findings:** {{ investigation_results }}
+  - **Why this happened:** {{ root_cause }}
+  - **Related systems affected:** {{ affected_systems }}
+  
+  **Lessons Learned:**
+  - **Immediate fix:** {{ immediate_solution }}
+  - **Prevention strategy:** {{ prevention_approach }}
+  - **Future considerations:** {{ future_considerations }}
+  - **Knowledge for future developers:** {{ wisdom_gained }}
+  
+  **Chronicle Keeper Notes:** 
+  This bug discovery is scroll-worthy because {{ why_preserve_this }}
+  
+  ---
+  *🍑 Butts saved through proper documentation and knowledge sharing*
+
+placeholders:
+  component_or_area:
+    description: "Component, feature, or area where bug was found"
+    default: "the authentication system"
+  what_went_wrong:
+    description: "Brief description of the unexpected behavior"
+    default: "users getting logged out unexpectedly"
+  expected_vs_actual:
+    description: "What should have happened vs what actually happened"
+    default: "Expected: session to persist | Actual: session expires after 5 minutes"
+  environment_details:
+    description: "OS, browser, version, or other environment info"
+    default: "Chrome 120, macOS 14, production environment"
+  step_1:
+    description: "First step to reproduce the bug"
+    default: "Log into the application"
+  step_2:
+    description: "Second step to reproduce the bug"
+    default: "Navigate to profile page"
+  step_3:
+    description: "Third step to reproduce the bug"
+    default: "Wait 5 minutes and refresh page"
+  investigation_results:
+    description: "What you found during investigation"
+    default: "Token expiry time was hardcoded to 300 seconds instead of using config"
+  root_cause:
+    description: "The underlying cause of the issue"
+    default: "Configuration value was not being read properly"
+  affected_systems:
+    description: "Other parts of the system that might be impacted"
+    default: "All authenticated pages, API endpoints"
+  immediate_solution:
+    description: "Quick fix that was applied"
+    default: "Updated token expiry configuration"
+  prevention_approach:
+    description: "How to prevent this in the future"
+    default: "Add configuration validation tests"
+  future_considerations:
+    description: "Longer-term improvements to consider"
+    default: "Implement configuration monitoring and alerts"
+  wisdom_gained:
+    description: "Key insight that helps future developers"
+    default: "Always validate that configuration changes work in production environment"
+  why_preserve_this:
+    description: "Why this bug story deserves preservation"
+    default: "it shows a subtle configuration issue that could affect other services"
+
+usage_examples:
+  - "Perfect for documenting interesting bugs found during feature development"
+  - "Use when a bug has an unexpected root cause worth sharing"
+  - "Good for bugs that reveal systemic issues or configuration problems"
+
+related_templates:
+  - debugging_ritual
+  - ci_failure_analysis
+  - lore_reflection

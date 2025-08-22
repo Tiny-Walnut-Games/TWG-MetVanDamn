@@ -1,0 +1,21 @@
+{
+  "FormattingOptions": {
+    "EnableEditorConfigSupport": true,
+    "OrganizeImports": true
+  },
+  "RoslynExtensionsOptions": {
+    "EnableAnalyzersSupport": true,
+    "LocationPaths": []
+  },
+  "FileOptions": {
+    "SystemExcludeSearchPatterns": [
+      "**/bin/**",
+      "**/obj/**",
+      "**/node_modules/**",
+      ".devtimetravel/snapshots/**"
+    ]
+  },
+  "MSBuild": {
+    "LoadProjectsOnDemand": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "name": "TinyWalnutGames.MetVD.Authoring",
+    "rootNamespace": "TinyWalnutGames.MetVD.Authoring",
+    "references": [
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Mathematics",
+        "TinyWalnutGames.MetVD.Core",
+        "TinyWalnutGames.MetVD.Graph",
+        "TinyWalnutGames.MetVD.Biome"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

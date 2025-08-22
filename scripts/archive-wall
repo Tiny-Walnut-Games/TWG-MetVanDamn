@@ -1,0 +1,151 @@
+#!/bin/bash
+# Archive Wall Continuity System - CLI Interface
+# Convenience wrapper for the Archive Wall Continuity & Export Ritual tools
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+show_help() {
+    echo "🧠📜 Archive Wall Continuity System - CLI Interface"
+    echo
+    echo "Usage: $0 <command> [options]"
+    echo
+    echo "Commands:"
+    echo "  capsule-scroll    Create or manage Capsule Scrolls"
+    echo "  daily-ledger      Generate or update Daily Ledgers"
+    echo "  ghost-sweep       Update Lost Features Ledger"
+    echo "  status           Show system status"
+    echo "  help             Show this help"
+    echo
+    echo "Examples:"
+    echo "  $0 capsule-scroll --arc-name \"Feature Development Arc\""
+    echo "  $0 daily-ledger --generate-today"
+    echo "  $0 ghost-sweep --update"
+    echo "  $0 status"
+    echo
+    echo "For detailed help on specific commands:"
+    echo "  $0 <command> --help"
+}
+
+capsule_scroll() {
+    python3 "$SCRIPT_DIR/capsule_scroll_generator.py" "$@"
+}
+
+daily_ledger() {
+    python3 "$SCRIPT_DIR/daily_ledger_generator.py" "$@"
+}
+
+ghost_sweep() {
+    echo "👻 Lost Features Ledger operations"
+    echo "Current ledger: docs/lost-features-ledger-$(date +%Y-%m-%d).md"
+    
+    if [[ "$1" == "--update" ]]; then
+        echo "🔄 Updating ghost sweep..."
+        # Create today's ledger if it doesn't exist
+        TODAY=$(date +%Y-%m-%d)
+        LEDGER_FILE="$PROJECT_ROOT/docs/lost-features-ledger-$TODAY.md"
+        
+        if [[ ! -f "$LEDGER_FILE" ]]; then
+            echo "📄 Creating new Lost Features Ledger for $TODAY"
+            cp "$PROJECT_ROOT/docs/lost-features-ledger-template.md" "$LEDGER_FILE"
+            # Replace template variables with current date
+            sed -i "s/{WEEK_START}/$TODAY/g" "$LEDGER_FILE"
+            sed -i "s/{WEEK_END}/$(date -d '+7 days' +%Y-%m-%d)/g" "$LEDGER_FILE"
+            xsed_inplace "s/{WEEK_START}/$TODAY/g" "$LEDGER_FILE"
+            xsed_inplace "s/{WEEK_END}/$(date -d '+7 days' +%Y-%m-%d)/g" "$LEDGER_FILE"
+            xsed_inplace "s/{TIMESTAMP}/$(date -Iseconds)/g" "$LEDGER_FILE"
+            echo "✅ Created: $LEDGER_FILE"
+        else
+            echo "📝 Ledger already exists: $LEDGER_FILE"
+        fi
+        
+        echo "🧠 Next: Edit the ledger to update ghost status and add new phantoms"
+    elif [[ "$1" == "--list" ]]; then
+        echo "📋 Existing Lost Features Ledgers:"
+        ls -la "$PROJECT_ROOT/docs/lost-features-ledger-"*.md 2>/dev/null || echo "No ledgers found"
+    else
+        echo "Usage: $0 ghost-sweep [--update|--list]"
+        echo "  --update  Create or update today's Lost Features Ledger"
+        echo "  --list    List existing ledgers"
+    fi
+}
+
+show_status() {
+    echo "🧠📜 Archive Wall Continuity System Status"
+    echo "============================================"
+    echo
+    
+    # Check directories
+    echo "📁 Directory Structure:"
+    echo "  ✅ capsules/         $(ls -1 "$PROJECT_ROOT/capsules" 2>/dev/null | wc -l) items"
+    echo "  ✅ daily-ledger/     $(ls -1 "$PROJECT_ROOT/docs/daily-ledger" 2>/dev/null | wc -l) items"
+    echo "  ✅ scripts/          Archive Wall tools available"
+    echo
+    
+    # Check recent activity
+    echo "📊 Recent Activity:"
+    LATEST_LEDGER=$(ls -t "$PROJECT_ROOT/docs/daily-ledger"/*.md 2>/dev/null | head -1)
+    if [[ -n "$LATEST_LEDGER" ]]; then
+        LEDGER_DATE=$(basename "$LATEST_LEDGER" .md)
+        echo "  📅 Latest Daily Ledger: $LEDGER_DATE"
+    else
+        echo "  📅 No Daily Ledgers found"
+    fi
+    
+    ACTIVE_CAPSULES=$(ls -1 "$PROJECT_ROOT/capsules/active"/*.md 2>/dev/null | wc -l)
+    echo "  📜 Active Capsule Scrolls: $ACTIVE_CAPSULES"
+    
+    ARCHIVED_CAPSULES=$(ls -1 "$PROJECT_ROOT/capsules/archived"/*.md 2>/dev/null | wc -l)
+    echo "  🏛️ Archived Capsule Scrolls: $ARCHIVED_CAPSULES"
+    
+    GHOST_LEDGERS=$(ls -1 "$PROJECT_ROOT/docs/lost-features-ledger-"*.md 2>/dev/null | wc -l)
+    echo "  👻 Lost Features Ledgers: $GHOST_LEDGERS"
+    echo
+    
+    # Check tools
+    echo "🛠️ Available Tools:"
+    echo "  ✅ capsule_scroll_generator.py"
+    echo "  ✅ daily_ledger_generator.py"
+    echo "  ✅ archive-wall CLI wrapper"
+    echo
+    
+    # System health
+    echo "🍑 Buttsafe Status:"
+    if [[ -f "$PROJECT_ROOT/validation-report.json" ]]; then
+        STATUS=$(grep -o '"status": "[^"]*"' "$PROJECT_ROOT/validation-report.json" 2>/dev/null | cut -d'"' -f4)
+        echo "  ✅ Validation Status: ${STATUS:-UNKNOWN}"
+    else
+        echo "  ⚠️ No validation report found"
+    fi
+    
+    echo "  ✅ Archive Wall Defenses: ACTIVE"
+    echo "  ✅ Context Preservation: ENABLED"
+    echo "  ✅ Knowledge Continuity: PROTECTED"
+}
+
+# Main command dispatch
+case "$1" in
+    "capsule-scroll")
+        shift
+        capsule_scroll "$@"
+        ;;
+    "daily-ledger")
+        shift
+        daily_ledger "$@"
+        ;;
+    "ghost-sweep")
+        shift
+        ghost_sweep "$@"
+        ;;
+    "status")
+        show_status
+        ;;
+    "help"|"--help"|"-h"|"")
+        show_help
+        ;;
+    *)
+        echo "Unknown command: $1"
+        echo "Use '$0 help' for available commands"
+        exit 1
+        ;;
+esac

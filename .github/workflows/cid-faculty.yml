@@ -1,0 +1,288 @@
+name: CID Faculty — Advisor + Oracle with Smart‑Usage Meter
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  faculty-consultation:
+    if: >
+      (github.event_name == 'issues' &&
+       (contains(github.event.issue.title, '🎓📜') ||
+        contains(join(github.event.issue.labels.*.name, ','), 'cid:faculty')))
+      || (github.event_name == 'issue_comment' &&
+          (contains(github.event.comment.body, 'TLDL:') ||
+           contains(github.event.comment.body, '📊 budget-check')))
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        faculty: [advisor, oracle]
+        include:
+          - faculty: advisor
+            role_name: "The Advisor"
+            role_desc: "Present Wisdom"
+          - faculty: oracle
+            role_name: "The Oracle" 
+            role_desc: "Future Sight"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node and Python
+        uses: actions/setup-node@v4
+        with: { node-version: 18 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyYAML argparse
+          npm install --no-audit --no-fund
+
+      - name: Initialize Faculty Infrastructure  
+        run: |
+          mkdir -p scripts/cid-faculty out/cid/cache
+          echo '{}' > out/cid/context.json
+
+      - name: Parse Faculty Configuration
+        id: config
+        run: |
+          # Parse issue body for configuration
+          ISSUE_BODY="${{ github.event.issue.body }}"
+          
+          # Check for faculty role selection
+          if echo "$ISSUE_BODY" | grep -q "\[x\].*The Advisor"; then
+            echo "advisor_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          if echo "$ISSUE_BODY" | grep -q "\[x\].*The Oracle"; then
+            echo "oracle_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          if echo "$ISSUE_BODY" | grep -q "\[x\].*Both"; then
+            echo "advisor_enabled=true" >> $GITHUB_OUTPUT
+            echo "oracle_enabled=true" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check for budget configuration  
+          if echo "$ISSUE_BODY" | grep -q "\[x\].*Quick assessment"; then
+            echo "budget_minutes=3" >> $GITHUB_OUTPUT
+          elif echo "$ISSUE_BODY" | grep -q "\[x\].*Deep dive"; then
+            echo "budget_minutes=12" >> $GITHUB_OUTPUT
+          else
+            echo "budget_minutes=6" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check for dry-run mode
+          if echo "$ISSUE_BODY" | grep -q "\[x\].*Dry-run mode"; then
+            echo "dry_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "dry_run=false" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check for escalation permission
+          LABELS="${{ join(github.event.issue.labels.*.name, ',') }}"
+          if echo "$LABELS" | grep -q "faculty:proceed"; then
+            echo "escalation_approved=true" >> $GITHUB_OUTPUT
+          else
+            echo "escalation_approved=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check Faculty Role Filter
+        id: role_filter
+        run: |
+          FACULTY_ROLE="${{ matrix.faculty }}"
+          
+          if [ "$FACULTY_ROLE" = "advisor" ] && [ "${{ steps.config.outputs.advisor_enabled }}" = "true" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          elif [ "$FACULTY_ROLE" = "oracle" ] && [ "${{ steps.config.outputs.oracle_enabled }}" = "true" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Learn Repository Context (Shared)
+        if: steps.role_filter.outputs.should_run == 'true'
+        run: |
+          # Use existing CID Schoolhouse learning infrastructure
+          node scripts/cid-schoolhouse/learn.js --out=out/cid/context.json
+
+      - name: Check Budget and Escalation Requirements
+        if: steps.role_filter.outputs.should_run == 'true'
+        id: budget_check
+        run: |
+          BUDGET_MINUTES="${{ steps.config.outputs.budget_minutes }}"
+          ESCALATION_APPROVED="${{ steps.config.outputs.escalation_approved }}"
+          
+          if [ "$BUDGET_MINUTES" -gt 6 ] && [ "$ESCALATION_APPROVED" != "true" ]; then
+            echo "needs_escalation=true" >> $GITHUB_OUTPUT
+            echo "❌ Deep analysis requested but faculty:proceed label not found"
+            echo "Add 'faculty:proceed' label to approve extended budget usage"
+            exit 1
+          else
+            echo "needs_escalation=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Execute Faculty Analysis - ${{ matrix.faculty }}
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FACULTY_ROLE="${{ matrix.faculty }}"
+          BUDGET_MINUTES="${{ steps.config.outputs.budget_minutes }}"
+          DRY_RUN="${{ steps.config.outputs.dry_run }}"
+          
+          # Set up faculty-specific parameters
+          FACULTY_ARGS="--context=out/cid/context.json --out=out/cid/${FACULTY_ROLE}-report.json"
+          
+          if [ "$DRY_RUN" = "true" ]; then
+            FACULTY_ARGS="$FACULTY_ARGS --dry-run"
+          fi
+          
+          # Execute the specific faculty role
+          echo "🎓 Executing ${{ matrix.role_name }} analysis..."
+          node "scripts/cid-faculty/${FACULTY_ROLE}.js" $FACULTY_ARGS \
+            --budget-minutes="$BUDGET_MINUTES" \
+            --github-api-limit=60 \
+            --other-service-limit=20
+
+      - name: Generate Faculty TLDL Entry
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        run: |
+          # Wait for all faculty roles to complete before generating combined TLDL
+          # This step only runs once for the advisor role in the matrix
+          if [ "${{ matrix.faculty }}" = "advisor" ]; then
+            echo "📜 Generating combined faculty TLDL entry..."
+            
+            ADVISOR_FILE=""
+            ORACLE_FILE=""
+            
+            if [ -f "out/cid/advisor-report.json" ]; then
+              ADVISOR_FILE="--advisor=out/cid/advisor-report.json"
+            fi
+            
+            if [ -f "out/cid/oracle-report.json" ]; then
+              ORACLE_FILE="--oracle=out/cid/oracle-report.json"
+            fi
+            
+            # Generate enhanced faculty TLDL entry
+            node scripts/cid-faculty/faculty-tldl.js \
+              $ADVISOR_FILE $ORACLE_FILE \
+              --issue=${{ github.event.issue.number }} \
+              --out=/tmp/faculty-scroll-entry.json
+          fi
+
+      - name: Write Faculty TLDL via Chronicle Keeper
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        run: |
+          FACULTY_ROLE="${{ matrix.faculty }}"
+          
+          if [ -f "/tmp/faculty-${FACULTY_ROLE}-scroll-entry.json" ]; then
+            # Use Chronicle Keeper to write the TLDL entry
+            ./scripts/chronicle-keeper/tldl-writer.sh write "/tmp/faculty-${FACULTY_ROLE}-scroll-entry.json" --verbose --force
+          fi
+
+      - name: Post Faculty Comment
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FACULTY_ROLE="${{ matrix.faculty }}"
+          ROLE_NAME="${{ matrix.role_name }}"
+          
+          if [ -f "out/cid/${FACULTY_ROLE}-report.json" ]; then
+            echo "💬 Posting $ROLE_NAME consultation results..."
+            
+            # Create a faculty comment poster
+            node -e "
+              const fs = require('fs');
+              const report = JSON.parse(fs.readFileSync('out/cid/${FACULTY_ROLE}-report.json', 'utf8'));
+              
+              let comment = '## $ROLE_NAME Consultation\\n\\n';
+              comment += '> ' + report.summary.join('\\n> ') + '\\n\\n';
+              
+              if (report.actionItems && report.actionItems.length > 0) {
+                comment += '### Present Wisdom - Prioritized Actions\\n\\n';
+                report.actionItems.forEach((item, index) => {
+                  comment += \`**\${index + 1}. \${item.title}** (\${item.impact} impact, \${item.effort} effort)\\n\`;
+                  comment += \`- \${item.description}\\n\`;
+                  comment += \`- Evidence: \${item.evidence}\\n\\n\`;
+                });
+              }
+              
+              if (report.scenarios && report.scenarios.length > 0) {
+                comment += '### Future Sight - Strategic Scenarios\\n\\n';
+                report.scenarios.forEach((scenario, index) => {
+                  comment += \`**\${index + 1}. \${scenario.name}** (Probability: \${(scenario.probability * 100).toFixed(0)}%)\\n\`;
+                  comment += \`- \${scenario.description}\\n\`;
+                  comment += \`- Timeline: \${scenario.timeframe}\\n\`;
+                  comment += \`- Key Outcomes: \${scenario.outcomes.slice(0, 2).join(', ')}\\n\\n\`;
+                });
+              }
+              
+              // Add telemetry footer
+              if (report.telemetry) {
+                comment += report.telemetry;
+              }
+              
+              console.log(JSON.stringify({body: comment}));
+            " > /tmp/faculty-comment.json
+            
+            # Post the comment
+            curl -X POST \\
+              -H \"Authorization: token \$GITHUB_TOKEN\" \\
+              -H \"Content-Type: application/json\" \\
+              -d @/tmp/faculty-comment.json \\
+              \"https://api.github.com/repos/\${{ github.repository }}/issues/\${{ github.event.issue.number }}/comments\"
+          fi
+
+      - name: Award Faculty Badges
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Only run for advisor role to avoid duplicate badge evaluations
+          if [ "${{ matrix.faculty }}" = "advisor" ]; then
+            echo "🏆 Evaluating faculty badges..."
+            
+            ADVISOR_FILE=""
+            ORACLE_FILE=""
+            
+            if [ -f "out/cid/advisor-report.json" ]; then
+              ADVISOR_FILE="--advisor=out/cid/advisor-report.json"
+            fi
+            
+            if [ -f "out/cid/oracle-report.json" ]; then
+              ORACLE_FILE="--oracle=out/cid/oracle-report.json"
+            fi
+            
+            # Use enhanced faculty badge system
+            node scripts/cid-faculty/faculty-badges.js \
+              $ADVISOR_FILE $ORACLE_FILE \
+              --issue=${{ github.event.issue.number }}
+          fi
+
+      - name: Upload Faculty Artifacts
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cid-faculty-${{ matrix.faculty }}-artifacts
+          path: |
+            out/cid/${{ matrix.faculty }}-report.json
+            out/cid/cache/**
+            TLDL/entries/*${{ matrix.faculty }}*.md
+
+      - name: Clean Up Cache (Maintenance)
+        if: steps.role_filter.outputs.should_run == 'true'
+        run: |
+          # Clean old cache files to prevent storage bloat
+          node scripts/cid-faculty/shared/context-cache.js cleanup

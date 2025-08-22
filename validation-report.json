@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-08-06T17:35:08.178867",
+  "summary": {
+    "total_systems": 0,
+    "domains": {},
+    "average_health_score": 0,
+    "total_issues": 0,
+    "total_strengths": 0
+  },
+  "systems": [],
+  "detailed_validations": [],
+  "component_usage": {},
+  "dependency_graph": {}
+}

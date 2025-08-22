@@ -1,0 +1,160 @@
+#!/usr/bin/env bash
+#
+# Scroll Quote CLI - Easy access to the Secret Art of the Living Dev
+#
+# Usage examples:
+#   ./lda-quote                     # Random quote
+#   ./lda-quote --context readme   # Context-appropriate quote
+#   ./lda-quote --buttsafe          # Buttsafe certified quote
+#   ./lda-quote --markdown          # Markdown formatted quote
+#
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Default values
+CONTEXT=""
+CATEGORY=""
+FORMAT="cli"
+BUTTSAFE_ONLY=false
+
+# Colors
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# ---------- Python bootstrap (cross-platform, non-interactive) ----------
+command_exists() { command -v "$1" >/dev/null 2>&1; }
+
+create_python3_shim_if_needed() {
+  if command_exists python && ! command_exists python3; then
+    mkdir -p "$PROJECT_ROOT/.bin"
+    cat > "$PROJECT_ROOT/.bin/python3" <<'EOF'
+#!/usr/bin/env bash
+exec python "$@"
+EOF
+    chmod +x "$PROJECT_ROOT/.bin/python3"
+    export PATH="$PROJECT_ROOT/.bin:$PATH"
+  fi
+}
+
+ensure_python() {
+  if command_exists python3 || command_exists python; then
+    create_python3_shim_if_needed
+    return 0
+  fi
+  return 1
+}
+
+ensure_python || true
+PY=$(command -v python3 || command -v python || echo "")
+export PY
+# ---------- end Python bootstrap ----------
+
+show_help() {
+    echo "🪶 Scroll Quote CLI - Access the Secret Art of the Living Dev"
+    echo ""
+    echo "Usage: $0 [options]"
+    echo ""
+    echo "Options:"
+    echo "  --context <context>     Get quote for specific context (readme, tldl, ci, etc.)"
+    echo "  --category <category>   Get quote from specific category"
+    echo "                         (general, development, debugging, documentation, commits,"
+    echo "                          ci_cd, buttsafe, workflow, lore)"
+    echo "  --format <format>       Output format: cli, markdown, plain (default: cli)"
+    echo "  --buttsafe             Only show buttsafe certified quotes"
+    echo "  --stats                Show database statistics"
+    echo "  --validate             Validate quote database"
+    echo "  --help, -h             Show this help"
+    echo ""
+    echo "Examples:"
+    echo "  $0                                    # Random quote"
+    echo "  $0 --context readme                  # Quote for README"
+    echo "  $0 --category buttsafe --markdown    # Buttsafe quote in markdown"
+    echo "  $0 --stats                          # Show quote statistics"
+    echo ""
+    echo "🍑 Part of the Living Dev Agent ecosystem - Save the butts!"
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --context)
+            CONTEXT="$2"
+            shift 2
+            ;;
+        --category)
+            CATEGORY="$2"
+            shift 2
+            ;;
+        --format)
+            FORMAT="$2"
+            shift 2
+            ;;
+        --buttsafe)
+            BUTTSAFE_ONLY=true
+            shift
+            ;;
+        --stats)
+            if [[ -z "$PY" ]]; then
+              echo -e "${YELLOW}⚠️  Python not available. Cannot access the Secret Art.${NC}"
+              exit 1
+            fi
+            "$PY" "$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py" --stats
+            exit 0
+            ;;
+        --validate)
+            if [[ -z "$PY" ]]; then
+              echo -e "${YELLOW}⚠️  Python not available. Cannot access the Secret Art.${NC}"
+              exit 1
+            fi
+            "$PY" "$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py" --validate
+            exit 0
+            ;;
+        --help|-h)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo -e "${YELLOW}⚠️  Unknown option: $1${NC}"
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
+# Apply buttsafe-only preference by defaulting category when not set
+if [[ "$BUTTSAFE_ONLY" == true && -z "$CATEGORY" ]]; then
+    CATEGORY="buttsafe"
+fi
+
+# Check if Python and quote engine are available
+if [[ -z "$PY" ]] || ! command -v "$PY" &> /dev/null; then
+    echo -e "${YELLOW}⚠️  Python not available. Cannot access the Secret Art.${NC}"
+    exit 1
+fi
+
+if [[ ! -f "$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py" ]]; then
+    echo -e "${YELLOW}⚠️  Quote engine not found. The scrolls may be missing.${NC}"
+    exit 1
+fi
+
+# Build the command
+CMD="\"$PY\" $PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py"
+
+if [[ -n "$CONTEXT" ]]; then
+    CMD="$CMD --context '$CONTEXT'"
+fi
+
+if [[ -n "$CATEGORY" ]]; then
+    CMD="$CMD --category '$CATEGORY'"
+fi
+
+if [[ "$FORMAT" != "cli" ]]; then
+    CMD="$CMD --format '$FORMAT'"
+fi
+
+# Execute the command
+eval "$CMD"

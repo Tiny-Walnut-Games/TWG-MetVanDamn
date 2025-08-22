@@ -1,0 +1,60 @@
+# Living Dev Agent Profile Configuration
+# Defines agent behavior, preferences, and pipeline compatibility
+
+name: validator
+description: "Default validation-focused agent profile"
+version: "1.0.0"
+
+# Agent behavioral settings
+behavior:
+  tone: friendly
+  detail_level: comprehensive
+  communication_style: professional
+
+# Unity pipeline preferences (BRP, URP, SRP, HDRP)
+pipeline_preferences:
+  - URP  # Universal Render Pipeline (preferred)
+  - HDRP # High Definition Render Pipeline
+  - BRP  # Built-in Render Pipeline
+  - SRP  # Scriptable Render Pipeline (custom)
+
+# Development flags and preferences
+flags:
+  dry_run: true
+  context: true
+  snapshot_id: false
+  verbose: false
+  
+# Validation preferences
+validation:
+  enabled: true
+  auto_run: true
+  strict_mode: false
+  
+# CI/CD integration settings
+ci_integration:
+  auto_snapshot: true
+  validate_on_commit: true
+  generate_reports: true
+  
+# IDE integration preferences
+ide_support:
+  vscode: true
+  rider: true
+  jetbrains: true
+  omnisharp: true
+  
+# Tagging and context settings
+tagging:
+  auto_tag: true
+  context_aware: true
+  conventions:
+    - "#LDA:context"
+    - "#LDA:snapshot"
+    - "#LDA:validation"
+    
+# CLI tool preferences
+cli:
+  auto_complete: true
+  rich_help: true
+  context_hints: true

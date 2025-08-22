@@ -1,0 +1,659 @@
+name: Chronicle Keeper - TLDL Scribe System
+
+on:
+  issues:
+    types: [opened, closed, edited]
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened, closed, synchronize]
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Living Dev Agent CI"]
+    types: [completed]
+  schedule:
+    # Daily at 6 AM UTC to ensure fresh ledger for the day
+    - cron: '0 6 * * *'
+
+jobs:
+  # 🧙‍♂️ Explain when Chronicle Keeper is dormant (runs when the main job is skipped)
+  chronicle-keeper-skip-explain:
+    runs-on: ubuntu-latest
+    name: Chronicle Keeper - Why the Scribe Slumbers
+    # Only run when Chronicle Keeper would be skipped
+    if: >
+      !((github.event_name == 'issues' && (contains(github.event.issue.title, '🧠') || contains(github.event.issue.title, '🧠📜'))) ||
+      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, 'TLDL:') || contains(github.event.comment.body, '📜') || contains(github.event.comment.body, 'chronicle') || contains(github.event.comment.body, 'lore'))) ||
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success') ||
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'schedule'))
+    
+    steps:
+      - name: 🛡️ Chronicle Keeper Dormancy Explanation
+        run: |
+          echo "📜 CHRONICLE KEEPER STATUS: DORMANT"
+          echo ""
+          echo "🧙‍♂️ The Chronicle Keeper slumbers, preserving the cheeks from spam."
+          echo "⚡ This mystical scribe only awakens for truly lore-worthy events:"
+          echo ""
+          echo "🧠 Brain Emoji Issues: '${{ github.event_name }}' ≠ issues with 🧠"
+          echo "💬 Lore Comments: No sacred keywords detected (TLDL:, 📜, chronicle, lore)" 
+          echo "🔀 Merged PRs: '${{ github.event_name }}' ≠ merged pull_request"
+          echo "💥 Failed Workflows: '${{ github.event_name }}' ≠ failed workflow_run"
+          echo ""
+          echo "🎯 Current Event: ${{ github.event_name }}"
+          echo "📋 Action: ${{ github.event.action || 'N/A' }}"
+          echo ""
+          echo "✨ The scribe awaits worthy tales to chronicle."
+          echo "🙌 All hail the Cheeks! This skip prevents notification spam."
+
+  # 📜 Parse and generate TLDL entries for lore-worthy content 
+  chronicle-keeper:
+    runs-on: ubuntu-latest
+    name: Chronicle Keeper - Preserve the Lore
+    # Run for lore-worthy events or manual dispatch
+    if: >
+      (github.event_name == 'issues' && (contains(github.event.issue.title, '🧠') || contains(github.event.issue.title, '🧠📜'))) ||
+      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, 'TLDL:') || contains(github.event.comment.body, '📜') || contains(github.event.comment.body, 'chronicle') || contains(github.event.comment.body, 'lore'))) ||
+      (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success') ||
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'schedule')
+    
+    steps:
+      - name: 🧙‍♂️ Summon the Repository
+        uses: actions/checkout@v4
+        with:
+          # Need write access to create TLDL entries
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🐍 Prepare the Scrolls (Setup Python)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🟢 Prepare the Chronicles (Setup Node.js)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Gather Dependencies  
+        run: |
+          # Python dependencies for ScrollQuoteEngine
+          python -m pip install --upgrade pip
+          pip install PyYAML argparse || echo "⚠️ Some dependencies may already be available"
+          
+          # 🔒 Node.js dependencies with pinned versions (addresses issue #50)
+          npm install js-yaml@^4.1.0 || { echo "⚠️ js-yaml installation failed: $?"; echo "⚠️ js-yaml installation attempted"; }
+          
+          # 🔒 Install pinned @playwright/mcp version (addresses issue #50)
+          if [ -f "package.json" ]; then
+            npm install || echo "⚠️ Package installation issues detected"
+          fi
+          
+          # 🕒 Add startup buffer for MCP connection stability (addresses issue #50)
+          echo "🕒 Adding startup buffer for MCP server stability..."
+          sleep 2
+
+      - name: 🔍 Chronicle Keeper Analysis
+        id: parse-content
+        run: |
+          set -Eeuo pipefail
+          trap 'echo "💥 Script failure near line $LINENO"' ERR
+
+          echo "🧠 Chronicle Keeper awakening..."
+          echo "Event: ${{ github.event_name }}"
+          echo "Action: ${{ github.event.action }}"
+          
+          # 🏷️ Centralized function for generating labels JSON
+          generate_labels_json() {
+            case "$1" in
+              "github_event")
+                # Transform GitHub event labels to standard format
+                echo "$2" | jq '[.[] | {name: .name}]'
+                ;;
+              "manual_dispatch")
+                # Static labels for manual dispatch
+                jq -n '[{name:"brain-dump"},{name:"manual-dispatch"}]'
+                ;;
+              "fallback")
+                # Static labels for fallback scenarios
+                jq -n '[{name:"fallback"}]'
+                ;;
+              *)
+                echo "❌ Unknown label type: $1" >&2
+                return 1
+                ;;
+            esac
+          }
+          
+          PARSE_RESULT="null"
+          
+          if [[ "${{ github.event_name }}" == "issues" ]]; then
+            echo "📋 Parsing issue #${{ github.event.issue.number }}"
+
+            ISSUE_NUMBER=${{ github.event.issue.number }}
+            ISSUE_TITLE_JSON='${{ toJson(github.event.issue.title) }}'
+            ISSUE_BODY_JSON='${{ toJson(github.event.issue.body) }}'
+            ISSUE_USER_LOGIN_JSON='${{ toJson(github.event.issue.user.login) }}'
+            ISSUE_CREATED_AT_JSON='${{ toJson(github.event.issue.created_at) }}'
+            ISSUE_UPDATED_AT_JSON='${{ toJson(github.event.issue.updated_at) }}'
+            ISSUE_STATE_JSON='${{ toJson(github.event.issue.state) }}'
+            ISSUE_HTML_URL_JSON='${{ toJson(github.event.issue.html_url) }}'
+            
+            # Write labels JSON to temp file to avoid shell syntax issues with multiline JSON
+            echo '${{ toJson(github.event.issue.labels) }}' > /tmp/labels.json
+            LABELS_JSON=$(generate_labels_json "github_event" "$(cat /tmp/labels.json)")
+
+            jq -n --argjson number "$ISSUE_NUMBER" --argjson title "$ISSUE_TITLE_JSON" --argjson body "$ISSUE_BODY_JSON" --argjson user_login "$ISSUE_USER_LOGIN_JSON" --argjson created_at "$ISSUE_CREATED_AT_JSON" --argjson updated_at "$ISSUE_UPDATED_AT_JSON" --argjson state "$ISSUE_STATE_JSON" --argjson labels "$LABELS_JSON" --argjson html_url "$ISSUE_HTML_URL_JSON" '{ number: $number, title: $title, body: $body, user: {login: $user_login}, created_at: $created_at, updated_at: $updated_at, state: $state, labels: $labels, html_url: $html_url }' > /tmp/github-content.json
+
+            PARSE_RESULT="issue"
+          fi
+          
+          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+            echo "💬 Parsing comment on issue #${{ github.event.issue.number }}"
+
+            COMMENT_ID=${{ github.event.comment.id }}
+            COMMENT_BODY_JSON='${{ toJson(github.event.comment.body) }}'
+            COMMENT_USER_LOGIN_JSON='${{ toJson(github.event.comment.user.login) }}'
+            COMMENT_CREATED_AT_JSON='${{ toJson(github.event.comment.created_at) }}'
+            COMMENT_UPDATED_AT_JSON='${{ toJson(github.event.comment.updated_at) }}'
+            COMMENT_HTML_URL_JSON='${{ toJson(github.event.comment.html_url) }}'
+            ISSUE_URL_JSON='${{ toJson(github.event.issue.url) }}'
+
+            jq -n --argjson id "$COMMENT_ID" --argjson body "$COMMENT_BODY_JSON" --argjson user_login "$COMMENT_USER_LOGIN_JSON" --argjson created_at "$COMMENT_CREATED_AT_JSON" --argjson updated_at "$COMMENT_UPDATED_AT_JSON" --argjson html_url "$COMMENT_HTML_URL_JSON" --argjson issue_url "$ISSUE_URL_JSON" '{ id: $id, body: $body, user: {login: $user_login}, created_at: $created_at, updated_at: $updated_at, html_url: $html_url, issue_url: $issue_url }' > /tmp/github-content.json
+
+            PARSE_RESULT="comment"
+          fi
+          
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "🔀 Parsing pull request #${{ github.event.pull_request.number }}"
+
+            PR_NUMBER=${{ github.event.pull_request.number }}
+            PR_TITLE_JSON='${{ toJson(github.event.pull_request.title) }}'
+            PR_BODY_JSON='${{ toJson(github.event.pull_request.body) }}'
+            PR_USER_LOGIN_JSON='${{ toJson(github.event.pull_request.user.login) }}'
+            PR_CREATED_AT_JSON='${{ toJson(github.event.pull_request.created_at) }}'
+            PR_UPDATED_AT_JSON='${{ toJson(github.event.pull_request.updated_at) }}'
+            PR_MERGED_AT_JSON='${{ toJson(github.event.pull_request.merged_at) }}'
+            PR_STATE_JSON='${{ toJson(github.event.pull_request.state) }}'
+            PR_MERGED_JSON='${{ toJson(github.event.pull_request.merged) }}'
+            PR_BASE_REF_JSON='${{ toJson(github.event.pull_request.base.ref) }}'
+            PR_HEAD_REF_JSON='${{ toJson(github.event.pull_request.head.ref) }}'
+            PR_HTML_URL_JSON='${{ toJson(github.event.pull_request.html_url) }}'
+            PR_COMMITS=${{ github.event.pull_request.commits }}
+            PR_ADDITIONS=${{ github.event.pull_request.additions }}
+            PR_DELETIONS=${{ github.event.pull_request.deletions }}
+            PR_CHANGED_FILES=${{ github.event.pull_request.changed_files }}
+            
+            # Write labels JSON to temp file to avoid shell syntax issues with multiline JSON
+            echo '${{ toJson(github.event.pull_request.labels) }}' > /tmp/pr-labels.json
+            LABELS_JSON=$(generate_labels_json "github_event" "$(cat /tmp/pr-labels.json)")
+
+            echo '${{ toJson(github.event.pull_request.body) }}' > /tmp/pr-body.json
+            PR_BODY_JSON=$(cat /tmp/pr-body.json)
+
+            PARSE_RESULT="pull_request"
+          fi
+          
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            echo "⚙️ Parsing workflow run"
+
+            WR_ID=${{ github.event.workflow_run.id }}
+            WR_NAME_JSON='${{ toJson(github.event.workflow_run.name) }}'
+            WR_STATUS_JSON='${{ toJson(github.event.workflow_run.status) }}'
+            WR_CONCLUSION_JSON='${{ toJson(github.event.workflow_run.conclusion) }}'
+            WR_CREATED_AT_JSON='${{ toJson(github.event.workflow_run.created_at) }}'
+            WR_UPDATED_AT_JSON='${{ toJson(github.event.workflow_run.updated_at) }}'
+            WR_HEAD_BRANCH_JSON='${{ toJson(github.event.workflow_run.head_branch) }}'
+            WR_HEAD_SHA_JSON='${{ toJson(github.event.workflow_run.head_sha) }}'
+            WR_HTML_URL_JSON='${{ toJson(github.event.workflow_run.html_url) }}'
+            WR_RUN_NUMBER=${{ github.event.workflow_run.run_number }}
+
+            jq -n --argjson id "$WR_ID" --argjson name "$WR_NAME_JSON" --argjson status "$WR_STATUS_JSON" --argjson conclusion "$WR_CONCLUSION_JSON" --argjson created_at "$WR_CREATED_AT_JSON" --argjson updated_at "$WR_UPDATED_AT_JSON" --argjson head_branch "$WR_HEAD_BRANCH_JSON" --argjson head_sha "$WR_HEAD_SHA_JSON" --argjson html_url "$WR_HTML_URL_JSON" --argjson run_number "$WR_RUN_NUMBER" '{ id: $id, name: $name, status: $status, conclusion: $conclusion, created_at: $created_at, updated_at: $updated_at, head_branch: $head_branch, head_sha: $head_sha, html_url: $html_url, run_number: $run_number }' > /tmp/github-content.json
+
+            PARSE_RESULT="workflow_run"
+          fi
+          
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "🧠 Manual dispatch detected - creating brain dump entry"
+
+            echo "📋 Full GitHub event payload:"
+            cat "$GITHUB_EVENT_PATH" | jq . > /tmp/github-event.json || echo "{}" > /tmp/github-event.json
+            cat /tmp/github-event.json
+
+            MANUAL_DISPATCH_ID="MD$(date +%s)"
+            NOW_TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            TITLE_TEXT="Manual Chronicle Keeper Invocation"
+            BODY_TEXT="Manual dispatch test entry"
+            MD_HTML_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            LABELS_JSON=$(generate_labels_json "manual_dispatch")
+
+
+            jq -n --arg type "manual_dispatch" --arg number "$MANUAL_DISPATCH_ID" --arg title "$TITLE_TEXT" --arg body "$BODY_TEXT" --arg user_login "chronicle-keeper" --arg created_at "$NOW_TS" --arg updated_at "$NOW_TS" --arg state "manual" --arg html_url "$MD_HTML_URL" --argjson labels "$LABELS_JSON" '{ type: $type, number: $number, title: $title, body: $body, user: {login: $user_login}, created_at: $created_at, updated_at: $updated_at, state: $state, labels: $labels, html_url: $html_url }' > /tmp/github-content.json
+
+
+            jq -n --arg type "manual_dispatch" --arg number "$MANUAL_DISPATCH_ID" --arg title "$TITLE_TEXT" --arg body "$BODY_TEXT" --arg user_login "chronicle-keeper" --arg created_at "$NOW_TS" --arg updated_at "$NOW_TS" --arg state "manual" --arg html_url "$MD_HTML_URL" --argjson labels '[{"name":"brain-dump"},{"name":"manual-dispatch"}]' '{ type: $type, number: $number, title: $title, body: $body, user: {login: $user_login}, created_at: $created_at, updated_at: $updated_at, state: $state, labels: $labels, html_url: $html_url }' > /tmp/github-content.json
+            PARSE_RESULT="brain_dump"
+          fi
+          
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "⏰ Scheduled daily ledger generation detected"
+
+            echo "📋 Full GitHub event payload:"
+            cat "$GITHUB_EVENT_PATH" | jq . > /tmp/github-event.json || echo "{}" > /tmp/github-event.json
+            cat /tmp/github-event.json
+
+            SCHEDULE_ID="SCH$(date +%s)"
+            NOW_TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            TITLE_TEXT="Daily Chronicle Keeper - Scheduled Ledger Generation"
+            BODY_TEXT="Scheduled daily ledger entry for $(date +%Y-%m-%d)"
+            LABELS_JSON=$(generate_labels_json "manual_dispatch")
+            
+            SCH_HTML_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+            jq -n --arg type "scheduled_ledger" --arg number "$SCHEDULE_ID" --arg title "$TITLE_TEXT" --arg body "$BODY_TEXT" --arg user_login "chronicle-keeper" --arg created_at "$NOW_TS" --arg updated_at "$NOW_TS" --arg state "scheduled" --arg html_url "$SCH_HTML_URL" --argjson labels '[{"name":"daily-ledger"},{"name":"scheduled"}]' '{ type: $type, number: $number, title: $title, body: $body, user: {login: $user_login}, created_at: $created_at, updated_at: $updated_at, state: $state, labels: $labels, html_url: $html_url }' > /tmp/github-content.json
+            PARSE_RESULT="scheduled_ledger"
+          fi
+          
+            echo "⚠️ No specific event matched. Defaulting to 'brain_dump'."
+
+            FALLBACK_ID="FB$(date +%s)"
+            NOW_TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            TITLE_TEXT="Chronicle Keeper Fallback Entry"
+            BODY_TEXT="Fallback entry"
+            LABELS_JSON=$(generate_labels_json "fallback")
+
+            FB_HTML_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+            jq -n --arg type "fallback" --arg number "$FALLBACK_ID" --arg title "$TITLE_TEXT" --arg body "$BODY_TEXT" --arg user_login "chronicle-keeper" --arg created_at "$NOW_TS" --arg updated_at "$NOW_TS" --arg state "fallback" --arg html_url "$FB_HTML_URL" --argjson labels "$LABELS_JSON" '{ type: $type, number: $number, title: $title, body: $body, user: {login: $user_login}, created_at: $created_at, updated_at: $updated_at, state: $state, labels: $labels, html_url: $html_url }' > /tmp/github-content.json
+
+            PARSE_RESULT="brain_dump"
+          fi
+
+          echo "content-type=$PARSE_RESULT" >> "$GITHUB_OUTPUT"
+          echo "📋 Content to parse:"
+          cat /tmp/github-content.json | jq .
+
+      - name: 🧪 Chronicle Keeper Parsing
+        id: scribe-parse
+        if: steps.parse-content.outputs.content-type != 'null'
+        run: |
+          # Test the scribe parser with actual content
+          echo "🔍 Running Chronicle Keeper parser..."
+          
+          cd scripts/chronicle-keeper
+          
+          # Create a test script to use our JSON content
+          cat > test-parse.js <<'EOF'
+          const fs = require('fs');
+          const ScribeParser = require('./scribe-parser.js');
+          
+          try {
+            const contentData = JSON.parse(fs.readFileSync('/tmp/github-content.json', 'utf8'));
+            const parser = new ScribeParser();
+          
+            let result;
+            if (contentData.number && !contentData.pull_request && !contentData.base) {
+              // Issue
+              result = parser.parseIssue(contentData);
+            } else if (contentData.number && contentData.base) {
+              // Pull Request  
+              result = parser.parsePullRequest(contentData);
+            } else if (contentData.issue_url) {
+              // Comment
+              result = parser.parseComment(contentData);
+            } else if (contentData.workflow_id !== undefined || contentData.name) {
+              // Workflow run
+              result = parser.parseWorkflowRun(contentData);
+            } else if (contentData.type === 'manual_dispatch' || contentData.type === 'fallback' || contentData.type === 'scheduled_ledger') {
+              // Manual dispatch, fallback, or scheduled ledger - treat as special issue
+              console.log('🧠 Processing manual dispatch/fallback/scheduled content');
+              result = parser.parseIssue(contentData);
+              // Use the new forceAsLoreWorthy method to properly increment stats
+              if (result) {
+                result = parser.forceAsLoreWorthy(result);
+              }
+            }
+          
+            if (result && result.lore_worthy) {
+              console.log('✅ Content is lore-worthy!');
+              console.log('📊 Parse stats:', JSON.stringify(parser.getStats()));
+          
+              // Write result for next step
+              fs.writeFileSync('/tmp/parsed-content.json', JSON.stringify(result, null, 2));
+              process.exit(0);
+            } else {
+              console.log('ℹ️ Content not lore-worthy, skipping TLDL generation');
+              process.exit(78); // Skip remaining steps
+            }
+          } catch (error) {
+            console.error('❌ Parsing error:', error.message);
+            process.exit(1);
+          }
+          EOF
+          
+          # Run the parser          
+          if node test-parse.js; then
+            echo "parse-success=true" >> $GITHUB_OUTPUT
+          else
+            echo "parse-success=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📜 Generate TLDL Scroll
+        id: generate-scroll
+        if: steps.scribe-parse.outputs.parse-success == 'true'
+        run: |
+          echo "📜 Generating TLDL scroll..."
+          
+          cd scripts/chronicle-keeper
+          
+          # Create scroll generation script
+          cat > generate-scroll.js <<'EOF'
+          const fs = require('fs');
+          const ScrollGenerator = require('./scroll-generator.js');
+          
+          try {
+            const parsedContent = JSON.parse(fs.readFileSync('/tmp/parsed-content.json', 'utf8'));
+            const generator = new ScrollGenerator();
+          
+            const scroll = generator.generateScrollEntry(parsedContent);
+          
+            console.log('📜 Generated scroll:', scroll.filename);
+          
+            // Write scroll data for the writer (properly escaped)
+            const scrollData = {
+              filename: scroll.filename,
+              content: scroll.content,
+              metadata: scroll.metadata
+            };
+            fs.writeFileSync('/tmp/scroll-entry.json', JSON.stringify(scrollData, null, 2));
+          
+            console.log('📊 Generation stats:', JSON.stringify(generator.getStats()));
+          } catch (error) {
+            console.error('❌ Scroll generation error:', error.message);
+            process.exit(1);
+          }
+          EOF
+          
+          node generate-scroll.js
+          
+          echo "scroll-generated=true" >> $GITHUB_OUTPUT
+
+      - name: 🧠📜 Generate Capsule Scroll (Archive Wall Detection)
+        id: generate-capsule-scroll
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' && contains(github.event.issue.title, '🧠📜')
+        run: |
+          echo "🧠📜 Archive Wall detected! Generating Capsule Scroll..."
+          
+          cd scripts/chronicle-keeper
+          
+          # Create capsule scroll generation script
+          cat > generate-capsule-scroll.js <<'EOF'
+          const fs = require('fs');
+          const CapsuleScrollGenerator = require('./capsule-scroll-generator.js');
+          
+          try {
+            const parsedContent = JSON.parse(fs.readFileSync('/tmp/parsed-content.json', 'utf8'));
+            const generator = new CapsuleScrollGenerator();
+          
+            const result = generator.generateCapsuleScroll(parsedContent);
+          
+            if (result.success) {
+              console.log('🧠📜 Generated Capsule Scroll:', result.filename);
+              console.log('📊 Capsule stats:', JSON.stringify(result.stats));
+              
+              // Write result data for potential linking to TLDL
+              const capsuleData = {
+                filename: result.filename,
+                scrollType: result.scrollType,
+                success: true,
+                stats: result.stats
+              };
+              fs.writeFileSync('/tmp/capsule-result.json', JSON.stringify(capsuleData, null, 2));
+              
+            } else {
+              console.error('❌ Capsule Scroll generation failed:', result.error);
+              process.exit(1);
+            }
+          } catch (error) {
+            console.error('❌ Capsule Scroll generation error:', error.message);
+            process.exit(1);
+          (async () => {
+            try {
+              const parsedContent = JSON.parse(fs.readFileSync('/tmp/parsed-content.json', 'utf8'));
+              const generator = new CapsuleScrollGenerator();
+              const result = await generator.generateCapsuleScroll(parsedContent);
+          
+              if (result.success) {
+                console.log('🧠📜 Generated Capsule Scroll:', result.filename);
+                console.log('📊 Capsule stats:', JSON.stringify(result.stats));
+                
+                // Write result data for potential linking to TLDL
+                const capsuleData = {
+                  filename: result.filename,
+                  scrollType: result.scrollType,
+                  success: true,
+                  stats: result.stats
+                };
+                fs.writeFileSync('/tmp/capsule-result.json', JSON.stringify(capsuleData, null, 2));
+                
+              } else {
+                console.error('❌ Capsule Scroll generation failed:', result.error);
+                process.exit(1);
+              }
+            } catch (error) {
+              console.error('❌ Capsule Scroll generation error:', error.message);
+              process.exit(1);
+            }
+          })();
+          EOF
+          
+          node generate-capsule-scroll.js
+          
+          echo "capsule-generated=true" >> $GITHUB_OUTPUT
+
+      - name: ✍️ Write TLDL Entry
+        if: steps.generate-scroll.outputs.scroll-generated == 'true'
+        run: |
+          echo "✍️ Writing TLDL entry to chronicle..."
+          
+          # Use the TLDL writer to save the entry
+          ./scripts/chronicle-keeper/tldl-writer.sh write /tmp/scroll-entry.json --verbose
+          
+          echo "📊 Chronicle statistics:"
+          ./scripts/chronicle-keeper/tldl-writer.sh stats || true
+
+      # 🧠 Daily Ledger Generator — Keeper‑plus Ritual
+      # Generates a new ledger from /docs/daily-ledger/_TEMPLATE.md
+      # Purpose: Preserve daily arc context, decisions, and glyphs for continuity.
+      # Usage: Fill each section before day's end. Use Re‑entry Spell to reload tone/context in new thread.
+      # Links: Backward/forward to previous/next ledger to maintain unbroken chain.
+      - name: 📓 Generate Daily Ledger Entry
+        id: generate-daily-ledger
+        if: steps.generate-scroll.outputs.scroll-generated == 'true'
+        run: |
+          echo "📓 Generating Daily Ledger entry..."
+          
+          # Parse the TLDL content to extract arc information
+          if [[ -f /tmp/parsed-content.json ]]; then
+            # Try to extract meaningful arc name from the content
+            ARC_NAME=""
+            
+            # Check if it's from an issue with 🧠 
+            if [[ "${{ github.event_name }}" == "issues" && "${{ contains(github.event.issue.title, '🧠') }}" == "true" ]]; then
+              # Extract arc name from issue title, removing 🧠 and cleaning up
+              ARC_NAME=$(echo '${{ github.event.issue.title }}' | sed 's/🧠//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | cut -c1-50)
+              echo "📋 Extracted arc from issue: $ARC_NAME"
+            elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              # Extract arc name from PR title
+              ARC_NAME=$(echo '${{ github.event.pull_request.title }}' | cut -c1-50)
+              echo "🔀 Extracted arc from PR: $ARC_NAME"
+            elif [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+              # Use a generic name for comments
+              ARC_NAME="Lore Commentary Arc"
+              echo "💬 Using generic arc for comment"
+            elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+              # For scheduled events, use a daily development arc
+              ARC_NAME="Daily Development Arc"
+              echo "⏰ Using scheduled daily arc"
+            else
+              # Fallback to daily development arc
+              ARC_NAME="Chronicle Keeper Arc"
+              echo "📜 Using default Chronicle Keeper arc"
+            fi
+            
+            # Ensure we have some arc name
+            if [[ -z "$ARC_NAME" ]]; then
+              ARC_NAME="Daily Development Arc"
+            fi
+            
+            echo "🎯 Final arc name: $ARC_NAME"
+            
+            # Generate today's ledger entry (will check if it already exists)
+            chmod +x scripts/chronicle-keeper/daily-ledger-generator.sh
+            if scripts/chronicle-keeper/daily-ledger-generator.sh today "$ARC_NAME" --verbose; then
+              echo "ledger-generated=true" >> $GITHUB_OUTPUT
+              log_success "Daily Ledger entry generated successfully"
+            else
+              echo "ledger-generated=false" >> $GITHUB_OUTPUT
+              echo "ℹ️ Daily Ledger entry may already exist for today"
+            fi
+          else
+            echo "⚠️ No parsed content available, skipping Daily Ledger generation"
+            echo "ledger-generated=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Special Daily Ledger generation for scheduled events (runs even without TLDL)
+      - name: 📓 Scheduled Daily Ledger Generation
+        id: scheduled-daily-ledger
+        if: github.event_name == 'schedule'
+        run: |
+          echo "⏰ Scheduled Daily Ledger generation..."
+          
+          ARC_NAME="Daily Development Arc"
+          
+          # Try to determine what kind of arc we're in based on recent activity
+          # Look at recent commits, issues, or PRs to infer current development focus
+          if command -v gh >/dev/null 2>&1; then
+            # Try to get recent activity context if gh CLI is available
+            echo "🔍 Attempting to infer current development arc from recent activity..."
+            
+            # Get most recent merged PR or issue
+            RECENT_CONTEXT=$(gh pr list --state merged --limit 1 --json title --jq '.[0].title' 2>/dev/null || \
+                           gh issue list --state open --limit 1 --json title --jq '.[0].title' 2>/dev/null || \
+                           echo "")
+                           
+            if [[ -n "$RECENT_CONTEXT" && "$RECENT_CONTEXT" != "null" ]]; then
+              ARC_NAME=$(echo "$RECENT_CONTEXT" | cut -c1-50)
+              echo "📈 Inferred arc from recent activity: $ARC_NAME"
+            fi
+          fi
+          
+          echo "🎯 Using arc name: $ARC_NAME"
+          
+          # Generate today's ledger entry (will use --force to ensure creation for scheduled runs)
+          chmod +x scripts/chronicle-keeper/daily-ledger-generator.sh
+          if scripts/chronicle-keeper/daily-ledger-generator.sh today "$ARC_NAME" --verbose || \
+             scripts/chronicle-keeper/daily-ledger-generator.sh today "$ARC_NAME" --force --verbose; then
+            echo "scheduled-ledger-generated=true" >> $GITHUB_OUTPUT
+            echo "✅ Scheduled Daily Ledger entry generated or updated"
+          else
+            echo "scheduled-ledger-generated=false" >> $GITHUB_OUTPUT
+          OUTPUT=$(scripts/chronicle-keeper/daily-ledger-generator.sh today "$ARC_NAME" --verbose 2>&1)
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -eq 0 ]; then
+            echo "scheduled-ledger-generated=true" >> $GITHUB_OUTPUT
+            echo "✅ Scheduled Daily Ledger entry generated or updated"
+          elif echo "$OUTPUT" | grep -qi "already exists"; then
+            # Only retry with --force if the error is about file existence
+            if scripts/chronicle-keeper/daily-ledger-generator.sh today "$ARC_NAME" --force --verbose; then
+              echo "scheduled-ledger-generated=true" >> $GITHUB_OUTPUT
+              echo "✅ Scheduled Daily Ledger entry generated or updated (forced)"
+            else
+              echo "scheduled-ledger-generated=false" >> $GITHUB_OUTPUT
+              echo "❌ Failed to generate scheduled Daily Ledger entry (even with --force)"
+            fi
+          else
+            echo "scheduled-ledger-generated=false" >> $GITHUB_OUTPUT
+            echo "❌ Failed to generate scheduled Daily Ledger entry"
+            echo "$OUTPUT"
+          fi
+
+      - name: 🛡️ Validate TLDL Chronicle
+        if: steps.generate-scroll.outputs.scroll-generated == 'true'
+        run: |
+          echo "🛡️ Validating TLDL chronicle..."
+          
+          # Run TLDL validation
+          ./scripts/chronicle-keeper/tldl-writer.sh validate --verbose || echo "⚠️ TLDL validation issues detected"
+          
+          # Run existing validation if available
+          if [[ -f src/SymbolicLinter/validate_docs.py ]]; then
+            python3 src/SymbolicLinter/validate_docs.py --tldl-path TLDL/ || echo "⚠️ Some validation issues detected"
+          fi
+          
+          # 🔒 Validate MCP configuration for security compliance (addresses issue #50)
+          if [[ -f scripts/validate_mcp_config.py ]]; then
+            echo "🔒 Validating MCP security configuration..."
+            python3 scripts/validate_mcp_config.py || echo "⚠️ MCP configuration issues detected"
+          fi
+
+      - name: 📦 Upload Generated TLDL as Artifact
+        if: steps.generate-scroll.outputs.scroll-generated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: chronicle-keeper-tldl-entry
+          path: |
+            TLDL/entries/*.md
+            TLDL/index.md
+            docs/daily-ledger/*.md
+            /tmp/scroll-entry.json
+          retention-days: 30
+
+      - name: 📤 Commit TLDL Chronicle
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' || steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "📜 Chronicle Keeper: Auto-generated TLDL entry and Daily Ledger"
+          commit_author: "Chronicle Keeper <chronicle-keeper@living-dev-agent.local>"
+          file_pattern: "TLDL/** docs/daily-ledger/**"
+          skip_dirty_check: false
+
+      - name: 🧠📜 Commit Capsule Scroll
+        if: steps.generate-capsule-scroll.outputs.capsule-generated == 'true'
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "🧠📜 Archive Wall Capsule: Auto-generated context preservation scroll"
+          commit_author: "Chronicle Keeper <chronicle-keeper@living-dev-agent.local>"
+          file_pattern: "capsules/**"
+          skip_dirty_check: false
+
+      - name: 🎉 Chronicle Complete
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' || steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated == 'true'
+        run: |
+          if [[ "${{ steps.generate-scroll.outputs.scroll-generated }}" == "true" ]]; then
+            echo "🎉 Chronicle Keeper has successfully preserved the lore!"
+            echo "📜 New TLDL entry has been added to the eternal chronicle"
+          fi
+          
+          if [[ "${{ steps.generate-daily-ledger.outputs.ledger-generated }}" == "true" || "${{ steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated }}" == "true" ]]; then
+            echo "📓 Daily Ledger entry has been created or updated"
+            echo "🔗 Navigation links have been updated to maintain the unbroken chain"
+          fi
+          
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "⏰ Scheduled daily ledger ritual completed successfully"
+            echo "🌅 A fresh page awaits today's development adventures"
+          fi
+          
+          echo "🧙‍♂️ The adventure continues, and the stories live on..."
+          
+          # Add a quote for good measure
+          if [[ -f src/ScrollQuoteEngine/quote_engine.py ]]; then
+            echo ""
+            echo "📜 A parting quote from the Secret Art:"
+            python3 src/ScrollQuoteEngine/quote_engine.py --context lore --format cli || true
+          fi

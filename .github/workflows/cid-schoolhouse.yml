@@ -1,0 +1,79 @@
+name: CID Schoolhouse — Learn and Critique
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  study-and-critique:
+    if: >
+      (github.event_name == 'issues' &&
+       (contains(github.event.issue.title, '🎓') ||
+        contains(join(github.event.issue.labels.*.name, ','), 'cid:schoolhouse')))
+      || (github.event_name == 'issue_comment' &&
+          contains(github.event.comment.body, 'TLDL:'))
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node and Python
+        uses: actions/setup-node@v4
+        with: { node-version: 18 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+
+      - name: Install deps for analyzers
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyYAML argparse
+          npm install --no-audit --no-fund js-yaml@^4.1.0
+
+      - name: Initialize Schoolhouse
+        run: |
+          mkdir -p scripts/cid-schoolhouse out/cid
+          echo '{}' > out/cid/context.json
+
+      - name: Build project syllabus
+        run: node scripts/cid-schoolhouse/build-syllabus.js "${{ github.event.issue.number }}" || true
+
+      - name: Learn repository (context pack)
+        run: node scripts/cid-schoolhouse/learn.js --out=out/cid/context.json
+
+      - name: Critique and proposals
+        run: node scripts/cid-schoolhouse/critique.js --context=out/cid/context.json --out=out/cid/report.json
+
+      - name: Post comment with findings
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/cid-schoolhouse/post-comment.js --issue=${{ github.event.issue.number }} --report=out/cid/report.json
+
+      - name: Generate TLDL entry
+        run: node scripts/cid-schoolhouse/tldl.js --report=out/cid/report.json --out=/tmp/scroll-entry.json
+
+      - name: Write TLDL via Chronicle Keeper
+        run: ./scripts/chronicle-keeper/tldl-writer.sh write /tmp/scroll-entry.json --verbose --force
+
+      - name: Stamp CID badges on issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/cid-schoolhouse/badges.js --issue=${{ github.event.issue.number }} --report=out/cid/report.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cid-schoolhouse-artifacts
+          path: |
+            out/cid/**
+            TLDL/index.md
+            TLDL/entries/*.md

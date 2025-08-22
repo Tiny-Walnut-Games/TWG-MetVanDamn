@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@playwright/mcp": "0.0.34",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

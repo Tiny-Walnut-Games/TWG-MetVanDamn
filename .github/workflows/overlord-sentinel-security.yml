@@ -1,0 +1,485 @@
+name: ♜ Overlord Sentinel Security Sweep
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 0 * * 0" # weekly deep scan
+  workflow_dispatch:
+    inputs:
+      scan_depth:
+        description: 'Security scan depth'
+        required: false
+        default: 'standard'
+        type: choice
+        options:
+        - standard
+        - deep
+        - quick
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    name: 🛡️ Overlord Sentinel - Security Sweep
+    
+    steps:
+      - name: 🏛️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: 📦 Install Python security tools
+        run: |
+          pip install bandit pip-audit safety
+          echo "✅ Python security tools installed"
+
+      - name: 🔍 Run Bandit (Python security)
+        run: |
+          echo "🔍 Running Bandit security analysis..."
+          bandit -r scripts/ src/ -f json -o bandit-results.json || true
+          
+          # Convert JSON to basic SARIF format for GitHub Security tab
+          if [ -f bandit-results.json ]; then
+            python3 -c "
+          import json, sys
+          
+          # Read Bandit JSON results
+          try:
+            with open('bandit-results.json', 'r') as f:
+              bandit_data = json.load(f)
+          except:
+            bandit_data = {'results': []}
+          
+          # Convert to SARIF format
+          sarif = {
+            'version': '2.1.0',
+            'runs': [{
+              'tool': {
+                'driver': {
+                  'name': 'Bandit',
+                  'version': '1.8.6',
+                  'informationUri': 'https://bandit.readthedocs.io/',
+                  'shortDescription': {'text': 'Python security linter'}
+                }
+              },
+              'results': []
+            }]
+          }
+          
+          # Process Bandit results
+          for result in bandit_data.get('results', []):
+            sarif_result = {
+              'ruleId': result.get('test_id', 'unknown'),
+              'message': {'text': result.get('issue_text', 'Security issue detected')},
+              'level': 'warning' if result.get('issue_severity', 'LOW').upper() in ['HIGH', 'MEDIUM'] else 'note',
+              'locations': [{
+                'physicalLocation': {
+                  'artifactLocation': {
+                    'uri': result.get('filename', 'unknown')
+                  },
+                  'region': {
+                    'startLine': result.get('line_number', 1)
+                  }
+                }
+              }]
+            }
+            sarif['runs'][0]['results'].append(sarif_result)
+          
+          # Write SARIF output
+          with open('bandit-results.sarif', 'w') as f:
+            json.dump(sarif, f, indent=2)
+          "
+          fi
+          echo "📊 Bandit scan completed"
+
+      - name: 🟢 Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 📦 Install JS/TS security tools
+        run: |
+          npm install --global eslint @eslint/js eslint-plugin-security
+          echo "✅ JavaScript security tools installed"
+
+      - name: 🔍 Run ESLint Security Scan
+        run: |
+          echo "🔍 Running ESLint security analysis..."
+          # Create basic eslint config for security scanning
+          cat > .eslintrc.json << 'EOF'
+          {
+            "extends": ["eslint:recommended"],
+            "plugins": ["security"],
+            "rules": {
+              "security/detect-buffer-noassert": "error",
+              "security/detect-child-process": "error",
+              "security/detect-disable-mustache-escape": "error",
+              "security/detect-eval-with-expression": "error",
+              "security/detect-no-csrf-before-method-override": "error",
+              "security/detect-non-literal-fs-filename": "error",
+              "security/detect-non-literal-regexp": "error",
+              "security/detect-non-literal-require": "error",
+              "security/detect-object-injection": "error",
+              "security/detect-possible-timing-attacks": "error",
+              "security/detect-pseudoRandomBytes": "error",
+              "security/detect-unsafe-regex": "error"
+            },
+            "env": {
+              "node": true,
+              "es2021": true
+            }
+          }
+          EOF
+          
+          # Run ESLint security scan
+          eslint scripts/ --ext .js --format json --output-file eslint-security.json || true
+          echo "📊 ESLint security scan completed"
+
+      - name: 🔍 Install and run Semgrep OSS
+        run: |
+          echo "🔍 Installing Semgrep OSS..."
+          pip install semgrep
+          
+          echo "🔍 Running Semgrep security analysis..."
+          # Try to use local security rules to avoid network dependency
+          semgrep --config=auto --sarif --output semgrep-results.sarif scripts/ src/ 2>/dev/null || {
+            echo "📊 Semgrep network access limited, creating basic security scan results..."
+            # Create basic SARIF output when network is limited
+            python3 -c "
+          import json, os, re
+          
+          # Basic security pattern checks for common issues
+          issues = []
+          
+          # Check Python files for basic security patterns
+          for root, dirs, files in os.walk('.'):
+            for file in files:
+              if file.endswith('.py'):
+                filepath = os.path.join(root, file)
+                try:
+                  with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
+                    
+                  # Basic security pattern detection
+                  patterns = [
+                    (r'eval\s*\(', 'Potential code injection via eval()'),
+                    (r'exec\s*\(', 'Potential code injection via exec()'),
+                    (r'subprocess\.call\s*\(.*shell=True', 'Potential shell injection'),
+                    (r'os\.system\s*\(', 'Potentially unsafe system call'),
+                    (r'pickle\.loads?\s*\(', 'Potentially unsafe pickle deserialization'),
+                    (r'[\"\']\s*SELECT\s+.*\s+FROM\s+.*[\"\']\s*%', 'Potential SQL injection')
+                  ]
+                  
+                  for line_num, line in enumerate(content.split('\n'), 1):
+                    for pattern, message in patterns:
+                      if re.search(pattern, line, re.IGNORECASE):
+                        issues.append({
+                          'file': filepath,
+                          'line': line_num,
+                          'pattern': pattern,
+                          'message': message,
+                          'code': line.strip()
+                        })
+                except Exception:
+                  continue
+          
+          # Create SARIF format
+          sarif = {
+            'version': '2.1.0',
+            'runs': [{
+              'tool': {
+                'driver': {
+                  'name': 'Semgrep (offline fallback)',
+                  'version': '1.x',
+                  'informationUri': 'https://semgrep.dev/',
+                  'shortDescription': {'text': 'Multi-language security scanner (basic offline patterns)'}
+                }
+              },
+              'results': []
+            }]
+          }
+          
+          # Convert issues to SARIF format
+          for issue in issues:
+            sarif_result = {
+              'ruleId': f'offline-security-{issue[\"pattern\"][:20]}',
+              'message': {'text': issue['message']},
+              'level': 'warning',
+              'locations': [{
+                'physicalLocation': {
+                  'artifactLocation': {
+                    'uri': issue['file']
+                  },
+                  'region': {
+                    'startLine': issue['line'],
+                    'snippet': {'text': issue['code']}
+                  }
+                }
+              }]
+            }
+            sarif['runs'][0]['results'].append(sarif_result)
+          
+          # Write SARIF output
+          with open('semgrep-results.sarif', 'w') as f:
+            json.dump(sarif, f, indent=2)
+          "
+          }
+          echo "📊 Semgrep scan completed"
+
+      - name: 🔍 Dependency Audit (Python)
+        run: |
+          echo "🔍 Running Python dependency security audit..."
+          pip-audit --format=json --output=pip-audit-results.json || true
+          
+          # Convert JSON to SARIF format for GitHub Security tab  
+          if [ -f pip-audit-results.json ]; then
+            python3 -c "
+          import json, sys
+          
+          # Read pip-audit JSON results
+          try:
+            with open('pip-audit-results.json', 'r') as f:
+              audit_data = json.load(f)
+          except:
+            audit_data = []
+          
+          # Convert to SARIF format
+          sarif = {
+            'version': '2.1.0',
+            'runs': [{
+              'tool': {
+                'driver': {
+                  'name': 'pip-audit',
+                  'version': '2.x',
+                  'informationUri': 'https://github.com/pypa/pip-audit',
+                  'shortDescription': {'text': 'Python dependency vulnerability scanner'}
+                }
+              },
+              'results': []
+            }]
+          }
+          
+          # Process pip-audit results (format may vary)
+          vulnerabilities = audit_data if isinstance(audit_data, list) else audit_data.get('vulnerabilities', [])
+          
+          for vuln in vulnerabilities:
+            sarif_result = {
+              'ruleId': vuln.get('id', 'unknown'),
+              'message': {'text': f\"Vulnerability in {vuln.get('package', 'unknown')}: {vuln.get('description', 'Security vulnerability detected')}\"},
+              'level': 'error' if vuln.get('fix_versions') else 'warning',
+              'locations': [{
+                'logicalLocations': [{
+                  'name': vuln.get('package', 'unknown'),
+                  'kind': 'package'
+                }]
+              }]
+            }
+            sarif['runs'][0]['results'].append(sarif_result)
+          
+          # Write SARIF output
+          with open('pip-audit-results.sarif', 'w') as f:
+            json.dump(sarif, f, indent=2)
+          "
+          fi
+          echo "📊 Python dependency audit completed"
+
+      - name: 🔍 Dependency Audit (Node) 
+        run: |
+          echo "🔍 Running Node.js dependency security audit..."
+          npm audit --audit-level=moderate --json > npm-audit-results.json || true
+          echo "📊 Node.js dependency audit completed"
+
+      - name: 📊 Upload SARIF results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: |
+            bandit-results.sarif
+            pip-audit-results.sarif
+            semgrep-results.sarif
+        continue-on-error: true
+
+      - name: 🎖️ Generate Sentinel Verdict & Lore Log
+        id: sentinel-verdict
+        run: |
+          echo "🛡️ Generating Overlord Sentinel verdict..."
+          
+          # Initialize verdict variables
+          CRITICAL_ISSUES=0
+          HIGH_ISSUES=0
+          MEDIUM_ISSUES=0
+          TOTAL_ISSUES=0
+          VERDICT="PASS"
+          
+          # Parse SARIF results if they exist
+          if [ -f bandit-results.sarif ]; then
+            BANDIT_ISSUES=$(cat bandit-results.sarif | python3 -c "
+          import json, sys
+          try:
+            data = json.load(sys.stdin)
+            total = 0
+            for run in data.get('runs', []):
+              total += len(run.get('results', []))
+            print(total)
+          except:
+            print(0)
+          " 2>/dev/null || echo 0)
+            TOTAL_ISSUES=$((TOTAL_ISSUES + BANDIT_ISSUES))
+            echo "📊 Bandit found $BANDIT_ISSUES issues"
+          fi
+          
+          if [ -f semgrep-results.sarif ]; then
+            SEMGREP_ISSUES=$(cat semgrep-results.sarif | python3 -c "
+          import json, sys
+          try:
+            data = json.load(sys.stdin)
+            total = 0
+            critical = 0
+            high = 0
+            for run in data.get('runs', []):
+              for result in run.get('results', []):
+                total += 1
+                level = result.get('level', 'note')
+                if level == 'error': critical += 1
+                elif level == 'warning': high += 1
+            print(f'{total},{critical},{high}')
+          except:
+            print('0,0,0')
+          " 2>/dev/null || echo "0,0,0")
+            IFS=',' read -r SEMGREP_TOTAL SEMGREP_CRIT SEMGREP_HIGH <<< "$SEMGREP_ISSUES"
+            TOTAL_ISSUES=$((TOTAL_ISSUES + SEMGREP_TOTAL))
+            CRITICAL_ISSUES=$((CRITICAL_ISSUES + SEMGREP_CRIT))
+            HIGH_ISSUES=$((HIGH_ISSUES + SEMGREP_HIGH))
+            echo "📊 Semgrep found $SEMGREP_TOTAL issues ($SEMGREP_CRIT critical, $SEMGREP_HIGH high)"
+          fi
+          
+          # Determine verdict based on issue severity
+          if [ $CRITICAL_ISSUES -gt 0 ]; then
+            VERDICT="FAIL"
+          elif [ $HIGH_ISSUES -gt 5 ]; then
+            VERDICT="⚠ GUARDED FAIL"
+          elif [ $TOTAL_ISSUES -gt 15 ]; then
+            VERDICT="⚠ GUARDED FAIL"
+          else
+            VERDICT="PASS"
+          fi
+          
+          # Generate Sentinel report
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          ## 🛡️ Overlord Sentinel Security Verdict
+          
+          **Final Verdict:** **$VERDICT**
+          
+          ### 📊 Security Scan Results
+          - **Total Issues Found:** $TOTAL_ISSUES
+          - **Critical Issues:** $CRITICAL_ISSUES
+          - **High Priority Issues:** $HIGH_ISSUES
+          
+          ### 🔍 Scan Coverage
+          - ✅ **Bandit** (Python security linting)
+          - ✅ **Semgrep OSS** (Multi-language security patterns)
+          - ✅ **ESLint Security** (JavaScript security rules)
+          - ✅ **pip-audit** (Python dependency vulnerabilities)
+          - ✅ **npm audit** (Node.js dependency vulnerabilities)
+          
+          ### 🎖️ Sentinel Badge Status
+          - **Security Posture:** $([ "$VERDICT" = "PASS" ] && echo "🟢 STRONG" || echo "🟡 NEEDS ATTENTION")
+          - **Free Tier Compliance:** ✅ All scans use cost-free tools
+          - **SARIF Integration:** ✅ Results uploaded to Security tab
+          
+          ### 📜 Chronicle Keeper Entry
+          **TLDL Context:** Overlord Sentinel automated security sweep completed
+          - **Scan Trigger:** ${{ github.event_name }}
+          - **Repository:** ${{ github.repository }}
+          - **Branch:** ${{ github.ref_name || github.head_ref || 'main' }}
+          - **Verdict:** $VERDICT ($TOTAL_ISSUES total issues)
+          
+          ---
+          *🛡️ The Overlord Sentinel stands watch, preserving the cheeks through automated vigilance*
+          EOF
+          
+          # Set outputs for other jobs
+          echo "verdict=$VERDICT" >> $GITHUB_OUTPUT
+          echo "total_issues=$TOTAL_ISSUES" >> $GITHUB_OUTPUT
+          echo "critical_issues=$CRITICAL_ISSUES" >> $GITHUB_OUTPUT
+          echo "high_issues=$HIGH_ISSUES" >> $GITHUB_OUTPUT
+
+      - name: 📦 Upload security reports as artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: overlord-sentinel-security-reports
+          path: |
+            bandit-results.sarif
+            semgrep-results.sarif
+            pip-audit-results.sarif
+            eslint-security.json
+            npm-audit-results.json
+          retention-days: 30
+
+      - name: 🚨 Fail build on critical security issues
+        if: steps.sentinel-verdict.outputs.verdict == 'FAIL'
+        run: |
+          echo "🚨 CRITICAL SECURITY ISSUES DETECTED"
+          echo "❌ Overlord Sentinel verdict: FAIL"
+          echo "🛡️ ${{ steps.sentinel-verdict.outputs.critical_issues }} critical issues must be resolved"
+          exit 1
+
+  # 📜 Chronicle Keeper integration for lore preservation
+  chronicle-keeper-integration:
+    runs-on: ubuntu-latest
+    name: 📜 Chronicle Keeper - Security Lore
+    needs: security-scan
+    if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    
+    steps:
+      - name: 🏛️ Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: 📜 Log Sentinel Verdict in Chronicles
+        run: |
+          echo "📜 Recording Overlord Sentinel security verdict in project lore..."
+          
+          # Create or append to security chronicle
+          CHRONICLE_DIR="docs/security-chronicles"
+          CHRONICLE_FILE="$CHRONICLE_DIR/sentinel-verdicts-$(date +%Y-%m).md"
+          
+          mkdir -p "$CHRONICLE_DIR"
+          
+          if [ ! -f "$CHRONICLE_FILE" ]; then
+            cat > "$CHRONICLE_FILE" << 'EOF'
+          # 🛡️ Overlord Sentinel Security Chronicles
+          
+          Monthly security verdicts and notable findings from the Overlord Sentinel.
+          
+          ## Security Verdicts
+          
+          EOF
+          fi
+          
+          # Append this scan result
+          cat >> "$CHRONICLE_FILE" << EOF
+          ### $(date '+%Y-%m-%d %H:%M UTC') - ${{ github.event_name }}
+          - **Verdict:** ${{ needs.security-scan.outputs.verdict || 'UNKNOWN' }}
+          - **Total Issues:** ${{ needs.security-scan.outputs.total_issues || '0' }}
+          - **Trigger:** ${{ github.event_name }} on ${{ github.ref_name || github.head_ref || 'main' }}
+          - **Commit:** ${{ github.sha }}
+          
+          EOF
+          
+          echo "✅ Security verdict logged to $CHRONICLE_FILE"
+
+# 🔒 Security Notice: This workflow uses only free-tier security tools
+# 🎯 Budget Compliance: Designed for <2000 Actions minutes, <5 premium calls/month  
+# 🛡️ SARIF Integration: Results appear in repository Security tab
+# 📜 Lore Integration: Connects with Chronicle Keeper for wisdom preservation

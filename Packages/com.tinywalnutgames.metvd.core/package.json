@@ -1,0 +1,21 @@
+{
+  "name": "com.tinywalnutgames.metvd.core",
+  "displayName": "MetVanDAMN Core",
+  "version": "0.1.0",
+  "description": "Core components, tags, math, IDs, and shared utilities for the MetVanDAMN procedural Metroidvania engine",
+  "unity": "6000.2",
+  "dependencies": {
+    "com.unity.entities": "1.2.0",
+    "com.unity.collections": "1.2.4"
+  },
+  "keywords": [
+    "metroidvania",
+    "procedural",
+    "ecs",
+    "dots",
+    "gamedev"
+  ],
+  "author": {
+    "name": "Tiny Walnut Games"
+  }
+}

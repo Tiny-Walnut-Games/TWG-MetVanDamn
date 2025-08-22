@@ -1,0 +1,220 @@
+name: TLDL Monthly Archive Generation
+
+on:
+  # Run on the 1st of each month at 02:00 UTC
+  schedule:
+    - cron: '0 2 1 * *'
+  
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      target_month:
+        description: 'Target month (YYYY-MM format, leave empty for previous month)'
+        required: false
+        type: string
+      archive_old_files:
+        description: 'Archive old TLDL files after generation'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  generate_monthly_archive:
+    runs-on: ubuntu-latest
+    name: Generate Monthly TLDL Archive
+    
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install Dependencies
+        run: |
+          pip install -r scripts/requirements.txt
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "TLDL Archive Bot"
+          git config --global user.email "archive-bot@living-dev-agent.local"
+      
+      - name: Determine Target Month
+        id: month
+        run: |
+          if [[ "${{ github.event.inputs.target_month }}" != "" ]]; then
+            echo "target_month=${{ github.event.inputs.target_month }}" >> $GITHUB_OUTPUT
+            echo "🎯 Using specified month: ${{ github.event.inputs.target_month }}"
+          else
+            # Use previous month for scheduled runs
+            target_month=$(date -d "last month" +%Y-%m)
+            echo "target_month=$target_month" >> $GITHUB_OUTPUT
+            echo "📅 Using previous month: $target_month"
+          fi
+      
+      - name: Check for Existing Archive
+        id: check_existing
+        run: |
+          archive_file="docs/TLDL-Monthly/${{ steps.month.outputs.target_month }}.md"
+          if [[ -f "$archive_file" ]]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Archive already exists: $archive_file"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "✅ Archive does not exist, proceeding with generation"
+          fi
+      
+      - name: Generate Monthly Archive
+        if: steps.check_existing.outputs.exists == 'false'
+        run: |
+          echo "🧹 Generating monthly TLDL archive for ${{ steps.month.outputs.target_month }}"
+          scripts/tldl-monthly-generator.sh ${{ steps.month.outputs.target_month }}
+          
+          # Verify archive was created
+          archive_file="docs/TLDL-Monthly/${{ steps.month.outputs.target_month }}.md"
+          if [[ ! -f "$archive_file" ]]; then
+            echo "❌ Failed to generate archive file: $archive_file"
+            exit 1
+          fi
+          
+          echo "✅ Archive generated successfully"
+          echo "📊 Archive stats:"
+          wc -l "$archive_file"
+      
+      - name: Archive Old TLDL Files
+        if: steps.check_existing.outputs.exists == 'false' && (github.event.inputs.archive_old_files == 'true' || github.event_name == 'schedule')
+        run: |
+          echo "📦 Archiving old TLDL files for ${{ steps.month.outputs.target_month }}"
+          scripts/tldl-monthly-generator.sh --archive-old ${{ steps.month.outputs.target_month }}
+      
+      - name: Update Documentation Indices
+        if: steps.check_existing.outputs.exists == 'false'
+        run: |
+          echo "📚 Updating documentation indices"
+          
+          # Create or update docs/SUMMARY.md for GitBook compatibility
+          if [[ ! -f "docs/SUMMARY.md" ]]; then
+            cat > docs/SUMMARY.md << 'EOF'
+          # Summary
+          
+          ## Documentation
+          - [README](README.md)
+          
+          ## TLDL Archives
+          EOF
+          fi
+          
+          # Add monthly archive to SUMMARY.md if not present
+          archive_link="- [${{ steps.month.outputs.target_month }}](TLDL-Monthly/${{ steps.month.outputs.target_month }}.md)"
+          if ! grep -q "TLDL-Monthly/${{ steps.month.outputs.target_month }}.md" docs/SUMMARY.md; then
+            # Insert archive link in TLDL Archives section
+            if grep -q "## TLDL Archives" docs/SUMMARY.md; then
+              sed -i "/## TLDL Archives/a\\$archive_link" docs/SUMMARY.md
+            else
+              echo -e "\\n## TLDL Archives\\n$archive_link" >> docs/SUMMARY.md
+            fi
+            echo "✅ Added archive link to docs/SUMMARY.md"
+          fi
+      
+      - name: Validate Generated Archive
+        if: steps.check_existing.outputs.exists == 'false'
+        run: |
+          echo "🔍 Validating generated archive"
+          archive_file="docs/TLDL-Monthly/${{ steps.month.outputs.target_month }}.md"
+          
+          # Basic validation checks
+          if ! grep -q "# TLDL Monthly Archive" "$archive_file"; then
+            echo "❌ Archive missing proper title"
+            exit 1
+          fi
+          
+          if ! grep -q "## 📊 Archive Summary" "$archive_file"; then
+            echo "❌ Archive missing summary section"
+            exit 1
+          fi
+          
+          if ! grep -q "Total TLDL Entries" "$archive_file"; then
+            echo "❌ Archive missing entry count"
+            exit 1
+          fi
+          
+          echo "✅ Archive validation passed"
+      
+      - name: Create Pull Request
+        if: steps.check_existing.outputs.exists == 'false'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            📜 Monthly TLDL Archive: ${{ steps.month.outputs.target_month }}
+            
+            - Generated consolidated monthly archive for ${{ steps.month.outputs.target_month }}
+            - Includes actionables, themes, and cross-references
+            - Updated GitBook SUMMARY.md with archive link
+            ${{ github.event.inputs.archive_old_files == 'true' && '- Archived old TLDL files to TLDL-Archive/' || '' }}
+            
+            Generated by TLDL Monthly Archive workflow
+          branch: tldl-monthly-${{ steps.month.outputs.target_month }}
+          title: "📜 Monthly TLDL Archive: ${{ steps.month.outputs.target_month }}"
+          body: |
+            ## 📜 TLDL Monthly Archive Generated
+            
+            This PR contains the automated monthly consolidation of TLDL entries for **${{ steps.month.outputs.target_month }}**.
+            
+            ### 🎯 Changes Included
+            - ✅ Monthly archive: `docs/TLDL-Monthly/${{ steps.month.outputs.target_month }}.md`
+            - ✅ Updated GitBook SUMMARY.md with archive link
+            ${{ github.event.inputs.archive_old_files == 'true' && '- ✅ Old TLDL files moved to `docs/TLDL-Archive/`' || '' }}
+            
+            ### 📊 Archive Statistics
+            The monthly archive consolidates TLDL entries from:
+            - `docs/TLDL-*.md` files
+            - `TLDL/entries/` directory
+            
+            ### 🔗 Navigation
+            The archive is accessible via:
+            - Direct link: [docs/TLDL-Monthly/${{ steps.month.outputs.target_month }}.md](docs/TLDL-Monthly/${{ steps.month.outputs.target_month }}.md)
+            - GitBook SUMMARY: Listed under "TLDL Archives" section
+            
+            ### 🧹 Spring Cleaning Benefits
+            - **Single source of truth**: Monthly archives provide consolidated view
+            - **Discoverability**: All archives indexed in GitBook SUMMARY
+            - **Continuity**: Actionables and themes preserved with traceability
+            - **Navigation**: Archives accessible in ≤3 clicks from main docs
+            
+            ---
+            
+            **Generated by**: TLDL Monthly Archive workflow  
+            **Trigger**: ${{ github.event_name == 'schedule' && 'Scheduled (1st of month)' || 'Manual dispatch' }}  
+            **Timestamp**: ${{ github.run_started_at }}
+          labels: |
+            documentation
+            tldl-archive
+            automation
+          reviewers: |
+            jmeyer1980
+      
+      - name: Archive Generation Summary
+        if: always()
+        run: |
+          echo "## 📊 TLDL Monthly Archive Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Target Month**: ${{ steps.month.outputs.target_month }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.check_existing.outputs.exists }}" == "true" ]]; then
+            echo "**Status**: ⚠️ Archive already exists - skipped generation" >> $GITHUB_STEP_SUMMARY
+          elif [[ -f "docs/TLDL-Monthly/${{ steps.month.outputs.target_month }}.md" ]]; then
+            echo "**Status**: ✅ Archive generated successfully" >> $GITHUB_STEP_SUMMARY
+            echo "**Location**: \`docs/TLDL-Monthly/${{ steps.month.outputs.target_month }}.md\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status**: ❌ Archive generation failed" >> $GITHUB_STEP_SUMMARY
+          fi

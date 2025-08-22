@@ -1,0 +1,523 @@
+#!/usr/bin/env python3
+"""
+Living Dev Agent CLI Tool
+Provides command-line interface for LDA operations including profile management,
+snapshots, and project initialization.
+"""
+
+import argparse
+import sys
+import os
+import yaml
+import subprocess
+import time
+from pathlib import Path
+from typing import Dict, Any, List
+
+class LDAConfig:
+    """Configuration manager for LDA CLI tool"""
+    
+    def __init__(self):
+        self.project_root = self.find_project_root()
+        self.agent_profile_path = self.project_root / "agent-profile.yaml"
+        self.profiles_dir = self.project_root / ".github" / "agents"
+        
+    def find_project_root(self) -> Path:
+        """Find the project root directory"""
+        current = Path.cwd()
+        while current != current.parent:
+            if (current / "agent-profile.yaml").exists() or (current / ".git").exists():
+                return current
+            current = current.parent
+        return Path.cwd()
+        
+    def load_profile(self, profile_name: str = None) -> Dict[str, Any]:
+        """Load agent profile configuration"""
+        if profile_name:
+            profile_path = self.profiles_dir / f"{profile_name}.yaml"
+        else:
+            profile_path = self.agent_profile_path
+            
+        if profile_path.exists():
+            with open(profile_path, 'r') as f:
+                return yaml.safe_load(f)
+        else:
+            return self.get_default_profile()
+            
+    def get_default_profile(self) -> Dict[str, Any]:
+        """Get default agent profile"""
+        return {
+            'name': 'default',
+            'description': 'Default Living Dev Agent profile',
+            'behavior': {'tone': 'helpful', 'detail_level': 'moderate'},
+            'pipeline_preferences': ['URP', 'HDRP', 'BRP'],
+            'flags': {'dry_run': False, 'context': True}
+        }
+
+class LDACLICommands:
+    """LDA CLI command implementations"""
+    
+    def __init__(self):
+        self.config = LDAConfig()
+        
+    def init(self, args):
+        """Initialize LDA in current project"""
+        print("🤖 Living Dev Agent Initialization")
+        print("==================================")
+        
+        # Check if already initialized
+        if self.config.agent_profile_path.exists():
+            print(f"⚠️  LDA already initialized in {self.config.project_root}")
+            if not args.force:
+                return 1
+        
+        # Create agent profile if it doesn't exist
+        if not self.config.agent_profile_path.exists():
+            profile = self.config.get_default_profile()
+            
+            # Interactive setup if not in quiet mode
+            if not args.quiet:
+                profile = self.interactive_profile_setup(profile)
+            
+            with open(self.config.agent_profile_path, 'w') as f:
+                yaml.dump(profile, f, default_flow_style=False, sort_keys=False)
+            print(f"✅ Created agent profile: {self.config.agent_profile_path}")
+        
+        # Create profiles directory
+        self.config.profiles_dir.mkdir(parents=True, exist_ok=True)
+        print(f"✅ Created profiles directory: {self.config.profiles_dir}")
+        
+        # Initialize DevTimeTravel if configured
+        devtimetravel_config = self.config.project_root / "docs" / "devtimetravel_snapshot.yaml"
+        if devtimetravel_config.exists():
+            snapshot_dir = self.config.project_root / ".devtimetravel"
+            snapshot_dir.mkdir(exist_ok=True)
+            print("✅ Initialized DevTimeTravel context")
+        
+        print("🎉 LDA initialization complete!")
+        print(f"📝 Edit {self.config.agent_profile_path} to customize your agent")
+        return 0
+        
+    def interactive_profile_setup(self, profile: Dict[str, Any]) -> Dict[str, Any]:
+        """Interactive setup for agent profile"""
+        print("\n📋 Agent Profile Setup")
+        print("======================")
+        
+        # Profile name
+        name = input(f"Profile name [{profile['name']}]: ").strip()
+        if name:
+            profile['name'] = name
+            
+        # Description
+        desc = input(f"Description [{profile['description']}]: ").strip()
+        if desc:
+            profile['description'] = desc
+            
+        # Pipeline preferences
+        print("\nSelect preferred rendering pipelines (comma-separated):")
+        print("Available: URP, HDRP, BRP, SRP")
+        pipelines = input("Pipelines [URP,HDRP]: ").strip()
+        if pipelines:
+            profile['pipeline_preferences'] = [p.strip().upper() for p in pipelines.split(',')]
+            
+        return profile
+        
+    def snapshot(self, args):
+        """Create development snapshot"""
+        print("📸 Creating DevTimeTravel snapshot...")
+        
+        profile = self.config.load_profile()
+        snapshot_id = args.id or f"snapshot-{int(time.time())}"
+        
+        if args.dry_run or profile.get('flags', {}).get('dry_run', False):
+            print(f"🔍 DRY RUN: Would create snapshot '{snapshot_id}'")
+            return 0
+            
+        # Create snapshot directory
+        snapshot_dir = self.config.project_root / ".devtimetravel" / "snapshots" / snapshot_id
+        snapshot_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Capture context
+        context = {
+            'id': snapshot_id,
+            'timestamp': time.time(),
+            'profile': profile['name'],
+            'git_commit': self.get_git_commit(),
+            'description': args.description or "Development snapshot"
+        }
+        
+        with open(snapshot_dir / "context.yaml", 'w') as f:
+            yaml.dump(context, f, default_flow_style=False)
+            
+        print(f"✅ Snapshot created: {snapshot_id}")
+        return 0
+        
+    def profile(self, args):
+        """Manage agent profiles"""
+        if args.profile_command == 'list':
+            return self.list_profiles()
+        elif args.profile_command == 'switch':
+            return self.switch_profile(args.profile_name)
+        elif args.profile_command == 'create':
+            return self.create_profile(args.profile_name)
+        else:
+            print("❌ Unknown profile command")
+            return 1
+            
+    def list_profiles(self):
+        """List available agent profiles"""
+        print("📋 Available Agent Profiles:")
+        print("============================")
+        
+        # Current profile
+        current = self.config.load_profile()
+        print(f"Current: {current.get('name', 'default')} - {current.get('description', 'No description')}")
+        
+        # Available profiles
+        if self.config.profiles_dir.exists():
+            for profile_file in self.config.profiles_dir.glob("*.yaml"):
+                try:
+                    with open(profile_file, 'r') as f:
+                        profile = yaml.safe_load(f)
+                    print(f"  {profile.get('name', profile_file.stem)}: {profile.get('description', 'No description')}")
+                except Exception as e:
+                    print(f"  {profile_file.stem}: (error loading: {e})")
+        
+        return 0
+        
+    def switch_profile(self, profile_name: str):
+        """Switch to a different agent profile"""
+        profile_path = self.config.profiles_dir / f"{profile_name}.yaml"
+        
+        if not profile_path.exists():
+            print(f"❌ Profile '{profile_name}' not found")
+            return 1
+            
+        # Copy profile to active location
+        import shutil
+        shutil.copy2(profile_path, self.config.agent_profile_path)
+        print(f"✅ Switched to profile: {profile_name}")
+        return 0
+        
+    def create_profile(self, profile_name: str):
+        """Create a new agent profile"""
+        profile_path = self.config.profiles_dir / f"{profile_name}.yaml"
+        
+        if profile_path.exists():
+            print(f"❌ Profile '{profile_name}' already exists")
+            return 1
+            
+        # Create profile from current or default
+        current_profile = self.config.load_profile()
+        new_profile = current_profile.copy()
+        new_profile['name'] = profile_name
+        new_profile['description'] = f"Custom profile: {profile_name}"
+        
+        profile_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(profile_path, 'w') as f:
+            yaml.dump(new_profile, f, default_flow_style=False, sort_keys=False)
+            
+        print(f"✅ Created profile: {profile_name}")
+        return 0
+        
+    def template(self, args):
+        """Generate Chronicle Keeper comment templates"""
+        # Import the template engine
+        try:
+            template_engine_path = self.config.project_root / "src" / "CommentTemplateEngine" / "template_engine.py"
+            if not template_engine_path.exists():
+                print("❌ Template engine not found. Comment templates may not be installed.")
+                return 1
+            
+            # Execute the template engine with the provided arguments
+            cmd = [sys.executable, str(template_engine_path)]
+            
+            # Convert argparse namespace to list of arguments
+            if args.list:
+                cmd.append("--list")
+            elif args.categories:
+                cmd.append("--categories")
+            elif args.search:
+                cmd.extend(["--search", args.search])
+            elif args.template_id:
+                cmd.extend(["--scenario", args.template_id])
+                if args.non_interactive:
+                    cmd.append("--non-interactive")
+                if args.output:
+                    cmd.extend(["--output", args.output])
+                if args.values:
+                    cmd.extend(["--values"] + args.values)
+            else:
+                cmd.append("--help")
+            
+            result = subprocess.run(cmd, cwd=self.config.project_root)
+            return result.returncode
+            
+        except Exception as e:
+            print(f"❌ Error running template command: {e}")
+            return 1
+    
+    def overlord(self, args):
+        """Manage LDA Overlord/Sentinel - Internal Workflow Approval Authority"""
+        try:
+            overlord_script_path = self.config.overlord_script_path
+            if not overlord_script_path.exists():
+                print("❌ Overlord/Sentinel script not found.")
+                return 1
+            
+            # Build command for overlord-sentinel.js
+            cmd = ["node", str(overlord_script_path)]
+            
+            if args.overlord_command == 'evaluate':
+                cmd.append("evaluate")
+                if hasattr(args, 'actor') and args.actor:
+                    cmd.extend(["--actor", args.actor])
+                if hasattr(args, 'repo') and args.repo:
+                    cmd.extend(["--repo", args.repo])
+                if hasattr(args, 'workflow') and args.workflow:
+                    cmd.extend(["--workflow", args.workflow])
+                if hasattr(args, 'branch') and args.branch:
+                    cmd.extend(["--branch", args.branch])
+                if hasattr(args, 'dry_run') and args.dry_run:
+                    cmd.append("--dry-run")
+                if hasattr(args, 'emergency_stop') and args.emergency_stop:
+                    cmd.append("--emergency-stop")
+                    
+            elif args.overlord_command == 'report':
+                cmd.append("report")
+                
+            elif args.overlord_command == 'grant-consent':
+                cmd.append("grant-consent")
+                if hasattr(args, 'user') and args.user:
+                    cmd.extend(["--user", args.user])
+                    
+            elif args.overlord_command == 'revoke-consent':
+                cmd.append("revoke-consent")
+                if hasattr(args, 'user') and args.user:
+                    cmd.extend(["--user", args.user])
+                    
+            else:
+                # Show overlord help
+                cmd.append("--help")
+            
+            print(f"🧠 LDA Overlord/Sentinel - {args.overlord_command or 'help'}")
+            result = subprocess.run(cmd, cwd=self.config.project_root)
+            return result.returncode
+            
+        except Exception as e:
+            print(f"❌ Error running overlord command: {e}")
+            return 1
+        
+    def get_git_commit(self) -> str:
+        """Get current git commit hash"""
+        try:
+            result = subprocess.run(['git', 'rev-parse', 'HEAD'], 
+                                  capture_output=True, text=True, check=True)
+            return result.stdout.strip()
+        except:
+            return "unknown"
+            
+    def dtt(self, args):
+        """Dev Time Travel Vault operations"""
+        print("🏛️ Dev Time Travel Vault")
+        print("========================")
+        
+        # Get project root
+        dtt_script = self.config.project_root / "scripts" / "dtt"
+        
+        if not dtt_script.exists():
+            print("❌ DTT vault script not found")
+            print("   Make sure 'scripts/dtt' exists in your project")
+            return 1
+            
+        # Build command arguments
+        cmd_args = ["python3", str(dtt_script)]
+        
+        if hasattr(args, 'dtt_command') and args.dtt_command:
+            cmd_args.append(args.dtt_command)
+            
+            if args.dtt_command == 'snapshot':
+                if hasattr(args, 'dtt_id') and args.dtt_id:
+                    cmd_args.extend(["--id", args.dtt_id])
+                if hasattr(args, 'dtt_description') and args.dtt_description:
+                    cmd_args.extend(["--description", args.dtt_description])
+            elif args.dtt_command == 'restore':
+                if hasattr(args, 'brick_id') and args.brick_id:
+                    cmd_args.append(args.brick_id)
+                if hasattr(args, 'dtt_force') and args.dtt_force:
+                    cmd_args.append("--force")
+            elif args.dtt_command == 'verify':
+                if hasattr(args, 'brick_id') and args.brick_id:
+                    cmd_args.append(args.brick_id)
+            elif args.dtt_command == 'compact':
+                if hasattr(args, 'dtt_layer') and args.dtt_layer:
+                    cmd_args.extend(["--layer", args.dtt_layer])
+        
+        # Execute DTT command
+        try:
+            result = subprocess.run(cmd_args, cwd=self.config.project_root)
+            return result.returncode
+        except Exception as e:
+            print(f"❌ Error executing DTT command: {e}")
+            return 1
+
+def create_parser():
+    """Create argument parser for LDA CLI"""
+    parser = argparse.ArgumentParser(
+        prog='lda',
+        description='Living Dev Agent CLI - Manage agent profiles, snapshots, and project configuration',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  lda init                          # Initialize LDA in current project
+  lda init --quiet                  # Initialize with defaults, no prompts
+  lda snapshot --id "feature-xyz"   # Create named snapshot
+  lda profile list                  # List available profiles
+  lda profile switch validator      # Switch to validator profile
+  lda profile create custom         # Create new profile
+  lda template --list               # List comment templates
+  lda template --scenario bug_discovery  # Generate bug discovery template
+  lda overlord evaluate --actor=copilot --workflow="Living Dev Agent CI"  # Evaluate approval
+  lda overlord report               # Show overlord status
+  lda overlord grant-consent --user=copilot  # Grant user consent
+  lda dtt init                      # Initialize DTT vault
+  lda dtt snapshot --description "Feature complete"  # Create DTT snapshot
+  lda dtt restore abc123def456 --force  # Restore DTT snapshot
+        """
+    )
+    
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    
+    # Init command
+    init_parser = subparsers.add_parser('init', help='Initialize LDA in current project')
+    init_parser.add_argument('--force', action='store_true', help='Force reinitialize if already exists')
+    init_parser.add_argument('--quiet', action='store_true', help='Use defaults without prompts')
+    
+    # Snapshot command
+    snapshot_parser = subparsers.add_parser('snapshot', help='Create development snapshot')
+    snapshot_parser.add_argument('--id', help='Snapshot identifier')
+    snapshot_parser.add_argument('--description', help='Snapshot description')
+    snapshot_parser.add_argument('--dry-run', action='store_true', help='Show what would be done')
+    
+    # Profile command
+    profile_parser = subparsers.add_parser('profile', help='Manage agent profiles')
+    profile_subparsers = profile_parser.add_subparsers(dest='profile_command', help='Profile operations')
+    
+    profile_subparsers.add_parser('list', help='List available profiles')
+    
+    switch_parser = profile_subparsers.add_parser('switch', help='Switch to profile')
+    switch_parser.add_argument('profile_name', help='Name of profile to switch to')
+    
+    create_parser = profile_subparsers.add_parser('create', help='Create new profile')
+    create_parser.add_argument('profile_name', help='Name of new profile')
+    
+    # Template command
+    template_parser = subparsers.add_parser('template', help='Generate Chronicle Keeper comment templates')
+    template_parser.add_argument('--type', choices=['comment'], default='comment',
+                                help='Type of template to generate')
+    template_parser.add_argument('--scenario', '--template-id', dest='template_id',
+                                help='Template scenario to generate')
+    template_parser.add_argument('--list', action='store_true',
+                                help='List available templates')
+    template_parser.add_argument('--categories', action='store_true',
+                                help='Show template categories')
+    template_parser.add_argument('--search', metavar='QUERY',
+                                help='Search templates by keyword')
+    template_parser.add_argument('--non-interactive', action='store_true',
+                                help='Generate template with default values only')
+    template_parser.add_argument('--output', metavar='FILE',
+                                help='Output template to file instead of stdout')
+    template_parser.add_argument('--values', metavar='KEY=VALUE', nargs='*',
+                                help='Provide placeholder values (format: key=value)')
+    
+    # Overlord command
+    overlord_parser = subparsers.add_parser('overlord', help='Manage LDA Overlord/Sentinel - Internal Workflow Approval Authority')
+    overlord_subparsers = overlord_parser.add_subparsers(dest='overlord_command', help='Overlord operations')
+    
+    # Overlord evaluate subcommand
+    evaluate_parser = overlord_subparsers.add_parser('evaluate', help='Evaluate workflow approval request')
+    evaluate_parser.add_argument('--actor', required=True, help='GitHub actor requesting approval')
+    evaluate_parser.add_argument('--repo', default='jmeyer1980/living-dev-agent', help='Repository (owner/repo format)')
+    evaluate_parser.add_argument('--workflow', required=True, help='Workflow name to approve')
+    evaluate_parser.add_argument('--branch', default='main', help='Branch or ref')
+    evaluate_parser.add_argument('--dry-run', action='store_true', help='Preview mode - no actual approvals')
+    evaluate_parser.add_argument('--emergency-stop', action='store_true', help='Activate emergency stop')
+    
+    # Overlord report subcommand
+    overlord_subparsers.add_parser('report', help='Generate overlord status report')
+    
+    # Overlord consent management
+    grant_consent_parser = overlord_subparsers.add_parser('grant-consent', help='Grant user consent for auto-approval')
+    grant_consent_parser.add_argument('--user', required=True, help='Username to grant consent')
+    
+    revoke_consent_parser = overlord_subparsers.add_parser('revoke-consent', help='Revoke user consent for auto-approval')
+    revoke_consent_parser.add_argument('--user', required=True, help='Username to revoke consent')
+    
+    # DTT Vault command
+    dtt_parser = subparsers.add_parser('dtt', help='Dev Time Travel Vault operations')
+    dtt_subparsers = dtt_parser.add_subparsers(dest='dtt_command', help='DTT operations')
+    
+    # DTT init
+    dtt_subparsers.add_parser('init', help='Initialize DTT vault')
+    
+    # DTT snapshot
+    dtt_snapshot_parser = dtt_subparsers.add_parser('snapshot', help='Create snapshot')
+    dtt_snapshot_parser.add_argument('--id', dest='dtt_id', help='Snapshot identifier')
+    dtt_snapshot_parser.add_argument('--description', dest='dtt_description', help='Snapshot description')
+    
+    # DTT restore
+    dtt_restore_parser = dtt_subparsers.add_parser('restore', help='Restore snapshot')
+    dtt_restore_parser.add_argument('brick_id', help='Brick ID to restore')
+    dtt_restore_parser.add_argument('--force', dest='dtt_force', action='store_true', help='Force restore')
+    
+    # DTT verify
+    dtt_verify_parser = dtt_subparsers.add_parser('verify', help='Verify snapshot integrity')
+    dtt_verify_parser.add_argument('brick_id', nargs='?', help='Brick ID to verify (or "all")')
+    
+    # DTT compact
+    dtt_compact_parser = dtt_subparsers.add_parser('compact', help='Compact layer')
+    dtt_compact_parser.add_argument('--layer', dest='dtt_layer', default='layer-0', help='Layer to compact')
+    
+    # DTT prune
+    dtt_subparsers.add_parser('prune', help='Prune according to retention policy')
+    
+    return parser
+
+def main():
+    """Main entry point for LDA CLI"""
+    # Import moved to top of file
+    
+    parser = create_parser()
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        return 1
+        
+    commands = LDACLICommands()
+    
+    try:
+        if args.command == 'init':
+            return commands.init(args)
+        elif args.command == 'snapshot':
+            return commands.snapshot(args)
+        elif args.command == 'profile':
+            return commands.profile(args)
+        elif args.command == 'template':
+            return commands.template(args)
+        elif args.command == 'overlord':
+            return commands.overlord(args)
+        elif args.command == 'dtt':
+            return commands.dtt(args)
+        else:
+            print(f"❌ Unknown command: {args.command}")
+            return 1
+    except KeyboardInterrupt:
+        print("\n❌ Operation cancelled")
+        return 1
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return 1
+
+if __name__ == "__main__":
+    sys.exit(main())

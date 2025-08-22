@@ -1,0 +1,41 @@
+# Living Dev Agent Template - Python Dependencies
+# Install with: pip install -r scripts/requirements.txt
+
+# Core dependencies for linting and validation
+PyYAML>=6.0
+argparse>=1.4.0
+
+# Optional dependencies for enhanced functionality
+# Uncomment as needed for your specific use case
+
+# Code analysis and linting
+# pylint>=2.17.0
+# flake8>=6.0.0
+# black>=23.0.0
+# mypy>=1.5.0
+
+# Documentation generation
+# sphinx>=7.0.0
+# mkdocs>=1.5.0
+
+# Testing frameworks
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
+
+# Development utilities
+# rich>=13.5.0  # For enhanced console output
+# click>=8.1.0  # For CLI development
+# gitpython>=3.1.0  # For Git integration
+
+# DevTimeTravel specific (if implementing advanced features)
+# watchdog>=3.0.0  # For file system monitoring
+# psutil>=5.9.0  # For system metrics
+
+# MCP server dependencies (if implementing MCP integration)
+fastapi>=0.110.0
+uvicorn>=0.23.0
+pydantic>=2.3.0
+
+# Development and debugging
+# ipdb>=0.13.0
+# jupyter>=1.0.0

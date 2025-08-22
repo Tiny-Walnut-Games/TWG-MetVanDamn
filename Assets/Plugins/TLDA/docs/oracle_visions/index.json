@@ -1,0 +1,88 @@
+{
+  "metadata": {
+    "created": "2025-08-20T18:49:52.149Z",
+    "lastUpdated": "2025-08-20T18:56:16.975Z",
+    "totalVisions": 6,
+    "version": "1.0.0"
+  },
+  "visions": [
+    {
+      "id": "vision-mekbuzd1-cb839cf1",
+      "timestamp": "2025-08-20T18:50:07.621Z",
+      "archived": "2025-08-20T18:50:08.620Z",
+      "sourceIntel": null,
+      "trigger": "manual",
+      "visionType": "general",
+      "priority": 60,
+      "disposition": "pending",
+      "reportPath": "2025/08/vision-mekbuzd1-cb839cf1.md",
+      "dataPath": "2025/08/vision-mekbuzd1-cb839cf1.json",
+      "resultingChanges": []
+    },
+    {
+      "id": "vision-mekbx65c-edaa1ee5",
+      "timestamp": "2025-08-20T18:51:49.728Z",
+      "archived": "2025-08-20T18:51:59.766Z",
+      "sourceIntel": null,
+      "trigger": "advisor",
+      "visionType": "tech",
+      "priority": 95,
+      "disposition": "pending",
+      "reportPath": "2025/08/vision-mekbx65c-edaa1ee5.md",
+      "dataPath": "2025/08/vision-mekbx65c-edaa1ee5.json",
+      "resultingChanges": []
+    },
+    {
+      "id": "vision-mekbx65d-2104f15f",
+      "timestamp": "2025-08-20T18:51:49.729Z",
+      "archived": "2025-08-20T18:51:59.775Z",
+      "sourceIntel": null,
+      "trigger": "advisor",
+      "visionType": "tech",
+      "priority": 90,
+      "disposition": "pending",
+      "reportPath": "2025/08/vision-mekbx65d-2104f15f.md",
+      "dataPath": "2025/08/vision-mekbx65d-2104f15f.json",
+      "resultingChanges": []
+    },
+    {
+      "id": "vision-mekbx65d-5e208d7b",
+      "timestamp": "2025-08-20T18:51:49.729Z",
+      "archived": "2025-08-20T18:53:30.484Z",
+      "sourceIntel": null,
+      "trigger": "advisor",
+      "visionType": "tech",
+      "priority": 85,
+      "disposition": "pending",
+      "reportPath": "2025/08/vision-mekbx65d-5e208d7b.md",
+      "dataPath": "2025/08/vision-mekbx65d-5e208d7b.json",
+      "resultingChanges": []
+    },
+    {
+      "id": "vision-mekc2w7z-b97217ad",
+      "timestamp": "2025-08-20T18:56:16.799Z",
+      "archived": "2025-08-20T18:56:16.967Z",
+      "sourceIntel": null,
+      "trigger": "advisor",
+      "visionType": "tech",
+      "priority": 95,
+      "disposition": "pending",
+      "reportPath": "2025/08/vision-mekc2w7z-b97217ad.md",
+      "dataPath": "2025/08/vision-mekc2w7z-b97217ad.json",
+      "resultingChanges": []
+    },
+    {
+      "id": "vision-mekc2w80-fd0e5e70",
+      "timestamp": "2025-08-20T18:56:16.800Z",
+      "archived": "2025-08-20T18:56:16.975Z",
+      "sourceIntel": null,
+      "trigger": "advisor",
+      "visionType": "tech",
+      "priority": 90,
+      "disposition": "pending",
+      "reportPath": "2025/08/vision-mekc2w80-fd0e5e70.md",
+      "dataPath": "2025/08/vision-mekc2w80-fd0e5e70.json",
+      "resultingChanges": []
+    }
+  ]
+}

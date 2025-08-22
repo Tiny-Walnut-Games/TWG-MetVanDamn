@@ -1,0 +1,45 @@
+name: Docs Architecture Compliance
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'TLDL/**'
+  push:
+    paths:
+      - 'docs/**'
+      - 'TLDL/**'
+
+jobs:
+  directory-lint:
+    runs-on: ubuntu-latest
+    name: Check TLDL vs Docs Architecture
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Run Directory Structure Lint
+        run: |
+          python3 scripts/directory_lint.py
+          
+      - name: Architecture Compliance Check
+        if: failure()
+        run: |
+          echo "❌ Architecture violation detected!"
+          echo ""
+          echo "📋 Docs Architecture Rules:"
+          echo "  • TLDL entries (TLDL-YYYY-MM-DD-*.md) belong in TLDL/entries/"
+          echo "  • Evergreen docs (guides, references) belong in docs/"
+          echo "  • Templates belong in templates/"
+          echo ""
+          echo "🔧 To fix:"
+          echo "  • Move TLDL entries: mv docs/TLDL-*.md TLDL/entries/"
+          echo "  • Move templates: mv *.md templates/tldl/"
+          echo "  • Re-run: python3 scripts/directory_lint.py"
+          exit 1

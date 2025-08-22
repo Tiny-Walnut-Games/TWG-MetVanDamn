@@ -1,0 +1,38 @@
+# Living Dev Agent - Code Ownership and Review Requirements
+# This file defines ownership for security-sensitive and critical areas
+
+# Default owner for the repository
+* @jmeyer1980
+
+# Security-sensitive workflow files require security owner review
+.github/workflows/ @jmeyer1980
+.github/dependabot.yml @jmeyer1980
+
+# Security configuration files
+mcp-config.json @jmeyer1980
+scripts/validate_*.sh @jmeyer1980
+
+# Critical infrastructure and configuration
+scripts/init_agent_context.sh @jmeyer1980
+scripts/clone-and-clean.sh @jmeyer1980
+
+# Security documentation
+docs/MCP-Security-Audit-Report.md @jmeyer1980
+docs/*Security*.md @jmeyer1980
+
+# Core validation and security tools
+src/SymbolicLinter/ @jmeyer1980
+src/DebugOverlayValidation/ @jmeyer1980
+
+# Agent profiles and configuration
+.agent-profile.yaml @jmeyer1980
+agent-profile.yaml @jmeyer1980
+flags.yaml @jmeyer1980
+
+# Package and dependency management
+package.json @jmeyer1980
+scripts/requirements.txt @jmeyer1980
+
+# TLDL entries documenting security changes
+docs/TLDL-*Security*.md @jmeyer1980
+docs/TLDL-*security*.md @jmeyer1980
