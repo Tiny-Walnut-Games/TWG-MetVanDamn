@@ -63,7 +63,7 @@ jobs:
     
     steps:
       - name: 🧙‍♂️ Summon the Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Need write access to create TLDL entries
           token: ${{ secrets.GITHUB_TOKEN }}
