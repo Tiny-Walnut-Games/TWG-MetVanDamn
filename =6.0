@@ -1,4 +1,0 @@
-Defaulting to user installation because normal site-packages is not writeable
-# Ignore package installation logs and artifacts
-*.log
-pip-log.txt

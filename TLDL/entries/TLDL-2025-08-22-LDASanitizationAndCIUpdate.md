@@ -118,7 +118,7 @@ unity-tests:
 
 ## Next Steps
 
-- [ ] Monitor CI pipeline performance with new Unity test jobs (Priority: High, Assignee: @dev-team)
+- [ ] Monitor CI pipeline performance with new Unity test jobs (Priority: High, Assignee: @jmeyer1980)
 - [ ] Validate badge generation from Unity test coverage reports (Priority: High, Assignee: @copilot)
 - [ ] Create specific Unity test documentation for MetVanDAMN developers (Priority: Medium, Assignee: Future contributors)
 - [ ] Consider Unity Cloud Build integration for built player testing (Priority: Low, Assignee: Future enhancement)
