@@ -209,7 +209,12 @@ jobs:
             echo "This marks the final checkpoint before merge or deployment."
           else
             echo "❌ Validation failed. Please check the logs above."
-            exit 1
+              echo "✅ All required validation jobs completed successfully."
+              echo "🛡️ Buttsafe Certification Achieved."
+              echo "This marks the final checkpoint before merge or deployment."
+          else
+              echo "❌ Validation failed. Please check the logs above."
+              exit 1
           fi
 
       - name: Display recent commit info
