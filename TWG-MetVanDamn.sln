@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Biome
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Core.Tests", "TinyWalnutGames.MetVD.Core.Tests.csproj", "{E9C4D347-2E1D-F368-39D1-5811E421A254}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.GridLayerEditor", "TinyWalnutGames.GridLayerEditor.csproj", "{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Utility", "TinyWalnutGames.MetVD.Utility.Player.csproj", "{42CE9A5A-151F-11C2-CF3F-733E043831F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Graph.Tests", "TinyWalnutGames.MetVD.Graph.Tests.Player.csproj", "{5D271A50-07E2-9D14-5FD2-CF5E33EE1208}"
@@ -83,6 +85,10 @@ Global
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42CE9A5A-151F-11C2-CF3F-733E043831F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42CE9A5A-151F-11C2-CF3F-733E043831F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42CE9A5A-151F-11C2-CF3F-733E043831F5}.Release|Any CPU.ActiveCfg = Release|Any CPU

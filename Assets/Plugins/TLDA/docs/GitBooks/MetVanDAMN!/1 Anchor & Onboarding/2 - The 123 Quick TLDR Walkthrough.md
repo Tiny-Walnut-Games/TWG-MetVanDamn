@@ -6,6 +6,38 @@
 
 ---
 
+## ⚡ One‑Click Baseline Playable Scene (Fast Onboarding)
+Use the built‑in bootstrap to generate a ready‑to‑run scene + sub‑scenes that exercise world generation, WFC, biome fields and future UI/NPC layers.
+
+Menu: `MetVanDAMN/Create Baseline Scene`  (Shortcut: Ctrl/Cmd + Shift + M)
+Outputs:
+- Root scene: `Assets/Scenes/MetVanDAMN_Baseline.unity`
+- Sub‑scenes (additive, auto‑created if missing):
+  - `WorldGen_Terrain`
+  - `WorldGen_Dungeon`
+  - `NPC_Interactions`
+  - `UI_HUD`
+- `Bootstrap` GameObject (adds `SmokeTestSceneSetup` if available) with seed + world size defaults
+- Light + Camera added if absent
+
+Two operating modes:
+1. Direct Mode (define `METVD_FULL_DOTS` + have Samples & SubScene assemblies referenced) – compile‑time safety.
+2. Fallback Mode (no symbol) – reflection gracefully skips absent packages (ideal for lean CI / partial installs).
+
+Switch to Direct Mode:
+1. Add asmdef references to `TinyWalnutGames.MetVD.Samples` and `Unity.Scenes`.
+2. Add scripting define symbol: `METVD_FULL_DOTS` (in asmdef or Player Settings).
+3. Recompile – bootstrap now uses strong types.
+
+Why run this first?
+- Instant “Press Play” validation of generation pipeline.
+- Standardized layout for PRs & screenshots.
+- Establishes reproducible seeds quickly for regression snapshots.
+
+If you skip it: follow the 1️⃣–4️⃣ seeds/assemblies/systems/polarity steps below manually.
+
+---
+
 ## **1️⃣ One World Seed**
 - Create a **WorldConfiguration** entity with:
   - `WorldSeed` set to a fixed test value.
