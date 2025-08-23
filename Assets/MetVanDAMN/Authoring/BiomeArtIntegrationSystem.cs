@@ -7,6 +7,7 @@ using UnityEngine.Tilemaps;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.GridLayerEditor;
 using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem;
+using System.Linq;
 
 namespace TinyWalnutGames.MetVD.Authoring
 {
@@ -128,7 +129,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             CreateProjectionAwareGrid(projectionType, layerNames, artProfile.biomeName);
             
             // Apply biome-specific tiles to the created layers
-            ApplyBiomeTilesToLayers(artProfile, layerNames);
+            ApplyBiomeTilesToLayers(artProfile, layerNames, createdGrid);
         }
 
         private string[] GetLayerNamesForProjection(ProjectionType projectionType)
@@ -233,40 +234,468 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private void PlaceBiomeProps(BiomeArtProfile artProfile, Biome biome, NodeId nodeId)
         {
-            if (artProfile.propPrefabs == null || artProfile.propPrefabs.Length == 0)
+            if (artProfile.propSettings?.propPrefabs == null || artProfile.propSettings.propPrefabs.Length == 0)
                 return;
 
             var grid = GameObject.FindObjectOfType<Grid>();
             if (grid == null) return;
 
-            // Place props in allowed layers
-            foreach (string layerName in artProfile.allowedPropLayers)
+            // Use advanced prop placement based on strategy
+            var placer = new AdvancedPropPlacer(artProfile.propSettings, grid, biome, nodeId);
+            placer.PlaceProps();
+        }
+
+    }
+
+    /// <summary>
+    /// Advanced prop placement system for B+/A-level biome art
+    /// Implements clustering, avoidance, density curves, and terrain awareness
+    /// </summary>
+    public class AdvancedPropPlacer
+    {
+        private readonly PropPlacementSettings settings;
+        private readonly Grid grid;
+        private readonly Biome biome;
+        private readonly NodeId nodeId;
+        private readonly System.Random rng;
+        private readonly List<Vector3> placedPropPositions;
+
+        public AdvancedPropPlacer(PropPlacementSettings settings, Grid grid, Biome biome, NodeId nodeId)
+        {
+            this.settings = settings;
+            this.grid = grid;
+            this.biome = biome;
+            this.nodeId = nodeId;
+            this.rng = new System.Random(nodeId.Coordinates.GetHashCode());
+            this.placedPropPositions = new List<Vector3>();
+        }
+
+        public void PlaceProps()
+        {
+            switch (settings.strategy)
             {
-                if (UnityEngine.Random.value <= artProfile.propSpawnChance)
+                case PropPlacementStrategy.Random:
+                    PlaceRandomProps();
+                    break;
+                case PropPlacementStrategy.Clustered:
+                    PlaceClusteredProps();
+                    break;
+                case PropPlacementStrategy.Sparse:
+                    PlaceSparseProps();
+                    break;
+                case PropPlacementStrategy.Linear:
+                    PlaceLinearProps();
+                    break;
+                case PropPlacementStrategy.Radial:
+                    PlaceRadialProps();
+                    break;
+                case PropPlacementStrategy.Terrain:
+                    PlaceTerrainAwareProps();
+                    break;
+            }
+        }
+
+        private void PlaceRandomProps()
+        {
+            foreach (string layerName in settings.allowedPropLayers)
+            {
+                var layerObject = grid.transform.Find(layerName);
+                if (layerObject == null) continue;
+
+                // Calculate number of props to place based on density
+                int propCount = CalculatePropCount(layerName);
+                
+                for (int i = 0; i < propCount; i++)
                 {
-                    PlacePropInLayer(grid, layerName, artProfile, nodeId);
+                    Vector3 position = GenerateRandomPosition(layerObject);
+                    
+                    if (IsPositionValid(position, layerName))
+                    {
+                        PlacePropAtPosition(position, layerObject);
+                    }
                 }
             }
         }
 
-        private void PlacePropInLayer(Grid grid, string layerName, BiomeArtProfile artProfile, NodeId nodeId)
+        private void PlaceClusteredProps()
+        {
+            foreach (string layerName in settings.allowedPropLayers)
+            {
+                var layerObject = grid.transform.Find(layerName);
+                if (layerObject == null) continue;
+
+                // Generate cluster centers
+                int clusterCount = Mathf.Max(1, Mathf.RoundToInt(settings.baseDensity * settings.densityMultiplier * 10));
+                var clusterCenters = GenerateClusterCenters(clusterCount, layerObject);
+
+                // Place props around each cluster center
+                foreach (var center in clusterCenters)
+                {
+                    PlaceClusterAroundCenter(center, layerObject);
+                }
+            }
+        }
+
+        private void PlaceSparseProps()
+        {
+            foreach (string layerName in settings.allowedPropLayers)
+            {
+                var layerObject = grid.transform.Find(layerName);
+                if (layerObject == null) continue;
+
+                // Very selective placement with high quality spots
+                int maxAttempts = Mathf.RoundToInt(settings.maxPropsPerBiome * 0.1f); // 10% of max for sparse
+                int placedCount = 0;
+                int attempts = 0;
+
+                while (placedCount < maxAttempts / settings.allowedPropLayers.Count && attempts < maxAttempts * 3)
+                {
+                    Vector3 position = GenerateRandomPosition(layerObject);
+                    
+                    if (IsHighQualityPosition(position, layerName))
+                    {
+                        PlacePropAtPosition(position, layerObject);
+                        placedCount++;
+                    }
+                    attempts++;
+                }
+            }
+        }
+
+        private void PlaceLinearProps()
+        {
+            foreach (string layerName in settings.allowedPropLayers)
+            {
+                var layerObject = grid.transform.Find(layerName);
+                if (layerObject == null) continue;
+
+                // Find edges and place props along them
+                var edgePoints = FindEdgePoints(layerObject);
+                
+                foreach (var point in edgePoints)
+                {
+                    if (rng.NextDouble() < settings.baseDensity * settings.densityMultiplier)
+                    {
+                        if (IsPositionValid(point, layerName))
+                        {
+                            PlacePropAtPosition(point, layerObject);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void PlaceRadialProps()
+        {
+            foreach (string layerName in settings.allowedPropLayers)
+            {
+                var layerObject = grid.transform.Find(layerName);
+                if (layerObject == null) continue;
+
+                // Create radial pattern from center
+                Vector3 center = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+                float maxRadius = 10f; // Adjust based on biome size
+                
+                for (float radius = 1f; radius <= maxRadius; radius += 2f)
+                {
+                    int pointsOnCircle = Mathf.RoundToInt(radius * 2 * Mathf.PI * settings.baseDensity);
+                    
+                    for (int i = 0; i < pointsOnCircle; i++)
+                    {
+                        float angle = (float)i / pointsOnCircle * 2 * Mathf.PI;
+                        Vector3 position = center + new Vector3(
+                            Mathf.Cos(angle) * radius,
+                            Mathf.Sin(angle) * radius,
+                            0
+                        );
+                        
+                        if (IsPositionValid(position, layerName))
+                        {
+                            PlacePropAtPosition(position, layerObject);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void PlaceTerrainAwareProps()
+        {
+            foreach (string layerName in settings.allowedPropLayers)
+            {
+                var layerObject = grid.transform.Find(layerName);
+                if (layerObject == null) continue;
+
+                // Sample terrain and place props based on terrain features
+                var terrainSamples = SampleTerrain(layerObject);
+                
+                foreach (var sample in terrainSamples)
+                {
+                    float terrainSuitability = CalculateTerrainSuitability(sample, layerName);
+                    float spawnChance = settings.baseDensity * terrainSuitability * settings.densityMultiplier;
+                    
+                    if (rng.NextDouble() < spawnChance && IsPositionValid(sample.position, layerName))
+                    {
+                        PlacePropAtPosition(sample.position, layerObject);
+                    }
+                }
+            }
+        }
+
+        private int CalculatePropCount(string layerName)
+        {
+            float baseCount = settings.baseDensity * settings.densityMultiplier * 50; // Base scaling factor
+            float distanceFromCenter = Vector2.Distance(Vector2.zero, new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y));
+            float normalizedDistance = Mathf.Clamp01(distanceFromCenter / 20f); // Normalize to 0-1 over 20 units
+            float densityFactor = settings.densityCurve.Evaluate(1f - normalizedDistance); // Invert so center = 1
+            
+            return Mathf.RoundToInt(baseCount * densityFactor);
+        }
+
+        private Vector3 GenerateRandomPosition(Transform layerObject)
+        {
+            // Generate position within biome bounds
+            float x = (float)(rng.NextDouble() * 20 - 10) + nodeId.Coordinates.x; // ±10 units from center
+            float y = (float)(rng.NextDouble() * 20 - 10) + nodeId.Coordinates.y;
+            
+            // Add position jitter if enabled
+            if (settings.variation.positionJitter > 0)
+            {
+                x += (float)(rng.NextDouble() - 0.5) * settings.variation.positionJitter;
+                y += (float)(rng.NextDouble() - 0.5) * settings.variation.positionJitter;
+            }
+            
+            return new Vector3(x, y, 0);
+        }
+
+        private bool IsPositionValid(Vector3 position, string layerName)
+        {
+            // Check avoidance rules
+            if (settings.avoidance.avoidOvercrowding)
+            {
+                foreach (var existingPos in placedPropPositions)
+                {
+                    if (Vector3.Distance(position, existingPos) < settings.avoidance.minimumPropDistance)
+                        return false;
+                }
+            }
+
+            // Check layer avoidance
+            foreach (string avoidLayer in settings.avoidance.avoidLayers)
+            {
+                if (IsNearLayer(position, avoidLayer, settings.avoidance.avoidanceRadius))
+                    return false;
+            }
+
+            // Check biome transition avoidance
+            if (settings.avoidance.avoidTransitions && IsNearBiomeTransition(position))
+                return false;
+
+            return true;
+        }
+
+        private bool IsHighQualityPosition(Vector3 position, string layerName)
+        {
+            // High quality positions are away from edges, hazards, and other props
+            return IsPositionValid(position, layerName) && 
+                   !IsNearLayer(position, "Edge", 3f) &&
+                   placedPropPositions.All(p => Vector3.Distance(position, p) > settings.avoidance.minimumPropDistance * 2);
+        }
+
+        private List<Vector3> GenerateClusterCenters(int clusterCount, Transform layerObject)
+        {
+            var centers = new List<Vector3>();
+            int attempts = 0;
+            
+            while (centers.Count < clusterCount && attempts < clusterCount * 10)
+            {
+                Vector3 candidate = GenerateRandomPosition(layerObject);
+                
+                // Check minimum separation from other cluster centers
+                bool validCenter = true;
+                foreach (var existingCenter in centers)
+                {
+                    if (Vector3.Distance(candidate, existingCenter) < settings.clustering.clusterSeparation)
+                    {
+                        validCenter = false;
+                        break;
+                    }
+                }
+                
+                if (validCenter && IsPositionValid(candidate, layerObject.name))
+                {
+                    centers.Add(candidate);
+                }
+                
+                attempts++;
+            }
+            
+            return centers;
+        }
+
+        private void PlaceClusterAroundCenter(Vector3 center, Transform layerObject)
+        {
+            int propsInCluster = Mathf.RoundToInt(settings.clustering.clusterSize * settings.clustering.clusterDensity);
+            
+            for (int i = 0; i < propsInCluster; i++)
+            {
+                // Generate position within cluster radius
+                float angle = (float)(rng.NextDouble() * 2 * Mathf.PI);
+                float distance = (float)(rng.NextDouble() * settings.clustering.clusterRadius);
+                
+                Vector3 offset = new Vector3(
+                    Mathf.Cos(angle) * distance,
+                    Mathf.Sin(angle) * distance,
+                    0
+                );
+                
+                Vector3 propPosition = center + offset;
+                
+                if (IsPositionValid(propPosition, layerObject.name))
+                {
+                    PlacePropAtPosition(propPosition, layerObject);
+                }
+            }
+        }
+
+        private List<Vector3> FindEdgePoints(Transform layerObject)
+        {
+            // Simplified edge detection - in production, this would analyze the actual tilemap
+            var edgePoints = new List<Vector3>();
+            
+            // Generate points along the perimeter of the biome area
+            Vector3 center = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+            float radius = 8f; // Approximate biome radius
+            int pointCount = 20;
+            
+            for (int i = 0; i < pointCount; i++)
+            {
+                float angle = (float)i / pointCount * 2 * Mathf.PI;
+                Vector3 edgePoint = center + new Vector3(
+                    Mathf.Cos(angle) * radius,
+                    Mathf.Sin(angle) * radius,
+                    0
+                );
+                edgePoints.Add(edgePoint);
+            }
+            
+            return edgePoints;
+        }
+
+        private struct TerrainSample
+        {
+            public Vector3 position;
+            public string terrainType;
+            public float elevation;
+            public float moisture;
+        }
+
+        private List<TerrainSample> SampleTerrain(Transform layerObject)
+        {
+            var samples = new List<TerrainSample>();
+            
+            // Grid-based terrain sampling
+            Vector3 center = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+            
+            for (float x = -8; x <= 8; x += 2)
+            {
+                for (float y = -8; y <= 8; y += 2)
+                {
+                    Vector3 samplePos = center + new Vector3(x, y, 0);
+                    
+                    samples.Add(new TerrainSample
+                    {
+                        position = samplePos,
+                        terrainType = layerObject.name,
+                        elevation = Mathf.PerlinNoise(samplePos.x * 0.1f, samplePos.y * 0.1f),
+                        moisture = Mathf.PerlinNoise(samplePos.x * 0.05f + 100, samplePos.y * 0.05f + 100)
+                    });
+                }
+            }
+            
+            return samples;
+        }
+
+        private float CalculateTerrainSuitability(TerrainSample sample, string layerName)
+        {
+            float suitability = 1f;
+            
+            // Adjust based on terrain type
+            if (layerName.Contains("Ground") || layerName.Contains("Floor"))
+            {
+                // Ground props prefer flat areas
+                suitability *= 1f - Mathf.Abs(sample.elevation - 0.5f);
+            }
+            else if (layerName.Contains("Water"))
+            {
+                // Water props prefer high moisture
+                suitability *= sample.moisture;
+            }
+            else if (layerName.Contains("Mountain") || layerName.Contains("Rock"))
+            {
+                // Mountain props prefer high elevation
+                suitability *= sample.elevation;
+            }
+            
+            return Mathf.Clamp01(suitability);
+        }
+
+        private bool IsNearLayer(Vector3 position, string layerName, float radius)
         {
             var layerObject = grid.transform.Find(layerName);
-            if (layerObject == null) return;
+            if (layerObject == null) return false;
+            
+            // Simplified distance check - in production, would check actual tilemap content
+            return Vector3.Distance(position, layerObject.position) < radius;
+        }
 
+        private bool IsNearBiomeTransition(Vector3 position)
+        {
+            // Simplified biome edge detection
+            Vector3 biomeCenter = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+            float distanceFromCenter = Vector3.Distance(position, biomeCenter);
+            return distanceFromCenter > 8f - settings.avoidance.transitionAvoidanceRadius;
+        }
+
+        private void PlacePropAtPosition(Vector3 position, Transform layerObject)
+        {
+            if (settings.propPrefabs.Length == 0) return;
+            
             // Select random prop prefab
-            if (artProfile.propPrefabs.Length == 0) return;
-            int propIndex = UnityEngine.Random.Range(0, artProfile.propPrefabs.Length);
-            var propPrefab = artProfile.propPrefabs[propIndex];
+            int propIndex = rng.Next(0, settings.propPrefabs.Length);
+            var propPrefab = settings.propPrefabs[propIndex];
             
             if (propPrefab == null) return;
-
-            // Calculate world position based on node coordinates
-            Vector3 worldPosition = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+            
+            // Apply variations
+            Quaternion rotation = Quaternion.identity;
+            if (settings.variation.randomRotation)
+            {
+                float rotationAngle = (float)(rng.NextDouble() * settings.variation.maxRotationAngle);
+                rotation = Quaternion.Euler(0, 0, rotationAngle);
+            }
+            
+            Vector3 scale = Vector3.one;
+            if (settings.variation.minScale != settings.variation.maxScale)
+            {
+                float scaleMultiplier = Mathf.Lerp(
+                    settings.variation.minScale,
+                    settings.variation.maxScale,
+                    (float)rng.NextDouble()
+                );
+                scale = Vector3.one * scaleMultiplier;
+            }
             
             // Instantiate prop
-            var propInstance = GameObject.Instantiate(propPrefab, worldPosition, Quaternion.identity, layerObject);
-            propInstance.name = $"{artProfile.biomeName} Prop ({propIndex})";
+            var propInstance = GameObject.Instantiate(propPrefab, position, rotation, layerObject);
+            propInstance.transform.localScale = scale;
+            propInstance.name = $"{biome.BiomeType} Prop ({propIndex})";
+            
+            // Track placed position for avoidance calculations
+            placedPropPositions.Add(position);
+            
+            // Respect max props limit
+            if (placedPropPositions.Count >= settings.maxPropsPerBiome)
+                return;
         }
     }
 }
