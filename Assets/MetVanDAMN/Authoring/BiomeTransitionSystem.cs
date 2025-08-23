@@ -149,8 +149,15 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private readonly bool TryFindEntityByNodeId(uint nodeId, out Entity entity)
         {
-            // Simplified lookup - in production this would use a more efficient indexing system
-            // For now, we'll return false and skip neighbor checking
+            // Linear search through all entities with NodeId component
+            foreach (var pair in NodeIdLookup)
+            {
+                if (pair.Value.Value == nodeId)
+                {
+                    entity = pair.Key;
+                    return true;
+                }
+            }
             entity = Entity.Null;
             return false;
         }
