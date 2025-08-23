@@ -25,13 +25,13 @@ namespace TinyWalnutGames.MetVD.Authoring
     {
         [Range(2, 20), Tooltip("Number of props per cluster")]
         public int clusterSize = 5;
-        
+
         [Range(0.5f, 10f), Tooltip("Radius of each cluster in world units")]
         public float clusterRadius = 3f;
-        
+
         [Range(0f, 1f), Tooltip("How tightly packed props are within clusters")]
         public float clusterDensity = 0.7f;
-        
+
         [Range(5f, 50f), Tooltip("Minimum distance between cluster centers")]
         public float clusterSeparation = 15f;
     }
@@ -43,20 +43,20 @@ namespace TinyWalnutGames.MetVD.Authoring
     public class AvoidanceSettings
     {
         [Tooltip("Layers to avoid when placing props")]
-        public List<string> avoidLayers = new List<string> { "Hazards", "Walls" };
-        
+        public List<string> avoidLayers = new() { "Hazards", "Walls" };
+
         [Range(0.5f, 5f), Tooltip("Minimum distance from avoided features")]
         public float avoidanceRadius = 1.5f;
-        
+
         [Tooltip("Avoid biome transition areas")]
         public bool avoidTransitions = true;
-        
+
         [Range(0.5f, 10f), Tooltip("Distance from biome edges to avoid")]
         public float transitionAvoidanceRadius = 2f;
-        
+
         [Tooltip("Avoid spawning props too close to each other")]
         public bool avoidOvercrowding = true;
-        
+
         [Range(0.5f, 5f), Tooltip("Minimum distance between props")]
         public float minimumPropDistance = 1f;
     }
@@ -70,17 +70,17 @@ namespace TinyWalnutGames.MetVD.Authoring
         [Header("Size Variation")]
         [Range(0.5f, 2f), Tooltip("Minimum scale multiplier")]
         public float minScale = 0.8f;
-        
+
         [Range(0.5f, 2f), Tooltip("Maximum scale multiplier")]
         public float maxScale = 1.2f;
-        
+
         [Header("Rotation Variation")]
         [Tooltip("Allow random Y-axis rotation")]
         public bool randomRotation = true;
-        
+
         [Range(0f, 360f), Tooltip("Maximum rotation angle in degrees")]
         public float maxRotationAngle = 360f;
-        
+
         [Header("Position Variation")]
         [Range(0f, 1f), Tooltip("Random offset within tile bounds")]
         public float positionJitter = 0.3f;
@@ -95,39 +95,37 @@ namespace TinyWalnutGames.MetVD.Authoring
         [Header("Basic Settings")]
         [Tooltip("Prefabs to spawn as props in this biome")]
         public GameObject[] propPrefabs = new GameObject[0];
-        
+
         [Tooltip("Names of tilemap layers where props can be placed")]
-        public List<string> allowedPropLayers = new List<string>();
-        
+        public List<string> allowedPropLayers = new();
+
         [Header("Placement Strategy")]
         [Tooltip("How props should be distributed in this biome")]
         public PropPlacementStrategy strategy = PropPlacementStrategy.Random;
-        
+
         [Header("Density Control")]
         [Range(0f, 1f), Tooltip("Base spawn probability per eligible tile")]
         public float baseDensity = 0.1f;
-        
+
         [Tooltip("Density curve based on distance from biome center (0=edge, 1=center)")]
         public AnimationCurve densityCurve = AnimationCurve.Linear(0f, 0.5f, 1f, 1f);
-        
+
         [Range(0f, 2f), Tooltip("Multiplier for overall prop density")]
         public float densityMultiplier = 1f;
-        
+
         [Header("Advanced Placement")]
-        public ClusteringSettings clustering = new ClusteringSettings();
-        public AvoidanceSettings avoidance = new AvoidanceSettings();
-        public VariationSettings variation = new VariationSettings();
-        
+        public ClusteringSettings clustering = new();
+        public AvoidanceSettings avoidance = new();
+        public VariationSettings variation = new();
+
         [Header("Performance")]
         [Range(10, 1000), Tooltip("Maximum props to place per biome instance")]
         public int maxPropsPerBiome = 100;
-        
+
         [Tooltip("Use spatial optimization for large biomes")]
         public bool useSpatialOptimization = true;
     }
 
-namespace TinyWalnutGames.MetVD.Authoring
-{
     [CreateAssetMenu(
         fileName = "BiomeArtProfile",
         menuName = "MetVanDAMN/Biome Art Profile",
@@ -141,10 +139,10 @@ namespace TinyWalnutGames.MetVD.Authoring
         [Header("Tilemap Art")]
         [Tooltip("Floor tile (preferably RuleTile from Unity 2D Tilemap Extras)")]
         public TileBase floorTile;
-        
+
         [Tooltip("Wall tile (preferably RuleTile from Unity 2D Tilemap Extras)")]
         public TileBase wallTile;
-        
+
         [Tooltip("Background tile (preferably RuleTile from Unity 2D Tilemap Extras)")]
         public TileBase backgroundTile;
 

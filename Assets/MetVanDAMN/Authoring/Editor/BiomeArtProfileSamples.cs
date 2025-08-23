@@ -9,6 +9,28 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     /// </summary>
     public static class BiomeArtProfileSamples
     {
+        // Helper curve builders (Unity does not expose AnimationCurve.EaseIn / EaseOut factory methods natively)
+        // These approximate ease shapes using two keyframes with adjusted tangents.
+        private static AnimationCurve EaseOutCurve(float x0, float y0, float x1, float y1)
+        {
+            var k0 = new Keyframe(x0, y0, 0f, 0f);          // Flat tangent at start (quick rise after)
+            var k1 = new Keyframe(x1, y1, 0f, 0f);          // Flat tangent at end to slow into value
+            // Adjust tangents to create an ease-out effect (fast start -> slow end)
+            k0.outTangent = (y1 - y0) * 2f;                // Push quickly upward
+            k1.inTangent = 0f;                             // Flatten into end
+            return new AnimationCurve(k0, k1);
+        }
+
+        private static AnimationCurve EaseInCurve(float x0, float y0, float x1, float y1)
+        {
+            var k0 = new Keyframe(x0, y0, 0f, 0f);          // Flat at start (slow start)
+            var k1 = new Keyframe(x1, y1, 0f, 0f);          // Flat at end optional
+            // Adjust tangents to create an ease-in effect (slow start -> fast end)
+            k0.outTangent = 0f;                            // Stay flat initially
+            k1.inTangent = (y1 - y0) * 2f;                 // Accelerate into end
+            return new AnimationCurve(k0, k1);
+        }
+
         /// <summary>
         /// Creates a sample forest biome with clustered vegetation placement
         /// Demonstrates B+ level clustering and natural distribution
@@ -87,7 +109,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 // Density: Low with center concentration
                 baseDensity = 0.08f,
                 densityMultiplier = 1.2f,
-                densityCurve = AnimationCurve.EaseOut(0f, 0.1f, 1f, 0.9f),
+                densityCurve = EaseOutCurve(0f, 0.1f, 1f, 0.9f), // replaced unsupported AnimationCurve.EaseOut
                 
                 // Clustering: Small, tight oasis clusters
                 clustering = new ClusteringSettings
@@ -203,7 +225,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 // Density: Edge-focused distribution
                 baseDensity = 0.2f,
                 densityMultiplier = 1.3f,
-                densityCurve = AnimationCurve.EaseIn(0f, 1f, 1f, 0.2f), // Dense at edges
+                densityCurve = EaseInCurve(0f, 1f, 1f, 0.2f), // replaced unsupported AnimationCurve.EaseIn
                 
                 // Clustering: Small tidal pools and driftwood
                 clustering = new ClusteringSettings

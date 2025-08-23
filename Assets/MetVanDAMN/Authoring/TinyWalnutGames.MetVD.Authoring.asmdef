@@ -9,7 +9,8 @@
         "Unity.Mathematics",
         "TinyWalnutGames.MetVD.Core",
         "TinyWalnutGames.MetVD.Graph",
-        "TinyWalnutGames.MetVD.Biome"
+        "TinyWalnutGames.MetVD.Biome",
+        "TinyWalnutGames.GridLayerEditor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -62,6 +62,20 @@ Reflection overhead here is negligible (< 1 ms per invocation) so keep it unless
 - Sub‑scenes reused if already on disk (idempotent).
 - Already loaded sub‑scenes are not re‑opened (prevents duplicate tabs).
 
+## World Debug & Visualization
+
+To visualize authored graph data outside of play mode:
+
+- Create (or let the World Debugger create) a `MetVDGizmoSettings` asset.
+- Open the World Debug window: `MetVanDAMN/World Debugger`.
+- Toggle colors, sizes, and labels. Frame all districts with a single button.
+- Scene view shows:
+  - Filled quads for districts (ID + level label)
+  - Connection lines + arrow heads (double arrows for bidirectional)
+  - Biome field primary fill + secondary gradient ring
+
+Gizmos respect play/edit toggles so you can disable noise when not needed.
+
 ## Usage
 1. Create an empty GameObject, add WorldConfigurationAuthoring.
 2. Add several DistrictAuthoring objects (place in scene). Assign unique nodeIds.
@@ -69,7 +83,8 @@ Reflection overhead here is negligible (< 1 ms per invocation) so keep it unless
 4. Add optional BiomeFieldAuthoring objects for biome gradient seeding.
 5. Add GateConditionAuthoring to districts needing gates.
 6. (Optional) Run baseline generator for a pre‑wired smoke scene.
-7. Enter Play Mode. Bakers convert authoring data to entities; WFC + refinement systems progress automatically.
+7. Use the World Debugger window + gizmos to validate spatial layout pre-play.
+8. Enter Play Mode. Bakers convert authoring data to entities; WFC + refinement systems progress automatically.
 
 ## Notes
 - Bakers avoid heavy logic; generation left to runtime systems.
@@ -77,7 +92,8 @@ Reflection overhead here is negligible (< 1 ms per invocation) so keep it unless
 - Gate descriptions truncated to 64 chars by FixedString64Bytes.
 
 ## TODO
-- Gizmo drawing (district labels, connection arrows, biome field radius)
-- Validation warnings for duplicate nodeIds
-- Sample scene + prefabs (baseline generator partially covers this)
+- Additional gizmo overlays (prop preview density heatmap)
+- Validation warnings for duplicate nodeIds (editor utility)
 - Authoring validation report (missing connections, unreferenced districts)
+- Sector / room hierarchy drill-down visualization
+- Quick biome color legend panel in World Debugger

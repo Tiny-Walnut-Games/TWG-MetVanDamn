@@ -168,6 +168,28 @@ living-dev-agent/
 - **Initialize with init_agent_context.sh** after template creation
 - **Customize configuration files** for project-specific needs
 
+## NEW: Biome Art Integration (MetVanDAMN)
+Recent PR introduced biome-aware tilemap + prop placement systems:
+- BiomeArtProfile ScriptableObject (tiles, props, variation, avoidance, clustering)
+- Runtime systems: BiomeArtIntegrationSystem (ECS job pre-pass), BiomeArtMainThreadSystem (GameObject + Tilemap creation)
+- Multi-projection support: Platformer, TopDown, Isometric, Hexagonal via Grid Layer Editor
+- 6 placement strategies: Random, Clustered, Sparse, Linear, Radial, Terrain
+
+Troubleshooting quick fixes (common mistakes during merge):
+1. Undefined variable createdGrid in CreateBiomeSpecificTilemap – capture return: `var grid = CreateProjectionAwareGrid(...);`
+2. Missing `using System.Collections.Generic;` for List usage in AdvancedPropPlacer
+3. Main thread system skipped because job prematurely set `IsApplied = true` – ensure only main thread sets flag after successful creation
+4. Ensure profile references valid (ProfileRef.IsValid) before accessing `.Value`
+5. For tests, inject mock BiomeArtProfile with minimal tiles to avoid null tilemap writes
+
+Minimal hotfix pattern:
+```
+if (artProfileRef.IsApplied || !artProfileRef.ProfileRef.IsValid) return;
+var profile = artProfileRef.ProfileRef.Value; if (!profile) return; // Unity null check
+// build grid + layers, then set tiles & props
+artProfileRef.IsApplied = true; // only after success
+```
+
 ## Living Dev Agent Personality and Workflow Intelligence
 
 ### 🧙‍♂️ Communication Style

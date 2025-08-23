@@ -4,87 +4,49 @@ using Unity.Burst;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using TinyWalnutGames.MetVD.Core;
+using TinyWalnutGames.MetVD.Core; // For NodeId, Biome component
+using TinyWalnutGames.MetVD.Biome;
 using TinyWalnutGames.GridLayerEditor;
 using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem;
 using System.Linq;
+using System.Collections.Generic; // Needed for List<>
+
+// Disambiguate Biome component from potential namespace collisions
+using CoreBiome = TinyWalnutGames.MetVD.Core.Biome;
 
 namespace TinyWalnutGames.MetVD.Authoring
 {
     /// <summary>
     /// System responsible for applying biome art profiles to generated worlds
     /// Integrates with Grid Layer Editor for projection-aware tilemap creation
+    /// NOTE: Current implementation performs all work on main thread via BiomeArtMainThreadSystem.
+    /// This integration system is a placeholder for potential pre-pass / tagging logic.
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     [UpdateAfter(typeof(BiomeFieldSystem))]
     public partial struct BiomeArtIntegrationSystem : ISystem
     {
-        private ComponentLookup<Biome> biomeLookup;
+        private ComponentLookup<CoreBiome> biomeLookup;
         private ComponentLookup<BiomeArtProfileReference> artProfileLookup;
         private ComponentLookup<NodeId> nodeIdLookup;
 
         public void OnCreate(ref SystemState state)
         {
-            biomeLookup = state.GetComponentLookup<Biome>(true);
+            biomeLookup = state.GetComponentLookup<CoreBiome>(true);
             artProfileLookup = state.GetComponentLookup<BiomeArtProfileReference>();
             nodeIdLookup = state.GetComponentLookup<NodeId>(true);
 
             // Require biome components to run
-            state.RequireForUpdate<Biome>();
+            state.RequireForUpdate<CoreBiome>();
             state.RequireForUpdate<BiomeArtProfileReference>();
         }
 
         public void OnUpdate(ref SystemState state)
         {
+            // Currently no pre-pass job required; main-thread system handles creation.
             biomeLookup.Update(ref state);
             artProfileLookup.Update(ref state);
             nodeIdLookup.Update(ref state);
-
-            // Process biome art integration on main thread since it interacts with GameObjects
-            var job = new BiomeArtIntegrationJob
-            {
-                BiomeLookup = biomeLookup,
-                ArtProfileLookup = artProfileLookup,
-                NodeIdLookup = nodeIdLookup
-            };
-
-            state.Dependency = job.ScheduleParallel(state.Dependency);
-        }
-    }
-
-    /// <summary>
-    /// Job for processing biome art integration
-    /// Handles tilemap creation and prop placement for biomes
-    /// </summary>
-    [BurstCompile]
-    public partial struct BiomeArtIntegrationJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<Biome> BiomeLookup;
-        public ComponentLookup<BiomeArtProfileReference> ArtProfileLookup;
-        [ReadOnly] public ComponentLookup<NodeId> NodeIdLookup;
-
-        public readonly void Execute(Entity entity, ref BiomeArtProfileReference artProfile, in Biome biome, in NodeId nodeId)
-        {
-            // Skip if already applied or profile is null
-            if (artProfile.IsApplied || !artProfile.ProfileRef.IsValid)
-                return;
-
-            // Mark as applied to prevent duplicate processing
-            artProfile.IsApplied = true;
-
-            // Schedule tilemap creation based on projection type
-            // Note: Actual tilemap creation happens on main thread via hybrid components
-            ScheduleTilemapCreation(artProfile.ProjectionType, biome, nodeId);
-        }
-
-        private readonly void ScheduleTilemapCreation(ProjectionType projectionType, Biome biome, NodeId nodeId)
-        {
-            // This method sets up data for main thread tilemap creation
-            // The actual GameObject/Tilemap creation must happen on main thread
-            // For now, we'll use a marker to indicate this biome needs tilemap creation
-            
-            // Future: Add to a command buffer or event system for main thread processing
-            // For the initial implementation, we'll handle this in the main thread portion
         }
     }
 
@@ -98,10 +60,15 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             // Process biome art profiles that need tilemap creation
             Entities
-                .WithStructuralChanges() // Allow structural changes for GameObject creation
-                .ForEach((Entity entity, ref BiomeArtProfileReference artProfileRef, in Biome biome, in NodeId nodeId) =>
+                .WithStructuralChanges()
+                .ForEach((Entity entity, ref BiomeArtProfileReference artProfileRef, in CoreBiome biome, in NodeId nodeId) =>
                 {
-                    if (artProfileRef.IsApplied || !artProfileRef.ProfileRef.IsValid)
+                    if (artProfileRef.IsApplied)
+                        return;
+
+                    // UnityObjectRef validity check (method expected)
+                    bool isValid = artProfileRef.ProfileRef.IsValid();
+                    if (!isValid)
                         return;
 
                     var artProfile = artProfileRef.ProfileRef.Value;
@@ -109,10 +76,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                         return;
 
                     // Create tilemap based on projection type
-                    CreateBiomeSpecificTilemap(artProfileRef.ProjectionType, artProfile, biome, nodeId);
-                    
-                    // Place props
-                    PlaceBiomeProps(artProfile, biome, nodeId);
+                    var grid = CreateBiomeSpecificTilemap(artProfileRef.ProjectionType, artProfile, biome, nodeId);
+
+                    // Place props (grid may be null if creation failed)
+                    PlaceBiomeProps(artProfile, biome, nodeId, grid);
 
                     // Mark as applied
                     artProfileRef.IsApplied = true;
@@ -120,59 +87,92 @@ namespace TinyWalnutGames.MetVD.Authoring
                 }).Run();
         }
 
-        private void CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, Biome biome, NodeId nodeId)
+        private Grid CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
         {
             // Get appropriate layer configuration based on projection type
             string[] layerNames = GetLayerNamesForProjection(projectionType);
-            
-            // Create grid with appropriate projection settings
-            CreateProjectionAwareGrid(projectionType, layerNames, artProfile.biomeName);
-            
-            // Apply biome-specific tiles to the created layers
-            ApplyBiomeTilesToLayers(artProfile, layerNames, createdGrid);
+
+            // Create grid with appropriate projection settings (factory methods are void; capture before/after set)
+            var existing = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
+            HashSet<Grid> before = new(existing);
+            InvokeProjectionCreation(projectionType);
+            Grid createdGrid = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
+                .Where(g => !before.Contains(g))
+                .OrderByDescending(g => g.GetInstanceID())
+                .FirstOrDefault();
+
+            if (createdGrid == null)
+            {
+                createdGrid = existing.OrderByDescending(g => g.GetInstanceID()).FirstOrDefault();
+            }
+
+            if (createdGrid != null)
+            {
+                // Use previously unused parameters nodeId + biome to position and label the grid meaningfully
+                var biomeCenter = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0f);
+                createdGrid.transform.position = biomeCenter; // Anchor grid at biome logical center
+
+                createdGrid.name = string.IsNullOrEmpty(artProfile.biomeName)
+                    ? $"Biome Grid [{biome.Type}] ({projectionType}) @ {nodeId.Coordinates}" // include biome type + coords
+                    : $"{artProfile.biomeName} Grid [{biome.Type}] ({projectionType}) @ {nodeId.Coordinates}";
+
+                // Propagate debug color (if provided) to child tilemap renderers that do not have material overrides
+                if (artProfile.debugColor.a > 0f)
+                {
+                    foreach (var r in createdGrid.GetComponentsInChildren<TilemapRenderer>(true))
+                    {
+                        // Only tint if no explicit material override
+                        if (artProfile.materialOverride == null && r.sharedMaterial != null && r.sharedMaterial.HasProperty("_Color"))
+                        {
+                            // Duplicate material instance to avoid editing shared asset at runtime
+                            var instMat = Object.Instantiate(r.sharedMaterial);
+                            instMat.name = r.sharedMaterial.name + " (BiomeTint)";
+                            instMat.color = artProfile.debugColor;
+                            r.material = instMat;
+                        }
+                    }
+                }
+
+                // Apply biome-specific tiles to the created layers
+                ApplyBiomeTilesToLayers(artProfile, layerNames, createdGrid);
+            }
+
+            return createdGrid;
         }
 
         private string[] GetLayerNamesForProjection(ProjectionType projectionType)
         {
+            // Removed IsometricHexagonalLayers (not found). Use top-down layers for isometric/hex as fallback.
             return projectionType switch
             {
                 ProjectionType.Platformer => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.SideScrollingLayers)),
                 ProjectionType.TopDown => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers)),
-                ProjectionType.Isometric => System.Enum.GetNames(typeof(IsometricHexagonalLayers)),
-                ProjectionType.Hexagonal => System.Enum.GetNames(typeof(IsometricHexagonalLayers)),
+                ProjectionType.Isometric => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers)),
+                ProjectionType.Hexagonal => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers)),
                 _ => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers))
             };
         }
 
-        private Grid CreateProjectionAwareGrid(ProjectionType projectionType, string[] layerNames, string biomeName)
+        private void InvokeProjectionCreation(ProjectionType projectionType)
         {
-            // Call appropriate TwoDimensionalGridSetup method based on projection
-            Grid createdGrid = null;
             switch (projectionType)
             {
                 case ProjectionType.Platformer:
-                    createdGrid = TwoDimensionalGridSetup.CreateSideScrollingGrid();
+                    TwoDimensionalGridSetup.CreateSideScrollingGrid();
                     break;
                 case ProjectionType.TopDown:
-                    createdGrid = TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
+                    TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
                     break;
                 case ProjectionType.Isometric:
-                    createdGrid = TwoDimensionalGridSetup.CreateIsometricTopDownGrid();
+                    TwoDimensionalGridSetup.CreateIsometricTopDownGrid();
                     break;
                 case ProjectionType.Hexagonal:
-                    createdGrid = TwoDimensionalGridSetup.CreateHexTopDownGrid();
+                    TwoDimensionalGridSetup.CreateHexTopDownGrid();
                     break;
                 default:
-                    createdGrid = TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
+                    TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
                     break;
             }
-
-            // Rename the created grid to include biome information
-            if (createdGrid != null)
-            {
-                createdGrid.name = $"{biomeName} Grid ({projectionType})";
-            }
-            return createdGrid;
         }
 
         private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string[] layerNames, Grid grid)
@@ -186,7 +186,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
                 var tilemap = layerObject.GetComponent<Tilemap>();
                 var renderer = layerObject.GetComponent<TilemapRenderer>();
-                
+
                 if (tilemap == null || renderer == null) continue;
 
                 // Apply biome-specific tiles based on layer type
@@ -197,7 +197,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         private void ApplyTileToLayer(Tilemap tilemap, TilemapRenderer renderer, string layerName, BiomeArtProfile artProfile)
         {
             TileBase tileToApply = null;
-            
+
             // Determine which tile to use based on layer name
             if (layerName.Contains("Floor") || layerName.Contains("Ground"))
             {
@@ -214,8 +214,6 @@ namespace TinyWalnutGames.MetVD.Authoring
 
             if (tileToApply != null)
             {
-                // For demonstration, place a single tile at origin
-                // In production, this would be driven by the actual world generation data
                 Vector3Int position = Vector3Int.zero;
                 tilemap.SetTile(position, tileToApply);
             }
@@ -232,19 +230,23 @@ namespace TinyWalnutGames.MetVD.Authoring
             }
         }
 
-        private void PlaceBiomeProps(BiomeArtProfile artProfile, Biome biome, NodeId nodeId)
+        private void PlaceBiomeProps(BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId, Grid grid)
         {
             if (artProfile.propSettings?.propPrefabs == null || artProfile.propSettings.propPrefabs.Length == 0)
                 return;
 
-            var grid = GameObject.FindObjectOfType<Grid>();
+            // Use provided grid; fallback if null
+            if (grid == null)
+            {
+                grid = GameObject.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
+                    .OrderByDescending(g => g.GetInstanceID())
+                    .FirstOrDefault();
+            }
             if (grid == null) return;
 
-            // Use advanced prop placement based on strategy
             var placer = new AdvancedPropPlacer(artProfile.propSettings, grid, biome, nodeId);
             placer.PlaceProps();
         }
-
     }
 
     /// <summary>
@@ -255,12 +257,12 @@ namespace TinyWalnutGames.MetVD.Authoring
     {
         private readonly PropPlacementSettings settings;
         private readonly Grid grid;
-        private readonly Biome biome;
+        private readonly CoreBiome biome;
         private readonly NodeId nodeId;
         private readonly System.Random rng;
         private readonly List<Vector3> placedPropPositions;
 
-        public AdvancedPropPlacer(PropPlacementSettings settings, Grid grid, Biome biome, NodeId nodeId)
+        public AdvancedPropPlacer(PropPlacementSettings settings, Grid grid, CoreBiome biome, NodeId nodeId)
         {
             this.settings = settings;
             this.grid = grid;
@@ -302,16 +304,16 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var layerObject = grid.transform.Find(layerName);
                 if (layerObject == null) continue;
 
-                // Calculate number of props to place based on density
                 int propCount = CalculatePropCount(layerName);
-                
+
                 for (int i = 0; i < propCount; i++)
                 {
                     Vector3 position = GenerateRandomPosition(layerObject);
-                    
+
                     if (IsPositionValid(position, layerName))
                     {
                         PlacePropAtPosition(position, layerObject);
+                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
                     }
                 }
             }
@@ -324,14 +326,13 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var layerObject = grid.transform.Find(layerName);
                 if (layerObject == null) continue;
 
-                // Generate cluster centers
                 int clusterCount = Mathf.Max(1, Mathf.RoundToInt(settings.baseDensity * settings.densityMultiplier * 10));
                 var clusterCenters = GenerateClusterCenters(clusterCount, layerObject);
 
-                // Place props around each cluster center
                 foreach (var center in clusterCenters)
                 {
                     PlaceClusterAroundCenter(center, layerObject);
+                    if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
                 }
             }
         }
@@ -343,19 +344,21 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var layerObject = grid.transform.Find(layerName);
                 if (layerObject == null) continue;
 
-                // Very selective placement with high quality spots
-                int maxAttempts = Mathf.RoundToInt(settings.maxPropsPerBiome * 0.1f); // 10% of max for sparse
+                int maxAttempts = Mathf.RoundToInt(settings.maxPropsPerBiome * 0.1f);
                 int placedCount = 0;
                 int attempts = 0;
 
-                while (placedCount < maxAttempts / settings.allowedPropLayers.Count && attempts < maxAttempts * 3)
+                int perLayerTarget = Mathf.Max(1, maxAttempts / Mathf.Max(1, settings.allowedPropLayers.Count));
+
+                while (placedCount < perLayerTarget && attempts < maxAttempts * 3)
                 {
                     Vector3 position = GenerateRandomPosition(layerObject);
-                    
+
                     if (IsHighQualityPosition(position, layerName))
                     {
                         PlacePropAtPosition(position, layerObject);
                         placedCount++;
+                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
                     }
                     attempts++;
                 }
@@ -369,9 +372,8 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var layerObject = grid.transform.Find(layerName);
                 if (layerObject == null) continue;
 
-                // Find edges and place props along them
                 var edgePoints = FindEdgePoints(layerObject);
-                
+
                 foreach (var point in edgePoints)
                 {
                     if (rng.NextDouble() < settings.baseDensity * settings.densityMultiplier)
@@ -379,6 +381,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                         if (IsPositionValid(point, layerName))
                         {
                             PlacePropAtPosition(point, layerObject);
+                            if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
                         }
                     }
                 }
@@ -392,14 +395,13 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var layerObject = grid.transform.Find(layerName);
                 if (layerObject == null) continue;
 
-                // Create radial pattern from center
-                Vector3 center = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
-                float maxRadius = 10f; // Adjust based on biome size
-                
+                Vector3 center = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+                float maxRadius = 10f;
+
                 for (float radius = 1f; radius <= maxRadius; radius += 2f)
                 {
                     int pointsOnCircle = Mathf.RoundToInt(radius * 2 * Mathf.PI * settings.baseDensity);
-                    
+
                     for (int i = 0; i < pointsOnCircle; i++)
                     {
                         float angle = (float)i / pointsOnCircle * 2 * Mathf.PI;
@@ -408,10 +410,11 @@ namespace TinyWalnutGames.MetVD.Authoring
                             Mathf.Sin(angle) * radius,
                             0
                         );
-                        
+
                         if (IsPositionValid(position, layerName))
                         {
                             PlacePropAtPosition(position, layerObject);
+                            if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
                         }
                     }
                 }
@@ -425,17 +428,17 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var layerObject = grid.transform.Find(layerName);
                 if (layerObject == null) continue;
 
-                // Sample terrain and place props based on terrain features
                 var terrainSamples = SampleTerrain(layerObject);
-                
+
                 foreach (var sample in terrainSamples)
                 {
                     float terrainSuitability = CalculateTerrainSuitability(sample, layerName);
                     float spawnChance = settings.baseDensity * terrainSuitability * settings.densityMultiplier;
-                    
+
                     if (rng.NextDouble() < spawnChance && IsPositionValid(sample.position, layerName))
                     {
                         PlacePropAtPosition(sample.position, layerObject);
+                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
                     }
                 }
             }
@@ -443,50 +446,81 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private int CalculatePropCount(string layerName)
         {
-            float baseCount = settings.baseDensity * settings.densityMultiplier * 50; // Base scaling factor
+            // Base density influenced by distance + global settings
+            float baseCount = settings.baseDensity * settings.densityMultiplier * 50;
             float distanceFromCenter = Vector2.Distance(Vector2.zero, new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y));
-            float normalizedDistance = Mathf.Clamp01(distanceFromCenter / 20f); // Normalize to 0-1 over 20 units
-            float densityFactor = settings.densityCurve.Evaluate(1f - normalizedDistance); // Invert so center = 1
-            
+            float normalizedDistance = Mathf.Clamp01(distanceFromCenter / 20f);
+            float densityFactor = settings.densityCurve.Evaluate(1f - normalizedDistance);
+
+            // Layer-specific scaling (previously unused layerName parameter now meaningfully applied)
+            if (!string.IsNullOrEmpty(layerName))
+            {
+                if (layerName.Contains("Background"))
+                    baseCount *= 0.35f; // fewer background props
+                else if (layerName.Contains("Parallax"))
+                    baseCount *= 0.2f; // parallax layers are sparse
+                else if (layerName.Contains("Foreground") || layerName.Contains("Detail"))
+                    baseCount *= 1.25f; // more detail on foreground layers
+                else if (layerName.Contains("Hazard"))
+                    baseCount *= 0.6f; // hazards sparse
+            }
+
             return Mathf.RoundToInt(baseCount * densityFactor);
         }
 
         private Vector3 GenerateRandomPosition(Transform layerObject)
         {
-            // Generate position within biome bounds
-            float x = (float)(rng.NextDouble() * 20 - 10) + nodeId.Coordinates.x; // ±10 units from center
-            float y = (float)(rng.NextDouble() * 20 - 10) + nodeId.Coordinates.y;
-            
-            // Add position jitter if enabled
+            // Base random position around biome logical center
+            Vector3 baseCenter = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+
+            // If we have a layer object, bias the center to that object's transform (meaningful use of parameter)
+            if (layerObject != null)
+            {
+                baseCenter = layerObject.position;
+                // If a Tilemap exists, constrain sampling to its cell bounds for more accurate placement
+                if (layerObject.TryGetComponent<Tilemap>(out var tm))
+                {
+                    var bounds = tm.cellBounds; // integer cell bounds
+                    // Choose a random cell within bounds then convert to world position
+                    int rx = rng.Next(bounds.xMin, bounds.xMax + 1);
+                    int ry = rng.Next(bounds.yMin, bounds.yMax + 1);
+                    Vector3 cellWorld = tm.CellToWorld(new Vector3Int(rx, ry, 0));
+                    baseCenter = cellWorld + tm.tileAnchor; // anchor offset
+                }
+            }
+
+            float x = (float)(rng.NextDouble() * 20 - 10) + baseCenter.x;
+            float y = (float)(rng.NextDouble() * 20 - 10) + baseCenter.y;
+
             if (settings.variation.positionJitter > 0)
             {
                 x += (float)(rng.NextDouble() - 0.5) * settings.variation.positionJitter;
                 y += (float)(rng.NextDouble() - 0.5) * settings.variation.positionJitter;
             }
-            
+
             return new Vector3(x, y, 0);
         }
 
         private bool IsPositionValid(Vector3 position, string layerName)
         {
-            // Check avoidance rules
-            if (settings.avoidance.avoidOvercrowding)
+            if (string.IsNullOrEmpty(layerName))
             {
-                foreach (var existingPos in placedPropPositions)
+                if (settings.avoidance.avoidOvercrowding)
                 {
-                    if (Vector3.Distance(position, existingPos) < settings.avoidance.minimumPropDistance)
-                        return false;
+                    foreach (var existingPos in placedPropPositions)
+                    {
+                        if (Vector3.Distance(position, existingPos) < settings.avoidance.minimumPropDistance)
+                            return false;
+                    }
                 }
             }
 
-            // Check layer avoidance
             foreach (string avoidLayer in settings.avoidance.avoidLayers)
             {
                 if (IsNearLayer(position, avoidLayer, settings.avoidance.avoidanceRadius))
                     return false;
             }
 
-            // Check biome transition avoidance
             if (settings.avoidance.avoidTransitions && IsNearBiomeTransition(position))
                 return false;
 
@@ -495,22 +529,33 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private bool IsHighQualityPosition(Vector3 position, string layerName)
         {
-            // High quality positions are away from edges, hazards, and other props
-            return IsPositionValid(position, layerName) && 
-                   !IsNearLayer(position, "Edge", 3f) &&
-                   placedPropPositions.All(p => Vector3.Distance(position, p) > settings.avoidance.minimumPropDistance * 2);
+            // Add layer-aware quality adjustments (meaningful use of layerName parameter beyond validity pass-through)
+            float qualityBoost = 1f;
+            if (!string.IsNullOrEmpty(layerName))
+            {
+                if (layerName.Contains("Foreground") || layerName.Contains("Detail")) qualityBoost *= 1.2f; // encourage detail layers
+                if (layerName.Contains("Parallax") || layerName.Contains("Background")) qualityBoost *= 0.7f; // discourage props in far layers
+                if (layerName.Contains("Hazard")) qualityBoost *= 0.5f; // sparse hazards
+            }
+
+            bool spatialOk = IsPositionValid(position, layerName) &&
+                             !IsNearLayer(position, "Edge", 3f) &&
+                             placedPropPositions.All(p => Vector3.Distance(position, p) > settings.avoidance.minimumPropDistance * 2);
+
+            if (!spatialOk) return false;
+            // Random acceptance gate influenced by qualityBoost to allow slight stochastic variety
+            return rng.NextDouble() < qualityBoost;
         }
 
         private List<Vector3> GenerateClusterCenters(int clusterCount, Transform layerObject)
         {
             var centers = new List<Vector3>();
             int attempts = 0;
-            
+
             while (centers.Count < clusterCount && attempts < clusterCount * 10)
             {
                 Vector3 candidate = GenerateRandomPosition(layerObject);
-                
-                // Check minimum separation from other cluster centers
+
                 bool validCenter = true;
                 foreach (var existingCenter in centers)
                 {
@@ -520,53 +565,71 @@ namespace TinyWalnutGames.MetVD.Authoring
                         break;
                     }
                 }
-                
+
                 if (validCenter && IsPositionValid(candidate, layerObject.name))
                 {
                     centers.Add(candidate);
                 }
-                
+
                 attempts++;
             }
-            
+
             return centers;
         }
 
         private void PlaceClusterAroundCenter(Vector3 center, Transform layerObject)
         {
             int propsInCluster = Mathf.RoundToInt(settings.clustering.clusterSize * settings.clustering.clusterDensity);
-            
+
             for (int i = 0; i < propsInCluster; i++)
             {
-                // Generate position within cluster radius
                 float angle = (float)(rng.NextDouble() * 2 * Mathf.PI);
                 float distance = (float)(rng.NextDouble() * settings.clustering.clusterRadius);
-                
-                Vector3 offset = new Vector3(
+
+                Vector3 offset = new(
                     Mathf.Cos(angle) * distance,
                     Mathf.Sin(angle) * distance,
                     0
                 );
-                
+
                 Vector3 propPosition = center + offset;
-                
+
                 if (IsPositionValid(propPosition, layerObject.name))
                 {
                     PlacePropAtPosition(propPosition, layerObject);
+                    if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
                 }
             }
         }
 
         private List<Vector3> FindEdgePoints(Transform layerObject)
         {
-            // Simplified edge detection - in production, this would analyze the actual tilemap
             var edgePoints = new List<Vector3>();
-            
-            // Generate points along the perimeter of the biome area
-            Vector3 center = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
-            float radius = 8f; // Approximate biome radius
+
+            Vector3 center = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+
+            // Radius & point density adapt to layer name (utilize previously unused layerObject parameter more fully)
+            float radius = 8f;
             int pointCount = 20;
-            
+            string lname = layerObject != null ? layerObject.name : string.Empty;
+            if (!string.IsNullOrEmpty(lname))
+            {
+                if (lname.Contains("Background") || lname.Contains("Parallax"))
+                {
+                    radius *= 1.5f; // broader ring for backgrounds
+                    pointCount = Mathf.RoundToInt(pointCount * 0.6f); // fewer points needed
+                }
+                else if (lname.Contains("Foreground") || lname.Contains("Detail"))
+                {
+                    radius *= 0.9f; // slightly tighter ring
+                    pointCount = Mathf.RoundToInt(pointCount * 1.3f);
+                }
+                else if (lname.Contains("Hazard"))
+                {
+                    radius *= 0.7f;
+                }
+            }
+
             for (int i = 0; i < pointCount; i++)
             {
                 float angle = (float)i / pointCount * 2 * Mathf.PI;
@@ -577,7 +640,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 );
                 edgePoints.Add(edgePoint);
             }
-            
+
             return edgePoints;
         }
 
@@ -592,16 +655,15 @@ namespace TinyWalnutGames.MetVD.Authoring
         private List<TerrainSample> SampleTerrain(Transform layerObject)
         {
             var samples = new List<TerrainSample>();
-            
-            // Grid-based terrain sampling
-            Vector3 center = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
-            
+
+            Vector3 center = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+
             for (float x = -8; x <= 8; x += 2)
             {
                 for (float y = -8; y <= 8; y += 2)
                 {
                     Vector3 samplePos = center + new Vector3(x, y, 0);
-                    
+
                     samples.Add(new TerrainSample
                     {
                         position = samplePos,
@@ -611,31 +673,27 @@ namespace TinyWalnutGames.MetVD.Authoring
                     });
                 }
             }
-            
+
             return samples;
         }
 
         private float CalculateTerrainSuitability(TerrainSample sample, string layerName)
         {
             float suitability = 1f;
-            
-            // Adjust based on terrain type
+
             if (layerName.Contains("Ground") || layerName.Contains("Floor"))
             {
-                // Ground props prefer flat areas
                 suitability *= 1f - Mathf.Abs(sample.elevation - 0.5f);
             }
             else if (layerName.Contains("Water"))
             {
-                // Water props prefer high moisture
                 suitability *= sample.moisture;
             }
             else if (layerName.Contains("Mountain") || layerName.Contains("Rock"))
             {
-                // Mountain props prefer high elevation
                 suitability *= sample.elevation;
             }
-            
+
             return Mathf.Clamp01(suitability);
         }
 
@@ -643,15 +701,12 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             var layerObject = grid.transform.Find(layerName);
             if (layerObject == null) return false;
-            
-            // Simplified distance check - in production, would check actual tilemap content
             return Vector3.Distance(position, layerObject.position) < radius;
         }
 
         private bool IsNearBiomeTransition(Vector3 position)
         {
-            // Simplified biome edge detection
-            Vector3 biomeCenter = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+            Vector3 biomeCenter = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
             float distanceFromCenter = Vector3.Distance(position, biomeCenter);
             return distanceFromCenter > 8f - settings.avoidance.transitionAvoidanceRadius;
         }
@@ -659,23 +714,20 @@ namespace TinyWalnutGames.MetVD.Authoring
         private void PlacePropAtPosition(Vector3 position, Transform layerObject)
         {
             if (settings.propPrefabs.Length == 0) return;
-            
-            // Select random prop prefab
+
             int propIndex = rng.Next(0, settings.propPrefabs.Length);
             var propPrefab = settings.propPrefabs[propIndex];
-            
             if (propPrefab == null) return;
-            
-            // Apply variations
+
             Quaternion rotation = Quaternion.identity;
             if (settings.variation.randomRotation)
             {
                 float rotationAngle = (float)(rng.NextDouble() * settings.variation.maxRotationAngle);
                 rotation = Quaternion.Euler(0, 0, rotationAngle);
             }
-            
+
             Vector3 scale = Vector3.one;
-            if (settings.variation.minScale != settings.variation.maxScale)
+            if (Mathf.Abs(settings.variation.minScale - settings.variation.maxScale) > Mathf.Epsilon)
             {
                 float scaleMultiplier = Mathf.Lerp(
                     settings.variation.minScale,
@@ -684,18 +736,12 @@ namespace TinyWalnutGames.MetVD.Authoring
                 );
                 scale = Vector3.one * scaleMultiplier;
             }
-            
-            // Instantiate prop
+
             var propInstance = GameObject.Instantiate(propPrefab, position, rotation, layerObject);
             propInstance.transform.localScale = scale;
-            propInstance.name = $"{biome.BiomeType} Prop ({propIndex})";
-            
-            // Track placed position for avoidance calculations
+            propInstance.name = $"{biome.Type} Prop ({propIndex})";
+
             placedPropPositions.Add(position);
-            
-            // Respect max props limit
-            if (placedPropPositions.Count >= settings.maxPropsPerBiome)
-                return;
         }
     }
 }

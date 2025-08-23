@@ -4,14 +4,16 @@
     "references": [
         "Unity.Burst",
         "Unity.Collections",
-        "Unity.Mathematics",
         "Unity.Entities",
-        "Unity.Entities.Hybrid",
         "Unity.Entities.Editor",
+        "Unity.Entities.Hybrid",
+        "Unity.Mathematics",
+        "Unity.Scenes",
         "TinyWalnutGames.MetVD.Authoring",
+        "TinyWalnutGames.MetVD.Biome",
         "TinyWalnutGames.MetVD.Core",
         "TinyWalnutGames.MetVD.Graph",
-        "TinyWalnutGames.MetVD.Biome",
+        "TinyWalnutGames.MetVD.Samples",
         "TinyWalnutGames.MetVD.Utility"
     ],
     "includePlatforms": [

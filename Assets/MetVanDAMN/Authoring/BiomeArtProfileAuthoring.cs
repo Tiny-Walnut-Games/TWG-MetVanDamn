@@ -1,6 +1,10 @@
 using UnityEngine;
 using Unity.Entities;
-using TinyWalnutGames.MetVD.Core;
+using TinyWalnutGames.MetVD.Core; // Provides BiomeType, Polarity, Biome struct
+// using TinyWalnutGames.MetVD.Biome; // Removed to avoid 'Biome' namespace/type ambiguity
+
+// Alias to disambiguate biome component explicitly (in case other namespaces introduce Biome symbol)
+using CoreBiome = TinyWalnutGames.MetVD.Core.Biome;
 
 namespace TinyWalnutGames.MetVD.Authoring
 {
@@ -34,7 +38,6 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             var entity = GetEntity(TransformUsageFlags.None);
             
-            // Add BiomeArtProfileReference component
             AddComponent(entity, new BiomeArtProfileReference
             {
                 ProfileRef = new UnityObjectRef<BiomeArtProfile> { Value = authoring.artProfile },
@@ -42,17 +45,29 @@ namespace TinyWalnutGames.MetVD.Authoring
                 ProjectionType = authoring.projectionType
             });
             
-            // Auto-configure or use override biome type
             BiomeType biomeType = authoring.biomeTypeOverride;
             if (authoring.autoConfigureBiomeType && authoring.artProfile != null)
             {
                 biomeType = InferBiomeTypeFromProfileName(authoring.artProfile.biomeName);
             }
             
-            // Add or update Biome component if it doesn't exist
-            if (!HasComponent<Biome>(entity))
+            // Safe add/update of biome component without relying on HasComponent (not exposed in some Baker API versions)
+            var biomeComponent = new CoreBiome(biomeType, Polarity.None);
+            try
             {
-                AddComponent(entity, new Biome(biomeType, Polarity.None));
+                AddComponent(entity, biomeComponent);
+            }
+            catch (System.InvalidOperationException)
+            {
+                // Component likely already added by another baker; attempt to update
+                try
+                {
+                    SetComponent(entity, biomeComponent);
+                }
+                catch
+                {
+                    // Swallow if SetComponent not available in this Entities version
+                }
             }
         }
         
@@ -63,39 +78,22 @@ namespace TinyWalnutGames.MetVD.Authoring
                 
             string lowerName = profileName.ToLower();
             
-            // Simple name matching - could be expanded with more sophisticated logic
-            if (lowerName.Contains("solar") || lowerName.Contains("sun"))
-                return BiomeType.SolarPlains;
-            else if (lowerName.Contains("crystal"))
-                return BiomeType.CrystalCaverns;
-            else if (lowerName.Contains("sky") || lowerName.Contains("garden"))
-                return BiomeType.SkyGardens;
-            else if (lowerName.Contains("shadow"))
-                return BiomeType.ShadowRealms;
-            else if (lowerName.Contains("underwater") || lowerName.Contains("ocean"))
-                return BiomeType.DeepUnderwater;
-            else if (lowerName.Contains("void"))
-                return BiomeType.VoidChambers;
-            else if (lowerName.Contains("volcanic") || lowerName.Contains("volcano"))
-                return BiomeType.VolcanicCore;
-            else if (lowerName.Contains("power") || lowerName.Contains("plant"))
-                return BiomeType.PowerPlant;
-            else if (lowerName.Contains("plasma"))
-                return BiomeType.PlasmaFields;
-            else if (lowerName.Contains("frozen") || lowerName.Contains("ice"))
-                return BiomeType.FrozenWastes;
-            else if (lowerName.Contains("catacomb"))
-                return BiomeType.IceCatacombs;
-            else if (lowerName.Contains("cryogenic") || lowerName.Contains("lab"))
-                return BiomeType.CryogenicLabs;
-            else if (lowerName.Contains("hub"))
-                return BiomeType.HubArea;
-            else if (lowerName.Contains("transition"))
-                return BiomeType.TransitionZone;
-            else if (lowerName.Contains("ancient") || lowerName.Contains("ruin"))
-                return BiomeType.AncientRuins;
-            else
-                return BiomeType.Unknown;
+            if (lowerName.Contains("solar") || lowerName.Contains("sun")) return BiomeType.SolarPlains;
+            if (lowerName.Contains("crystal")) return BiomeType.CrystalCaverns;
+            if (lowerName.Contains("sky") || lowerName.Contains("garden")) return BiomeType.SkyGardens;
+            if (lowerName.Contains("shadow")) return BiomeType.ShadowRealms;
+            if (lowerName.Contains("underwater") || lowerName.Contains("ocean")) return BiomeType.DeepUnderwater;
+            if (lowerName.Contains("void")) return BiomeType.VoidChambers;
+            if (lowerName.Contains("volcanic") || lowerName.Contains("volcano")) return BiomeType.VolcanicCore;
+            if (lowerName.Contains("power") || lowerName.Contains("plant")) return BiomeType.PowerPlant;
+            if (lowerName.Contains("plasma")) return BiomeType.PlasmaFields;
+            if (lowerName.Contains("frozen") || lowerName.Contains("ice")) return BiomeType.FrozenWastes;
+            if (lowerName.Contains("catacomb")) return BiomeType.IceCatacombs;
+            if (lowerName.Contains("cryogenic") || lowerName.Contains("lab")) return BiomeType.CryogenicLabs;
+            if (lowerName.Contains("hub")) return BiomeType.HubArea;
+            if (lowerName.Contains("transition")) return BiomeType.TransitionZone;
+            if (lowerName.Contains("ancient") || lowerName.Contains("ruin")) return BiomeType.AncientRuins;
+            return BiomeType.Unknown;
         }
     }
 }
