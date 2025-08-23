@@ -268,8 +268,7 @@ namespace TinyWalnutGames.MetVD.Graph
             var roomEntity = entityManager.CreateEntity();
             
             // Create room node ID
-            var roomNodeId = new NodeId(
-                (uint)(sectorNodeId.Value * 100 + roomIndex), // Unique room ID
+                (uint)(sectorNodeId.Value * RoomsPerSectorMultiplier + roomIndex), // Unique room ID
                 2, // Level 2 = room
                 sectorNodeId.Value, // Parent is sector
                 new int2(bounds.x + bounds.width/2, bounds.y + bounds.height/2) // Room center
