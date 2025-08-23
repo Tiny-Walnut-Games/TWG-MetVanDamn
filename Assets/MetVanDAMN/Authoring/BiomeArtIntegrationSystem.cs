@@ -137,8 +137,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             {
                 ProjectionType.Platformer => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.SideScrollingLayers)),
                 ProjectionType.TopDown => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers)),
-                ProjectionType.Isometric => new[] { "Blending", "RoomMasking", "OverheadProps", "WalkableProps", "WalkableGround", "FloorProps", "Floor", "ShallowWater", "Ocean", "DeepOcean" },
-                ProjectionType.Hexagonal => new[] { "Blending", "RoomMasking", "OverheadProps", "WalkableProps", "WalkableGround", "FloorProps", "Floor", "ShallowWater", "Ocean", "DeepOcean" },
+                ProjectionType.Isometric => System.Enum.GetNames(typeof(IsometricHexagonalLayers)),
+                ProjectionType.Hexagonal => System.Enum.GetNames(typeof(IsometricHexagonalLayers)),
                 _ => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers))
             };
         }
