@@ -165,8 +165,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
                 // Create sector entity
                 var sectorEntity = entityManager.CreateEntity();
-                var sectorNodeId = new NodeId(
-                    (uint)(districtNodeId.Value * 1000 + sectorIndex), // Unique sector ID
+                    (uint)(districtNodeId.Value * SectorIdMultiplier + sectorIndex), // Unique sector ID
                     1, // Level 1 = sector
                     districtNodeId.Value, // Parent is district
                     sectorLocalCoords
