@@ -79,6 +79,14 @@ jobs:
         with:
           node-version: '18'
 
+      # ⚡ Cache NPM dependencies for faster installs (Phase 3 optimization)
+      - name: Cache NPM dependencies
+        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package.json', 'package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
       - name: 📦 Gather Dependencies  
         run: |
           # Python dependencies for ScrollQuoteEngine
