@@ -143,39 +143,39 @@ namespace TinyWalnutGames.MetVD.Authoring
             };
         }
 
-        private void CreateProjectionAwareGrid(ProjectionType projectionType, string[] layerNames, string biomeName)
+        private Grid CreateProjectionAwareGrid(ProjectionType projectionType, string[] layerNames, string biomeName)
         {
             // Call appropriate TwoDimensionalGridSetup method based on projection
+            Grid createdGrid = null;
             switch (projectionType)
             {
                 case ProjectionType.Platformer:
-                    TwoDimensionalGridSetup.CreateSideScrollingGrid();
+                    createdGrid = TwoDimensionalGridSetup.CreateSideScrollingGrid();
                     break;
                 case ProjectionType.TopDown:
-                    TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
+                    createdGrid = TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
                     break;
                 case ProjectionType.Isometric:
-                    TwoDimensionalGridSetup.CreateIsometricTopDownGrid();
+                    createdGrid = TwoDimensionalGridSetup.CreateIsometricTopDownGrid();
                     break;
                 case ProjectionType.Hexagonal:
-                    TwoDimensionalGridSetup.CreateHexTopDownGrid();
+                    createdGrid = TwoDimensionalGridSetup.CreateHexTopDownGrid();
                     break;
                 default:
-                    TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
+                    createdGrid = TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
                     break;
             }
 
             // Rename the created grid to include biome information
-            var createdGrid = GameObject.FindObjectOfType<Grid>();
             if (createdGrid != null)
             {
                 createdGrid.name = $"{biomeName} Grid ({projectionType})";
             }
+            return createdGrid;
         }
 
-        private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string[] layerNames)
+        private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string[] layerNames, Grid grid)
         {
-            var grid = GameObject.FindObjectOfType<Grid>();
             if (grid == null) return;
 
             foreach (string layerName in layerNames)
