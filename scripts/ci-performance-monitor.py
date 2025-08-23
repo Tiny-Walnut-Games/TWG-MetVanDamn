@@ -13,7 +13,7 @@ Usage:
 import argparse
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import sys
 
@@ -46,7 +46,7 @@ class CIPerformanceMonitor:
     
     def save_metrics(self, metrics):
         """Save metrics to file"""
-        metrics["summary"]["last_updated"] = datetime.utcnow().isoformat()
+        metrics["summary"]["last_updated"] = datetime.now(timezone.utc).isoformat()
         try:
             with open(self.metrics_file, 'w') as f:
                 json.dump(metrics, f, indent=2)
@@ -60,7 +60,7 @@ class CIPerformanceMonitor:
         run_data = {
             "workflow": workflow_name,
             "run_id": run_id,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "duration_seconds": duration,
             "status": status,
             "jobs": job_details or {}
@@ -93,7 +93,7 @@ class CIPerformanceMonitor:
             return
         
         # Filter runs by period
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         if period == "daily":
             cutoff = now - timedelta(days=1)
         elif period == "weekly":
@@ -104,9 +104,23 @@ class CIPerformanceMonitor:
             cutoff = None  # All time
             
         if cutoff:
+            def parse_timestamp(timestamp_str):
+                """Parse timestamp handling both old (with Z) and new (timezone-aware) formats"""
+                try:
+                    # Try parsing as-is first (new format)
+                    dt = datetime.fromisoformat(timestamp_str)
+                    # If it's naive, assume UTC
+                    if dt.tzinfo is None:
+                        dt = dt.replace(tzinfo=timezone.utc)
+                    return dt
+                except ValueError:
+                    # Fall back to old format handling  
+                    dt = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
+                    return dt
+            
             filtered_runs = [
                 run for run in metrics["runs"] 
-                if datetime.fromisoformat(run["timestamp"].replace('Z', '+00:00')) > cutoff
+                if parse_timestamp(run["timestamp"]) > cutoff
             ]
         else:
             filtered_runs = metrics["runs"]
