@@ -119,6 +119,16 @@ jobs:
           key: Library-${{ runner.os }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: Library-${{ runner.os }}-
 
+      # ⚡ Cache Unity Package Manager downloads for faster package resolution
+      - name: Cache Unity UPM
+        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
+        with:
+          path: |
+            Library/PackageCache
+            ~/.config/unity3d
+          key: unity-upm-${{ runner.os }}-${{ hashFiles('Packages/manifest.json', 'Packages/packages-lock.json') }}
+          restore-keys: unity-upm-${{ runner.os }}-
+
       # Unity Edit Mode Tests
       - name: Run Unity Edit Mode Tests
         uses: game-ci/unity-test-runner@d4c8dea0ae32a2cb4a9e27c2b7b8a9c2fda66f8d # v4

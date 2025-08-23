@@ -123,7 +123,9 @@ declare -A KNOWN_TOOLS=(
 - [ ] Create dashboard for CI efficiency tracking
 
 ### Long-term Considerations (Low Priority)
-- [ ] Investigate additional caching opportunities (npm, NuGet, etc.)
+- [x] Investigate additional caching opportunities (npm, NuGet, etc.)
+- [x] Implement Unity Package Manager caching for faster package resolution
+- [x] Add NPM dependency caching to reduce install times
 - [ ] Explore parallel job execution optimizations
 - [ ] Consider workflow matrix optimization based on usage patterns
 - [ ] Integration with repository settings for required check management

@@ -44,6 +44,14 @@ jobs:
       - uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with: { python-version: '3.11' }
 
+      # ⚡ Cache NPM dependencies for faster installs (Phase 3 optimization)
+      - name: Cache NPM dependencies
+        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package.json', 'package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
