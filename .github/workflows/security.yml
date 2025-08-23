@@ -31,7 +31,16 @@ concurrency:
 jobs:
   # 🛡️ Dependency vulnerability scanning - ADVISORY
   dependency-scan:
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'dependencies'
+    if: >
+      github.event_name != 'workflow_dispatch' && (
+        github.event_name == 'push' ||
+        (github.event_name == 'pull_request' && (
+          contains(github.event.pull_request.changed_files.*.filename, 'scripts/requirements.txt') ||
+          contains(github.event.pull_request.changed_files.*.filename, 'scripts/') ||
+          contains(github.event.pull_request.changed_files.*.filename, 'src/') ||
+          contains(github.event.pull_request.changed_files.*.filename, '.github/workflows/security.yml')
+        ))
+      ) || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'dependencies'
     runs-on: ubuntu-latest
     name: Dependency Security Scan
 
@@ -94,7 +103,16 @@ jobs:
 
   # 🔐 Secret scanning (GitHub native + additional tools) - ADVISORY
   secret-scan:
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'secrets'
+    if: >
+      github.event_name != 'workflow_dispatch' && (
+        github.event_name == 'push' ||
+        (github.event_name == 'pull_request' && (
+          contains(github.event.pull_request.changed_files.*.filename, 'scripts/') ||
+          contains(github.event.pull_request.changed_files.*.filename, 'src/') ||
+          contains(github.event.pull_request.changed_files.*.filename, 'configs/') ||
+          contains(github.event.pull_request.changed_files.*.filename, '.github/')
+        ))
+      ) || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'secrets'
     runs-on: ubuntu-latest
     name: Secret Detection Scan
     continue-on-error: true  # Advisory - don't block merges on secret detection
@@ -115,7 +133,15 @@ jobs:
 
   # 🔍 Code security analysis - ADVISORY
   code-scan:
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'code'
+    if: >
+      github.event_name != 'workflow_dispatch' && (
+        github.event_name == 'push' ||
+        (github.event_name == 'pull_request' && (
+          contains(github.event.pull_request.changed_files.*.filename, 'src/') ||
+          contains(github.event.pull_request.changed_files.*.filename, 'scripts/') ||
+          contains(github.event.pull_request.changed_files.*.filename, '.github/workflows/')
+        ))
+      ) || github.event.inputs.scan_type == 'all' || github.event.inputs.scan_type == 'code'
     runs-on: ubuntu-latest
     name: Code Security Analysis
     continue-on-error: true  # Advisory - don't block merges on code analysis
@@ -150,7 +176,15 @@ jobs:
 
   # 🧰 MCP Security Configuration Validation - ADVISORY  
   mcp-security-validation:
-    if: github.event_name != 'workflow_dispatch' || github.event.inputs.scan_type == 'all'
+    if: >
+      github.event_name != 'workflow_dispatch' && (
+        github.event_name == 'push' ||
+        (github.event_name == 'pull_request' && (
+          contains(github.event.pull_request.changed_files.*.filename, 'mcp-config.json') ||
+          contains(github.event.pull_request.changed_files.*.filename, 'scripts/validate_mcp_config.py') ||
+          contains(github.event.pull_request.changed_files.*.filename, 'scripts/validate_package_install.sh')
+        ))
+      ) || github.event.inputs.scan_type == 'all'
     runs-on: ubuntu-latest
     name: MCP Security Configuration
     continue-on-error: true  # Advisory - don't block merges on MCP validation

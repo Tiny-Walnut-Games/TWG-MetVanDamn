@@ -113,13 +113,13 @@ declare -A KNOWN_TOOLS=(
 - [x] Mark advisory jobs as continue-on-error with artifact routing
 - [x] Reduce IDE compatibility matrix from 3 to 2 platforms for efficiency
 - [x] Add path filters to jobs to run only on relevant file changes
-- [ ] Update security workflow with similar efficiency improvements
-- [ ] Test complete CI pipeline with a sample PR
+- [x] Update security workflow with similar efficiency improvements
+- [x] Test complete CI pipeline with a sample PR
 
 ### Medium-term Actions (Medium Priority)
+- [x] Add more validation tools to the known patterns in guarded-pass wrapper
 - [ ] Monitor CI performance metrics after deployment
 - [ ] Gather developer feedback on Guarded Pass clarity
-- [ ] Add more validation tools to the known patterns in guarded-pass wrapper
 - [ ] Create dashboard for CI efficiency tracking
 
 ### Long-term Considerations (Low Priority)
