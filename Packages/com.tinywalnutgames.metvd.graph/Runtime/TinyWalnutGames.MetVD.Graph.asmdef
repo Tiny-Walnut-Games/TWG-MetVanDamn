@@ -6,7 +6,8 @@
         "Unity.Collections",
         "Unity.Entities",
         "Unity.Mathematics",
-        "TinyWalnutGames.MetVD.Core"
+        "TinyWalnutGames.MetVD.Core",
+        "TinyWalnutGames.MetVD.Authoring"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

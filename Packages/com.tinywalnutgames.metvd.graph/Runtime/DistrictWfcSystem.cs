@@ -25,6 +25,7 @@ namespace TinyWalnutGames.MetVD.Graph
             socketBufferLookup = state.GetBufferLookup<WfcSocketBufferElement>(true);
             candidateBufferLookup = state.GetBufferLookup<WfcCandidateBufferElement>();
             state.RequireForUpdate<WfcState>();
+            state.RequireForUpdate<DistrictLayoutDoneTag>(); // Wait for district layout to complete
         }
 
         [BurstCompile]

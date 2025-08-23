@@ -15,7 +15,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 Seed = authoring.seed,
                 WorldSize = authoring.worldSize,
-                TargetSectors = authoring.targetSectors
+                TargetSectors = authoring.targetSectors,
+                RandomizationMode = authoring.randomizationMode
             });
         }
     }
