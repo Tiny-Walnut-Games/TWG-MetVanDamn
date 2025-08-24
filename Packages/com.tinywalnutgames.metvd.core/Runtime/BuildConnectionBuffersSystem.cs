@@ -3,7 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using TinyWalnutGames.MetVD.Core;
 
-namespace TinyWalnutGames.MetVD.Authoring
+namespace TinyWalnutGames.MetVD.Core
 {
     /// <summary>
     /// One-shot system that converts baked ConnectionEdge components into
