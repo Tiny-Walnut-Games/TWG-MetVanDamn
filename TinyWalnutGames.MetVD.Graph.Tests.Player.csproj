@@ -76,8 +76,8 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\DistrictSectorRoomFeaturesTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\WfcSystemTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\SectorRefineSystemTests.cs" />
-    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\DistrictWfcSystemTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\ProceduralLayoutSystemTests.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\DistrictWfcSystemTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\TinyWalnutGames.MetVD.Graph.Tests.asmdef" />
@@ -928,6 +928,10 @@
     <ProjectReference Include="TinyWalnutGames.MetVD.Graph.Player.csproj">
       <Project>{49C4E017-0693-4452-4C85-D76D7D58CC49}</Project>
       <Name>TinyWalnutGames.MetVD.Graph.Player</Name>
+    </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.Player.csproj">
+      <Project>{48CCF777-0B65-3DF8-17E2-3AECF5BDA8CE}</Project>
+      <Name>TinyWalnutGames.MetVD.Shared.Player</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

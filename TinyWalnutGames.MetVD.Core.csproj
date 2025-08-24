@@ -75,8 +75,10 @@
   <ItemGroup>
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\DistrictLayoutTags.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Connection.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BuildConnectionBuffersSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\NodeId.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Biome.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\ConnectionEdge.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\GateCondition.cs" />
   </ItemGroup>
   <ItemGroup>

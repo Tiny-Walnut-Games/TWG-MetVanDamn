@@ -75,11 +75,9 @@
   <ItemGroup>
     <Compile Include="Assets\MetVanDAMN\Authoring\WorldConfigurationAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfile.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Runtime\BuildConnectionBuffersSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\GateConditionAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileReference.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeTransitionSystem.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\ConnectionEdge.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeFieldAuthoring.cs" />
@@ -1215,10 +1213,6 @@
     <ProjectReference Include="TinyWalnutGames.MetVD.Biome.csproj">
       <Project>{657EBCB1-E90D-F326-9D47-83652F99795B}</Project>
       <Name>TinyWalnutGames.MetVD.Biome</Name>
-    </ProjectReference>
-    <ProjectReference Include="TinyWalnutGames.GridLayerEditor.csproj">
-      <Project>{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}</Project>
-      <Name>TinyWalnutGames.GridLayerEditor</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

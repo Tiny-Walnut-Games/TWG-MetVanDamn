@@ -113,20 +113,13 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         private static WorldRuleSet GenerateWorldRules(RandomizationMode mode, int districtCount, ref Unity.Mathematics.Random random)
         {
-            switch (mode)
+            return mode switch
             {
-                case RandomizationMode.None:
-                    return ApplyCuratedRules(ref random);
-                
-                case RandomizationMode.Partial:
-                    return ApplyPartialRandomization(districtCount, ref random);
-                
-                case RandomizationMode.Full:
-                    return ApplyFullRandomization(districtCount, ref random);
-                
-                default:
-                    return ApplyCuratedRules(ref random);
-            }
+                RandomizationMode.None => ApplyCuratedRules(ref random),
+                RandomizationMode.Partial => ApplyPartialRandomization(ref random),
+                RandomizationMode.Full => ApplyFullRandomization(districtCount, ref random),
+                _ => ApplyCuratedRules(ref random),
+            };
         }
 
         /// <summary>
@@ -152,7 +145,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Apply partial randomization - randomize biome polarities, keep upgrades fixed
         /// </summary>
         [BurstCompile]
-        private static WorldRuleSet ApplyPartialRandomization(int districtCount, ref Unity.Mathematics.Random random)
+        private static WorldRuleSet ApplyPartialRandomization(ref Unity.Mathematics.Random random)
         {
             // Randomize biome polarities but ensure at least 2 are present
             var availablePolarities = new[]
