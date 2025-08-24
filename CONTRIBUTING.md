@@ -241,6 +241,107 @@ living-dev-agent-template/
 - **Clone and Clean** (`scripts/clone-and-clean.sh`): Template setup script
 - **Agent Context Initialization** (`scripts/init_agent_context.sh`): Development environment setup
 
+## 🏗️ Helper Scripts and Shared Namespace Guidelines
+
+### Circular Dependency Prevention
+
+To maintain clean architecture and prevent circular dependencies between modules, follow these strict placement rules:
+
+#### **Shared Namespace Rules**
+
+All dependency-free helper scripts and utilities must be placed in the shared namespace:
+
+- **Location**: `TinyWalnutGames.MetVD.Shared` (Assembly: `TinyWalnutGames.MetVD.Shared`)
+- **Package Path**: `Packages/com.tinywalnutgames.metvd.shared/Runtime/`
+- **Purpose**: Contains pure utilities, data types, and helpers with no internal dependencies
+
+#### **What Belongs in Shared Namespace**
+
+✅ **Allowed in Shared:**
+- Pure data structures (structs, enums)
+- Mathematical utilities with no external dependencies
+- Simple component interfaces (`IComponentData`, `IBufferElementData`)
+- Constants and configuration types
+- Platform-agnostic helper functions
+
+❌ **Not Allowed in Shared:**
+- Types that depend on feature-specific assemblies
+- Systems that reference feature modules
+- Editor-specific functionality
+- Unity scene/prefab dependent code
+
+#### **Placement Decision Tree**
+
+```
+Does your helper script have dependencies on feature assemblies?
+├─ YES → Place in the appropriate feature namespace (Authoring, Graph, etc.)
+└─ NO  → Does it have Unity Editor dependencies?
+    ├─ YES → Place in feature.Editor namespace
+    └─ NO  → Place in TinyWalnutGames.MetVD.Shared
+```
+
+#### **CI Validation**
+
+The project includes automated circular dependency detection:
+
+- **Script**: `scripts/validate-circular-dependencies.py`
+- **CI Guard**: `scripts/ci-guard-circular-dependencies.sh`
+- **Workflow**: `.github/workflows/circular-dependency-guard.yml`
+
+This validation runs on all pull requests and will **block merges** if:
+1. Circular dependencies are detected between assemblies
+2. Shared namespace imports from feature assemblies
+3. New helper scripts are placed incorrectly
+
+#### **Examples**
+
+**✅ Good Shared Types:**
+```csharp
+// WorldConfiguration - pure data, no dependencies
+public struct WorldConfiguration : IComponentData
+{
+    public int Seed;
+    public int2 WorldSize;
+    public RandomizationMode RandomizationMode;
+}
+
+// RandomizationMode - simple enum
+public enum RandomizationMode : byte
+{
+    None = 0,
+    Partial = 1,
+    Full = 2
+}
+```
+
+**❌ Bad Shared Types:**
+```csharp
+// System with feature dependencies - belongs in Graph namespace
+public partial struct DistrictLayoutSystem : ISystem
+{
+    // References Graph-specific components
+}
+
+// Editor functionality - belongs in feature.Editor namespace  
+public class CustomInspector : Editor
+{
+    // Unity Editor dependent
+}
+```
+
+### Helper Migration Checklist
+
+When moving helpers to shared namespace:
+
+1. **[ ]** Verify helper has no feature assembly dependencies
+2. **[ ]** Move file to `Packages/com.tinywalnutgames.metvd.shared/Runtime/`
+3. **[ ]** Update namespace to `TinyWalnutGames.MetVD.Shared`
+4. **[ ]** Update all references across the codebase
+5. **[ ]** Update assembly definitions to reference shared
+6. **[ ]** Remove circular references from assembly definitions
+7. **[ ]** Run `scripts/validate-circular-dependencies.py` to verify
+8. **[ ]** Test build and ensure no compilation errors
+
 ## 🧪 Testing Guidelines
 
 ### Validation Testing

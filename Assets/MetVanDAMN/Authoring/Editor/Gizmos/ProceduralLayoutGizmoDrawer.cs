@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Authoring;
+using TinyWalnutGames.MetVD.Shared;
 
 namespace TinyWalnutGames.MetVD.Authoring.Editor
 {

@@ -3,7 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
-using TinyWalnutGames.MetVD.Authoring;
+using TinyWalnutGames.MetVD.Shared;
 
 namespace TinyWalnutGames.MetVD.Graph.Tests
 {
