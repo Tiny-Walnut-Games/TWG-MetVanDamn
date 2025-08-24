@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
-using TinyWalnutGames.MetVD.Authoring;
+using TinyWalnutGames.MetVD.Shared;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
@@ -81,31 +81,47 @@ namespace TinyWalnutGames.MetVD.Graph
                 return;
             }
 
+            // Use TargetSectors to determine how many districts to place
+            // If TargetSectors is specified, limit the number of districts accordingly
+            var targetDistrictCount = worldConfig.TargetSectors > 0 ? 
+                math.min(worldConfig.TargetSectors, unplacedCount) : unplacedCount;
+
             // Initialize random generator with world seed
             var random = new Unity.Mathematics.Random((uint)worldConfig.Seed);
             
-            // Choose placement strategy based on district count
-            var strategy = unplacedCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
+            // Choose placement strategy based on target district count
+            var strategy = targetDistrictCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
             
-            // Generate district positions
-            using var positions = new NativeArray<int2>(unplacedCount, Allocator.Temp);
+            // Generate district positions for target count
+            using var positions = new NativeArray<int2>(targetDistrictCount, Allocator.Temp);
             GenerateDistrictPositions(positions, worldConfig.WorldSize, strategy, ref random);
 
-            // Apply positions to unplaced districts
+            // Apply positions to unplaced districts (up to target count)
             int positionIndex = 0;
-            for (int i = 0; i < nodeIds.Length; i++)
+            int placedCount = 0;
+            for (int i = 0; i < nodeIds.Length && placedCount < targetDistrictCount; i++)
             {
                 var nodeId = nodeIds[i];
                 if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
                 {
                     nodeId.Coordinates = positions[positionIndex++];
                     state.EntityManager.SetComponentData(unplacedEntities[i], nodeId);
+                    
+                    // Add SectorHierarchyData to each placed district for later subdivision
+                    var sectorData = new SectorHierarchyData(
+                        new int2(6, 6), // Local grid size for sectors
+                        math.max(1, worldConfig.TargetSectors / targetDistrictCount), // Sectors per district
+                        random.NextUInt()
+                    );
+                    state.EntityManager.AddComponentData(unplacedEntities[i], sectorData);
+                    
+                    placedCount++;
                 }
             }
 
             // Mark layout as complete
             var doneEntity = state.EntityManager.CreateEntity();
-            state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(unplacedCount, 0));
+            state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
         }
 
         /// <summary>

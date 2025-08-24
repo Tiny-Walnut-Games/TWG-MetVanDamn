@@ -1,0 +1,42 @@
+name: 🛡️ Circular Dependency Guard
+
+on:
+  pull_request:
+    paths:
+      - '**/*.asmdef'
+      - 'Assets/**/*.cs'
+      - 'Packages/**/*.cs'
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**/*.asmdef'
+      - 'Assets/**/*.cs'
+      - 'Packages/**/*.cs'
+
+jobs:
+  dependency-validation:
+    name: Validate Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🛎️ Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: 🛡️ Run Circular Dependency Guard
+      run: |
+        chmod +x scripts/ci-guard-circular-dependencies.sh
+        ./scripts/ci-guard-circular-dependencies.sh
+        
+    - name: 📊 Upload Dependency Analysis
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: dependency-analysis
+        path: |
+          scripts/validate-circular-dependencies.py
+        retention-days: 7

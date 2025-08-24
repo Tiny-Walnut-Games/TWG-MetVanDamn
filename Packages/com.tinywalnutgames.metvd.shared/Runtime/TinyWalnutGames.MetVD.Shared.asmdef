@@ -1,13 +1,11 @@
 {
-    "name": "TinyWalnutGames.MetVD.Graph",
-    "rootNamespace": "TinyWalnutGames.MetVD.Graph",
+    "name": "TinyWalnutGames.MetVD.Shared",
+    "rootNamespace": "TinyWalnutGames.MetVD.Shared",
     "references": [
         "Unity.Burst",
         "Unity.Collections",
         "Unity.Entities",
-        "Unity.Mathematics",
-        "TinyWalnutGames.MetVD.Core",
-        "TinyWalnutGames.MetVD.Shared"
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
