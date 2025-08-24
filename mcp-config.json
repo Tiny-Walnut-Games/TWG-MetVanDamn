@@ -170,12 +170,14 @@
     "allowedOrigins": [
       "https://github.com",
       "https://vscode.dev",
-      "https://github.dev"
+      "https://github.dev",
+      "http://localhost:8000",
+      "http://127.0.0.1:8000"
     ],
     "localhostRestrictions": {
       "enabled": true,
-      "allowedPorts": [],
-      "comment": "Localhost access disabled for security - use specific origins only"
+      "allowedPorts": [8000, 8080, 3000],
+      "comment": "Allow specific development ports for MCP server and common dev servers"
     },
     "rateLimiting": {
       "enabled": true,
