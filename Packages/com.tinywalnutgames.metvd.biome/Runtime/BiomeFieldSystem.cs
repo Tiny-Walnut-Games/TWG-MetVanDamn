@@ -225,8 +225,8 @@ namespace TinyWalnutGames.MetVD.Biome
 
         protected override void OnUpdate()
         {
-            biomeLookup.Update(this);
-            nodeIdLookup.Update(this);
+            biomeLookup.Update(ref CheckedStateRef);
+            nodeIdLookup.Update(ref CheckedStateRef);
 
             // Validation job runs only occasionally
             if (World.Time.ElapsedTime % 5.0 < World.Time.DeltaTime)
