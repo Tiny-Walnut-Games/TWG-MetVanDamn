@@ -81,8 +81,10 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoSettings.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVDWorldDebugWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileSamples.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\ProceduralLayoutPreview.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\GateConditionBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNSceneBootstrap.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\ProceduralLayoutGizmoDrawer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\ConnectionBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileInspector.cs" />
   </ItemGroup>
@@ -1255,6 +1257,10 @@
     <ProjectReference Include="TinyWalnutGames.MetVD.Samples.csproj">
       <Project>{077B9EBE-F88F-C8BA-6798-C73D2EAC959F}</Project>
       <Name>TinyWalnutGames.MetVD.Samples</Name>
+    </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.csproj">
+      <Project>{6BEF65E0-E1A3-6D7E-9453-DA8D0FDF65FD}</Project>
+      <Name>TinyWalnutGames.MetVD.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="TinyWalnutGames.MetVD.Utility.csproj">
       <Project>{B929F59F-9716-BF18-93BC-E56A67BCECDE}</Project>

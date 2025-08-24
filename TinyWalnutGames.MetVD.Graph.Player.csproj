@@ -74,8 +74,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SectorRefineSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\DistrictLayoutSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\Data\SampleWfcData.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WfcComponents.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ConnectionBuilderSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RuleRandomizationSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SectorRoomHierarchySystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\DistrictWfcSystem.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -919,6 +924,10 @@
     <ProjectReference Include="TinyWalnutGames.MetVD.Core.Player.csproj">
       <Project>{9891ACE8-EE1A-59D1-CC4D-251A5A062472}</Project>
       <Name>TinyWalnutGames.MetVD.Core.Player</Name>
+    </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.Player.csproj">
+      <Project>{48CCF777-0B65-3DF8-17E2-3AECF5BDA8CE}</Project>
+      <Name>TinyWalnutGames.MetVD.Shared.Player</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

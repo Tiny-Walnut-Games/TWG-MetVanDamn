@@ -73,9 +73,11 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\DistrictSectorRoomFeaturesTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\WfcSystemTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\SectorRefineSystemTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\DistrictWfcSystemTests.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\ProceduralLayoutSystemTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\TinyWalnutGames.MetVD.Graph.Tests.asmdef" />

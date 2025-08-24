@@ -1204,6 +1204,10 @@
       <Project>{4C65C270-6B4A-86F0-414F-15C2B74B3280}</Project>
       <Name>TinyWalnutGames.MetVD.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.csproj">
+      <Project>{6BEF65E0-E1A3-6D7E-9453-DA8D0FDF65FD}</Project>
+      <Name>TinyWalnutGames.MetVD.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="TinyWalnutGames.MetVD.Graph.csproj">
       <Project>{E4E50120-3677-2516-6933-2F6698D8F8BC}</Project>
       <Name>TinyWalnutGames.MetVD.Graph</Name>

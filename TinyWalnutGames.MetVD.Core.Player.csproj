@@ -73,6 +73,7 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\DistrictLayoutTags.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Connection.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\NodeId.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Biome.cs" />

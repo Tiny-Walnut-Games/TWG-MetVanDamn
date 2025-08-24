@@ -42,6 +42,14 @@
         "com.unity.entities": "1.2.0"
       }
     },
+    "com.tinywalnutgames.metvd.shared": {
+      "version": "file:com.tinywalnutgames.metvd.shared",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.entities": "1.0.16"
+      }
+    },
     "com.unity.2d.animation": {
       "version": "12.0.2",
       "depth": 0,

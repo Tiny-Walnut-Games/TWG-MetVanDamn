@@ -932,6 +932,10 @@
       <Project>{9891ACE8-EE1A-59D1-CC4D-251A5A062472}</Project>
       <Name>TinyWalnutGames.MetVD.Core.Player</Name>
     </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.Player.csproj">
+      <Project>{48CCF777-0B65-3DF8-17E2-3AECF5BDA8CE}</Project>
+      <Name>TinyWalnutGames.MetVD.Shared.Player</Name>
+    </ProjectReference>
     <ProjectReference Include="TinyWalnutGames.MetVD.Graph.Player.csproj">
       <Project>{49C4E017-0693-4452-4C85-D76D7D58CC49}</Project>
       <Name>TinyWalnutGames.MetVD.Graph.Player</Name>

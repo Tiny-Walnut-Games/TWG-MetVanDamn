@@ -209,7 +209,7 @@ namespace TinyWalnutGames.MetVD.Graph
             float jitterAmount = math.min(cellSize.x, cellSize.y) * 0.3f; // 30% jitter
 
             // Create shuffled indices for grid cells
-            using var shuffledIndices = new NativeArray<int>(positions.Length, Allocator.Temp);
+            var shuffledIndices = new NativeArray<int>(positions.Length, Allocator.Temp);
             for (int i = 0; i < shuffledIndices.Length; i++)
             {
                 shuffledIndices[i] = i;
