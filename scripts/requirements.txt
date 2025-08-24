@@ -3,7 +3,7 @@
 
 # Core dependencies for linting and validation
 PyYAML>=6.0
-argparse>=1.4.0
+# argparse is built into Python 3.2+ - no need to install separately
 
 # Optional dependencies for enhanced functionality
 # Uncomment as needed for your specific use case
@@ -31,7 +31,7 @@ argparse>=1.4.0
 # watchdog>=3.0.0  # For file system monitoring
 # psutil>=5.9.0  # For system metrics
 
-# MCP server dependencies (if implementing MCP integration)
+# MCP server dependencies (required for MCP integration)
 fastapi>=0.110.0
 uvicorn>=0.23.0
 pydantic>=2.3.0

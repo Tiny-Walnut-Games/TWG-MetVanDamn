@@ -117,14 +117,21 @@ main() {
         fi
     fi
     
-    # Test Node.js package installation if npm is available
+    # Test Node.js package installation if npm is available and network accessible
     if command -v npm &> /dev/null; then
-        if validate_package_install "js-yaml" "npm install js-yaml@^4.1.0 --dry-run"; then
-            log_success "Node.js package validation passed"
+        # Quick network connectivity test for npm
+        if timeout 5 npm ping &> /dev/null; then
+            if validate_package_install "js-yaml" "npm install js-yaml@^4.1.0 --dry-run"; then
+                log_success "Node.js package validation passed"
+            else
+                log_error "Node.js package validation failed"  
+                exit_code=1
+            fi
         else
-            log_error "Node.js package validation failed"  
-            exit_code=1
+            log_info "npm registry not accessible, skipping Node.js package validation"
         fi
+    else
+        log_info "npm not available, skipping Node.js package validation"
     fi
     
     echo ""
