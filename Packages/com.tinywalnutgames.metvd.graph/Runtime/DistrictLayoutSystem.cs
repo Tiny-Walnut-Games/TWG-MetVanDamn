@@ -137,129 +137,129 @@ namespace TinyWalnutGames.MetVD.Graph
                 if (unplacedEntities.IsCreated) unplacedEntities.Dispose();
                 if (nodeIds.IsCreated) nodeIds.Dispose();
             }
+        }
 
-            /// <summary>
-            /// Generate district positions using the specified strategy
-            /// </summary>
-            [BurstCompile]
-            static void GenerateDistrictPositions(NativeArray<int2> positions, int2 worldSize,
-                DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
+        /// <summary>
+        /// Generate district positions using the specified strategy
+        /// </summary>
+        [BurstCompile]
+        static void GenerateDistrictPositions(NativeArray<int2> positions, int2 worldSize,
+            DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
+        {
+            switch (strategy)
             {
-                switch (strategy)
-                {
-                    case DistrictPlacementStrategy.PoissonDisc:
-                        GeneratePoissonDiscPositions(positions, worldSize, ref random);
-                        break;
-                    case DistrictPlacementStrategy.JitteredGrid:
-                        GenerateJitteredGridPositions(positions, worldSize, ref random);
-                        break;
-                }
+                case DistrictPlacementStrategy.PoissonDisc:
+                    GeneratePoissonDiscPositions(positions, worldSize, ref random);
+                    break;
+                case DistrictPlacementStrategy.JitteredGrid:
+                    GenerateJitteredGridPositions(positions, worldSize, ref random);
+                    break;
             }
+        }
 
-            /// <summary>
-            /// Generate positions using Poisson-disc sampling for organic spacing
-            /// Simple rejection sampling implementation
-            /// </summary>
-            [BurstCompile]
-            static void GeneratePoissonDiscPositions(NativeArray<int2> positions, int2 worldSize,
-                ref Unity.Mathematics.Random random)
+        /// <summary>
+        /// Generate positions using Poisson-disc sampling for organic spacing
+        /// Simple rejection sampling implementation
+        /// </summary>
+        [BurstCompile]
+        static void GeneratePoissonDiscPositions(NativeArray<int2> positions, int2 worldSize,
+            ref Unity.Mathematics.Random random)
+        {
+            float minDistance = math.min(worldSize.x, worldSize.y) * 0.2f; // 20% of world size as minimum distance
+            int maxAttempts = 30;
+
+            for (int i = 0; i < positions.Length; i++)
             {
-                float minDistance = math.min(worldSize.x, worldSize.y) * 0.2f; // 20% of world size as minimum distance
-                int maxAttempts = 30;
+                bool validPosition = false;
+                int attempts = 0;
 
-                for (int i = 0; i < positions.Length; i++)
+                while (!validPosition && attempts < maxAttempts)
                 {
-                    bool validPosition = false;
-                    int attempts = 0;
-
-                    while (!validPosition && attempts < maxAttempts)
-                    {
-                        // Generate random position within world bounds
-                        int2 candidate = new(
-                            random.NextInt(0, worldSize.x),
-                            random.NextInt(0, worldSize.y)
-                        );
-
-                        // Check distance to all previously placed positions
-                        validPosition = true;
-                        for (int j = 0; j < i; j++)
-                        {
-                            float distance = math.length(new float2(candidate - positions[j]));
-                            if (distance < minDistance)
-                            {
-                                validPosition = false;
-                                break;
-                            }
-                        }
-
-                        if (validPosition)
-                        {
-                            positions[i] = candidate;
-                        }
-
-                        attempts++;
-                    }
-
-                    // Fallback if no valid position found
-                    if (!validPosition)
-                    {
-                        positions[i] = new int2(
-                            random.NextInt(0, worldSize.x),
-                            random.NextInt(0, worldSize.y)
-                        );
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Generate positions using jittered grid for larger district counts
-            /// </summary>
-            [BurstCompile]
-            static void GenerateJitteredGridPositions(NativeArray<int2> positions, int2 worldSize,
-                ref Unity.Mathematics.Random random)
-            {
-                int gridDim = (int)math.ceil(math.sqrt(positions.Length));
-                float2 cellSize = new float2(worldSize) / gridDim;
-                float jitterAmount = math.min(cellSize.x, cellSize.y) * 0.3f; // 30% jitter
-
-                // Create shuffled indices for grid cells
-                var shuffledIndices = new NativeArray<int>(positions.Length, Allocator.Temp);
-                for (int i = 0; i < shuffledIndices.Length; i++)
-                {
-                    shuffledIndices[i] = i;
-                }
-
-                // Simple shuffle
-                for (int i = shuffledIndices.Length - 1; i > 0; i--)
-                {
-                    int j = random.NextInt(0, i + 1);
-                    (shuffledIndices[i], shuffledIndices[j]) = (shuffledIndices[j], shuffledIndices[i]);
-                }
-
-                // Assign positions based on shuffled grid
-                for (int i = 0; i < positions.Length; i++)
-                {
-                    int gridIndex = shuffledIndices[i];
-                    int gridX = gridIndex % gridDim;
-                    int gridY = gridIndex / gridDim;
-
-                    // Calculate cell center
-                    float2 cellCenter = new float2(gridX + 0.5f, gridY + 0.5f) * cellSize;
-
-                    // Apply jitter
-                    float2 jitter = new(
-                        random.NextFloat(-jitterAmount, jitterAmount),
-                        random.NextFloat(-jitterAmount, jitterAmount)
+                    // Generate random position within world bounds
+                    int2 candidate = new(
+                        random.NextInt(0, worldSize.x),
+                        random.NextInt(0, worldSize.y)
                     );
 
-                    float2 finalPosition = cellCenter + jitter;
+                    // Check distance to all previously placed positions
+                    validPosition = true;
+                    for (int j = 0; j < i; j++)
+                    {
+                        float distance = math.length(new float2(candidate - positions[j]));
+                        if (distance < minDistance)
+                        {
+                            validPosition = false;
+                            break;
+                        }
+                    }
 
-                    // Clamp to world bounds
-                    positions[i] = new(
-                        math.clamp((int)finalPosition.x, 0, worldSize.x - 1),
-                        math.clamp((int)finalPosition.y, 0, worldSize.y - 1)
+                    if (validPosition)
+                    {
+                        positions[i] = candidate;
+                    }
+
+                    attempts++;
+                }
+
+                // Fallback if no valid position found
+                if (!validPosition)
+                {
+                    positions[i] = new int2(
+                        random.NextInt(0, worldSize.x),
+                        random.NextInt(0, worldSize.y)
                     );
                 }
+            }
+        }
+
+        /// <summary>
+        /// Generate positions using jittered grid for larger district counts
+        /// </summary>
+        [BurstCompile]
+        static void GenerateJitteredGridPositions(NativeArray<int2> positions, int2 worldSize,
+            ref Unity.Mathematics.Random random)
+        {
+            int gridDim = (int)math.ceil(math.sqrt(positions.Length));
+            float2 cellSize = new float2(worldSize) / gridDim;
+            float jitterAmount = math.min(cellSize.x, cellSize.y) * 0.3f; // 30% jitter
+
+            // Create shuffled indices for grid cells
+            var shuffledIndices = new NativeArray<int>(positions.Length, Allocator.Temp);
+            for (int i = 0; i < shuffledIndices.Length; i++)
+            {
+                shuffledIndices[i] = i;
+            }
+
+            // Simple shuffle
+            for (int i = shuffledIndices.Length - 1; i > 0; i--)
+            {
+                int j = random.NextInt(0, i + 1);
+                (shuffledIndices[i], shuffledIndices[j]) = (shuffledIndices[j], shuffledIndices[i]);
+            }
+
+            // Assign positions based on shuffled grid
+            for (int i = 0; i < positions.Length; i++)
+            {
+                int gridIndex = shuffledIndices[i];
+                int gridX = gridIndex % gridDim;
+                int gridY = gridIndex / gridDim;
+
+                // Calculate cell center
+                float2 cellCenter = new float2(gridX + 0.5f, gridY + 0.5f) * cellSize;
+
+                // Apply jitter
+                float2 jitter = new(
+                    random.NextFloat(-jitterAmount, jitterAmount),
+                    random.NextFloat(-jitterAmount, jitterAmount)
+                );
+
+                float2 finalPosition = cellCenter + jitter;
+
+                // Clamp to world bounds
+                positions[i] = new(
+                    math.clamp((int)finalPosition.x, 0, worldSize.x - 1),
+                    math.clamp((int)finalPosition.y, 0, worldSize.y - 1)
+                );
             }
         }
     }
