@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Shared;
@@ -54,8 +55,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(district2, new WfcState());
 
             // Act
-            var layoutSystem = _testWorld.CreateSystemManaged<DistrictLayoutSystem>();
-            layoutSystem.Update();
+            var layoutSystem = _testWorld.CreateSystem<DistrictLayoutSystem>();
+            _testWorld.Update();
 
             // Assert
             var node1 = _entityManager.GetComponentData<NodeId>(district1);
@@ -87,8 +88,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(3, 0));
 
             // Act
-            var ruleSystem = _testWorld.CreateSystemManaged<RuleRandomizationSystem>();
-            ruleSystem.Update();
+            var ruleSystem = _testWorld.CreateSystem<RuleRandomizationSystem>();
+            _testWorld.Update();
 
             // Assert
             using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
@@ -119,8 +120,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(8, 0));
 
             // Act
-            var ruleSystem = _testWorld.CreateSystemManaged<RuleRandomizationSystem>();
-            ruleSystem.Update();
+            var ruleSystem = _testWorld.CreateSystem<RuleRandomizationSystem>();
+            _testWorld.Update();
 
             // Assert
             using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
@@ -152,8 +153,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(4, 0));
 
             // Act
-            var ruleSystem = _testWorld.CreateSystemManaged<RuleRandomizationSystem>();
-            ruleSystem.Update();
+            var ruleSystem = _testWorld.CreateSystem<RuleRandomizationSystem>();
+            _testWorld.Update();
 
             // Assert
             using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));

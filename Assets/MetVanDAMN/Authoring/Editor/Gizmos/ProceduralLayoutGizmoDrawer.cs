@@ -119,7 +119,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             Vector3 position = GetGizmoPosition(district);
             
             // Determine if this is an unplaced district (coordinates 0,0)
-            bool isUnplaced = district.nodeId.coordinates.x == 0 && district.nodeId.coordinates.y == 0;
+            bool isUnplaced = district.gridCoordinates.x == 0 && district.gridCoordinates.y == 0;
             
             if (isUnplaced && _showUnplacedDistricts)
             {
@@ -146,7 +146,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             // Draw label
             Handles.color = Color.gray;
-            Handles.Label(position + Vector3.up * 1.5f, $"UNPLACED\nNode: {district.nodeId.value}\nLevel: {district.nodeId.level}");
+            Handles.Label(position + Vector3.up * 1.5f, $"UNPLACED\nNode: {district.nodeId}\nLevel: {district.level}");
         }
 
         private static void DrawPlacedDistrictGizmo(Vector3 position, DistrictAuthoring district)
@@ -248,9 +248,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (_settings.useGridCoordinatesForGizmos)
             {
                 return new Vector3(
-                    district.nodeId.coordinates.x * _settings.gridCellSize,
+                    district.gridCoordinates.x * _settings.gridCellSize,
                     0,
-                    district.nodeId.coordinates.y * _settings.gridCellSize
+                    district.gridCoordinates.y * _settings.gridCellSize
                 ) + _settings.gridOriginOffset;
             }
             return district.transform.position;

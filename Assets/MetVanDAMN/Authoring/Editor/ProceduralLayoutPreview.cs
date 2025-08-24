@@ -296,7 +296,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             foreach (var district in _districts)
             {
-                bool isUnplaced = district.nodeId.coordinates.x == 0 && district.nodeId.coordinates.y == 0;
+                bool isUnplaced = district.gridCoordinates.x == 0 && district.gridCoordinates.y == 0;
                 if (isUnplaced) unplacedCount++;
                 else placedCount++;
                 

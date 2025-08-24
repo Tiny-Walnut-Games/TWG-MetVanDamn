@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Authoring;
+using TinyWalnutGames.MetVD.Shared;
 
 namespace TinyWalnutGames.MetVD.Samples
 {
@@ -34,12 +35,14 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void Start()
         {
-            _entityManager = World.DefaultGameObjectInjectionWorld?.EntityManager;
-            if (_entityManager == null)
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null)
             {
-                Debug.LogError("ProceduralLayoutDemo: EntityManager not available!");
+                Debug.LogError("ProceduralLayoutDemo: Default World not available!");
                 return;
             }
+            
+            _entityManager = world.EntityManager;
 
             if (enableAutoDemo)
             {

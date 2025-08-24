@@ -8,7 +8,9 @@
         "Unity.Collections",
         "TinyWalnutGames.MetVD.Core",
         "TinyWalnutGames.MetVD.Graph",
-        "TinyWalnutGames.MetVD.Biome"
+        "TinyWalnutGames.MetVD.Biome",
+        "TinyWalnutGames.MetVD.Shared",
+        "TinyWalnutGames.MetVD.Authoring"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

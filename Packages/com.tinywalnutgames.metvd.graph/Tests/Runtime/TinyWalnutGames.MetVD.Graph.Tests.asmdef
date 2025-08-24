@@ -6,6 +6,7 @@
         "UnityEditor.TestRunner",
         "TinyWalnutGames.MetVD.Core",
         "TinyWalnutGames.MetVD.Graph",
+        "TinyWalnutGames.MetVD.Shared",
         "Unity.Entities",
         "Unity.Mathematics",
         "Unity.Collections",
