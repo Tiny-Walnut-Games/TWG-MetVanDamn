@@ -151,8 +151,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void DrawPlacedDistrictGizmo(Vector3 position, DistrictAuthoring district)
         {
-            // Use default district color since biomeType is no longer on DistrictAuthoring
-            Color biomeColor = GetBiomeColor(BiomeType.HubArea);
+            // Use a descriptive default color for placed districts since biomeType is no longer on DistrictAuthoring
+            Color biomeColor = _settings != null ? _settings.placedDistrictColor : Color.cyan;
             
             // Draw filled district area
             Handles.color = new Color(biomeColor.r, biomeColor.g, biomeColor.b, 0.3f);
