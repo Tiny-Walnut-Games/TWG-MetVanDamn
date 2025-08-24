@@ -55,7 +55,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(district2, new WfcState());
 
             // Act
-            var layoutSystem = _testWorld.CreateSystem<DistrictLayoutSystem>();
+            var layoutSystemHandle = _testWorld.CreateSystem<DistrictLayoutSystem>();
             _testWorld.Update();
 
             // Assert
@@ -88,7 +88,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(3, 0));
 
             // Act
-            var ruleSystem = _testWorld.CreateSystem<RuleRandomizationSystem>();
+            var ruleSystemHandle = _testWorld.CreateSystem<RuleRandomizationSystem>();
             _testWorld.Update();
 
             // Assert
@@ -120,7 +120,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(8, 0));
 
             // Act
-            var ruleSystem = _testWorld.CreateSystem<RuleRandomizationSystem>();
+            var ruleSystemHandle2 = _testWorld.CreateSystem<RuleRandomizationSystem>();
             _testWorld.Update();
 
             // Assert
@@ -153,7 +153,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(4, 0));
 
             // Act
-            var ruleSystem = _testWorld.CreateSystem<RuleRandomizationSystem>();
+            var ruleSystemHandle3 = _testWorld.CreateSystem<RuleRandomizationSystem>();
             _testWorld.Update();
 
             // Assert
