@@ -1,6 +1,7 @@
 name: 🛡️ Circular Dependency Guard
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - '**/*.asmdef'
