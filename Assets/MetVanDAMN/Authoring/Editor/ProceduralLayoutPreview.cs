@@ -300,10 +300,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 if (isUnplaced) unplacedCount++;
                 else placedCount++;
                 
-                Debug.Log($"   District {district.nodeId.value}: " +
-                         $"Pos({district.nodeId.coordinates.x}, {district.nodeId.coordinates.y}), " +
-                         $"Level {district.nodeId.level}, " +
-                         $"Biome {district.biomeType}, " +
+                Debug.Log($"   District {district.nodeId}: " +
+                         $"Pos({district.gridCoordinates.x}, {district.gridCoordinates.y}), " +
+                         $"Level {district.level}, " +
                          $"Status: {(isUnplaced ? "UNPLACED" : "PLACED")}");
             }
             
