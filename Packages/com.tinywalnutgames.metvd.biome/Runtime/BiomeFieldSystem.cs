@@ -211,28 +211,25 @@ namespace TinyWalnutGames.MetVD.Biome
     /// <summary>
     /// Utility system for biome validation and debugging
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(PresentationSystemGroup))]
-    public partial struct BiomeValidationSystem : ISystem
+    public partial class BiomeValidationSystem : SystemBase
     {
         private ComponentLookup<Core.Biome> biomeLookup;
         private ComponentLookup<NodeId> nodeIdLookup;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            biomeLookup = state.GetComponentLookup<Core.Biome>(true);
-            nodeIdLookup = state.GetComponentLookup<NodeId>(true);
+            biomeLookup = GetComponentLookup<Core.Biome>(true);
+            nodeIdLookup = GetComponentLookup<NodeId>(true);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
-            biomeLookup.Update(ref state);
-            nodeIdLookup.Update(ref state);
+            biomeLookup.Update(this);
+            nodeIdLookup.Update(this);
 
             // Validation job runs only occasionally
-            if (state.WorldUnmanaged.Time.ElapsedTime % 5.0 < state.WorldUnmanaged.Time.DeltaTime)
+            if (World.Time.ElapsedTime % 5.0 < World.Time.DeltaTime)
             {
                 var validationJob = new BiomeValidationJob
                 {
@@ -240,7 +237,7 @@ namespace TinyWalnutGames.MetVD.Biome
                     NodeIdLookup = nodeIdLookup
                 };
 
-                state.Dependency = validationJob.ScheduleParallel(state.Dependency);
+                Dependency = validationJob.ScheduleParallel(Dependency);
             }
         }
     }
@@ -336,20 +333,20 @@ namespace TinyWalnutGames.MetVD.Biome
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateBefore(typeof(BiomeValidationSystem))]
-    public partial struct BiomeValidationBufferSetupSystem : ISystem
+    public partial class BiomeValidationBufferSetupSystem : SystemBase
     {
         private EntityQuery _missingBufferQuery;
 
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            _missingBufferQuery = state.GetEntityQuery(new EntityQueryDesc
+            _missingBufferQuery = GetEntityQuery(new EntityQueryDesc
             {
                 All = new[] { ComponentType.ReadOnly<Core.Biome>() },
                 None = new[] { ComponentType.ReadOnly<BiomeValidationRecord>() }
             });
         }
 
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             if (_missingBufferQuery.IsEmptyIgnoreFilter)
                 return;
@@ -360,7 +357,7 @@ namespace TinyWalnutGames.MetVD.Biome
             {
                 ecb.AddBuffer<BiomeValidationRecord>(entities[i]);
             }
-            ecb.Playback(state.EntityManager);
+            ecb.Playback(EntityManager);
             ecb.Dispose();
             entities.Dispose();
         }

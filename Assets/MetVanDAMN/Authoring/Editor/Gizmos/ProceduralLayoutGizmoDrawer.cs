@@ -151,8 +151,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void DrawPlacedDistrictGizmo(Vector3 position, DistrictAuthoring district)
         {
-            // Get biome-specific color
-            Color biomeColor = GetBiomeColor(district.biomeType);
+            // Use default district color since biomeType is no longer on DistrictAuthoring
+            Color biomeColor = GetBiomeColor(BiomeType.HubArea);
             
             // Draw filled district area
             Handles.color = new Color(biomeColor.r, biomeColor.g, biomeColor.b, 0.3f);
@@ -163,7 +163,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             // Draw district label
             Handles.color = _settings.labelColor;
-            string label = $"District {district.nodeId.value}\nCoords: ({district.nodeId.coordinates.x}, {district.nodeId.coordinates.y})\nBiome: {district.biomeType}";
+            string label = $"District {district.nodeId}\nCoords: ({district.gridCoordinates.x}, {district.gridCoordinates.y})\nLevel: {district.level}";
             Handles.Label(position + Vector3.up * 2f, label);
         }
 
@@ -189,7 +189,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void DrawBiomeRadiusGizmo(Vector3 position, DistrictAuthoring district)
         {
-            Color biomeColor = GetBiomeColor(district.biomeType);
+            Color biomeColor = GetBiomeColor(BiomeType.HubArea);
             Handles.color = new Color(biomeColor.r, biomeColor.g, biomeColor.b, 0.1f);
             
             // Draw wire disc for biome influence radius
