@@ -1,7 +1,6 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Core
 {
