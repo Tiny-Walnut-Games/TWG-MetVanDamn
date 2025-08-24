@@ -60,23 +60,21 @@ namespace TinyWalnutGames.MetVD.Graph
             if (districtCount < 2) return; // Need at least 2 districts to connect
 
             // Create arrays for district data
-            var districtEntities = new NativeArray<Entity>(districtCount, Allocator.Temp);
-            var districtPositions = new NativeArray<int2>(districtCount, Allocator.Temp);
-            var districtNodeIds = new NativeArray<uint>(districtCount, Allocator.Temp);
+            using var districtEntities = new NativeArray<Entity>(districtCount, Allocator.Temp);
+            using var districtPositions = new NativeArray<int2>(districtCount, Allocator.Temp);  
+            using var districtNodeIds = new NativeArray<uint>(districtCount, Allocator.Temp);
 
-            try
+            int districtIndex = 0;
+            for (int i = 0; i < nodeIds.Length; i++)
             {
-                int districtIndex = 0;
-                for (int i = 0; i < nodeIds.Length; i++)
+                if (nodeIds[i].Level == 0)
                 {
-                    if (nodeIds[i].Level == 0)
-                    {
-                        districtEntities[districtIndex] = entities[i];
-                        districtPositions[districtIndex] = nodeIds[i].Coordinates;
-                        districtNodeIds[districtIndex] = nodeIds[i].Value;
-                        districtIndex++;
-                    }
+                    districtEntities[districtIndex] = entities[i];
+                    districtPositions[districtIndex] = nodeIds[i].Coordinates;
+                    districtNodeIds[districtIndex] = nodeIds[i].Value;
+                    districtIndex++;
                 }
+            }
 
                 // Get world configuration for random seed
                 var worldConfigQuery = state.GetEntityQuery(ComponentType.ReadOnly<WorldConfiguration>());
@@ -95,13 +93,6 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Update layout done tag with connection count
                 var layoutDoneEntity = _layoutDoneQuery.GetSingletonEntity();
                 state.EntityManager.SetComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(districtCount, connectionCount));
-            }
-            finally
-            {
-                if (districtEntities.IsCreated) districtEntities.Dispose();
-                if (districtPositions.IsCreated) districtPositions.Dispose();
-                if (districtNodeIds.IsCreated) districtNodeIds.Dispose();
-            }
         }
 
         /// <summary>
@@ -126,12 +117,10 @@ namespace TinyWalnutGames.MetVD.Graph
                 var sourceEntity = districtEntities[i];
 
                 // Find K nearest neighbors
-                var distances = new NativeArray<DistanceEntry>(districtPositions.Length - 1, Allocator.Temp);
-                try
-                {
-                    int entryIndex = 0;
+                using var distances = new NativeArray<DistanceEntry>(districtPositions.Length - 1, Allocator.Temp);
+                int entryIndex = 0;
 
-                    for (int j = 0; j < districtPositions.Length; j++)
+                for (int j = 0; j < districtPositions.Length; j++)
                     {
                         if (i == j) continue; // Skip self
 
@@ -180,10 +169,6 @@ namespace TinyWalnutGames.MetVD.Graph
                             connectionCount++;
                         }
                     }
-                }
-                finally
-                {
-                    if (distances.IsCreated) distances.Dispose();
                 }
             }
 
