@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using TinyWalnutGames.MetVD.Core; // For NodeId, Biome component
 using TinyWalnutGames.MetVD.Biome;
-using TinyWalnutGames.GridLayerEditor;
 using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem;
 using System.Linq;
 using System.Collections.Generic; // Needed for List<>
@@ -142,37 +141,76 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private string[] GetLayerNamesForProjection(ProjectionType projectionType)
         {
-            // Removed IsometricHexagonalLayers (not found). Use top-down layers for isometric/hex as fallback.
+            // Define layer configurations directly instead of using Editor-only enums
             return projectionType switch
             {
-                ProjectionType.Platformer => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.SideScrollingLayers)),
-                ProjectionType.TopDown => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers)),
-                ProjectionType.Isometric => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers)),
-                ProjectionType.Hexagonal => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers)),
-                _ => System.Enum.GetNames(typeof(TwoDimensionalGridSetup.TopDownLayers))
+                ProjectionType.Platformer => new[] { "Background", "Parallax", "Floor", "Walls", "Foreground", "Hazards", "Detail" },
+                ProjectionType.TopDown => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+                ProjectionType.Isometric => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+                ProjectionType.Hexagonal => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+                _ => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" }
             };
         }
 
         private void InvokeProjectionCreation(ProjectionType projectionType)
         {
+            // Create grid directly using Unity API instead of Editor-only TwoDimensionalGridSetup
+            GameObject gridGO;
+            Grid grid;
+            
             switch (projectionType)
             {
                 case ProjectionType.Platformer:
-                    TwoDimensionalGridSetup.CreateSideScrollingGrid();
+                    gridGO = new GameObject("Side-Scrolling Grid", typeof(Grid));
+                    grid = gridGO.GetComponent<Grid>();
+                    grid.cellLayout = GridLayout.CellLayout.Rectangle;
                     break;
                 case ProjectionType.TopDown:
-                    TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
+                    gridGO = new GameObject("Top-Down Grid", typeof(Grid));
+                    grid = gridGO.GetComponent<Grid>();
+                    grid.cellLayout = GridLayout.CellLayout.Rectangle;
                     break;
                 case ProjectionType.Isometric:
-                    TwoDimensionalGridSetup.CreateIsometricTopDownGrid();
+                    gridGO = new GameObject("Isometric Top-Down Grid", typeof(Grid));
+                    grid = gridGO.GetComponent<Grid>();
+                    grid.cellLayout = GridLayout.CellLayout.Isometric;
                     break;
                 case ProjectionType.Hexagonal:
-                    TwoDimensionalGridSetup.CreateHexTopDownGrid();
+                    gridGO = new GameObject("Hexagonal Top-Down Grid", typeof(Grid));
+                    grid = gridGO.GetComponent<Grid>();
+                    grid.cellLayout = GridLayout.CellLayout.Hexagon;
                     break;
                 default:
-                    TwoDimensionalGridSetup.CreateDefaultTopDownGrid();
+                    gridGO = new GameObject("Default Top-Down Grid", typeof(Grid));
+                    grid = gridGO.GetComponent<Grid>();
+                    grid.cellLayout = GridLayout.CellLayout.Rectangle;
                     break;
             }
+            
+            gridGO.transform.position = Vector3.zero;
+            
+            // Create tilemap layers for this grid
+            string[] layerNames = GetLayerNamesForProjection(projectionType);
+            for (int i = 0; i < layerNames.Length; i++)
+            {
+                int flippedZ = layerNames.Length - 1 - i;
+                CreateTilemapLayer(gridGO.transform, layerNames[i], flippedZ);
+            }
+        }
+        
+        private void CreateTilemapLayer(Transform parent, string layerName, int zDepth)
+        {
+            var layerGO = new GameObject(layerName, typeof(Tilemap), typeof(TilemapRenderer));
+            layerGO.transform.SetParent(parent);
+            layerGO.transform.localPosition = new Vector3(0, 0, -zDepth);
+            
+            var renderer = layerGO.GetComponent<TilemapRenderer>();
+            renderer.sortingLayerName = layerName;
+            if (renderer.sortingLayerName != layerName)
+            {
+                UnityEngine.Debug.LogWarning($"Sorting Layer '{layerName}' not found. Renderer will use default sorting layer.");
+            }
+            renderer.sortingOrder = 0;
         }
 
         private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string[] layerNames, Grid grid)

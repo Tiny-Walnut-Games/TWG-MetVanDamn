@@ -60,9 +60,11 @@ namespace TinyWalnutGames.MetVD.Graph
             var worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
             
             // Find unplaced districts (those at coordinates 0,0 with Level 0)
-            using var unplacedEntities = _unplacedQuery.ToEntityArray(Allocator.Temp);
-            using var nodeIds = _unplacedQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            var unplacedEntities = _unplacedQuery.ToEntityArray(Allocator.Temp);
+            var nodeIds = _unplacedQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
             
+            try
+            {
             var unplacedCount = 0;
             for (int i = 0; i < nodeIds.Length; i++)
             {
@@ -93,35 +95,47 @@ namespace TinyWalnutGames.MetVD.Graph
             var strategy = targetDistrictCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
             
             // Generate district positions for target count
-            using var positions = new NativeArray<int2>(targetDistrictCount, Allocator.Temp);
-            GenerateDistrictPositions(positions, worldConfig.WorldSize, strategy, ref random);
-
-            // Apply positions to unplaced districts (up to target count)
-            int positionIndex = 0;
-            int placedCount = 0;
-            for (int i = 0; i < nodeIds.Length && placedCount < targetDistrictCount; i++)
+            var positions = new NativeArray<int2>(targetDistrictCount, Allocator.Temp);
+            try
             {
-                var nodeId = nodeIds[i];
-                if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
-                {
-                    nodeId.Coordinates = positions[positionIndex++];
-                    state.EntityManager.SetComponentData(unplacedEntities[i], nodeId);
-                    
-                    // Add SectorHierarchyData to each placed district for later subdivision
-                    var sectorData = new SectorHierarchyData(
-                        new int2(6, 6), // Local grid size for sectors
-                        math.max(1, worldConfig.TargetSectors / targetDistrictCount), // Sectors per district
-                        random.NextUInt()
-                    );
-                    state.EntityManager.AddComponentData(unplacedEntities[i], sectorData);
-                    
-                    placedCount++;
-                }
-            }
+                GenerateDistrictPositions(positions, worldConfig.WorldSize, strategy, ref random);
 
-            // Mark layout as complete
-            var doneEntity = state.EntityManager.CreateEntity();
-            state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
+                // Apply positions to unplaced districts (up to target count)
+                int positionIndex = 0;
+                int placedCount = 0;
+                for (int i = 0; i < nodeIds.Length && placedCount < targetDistrictCount; i++)
+                {
+                    var nodeId = nodeIds[i];
+                    if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
+                    {
+                        nodeId.Coordinates = positions[positionIndex++];
+                        state.EntityManager.SetComponentData(unplacedEntities[i], nodeId);
+                        
+                        // Add SectorHierarchyData to each placed district for later subdivision
+                        var sectorData = new SectorHierarchyData(
+                            new int2(6, 6), // Local grid size for sectors
+                            math.max(1, worldConfig.TargetSectors / targetDistrictCount), // Sectors per district
+                            random.NextUInt()
+                        );
+                        state.EntityManager.AddComponentData(unplacedEntities[i], sectorData);
+                        
+                        placedCount++;
+                    }
+                }
+
+                // Mark layout as complete
+                var doneEntity = state.EntityManager.CreateEntity();
+                state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
+            }
+            finally
+            {
+                if (positions.IsCreated) positions.Dispose();
+            }
+        }
+        finally
+        {
+            if (unplacedEntities.IsCreated) unplacedEntities.Dispose();
+            if (nodeIds.IsCreated) nodeIds.Dispose();
         }
 
         /// <summary>
