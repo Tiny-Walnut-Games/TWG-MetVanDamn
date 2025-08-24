@@ -8,6 +8,15 @@ using TinyWalnutGames.MetVD.Core;
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>
+    /// Constants for hierarchical ID generation
+    /// </summary>
+    public static class HierarchyConstants
+    {
+        public const uint SectorIdMultiplier = 1000;
+        public const uint RoomsPerSectorMultiplier = 100;
+    }
+
+    /// <summary>
     /// Component for sector hierarchy data within districts
     /// </summary>
     public struct SectorHierarchyData : IComponentData
@@ -165,7 +174,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
                 // Create sector entity
                 var sectorEntity = entityManager.CreateEntity();
-                    (uint)(districtNodeId.Value * SectorIdMultiplier + sectorIndex), // Unique sector ID
+                var sectorNodeId = new NodeId(
+                    (uint)(districtNodeId.Value * HierarchyConstants.SectorIdMultiplier + sectorIndex), // Unique sector ID
                     1, // Level 1 = sector
                     districtNodeId.Value, // Parent is district
                     sectorLocalCoords
@@ -268,7 +278,8 @@ namespace TinyWalnutGames.MetVD.Graph
             var roomEntity = entityManager.CreateEntity();
             
             // Create room node ID
-                (uint)(sectorNodeId.Value * RoomsPerSectorMultiplier + roomIndex), // Unique room ID
+            var roomNodeId = new NodeId(
+                (uint)(sectorNodeId.Value * HierarchyConstants.RoomsPerSectorMultiplier + roomIndex), // Unique room ID
                 2, // Level 2 = room
                 sectorNodeId.Value, // Parent is sector
                 new int2(bounds.x + bounds.width/2, bounds.y + bounds.height/2) // Room center
