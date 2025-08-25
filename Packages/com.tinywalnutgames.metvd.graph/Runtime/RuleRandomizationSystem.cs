@@ -64,31 +64,29 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(ConnectionBuilderSystem))]
-    public partial struct RuleRandomizationSystem : ISystem
+    public partial class RuleRandomizationSystem : SystemBase
     {
         private EntityQuery _worldConfigQuery;
         private EntityQuery _layoutDoneQuery;
         private EntityQuery _rulesDoneQuery;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
             _worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<WorldConfiguration>()
-                .Build(ref state);
+                .Build(this);
             _layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<DistrictLayoutDoneTag>()
-                .Build(ref state);
+                .Build(this);
             _rulesDoneQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<RuleRandomizationDoneTag>()
-                .Build(ref state);
+                .Build(this);
 
-            state.RequireForUpdate(_worldConfigQuery);
-            state.RequireForUpdate(_layoutDoneQuery);
+            RequireForUpdate(_worldConfigQuery);
+            RequireForUpdate(_layoutDoneQuery);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             // Skip if rules already generated
             if (!_rulesDoneQuery.IsEmptyIgnoreFilter) return;
@@ -104,12 +102,12 @@ namespace TinyWalnutGames.MetVD.Graph
             var ruleSet = GenerateWorldRules(worldConfig.RandomizationMode, layoutDone.DistrictCount, ref random);
 
             // Create singleton rule set entity
-            var ruleEntity = state.EntityManager.CreateEntity();
-            state.EntityManager.AddComponentData(ruleEntity, ruleSet);
+            var ruleEntity = EntityManager.CreateEntity();
+            EntityManager.AddComponentData(ruleEntity, ruleSet);
 
             // Mark rules as done
-            var doneEntity = state.EntityManager.CreateEntity();
-            state.EntityManager.AddComponentData(doneEntity, new RuleRandomizationDoneTag(worldConfig.RandomizationMode, 1));
+            var doneEntity = EntityManager.CreateEntity();
+            EntityManager.AddComponentData(doneEntity, new RuleRandomizationDoneTag(worldConfig.RandomizationMode, 1));
         }
 
         /// <summary>

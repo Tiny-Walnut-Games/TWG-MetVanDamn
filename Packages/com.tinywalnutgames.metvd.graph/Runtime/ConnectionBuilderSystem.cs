@@ -12,29 +12,26 @@ namespace TinyWalnutGames.MetVD.Graph
     /// System that builds connection graph between districts after layout is complete
     /// Uses K-nearest neighbors plus random long edges for loops and replayability
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(DistrictLayoutSystem))]
-    public partial struct ConnectionBuilderSystem : ISystem
+    public partial class ConnectionBuilderSystem : SystemBase
     {
         private EntityQuery _layoutDoneQuery;
         private EntityQuery _districtsQuery;
 
-        // Removed BurstCompile from OnCreate (BC1028: managed array allocation inside Burst)
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            _layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadWrite<DistrictLayoutDoneTag>());
-            _districtsQuery = state.GetEntityQuery(
+            _layoutDoneQuery = GetEntityQuery(ComponentType.ReadWrite<DistrictLayoutDoneTag>());
+            _districtsQuery = GetEntityQuery(
                 ComponentType.ReadOnly<NodeId>(),
                 ComponentType.ReadWrite<ConnectionBufferElement>()
             );
 
-            state.RequireForUpdate(_layoutDoneQuery);
-            state.RequireForUpdate(_districtsQuery);
+            RequireForUpdate(_layoutDoneQuery);
+            RequireForUpdate(_districtsQuery);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             // Check if we need to build connections
             var layoutDoneArray = _layoutDoneQuery.ToComponentDataArray<DistrictLayoutDoneTag>(Allocator.Temp);
@@ -83,7 +80,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
             // Build connection graph
             var connectionCount = BuildConnectionGraph(
-                state.EntityManager,
+                EntityManager,
                 districtEntities,
                 districtPositions,
                 districtNodeIds,
@@ -92,7 +89,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
             // Update layout done tag with connection count
             var layoutDoneEntity = _layoutDoneQuery.GetSingletonEntity();
-            state.EntityManager.SetComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(districtCount, connectionCount));
+            EntityManager.SetComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(districtCount, connectionCount));
         }
 
         /// <summary>

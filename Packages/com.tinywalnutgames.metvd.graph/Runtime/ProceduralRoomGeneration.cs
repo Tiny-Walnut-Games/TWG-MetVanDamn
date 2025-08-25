@@ -32,11 +32,11 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         public Ability RequiredSkills;      // Skills needed to complete room
         public Ability OptionalSkills;     // Skills that provide alternate routes/secrets
-        public BiomeType BiomeType;         // Primary biome this room fits
+        public BiomeAffinity BiomeType;     // Primary biome this room fits
         public float DifficultyRating;     // 0.0 (trivial) to 1.0 (expert)
         
         public MovementCapabilityTags(Ability required, Ability optional = Ability.None, 
-                                     BiomeType biome = BiomeType.HubArea, float difficulty = 0.5f)
+                                     BiomeAffinity biome = BiomeAffinity.Any, float difficulty = 0.5f)
         {
             RequiredSkills = required;
             OptionalSkills = optional;

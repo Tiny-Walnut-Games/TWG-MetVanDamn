@@ -26,30 +26,47 @@ namespace TinyWalnutGames.MetVD.Graph
         public RoomLayoutType LayoutType;
         public int CurrentStep;
         
-        public RoomGenerationRequest(RoomGeneratorType generatorType, uint seed = 0, Ability skills = Ability.Jump, BiomeType biome = BiomeType.HubArea)
+        public RoomGenerationRequest(RoomGeneratorType generatorType, uint seed = 0, Ability skills = Ability.Jump, BiomeAffinity biome = BiomeAffinity.Any)
         {
             GeneratorType = generatorType;
             Seed = seed;
             IsComplete = false;
             AvailableSkills = skills;
             GenerationSeed = seed;
-            TargetBiome = biome;
+            TargetBiome = ConvertAffinityToBiomeType(biome);
             TargetPolarity = Polarity.None;
             LayoutType = RoomLayoutType.Linear;
             CurrentStep = 0;
         }
         
-        public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeType targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
+        public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeAffinity targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
         {
             GeneratorType = generatorType;
             Seed = seed;
             IsComplete = false;
             AvailableSkills = availableSkills;
             GenerationSeed = seed;
-            TargetBiome = targetBiome;
+            TargetBiome = ConvertAffinityToBiomeType(targetBiome);
             TargetPolarity = targetPolarity;
             LayoutType = RoomLayoutType.Linear;
             CurrentStep = 0;
+        }
+        
+        // Conversion helper
+        private static BiomeType ConvertAffinityToBiomeType(BiomeAffinity affinity)
+        {
+            return affinity switch
+            {
+                BiomeAffinity.Forest => BiomeType.SolarPlains,
+                BiomeAffinity.Desert => BiomeType.VolcanicCore,
+                BiomeAffinity.Mountain => BiomeType.CrystalCaverns,
+                BiomeAffinity.Ocean => BiomeType.DeepUnderwater,
+                BiomeAffinity.Sky => BiomeType.SkyGardens,
+                BiomeAffinity.Underground => BiomeType.ShadowRealms,
+                BiomeAffinity.TechZone => BiomeType.PowerPlant,
+                BiomeAffinity.Volcanic => BiomeType.VolcanicCore,
+                _ => BiomeType.HubArea
+            };
         }
     }
 
@@ -211,11 +228,11 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         public float Strength;
         public int BiomeType;
-        public BiomeType Biome;
+        public BiomeAffinity Biome;
         public float Influence;
         public float Distance;
         
-        public BiomeInfluence(BiomeType biome, float influence, float distance)
+        public BiomeInfluence(BiomeAffinity biome, float influence, float distance)
         {
             Biome = biome;
             Influence = influence;
@@ -230,9 +247,9 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     public struct BiomeAffinityComponent : IComponentData
     {
-        public BiomeType Affinity;
+        public BiomeAffinity Affinity;
         
-        public BiomeAffinityComponent(BiomeType affinity)
+        public BiomeAffinityComponent(BiomeAffinity affinity)
         {
             Affinity = affinity;
         }
@@ -302,7 +319,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     public struct BiomeSettings : IComponentData
     {
-        public BiomeType PrimaryBiome;
+        public BiomeAffinity PrimaryBiome;
         public float BiomeWeight;
         public int BiomeVariationCount;
     }
