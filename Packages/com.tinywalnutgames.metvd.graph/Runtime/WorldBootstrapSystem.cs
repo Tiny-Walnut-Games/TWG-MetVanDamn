@@ -3,6 +3,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Biome;
@@ -107,7 +108,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static void GenerateBiomeFields(ref SystemState state, WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
         {
-            int biomeCount = random.NextInt(config.BiomeCountRange.x, config.BiomeCountRange.y + 1);
+            int biomeCount = random.NextInt(config.BiomeSettings.BiomeCountRange.x, config.BiomeSettings.BiomeCountRange.y + 1);
             
             var biomeTypes = new NativeArray<BiomeType>(biomeCount, Allocator.Temp);
             var biomePositions = new NativeArray<float2>(biomeCount, Allocator.Temp);
@@ -142,7 +143,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static void GenerateDistricts(ref SystemState state, WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
         {
-            int districtCount = random.NextInt(config.DistrictCountRange.x, config.DistrictCountRange.y + 1);
+            int districtCount = random.NextInt(config.DistrictSettings.DistrictCountRange.x, config.DistrictSettings.DistrictCountRange.y + 1);
             
             // Create districts at (0,0) coordinates - DistrictLayoutSystem will place them procedurally
             for (int i = 0; i < districtCount; i++)
@@ -239,24 +240,153 @@ namespace TinyWalnutGames.MetVD.Graph
             var entity = state.EntityManager.CreateEntity();
             
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            state.EntityManager.SetName(entity, $"BiomeField_{biomeType}");
+            state.EntityManager.SetName(entity, $"BiomeField_{biomeType}_{position.x:F0}_{position.y:F0}");
 #endif
 
-            // TODO: Implement the full biome field system.
-            // Intended future behavior:
-            // - Support multiple biomes per field with weighted strengths.
-            // - Allow for dynamic blending and transitions between biomes.
-            // - Store additional biome metadata (e.g., temperature, humidity, special features).
-            // - Integrate with world generation and district/sector placement logic.
-            // - Provide editor/debug visualization for biome fields.
-            // Current implementation: simple biome field marker for prototyping.
+            // Enhanced biome field with improved metadata and configuration
+            var strength = math.lerp(0.7f, 1.0f, config.BiomeSettings.BiomeWeight);
+            var gradient = random.NextFloat(0.3f, 0.8f);
+            
+            // Determine secondary biome for transition zones
+            var secondaryBiome = DetermineSecondaryBiome(biomeType, ref random);
+            
             state.EntityManager.AddComponentData(entity, new BiomeFieldData
             {
                 PrimaryBiome = biomeType,
-                SecondaryBiome = BiomeType.Unknown,
-                Strength = 1.0f,
-                Gradient = random.NextFloat(0.3f, 0.8f)
+                SecondaryBiome = secondaryBiome,
+                Strength = strength,
+                Gradient = gradient
             });
+
+            // Add comprehensive biome component with polarity data
+            var (primaryPolarity, secondaryPolarity) = GetBiomePolarities(biomeType, secondaryBiome);
+            var difficultyModifier = CalculateBiomeDifficulty(biomeType, ref random);
+            
+            state.EntityManager.AddComponentData(entity, new Biome(
+                biomeType, 
+                primaryPolarity, 
+                strength,
+                secondaryPolarity,
+                difficultyModifier));
+
+            // Store position data for spatial queries and district assignment
+            state.EntityManager.AddComponentData(entity, new Unity.Transforms.LocalTransform
+            {
+                Position = new float3(position.x, 0, position.y),
+                Rotation = quaternion.identity,
+                Scale = CalculateBiomeInfluenceRadius(biomeType, config.WorldSize)
+            });
+
+            // Add biome influence buffer for dynamic blending support
+            var influenceBuffer = state.EntityManager.AddBuffer<BiomeInfluence>(entity);
+            PopulateBiomeInfluences(influenceBuffer, biomeType, secondaryBiome, strength, gradient);
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (config.LogGenerationSteps)
+            {
+                UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} " +
+                                    $"(Strength: {strength:F2}, Gradient: {gradient:F2}, " +
+                                    $"Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:F2})");
+            }
+#endif
+        }
+
+        private static BiomeType DetermineSecondaryBiome(BiomeType primaryBiome, ref Unity.Mathematics.Random random)
+        {
+            // 30% chance of having a secondary biome for transition zones
+            if (random.NextFloat() > 0.3f)
+                return BiomeType.Unknown;
+
+            // Select compatible secondary biome based on primary
+            return primaryBiome switch
+            {
+                BiomeType.SolarPlains => random.NextBool() ? BiomeType.SkyGardens : BiomeType.HubArea,
+                BiomeType.CrystalCaverns => random.NextBool() ? BiomeType.FrozenWastes : BiomeType.AncientRuins,
+                BiomeType.ShadowRealms => random.NextBool() ? BiomeType.DeepUnderwater : BiomeType.VoidChambers,
+                BiomeType.VolcanicCore => random.NextBool() ? BiomeType.PowerPlant : BiomeType.PlasmaFields,
+                BiomeType.FrozenWastes => random.NextBool() ? BiomeType.IceCatacombs : BiomeType.CryogenicLabs,
+                BiomeType.HubArea => random.NextBool() ? BiomeType.TransitionZone : BiomeType.AncientRuins,
+                _ => BiomeType.TransitionZone
+            };
+        }
+
+        private static (Polarity primary, Polarity secondary) GetBiomePolarities(BiomeType primaryBiome, BiomeType secondaryBiome)
+        {
+            var primary = primaryBiome switch
+            {
+                BiomeType.SolarPlains or BiomeType.SkyGardens => Polarity.Sun,
+                BiomeType.ShadowRealms or BiomeType.DeepUnderwater or BiomeType.VoidChambers => Polarity.Moon,
+                BiomeType.VolcanicCore or BiomeType.PowerPlant or BiomeType.PlasmaFields => Polarity.Heat,
+                BiomeType.FrozenWastes or BiomeType.IceCatacombs or BiomeType.CryogenicLabs or BiomeType.CrystalCaverns => Polarity.Cold,
+                BiomeType.HubArea or BiomeType.TransitionZone => Polarity.Any,
+                BiomeType.AncientRuins => Polarity.Earth | Polarity.Life,
+                _ => Polarity.None
+            };
+
+            var secondary = secondaryBiome == BiomeType.Unknown ? Polarity.None : GetBiomePolarities(secondaryBiome, BiomeType.Unknown).primary;
+            
+            return (primary, secondary);
+        }
+
+        private static float CalculateBiomeDifficulty(BiomeType biomeType, ref Unity.Mathematics.Random random)
+        {
+            var baseDifficulty = biomeType switch
+            {
+                BiomeType.HubArea => 0.5f,
+                BiomeType.SolarPlains or BiomeType.SkyGardens => 0.7f,
+                BiomeType.CrystalCaverns or BiomeType.FrozenWastes => 0.9f,
+                BiomeType.ShadowRealms or BiomeType.VolcanicCore => 1.2f,
+                BiomeType.DeepUnderwater or BiomeType.VoidChambers => 1.4f,
+                BiomeType.PowerPlant or BiomeType.PlasmaFields => 1.3f,
+                BiomeType.IceCatacombs or BiomeType.CryogenicLabs => 1.1f,
+                BiomeType.AncientRuins => 1.5f,
+                BiomeType.TransitionZone => random.NextFloat(0.6f, 1.1f),
+                _ => 1.0f
+            };
+
+            // Add some variance to difficulty
+            return math.clamp(baseDifficulty + random.NextFloat(-0.2f, 0.2f), 0.1f, 2.0f);
+        }
+
+        private static float CalculateBiomeInfluenceRadius(BiomeType biomeType, int2 worldSize)
+        {
+            var baseRadius = math.min(worldSize.x, worldSize.y) * 0.4f;
+            
+            // Adjust radius based on biome type
+            var multiplier = biomeType switch
+            {
+                BiomeType.HubArea => 1.5f,      // Hub areas have larger influence
+                BiomeType.TransitionZone => 1.2f, // Transition zones blend widely
+                BiomeType.VolcanicCore or BiomeType.PowerPlant => 0.8f, // Intense biomes have smaller radius
+                BiomeType.VoidChambers or BiomeType.DeepUnderwater => 0.7f, // Isolated biomes
+                _ => 1.0f
+            };
+
+            return baseRadius * multiplier;
+        }
+
+        private static void PopulateBiomeInfluences(DynamicBuffer<BiomeInfluence> buffer, 
+                                                  BiomeType primaryBiome, BiomeType secondaryBiome, 
+                                                  float strength, float gradient)
+        {
+            // Add primary biome influence
+            buffer.Add(new BiomeInfluence
+            {
+                Biome = primaryBiome,
+                Influence = strength,
+                Distance = 0f
+            });
+
+            // Add secondary biome influence if present
+            if (secondaryBiome != BiomeType.Unknown)
+            {
+                buffer.Add(new BiomeInfluence
+                {
+                    Biome = secondaryBiome,
+                    Influence = (1f - strength) * gradient, // Secondary influence based on gradient
+                    Distance = gradient * 10f // Approximate distance for blending
+                });
+            }
         }
 
         private static void CreateDistrictEntity(ref SystemState state, uint nodeId, 
@@ -271,12 +401,12 @@ namespace TinyWalnutGames.MetVD.Graph
             // Create district at (0,0) - DistrictLayoutSystem will place it
             state.EntityManager.AddComponentData(entity, new NodeId(nodeId, 0, 0, int2.zero));
             state.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
-            state.EntityManager.AddComponentData(entity, new SectorRefinementData(config.TargetLoopDensity));
+            state.EntityManager.AddComponentData(entity, new SectorRefinementData(config.RoomSettings.TargetLoopDensity));
 
             // Add sector hierarchy data for the SectorRoomHierarchySystem
-            int sectorCount = random.NextInt(config.SectorsPerDistrictRange.x, config.SectorsPerDistrictRange.y + 1);
+            int sectorCount = random.NextInt(config.SectorSettings.SectorsPerDistrictRange.x, config.SectorSettings.SectorsPerDistrictRange.y + 1);
             state.EntityManager.AddComponentData(entity, new SectorHierarchyData(
-                config.SectorGridSize, 
+                config.SectorSettings.SectorGridSize, 
                 sectorCount, 
                 random.NextUInt()
             ));
@@ -288,25 +418,25 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static int CalculateGeneratedBiomes(WorldBootstrapConfiguration config)
         {
-            return (config.BiomeCountRange.x + config.BiomeCountRange.y) / 2;
+            return (config.BiomeSettings.BiomeCountRange.x + config.BiomeSettings.BiomeCountRange.y) / 2;
         }
 
         private static int CalculateGeneratedDistricts(WorldBootstrapConfiguration config)
         {
-            return (config.DistrictCountRange.x + config.DistrictCountRange.y) / 2;
+            return (config.DistrictSettings.DistrictCountRange.x + config.DistrictSettings.DistrictCountRange.y) / 2;
         }
 
         private static int CalculateGeneratedSectors(WorldBootstrapConfiguration config)
         {
             int avgDistricts = CalculateGeneratedDistricts(config);
-            int avgSectorsPerDistrict = (config.SectorsPerDistrictRange.x + config.SectorsPerDistrictRange.y) / 2;
+            int avgSectorsPerDistrict = (config.SectorSettings.SectorsPerDistrictRange.x + config.SectorSettings.SectorsPerDistrictRange.y) / 2;
             return avgDistricts * avgSectorsPerDistrict;
         }
 
         private static int CalculateGeneratedRooms(WorldBootstrapConfiguration config)
         {
             int avgSectors = CalculateGeneratedSectors(config);
-            int avgRoomsPerSector = (config.RoomsPerSectorRange.x + config.RoomsPerSectorRange.y) / 2;
+            int avgRoomsPerSector = (config.RoomSettings.RoomsPerSectorRange.x + config.RoomSettings.RoomsPerSectorRange.y) / 2;
             return avgSectors * avgRoomsPerSector;
         }
     }
