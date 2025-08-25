@@ -32,19 +32,28 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void WorldBootstrapConfiguration_CanBeCreated()
         {
+            var biomeSettings = new BiomeGenerationSettings(
+                biomeCountRange: new int2(3, 6),
+                biomeWeight: 1.0f
+            );
+            var districtSettings = new DistrictGenerationSettings(
+                districtCountRange: new int2(4, 12),
+                districtMinDistance: 15f,
+                districtWeight: 1.0f
+            );
+            var sectorSettings = new SectorGenerationSettings(
+                sectorsPerDistrictRange: new int2(2, 8),
+                sectorGridSize: new int2(6, 6),
+                roomsPerSectorRange: new int2(3, 12),
+                targetLoopDensity: 0.3f
+            );
             var config = new WorldBootstrapConfiguration(
                 seed: 42,
                 worldSize: new int2(64, 64),
                 randomizationMode: RandomizationMode.Partial,
-                biomeCountRange: new int2(3, 6),
-                biomeWeight: 1.0f,
-                districtCountRange: new int2(4, 12),
-                districtMinDistance: 15f,
-                districtWeight: 1.0f,
-                sectorsPerDistrictRange: new int2(2, 8),
-                sectorGridSize: new int2(6, 6),
-                roomsPerSectorRange: new int2(3, 12),
-                targetLoopDensity: 0.3f,
+                biomeSettings: biomeSettings,
+                districtSettings: districtSettings,
+                sectorSettings: sectorSettings,
                 enableDebugVisualization: true,
                 logGenerationSteps: true
             );
