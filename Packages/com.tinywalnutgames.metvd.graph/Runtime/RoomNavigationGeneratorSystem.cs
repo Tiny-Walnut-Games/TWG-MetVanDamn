@@ -136,28 +136,31 @@ namespace TinyWalnutGames.MetVD.Graph
             // In real implementation, this would read from actual tilemap or content generation results
             int tileCount = bounds.width * bounds.height;
             var tilemap = new NativeArray<TileType>(tileCount, Allocator.Temp);
-            
-            // Fill with basic layout based on generator type
+
+            // Get configurable parameters for this room type
+            var config = GetTilemapGenerationConfig(template);
+
+            // Fill with basic layout based on config
             for (int y = 0; y < bounds.height; y++)
             {
                 for (int x = 0; x < bounds.width; x++)
                 {
                     int index = y * bounds.width + x;
-                    
+
                     // Ground level and walls
-                    if (y == 0 || x == 0 || x == bounds.width - 1)
+                    if ((config.HasGroundLevel && y == 0) ||
+                        (config.HasWalls && (x == 0 || x == bounds.width - 1)))
                         tilemap[index] = TileType.Solid;
-                    else if (y == 1)
+                    else if (config.HasGroundLevel && y == 1)
                         tilemap[index] = TileType.Platform; // Ground level platforms
-                    else if (random.NextFloat() < 0.1f) // Random platforms
+                    else if (random.NextFloat() < config.PlatformProbability) // Random platforms
                         tilemap[index] = TileType.Platform;
-                    else if (random.NextFloat() < 0.05f) // Climbable surfaces
+                    else if (random.NextFloat() < config.ClimbableProbability) // Climbable surfaces
                         tilemap[index] = TileType.Climbable;
                     else
                         tilemap[index] = TileType.Empty;
                 }
             }
-            
             return tilemap;
         }
 
