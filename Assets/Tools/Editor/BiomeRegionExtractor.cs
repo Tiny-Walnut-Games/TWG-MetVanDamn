@@ -1,5 +1,6 @@
 //  This script is intended to be used in the Unity Editor only, stored in an Editor folder to ensure it is not included in builds.
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -439,15 +440,143 @@ namespace TinyWalnutGames.Tools.Editor
         
         private void DetectBiomesFromJSON(TextAsset jsonAsset)
         {
-            // TODO: Implement JSON biome mapping format
-            // Expected format: {"biomes": [{"name": "Forest", "color": "#00FF00", "rects": [...]}]}
-            Debug.LogWarning("JSON biome mapping not yet implemented. Please use color mask for now.");
+            try
+            {
+                var jsonData = JsonUtility.FromJson<BiomeMapData>(jsonAsset.text);
+                if (jsonData != null && jsonData.biomes != null)
+                {
+                    detectedBiomes.Clear();
+                    foreach (var biomeDef in jsonData.biomes)
+                    {
+                        var biomeMapping = new BiomeMapping
+                        {
+                            biomeName = biomeDef.name,
+                            maskColor = ParseColorFromHex(biomeDef.color),
+                            includeInExport = true,
+                            exportFolderSuffix = biomeDef.name.ToLower().Replace(" ", "_")
+                        };
+                        detectedBiomes.Add(biomeMapping);
+                    }
+                    Debug.Log($"Loaded {detectedBiomes.Count} biomes from JSON mapping.");
+                }
+                else
+                {
+                    Debug.LogWarning("Invalid JSON format. Expected format: {\"biomes\": [{\"name\": \"Forest\", \"color\": \"#00FF00\"}]}");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to parse JSON biome mapping: {e.Message}");
+            }
+        }
+        
+        private Color ParseColorFromHex(string hexColor)
+        {
+            if (string.IsNullOrEmpty(hexColor)) return Color.white;
+            
+            if (hexColor.StartsWith("#"))
+                hexColor = hexColor.Substring(1);
+            
+            if (hexColor.Length == 6)
+            {
+                if (int.TryParse(hexColor.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, null, out int r) &&
+                    int.TryParse(hexColor.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out int g) &&
+                    int.TryParse(hexColor.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out int b))
+                {
+                    return new Color(r / 255f, g / 255f, b / 255f, 1f);
+                }
+            }
+            
+            Debug.LogWarning($"Invalid hex color format: {hexColor}. Using white as fallback.");
+            return Color.white;
         }
         
         private void AutoDetectBiomeRegions()
         {
-            // TODO: Implement automatic region detection based on color similarity
-            Debug.LogWarning("Auto-detection not yet implemented. Please provide a biome mask.");
+            if (spritesheets.Count == 0)
+            {
+                Debug.LogWarning("No spritesheets selected for auto-detection.");
+                return;
+            }
+            
+            var firstSpritesheet = spritesheets[0];
+            string path = AssetDatabase.GetAssetPath(firstSpritesheet);
+            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            
+            bool wasReadable = importer.isReadable;
+            if (!wasReadable)
+            {
+                importer.isReadable = true;
+                AssetDatabase.ImportAsset(path);
+            }
+            
+            try
+            {
+                detectedBiomes.Clear();
+                var uniqueColors = new HashSet<Color>();
+                
+                // Sample colors from grid cells
+                int cols = firstSpritesheet.width / cellSize.x;
+                int rows = firstSpritesheet.height / cellSize.y;
+                
+                for (int row = 0; row < rows; row++)
+                {
+                    for (int col = 0; col < cols; col++)
+                    {
+                        int sampleX = col * cellSize.x + cellSize.x / 2;
+                        int sampleY = row * cellSize.y + cellSize.y / 2;
+                        
+                        if (sampleX < firstSpritesheet.width && sampleY < firstSpritesheet.height)
+                        {
+                            Color cellColor = firstSpritesheet.GetPixel(sampleX, sampleY);
+                            
+                            // Skip transparent pixels
+                            if (cellColor.a > 0.1f)
+                            {
+                                // Quantize colors to reduce variation
+                                var quantized = QuantizeColor(cellColor);
+                                uniqueColors.Add(quantized);
+                            }
+                        }
+                    }
+                }
+                
+                // Create biome mappings from detected colors
+                int biomeIndex = 0;
+                foreach (var color in uniqueColors)
+                {
+                    detectedBiomes.Add(new BiomeMapping
+                    {
+                        biomeName = GetBiomeNameFromColor(color, biomeIndex),
+                        maskColor = color,
+                        includeInExport = true,
+                        exportFolderSuffix = GetBiomeNameFromColor(color, biomeIndex).ToLower()
+                    });
+                    biomeIndex++;
+                }
+                
+                Debug.Log($"Auto-detected {detectedBiomes.Count} biome regions from spritesheet colors.");
+            }
+            finally
+            {
+                if (!wasReadable)
+                {
+                    importer.isReadable = false;
+                    AssetDatabase.ImportAsset(path);
+                }
+            }
+        }
+        
+        private Color QuantizeColor(Color color)
+        {
+            // Quantize to 16 levels per channel to group similar colors
+            float quantum = 16f;
+            return new Color(
+                Mathf.Round(color.r * quantum) / quantum,
+                Mathf.Round(color.g * quantum) / quantum,
+                Mathf.Round(color.b * quantum) / quantum,
+                1f
+            );
         }
         
         private string GetBiomeNameFromColor(Color color, int index)
@@ -479,6 +608,12 @@ namespace TinyWalnutGames.Tools.Editor
                 validationWarnings.Add("No biomes detected. Please assign a biome mask or run auto-detection.");
             }
             
+            // Check if any biomes are selected for export
+            if (detectedBiomes.Count > 0 && !detectedBiomes.Any(b => b.includeInExport))
+            {
+                validationWarnings.Add("No biomes selected for export. Enable at least one biome in the biome list.");
+            }
+            
             // Check cell size consistency
             if (cellSize.x <= 0 || cellSize.y <= 0)
             {
@@ -493,12 +628,32 @@ namespace TinyWalnutGames.Tools.Editor
                     validationWarnings.Add($"Spritesheet '{sheet.name}' dimensions ({sheet.width}x{sheet.height}) " +
                                          $"are not evenly divisible by cell size ({cellSize.x}x{cellSize.y}).");
                 }
+                
+                // Check for extremely small or large cell sizes
+                if (cellSize.x > sheet.width || cellSize.y > sheet.height)
+                {
+                    validationWarnings.Add($"Cell size ({cellSize.x}x{cellSize.y}) is larger than spritesheet '{sheet.name}' ({sheet.width}x{sheet.height}).");
+                }
             }
             
             // Check output folder
             if (string.IsNullOrEmpty(outputFolderPath))
             {
                 validationWarnings.Add("Output folder path is empty.");
+            }
+            else if (!outputFolderPath.StartsWith("Assets/"))
+            {
+                validationWarnings.Add("Output folder must be within the Assets folder.");
+            }
+            
+            // Check file naming pattern
+            if (string.IsNullOrEmpty(fileNamingPattern))
+            {
+                validationWarnings.Add("File naming pattern is empty.");
+            }
+            else if (!fileNamingPattern.Contains("{biome}"))
+            {
+                validationWarnings.Add("File naming pattern should include {biome} placeholder for proper organization.");
             }
             
             // Check biome mask dimensions if provided
@@ -510,6 +665,14 @@ namespace TinyWalnutGames.Tools.Editor
                     validationWarnings.Add($"Biome mask dimensions ({maskTexture.width}x{maskTexture.height}) " +
                                          $"don't match spritesheet dimensions ({firstSheet.width}x{firstSheet.height}).");
                 }
+            }
+            
+            // Check for duplicate biome names
+            var biomeNames = detectedBiomes.Where(b => b.includeInExport).Select(b => b.biomeName).ToList();
+            var duplicates = biomeNames.GroupBy(name => name).Where(g => g.Count() > 1).Select(g => g.Key);
+            foreach (var duplicate in duplicates)
+            {
+                validationWarnings.Add($"Duplicate biome name detected: '{duplicate}'. Each biome must have a unique name.");
             }
             
             if (validationWarnings.Count == 0)
@@ -602,9 +765,27 @@ namespace TinyWalnutGames.Tools.Editor
             string biomeFolder = Path.Combine(outputFolderPath, biome.exportFolderSuffix);
             if (!AssetDatabase.IsValidFolder(biomeFolder))
             {
-                string parentFolder = Path.GetDirectoryName(biomeFolder);
+                // Ensure parent folders exist
+                string parentFolder = outputFolderPath;
+                if (!AssetDatabase.IsValidFolder(parentFolder))
+                {
+                    // Create parent folder structure if it doesn't exist
+                    string[] pathParts = parentFolder.Replace("Assets/", "").Split('/');
+                    string currentPath = "Assets";
+                    foreach (string part in pathParts)
+                    {
+                        string newPath = Path.Combine(currentPath, part);
+                        if (!AssetDatabase.IsValidFolder(newPath))
+                        {
+                            AssetDatabase.CreateFolder(currentPath, part);
+                        }
+                        currentPath = newPath;
+                    }
+                }
+                
                 string folderName = Path.GetFileName(biomeFolder);
                 AssetDatabase.CreateFolder(parentFolder, folderName);
+                AssetDatabase.Refresh();
             }
             
             // Get or create mask texture for biome filtering
@@ -821,6 +1002,22 @@ namespace TinyWalnutGames.Tools.Editor
         {
             public string biomeName;
             public Color biomeColor;
+        }
+        
+        /// <summary>
+        /// JSON data structure for biome mapping files.
+        /// </summary>
+        [System.Serializable]
+        public class BiomeMapData
+        {
+            public BiomeDefinition[] biomes;
+        }
+        
+        [System.Serializable]
+        public class BiomeDefinition
+        {
+            public string name;
+            public string color;
         }
         
         #endregion

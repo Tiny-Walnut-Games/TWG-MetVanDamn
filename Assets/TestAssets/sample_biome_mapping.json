@@ -1,0 +1,28 @@
+{
+  "biomes": [
+    {
+      "name": "Volcanic Plains",
+      "color": "#FF0000"
+    },
+    {
+      "name": "Emerald Forest",
+      "color": "#00FF00"
+    },
+    {
+      "name": "Crystal Ocean",
+      "color": "#0000FF"
+    },
+    {
+      "name": "Golden Desert",
+      "color": "#FFFF00"
+    },
+    {
+      "name": "Purple Caverns",
+      "color": "#FF00FF"
+    },
+    {
+      "name": "Frozen Tundra",
+      "color": "#00FFFF"
+    }
+  ]
+}
