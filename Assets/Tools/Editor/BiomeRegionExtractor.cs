@@ -250,7 +250,6 @@ namespace TinyWalnutGames.Tools.Editor
                 
                 previewScrollPos = EditorGUILayout.BeginScrollView(previewScrollPos, GUILayout.Height(200));
                 
-                // TODO: Implement preview rendering with biome overlay
                 var firstSheet = spritesheets[0];
                 if (firstSheet != null)
                 {
@@ -262,7 +261,7 @@ namespace TinyWalnutGames.Tools.Editor
                     
                     if (showPreviewOverlay && detectedBiomes.Count > 0)
                     {
-                        // TODO: Draw biome color overlay
+                        DrawBiomeOverlay(rect, firstSheet);
                     }
                 }
                 
@@ -335,6 +334,114 @@ namespace TinyWalnutGames.Tools.Editor
         }
 
         #region Implementation Methods
+        
+        private void DrawBiomeOverlay(Rect previewRect, Texture2D spritesheet)
+        {
+            if (biomeMaskAsset == null || detectedBiomes.Count == 0) return;
+            
+            // Draw grid overlay showing biome regions
+            Texture2D maskTexture = biomeMaskAsset as Texture2D;
+            if (maskTexture == null) return;
+            
+            string maskPath = AssetDatabase.GetAssetPath(maskTexture);
+            TextureImporter maskImporter = AssetImporter.GetAtPath(maskPath) as TextureImporter;
+            bool maskWasReadable = maskImporter.isReadable;
+            
+            if (!maskWasReadable)
+            {
+                maskImporter.isReadable = true;
+                AssetDatabase.ImportAsset(maskPath);
+            }
+            
+            try
+            {
+                // Calculate grid dimensions
+                int columns = spritesheet.width / cellSize.x;
+                int rows = spritesheet.height / cellSize.y;
+                
+                // Draw grid cells with biome colors
+                for (int row = 0; row < rows; row++)
+                {
+                    for (int col = 0; col < columns; col++)
+                    {
+                        // Calculate cell position in mask
+                        int maskX = col * cellSize.x + cellSize.x / 2;
+                        int maskY = row * cellSize.y + cellSize.y / 2;
+                        
+                        // Clamp to texture bounds
+                        maskX = Mathf.Clamp(maskX, 0, maskTexture.width - 1);
+                        maskY = Mathf.Clamp(maskY, 0, maskTexture.height - 1);
+                        
+                        Color maskPixel = maskTexture.GetPixel(maskX, maskY);
+                        
+                        // Find matching biome
+                        var matchingBiome = detectedBiomes.FirstOrDefault(b => 
+                            IsCellInBiome(maskTexture, maskX, maskY, b.maskColor) && b.includeInExport);
+                        
+                        if (matchingBiome != null)
+                        {
+                            // Calculate screen position for this cell
+                            float cellScreenX = previewRect.x + (col * cellSize.x * previewZoom);
+                            float cellScreenY = previewRect.y + (row * cellSize.y * previewZoom);
+                            float cellScreenWidth = cellSize.x * previewZoom;
+                            float cellScreenHeight = cellSize.y * previewZoom;
+                            
+                            Rect cellRect = new Rect(cellScreenX, cellScreenY, cellScreenWidth, cellScreenHeight);
+                            
+                            // Draw semi-transparent biome color overlay
+                            Color overlayColor = matchingBiome.maskColor;
+                            overlayColor.a = 0.3f;
+                            
+                            EditorGUI.DrawRect(cellRect, overlayColor);
+                            
+                            // Draw biome name label for larger cells
+                            if (cellScreenWidth > 40 && cellScreenHeight > 20)
+                            {
+                                GUI.Label(cellRect, matchingBiome.biomeName, 
+                                    new GUIStyle(EditorStyles.miniLabel) 
+                                    { 
+                                        alignment = TextAnchor.MiddleCenter,
+                                        normal = { textColor = Color.white }
+                                    });
+                            }
+                        }
+                    }
+                }
+                
+                // Draw grid lines
+                DrawPreviewGrid(previewRect, spritesheet, columns, rows);
+            }
+            finally
+            {
+                if (!maskWasReadable)
+                {
+                    maskImporter.isReadable = false;
+                    AssetDatabase.ImportAsset(maskPath);
+                }
+            }
+        }
+        
+        private void DrawPreviewGrid(Rect previewRect, Texture2D spritesheet, int columns, int rows)
+        {
+            Color gridColor = Color.white;
+            gridColor.a = 0.5f;
+            
+            // Draw vertical lines
+            for (int col = 0; col <= columns; col++)
+            {
+                float x = previewRect.x + (col * cellSize.x * previewZoom);
+                Rect lineRect = new Rect(x, previewRect.y, 1, previewRect.height);
+                EditorGUI.DrawRect(lineRect, gridColor);
+            }
+            
+            // Draw horizontal lines
+            for (int row = 0; row <= rows; row++)
+            {
+                float y = previewRect.y + (row * cellSize.y * previewZoom);
+                Rect lineRect = new Rect(previewRect.x, y, previewRect.width, 1);
+                EditorGUI.DrawRect(lineRect, gridColor);
+            }
+        }
         
         private void SelectSpritesheetsFromProject()
         {
@@ -719,8 +826,6 @@ namespace TinyWalnutGames.Tools.Editor
         
         private void ProcessBiomeExtraction()
         {
-            // TODO: Implement full biome extraction processing
-            // This is a placeholder implementation
             
             var biomesToProcess = detectedBiomes.Where(b => b.includeInExport).ToList();
             float totalSteps = biomesToProcess.Count * spritesheets.Count;
