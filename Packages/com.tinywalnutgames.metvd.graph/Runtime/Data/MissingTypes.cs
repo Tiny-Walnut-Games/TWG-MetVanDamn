@@ -22,6 +22,9 @@ namespace TinyWalnutGames.MetVD.Graph
         public Ability AvailableSkills;
         public uint GenerationSeed;
         public BiomeAffinity TargetBiome;
+        public Polarity TargetPolarity;
+        public RoomLayoutType LayoutType;
+        public int CurrentStep;
         
         public RoomGenerationRequest(RoomGeneratorType generatorType, uint seed = 0, Ability skills = Ability.Jump, BiomeAffinity biome = BiomeAffinity.Any)
         {
@@ -31,6 +34,22 @@ namespace TinyWalnutGames.MetVD.Graph
             AvailableSkills = skills;
             GenerationSeed = seed;
             TargetBiome = biome;
+            TargetPolarity = Polarity.Positive;
+            LayoutType = RoomLayoutType.Linear;
+            CurrentStep = 0;
+        }
+        
+        public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeAffinity targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
+        {
+            GeneratorType = generatorType;
+            Seed = seed;
+            IsComplete = false;
+            AvailableSkills = availableSkills;
+            GenerationSeed = seed;
+            TargetBiome = targetBiome;
+            TargetPolarity = targetPolarity;
+            LayoutType = RoomLayoutType.Linear;
+            CurrentStep = 0;
         }
     }
 
@@ -82,6 +101,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public int2 MinSecretSize;
         public bool UseAlternateRoutes;
         public bool UseDestructibleWalls;
+        public Ability SecretSkillRequirement;
         
         public SecretAreaConfig(float probability, int minSize, int maxSize, float secretPercent, bool altRoutes, bool destructibleWalls)
         {
@@ -92,6 +112,7 @@ namespace TinyWalnutGames.MetVD.Graph
             MinSecretSize = new int2(minSize, minSize);
             UseAlternateRoutes = altRoutes;
             UseDestructibleWalls = destructibleWalls;
+            SecretSkillRequirement = Ability.None;
         }
     }
 
