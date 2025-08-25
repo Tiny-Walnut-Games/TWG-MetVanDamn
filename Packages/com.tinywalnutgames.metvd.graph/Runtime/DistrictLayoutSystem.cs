@@ -49,18 +49,25 @@ namespace TinyWalnutGames.MetVD.Graph
             state.RequireForUpdate(_worldConfigQuery);
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            UnityEngine.Debug.Log($"DistrictLayoutSystem.OnUpdate() called");
+            
             // Skip if layout already done
             if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
+            {
+                UnityEngine.Debug.Log($"Layout already done, skipping");
                 return;
+            }
 
             var worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
+            UnityEngine.Debug.Log($"WorldConfig: Seed={worldConfig.Seed}, WorldSize={worldConfig.WorldSize}, TargetSectors={worldConfig.TargetSectors}");
 
             // Find unplaced districts (those at coordinates 0,0 with Level 0)
             var unplacedEntities = _unplacedQuery.ToEntityArray(Allocator.Temp);
             var nodeIds = _unplacedQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            
+            UnityEngine.Debug.Log($"Found {unplacedEntities.Length} entities in unplaced query");
 
             try
             {
@@ -68,15 +75,20 @@ namespace TinyWalnutGames.MetVD.Graph
                 for (int i = 0; i < nodeIds.Length; i++)
                 {
                     var nodeId = nodeIds[i];
+                    UnityEngine.Debug.Log($"Entity {i}: NodeId={nodeId}");
                     if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
                     {
                         unplacedCount++;
+                        UnityEngine.Debug.Log($"Found unplaced district {i}, total unplaced: {unplacedCount}");
                     }
                 }
+
+                UnityEngine.Debug.Log($"Total unplaced count: {unplacedCount}");
 
                 if (unplacedCount == 0)
                 {
                     // No unplaced districts, mark as done
+                    UnityEngine.Debug.Log("No unplaced districts found, marking as done");
                     var layoutDoneEntity = state.EntityManager.CreateEntity();
                     state.EntityManager.AddComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(0, 0));
                     return;
@@ -86,18 +98,28 @@ namespace TinyWalnutGames.MetVD.Graph
                 // If TargetSectors is specified, limit the number of districts accordingly
                 var targetDistrictCount = worldConfig.TargetSectors > 0 ?
                     math.min(worldConfig.TargetSectors, unplacedCount) : unplacedCount;
+                
+                UnityEngine.Debug.Log($"Target district count: {targetDistrictCount} (TargetSectors={worldConfig.TargetSectors}, unplacedCount={unplacedCount})");
 
                 // Initialize random generator with world seed
                 var random = new Unity.Mathematics.Random((uint)worldConfig.Seed);
 
                 // Choose placement strategy based on target district count
                 var strategy = targetDistrictCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
+                
+                UnityEngine.Debug.Log($"Using placement strategy: {strategy}");
 
                 // Generate district positions for target count
                 var positions = new NativeArray<int2>(targetDistrictCount, Allocator.Temp);
                 try
                 {
                     GenerateDistrictPositions(positions, worldConfig.WorldSize, strategy, ref random);
+                    
+                    UnityEngine.Debug.Log($"Generated {positions.Length} positions for strategy {strategy}");
+                    for (int p = 0; p < positions.Length; p++)
+                    {
+                        UnityEngine.Debug.Log($"Position {p}: {positions[p]}");
+                    }
 
                     // Apply positions to unplaced districts (up to target count)
                     int positionIndex = 0;
@@ -107,8 +129,11 @@ namespace TinyWalnutGames.MetVD.Graph
                         var nodeId = nodeIds[i];
                         if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
                         {
+                            var oldCoords = nodeId.Coordinates;
                             nodeId.Coordinates = positions[positionIndex++];
                             state.EntityManager.SetComponentData(unplacedEntities[i], nodeId);
+                            
+                            UnityEngine.Debug.Log($"Updated entity {i}: {oldCoords} -> {nodeId.Coordinates}");
 
                             // Add SectorHierarchyData to each placed district for later subdivision
                             var sectorData = new SectorHierarchyData(
@@ -125,6 +150,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     // Mark layout as complete
                     var doneEntity = state.EntityManager.CreateEntity();
                     state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
+                    UnityEngine.Debug.Log($"Layout complete: placed {placedCount} districts");
                 }
                 finally
                 {
