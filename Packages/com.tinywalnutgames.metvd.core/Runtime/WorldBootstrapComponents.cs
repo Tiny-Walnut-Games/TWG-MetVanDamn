@@ -8,54 +8,92 @@ namespace TinyWalnutGames.MetVD.Core
     /// Component data for world bootstrap configuration
     /// Contains all settings needed for procedural world generation
     /// </summary>
+    // Grouped settings structs
+    public struct BiomeGenerationSettings
+    {
+        public int2 BiomeCountRange;  // x = min, y = max
+        public float BiomeWeight;
+
+        public BiomeGenerationSettings(int2 biomeCountRange, float biomeWeight)
+        {
+            BiomeCountRange = biomeCountRange;
+            BiomeWeight = biomeWeight;
+        }
+    }
+
+    public struct DistrictGenerationSettings
+    {
+        public int2 DistrictCountRange;  // x = min, y = max
+        public float DistrictMinDistance;
+        public float DistrictWeight;
+
+        public DistrictGenerationSettings(int2 districtCountRange, float districtMinDistance, float districtWeight)
+        {
+            DistrictCountRange = districtCountRange;
+            DistrictMinDistance = districtMinDistance;
+            DistrictWeight = districtWeight;
+        }
+    }
+
+    public struct SectorGenerationSettings
+    {
+        public int2 SectorsPerDistrictRange;  // x = min, y = max
+        public int2 SectorGridSize;
+
+        public SectorGenerationSettings(int2 sectorsPerDistrictRange, int2 sectorGridSize)
+        {
+            SectorsPerDistrictRange = sectorsPerDistrictRange;
+            SectorGridSize = sectorGridSize;
+        }
+    }
+
+    public struct RoomGenerationSettings
+    {
+        public int2 RoomsPerSectorRange;  // x = min, y = max
+        public float TargetLoopDensity;
+
+        public RoomGenerationSettings(int2 roomsPerSectorRange, float targetLoopDensity)
+        {
+            RoomsPerSectorRange = roomsPerSectorRange;
+            TargetLoopDensity = targetLoopDensity;
+        }
+    }
+
     public struct WorldBootstrapConfiguration : IComponentData
     {
         // World-level settings
         public int Seed;
         public int2 WorldSize;
         public RandomizationMode RandomizationMode;
-        
-        // Biome generation settings
-        public int2 BiomeCountRange;  // x = min, y = max
-        public float BiomeWeight;
-        
-        // District generation settings
-        public int2 DistrictCountRange;  // x = min, y = max
-        public float DistrictMinDistance;
-        public float DistrictWeight;
-        
-        // Sector generation settings
-        public int2 SectorsPerDistrictRange;  // x = min, y = max
-        public int2 SectorGridSize;
-        
-        // Room generation settings
-        public int2 RoomsPerSectorRange;  // x = min, y = max
-        public float TargetLoopDensity;
-        
+
+        // Grouped settings
+        public BiomeGenerationSettings BiomeSettings;
+        public DistrictGenerationSettings DistrictSettings;
+        public SectorGenerationSettings SectorSettings;
+        public RoomGenerationSettings RoomSettings;
+
         // Debug settings
         public bool EnableDebugVisualization;
         public bool LogGenerationSteps;
 
         public WorldBootstrapConfiguration(
-            int seed, int2 worldSize, RandomizationMode randomizationMode,
-            int2 biomeCountRange, float biomeWeight,
-            int2 districtCountRange, float districtMinDistance, float districtWeight,
-            int2 sectorsPerDistrictRange, int2 sectorGridSize,
-            int2 roomsPerSectorRange, float targetLoopDensity,
-            bool enableDebugVisualization, bool logGenerationSteps)
+            int seed,
+            int2 worldSize,
+            RandomizationMode randomizationMode,
+            BiomeGenerationSettings biomeSettings,
+            DistrictGenerationSettings districtSettings,
+            SectorGenerationSettings sectorSettings,
+            RoomGenerationSettings roomSettings,
+            bool enableDebugVisualization,
+            bool logGenerationSteps)
         {
             Seed = seed;
             WorldSize = worldSize;
             RandomizationMode = randomizationMode;
-            BiomeCountRange = biomeCountRange;
-            BiomeWeight = biomeWeight;
-            DistrictCountRange = districtCountRange;
-            DistrictMinDistance = districtMinDistance;
-            DistrictWeight = districtWeight;
-            SectorsPerDistrictRange = sectorsPerDistrictRange;
-            SectorGridSize = sectorGridSize;
-            RoomsPerSectorRange = roomsPerSectorRange;
-            TargetLoopDensity = targetLoopDensity;
+            BiomeSettings = biomeSettings;
+            DistrictSettings = districtSettings;
+            SectorSettings = sectorSettings;
+            RoomSettings = roomSettings;
             EnableDebugVisualization = enableDebugVisualization;
             LogGenerationSteps = logGenerationSteps;
         }
