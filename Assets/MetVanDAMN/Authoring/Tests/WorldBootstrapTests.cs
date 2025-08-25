@@ -154,23 +154,25 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Test that WorldBootstrapConfiguration can coexist with WorldConfiguration
             var entity = entityManager.CreateEntity();
 
-            var bootstrapConfig = new WorldBootstrapConfiguration(
-                seed: 777,
-                worldSize: new int2(80, 80),
-                randomizationMode: RandomizationMode.Partial,
-                biomeCountRange: new int2(3, 7),
-                biomeWeight: 1.5f,
-                districtCountRange: new int2(5, 15),
-                districtMinDistance: 25f,
-                districtWeight: 0.9f,
-                sectorsPerDistrictRange: new int2(3, 10),
-                sectorGridSize: new int2(10, 10),
-                roomsPerSectorRange: new int2(4, 15),
-                targetLoopDensity: 0.7f,
-                enableDebugVisualization: false,
-                logGenerationSteps: true
-            );
+            var bootstrapSettings = new WorldBootstrapSettings
+            {
+                Seed = 777,
+                WorldSize = new int2(80, 80),
+                RandomizationMode = RandomizationMode.Partial,
+                BiomeCountRange = new int2(3, 7),
+                BiomeWeight = 1.5f,
+                DistrictCountRange = new int2(5, 15),
+                DistrictMinDistance = 25f,
+                DistrictWeight = 0.9f,
+                SectorsPerDistrictRange = new int2(3, 10),
+                SectorGridSize = new int2(10, 10),
+                RoomsPerSectorRange = new int2(4, 15),
+                TargetLoopDensity = 0.7f,
+                EnableDebugVisualization = false,
+                LogGenerationSteps = true
+            };
 
+            var bootstrapConfig = new WorldBootstrapConfiguration(bootstrapSettings);
             var worldConfig = new WorldConfiguration
             {
                 Seed = 777,
