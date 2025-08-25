@@ -23,7 +23,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
-    [UpdateAfter(typeof(BuildConnectionBuffersSystem))]
+    [UpdateAfter(typeof(TinyWalnutGames.MetVD.Core.BuildConnectionBuffersSystem))]
     public partial struct DistrictLayoutSystem : ISystem
     {
         private EntityQuery _unplacedQuery;
@@ -38,7 +38,6 @@ namespace TinyWalnutGames.MetVD.Graph
                 ComponentType.ReadWrite<NodeId>(),
                 ComponentType.ReadOnly<WfcState>()
             );
-            _unplacedQuery.SetChangedVersionFilter(ComponentType.ReadWrite<NodeId>());
 
             // Query for world configuration
             _worldConfigQuery = state.GetEntityQuery(ComponentType.ReadOnly<WorldConfiguration>());
