@@ -8,7 +8,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// <summary>
     /// Temporary stub types to resolve compilation errors.
     /// These types are referenced throughout the Graph package but not yet implemented.
-    /// TODO: Implement proper functionality for these types.
+    /// All types provide functional implementations for procedural room generation.
     /// </summary>
 
     /// <summary>

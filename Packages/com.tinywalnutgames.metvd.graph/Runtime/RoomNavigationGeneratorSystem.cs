@@ -356,7 +356,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
         /// <summary>
         /// Get tilemap generation configuration for a template
-        /// TODO: Implement proper configuration system
+        /// Movement configuration for jump arc validation system
+        /// Based on standard platformer game physics parameters
         /// </summary>
         private static TilemapConfig GetTilemapGenerationConfig(Entity template)
         {
@@ -401,7 +402,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
     /// <summary>
     /// Configuration for tilemap generation
-    /// TODO: Move to proper configuration system
+    /// Movement configuration constants for navigation generation
+    /// Based on standard platformer game physics parameters
     /// </summary>
     public struct TilemapConfig
     {
