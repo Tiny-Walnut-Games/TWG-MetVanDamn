@@ -253,7 +253,7 @@ public class BatchSpriteSlicer : EditorWindow
             return;
         }
 
-        UnityEngine.Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+        var selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
 
         foreach (UnityEngine.Object obj in selectedTextures)
         {
