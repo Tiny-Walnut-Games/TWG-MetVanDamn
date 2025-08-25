@@ -120,29 +120,26 @@ namespace TinyWalnutGames.MetVD.Graph
     /// Runs after sector hierarchy creation to populate rooms with content
     /// Now integrates with the new procedural room generation pipeline
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(SectorRoomHierarchySystem))]
-    public partial struct RoomManagementSystem : ISystem
+    public partial class RoomManagementSystem : SystemBase
     {
         private EntityQuery _roomsQuery;
         private EntityQuery _sectorsQuery;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
             // Use EntityQueryBuilder to avoid managed params array allocation
             _roomsQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<RoomHierarchyData, NodeId>()
-                .Build(ref state);
+                .Build(this);
             _sectorsQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<SectorHierarchyData, NodeId>()
-                .Build(ref state);
-            state.RequireForUpdate(_roomsQuery);
+                .Build(this);
+            RequireForUpdate(_roomsQuery);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             // Get all rooms that need management data
             using var roomEntities = _roomsQuery.ToEntityArray(Allocator.Temp);
@@ -156,7 +153,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 var nodeId = roomNodeIds[i];
 
                 // Skip rooms that already have management data
-                if (state.EntityManager.HasComponent<RoomStateData>(entity))
+                if (EntityManager.HasComponent<RoomStateData>(entity))
                     continue;
 
                 // Add room management components
@@ -164,20 +161,20 @@ namespace TinyWalnutGames.MetVD.Graph
                 
                 // Add room state data
                 var totalSecrets = DetermineSecretCount(roomData.Type, ref random);
-                state.EntityManager.AddComponentData(entity, new RoomStateData(totalSecrets));
+                EntityManager.AddComponentData(entity, new RoomStateData(totalSecrets));
 
                 // Add navigation data
                 var isCriticalPath = roomData.Type == RoomType.Entrance || roomData.Type == RoomType.Exit || roomData.Type == RoomType.Boss;
                 var traversalTime = CalculateTraversalTime(in roomData.Bounds, roomData.Type);
                 CalculatePrimaryEntrance(in roomData.Bounds, out int2 primaryEntrance);
-                state.EntityManager.AddComponentData(entity, new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime));
+                EntityManager.AddComponentData(entity, new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime));
 
                 // Add room features buffer
-                var featuresBuffer = state.EntityManager.AddBuffer<RoomFeatureElement>(entity);
+                var featuresBuffer = EntityManager.AddBuffer<RoomFeatureElement>(entity);
                 PopulateRoomFeatures(featuresBuffer, in roomData, ref random);
 
                 // Initialize room generation request for new procedural pipeline
-                InitializeRoomGenerationRequest(state.EntityManager, entity, roomData, nodeId, ref random);
+                InitializeRoomGenerationRequest(EntityManager, entity, roomData, nodeId, ref random);
             }
         }
 
