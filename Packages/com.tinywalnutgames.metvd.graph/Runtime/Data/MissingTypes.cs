@@ -360,4 +360,29 @@ namespace TinyWalnutGames.MetVD.Graph
         public WorldConfiguration WorldConfig;
         public DebugSettings DebugConfig;
     }
+
+    /// <summary>
+    /// Jump arc physics configuration for calculation compatibility
+    /// </summary>
+    public struct JumpArcPhysics : IComponentData
+    {
+        public float JumpHeight;
+        public float JumpDistance;
+        public float DoubleJumpBonus;
+        public float Gravity;
+        public float WallJumpHeight;
+        public float DashDistance;
+        public float GlideSpeed;
+        
+        public JumpArcPhysics(float jumpHeight, float jumpDistance, float doubleBonus, float gravity, float wallJumpHeight, float dashDistance, float glideSpeed)
+        {
+            JumpHeight = jumpHeight;
+            JumpDistance = jumpDistance;
+            DoubleJumpBonus = doubleBonus;
+            Gravity = gravity;
+            WallJumpHeight = wallJumpHeight;
+            DashDistance = dashDistance;
+            GlideSpeed = glideSpeed;
+        }
+    }
 }

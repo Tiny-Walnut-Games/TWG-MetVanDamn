@@ -111,8 +111,8 @@ namespace TinyWalnutGames.MetVD.Graph
                 var gapWidth = random.NextInt(3, 5);
                 
                 // Mark the gap area
-                patterns.Add(new RoomPatternElement(gapStart, RoomFeatureType.Platform, (uint)(seed + i * 10), Ability.Dash));
-                patterns.Add(new RoomPatternElement(new int2(gapStart.x + gapWidth, gapStart.y), RoomFeatureType.Platform, (uint)(seed + i * 10 + 1), Ability.Dash));
+                patterns.Add(new RoomPatternElement(gapStart, (int)RoomFeatureType.Platform, (int)(seed + i * 10) % 360, 1.0f));
+                patterns.Add(new RoomPatternElement(new int2(gapStart.x + gapWidth, gapStart.y), (int)RoomFeatureType.Platform, (int)(seed + i * 10 + 1) % 360, 1.0f));
             }
         }
 
@@ -130,7 +130,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Create vertical wall for wall-jumping
                 for (int y = shaftBottom; y < shaftBottom + shaftHeight; y += 2)
                 {
-                    patterns.Add(new RoomPatternElement(new int2(shaftX, y), RoomFeatureType.Obstacle, (uint)(seed + i * 20), Ability.WallJump));
+                    patterns.Add(new RoomPatternElement(new int2(shaftX, y), (int)RoomFeatureType.Obstacle, (int)(seed + i * 20) % 360, 1.0f));
                 }
             }
         }
@@ -148,12 +148,12 @@ namespace TinyWalnutGames.MetVD.Graph
                 );
 
                 // Place grapple points high up, over hazards
-                patterns.Add(new RoomPatternElement(grapplePoint, RoomFeatureType.Platform, (uint)(seed + i * 30), Ability.Grapple));
+                patterns.Add(new RoomPatternElement(grapplePoint, (int)RoomFeatureType.Platform, (int)(seed + i * 30) % 360, 1.0f));
                 
                 // Add hazard below grapple point
                 if (grapplePoint.y > bounds.y + 2)
                 {
-                    patterns.Add(new RoomPatternElement(new int2(grapplePoint.x, grapplePoint.y - 2), RoomFeatureType.Obstacle, (uint)(seed + i * 30 + 1)));
+                    patterns.Add(new RoomPatternElement(new int2(grapplePoint.x, grapplePoint.y - 2), (int)RoomFeatureType.Obstacle, (int)(seed + i * 30 + 1) % 360));
                 }
             }
         }
@@ -169,9 +169,9 @@ namespace TinyWalnutGames.MetVD.Graph
                 var centerX = bounds.x + bounds.width / 2;
                 var centerY = bounds.y + bounds.height / 2;
                 
-                patterns.Add(new RoomPatternElement(new int2(centerX - 3, centerY), RoomFeatureType.Platform, (uint)(seed + 100), Ability.Dash));
-                patterns.Add(new RoomPatternElement(new int2(centerX, centerY + 2), RoomFeatureType.Obstacle, (uint)(seed + 101), Ability.WallJump));
-                patterns.Add(new RoomPatternElement(new int2(centerX + 3, centerY), RoomFeatureType.Platform, (uint)(seed + 102), Ability.Dash));
+                patterns.Add(new RoomPatternElement(new int2(centerX - 3, centerY), (int)RoomFeatureType.Platform, (int)(seed + 100) % 360, 1.0f));
+                patterns.Add(new RoomPatternElement(new int2(centerX, centerY + 2), (int)RoomFeatureType.Obstacle, (int)(seed + 101) % 360, 1.0f));
+                patterns.Add(new RoomPatternElement(new int2(centerX + 3, centerY), (int)RoomFeatureType.Platform, (int)(seed + 102) % 360, 1.0f));
             }
         }
     }
@@ -300,8 +300,8 @@ namespace TinyWalnutGames.MetVD.Graph
             {
                 var validation = new JumpArcValidation(
                     platformPositions.Length > 2,
-                    platformPositions.Length,
-                    platformPositions.Length - 1
+                    (float)platformPositions.Length,
+                    (float)(platformPositions.Length - 1)
                 );
                 ValidationLookup[entity] = validation;
             }

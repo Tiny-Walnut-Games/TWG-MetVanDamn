@@ -17,23 +17,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Grouped settings structs for new constructor signature
             var biomeSettings = new BiomeGenerationSettings
             {
-                BiomeCount = new int2(authoring.biomeCount.x, authoring.biomeCount.y),
+                BiomeCountRange = new int2(authoring.biomeCount.x, authoring.biomeCount.y),
                 BiomeWeight = authoring.biomeWeight
             };
             var districtSettings = new DistrictGenerationSettings
             {
-                DistrictCount = new int2(authoring.districtCount.x, authoring.districtCount.y),
+                DistrictCountRange = new int2(authoring.districtCount.x, authoring.districtCount.y),
                 DistrictMinDistance = authoring.districtMinDistance,
                 DistrictWeight = authoring.districtWeight
             };
             var sectorSettings = new SectorGenerationSettings
             {
-                SectorsPerDistrict = new int2(authoring.sectorsPerDistrict.x, authoring.sectorsPerDistrict.y),
+                SectorsPerDistrictRange = new int2(authoring.sectorsPerDistrict.x, authoring.sectorsPerDistrict.y),
                 SectorGridSize = authoring.sectorGridSize
             };
             var roomSettings = new RoomGenerationSettings
             {
-                RoomsPerSector = new int2(authoring.roomsPerSector.x, authoring.roomsPerSector.y),
+                RoomsPerSectorRange = new int2(authoring.roomsPerSector.x, authoring.roomsPerSector.y),
                 TargetLoopDensity = authoring.targetLoopDensity
             };
             var bootstrapConfig = new WorldBootstrapConfiguration(
