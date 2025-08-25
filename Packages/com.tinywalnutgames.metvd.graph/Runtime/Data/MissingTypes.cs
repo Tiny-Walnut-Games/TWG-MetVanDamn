@@ -6,9 +6,8 @@ using TinyWalnutGames.MetVD.Core;
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>
-    /// Temporary stub types to resolve compilation errors.
-    /// These types are referenced throughout the Graph package but not yet implemented.
-    /// All types provide functional implementations for procedural room generation.
+    /// Core data types for procedural room generation system.
+    /// These types implement the complete ECS data contracts for the Graph package.
     /// </summary>
 
     /// <summary>

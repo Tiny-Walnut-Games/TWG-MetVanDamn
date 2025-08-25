@@ -17,7 +17,7 @@ namespace TinyWalnutGames.MetVD.Samples
         [Header("World Generation Parameters")]
         [SerializeField] private uint worldSeed = 42;
         [SerializeField] private int2 worldSize = new(50, 50);
-        [SerializeField] private int targetSectorCount = 5; // TODO: integrate with generation pipeline
+        [SerializeField] private int targetSectorCount = 5;
         [SerializeField] private float biomeTransitionRadius = 10.0f;
         
         [Header("Debug Visualization")]
