@@ -502,19 +502,31 @@ namespace TinyWalnutGames.Tools.Editor
                 // Sample colors from the mask to detect unique biome colors
                 var colors = maskTexture.GetPixels();
                 var uniqueColors = new HashSet<Color>();
-                
-                foreach (var color in colors)
+
+                // Sample at regular intervals to improve performance on large textures
+                const int sampleStride = 4; // Adjust as needed for accuracy/performance tradeoff
+                int width = maskTexture.width;
+                int height = maskTexture.height;
+                for (int y = 0; y < height; y += sampleStride)
                 {
-                    // Skip transparent pixels
-                    if (color.a > 0.1f)
+                    for (int x = 0; x < width; x += sampleStride)
                     {
-                        // Round colors to avoid minor variations
-                        var rounded = new Color(
-                            Mathf.Round(color.r * 255f) / 255f,
-                            Mathf.Round(color.g * 255f) / 255f,
-                            Mathf.Round(color.b * 255f) / 255f,
-                            1f);
-                        uniqueColors.Add(rounded);
+                        int idx = y * width + x;
+                        if (idx < colors.Length)
+                        {
+                            var color = colors[idx];
+                            // Skip transparent pixels
+                            if (color.a > 0.1f)
+                            {
+                                // Round colors to avoid minor variations
+                                var rounded = new Color(
+                                    Mathf.Round(color.r * 255f) / 255f,
+                                    Mathf.Round(color.g * 255f) / 255f,
+                                    Mathf.Round(color.b * 255f) / 255f,
+                                    1f);
+                                uniqueColors.Add(rounded);
+                            }
+                        }
                     }
                 }
                 
