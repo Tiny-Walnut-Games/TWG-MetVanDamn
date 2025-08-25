@@ -54,6 +54,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 biomeSettings: biomeSettings,
                 districtSettings: districtSettings,
                 sectorSettings: sectorSettings,
+                roomSettings: roomSettings,
                 enableDebugVisualization: true,
                 logGenerationSteps: true
             );
@@ -61,42 +62,45 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(42, config.Seed);
             Assert.AreEqual(new int2(64, 64), config.WorldSize);
             Assert.AreEqual(RandomizationMode.Partial, config.RandomizationMode);
-            Assert.AreEqual(new int2(3, 6), config.BiomeCountRange);
-            Assert.AreEqual(new int2(4, 12), config.DistrictCountRange);
-            Assert.AreEqual(15f, config.DistrictMinDistance, 0.001f);
+            Assert.AreEqual(new int2(3, 6), config.BiomeSettings.BiomeCountRange);
+            Assert.AreEqual(new int2(4, 12), config.DistrictSettings.DistrictCountRange);
+            Assert.AreEqual(15f, config.DistrictSettings.DistrictMinDistance, 0.001f);
         }
 
         [Test]
         public void WorldBootstrapConfiguration_CanBeAddedToEntity()
         {
             var entity = entityManager.CreateEntity();
-            var worldSettings = new WorldSettings(
-                seed: 12345,
-                worldSize: new int2(32, 32),
-                randomizationMode: RandomizationMode.Full
-            );
-            var biomeSettings = new BiomeSettings(
+            
+            // Create proper generation settings
+            var biomeSettings = new BiomeGenerationSettings(
                 biomeCountRange: new int2(2, 4),
                 biomeWeight: 0.8f
             );
-            var districtSettings = new DistrictSettings(
+            var districtSettings = new DistrictGenerationSettings(
                 districtCountRange: new int2(3, 8),
                 districtMinDistance: 10f,
-                districtWeight: 1.2f,
+                districtWeight: 1.2f
+            );
+            var sectorSettings = new SectorGenerationSettings(
                 sectorsPerDistrictRange: new int2(1, 6),
-                sectorGridSize: new int2(4, 4),
+                sectorGridSize: new int2(4, 4)
+            );
+            var roomSettings = new RoomGenerationSettings(
                 roomsPerSectorRange: new int2(2, 10),
                 targetLoopDensity: 0.5f
             );
-            var debugSettings = new DebugSettings(
+            
+            var config = new WorldBootstrapConfiguration(
+                seed: 12345,
+                worldSize: new int2(32, 32),
+                randomizationMode: RandomizationMode.Full,
+                biomeSettings: biomeSettings,
+                districtSettings: districtSettings,
+                sectorSettings: sectorSettings,
+                roomSettings: roomSettings,
                 enableDebugVisualization: false,
                 logGenerationSteps: false
-            );
-            var config = new WorldBootstrapConfiguration(
-                worldSettings,
-                biomeSettings,
-                districtSettings,
-                debugSettings
             );
 
             entityManager.AddComponentData(entity, config);
@@ -107,7 +111,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(12345, retrievedConfig.Seed);
             Assert.AreEqual(new int2(32, 32), retrievedConfig.WorldSize);
             Assert.AreEqual(RandomizationMode.Full, retrievedConfig.RandomizationMode);
-            Assert.AreEqual(0.8f, retrievedConfig.BiomeWeight, 0.001f);
+            Assert.AreEqual(0.8f, retrievedConfig.BiomeSettings.BiomeWeight, 0.001f);
             Assert.IsFalse(retrievedConfig.EnableDebugVisualization);
         }
 
@@ -140,24 +144,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // without running the actual system update (which requires Unity runtime)
             
             var bootstrapEntity = entityManager.CreateEntity();
-            var biomeSettings = new BiomeSettings
-            {
-                CountRange = new int2(1, 3),
-                Weight = 1.0f
-            };
-            var districtSettings = new DistrictSettings
-            {
-                CountRange = new int2(2, 5),
-                MinDistance = 20f,
-                Weight = 1.0f
-            };
-            var sectorSettings = new SectorSettings
-            {
-                SectorsPerDistrictRange = new int2(1, 4),
-                GridSize = new int2(8, 8),
-                RoomsPerSectorRange = new int2(1, 8),
-                TargetLoopDensity = 0.2f
-            };
+            var biomeSettings = new BiomeGenerationSettings(
+                biomeCountRange: new int2(1, 3),
+                biomeWeight: 1.0f
+            );
+            var districtSettings = new DistrictGenerationSettings(
+                districtCountRange: new int2(2, 5),
+                districtMinDistance: 20f,
+                districtWeight: 1.0f
+            );
+            var sectorSettings = new SectorGenerationSettings(
+                sectorsPerDistrictRange: new int2(1, 4),
+                sectorGridSize: new int2(8, 8)
+            );
+            var roomSettings = new RoomGenerationSettings(
+                roomsPerSectorRange: new int2(1, 8),
+                targetLoopDensity: 0.2f
+            );
             var config = new WorldBootstrapConfiguration(
                 seed: 999,
                 worldSize: new int2(50, 50),
@@ -165,6 +168,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 biomeSettings: biomeSettings,
                 districtSettings: districtSettings,
                 sectorSettings: sectorSettings,
+                roomSettings: roomSettings,
                 enableDebugVisualization: true,
                 logGenerationSteps: true
             );
@@ -187,32 +191,47 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Test that WorldBootstrapConfiguration can coexist with WorldConfiguration
             var entity = entityManager.CreateEntity();
 
-            var bootstrapSettings = new WorldBootstrapSettings
-            {
-                Seed = 777,
-                WorldSize = new int2(80, 80),
-                RandomizationMode = RandomizationMode.Partial,
-                BiomeCountRange = new int2(3, 7),
-                BiomeWeight = 1.5f,
-                DistrictCountRange = new int2(5, 15),
-                DistrictMinDistance = 25f,
-                DistrictWeight = 0.9f,
-                SectorsPerDistrictRange = new int2(3, 10),
-                SectorGridSize = new int2(10, 10),
-                RoomsPerSectorRange = new int2(4, 15),
-                TargetLoopDensity = 0.7f,
-                EnableDebugVisualization = false,
-                LogGenerationSteps = true
-            };
+            // Create proper generation settings
+            var biomeSettings = new BiomeGenerationSettings(
+                biomeCountRange: new int2(3, 7),
+                biomeWeight: 1.5f
+            );
+            var districtSettings = new DistrictGenerationSettings(
+                districtCountRange: new int2(5, 15),
+                districtMinDistance: 25f,
+                districtWeight: 0.9f
+            );
+            var sectorSettings = new SectorGenerationSettings(
+                sectorsPerDistrictRange: new int2(3, 10),
+                sectorGridSize: new int2(10, 10)
+            );
+            var roomSettings = new RoomGenerationSettings(
+                roomsPerSectorRange: new int2(4, 15),
+                targetLoopDensity: 0.7f
+            );
 
-            var bootstrapConfig = new WorldBootstrapConfiguration(bootstrapSettings);
-            var worldConfig = new WorldConfiguration
-            {
-                Seed = 777,
-                WorldSize = new int2(80, 80),
-                TargetSectors = 150, // Max possible: 15 districts * 10 sectors
-                RandomizationMode = RandomizationMode.Partial
-            };
+            var bootstrapConfig = new WorldBootstrapConfiguration(
+                seed: 777,
+                worldSize: new int2(80, 80),
+                randomizationMode: RandomizationMode.Partial,
+                biomeSettings: biomeSettings,
+                districtSettings: districtSettings,
+                sectorSettings: sectorSettings,
+                roomSettings: roomSettings,
+                enableDebugVisualization: false,
+                logGenerationSteps: true
+            );
+            var worldConfig = new WorldConfiguration(
+                seed: 777,
+                size: new int2(80, 80),
+                mode: RandomizationMode.Partial,
+                biome: biomeSettings,
+                district: districtSettings,
+                sector: sectorSettings,
+                room: roomSettings,
+                debug: false,
+                logging: true
+            );
 
             entityManager.AddComponentData(entity, bootstrapConfig);
             entityManager.AddComponentData(entity, worldConfig);
