@@ -14,21 +14,21 @@ namespace TinyWalnutGames.MetVD.Graph
 
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(DistrictLayoutSystem))]
-    public partial struct SectorRoomHierarchySystem : ISystem
+    public partial class SectorRoomHierarchySystem : SystemBase
     {
         private EntityQuery _districtsQuery; private EntityQuery _layoutDoneQuery;
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
             _districtsQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<NodeId, SectorHierarchyData>()
-                .Build(ref state);
+                .Build(this);
             _layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<DistrictLayoutDoneTag>()
-                .Build(ref state);
-            state.RequireForUpdate(_districtsQuery);
-            state.RequireForUpdate(_layoutDoneQuery);
+                .Build(this);
+            RequireForUpdate(_districtsQuery);
+            RequireForUpdate(_layoutDoneQuery);
         }
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             if (_layoutDoneQuery.IsEmptyIgnoreFilter) return;
             using var entities = _districtsQuery.ToEntityArray(Allocator.Temp);
@@ -38,7 +38,7 @@ namespace TinyWalnutGames.MetVD.Graph
             {
                 var nodeId = nodeIds[i]; var sectorHierarchy = sectorData[i];
                 if (nodeId.Level == 0 && !sectorHierarchy.IsSubdivided)
-                    SubdivideDistrictIntoSectors(state.EntityManager, entities[i], nodeId, sectorHierarchy);
+                    SubdivideDistrictIntoSectors(EntityManager, entities[i], nodeId, sectorHierarchy);
             }
         }
         private static void SubdivideDistrictIntoSectors(EntityManager entityManager, Entity districtEntity, NodeId districtNodeId, SectorHierarchyData sectorHierarchy)

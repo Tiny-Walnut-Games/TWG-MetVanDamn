@@ -12,35 +12,32 @@ namespace TinyWalnutGames.MetVD.Graph
     /// Generates solvable district graphs using Wave Function Collapse
     /// Status: In progress (as per TLDL specifications)
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
-    public partial struct DistrictWfcSystem : ISystem
+    public partial class DistrictWfcSystem : SystemBase
     {
         private BufferLookup<WfcSocketBufferElement> socketBufferLookup;
         private BufferLookup<WfcCandidateBufferElement> candidateBufferLookup;
         private EntityQuery _layoutDoneQuery; // optional
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            socketBufferLookup = state.GetBufferLookup<WfcSocketBufferElement>(true);
-            candidateBufferLookup = state.GetBufferLookup<WfcCandidateBufferElement>();
-            state.RequireForUpdate<WfcState>();
+            socketBufferLookup = GetBufferLookup<WfcSocketBufferElement>(true);
+            candidateBufferLookup = GetBufferLookup<WfcCandidateBufferElement>();
+            RequireForUpdate<WfcState>();
             // Optional layout done tag (do not require so tests without it still run)
             _layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<DistrictLayoutDoneTag>()
-                .Build(ref state);
+                .Build(this);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             // If layout tag exists but zero districts placed yet, you could early out. For now proceed regardless.
-            socketBufferLookup.Update(ref state);
-            candidateBufferLookup.Update(ref state);
+            socketBufferLookup.Update(ref CheckedStateRef);
+            candidateBufferLookup.Update(ref CheckedStateRef);
 
-            var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
-            uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 911.0);
+            var deltaTime = SystemAPI.Time.DeltaTime;
+            uint baseSeed = (uint)(SystemAPI.Time.ElapsedTime * 911.0);
             var random = new Unity.Mathematics.Random(baseSeed == 0 ? 1u : baseSeed);
 
             var wfcJob = new DistrictWfcJob
@@ -50,7 +47,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 Random = random,
                 DeltaTime = deltaTime
             };
-            state.Dependency = wfcJob.Schedule(state.Dependency);
+            Dependency = wfcJob.Schedule(Dependency);
         }
     }
 

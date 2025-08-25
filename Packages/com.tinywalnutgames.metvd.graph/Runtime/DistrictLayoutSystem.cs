@@ -10,33 +10,30 @@ namespace TinyWalnutGames.MetVD.Graph
 {
     public enum DistrictPlacementStrategy : byte { PoissonDisc = 0, JitteredGrid = 1 }
 
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
-    public partial struct DistrictLayoutSystem : ISystem
+    public partial class DistrictLayoutSystem : SystemBase
     {
         private EntityQuery _unplacedQuery;
         private EntityQuery _worldConfigQuery;
         private EntityQuery _layoutDoneQuery;
         private bool _loggedFallback;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
             _unplacedQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<NodeId, WfcState>()
-                .Build(ref state);
+                .Build(this);
             _worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<WorldConfiguration>()
-                .Build(ref state);
+                .Build(this);
             _layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<DistrictLayoutDoneTag>()
-                .Build(ref state);
+                .Build(this);
             // Only require unplaced districts; world config now optional (fallback if missing)
-            state.RequireForUpdate(_unplacedQuery);
+            RequireForUpdate(_unplacedQuery);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
                 return;
@@ -45,7 +42,7 @@ namespace TinyWalnutGames.MetVD.Graph
             WorldConfiguration worldConfig;
             if (_worldConfigQuery.IsEmptyIgnoreFilter)
             {
-                worldConfig = new WorldConfiguration { Seed = (int)(state.WorldUnmanaged.Time.ElapsedTime * 1000 + 1), WorldSize = new int2(64, 64), TargetSectors = 0, RandomizationMode = RandomizationMode.None };
+                worldConfig = new WorldConfiguration { Seed = (int)(SystemAPI.Time.ElapsedTime * 1000 + 1), WorldSize = new int2(64, 64), TargetSectors = 0, RandomizationMode = RandomizationMode.None };
                 if (!_loggedFallback && SystemAPI.Time.ElapsedTime > 0)
                 {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -73,8 +70,8 @@ namespace TinyWalnutGames.MetVD.Graph
                 }
                 if (unplacedCount == 0)
                 {
-                    var layoutDoneEntity = state.EntityManager.CreateEntity();
-                    state.EntityManager.AddComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(0, 0));
+                    var layoutDoneEntity = EntityManager.CreateEntity();
+                    EntityManager.AddComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(0, 0));
                     return;
                 }
 
@@ -100,19 +97,19 @@ namespace TinyWalnutGames.MetVD.Graph
                         if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
                         {
                             nodeId.Coordinates = positions[positionIndex++];
-                            state.EntityManager.SetComponentData(unplacedEntities[i], nodeId);
+                            EntityManager.SetComponentData(unplacedEntities[i], nodeId);
                             // Attach sector hierarchy data if not already present
-                            if (!state.EntityManager.HasComponent<SectorHierarchyData>(unplacedEntities[i]))
+                            if (!EntityManager.HasComponent<SectorHierarchyData>(unplacedEntities[i]))
                             {
                                 var sectorData = new SectorHierarchyData(new int2(6, 6), sectorsPerDistrict, random.NextUInt());
-                                state.EntityManager.AddComponentData(unplacedEntities[i], sectorData);
+                                EntityManager.AddComponentData(unplacedEntities[i], sectorData);
                             }
                             placedCount++;
                         }
                     }
                     // Now mark done AFTER all have coordinates.
-                    var doneEntity = state.EntityManager.CreateEntity();
-                    state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
+                    var doneEntity = EntityManager.CreateEntity();
+                    EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
                 }
                 finally { if (positions.IsCreated) positions.Dispose(); }
             }

@@ -37,36 +37,33 @@ namespace TinyWalnutGames.MetVD.Graph
         Failed = 5
     }
 
-    [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(DistrictWfcSystem))]
-    public partial struct SectorRefineSystem : ISystem
+    public partial class SectorRefineSystem : SystemBase
     {
         private ComponentLookup<WfcState> wfcStateLookup;
         private ComponentLookup<NodeId> nodeIdLookup;
         private BufferLookup<ConnectionBufferElement> connectionBufferLookup;
         private BufferLookup<GateConditionBufferElement> gateBufferLookup;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            wfcStateLookup = state.GetComponentLookup<WfcState>(true);
-            nodeIdLookup = state.GetComponentLookup<NodeId>(true);
-            connectionBufferLookup = state.GetBufferLookup<ConnectionBufferElement>();
-            gateBufferLookup = state.GetBufferLookup<GateConditionBufferElement>();
-            state.RequireForUpdate<SectorRefinementData>();
+            wfcStateLookup = GetComponentLookup<WfcState>(true);
+            nodeIdLookup = GetComponentLookup<NodeId>(true);
+            connectionBufferLookup = GetBufferLookup<ConnectionBufferElement>();
+            gateBufferLookup = GetBufferLookup<GateConditionBufferElement>();
+            RequireForUpdate<SectorRefinementData>();
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
-            wfcStateLookup.Update(ref state);
-            nodeIdLookup.Update(ref state);
-            connectionBufferLookup.Update(ref state);
-            gateBufferLookup.Update(ref state);
+            wfcStateLookup.Update(ref CheckedStateRef);
+            nodeIdLookup.Update(ref CheckedStateRef);
+            connectionBufferLookup.Update(ref CheckedStateRef);
+            gateBufferLookup.Update(ref CheckedStateRef);
 
-            var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
-            uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 997.0); // prime multiplier for better distribution
+            var deltaTime = SystemAPI.Time.DeltaTime;
+            uint baseSeed = (uint)(SystemAPI.Time.ElapsedTime * 997.0); // prime multiplier for better distribution
             var random = new Unity.Mathematics.Random(baseSeed == 0 ? 1u : baseSeed);
 
             var refinementJob = new SectorRefinementJob
@@ -79,7 +76,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 DeltaTime = deltaTime
             };
 
-            state.Dependency = refinementJob.ScheduleParallel(state.Dependency);
+            Dependency = refinementJob.ScheduleParallel(Dependency);
         }
     }
 
