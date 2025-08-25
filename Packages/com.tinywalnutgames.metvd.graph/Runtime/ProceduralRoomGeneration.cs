@@ -17,7 +17,11 @@ namespace TinyWalnutGames.MetVD.Graph
         VerticalSegment = 3,         // Vertical layout rooms (towers, shafts)
         HorizontalCorridor = 4,      // Horizontal layout rooms (flow platforming)
         BiomeWeightedTerrain = 5,    // Top-world terrain generation
-        SkyBiomePlatform = 6         // Sky biome with moving platforms
+        SkyBiomePlatform = 6,        // Sky biome with moving platforms
+        LayeredPlatformCloud = 7,    // Layered platform cloud generation
+        BiomeWeightedHeightmap = 8,  // Biome-weighted heightmap generation
+        LinearBranchingCorridor = 9, // Linear branching corridor generation
+        StackedSegment = 10          // Stacked segment generation
     }
 
     /// <summary>

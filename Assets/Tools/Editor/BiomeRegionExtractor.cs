@@ -18,6 +18,9 @@ namespace TinyWalnutGames.Tools.Editor
     /// </summary>
     public class BiomeRegionExtractor : EditorWindow
     {
+        // Color comparison tolerance for biome mask matching
+        private const float ColorComparisonTolerance = 0.01f;
+        
         // Spritesheet and mapping inputs
         private List<Texture2D> spritesheets = new();
         private UnityEngine.Object biomeMaskAsset = null; // Can be Texture2D, TextAsset (JSON), or other mapping file

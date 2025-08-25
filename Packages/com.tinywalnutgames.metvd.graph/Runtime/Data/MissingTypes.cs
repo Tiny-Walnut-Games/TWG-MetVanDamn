@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
@@ -17,11 +18,19 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         public RoomGeneratorType GeneratorType;
         public uint Seed;
+        public bool IsComplete;
+        public Ability AvailableSkills;
+        public uint GenerationSeed;
+        public BiomeAffinity TargetBiome;
         
-        public RoomGenerationRequest(RoomGeneratorType generatorType, uint seed = 0)
+        public RoomGenerationRequest(RoomGeneratorType generatorType, uint seed = 0, Ability skills = Ability.Jump, BiomeAffinity biome = BiomeAffinity.Any)
         {
             GeneratorType = generatorType;
             Seed = seed;
+            IsComplete = false;
+            AvailableSkills = skills;
+            GenerationSeed = seed;
+            TargetBiome = biome;
         }
     }
 
@@ -33,12 +42,31 @@ namespace TinyWalnutGames.MetVD.Graph
         public float JumpHeight;
         public float JumpDistance;
         public float Gravity;
+        public float MaxJumpHeight;
+        public float WallJumpHeight;
+        public float DashDistance;
+        public float GlideSpeed;
         
         public JumpPhysicsData(float jumpHeight, float jumpDistance, float gravity)
         {
             JumpHeight = jumpHeight;
             JumpDistance = jumpDistance;
             Gravity = gravity;
+            MaxJumpHeight = jumpHeight;
+            WallJumpHeight = jumpHeight * 0.8f;
+            DashDistance = jumpDistance * 1.5f;
+            GlideSpeed = 2.0f;
+        }
+        
+        public JumpPhysicsData(float jumpHeight, float jumpDistance, float gravity, float maxJumpHeight, float wallJumpHeight, float dashDistance, float glideSpeed)
+        {
+            JumpHeight = jumpHeight;
+            JumpDistance = jumpDistance;
+            Gravity = gravity;
+            MaxJumpHeight = maxJumpHeight;
+            WallJumpHeight = wallJumpHeight;
+            DashDistance = dashDistance;
+            GlideSpeed = glideSpeed;
         }
     }
 
@@ -50,6 +78,21 @@ namespace TinyWalnutGames.MetVD.Graph
         public float Probability;
         public int MinSize;
         public int MaxSize;
+        public float SecretAreaPercentage;
+        public int2 MinSecretSize;
+        public bool UseAlternateRoutes;
+        public bool UseDestructibleWalls;
+        
+        public SecretAreaConfig(float probability, int minSize, int maxSize, float secretPercent, bool altRoutes, bool destructibleWalls)
+        {
+            Probability = probability;
+            MinSize = minSize;
+            MaxSize = maxSize;
+            SecretAreaPercentage = secretPercent;
+            MinSecretSize = new int2(minSize, minSize);
+            UseAlternateRoutes = altRoutes;
+            UseDestructibleWalls = destructibleWalls;
+        }
     }
 
     /// <summary>
@@ -59,6 +102,32 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         public int2 Position;
         public int PatternType;
+        public int Rotation;
+        public float Weight;
+        
+        public RoomPatternElement(int2 position, int patternType)
+        {
+            Position = position;
+            PatternType = patternType;
+            Rotation = 0;
+            Weight = 1.0f;
+        }
+        
+        public RoomPatternElement(int2 position, int patternType, int rotation)
+        {
+            Position = position;
+            PatternType = patternType;
+            Rotation = rotation;
+            Weight = 1.0f;
+        }
+        
+        public RoomPatternElement(int2 position, int patternType, int rotation, float weight)
+        {
+            Position = position;
+            PatternType = patternType;
+            Rotation = rotation;
+            Weight = weight;
+        }
     }
 
     /// <summary>
@@ -77,6 +146,14 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         public bool IsValid;
         public float MaxDistance;
+        public float RequiredHeight;
+        
+        public JumpArcValidation(bool isValid, float maxDistance, float requiredHeight)
+        {
+            IsValid = isValid;
+            MaxDistance = maxDistance;
+            RequiredHeight = requiredHeight;
+        }
     }
 
     /// <summary>
@@ -87,6 +164,15 @@ namespace TinyWalnutGames.MetVD.Graph
         public int2 FromPosition;
         public int2 ToPosition;
         public float Distance;
+        public Ability RequiredSkill;
+        
+        public JumpConnectionElement(int2 fromPos, int2 toPos, float distance, Ability skill)
+        {
+            FromPosition = fromPos;
+            ToPosition = toPos;
+            Distance = distance;
+            RequiredSkill = skill;
+        }
     }
 
     /// <summary>
@@ -100,10 +186,22 @@ namespace TinyWalnutGames.MetVD.Graph
     /// <summary>
     /// Biome influence component
     /// </summary>
-    public struct BiomeInfluence : IComponentData
+    public struct BiomeInfluence : IBufferElementData
     {
         public float Strength;
         public int BiomeType;
+        public BiomeAffinity Biome;
+        public float Influence;
+        public float Distance;
+        
+        public BiomeInfluence(BiomeAffinity biome, float influence, float distance)
+        {
+            Biome = biome;
+            Influence = influence;
+            Distance = distance;
+            Strength = influence;
+            BiomeType = (int)biome;
+        }
     }
 
     /// <summary>
@@ -127,6 +225,7 @@ namespace TinyWalnutGames.MetVD.Graph
         Linear = 0,
         Branched = 1,
         Open = 2,
-        Vertical = 3
+        Vertical = 3,
+        Horizontal = 4
     }
 }

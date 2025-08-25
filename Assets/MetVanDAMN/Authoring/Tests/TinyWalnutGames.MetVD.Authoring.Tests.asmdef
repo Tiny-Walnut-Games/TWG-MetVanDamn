@@ -8,7 +8,9 @@
     "Unity.Collections",
     "Unity.Mathematics",
     "TinyWalnutGames.MetVD.Core",
-    "TinyWalnutGames.MetVD.Authoring"
+    "TinyWalnutGames.MetVD.Authoring",
+    "TinyWalnutGames.MetVD.Shared",
+    "TinyWalnutGames.MetVD.Graph"
   ],
   "includePlatforms": [ "Editor" ],
   "excludePlatforms": [],

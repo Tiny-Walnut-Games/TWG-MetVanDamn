@@ -285,6 +285,15 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             return physics.JumpDistance * 0.8f; // Conservative spacing
         }
+        
+        /// <summary>
+        /// Calculate minimum platform spacing for given jump physics with difficulty factor
+        /// </summary>
+        [BurstCompile]
+        public static float CalculateMinimumPlatformSpacing(JumpPhysicsData physics, float difficultyFactor)
+        {
+            return physics.JumpDistance * (0.5f + difficultyFactor * 0.5f); // Scale with difficulty
+        }
 
         /// <summary>
         /// Check if target position is reachable with basic movement
@@ -306,6 +315,42 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             float2 delta = (float2)toPos - (float2)fromPos;
             return delta; // Simplified - should calculate actual arc
+        }
+        
+        /// <summary>
+        /// Calculate jump arc between two positions with extended parameters
+        /// </summary>
+        [BurstCompile]
+        public static float2 CalculateJumpArc(float2 fromPos, float2 toPos, JumpArcPhysics physics, Ability skill, float difficultyFactor)
+        {
+            float2 delta = toPos - fromPos;
+            
+            // Adjust arc based on skill
+            if ((skill & Ability.DoubleJump) != 0)
+            {
+                delta *= physics.DoubleJumpBonus;
+            }
+            
+            // Apply difficulty scaling
+            delta *= (0.5f + difficultyFactor * 0.5f);
+            
+            return delta; // Simplified - should calculate actual arc physics
+        }
+        
+        /// <summary>
+        /// Calculate jump arc with angle and velocity output parameters
+        /// </summary>
+        [BurstCompile]
+        public static bool CalculateJumpArc(float2 fromPos, float2 toPos, JumpArcPhysics physics, out float angle, out float velocity)
+        {
+            float2 delta = toPos - fromPos;
+            
+            // Calculate angle and velocity (simplified)
+            angle = math.atan2(delta.y, delta.x);
+            velocity = math.length(delta) / physics.JumpDistance;
+            
+            // Return true if arc is feasible
+            return math.length(delta) <= physics.JumpDistance;
         }
     }
 }
