@@ -20,7 +20,7 @@ namespace TinyWalnutGames.MetVD.Graph
         private EntityQuery _layoutDoneQuery;
         private EntityQuery _districtsQuery;
 
-        [BurstCompile]
+        // Removed BurstCompile from OnCreate (BC1028: managed array allocation inside Burst)
         public void OnCreate(ref SystemState state)
         {
             _layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadWrite<DistrictLayoutDoneTag>());
@@ -47,8 +47,8 @@ namespace TinyWalnutGames.MetVD.Graph
             if (layoutDone.ConnectionCount > 0) return;
 
             // Get all districts
-            using var entities = _districtsQuery.ToEntityArray(Allocator.Temp);
-            using var nodeIds = _districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            var entities = _districtsQuery.ToEntityArray(Allocator.Temp);
+            var nodeIds = _districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
 
             // Filter to level 0 districts only
             var districtCount = 0;
@@ -64,50 +64,40 @@ namespace TinyWalnutGames.MetVD.Graph
             var districtPositions = new NativeArray<int2>(districtCount, Allocator.Temp);
             var districtNodeIds = new NativeArray<uint>(districtCount, Allocator.Temp);
 
-            try
+            int districtIndex = 0;
+            for (int i = 0; i < nodeIds.Length; i++)
             {
-                int districtIndex = 0;
-                for (int i = 0; i < nodeIds.Length; i++)
+                if (nodeIds[i].Level == 0)
                 {
-                    if (nodeIds[i].Level == 0)
-                    {
-                        districtEntities[districtIndex] = entities[i];
-                        districtPositions[districtIndex] = nodeIds[i].Coordinates;
-                        districtNodeIds[districtIndex] = nodeIds[i].Value;
-                        districtIndex++;
-                    }
+                    districtEntities[districtIndex] = entities[i];
+                    districtPositions[districtIndex] = nodeIds[i].Coordinates;
+                    districtNodeIds[districtIndex] = nodeIds[i].Value;
+                    districtIndex++;
                 }
-
-                // Get world configuration for random seed
-                var worldConfigQuery = state.GetEntityQuery(ComponentType.ReadOnly<WorldConfiguration>());
-                var worldConfig = worldConfigQuery.GetSingleton<WorldConfiguration>();
-                var random = new Unity.Mathematics.Random((uint)(worldConfig.Seed + 1337)); // Different seed for connections
-
-                // Build connection graph
-                var connectionCount = BuildConnectionGraph(
-                    state.EntityManager,
-                    districtEntities,
-                    districtPositions,
-                    districtNodeIds,
-                    ref random
-                );
-
-                // Update layout done tag with connection count
-                var layoutDoneEntity = _layoutDoneQuery.GetSingletonEntity();
-                state.EntityManager.SetComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(districtCount, connectionCount));
             }
-            finally
-            {
-                if (districtEntities.IsCreated) districtEntities.Dispose();
-                if (districtPositions.IsCreated) districtPositions.Dispose();
-                if (districtNodeIds.IsCreated) districtNodeIds.Dispose();
-            }
+
+            // Get world configuration for random seed
+            var worldConfigQuery = state.GetEntityQuery(ComponentType.ReadOnly<WorldConfiguration>());
+            var worldConfig = worldConfigQuery.GetSingleton<WorldConfiguration>();
+            var random = new Unity.Mathematics.Random((uint)(worldConfig.Seed + 1337)); // Different seed for connections
+
+            // Build connection graph
+            var connectionCount = BuildConnectionGraph(
+                state.EntityManager,
+                districtEntities,
+                districtPositions,
+                districtNodeIds,
+                ref random
+            );
+
+            // Update layout done tag with connection count
+            var layoutDoneEntity = _layoutDoneQuery.GetSingletonEntity();
+            state.EntityManager.SetComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(districtCount, connectionCount));
         }
 
         /// <summary>
         /// Build connection graph using K-nearest neighbors plus random long edges
         /// </summary>
-        [BurstCompile]
         private static int BuildConnectionGraph(
             EntityManager entityManager,
             NativeArray<Entity> districtEntities,
@@ -127,64 +117,59 @@ namespace TinyWalnutGames.MetVD.Graph
 
                 // Find K nearest neighbors
                 var distances = new NativeArray<DistanceEntry>(districtPositions.Length - 1, Allocator.Temp);
-                try
+                int entryIndex = 0;
+
+                for (int j = 0; j < districtPositions.Length; j++)
                 {
-                    int entryIndex = 0;
+                    if (i == j) continue; // Skip self
 
-                    for (int j = 0; j < districtPositions.Length; j++)
+                    var targetPos = districtPositions[j];
+                    var distance = math.length(new float2(targetPos - sourcePos));
+                    distances[entryIndex] = new DistanceEntry
                     {
-                        if (i == j) continue; // Skip self
+                        Index = j,
+                        Distance = distance
+                    };
+                    entryIndex++;
+                }
 
-                        var targetPos = districtPositions[j];
-                        var distance = math.length(new float2(targetPos - sourcePos));
-                        distances[entryIndex] = new DistanceEntry 
-                        { 
-                            Index = j, 
-                            Distance = distance 
-                        };
-                        entryIndex++;
-                    }
+                // Sort by distance (simple bubble sort for small arrays)
+                SortDistanceEntries(distances);
 
-                    // Sort by distance (simple bubble sort for small arrays)
-                    SortDistanceEntries(distances);
+                // Connect to K nearest neighbors
+                var connectionBuffer = entityManager.GetBuffer<ConnectionBufferElement>(sourceEntity);
+                for (int k_idx = 0; k_idx < math.min(k, distances.Length); k_idx++)
+                {
+                    var targetIndex = distances[k_idx].Index;
+                    var targetNodeId = districtNodeIds[targetIndex];
 
-                    // Connect to K nearest neighbors
-                    var connectionBuffer = entityManager.GetBuffer<ConnectionBufferElement>(sourceEntity);
-                    for (int k_idx = 0; k_idx < math.min(k, distances.Length); k_idx++)
+                    // Check if connection already exists (avoid duplicates)
+                    bool connectionExists = false;
+                    for (int c = 0; c < connectionBuffer.Length; c++)
                     {
-                        var targetIndex = distances[k_idx].Index;
-                        var targetNodeId = districtNodeIds[targetIndex];
-
-                        // Check if connection already exists (avoid duplicates)
-                        bool connectionExists = false;
-                        for (int c = 0; c < connectionBuffer.Length; c++)
+                        if (connectionBuffer[c].Value.ToNodeId == targetNodeId)
                         {
-                            if (connectionBuffer[c].Value.ToNodeId == targetNodeId)
-                            {
-                                connectionExists = true;
-                                break;
-                            }
-                        }
-
-                        if (!connectionExists)
-                        {
-                            var connection = new Connection(
-                                sourceNodeId,
-                                targetNodeId,
-                                ConnectionType.Bidirectional,
-                                Polarity.None,
-                                distances[k_idx].Distance * 0.1f // Scale down traversal cost
-                            );
-
-                            connectionBuffer.Add(new ConnectionBufferElement { Value = connection });
-                            connectionCount++;
+                            connectionExists = true;
+                            break;
                         }
                     }
+
+                    if (!connectionExists)
+                    {
+                        var connection = new Connection(
+                            sourceNodeId,
+                            targetNodeId,
+                            ConnectionType.Bidirectional,
+                            Polarity.None,
+                            distances[k_idx].Distance * 0.1f // Scale down traversal cost
+                        );
+
+                        connectionBuffer.Add(new ConnectionBufferElement { Value = connection });
+                        connectionCount++;
+                    }
                 }
-                finally
-                {
-                    if (distances.IsCreated) distances.Dispose();
-                }
+
+                distances.Dispose();
             }
 
             // Add random long edges for loops (1 per 3 districts, minimum 1)
@@ -193,7 +178,7 @@ namespace TinyWalnutGames.MetVD.Graph
             {
                 int sourceIdx = random.NextInt(0, districtPositions.Length);
                 int targetIdx = random.NextInt(0, districtPositions.Length);
-                
+
                 // Ensure different districts
                 if (sourceIdx == targetIdx)
                 {
@@ -238,7 +223,6 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Simple bubble sort for distance entries (suitable for small arrays)
         /// </summary>
-        [BurstCompile]
         private static void SortDistanceEntries(NativeArray<DistanceEntry> distances)
         {
             for (int i = 0; i < distances.Length - 1; i++)
@@ -256,7 +240,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Helper struct for distance calculations
         /// </summary>
-        private struct DistanceEntry
+        public struct DistanceEntry
         {
             public int Index;
             public float Distance;

@@ -8,258 +8,171 @@ using TinyWalnutGames.MetVD.Shared;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
-    /// <summary>
-    /// District placement strategy for procedural layout
-    /// </summary>
-    public enum DistrictPlacementStrategy : byte
-    {
-        PoissonDisc = 0,    // Organic spacing using simple rejection sampling
-        JitteredGrid = 1    // Grid-based with jitter for variation
-    }
+    public enum DistrictPlacementStrategy : byte { PoissonDisc = 0, JitteredGrid = 1 }
 
-    /// <summary>
-    /// System responsible for procedural district layout before WFC
-    /// Places districts using deterministic algorithms based on world configuration
-    /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
-    [UpdateAfter(typeof(BuildConnectionBuffersSystem))]
     public partial struct DistrictLayoutSystem : ISystem
     {
         private EntityQuery _unplacedQuery;
         private EntityQuery _worldConfigQuery;
         private EntityQuery _layoutDoneQuery;
+        private bool _loggedFallback;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            // Query for unplaced districts (Level 0, Coordinates (0,0))
-            _unplacedQuery = state.GetEntityQuery(
-                ComponentType.ReadWrite<NodeId>(),
-                ComponentType.ReadOnly<WfcState>()
-            );
-            _unplacedQuery.SetChangedVersionFilter(ComponentType.ReadWrite<NodeId>());
-
-            // Query for world configuration
-            _worldConfigQuery = state.GetEntityQuery(ComponentType.ReadOnly<WorldConfiguration>());
-            
-            // Query to check if layout is already done
-            _layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadOnly<DistrictLayoutDoneTag>());
-
+            _unplacedQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<NodeId, WfcState>()
+                .Build(ref state);
+            _worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<WorldConfiguration>()
+                .Build(ref state);
+            _layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<DistrictLayoutDoneTag>()
+                .Build(ref state);
+            // Only require unplaced districts; world config now optional (fallback if missing)
             state.RequireForUpdate(_unplacedQuery);
-            state.RequireForUpdate(_worldConfigQuery);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Skip if layout already done
             if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
                 return;
 
-            var worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
-            
-            // Find unplaced districts (those at coordinates 0,0 with Level 0)
+            // Fallback configuration if authoring/baker did not supply one (e.g., tests / legacy bootstrap)
+            WorldConfiguration worldConfig;
+            if (_worldConfigQuery.IsEmptyIgnoreFilter)
+            {
+                worldConfig = new WorldConfiguration { Seed = (int)(state.WorldUnmanaged.Time.ElapsedTime * 1000 + 1), WorldSize = new int2(64, 64), TargetSectors = 0, RandomizationMode = RandomizationMode.None };
+                if (!_loggedFallback && SystemAPI.Time.ElapsedTime > 0)
+                {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    UnityEngine.Debug.LogWarning("DistrictLayoutSystem: WorldConfiguration missing. Using fallback defaults (64x64, all sectors).");
+#endif
+                    _loggedFallback = true;
+                }
+            }
+            else
+            {
+                worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
+            }
+
             var unplacedEntities = _unplacedQuery.ToEntityArray(Allocator.Temp);
             var nodeIds = _unplacedQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-            
             try
             {
-            var unplacedCount = 0;
-            for (int i = 0; i < nodeIds.Length; i++)
-            {
-                var nodeId = nodeIds[i];
-                if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
+                // Collect all level 0 districts still at (0,0)
+                int unplacedCount = 0;
+                for (int i = 0; i < nodeIds.Length; i++)
                 {
-                    unplacedCount++;
+                    var n = nodeIds[i];
+                    if (n.Level == 0 && n.Coordinates.x == 0 && n.Coordinates.y == 0)
+                        unplacedCount++;
                 }
-            }
-
-            if (unplacedCount == 0)
-            {
-                // No unplaced districts, mark as done
-                var layoutDoneEntity = state.EntityManager.CreateEntity();
-                state.EntityManager.AddComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(0, 0));
-                return;
-            }
-
-            // Use TargetSectors to determine how many districts to place
-            // If TargetSectors is specified, limit the number of districts accordingly
-            var targetDistrictCount = worldConfig.TargetSectors > 0 ? 
-                math.min(worldConfig.TargetSectors, unplacedCount) : unplacedCount;
-
-            // Initialize random generator with world seed
-            var random = new Unity.Mathematics.Random((uint)worldConfig.Seed);
-            
-            // Choose placement strategy based on target district count
-            var strategy = targetDistrictCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
-            
-            // Generate district positions for target count
-            var positions = new NativeArray<int2>(targetDistrictCount, Allocator.Temp);
-            try
-            {
-                GenerateDistrictPositions(positions, worldConfig.WorldSize, strategy, ref random);
-
-                // Apply positions to unplaced districts (up to target count)
-                int positionIndex = 0;
-                int placedCount = 0;
-                for (int i = 0; i < nodeIds.Length && placedCount < targetDistrictCount; i++)
+                if (unplacedCount == 0)
                 {
-                    var nodeId = nodeIds[i];
-                    if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
+                    var layoutDoneEntity = state.EntityManager.CreateEntity();
+                    state.EntityManager.AddComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(0, 0));
+                    return;
+                }
+
+                // ALWAYS place all remaining unplaced districts so we do not leave any at origin.
+                var random = new Unity.Mathematics.Random((uint)(worldConfig.Seed == 0 ? 1 : worldConfig.Seed));
+                var strategy = unplacedCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
+                var positions = new NativeArray<int2>(unplacedCount, Allocator.Temp);
+                try
+                {
+                    GenerateDistrictPositions(positions, worldConfig.WorldSize, strategy, ref random);
+
+                    // Derive sectors per district: distribute TargetSectors across placed districts (>=1)
+                    int sectorsPerDistrict = 1;
+                    if (worldConfig.TargetSectors > 0)
+                        sectorsPerDistrict = math.max(1, worldConfig.TargetSectors / math.max(1, unplacedCount));
+                    sectorsPerDistrict = math.clamp(sectorsPerDistrict, 1, 25); // safety cap
+
+                    int positionIndex = 0;
+                    int placedCount = 0;
+                    for (int i = 0; i < nodeIds.Length && positionIndex < unplacedCount; i++)
                     {
-                        nodeId.Coordinates = positions[positionIndex++];
-                        state.EntityManager.SetComponentData(unplacedEntities[i], nodeId);
-                        
-                        // Add SectorHierarchyData to each placed district for later subdivision
-                        var sectorData = new SectorHierarchyData(
-                            new int2(6, 6), // Local grid size for sectors
-                            math.max(1, worldConfig.TargetSectors / targetDistrictCount), // Sectors per district
-                            random.NextUInt()
-                        );
-                        state.EntityManager.AddComponentData(unplacedEntities[i], sectorData);
-                        
-                        placedCount++;
+                        var nodeId = nodeIds[i];
+                        if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
+                        {
+                            nodeId.Coordinates = positions[positionIndex++];
+                            state.EntityManager.SetComponentData(unplacedEntities[i], nodeId);
+                            // Attach sector hierarchy data if not already present
+                            if (!state.EntityManager.HasComponent<SectorHierarchyData>(unplacedEntities[i]))
+                            {
+                                var sectorData = new SectorHierarchyData(new int2(6, 6), sectorsPerDistrict, random.NextUInt());
+                                state.EntityManager.AddComponentData(unplacedEntities[i], sectorData);
+                            }
+                            placedCount++;
+                        }
                     }
+                    // Now mark done AFTER all have coordinates.
+                    var doneEntity = state.EntityManager.CreateEntity();
+                    state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
                 }
-
-                // Mark layout as complete
-                var doneEntity = state.EntityManager.CreateEntity();
-                state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
+                finally { if (positions.IsCreated) positions.Dispose(); }
             }
             finally
             {
-                if (positions.IsCreated) positions.Dispose();
+                if (unplacedEntities.IsCreated) unplacedEntities.Dispose();
+                if (nodeIds.IsCreated) nodeIds.Dispose();
             }
         }
-        finally
-        {
-            if (unplacedEntities.IsCreated) unplacedEntities.Dispose();
-            if (nodeIds.IsCreated) nodeIds.Dispose();
-        }
 
-        /// <summary>
-        /// Generate district positions using the specified strategy
-        /// </summary>
-        [BurstCompile]
-        private static void GenerateDistrictPositions(NativeArray<int2> positions, int2 worldSize, 
-            DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
+        static void GenerateDistrictPositions(NativeArray<int2> positions, int2 worldSize, DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
         {
             switch (strategy)
             {
-                case DistrictPlacementStrategy.PoissonDisc:
-                    GeneratePoissonDiscPositions(positions, worldSize, ref random);
-                    break;
-                case DistrictPlacementStrategy.JitteredGrid:
-                    GenerateJitteredGridPositions(positions, worldSize, ref random);
-                    break;
+                case DistrictPlacementStrategy.PoissonDisc: GeneratePoissonDiscPositions(positions, worldSize, ref random); break;
+                case DistrictPlacementStrategy.JitteredGrid: GenerateJitteredGridPositions(positions, worldSize, ref random); break;
             }
         }
-
-        /// <summary>
-        /// Generate positions using Poisson-disc sampling for organic spacing
-        /// Simple rejection sampling implementation
-        /// </summary>
-        [BurstCompile]
-        private static void GeneratePoissonDiscPositions(NativeArray<int2> positions, int2 worldSize, 
-            ref Unity.Mathematics.Random random)
+        static void GeneratePoissonDiscPositions(NativeArray<int2> positions, int2 worldSize, ref Unity.Mathematics.Random random)
         {
-            float minDistance = math.min(worldSize.x, worldSize.y) * 0.2f; // 20% of world size as minimum distance
+            float minDistance = math.min(worldSize.x, worldSize.y) * 0.2f;
             int maxAttempts = 30;
-
             for (int i = 0; i < positions.Length; i++)
             {
-                bool validPosition = false;
-                int attempts = 0;
-                
+                bool validPosition = false; int attempts = 0;
                 while (!validPosition && attempts < maxAttempts)
                 {
-                    // Generate random position within world bounds
-                    int2 candidate = new int2(
-                        random.NextInt(0, worldSize.x),
-                        random.NextInt(0, worldSize.y)
-                    );
-
-                    // Check distance to all previously placed positions
+                    int2 candidate = new(random.NextInt(0, worldSize.x), random.NextInt(0, worldSize.y));
                     validPosition = true;
                     for (int j = 0; j < i; j++)
                     {
                         float distance = math.length(new float2(candidate - positions[j]));
-                        if (distance < minDistance)
-                        {
-                            validPosition = false;
-                            break;
-                        }
+                        if (distance < minDistance) { validPosition = false; break; }
                     }
-
-                    if (validPosition)
-                    {
-                        positions[i] = candidate;
-                    }
-
+                    if (validPosition) positions[i] = candidate;
                     attempts++;
                 }
-
-                // Fallback if no valid position found
                 if (!validPosition)
-                {
-                    positions[i] = new int2(
-                        random.NextInt(0, worldSize.x),
-                        random.NextInt(0, worldSize.y)
-                    );
-                }
+                    positions[i] = new(random.NextInt(0, worldSize.x), random.NextInt(0, worldSize.y));
             }
         }
-
-        /// <summary>
-        /// Generate positions using jittered grid for larger district counts
-        /// </summary>
-        [BurstCompile]
-        private static void GenerateJitteredGridPositions(NativeArray<int2> positions, int2 worldSize, 
-            ref Unity.Mathematics.Random random)
+        static void GenerateJitteredGridPositions(NativeArray<int2> positions, int2 worldSize, ref Unity.Mathematics.Random random)
         {
             int gridDim = (int)math.ceil(math.sqrt(positions.Length));
             float2 cellSize = new float2(worldSize) / gridDim;
-            float jitterAmount = math.min(cellSize.x, cellSize.y) * 0.3f; // 30% jitter
-
-            // Create shuffled indices for grid cells
+            float jitterAmount = math.min(cellSize.x, cellSize.y) * 0.3f;
             var shuffledIndices = new NativeArray<int>(positions.Length, Allocator.Temp);
-            for (int i = 0; i < shuffledIndices.Length; i++)
-            {
-                shuffledIndices[i] = i;
-            }
-
-            // Simple shuffle
+            for (int i = 0; i < shuffledIndices.Length; i++) shuffledIndices[i] = i;
             for (int i = shuffledIndices.Length - 1; i > 0; i--)
-            {
-                int j = random.NextInt(0, i + 1);
-                (shuffledIndices[i], shuffledIndices[j]) = (shuffledIndices[j], shuffledIndices[i]);
-            }
-
-            // Assign positions based on shuffled grid
+            { int j = random.NextInt(0, i + 1); (shuffledIndices[i], shuffledIndices[j]) = (shuffledIndices[j], shuffledIndices[i]); }
             for (int i = 0; i < positions.Length; i++)
             {
                 int gridIndex = shuffledIndices[i];
-                int gridX = gridIndex % gridDim;
-                int gridY = gridIndex / gridDim;
-
-                // Calculate cell center
+                int gridX = gridIndex % gridDim; int gridY = gridIndex / gridDim;
                 float2 cellCenter = new float2(gridX + 0.5f, gridY + 0.5f) * cellSize;
-
-                // Apply jitter
-                float2 jitter = new float2(
-                    random.NextFloat(-jitterAmount, jitterAmount),
-                    random.NextFloat(-jitterAmount, jitterAmount)
-                );
-
+                float2 jitter = new(random.NextFloat(-jitterAmount, jitterAmount), random.NextFloat(-jitterAmount, jitterAmount));
                 float2 finalPosition = cellCenter + jitter;
-
-                // Clamp to world bounds
-                positions[i] = new int2(
-                    math.clamp((int)finalPosition.x, 0, worldSize.x - 1),
-                    math.clamp((int)finalPosition.y, 0, worldSize.y - 1)
-                );
+                positions[i] = new(math.clamp((int)finalPosition.x, 0, worldSize.x - 1), math.clamp((int)finalPosition.y, 0, worldSize.y - 1));
             }
+            shuffledIndices.Dispose();
         }
     }
 }

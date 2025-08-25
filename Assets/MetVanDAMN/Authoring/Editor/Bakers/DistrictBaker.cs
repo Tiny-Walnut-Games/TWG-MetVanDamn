@@ -14,6 +14,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             AddComponent(entity, new NodeId(authoring.nodeId, authoring.level, authoring.parentId, authoring.gridCoordinates));
             AddComponent(entity, new WfcState(authoring.initialWfcState));
             AddComponent(entity, new SectorRefinementData(authoring.targetLoopDensity));
+            // Add the authoring MonoBehaviour as a component object so a sync system can push ECS changes back for gizmos/editor.
+            AddComponentObject(entity, authoring);
         }
     }
 }

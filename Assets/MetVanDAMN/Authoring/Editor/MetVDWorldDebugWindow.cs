@@ -38,7 +38,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
 
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
-            SerializedObject so = new SerializedObject(_settings);
+            SerializedObject so = new(_settings);
             so.Update();
             SerializedProperty prop = so.GetIterator();
             bool enter = true;
@@ -54,10 +54,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             EditorGUILayout.Space();
             if (GUILayout.Button("Frame All Districts"))
             {
-                var districts = GameObject.FindObjectsOfType<DistrictAuthoring>();
+                // With this line:
+                DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
                 if (districts.Length > 0)
                 {
-                    Bounds b = new Bounds(districts[0].transform.position, Vector3.one);
+                    Bounds b = new(districts[0].transform.position, Vector3.one);
                     foreach (var d in districts)
                         b.Encapsulate(d.transform.position);
                     SceneView.lastActiveSceneView.Frame(b, false);

@@ -1198,6 +1198,14 @@
       <Project>{657EBCB1-E90D-F326-9D47-83652F99795B}</Project>
       <Name>TinyWalnutGames.MetVD.Biome</Name>
     </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.csproj">
+      <Project>{6BEF65E0-E1A3-6D7E-9453-DA8D0FDF65FD}</Project>
+      <Name>TinyWalnutGames.MetVD.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Authoring.csproj">
+      <Project>{1C947371-7B21-A5C5-A553-6A4F3D0F5CFC}</Project>
+      <Name>TinyWalnutGames.MetVD.Authoring</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

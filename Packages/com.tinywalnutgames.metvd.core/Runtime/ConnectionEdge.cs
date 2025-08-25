@@ -1,7 +1,6 @@
 using Unity.Entities;
-using TinyWalnutGames.MetVD.Core;
 
-namespace TinyWalnutGames.MetVD.Authoring
+namespace TinyWalnutGames.MetVD.Core
 {
     /// <summary>
     /// Lightweight baked edge referencing two district entities.

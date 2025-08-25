@@ -62,7 +62,6 @@ namespace TinyWalnutGames.MetVD.Graph
     /// System responsible for adaptive rule randomization
     /// Operates after district layout to ensure world capabilities are considered
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(ConnectionBuilderSystem))]
     public partial struct RuleRandomizationSystem : ISystem
@@ -74,9 +73,15 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _worldConfigQuery = state.GetEntityQuery(ComponentType.ReadOnly<WorldConfiguration>());
-            _layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadOnly<DistrictLayoutDoneTag>());
-            _rulesDoneQuery = state.GetEntityQuery(ComponentType.ReadOnly<RuleRandomizationDoneTag>());
+            _worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<WorldConfiguration>()
+                .Build(ref state);
+            _layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<DistrictLayoutDoneTag>()
+                .Build(ref state);
+            _rulesDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RuleRandomizationDoneTag>()
+                .Build(ref state);
 
             state.RequireForUpdate(_worldConfigQuery);
             state.RequireForUpdate(_layoutDoneQuery);
@@ -110,29 +115,20 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Generate world rules based on randomization mode
         /// </summary>
-        [BurstCompile]
         private static WorldRuleSet GenerateWorldRules(RandomizationMode mode, int districtCount, ref Unity.Mathematics.Random random)
         {
-            switch (mode)
+            return mode switch
             {
-                case RandomizationMode.None:
-                    return ApplyCuratedRules(ref random);
-                
-                case RandomizationMode.Partial:
-                    return ApplyPartialRandomization(districtCount, ref random);
-                
-                case RandomizationMode.Full:
-                    return ApplyFullRandomization(districtCount, ref random);
-                
-                default:
-                    return ApplyCuratedRules(ref random);
-            }
+                RandomizationMode.None => ApplyCuratedRules(ref random),
+                RandomizationMode.Partial => ApplyPartialRandomization(ref random),
+                RandomizationMode.Full => ApplyFullRandomization(districtCount, ref random),
+                _ => ApplyCuratedRules(ref random),
+            };
         }
 
         /// <summary>
         /// Apply curated rules with no randomization
         /// </summary>
-        [BurstCompile]
         private static WorldRuleSet ApplyCuratedRules(ref Unity.Mathematics.Random random)
         {
             // Use balanced curated polarity distribution
@@ -148,27 +144,36 @@ namespace TinyWalnutGames.MetVD.Graph
             return new WorldRuleSet(curatedPolarity, curatedUpgrades, false, random.NextUInt());
         }
 
+        // Helper to pick one polarity by index (avoids managed arrays)
+        private static Polarity PickPolarity(int index)
+        {
+            return index switch
+            {
+                0 => Polarity.Sun,
+                1 => Polarity.Moon,
+                2 => Polarity.Heat,
+                3 => Polarity.Cold,
+                4 => Polarity.Earth,
+                5 => Polarity.Wind,
+                6 => Polarity.Life,
+                _ => Polarity.Tech,
+            };
+        }
+
         /// <summary>
         /// Apply partial randomization - randomize biome polarities, keep upgrades fixed
         /// </summary>
-        [BurstCompile]
-        private static WorldRuleSet ApplyPartialRandomization(int districtCount, ref Unity.Mathematics.Random random)
+        private static WorldRuleSet ApplyPartialRandomization(ref Unity.Mathematics.Random random)
         {
             // Randomize biome polarities but ensure at least 2 are present
-            var availablePolarities = new[]
-            {
-                Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold,
-                Polarity.Earth, Polarity.Wind, Polarity.Life, Polarity.Tech
-            };
-
             var randomizedPolarity = Polarity.None;
-            int polarityCount = math.max(2, random.NextInt(2, math.min(6, availablePolarities.Length)));
+            int polarityCount = math.max(2, random.NextInt(2, math.min(6, 8))); // 8 possible
             
             // Shuffle and select polarities
             for (int i = 0; i < polarityCount; i++)
             {
-                int randomIndex = random.NextInt(0, availablePolarities.Length);
-                randomizedPolarity |= availablePolarities[randomIndex];
+                int randomIndex = random.NextInt(0, 8);
+                randomizedPolarity |= PickPolarity(randomIndex);
             }
 
             // Keep curated upgrades for reachability
@@ -184,23 +189,16 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Apply full randomization - randomize everything with reachability guards
         /// </summary>
-        [BurstCompile]
         private static WorldRuleSet ApplyFullRandomization(int districtCount, ref Unity.Mathematics.Random random)
         {
             // Randomize biome polarities
-            var availablePolarities = new[]
-            {
-                Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold,
-                Polarity.Earth, Polarity.Wind, Polarity.Life, Polarity.Tech
-            };
-
             var randomizedPolarity = Polarity.None;
-            int polarityCount = math.max(2, random.NextInt(2, availablePolarities.Length));
+            int polarityCount = math.max(2, random.NextInt(2, 8));
             
             for (int i = 0; i < polarityCount; i++)
             {
-                int randomIndex = random.NextInt(0, availablePolarities.Length);
-                randomizedPolarity |= availablePolarities[randomIndex];
+                int randomIndex = random.NextInt(0, 8);
+                randomizedPolarity |= PickPolarity(randomIndex);
             }
 
             // Randomize upgrades but ensure minimum set for reachability

@@ -130,16 +130,13 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _roomsQuery = state.GetEntityQuery(
-                ComponentType.ReadWrite<RoomHierarchyData>(),
-                ComponentType.ReadOnly<NodeId>()
-            );
-            
-            _sectorsQuery = state.GetEntityQuery(
-                ComponentType.ReadOnly<SectorHierarchyData>(),
-                ComponentType.ReadOnly<NodeId>()
-            );
-
+            // Use EntityQueryBuilder to avoid managed params array allocation
+            _roomsQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RoomHierarchyData, NodeId>()
+                .Build(ref state);
+            _sectorsQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<SectorHierarchyData, NodeId>()
+                .Build(ref state);
             state.RequireForUpdate(_roomsQuery);
         }
 
@@ -170,20 +167,19 @@ namespace TinyWalnutGames.MetVD.Graph
 
                 // Add navigation data
                 var isCriticalPath = roomData.Type == RoomType.Entrance || roomData.Type == RoomType.Exit || roomData.Type == RoomType.Boss;
-                var traversalTime = CalculateTraversalTime(roomData.Bounds, roomData.Type);
-                var primaryEntrance = CalculatePrimaryEntrance(roomData.Bounds);
+                var traversalTime = CalculateTraversalTime(in roomData.Bounds, roomData.Type);
+                CalculatePrimaryEntrance(in roomData.Bounds, out int2 primaryEntrance);
                 state.EntityManager.AddComponentData(entity, new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime));
 
                 // Add room features buffer
                 var featuresBuffer = state.EntityManager.AddBuffer<RoomFeatureElement>(entity);
-                PopulateRoomFeatures(featuresBuffer, roomData, ref random);
+                PopulateRoomFeatures(featuresBuffer, in roomData, ref random);
             }
         }
 
         /// <summary>
         /// Determine number of secrets based on room type and size
         /// </summary>
-        [BurstCompile]
         private static int DetermineSecretCount(RoomType roomType, ref Unity.Mathematics.Random random)
         {
             return roomType switch
@@ -199,8 +195,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Calculate traversal time based on room size and type
         /// </summary>
-        [BurstCompile]
-        private static float CalculateTraversalTime(RectInt bounds, RoomType roomType)
+        private static float CalculateTraversalTime(in RectInt bounds, RoomType roomType)
         {
             var area = bounds.width * bounds.height;
             var baseTime = math.sqrt(area) * 0.5f;
@@ -217,18 +212,15 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Calculate primary entrance position
         /// </summary>
-        [BurstCompile]
-        private static int2 CalculatePrimaryEntrance(RectInt bounds)
+        private static void CalculatePrimaryEntrance(in RectInt bounds, out int2 result)
         {
-            // Use bottom-center as default entrance
-            return new int2(bounds.x + bounds.width / 2, bounds.y);
+            result = new int2(bounds.x + bounds.width / 2, bounds.y);
         }
 
         /// <summary>
         /// Populate room with features based on type and size
         /// </summary>
-        [BurstCompile]
-        private static void PopulateRoomFeatures(DynamicBuffer<RoomFeatureElement> features, RoomHierarchyData roomData, ref Unity.Mathematics.Random random)
+        private static void PopulateRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RoomHierarchyData roomData, ref Unity.Mathematics.Random random)
         {
             var bounds = roomData.Bounds;
             var area = bounds.width * bounds.height;
@@ -236,25 +228,24 @@ namespace TinyWalnutGames.MetVD.Graph
             switch (roomData.Type)
             {
                 case RoomType.Boss:
-                    AddBossRoomFeatures(features, bounds, ref random);
+                    AddBossRoomFeatures(features, in bounds, ref random);
                     break;
                 case RoomType.Treasure:
-                    AddTreasureRoomFeatures(features, bounds, ref random);
+                    AddTreasureRoomFeatures(features, in bounds, ref random);
                     break;
                 case RoomType.Save:
-                    AddSaveRoomFeatures(features, bounds, ref random);
+                    AddSaveRoomFeatures(features, in bounds, ref random);
                     break;
                 case RoomType.Shop:
-                    AddShopRoomFeatures(features, bounds, ref random);
+                    AddShopRoomFeatures(features, in bounds, ref random);
                     break;
                 default:
-                    AddNormalRoomFeatures(features, bounds, area, ref random);
+                    AddNormalRoomFeatures(features, in bounds, area, ref random);
                     break;
             }
         }
 
-        [BurstCompile]
-        private static void AddBossRoomFeatures(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, ref Unity.Mathematics.Random random)
+        private static void AddBossRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
         {
             // Add boss spawn point
             var bossPos = new int2(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
@@ -271,8 +262,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        [BurstCompile]
-        private static void AddTreasureRoomFeatures(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, ref Unity.Mathematics.Random random)
+        private static void AddTreasureRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
         {
             // Add treasure chests/power-ups
             var treasureCount = random.NextInt(1, 3);
@@ -287,16 +277,14 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        [BurstCompile]
-        private static void AddSaveRoomFeatures(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, ref Unity.Mathematics.Random random)
+        private static void AddSaveRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
         {
             // Add save station
             var savePos = new int2(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
             features.Add(new RoomFeatureElement(RoomFeatureType.SaveStation, savePos, random.NextUInt()));
         }
 
-        [BurstCompile]
-        private static void AddShopRoomFeatures(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, ref Unity.Mathematics.Random random)
+        private static void AddShopRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
         {
             // Add platforms for shop items
             var itemCount = random.NextInt(2, 5);
@@ -310,8 +298,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        [BurstCompile]
-        private static void AddNormalRoomFeatures(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, int area, ref Unity.Mathematics.Random random)
+        private static void AddNormalRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, int area, ref Unity.Mathematics.Random random)
         {
             // Add enemies based on room size
             var enemyCount = math.min(area / 8, random.NextInt(0, 3));

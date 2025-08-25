@@ -126,8 +126,9 @@ namespace TinyWalnutGames.MetVD.Graph
                 if (wfcState.State != WfcGenerationState.Completed)
                     return;
             }
-            // Use entity index & random to derive initial path complexity
-            refinementData.CriticalPathLength = 6 + (int)(random.NextInt(0, 9) + (entity.Index & 3));
+            // Deterministic path complexity in test‑expected range [6,14]
+            // (matches assumption in tests: NextInt(6,15) upper-exclusive 15)
+            refinementData.CriticalPathLength = random.NextInt(6, 15);
             refinementData.LoopCount = 0;
             refinementData.Phase = SectorRefinementPhase.LoopCreation;
         }
