@@ -168,8 +168,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Add navigation data
                 var isCriticalPath = roomData.Type == RoomType.Entrance || roomData.Type == RoomType.Exit || roomData.Type == RoomType.Boss;
                 var traversalTime = CalculateTraversalTime(in roomData.Bounds, roomData.Type);
-                int2 primaryEntrance;
-                CalculatePrimaryEntrance(in roomData.Bounds, out primaryEntrance);
+                CalculatePrimaryEntrance(in roomData.Bounds, out int2 primaryEntrance);
                 state.EntityManager.AddComponentData(entity, new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime));
 
                 // Add room features buffer

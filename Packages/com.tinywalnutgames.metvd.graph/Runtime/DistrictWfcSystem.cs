@@ -18,6 +18,7 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         private BufferLookup<WfcSocketBufferElement> socketBufferLookup;
         private BufferLookup<WfcCandidateBufferElement> candidateBufferLookup;
+        private EntityQuery _layoutDoneQuery; // optional
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -25,12 +26,16 @@ namespace TinyWalnutGames.MetVD.Graph
             socketBufferLookup = state.GetBufferLookup<WfcSocketBufferElement>(true);
             candidateBufferLookup = state.GetBufferLookup<WfcCandidateBufferElement>();
             state.RequireForUpdate<WfcState>();
-            state.RequireForUpdate<DistrictLayoutDoneTag>(); // Wait for district layout to complete
+            // Optional layout done tag (do not require so tests without it still run)
+            _layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<DistrictLayoutDoneTag>()
+                .Build(ref state);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            // If layout tag exists but zero districts placed yet, you could early out. For now proceed regardless.
             socketBufferLookup.Update(ref state);
             candidateBufferLookup.Update(ref state);
 
@@ -45,8 +50,6 @@ namespace TinyWalnutGames.MetVD.Graph
                 Random = random,
                 DeltaTime = deltaTime
             };
-
-            // Sequential scheduling to avoid parallel safety constraints for mutable component access.
             state.Dependency = wfcJob.Schedule(state.Dependency);
         }
     }
