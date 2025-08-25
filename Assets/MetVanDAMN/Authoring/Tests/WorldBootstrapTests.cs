@@ -119,19 +119,31 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // without running the actual system update (which requires Unity runtime)
             
             var bootstrapEntity = entityManager.CreateEntity();
+            var biomeSettings = new BiomeSettings
+            {
+                CountRange = new int2(1, 3),
+                Weight = 1.0f
+            };
+            var districtSettings = new DistrictSettings
+            {
+                CountRange = new int2(2, 5),
+                MinDistance = 20f,
+                Weight = 1.0f
+            };
+            var sectorSettings = new SectorSettings
+            {
+                SectorsPerDistrictRange = new int2(1, 4),
+                GridSize = new int2(8, 8),
+                RoomsPerSectorRange = new int2(1, 8),
+                TargetLoopDensity = 0.2f
+            };
             var config = new WorldBootstrapConfiguration(
                 seed: 999,
                 worldSize: new int2(50, 50),
                 randomizationMode: RandomizationMode.None,
-                biomeCountRange: new int2(1, 3),
-                biomeWeight: 1.0f,
-                districtCountRange: new int2(2, 5),
-                districtMinDistance: 20f,
-                districtWeight: 1.0f,
-                sectorsPerDistrictRange: new int2(1, 4),
-                sectorGridSize: new int2(8, 8),
-                roomsPerSectorRange: new int2(1, 8),
-                targetLoopDensity: 0.2f,
+                biomeSettings: biomeSettings,
+                districtSettings: districtSettings,
+                sectorSettings: sectorSettings,
                 enableDebugVisualization: true,
                 logGenerationSteps: true
             );
