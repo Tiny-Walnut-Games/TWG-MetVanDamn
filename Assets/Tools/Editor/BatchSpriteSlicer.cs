@@ -314,10 +314,7 @@ namespace TinyWalnutGames.Tools.Editor
                     guidToNewRect[srcRect.spriteID.ToString()] = newRect;
                 }
 
-                // Clear all previous rects before setting new ones
-                dataProvider.SetSpriteRects(System.Array.Empty<SpriteRect>());
-                dataProvider.Apply();
-
+                // Set new rects (replaces all previous rects)
                 dataProvider.SetSpriteRects(newRects.ToArray());
                 dataProvider.Apply();
 
