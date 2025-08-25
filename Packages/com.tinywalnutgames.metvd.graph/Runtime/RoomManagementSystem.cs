@@ -118,6 +118,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// <summary>
     /// System that manages room state, navigation, and features
     /// Runs after sector hierarchy creation to populate rooms with content
+    /// Now integrates with the new procedural room generation pipeline
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
@@ -174,7 +175,82 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Add room features buffer
                 var featuresBuffer = state.EntityManager.AddBuffer<RoomFeatureElement>(entity);
                 PopulateRoomFeatures(featuresBuffer, in roomData, ref random);
+
+                // Initialize room generation request for new procedural pipeline
+                InitializeRoomGenerationRequest(state.EntityManager, entity, roomData, nodeId, ref random);
             }
+        }
+
+        /// <summary>
+        /// Initialize room generation request for the new procedural pipeline
+        /// </summary>
+        private static void InitializeRoomGenerationRequest(EntityManager entityManager, Entity roomEntity, 
+                                                           RoomHierarchyData roomData, NodeId nodeId, 
+                                                           ref Unity.Mathematics.Random random)
+        {
+            // Determine generator type based on room type and characteristics
+            var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
+            
+            // Get biome information if available
+            var targetBiome = BiomeType.HubArea;
+            var targetPolarity = Polarity.None;
+            
+            // In a full implementation, would query for biome data from parent district/sector
+            // For now, use default values
+            
+            // Determine available skills (in full implementation, would come from player state)
+            var availableSkills = Ability.Jump | Ability.DoubleJump; // Basic starting abilities
+            
+            var generationRequest = new RoomGenerationRequest(
+                generatorType, 
+                targetBiome, 
+                targetPolarity, 
+                availableSkills, 
+                random.NextUInt()
+            );
+            
+            entityManager.AddComponentData(roomEntity, generationRequest);
+            
+            // Add additional components needed for specialized generators
+            if (generatorType == RoomGeneratorType.ParametricChallenge)
+            {
+                var jumpPhysics = new JumpPhysicsData(4.0f, 6.0f, 9.81f, 5.0f, true, false, false);
+                entityManager.AddComponentData(roomEntity, jumpPhysics);
+                entityManager.AddComponentData(roomEntity, new JumpArcValidation(false, 0, 0));
+                entityManager.AddBuffer<JumpConnectionElement>(roomEntity);
+            }
+            
+            if (generatorType == RoomGeneratorType.PatternDrivenModular)
+            {
+                entityManager.AddBuffer<RoomPatternElement>(roomEntity);
+                entityManager.AddBuffer<RoomModuleElement>(roomEntity);
+            }
+            
+            if (generatorType == RoomGeneratorType.WeightedTilePrefab || 
+                roomData.Type == RoomType.Treasure || roomData.Type == RoomType.Normal)
+            {
+                var secretConfig = new SecretAreaConfig(0.15f, new int2(2, 2), new int2(4, 4), 
+                                                      Ability.None, true, true);
+                entityManager.AddComponentData(roomEntity, secretConfig);
+            }
+        }
+
+        /// <summary>
+        /// Determine the appropriate generator type based on room characteristics
+        /// </summary>
+        private static RoomGeneratorType DetermineGeneratorType(RoomType roomType, RectInt bounds)
+        {
+            var aspectRatio = (float)bounds.width / bounds.height;
+            
+            return roomType switch
+            {
+                RoomType.Boss => RoomGeneratorType.PatternDrivenModular,     // Skill challenges
+                RoomType.Treasure => RoomGeneratorType.ParametricChallenge, // Testing grounds
+                RoomType.Save or RoomType.Shop or RoomType.Hub => RoomGeneratorType.WeightedTilePrefab, // Safe areas
+                _ => aspectRatio > 1.5f ? RoomGeneratorType.LinearBranchingCorridor :  // Wide = horizontal
+                     aspectRatio < 0.67f ? RoomGeneratorType.StackedSegment :         // Tall = vertical
+                     RoomGeneratorType.WeightedTilePrefab                              // Square = standard
+            };
         }
 
         /// <summary>
