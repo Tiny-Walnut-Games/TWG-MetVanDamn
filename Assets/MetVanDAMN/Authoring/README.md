@@ -2,9 +2,23 @@
 
 Minimal authoring + baker layer enabling scene-driven setup of world generation without custom bootstrap scripts.
 
+## 🆕 WorldBootstrap System
+
+**NEW**: Use `WorldBootstrapAuthoring` for **One‑District Authoring → Full Random World Generation**!
+
+Instead of manually placing multiple `DistrictAuthoring` objects, add a single `WorldBootstrapAuthoring` component that generates the complete world hierarchy procedurally:
+
+- **Single scene object** with configurable ranges for biomes, districts, sectors, rooms  
+- **Deterministic generation** with seed support (0 = random)
+- **Editor preview** without entering play mode
+- **Backward compatible** with existing manual authoring workflow
+
+See [README_WorldBootstrap.md](README_WorldBootstrap.md) for detailed documentation.
+
 ## Components
 
 - WorldConfigurationAuthoring -> WorldConfiguration (seed, world size, target sectors)
+- **WorldBootstrapAuthoring -> WorldBootstrapConfiguration (full procedural hierarchy generation)**
 - DistrictAuthoring -> NodeId, WfcState, SectorRefinementData (+ empty buffers)
 - ConnectionAuthoring -> ConnectionBufferElement edges between districts
 - BiomeFieldAuthoring -> BiomeFieldData field influences
@@ -77,6 +91,15 @@ To visualize authored graph data outside of play mode:
 Gizmos respect play/edit toggles so you can disable noise when not needed.
 
 ## Usage
+
+### Option 1: WorldBootstrap (Recommended)
+1. Create an empty GameObject, add **WorldBootstrapAuthoring**.
+2. Configure generation ranges for biomes, districts, sectors, rooms.
+3. Set seed (0 = random) and world size.
+4. Use "Preview Generation" button to test configuration.
+5. Press Play - complete world generates automatically!
+
+### Option 2: Manual Authoring (Legacy)
 1. Create an empty GameObject, add WorldConfigurationAuthoring.
 2. Add several DistrictAuthoring objects (place in scene). Assign unique nodeIds.
 3. Add ConnectionAuthoring objects specifying from/to DistrictAuthoring refs.
