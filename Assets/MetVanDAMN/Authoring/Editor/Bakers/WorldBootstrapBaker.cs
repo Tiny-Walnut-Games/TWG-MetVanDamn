@@ -14,19 +14,36 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var entity = GetEntity(TransformUsageFlags.None);
             
             // Convert authoring settings to component data
+            // Grouped settings structs for new constructor signature
+            var biomeSettings = new BiomeGenerationSettings
+            {
+                BiomeCount = new int2(authoring.biomeCount.x, authoring.biomeCount.y),
+                BiomeWeight = authoring.biomeWeight
+            };
+            var districtSettings = new DistrictGenerationSettings
+            {
+                DistrictCount = new int2(authoring.districtCount.x, authoring.districtCount.y),
+                DistrictMinDistance = authoring.districtMinDistance,
+                DistrictWeight = authoring.districtWeight
+            };
+            var sectorSettings = new SectorGenerationSettings
+            {
+                SectorsPerDistrict = new int2(authoring.sectorsPerDistrict.x, authoring.sectorsPerDistrict.y),
+                SectorGridSize = authoring.sectorGridSize
+            };
+            var roomSettings = new RoomGenerationSettings
+            {
+                RoomsPerSector = new int2(authoring.roomsPerSector.x, authoring.roomsPerSector.y),
+                TargetLoopDensity = authoring.targetLoopDensity
+            };
             var bootstrapConfig = new WorldBootstrapConfiguration(
                 authoring.seed,
                 authoring.worldSize,
                 authoring.randomizationMode,
-                new int2(authoring.biomeCount.x, authoring.biomeCount.y),
-                authoring.biomeWeight,
-                new int2(authoring.districtCount.x, authoring.districtCount.y),
-                authoring.districtMinDistance,
-                authoring.districtWeight,
-                new int2(authoring.sectorsPerDistrict.x, authoring.sectorsPerDistrict.y),
-                authoring.sectorGridSize,
-                new int2(authoring.roomsPerSector.x, authoring.roomsPerSector.y),
-                authoring.targetLoopDensity,
+                biomeSettings,
+                districtSettings,
+                sectorSettings,
+                roomSettings,
                 authoring.enableDebugVisualization,
                 authoring.logGenerationSteps
             );
