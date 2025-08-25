@@ -242,8 +242,14 @@ namespace TinyWalnutGames.MetVD.Graph
             state.EntityManager.SetName(entity, $"BiomeField_{biomeType}");
 #endif
 
-            // For now, create a simple biome field marker
-            // This would be expanded based on the actual biome field system requirements
+            // TODO: Implement the full biome field system.
+            // Intended future behavior:
+            // - Support multiple biomes per field with weighted strengths.
+            // - Allow for dynamic blending and transitions between biomes.
+            // - Store additional biome metadata (e.g., temperature, humidity, special features).
+            // - Integrate with world generation and district/sector placement logic.
+            // - Provide editor/debug visualization for biome fields.
+            // Current implementation: simple biome field marker for prototyping.
             state.EntityManager.AddComponentData(entity, new BiomeFieldData
             {
                 PrimaryBiome = biomeType,
