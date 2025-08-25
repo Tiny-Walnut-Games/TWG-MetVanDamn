@@ -20,28 +20,26 @@ namespace TinyWalnutGames.MetVD.Graph
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(RoomGenerationPipelineSystem))]
-    public partial struct PatternDrivenModularGenerator : ISystem
+    public partial class PatternDrivenModularGenerator : SystemBase
     {
         private ComponentLookup<SkillTag> _skillTagLookup;
         private BufferLookup<RoomPatternElement> _patternBufferLookup;
         private BufferLookup<RoomModuleElement> _moduleBufferLookup;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            _skillTagLookup = state.GetComponentLookup<SkillTag>(true);
-            _patternBufferLookup = state.GetBufferLookup<RoomPatternElement>();
-            _moduleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
+            _skillTagLookup = GetComponentLookup<SkillTag>(true);
+            _patternBufferLookup = GetBufferLookup<RoomPatternElement>();
+            _moduleBufferLookup = GetBufferLookup<RoomModuleElement>(true);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
-            _skillTagLookup.Update(ref state);
-            _patternBufferLookup.Update(ref state);
-            _moduleBufferLookup.Update(ref state);
+            _skillTagLookup.Update(ref CheckedStateRef);
+            _patternBufferLookup.Update(ref CheckedStateRef);
+            _moduleBufferLookup.Update(ref CheckedStateRef);
 
-            var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
+            var random = new Unity.Mathematics.Random((uint)(World.Unmanaged.Time.ElapsedTime * 1000));
 
             var patternJob = new PatternDrivenGenerationJob
             {
@@ -51,7 +49,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 Random = random
             };
 
-            state.Dependency = patternJob.ScheduleParallel(state.Dependency);
+            Dependency = patternJob.ScheduleParallel(Dependency);
         }
     }
 
@@ -184,26 +182,24 @@ namespace TinyWalnutGames.MetVD.Graph
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(PatternDrivenModularGenerator))]
-    public partial struct ParametricChallengeGenerator : ISystem
+    public partial class ParametricChallengeGenerator : SystemBase
     {
         private ComponentLookup<JumpPhysicsData> _jumpPhysicsLookup;
         private ComponentLookup<JumpArcValidation> _validationLookup;
         private BufferLookup<JumpConnectionElement> _jumpConnectionLookup;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            _jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
-            _validationLookup = state.GetComponentLookup<JumpArcValidation>();
-            _jumpConnectionLookup = state.GetBufferLookup<JumpConnectionElement>();
+            _jumpPhysicsLookup = GetComponentLookup<JumpPhysicsData>(true);
+            _validationLookup = GetComponentLookup<JumpArcValidation>();
+            _jumpConnectionLookup = GetBufferLookup<JumpConnectionElement>();
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
-            _jumpPhysicsLookup.Update(ref state);
-            _validationLookup.Update(ref state);
-            _jumpConnectionLookup.Update(ref state);
+            _jumpPhysicsLookup.Update(ref CheckedStateRef);
+            _validationLookup.Update(ref CheckedStateRef);
+            _jumpConnectionLookup.Update(ref CheckedStateRef);
 
             var parametricJob = new ParametricChallengeJob
             {
@@ -212,7 +208,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 JumpConnectionLookup = _jumpConnectionLookup
             };
 
-            state.Dependency = parametricJob.ScheduleParallel(state.Dependency);
+            Dependency = parametricJob.ScheduleParallel(Dependency);
         }
     }
 
@@ -318,28 +314,26 @@ namespace TinyWalnutGames.MetVD.Graph
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(ParametricChallengeGenerator))]
-    public partial struct WeightedTilePrefabGenerator : ISystem
+    public partial class WeightedTilePrefabGenerator : SystemBase
     {
         private ComponentLookup<SecretAreaConfig> _secretConfigLookup;
         private ComponentLookup<BiomeAffinityComponent> _biomeAffinityLookup;
         private BufferLookup<RoomModuleElement> _moduleBufferLookup;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            _secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
-            _biomeAffinityLookup = state.GetComponentLookup<BiomeAffinityComponent>(true);
-            _moduleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
+            _secretConfigLookup = GetComponentLookup<SecretAreaConfig>(true);
+            _biomeAffinityLookup = GetComponentLookup<BiomeAffinityComponent>(true);
+            _moduleBufferLookup = GetBufferLookup<RoomModuleElement>(true);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
-            _secretConfigLookup.Update(ref state);
-            _biomeAffinityLookup.Update(ref state);
-            _moduleBufferLookup.Update(ref state);
+            _secretConfigLookup.Update(ref CheckedStateRef);
+            _biomeAffinityLookup.Update(ref CheckedStateRef);
+            _moduleBufferLookup.Update(ref CheckedStateRef);
 
-            var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
+            var random = new Unity.Mathematics.Random((uint)(World.Unmanaged.Time.ElapsedTime * 1000));
 
             var weightedJob = new WeightedTilePrefabJob
             {
@@ -349,7 +343,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 Random = random
             };
 
-            state.Dependency = weightedJob.ScheduleParallel(state.Dependency);
+            Dependency = weightedJob.ScheduleParallel(Dependency);
         }
     }
 
