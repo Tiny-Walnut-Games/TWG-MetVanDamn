@@ -362,7 +362,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public Unity.Mathematics.Random Random;
 
         public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, 
-                          in NodeId nodeId, ref RoomFeatureElement features)
+                          in NodeId nodeId, in DynamicBuffer<RoomFeatureElement> features)
         {
             if (request.GeneratorType != RoomGeneratorType.WeightedTilePrefab || request.IsComplete) return;
 
