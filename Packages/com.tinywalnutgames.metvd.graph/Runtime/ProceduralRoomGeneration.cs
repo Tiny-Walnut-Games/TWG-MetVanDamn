@@ -1,255 +1,157 @@
-using Unity.Collections;
 using Unity.Entities;
+using Unity.Collections;
 using Unity.Mathematics;
+using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>
-    /// Types of room generators available for different gameplay goals
+    /// Room generation types aligned with the Best Fit Matrix for different gameplay goals
     /// </summary>
     public enum RoomGeneratorType : byte
     {
-        /// <summary>Movement skill puzzles (dash, wall-cling, grapple)</summary>
-        PatternDrivenModular = 0,
-        /// <summary>Platforming puzzle testing grounds (jump/double-jump)</summary>
-        ParametricChallenge = 1,
-        /// <summary>Standard platforming + optional secrets</summary>
-        WeightedTilePrefab = 2,
-        /// <summary>Vertical layout rooms</summary>
-        StackedSegment = 3,
-        /// <summary>Horizontal layout rooms</summary>
-        LinearBranchingCorridor = 4,
-        /// <summary>Top-world terrain generation (overworld biomes)</summary>
-        BiomeWeightedHeightmap = 5,
-        /// <summary>Sky biome generation</summary>
-        LayeredPlatformCloud = 6
+        PatternDrivenModular = 0,    // Movement skill puzzles (dash, wall-cling, grapple)
+        ParametricChallenge = 1,     // Platforming testing grounds with jump arc solver
+        WeightedTilePrefab = 2,      // Standard platforming with optional secrets
+        VerticalSegment = 3,         // Vertical layout rooms (towers, shafts)
+        HorizontalCorridor = 4,      // Horizontal layout rooms (flow platforming)
+        BiomeWeightedTerrain = 5,    // Top-world terrain generation
+        SkyBiomePlatform = 6         // Sky biome with moving platforms
     }
 
     /// <summary>
-    /// Layout orientation for room generation
+    /// Movement capability tags for skill-aware room generation
+    /// Maps to existing Ability flags for consistency
     /// </summary>
-    public enum RoomLayoutType : byte
+    public struct MovementCapabilityTags : IComponentData
     {
-        Horizontal = 0,
-        Vertical = 1,
-        Mixed = 2
-    }
-
-    /// <summary>
-    /// Skill tag component for prefabs and tiles
-    /// Enables skill-aware generation filtering
-    /// </summary>
-    public struct SkillTag : IComponentData
-    {
-        /// <summary>Required abilities to use this prefab/tile</summary>
-        public Ability RequiredSkill;
+        public Ability RequiredSkills;      // Skills needed to complete room
+        public Ability OptionalSkills;     // Skills that provide alternate routes/secrets
+        public BiomeAffinity BiomeType;    // Primary biome this room fits
+        public float DifficultyRating;     // 0.0 (trivial) to 1.0 (expert)
         
-        /// <summary>Optional abilities that enhance this prefab/tile</summary>
-        public Ability OptionalSkill;
-        
-        /// <summary>Difficulty level of using this skill element</summary>
-        public float SkillDifficulty;
-
-        public SkillTag(Ability requiredSkill, Ability optionalSkill = Ability.None, float skillDifficulty = 0.5f)
+        public MovementCapabilityTags(Ability required, Ability optional = Ability.None, 
+                                     BiomeAffinity biome = BiomeAffinity.Any, float difficulty = 0.5f)
         {
-            RequiredSkill = requiredSkill;
-            OptionalSkill = optionalSkill;
-            SkillDifficulty = math.clamp(skillDifficulty, 0.0f, 1.0f);
+            RequiredSkills = required;
+            OptionalSkills = optional;
+            BiomeType = biome;
+            DifficultyRating = math.clamp(difficulty, 0.0f, 1.0f);
         }
     }
 
     /// <summary>
-    /// Biome affinity component for prefabs and tiles
-    /// Controls biome-specific content selection
+    /// Biome affinity for room templates/modules  
     /// </summary>
-    public struct BiomeAffinity : IComponentData
+    public enum BiomeAffinity : byte
     {
-        /// <summary>Primary biome this element belongs to</summary>
-        public BiomeType PrimaryBiome;
-        
-        /// <summary>Secondary compatible biomes</summary>
-        public BiomeType SecondaryBiome;
-        
-        /// <summary>Polarity affinity for biome coherence</summary>
-        public Polarity PolarityAffinity;
-        
-        /// <summary>Weight/probability of selection (0.0 to 1.0)</summary>
-        public float SelectionWeight;
-
-        public BiomeAffinity(BiomeType primaryBiome, Polarity polarityAffinity = Polarity.None, 
-                           float selectionWeight = 1.0f, BiomeType secondaryBiome = BiomeType.Unknown)
-        {
-            PrimaryBiome = primaryBiome;
-            SecondaryBiome = secondaryBiome;
-            PolarityAffinity = polarityAffinity;
-            SelectionWeight = math.clamp(selectionWeight, 0.0f, 1.0f);
-        }
-
-        /// <summary>
-        /// Check if this element is compatible with a biome
-        /// </summary>
-        public readonly bool IsCompatibleWith(BiomeType biomeType, Polarity biomePolarity)
-        {
-            bool biomeMatch = PrimaryBiome == biomeType || SecondaryBiome == biomeType;
-            bool polarityMatch = PolarityAffinity == Polarity.None || 
-                               PolarityAffinity == Polarity.Any ||
-                               (PolarityAffinity & biomePolarity) != 0;
-            
-            return biomeMatch && polarityMatch;
-        }
+        Any = 0,
+        Forest = 1,
+        Desert = 2,
+        Mountain = 3,
+        Ocean = 4,
+        Sky = 5,
+        Underground = 6,
+        TechZone = 7,
+        Volcanic = 8
     }
 
     /// <summary>
-    /// Room generation request component
-    /// Coordinates the 6-step pipeline flow
+    /// Room template data for procedural generation
+    /// Contains layout patterns and skill requirements
     /// </summary>
-    public struct RoomGenerationRequest : IComponentData
+    public struct RoomTemplate : IComponentData
     {
-        /// <summary>Current pipeline step (1-6)</summary>
-        public byte CurrentStep;
-        
-        /// <summary>Selected generator type for this room</summary>
         public RoomGeneratorType GeneratorType;
+        public MovementCapabilityTags CapabilityTags;
+        public int2 MinSize;                // Minimum room dimensions
+        public int2 MaxSize;                // Maximum room dimensions
+        public float SecretAreaPercentage;  // % of tiles reserved for secrets (0.0-1.0)
+        public bool RequiresJumpValidation; // Whether to run jump arc solver
+        public uint TemplateId;             // Unique identifier for this template
         
-        /// <summary>Selected layout orientation</summary>
-        public RoomLayoutType LayoutType;
-        
-        /// <summary>Available player skills for filtering</summary>
-        public Ability AvailableSkills;
-        
-        /// <summary>Target biome for this room</summary>
-        public BiomeType TargetBiome;
-        
-        /// <summary>Target polarity for this room</summary>
-        public Polarity TargetPolarity;
-        
-        /// <summary>Seed for deterministic generation</summary>
-        public uint GenerationSeed;
-        
-        /// <summary>Whether room generation is complete</summary>
-        public bool IsComplete;
-
-        public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeType targetBiome, 
-                                   Polarity targetPolarity, Ability availableSkills, uint seed)
+        public RoomTemplate(RoomGeneratorType type, MovementCapabilityTags tags, 
+                           int2 minSize, int2 maxSize, float secretPercent = 0.1f, 
+                           bool jumpValidation = true, uint templateId = 0)
         {
-            CurrentStep = 1;
-            GeneratorType = generatorType;
-            LayoutType = RoomLayoutType.Mixed;
-            AvailableSkills = availableSkills;
-            TargetBiome = targetBiome;
-            TargetPolarity = targetPolarity;
+            GeneratorType = type;
+            CapabilityTags = tags;
+            MinSize = minSize;
+            MaxSize = maxSize;
+            SecretAreaPercentage = math.clamp(secretPercent, 0.0f, 0.5f);
+            RequiresJumpValidation = jumpValidation;
+            TemplateId = templateId;
+        }
+    }
+
+    /// <summary>
+    /// Component for rooms that have completed procedural generation
+    /// Links to navigation and visual generation phases
+    /// </summary>
+    public struct ProceduralRoomGenerated : IComponentData
+    {
+        public bool ContentGenerated;       // Room layout/content created
+        public bool NavigationGenerated;   // Nav graph created
+        public bool CinemachineGenerated;  // Camera zones created
+        public uint GenerationSeed;        // Seed used for this room's generation
+        public float GenerationTime;       // Time taken for generation (profiling)
+        
+        public ProceduralRoomGenerated(uint seed)
+        {
+            ContentGenerated = false;
+            NavigationGenerated = false;
+            CinemachineGenerated = false;
             GenerationSeed = seed;
-            IsComplete = false;
+            GenerationTime = 0.0f;
         }
     }
 
     /// <summary>
-    /// Secret area configuration for rooms
-    /// Implements Secret Area Hooks requirement
+    /// Buffer element for room navigation connections with movement type tags
+    /// Extends existing connection system with movement-aware navigation
     /// </summary>
-    public struct SecretAreaConfig : IComponentData
+    public struct RoomNavigationElement : IBufferElementData
     {
-        /// <summary>Percentage of tiles reserved for secrets (0.0 to 1.0)</summary>
-        public float SecretAreaPercentage;
+        public int2 FromPosition;           // Starting navigation point
+        public int2 ToPosition;             // Destination navigation point
+        public Ability RequiredMovement;   // Movement type needed for this connection
+        public float TraversalCost;        // Cost/difficulty of this connection
+        public bool IsSecret;               // Whether this is a secret/alternate route
         
-        /// <summary>Minimum secret area size</summary>
-        public int2 MinSecretSize;
-        
-        /// <summary>Maximum secret area size</summary>
-        public int2 MaxSecretSize;
-        
-        /// <summary>Required skill to access secrets</summary>
-        public Ability SecretSkillRequirement;
-        
-        /// <summary>Whether to place destructible walls</summary>
-        public bool UseDestructibleWalls;
-        
-        /// <summary>Whether to place alternate routes</summary>
-        public bool UseAlternateRoutes;
-
-        public SecretAreaConfig(float secretPercentage = 0.15f, int2 minSize = default, int2 maxSize = default,
-                              Ability secretSkill = Ability.None, bool destructibleWalls = true, bool alternateRoutes = true)
+        public RoomNavigationElement(int2 from, int2 to, Ability movement = Ability.Jump, 
+                                   float cost = 1.0f, bool secret = false)
         {
-            SecretAreaPercentage = math.clamp(secretPercentage, 0.0f, 0.5f);
-            MinSecretSize = minSize.Equals(default) ? new int2(2, 2) : minSize;
-            MaxSecretSize = maxSize.Equals(default) ? new int2(4, 4) : maxSize;
-            SecretSkillRequirement = secretSkill;
-            UseDestructibleWalls = destructibleWalls;
-            UseAlternateRoutes = alternateRoutes;
+            FromPosition = from;
+            ToPosition = to;
+            RequiredMovement = movement;
+            TraversalCost = cost;
+            IsSecret = secret;
         }
     }
 
     /// <summary>
-    /// Jump physics parameters for Jump Arc Solver
+    /// Component for jump arc physics validation
+    /// Used by ParametricChallengeRoomGenerator and reachability checks
     /// </summary>
-    public struct JumpPhysicsData : IComponentData
+    public struct JumpArcPhysics : IComponentData
     {
-        /// <summary>Maximum jump height in world units</summary>
-        public float MaxJumpHeight;
+        public float JumpHeight;            // Maximum jump height
+        public float JumpDistance;         // Maximum horizontal jump distance
+        public float DoubleJumpBonus;      // Additional height/distance for double jump
+        public float GravityScale;         // Gravity affecting jump arcs
+        public float WallJumpHeight;       // Height gained from wall jumps
+        public float DashDistance;         // Horizontal dash distance
         
-        /// <summary>Maximum horizontal jump distance</summary>
-        public float MaxJumpDistance;
-        
-        /// <summary>Gravity strength</summary>
-        public float Gravity;
-        
-        /// <summary>Player movement speed</summary>
-        public float MovementSpeed;
-        
-        /// <summary>Double jump availability</summary>
-        public bool HasDoubleJump;
-        
-        /// <summary>Wall jump availability</summary>
-        public bool HasWallJump;
-        
-        /// <summary>Dash availability</summary>
-        public bool HasDash;
-
-        public JumpPhysicsData(float maxHeight = 4.0f, float maxDistance = 6.0f, float gravity = 9.81f, 
-                             float speed = 5.0f, bool doubleJump = false, bool wallJump = false, bool dash = false)
+        public JumpArcPhysics(float height = 3.0f, float distance = 4.0f, float doubleBonus = 1.5f,
+                             float gravity = 1.0f, float wallHeight = 2.0f, float dash = 6.0f)
         {
-            MaxJumpHeight = maxHeight;
-            MaxJumpDistance = maxDistance;
-            Gravity = gravity;
-            MovementSpeed = speed;
-            HasDoubleJump = doubleJump;
-            HasWallJump = wallJump;
-            HasDash = dash;
-        }
-    }
-
-    /// <summary>
-    /// Buffer element for room generation modules/prefabs
-    /// </summary>
-    public struct RoomModuleElement : IBufferElementData
-    {
-        public Entity ModulePrefab;
-        public float Weight;
-        public SkillTag SkillRequirement;
-        public BiomeAffinity BiomeRequirement;
-        
-        public static implicit operator RoomModuleElement(Entity entity) 
-            => new() { ModulePrefab = entity, Weight = 1.0f };
-    }
-
-    /// <summary>
-    /// Buffer element for pattern-driven room generation
-    /// </summary>
-    public struct RoomPatternElement : IBufferElementData
-    {
-        public int2 Position;
-        public RoomFeatureType FeatureType;
-        public uint PatternId;
-        public Ability RequiredSkill;
-        
-        public RoomPatternElement(int2 position, RoomFeatureType featureType, uint patternId = 0, 
-                                Ability requiredSkill = Ability.None)
-        {
-            Position = position;
-            FeatureType = featureType;
-            PatternId = patternId;
-            RequiredSkill = requiredSkill;
+            JumpHeight = height;
+            JumpDistance = distance;
+            DoubleJumpBonus = doubleBonus;
+            GravityScale = gravity;
+            WallJumpHeight = wallHeight;
+            DashDistance = dash;
         }
     }
 }

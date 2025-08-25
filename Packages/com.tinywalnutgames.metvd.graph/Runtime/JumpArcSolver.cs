@@ -2,268 +2,278 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>
-    /// Physics-aware reachability validation for room generation
-    /// Implements Jump Arc Solver requirement from the issue
+    /// Physics-aware reachability validation system for procedural room generation.
+    /// Implements jump arc calculations to ensure all room areas are reachable with player movement capabilities.
+    /// Part of the Master Spec pipeline - runs during content pass before finalizing room layouts.
     /// </summary>
     [BurstCompile]
     public static class JumpArcSolver
     {
         /// <summary>
-        /// Check if a target position is reachable from a start position using jump physics
+        /// Validate that a target position is reachable from a starting position given movement capabilities
         /// </summary>
-        public static bool IsReachable(float2 startPos, float2 targetPos, in JumpPhysicsData physics)
+        [BurstCompile]
+        public static bool IsPositionReachable(int2 startPos, int2 targetPos, Ability availableMovement, JumpArcPhysics physics)
         {
-            float deltaX = targetPos.x - startPos.x;
-            float deltaY = targetPos.y - startPos.y;
+            float2 start = startPos;
+            float2 target = targetPos;
+            float2 delta = target - start;
             
-            // Basic distance check
-            if (math.abs(deltaX) > physics.MaxJumpDistance)
-                return false;
+            // Direct horizontal movement check
+            if (math.abs(delta.y) < 0.1f && math.abs(delta.x) <= physics.JumpDistance)
+                return true;
                 
-            // Basic height check
-            if (deltaY > physics.MaxJumpHeight)
-                return false;
+            // Check if dash can bridge the gap
+            if ((availableMovement & Ability.Dash) != 0 && math.abs(delta.x) <= physics.DashDistance && math.abs(delta.y) < 1.0f)
+                return true;
                 
-            // Parabolic trajectory calculation
-            return CanReachWithParabolicArc(deltaX, deltaY, physics);
-        }
-        
-        /// <summary>
-        /// Check if a path between two points is clear of obstacles
-        /// </summary>
-        public static bool IsPathClear(float2 startPos, float2 targetPos, in NativeArray<int2> obstacles)
-        {
-            if (obstacles.Length == 0) return true;
-            
-            // Simple line-of-sight check using Bresenham's algorithm
-            int x0 = (int)startPos.x;
-            int y0 = (int)startPos.y;
-            int x1 = (int)targetPos.x;
-            int y1 = (int)targetPos.y;
-            
-            int dx = math.abs(x1 - x0);
-            int dy = math.abs(y1 - y0);
-            int sx = x0 < x1 ? 1 : -1;
-            int sy = y0 < y1 ? 1 : -1;
-            int err = dx - dy;
-            
-            int x = x0, y = y0;
-            
-            while (true)
+            // Standard jump arc calculation
+            if ((availableMovement & Ability.Jump) != 0)
             {
-                // Check if current position is an obstacle
-                int2 currentPos = new int2(x, y);
-                for (int i = 0; i < obstacles.Length; i++)
+                if (CanReachWithJump(delta, physics, false))
+                    return true;
+                    
+                // Try double jump if available
+                if ((availableMovement & Ability.DoubleJump) != 0 && CanReachWithJump(delta, physics, true))
+                    return true;
+            }
+            
+            // Wall jump sequences for vertical movement
+            if ((availableMovement & Ability.WallJump) != 0 && delta.y > 0)
+            {
+                return CanReachWithWallJumps(delta, physics);
+            }
+            
+            // Grapple point connections (simplified - assumes grapple points exist)
+            if ((availableMovement & Ability.Grapple) != 0)
+            {
+                float grappleRange = physics.JumpDistance * 2.0f; // Grapple has longer range
+                return math.length(delta) <= grappleRange;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Calculate if a jump arc can reach the target position
+        /// </summary>
+        [BurstCompile]
+        private static bool CanReachWithJump(float2 delta, JumpArcPhysics physics, bool doubleJump)
+        {
+            float horizontalDistance = math.abs(delta.x);
+            float verticalDistance = delta.y;
+            
+            float maxJumpHeight = physics.JumpHeight;
+            float maxJumpDistance = physics.JumpDistance;
+            
+            if (doubleJump)
+            {
+                maxJumpHeight *= physics.DoubleJumpBonus;
+                maxJumpDistance *= physics.DoubleJumpBonus;
+            }
+            
+            // Simple ballistic trajectory check
+            if (horizontalDistance > maxJumpDistance)
+                return false;
+                
+            // For upward movement, check if we have enough height
+            if (verticalDistance > 0 && verticalDistance > maxJumpHeight)
+                return false;
+                
+            // For downward movement, gravity helps - use parabolic trajectory
+            if (verticalDistance < 0)
+            {
+                float timeToFall = math.sqrt(2.0f * math.abs(verticalDistance) / physics.GravityScale);
+                float maxHorizontalInTime = maxJumpDistance; // Simplified horizontal velocity
+                return horizontalDistance <= maxHorizontalInTime;
+            }
+            
+            // Parabolic trajectory for upward arcs
+            float discriminant = maxJumpHeight * maxJumpHeight - 2.0f * physics.GravityScale * verticalDistance * horizontalDistance * horizontalDistance / (maxJumpDistance * maxJumpDistance);
+            return discriminant >= 0;
+        }
+
+        /// <summary>
+        /// Check if wall jumping can reach the target (simplified wall jump chain)
+        /// </summary>
+        [BurstCompile]
+        private static bool CanReachWithWallJumps(float2 delta, JumpArcPhysics physics)
+        {
+            float verticalGain = physics.WallJumpHeight;
+            int maxWallJumps = (int)math.ceil(delta.y / verticalGain);
+            
+            // Assume we can wall jump up to a reasonable limit
+            if (maxWallJumps <= 3 && math.abs(delta.x) <= physics.JumpDistance * maxWallJumps)
+                return true;
+                
+            return false;
+        }
+
+        /// <summary>
+        /// Generate reachable positions from a starting point using breadth-first search
+        /// Used for room validation and navigation graph generation
+        /// </summary>
+        [BurstCompile]
+        /// <param name="maxPositions">Optional limit on the number of positions to explore (prevents excessive search in large rooms).</param>
+        public static void GenerateReachablePositions(int2 startPos, Ability availableMovement, JumpArcPhysics physics, 
+                                                     RectInt roomBounds, NativeList<int2> reachablePositions, Allocator allocator, int maxPositions = int.MaxValue)
+        {
+            if (!reachablePositions.IsCreated)
+                return;
+                
+            var visited = new NativeHashSet<int2>(roomBounds.width * roomBounds.height, allocator);
+            var queue = new NativeQueue<int2>(allocator);
+            
+            queue.Enqueue(startPos);
+            visited.Add(startPos);
+            reachablePositions.Add(startPos);
+            
+            // Movement offsets for different abilities
+            var basicMovement = new NativeArray<int2>(8, allocator);
+            basicMovement[0] = new int2(1, 0);   // Right
+            basicMovement[1] = new int2(-1, 0);  // Left
+            basicMovement[2] = new int2(0, 1);   // Up
+            basicMovement[3] = new int2(0, -1);  // Down
+            basicMovement[4] = new int2(1, 1);   // Diagonal up-right
+            basicMovement[5] = new int2(-1, 1);  // Diagonal up-left
+            basicMovement[6] = new int2(1, -1);  // Diagonal down-right
+            basicMovement[7] = new int2(-1, -1); // Diagonal down-left
+            
+            while (queue.TryDequeue(out int2 currentPos))
+            {
+                // Check all basic movement directions
+                for (int i = 0; i < basicMovement.Length; i++)
                 {
-                    if (obstacles[i].x == currentPos.x && obstacles[i].y == currentPos.y)
-                        return false;
+                    var offset = basicMovement[i];
+                    var newPos = currentPos + offset;
+                    
+                    if (!IsWithinBounds(newPos, roomBounds) || visited.Contains(newPos))
+                        continue;
+                        
+                    if (IsPositionReachable(currentPos, newPos, availableMovement, physics))
+                    {
+                        visited.Add(newPos);
+                        queue.Enqueue(newPos);
+                        reachablePositions.Add(newPos);
+                    }
                 }
                 
-                if (x == x1 && y == y1) break;
-                
-                int e2 = 2 * err;
-                if (e2 > -dy)
+                // Check jump-specific positions
+                if ((availableMovement & Ability.Jump) != 0)
                 {
-                    err -= dy;
-                    x += sx;
+                    AddJumpReachablePositions(currentPos, physics, roomBounds, availableMovement, visited, queue, reachablePositions);
                 }
-                if (e2 < dx)
+                
+                // Check dash-specific positions
+                if ((availableMovement & Ability.Dash) != 0)
                 {
-                    err += dx;
-                    y += sy;
+                    AddDashReachablePositions(currentPos, physics, roomBounds, visited, queue, reachablePositions);
                 }
             }
             
-            return true;
+            basicMovement.Dispose();
+            visited.Dispose();
+            queue.Dispose();
         }
-        
-        /// <summary>
-        /// Calculate jump vectors between platforms for navigation
-        /// </summary>
-        public static NativeArray<float2> CalculateJumpVectors(NativeArray<float2> platforms, 
-                                                              in JumpPhysicsData physics, 
-                                                              Allocator allocator)
+
+        [BurstCompile]
+        private static bool IsWithinBounds(int2 position, RectInt bounds)
         {
-            var jumpVectors = new NativeArray<float2>(platforms.Length * platforms.Length, allocator);
-            int vectorIndex = 0;
+            return position.x >= bounds.x && position.x < bounds.x + bounds.width &&
+                   position.y >= bounds.y && position.y < bounds.y + bounds.height;
+        }
+
+        [BurstCompile]
+        private static void AddJumpReachablePositions(int2 currentPos, JumpArcPhysics physics, RectInt roomBounds, 
+                                                     Ability availableMovement, NativeHashSet<int2> visited, 
+                                                     NativeQueue<int2> queue, NativeList<int2> reachablePositions)
+        {
+            int jumpRange = (int)physics.JumpDistance;
+            int jumpHeight = (int)physics.JumpHeight;
             
-            for (int i = 0; i < platforms.Length; i++)
+            // Check positions within jump range
+            for (int x = -jumpRange; x <= jumpRange; x++)
             {
-                for (int j = 0; j < platforms.Length; j++)
+                for (int y = -jumpHeight; y <= jumpHeight; y++)
                 {
-                    if (i == j) continue;
+                    if (x == 0 && y == 0) continue;
                     
-                    float2 from = platforms[i];
-                    float2 to = platforms[j];
+                    var targetPos = currentPos + new int2(x, y);
                     
-                    if (IsReachable(from, to, physics))
+                    if (!IsWithinBounds(targetPos, roomBounds) || visited.Contains(targetPos))
+                        continue;
+                        
+                    if (IsPositionReachable(currentPos, targetPos, availableMovement, physics))
                     {
-                        jumpVectors[vectorIndex] = to - from;
-                        vectorIndex++;
+                        visited.Add(targetPos);
+                        queue.Enqueue(targetPos);
+                        reachablePositions.Add(targetPos);
                     }
                 }
             }
-            
-            // Resize to actual number of valid vectors
-            var validVectors = new NativeArray<float2>(vectorIndex, allocator);
-            for (int i = 0; i < vectorIndex; i++)
-            {
-                validVectors[i] = jumpVectors[i];
-            }
-            
-            jumpVectors.Dispose();
-            return validVectors;
         }
-        
-        /// <summary>
-        /// Validate that a room layout has reachable connections between critical points
-        /// </summary>
-        public static bool ValidateRoomReachability(NativeArray<float2> criticalPoints,
-                                                   NativeArray<int2> obstacles,
-                                                   in JumpPhysicsData physics)
+
+        [BurstCompile]
+        private static void AddDashReachablePositions(int2 currentPos, JumpArcPhysics physics, RectInt roomBounds,
+                                                     NativeHashSet<int2> visited, NativeQueue<int2> queue, 
+                                                     NativeList<int2> reachablePositions)
         {
-            if (criticalPoints.Length < 2) return true;
+            int dashRange = (int)physics.DashDistance;
             
-            // Check that each critical point can reach at least one other critical point
-            for (int i = 0; i < criticalPoints.Length; i++)
+            // Horizontal dash positions
+            for (int x = -dashRange; x <= dashRange; x++)
             {
-                bool canReachAny = false;
+                if (x == 0) continue;
                 
-                for (int j = 0; j < criticalPoints.Length; j++)
+                var targetPos = currentPos + new int2(x, 0);
+                
+                if (IsWithinBounds(targetPos, roomBounds) && !visited.Contains(targetPos))
                 {
-                    if (i == j) continue;
-                    
-                    if (IsReachable(criticalPoints[i], criticalPoints[j], physics) &&
-                        IsPathClear(criticalPoints[i], criticalPoints[j], obstacles))
+                    visited.Add(targetPos);
+                    queue.Enqueue(targetPos);
+                    reachablePositions.Add(targetPos);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Validate that all critical positions in a room are reachable from the entrance
+        /// Used during room generation to ensure completability
+        /// </summary>
+        [BurstCompile]
+        public static bool ValidateRoomReachability(int2 entrancePos, NativeArray<int2> criticalPositions, 
+                                                   Ability playerMovement, JumpArcPhysics physics, RectInt roomBounds, Allocator allocator)
+        {
+            var reachablePositions = new NativeList<int2>(roomBounds.width * roomBounds.height, allocator);
+            GenerateReachablePositions(entrancePos, playerMovement, physics, roomBounds, reachablePositions, allocator);
+            
+            bool allReachable = true;
+            for (int i = 0; i < criticalPositions.Length; i++)
+            {
+                bool found = false;
+                for (int j = 0; j < reachablePositions.Length; j++)
+                {
+                    if (math.all(reachablePositions[j] == criticalPositions[i]))
                     {
-                        canReachAny = true;
+                        found = true;
                         break;
                     }
                 }
-                
-                if (!canReachAny) return false;
-            }
-            
-            return true;
-        }
-        
-        /// <summary>
-        /// Calculate minimum platform spacing for a given jump difficulty
-        /// </summary>
-        public static float2 CalculateMinimumPlatformSpacing(in JumpPhysicsData physics, float difficulty = 0.5f)
-        {
-            // Scale spacing based on difficulty (0.0 = easy, 1.0 = maximum challenge)
-            float horizontalSpacing = math.lerp(1.0f, physics.MaxJumpDistance * 0.9f, difficulty);
-            float verticalSpacing = math.lerp(0.5f, physics.MaxJumpHeight * 0.9f, difficulty);
-            
-            return new float2(horizontalSpacing, verticalSpacing);
-        }
-        
-        /// <summary>
-        /// Calculate optimal jump arc for reaching a target
-        /// </summary>
-        public static bool CalculateJumpArc(float2 startPos, float2 targetPos, in JumpPhysicsData physics,
-                                          out float launchAngle, out float launchVelocity)
-        {
-            launchAngle = 0;
-            launchVelocity = 0;
-            
-            float deltaX = targetPos.x - startPos.x;
-            float deltaY = targetPos.y - startPos.y;
-            
-            // Check if target is within range
-            if (math.abs(deltaX) > physics.MaxJumpDistance || deltaY > physics.MaxJumpHeight)
-                return false;
-
-            // Handle vertical jump (deltaX == 0) to avoid division by zero
-            if (math.abs(deltaX) < 1e-5f)
-            {
-                // For a vertical jump, the launch angle is 90 degrees (pi/2)
-                // The required velocity is determined by the height difference and gravity
-                float g = physics.Gravity;
-                if (deltaY < 0)
+                if (!found)
                 {
-                    // Can't jump down vertically (falling, not jumping)
-                    return false;
+                    allReachable = false;
+                    break;
                 }
-                // v^2 = 2 * g * deltaY
-                float v0_squared = 2f * g * deltaY;
-                if (v0_squared <= 0) return false;
-                launchVelocity = math.sqrt(v0_squared);
-                launchAngle = math.PI / 2f; // 90 degrees
-                return true;
             }
-
-            // Calculate launch parameters for parabolic trajectory
-            float g2 = physics.Gravity;
-            float v0_squared2 = g2 * (deltaX * deltaX) / (deltaX * math.sin(2 * math.PI/4) - 2 * deltaY * math.cos(math.PI/4) * math.cos(math.PI/4));
             
-            if (v0_squared2 <= 0) return false;
-            
-            launchVelocity = math.sqrt(v0_squared2);
-            launchAngle = math.PI / 4; // 45 degrees for optimal distance
-            
-            return true;
-        }
-        
-        [BurstCompile]
-        private static bool CanReachWithParabolicArc(float deltaX, float deltaY, in JumpPhysicsData physics)
-        {
-            float g = physics.Gravity;
-            float v0 = math.sqrt(2 * g * physics.MaxJumpHeight); // Initial velocity for max height
-            
-            // Check if trajectory can reach the target
-            float discriminant = (v0 * v0) * (v0 * v0) - g * (g * deltaX * deltaX + 2 * deltaY * v0 * v0);
-            
-            return discriminant >= 0;
-        }
-    }
-    
-    /// <summary>
-    /// Component to store jump arc validation results
-    /// </summary>
-    public struct JumpArcValidation : IComponentData
-    {
-        public bool IsValidated;
-        public bool IsReachable;
-        public float ValidationTime;
-        public int TestedConnections;
-        public int ValidConnections;
-        
-        public JumpArcValidation(bool isReachable, int testedConnections, int validConnections)
-        {
-            IsValidated = true;
-            IsReachable = isReachable;
-            ValidationTime = UnityEngine.Time.time;
-            TestedConnections = testedConnections;
-            ValidConnections = validConnections;
-        }
-    }
-    
-    /// <summary>
-    /// Buffer element for storing valid jump connections
-    /// </summary>
-    public struct JumpConnectionElement : IBufferElementData
-    {
-        public float2 FromPosition;
-        public float2 ToPosition;
-        public float LaunchAngle;
-        public float LaunchVelocity;
-        public Ability RequiredSkill;
-        
-        public JumpConnectionElement(float2 from, float2 to, float angle, float velocity, 
-                                   Ability skill = Ability.None)
-        {
-            FromPosition = from;
-            ToPosition = to;
-            LaunchAngle = angle;
-            LaunchVelocity = velocity;
-            RequiredSkill = skill;
+            reachablePositions.Dispose();
+            return allReachable;
         }
     }
 }
