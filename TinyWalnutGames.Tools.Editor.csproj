@@ -9,11 +9,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>TinyWalnutGames.MetVD.Authoring.Editor</RootNamespace>
-    <ProjectGuid>{2DDE79F6-EE58-C055-E19C-8CF00E5B0F1D}</ProjectGuid>
+    <RootNamespace>TinyWalnutGames.Tools.Editor</RootNamespace>
+    <ProjectGuid>{54AF92FA-E09D-D5AC-820C-76EFC9812DD4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>TinyWalnutGames.MetVD.Authoring.Editor</AssemblyName>
+    <AssemblyName>TinyWalnutGames.Tools.Editor</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -59,42 +59,13 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\AspectGenerator.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\JobEntityGenerator.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.LambdaJobs.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.SystemAPI.QueryBuilder.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.SystemAPI.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.SystemAPI.Query.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.Common.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Common.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\SystemGenerator.EntityQueryBulkOperations.dll" />
-    <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\DistrictBaker.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\BiomeFieldBaker.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldConfigurationBaker.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoDrawer.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapDemo.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVDWorldDebugWindow.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\ProceduralLayoutPreview.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Sync\DistrictPlacementSyncSystem.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapAuthoringInspector.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNSceneBootstrap.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\ConnectionBaker.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileInspector.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BatchSpriteSlicer.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileEditor.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldBootstrapBaker.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoSettings.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileSamples.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\GateConditionBaker.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\ProceduralLayoutGizmoDrawer.cs" />
+    <Compile Include="Assets\Tools\Editor\BiomeRegionExtractor.cs" />
+    <Compile Include="Assets\Tools\Editor\BatchSpriteSlicer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\MetVanDAMN\Authoring\Editor\TinyWalnutGames.MetVD.Authoring.Editor.asmdef" />
+    <None Include="Assets\Tools\Editor\TinyWalnutGames.Tools.Editor.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1197,34 +1168,6 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Xml.XPath.XDocument.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Burst">
-      <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Collections">
-      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Entities">
-      <HintPath>Library\ScriptAssemblies\Unity.Entities.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Entities.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Entities.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Entities.Hybrid">
-      <HintPath>Library\ScriptAssemblies\Unity.Entities.Hybrid.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Mathematics">
-      <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Scenes">
-      <HintPath>Library\ScriptAssemblies\Unity.Scenes.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
       <Private>False</Private>
@@ -1243,34 +1186,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="TinyWalnutGames.MetVD.Authoring.csproj">
-      <Project>{1C947371-7B21-A5C5-A553-6A4F3D0F5CFC}</Project>
-      <Name>TinyWalnutGames.MetVD.Authoring</Name>
-    </ProjectReference>
-    <ProjectReference Include="TinyWalnutGames.MetVD.Biome.csproj">
-      <Project>{657EBCB1-E90D-F326-9D47-83652F99795B}</Project>
-      <Name>TinyWalnutGames.MetVD.Biome</Name>
-    </ProjectReference>
-    <ProjectReference Include="TinyWalnutGames.MetVD.Core.csproj">
-      <Project>{4C65C270-6B4A-86F0-414F-15C2B74B3280}</Project>
-      <Name>TinyWalnutGames.MetVD.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="TinyWalnutGames.MetVD.Graph.csproj">
-      <Project>{E4E50120-3677-2516-6933-2F6698D8F8BC}</Project>
-      <Name>TinyWalnutGames.MetVD.Graph</Name>
-    </ProjectReference>
-    <ProjectReference Include="TinyWalnutGames.MetVD.Samples.csproj">
-      <Project>{077B9EBE-F88F-C8BA-6798-C73D2EAC959F}</Project>
-      <Name>TinyWalnutGames.MetVD.Samples</Name>
-    </ProjectReference>
-    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.csproj">
-      <Project>{6BEF65E0-E1A3-6D7E-9453-DA8D0FDF65FD}</Project>
-      <Name>TinyWalnutGames.MetVD.Shared</Name>
-    </ProjectReference>
-    <ProjectReference Include="TinyWalnutGames.MetVD.Utility.csproj">
-      <Project>{B929F59F-9716-BF18-93BC-E56A67BCECDE}</Project>
-      <Name>TinyWalnutGames.MetVD.Utility</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

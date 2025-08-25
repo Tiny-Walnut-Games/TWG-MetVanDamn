@@ -74,11 +74,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\DistrictLayoutTags.cs" />
-    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Connection.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\WorldBootstrapComponents.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BuildConnectionBuffersSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\ConnectionEdge.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Connection.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\NodeId.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Biome.cs" />
-    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\ConnectionEdge.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\GateCondition.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -398,7 +399,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -919,6 +920,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.Player.csproj">
+      <Project>{48CCF777-0B65-3DF8-17E2-3AECF5BDA8CE}</Project>
+      <Name>TinyWalnutGames.MetVD.Shared.Player</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
