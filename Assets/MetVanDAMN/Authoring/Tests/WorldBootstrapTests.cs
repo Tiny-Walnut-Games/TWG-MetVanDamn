@@ -61,21 +61,33 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         public void WorldBootstrapConfiguration_CanBeAddedToEntity()
         {
             var entity = entityManager.CreateEntity();
-            var config = new WorldBootstrapConfiguration(
+            var worldSettings = new WorldSettings(
                 seed: 12345,
                 worldSize: new int2(32, 32),
-                randomizationMode: RandomizationMode.Full,
+                randomizationMode: RandomizationMode.Full
+            );
+            var biomeSettings = new BiomeSettings(
                 biomeCountRange: new int2(2, 4),
-                biomeWeight: 0.8f,
+                biomeWeight: 0.8f
+            );
+            var districtSettings = new DistrictSettings(
                 districtCountRange: new int2(3, 8),
                 districtMinDistance: 10f,
                 districtWeight: 1.2f,
                 sectorsPerDistrictRange: new int2(1, 6),
                 sectorGridSize: new int2(4, 4),
                 roomsPerSectorRange: new int2(2, 10),
-                targetLoopDensity: 0.5f,
+                targetLoopDensity: 0.5f
+            );
+            var debugSettings = new DebugSettings(
                 enableDebugVisualization: false,
                 logGenerationSteps: false
+            );
+            var config = new WorldBootstrapConfiguration(
+                worldSettings,
+                biomeSettings,
+                districtSettings,
+                debugSettings
             );
 
             entityManager.AddComponentData(entity, config);
