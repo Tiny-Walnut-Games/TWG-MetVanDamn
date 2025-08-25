@@ -1016,10 +1016,9 @@ namespace TinyWalnutGames.Tools.Editor
             Color maskPixel = maskTexture.GetPixel(x, y);
             
             // Compare colors with tolerance for slight variations
-            float tolerance = 0.1f;
-            return Mathf.Abs(maskPixel.r - biomeColor.r) < tolerance &&
-                   Mathf.Abs(maskPixel.g - biomeColor.g) < tolerance &&
-                   Mathf.Abs(maskPixel.b - biomeColor.b) < tolerance;
+            return Mathf.Abs(maskPixel.r - biomeColor.r) < ColorComparisonTolerance &&
+                   Mathf.Abs(maskPixel.g - biomeColor.g) < ColorComparisonTolerance &&
+                   Mathf.Abs(maskPixel.b - biomeColor.b) < ColorComparisonTolerance;
         }
         
         private string GenerateSpriteName(string biomeName, int row, int col)
