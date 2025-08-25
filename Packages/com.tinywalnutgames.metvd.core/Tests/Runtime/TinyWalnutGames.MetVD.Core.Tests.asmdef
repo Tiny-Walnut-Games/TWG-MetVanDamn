@@ -1,25 +1,21 @@
 {
-    "name": "TinyWalnutGames.MetVD.Core.Tests",
-    "rootNamespace": "TinyWalnutGames.MetVD.Core",
-    "references": [
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "TinyWalnutGames.MetVD.Core",
-        "Unity.Entities",
-        "Unity.Mathematics",
-        "Unity.Collections"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
-    "autoReferenced": true,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
-    ],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "TinyWalnutGames.MetVD.Core.Tests",
+  "rootNamespace": "TinyWalnutGames.MetVD.Core",
+  "references": [
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner",
+    "TinyWalnutGames.MetVD.Core",
+    "Unity.Entities",
+    "Unity.Mathematics",
+    "Unity.Collections"
+  ],
+  "includePlatforms": [ "Editor" ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [ "nunit.framework.dll" ],
+  "autoReferenced": true,
+  "defineConstraints": [ "UNITY_INCLUDE_TESTS" ],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

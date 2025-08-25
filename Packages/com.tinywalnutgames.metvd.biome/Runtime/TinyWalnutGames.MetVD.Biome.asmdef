@@ -1,21 +1,21 @@
 {
-    "name": "TinyWalnutGames.MetVD.Biome",
-    "rootNamespace": "TinyWalnutGames.MetVD.Biome",
-    "references": [
-        "Unity.Burst",
-        "Unity.Collections",
-        "Unity.Entities",
-        "Unity.Mathematics",
-        "TinyWalnutGames.MetVD.Core",
-        "TinyWalnutGames.MetVD.Utility"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "TinyWalnutGames.MetVD.Biome",
+  "rootNamespace": "TinyWalnutGames.MetVD.Biome",
+  "references": [
+    "Unity.Burst",
+    "Unity.Collections",
+    "Unity.Entities",
+    "Unity.Mathematics",
+    "TinyWalnutGames.MetVD.Core",
+    "TinyWalnutGames.MetVD.Utility"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

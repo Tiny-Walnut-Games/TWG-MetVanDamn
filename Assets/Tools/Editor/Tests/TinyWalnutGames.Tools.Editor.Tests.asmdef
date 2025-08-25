@@ -1,24 +1,18 @@
 {
-    "name": "TinyWalnutGames.Tools.Editor.Tests",
-    "rootNamespace": "TinyWalnutGames.Tools.Editor.Tests",
-    "references": [
-        "TinyWalnutGames.Tools.Editor",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": true,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
-    "autoReferenced": false,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
-    ],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "TinyWalnutGames.Tools.Editor.Tests",
+  "rootNamespace": "TinyWalnutGames.Tools.Editor.Tests",
+  "references": [
+    "TinyWalnutGames.Tools.Editor",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner"
+  ],
+  "includePlatforms": [ "Editor" ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [ "nunit.framework.dll" ],
+  "autoReferenced": false,
+  "defineConstraints": [ "UNITY_INCLUDE_TESTS" ],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

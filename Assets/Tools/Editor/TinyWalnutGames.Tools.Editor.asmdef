@@ -2,7 +2,9 @@
     "name": "TinyWalnutGames.Tools.Editor",
     "rootNamespace": "TinyWalnutGames.Tools.Editor",
     "references": [
-        "UnityEditor.U2D.Sprites"
+        "UnityEditor",
+        "UnityEditor.U2D.Sprites",
+        "Unity.2D.Sprite.Editor"
     ],
     "includePlatforms": [
         "Editor"

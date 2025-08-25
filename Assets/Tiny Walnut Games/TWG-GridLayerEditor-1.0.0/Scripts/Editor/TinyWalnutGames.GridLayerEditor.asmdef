@@ -6,14 +6,13 @@
     "UnityEditor",
     "UnityEngine.TilemapModule"
   ],
-  "includePlatforms": [
-    "Editor"
-  ],
+  "includePlatforms": [ "Editor" ],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,
   "precompiledReferences": [],
   "autoReferenced": true,
   "defineConstraints": [],
-  "versionDefines": []
+  "versionDefines": [],
+  "noEngineReferences": false
 }

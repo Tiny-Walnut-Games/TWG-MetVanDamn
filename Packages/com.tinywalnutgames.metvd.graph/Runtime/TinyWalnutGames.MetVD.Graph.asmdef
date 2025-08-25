@@ -1,23 +1,23 @@
 {
-    "name": "TinyWalnutGames.MetVD.Graph",
-    "rootNamespace": "TinyWalnutGames.MetVD.Graph",
-    "references": [
-        "Unity.Burst",
-        "Unity.Collections",
-        "Unity.Entities",
-        "Unity.Mathematics",
-        "Unity.Transforms",
-        "TinyWalnutGames.MetVD.Biome",
-        "TinyWalnutGames.MetVD.Core",
-        "TinyWalnutGames.MetVD.Shared"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "TinyWalnutGames.MetVD.Graph",
+  "rootNamespace": "TinyWalnutGames.MetVD.Graph",
+  "references": [
+    "Unity.Burst",
+    "Unity.Collections",
+    "Unity.Entities",
+    "Unity.Mathematics",
+    "Unity.Transforms",
+    "TinyWalnutGames.MetVD.Biome",
+    "TinyWalnutGames.MetVD.Core",
+    "TinyWalnutGames.MetVD.Shared"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }
