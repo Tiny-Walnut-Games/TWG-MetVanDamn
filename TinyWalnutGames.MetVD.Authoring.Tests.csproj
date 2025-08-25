@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtProfileTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WorldBootstrapTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\MetVanDAMN\Authoring\Tests\TinyWalnutGames.MetVD.Authoring.Tests.asmdef" />
