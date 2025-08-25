@@ -398,8 +398,8 @@ MonoBehaviour:
   level: 0
   parentId: 0
   gridCoordinates:
-    x: 0
-    y: 0
+    x: 63
+    y: 54
   targetLoopDensity: 0.3
   initialWfcState: 1
 --- !u!114 &828339182
@@ -613,8 +613,8 @@ MonoBehaviour:
   level: 0
   parentId: 0
   gridCoordinates:
-    x: 0
-    y: 0
+    x: 49
+    y: 25
   targetLoopDensity: 0.3
   initialWfcState: 1
 --- !u!114 &1082815471
@@ -733,8 +733,8 @@ MonoBehaviour:
   level: 0
   parentId: 0
   gridCoordinates:
-    x: 0
-    y: 0
+    x: 11
+    y: 7
   targetLoopDensity: 0.3
   initialWfcState: 1
 --- !u!114 &1293838501
@@ -804,8 +804,8 @@ MonoBehaviour:
   level: 0
   parentId: 0
   gridCoordinates:
-    x: 0
-    y: 0
+    x: 35
+    y: 32
   targetLoopDensity: 0.3
   initialWfcState: 1
 --- !u!114 &1336439221
@@ -875,8 +875,8 @@ MonoBehaviour:
   level: 0
   parentId: 0
   gridCoordinates:
-    x: 0
-    y: 0
+    x: 45
+    y: 41
   targetLoopDensity: 0.3
   initialWfcState: 1
 --- !u!114 &1387375500
@@ -995,8 +995,8 @@ MonoBehaviour:
   level: 0
   parentId: 0
   gridCoordinates:
-    x: 0
-    y: 0
+    x: 10
+    y: 48
   targetLoopDensity: 0.3
   initialWfcState: 1
 --- !u!114 &1587047816
