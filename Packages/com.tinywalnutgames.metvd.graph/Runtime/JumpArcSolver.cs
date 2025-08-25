@@ -120,8 +120,9 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Used for room validation and navigation graph generation
         /// </summary>
         [BurstCompile]
+        /// <param name="maxPositions">Optional limit on the number of positions to explore (prevents excessive search in large rooms).</param>
         public static void GenerateReachablePositions(int2 startPos, Ability availableMovement, JumpArcPhysics physics, 
-                                                     RectInt roomBounds, NativeList<int2> reachablePositions, Allocator allocator)
+                                                     RectInt roomBounds, NativeList<int2> reachablePositions, Allocator allocator, int maxPositions = int.MaxValue)
         {
             if (!reachablePositions.IsCreated)
                 return;
