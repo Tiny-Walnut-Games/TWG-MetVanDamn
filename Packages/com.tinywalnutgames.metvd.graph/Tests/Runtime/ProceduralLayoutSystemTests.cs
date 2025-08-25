@@ -15,12 +15,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
     {
         private World _testWorld;
         private EntityManager _entityManager;
+        private InitializationSystemGroup _initGroup;
 
         [SetUp]
         public void SetUp()
         {
             _testWorld = new World("TestWorld");
             _entityManager = _testWorld.EntityManager;
+            _initGroup = _testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
         }
 
         [TearDown]
@@ -56,7 +58,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
             // Act
             var layoutSystemHandle = _testWorld.CreateSystem<DistrictLayoutSystem>();
-            _testWorld.Update();
+            _initGroup.AddSystemToUpdateList(layoutSystemHandle);
+            _initGroup.SortSystems();
+            _initGroup.Update();
 
             // Assert
             var node1 = _entityManager.GetComponentData<NodeId>(district1);
@@ -87,9 +91,23 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var layoutDone = _entityManager.CreateEntity();
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(3, 0));
 
-            // Act
+            // Create test districts to satisfy ConnectionBuilderSystem requirements
+            var district1 = _entityManager.CreateEntity();
+            _entityManager.AddComponentData(district1, new NodeId(1, 0, 0, new int2(1, 1)));
+            _entityManager.AddBuffer<ConnectionBufferElement>(district1);
+
+            var district2 = _entityManager.CreateEntity();
+            _entityManager.AddComponentData(district2, new NodeId(2, 0, 0, new int2(2, 2)));
+            _entityManager.AddBuffer<ConnectionBufferElement>(district2);
+
+            // Act - Run systems in dependency order
+            var connectionSystemHandle = _testWorld.CreateSystem<ConnectionBuilderSystem>();
+            _initGroup.AddSystemToUpdateList(connectionSystemHandle);
+            
             var ruleSystemHandle = _testWorld.CreateSystem<RuleRandomizationSystem>();
-            _testWorld.Update();
+            _initGroup.AddSystemToUpdateList(ruleSystemHandle);
+            _initGroup.SortSystems();
+            _initGroup.Update();
 
             // Assert
             using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
@@ -119,9 +137,23 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var layoutDone = _entityManager.CreateEntity();
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(8, 0));
 
-            // Act
+            // Create test districts to satisfy ConnectionBuilderSystem requirements
+            var district1 = _entityManager.CreateEntity();
+            _entityManager.AddComponentData(district1, new NodeId(1, 0, 0, new int2(1, 1)));
+            _entityManager.AddBuffer<ConnectionBufferElement>(district1);
+
+            var district2 = _entityManager.CreateEntity();
+            _entityManager.AddComponentData(district2, new NodeId(2, 0, 0, new int2(2, 2)));
+            _entityManager.AddBuffer<ConnectionBufferElement>(district2);
+
+            // Act - Run systems in dependency order
+            var connectionSystemHandle2 = _testWorld.CreateSystem<ConnectionBuilderSystem>();
+            _initGroup.AddSystemToUpdateList(connectionSystemHandle2);
+            
             var ruleSystemHandle2 = _testWorld.CreateSystem<RuleRandomizationSystem>();
-            _testWorld.Update();
+            _initGroup.AddSystemToUpdateList(ruleSystemHandle2);
+            _initGroup.SortSystems();
+            _initGroup.Update();
 
             // Assert
             using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
@@ -152,9 +184,23 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var layoutDone = _entityManager.CreateEntity();
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(4, 0));
 
-            // Act
+            // Create test districts to satisfy ConnectionBuilderSystem requirements
+            var district1 = _entityManager.CreateEntity();
+            _entityManager.AddComponentData(district1, new NodeId(1, 0, 0, new int2(1, 1)));
+            _entityManager.AddBuffer<ConnectionBufferElement>(district1);
+
+            var district2 = _entityManager.CreateEntity();
+            _entityManager.AddComponentData(district2, new NodeId(2, 0, 0, new int2(2, 2)));
+            _entityManager.AddBuffer<ConnectionBufferElement>(district2);
+
+            // Act - Run systems in dependency order
+            var connectionSystemHandle3 = _testWorld.CreateSystem<ConnectionBuilderSystem>();
+            _initGroup.AddSystemToUpdateList(connectionSystemHandle3);
+            
             var ruleSystemHandle3 = _testWorld.CreateSystem<RuleRandomizationSystem>();
-            _testWorld.Update();
+            _initGroup.AddSystemToUpdateList(ruleSystemHandle3);
+            _initGroup.SortSystems();
+            _initGroup.Update();
 
             // Assert
             using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
