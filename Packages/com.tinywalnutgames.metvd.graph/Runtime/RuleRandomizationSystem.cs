@@ -73,9 +73,15 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _worldConfigQuery = state.GetEntityQuery(ComponentType.ReadOnly<WorldConfiguration>());
-            _layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadOnly<DistrictLayoutDoneTag>());
-            _rulesDoneQuery = state.GetEntityQuery(ComponentType.ReadOnly<RuleRandomizationDoneTag>());
+            _worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<WorldConfiguration>()
+                .Build(ref state);
+            _layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<DistrictLayoutDoneTag>()
+                .Build(ref state);
+            _rulesDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RuleRandomizationDoneTag>()
+                .Build(ref state);
 
             state.RequireForUpdate(_worldConfigQuery);
             state.RequireForUpdate(_layoutDoneQuery);

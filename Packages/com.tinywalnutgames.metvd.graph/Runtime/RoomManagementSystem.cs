@@ -130,16 +130,13 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _roomsQuery = state.GetEntityQuery(
-                ComponentType.ReadWrite<RoomHierarchyData>(),
-                ComponentType.ReadOnly<NodeId>()
-            );
-            
-            _sectorsQuery = state.GetEntityQuery(
-                ComponentType.ReadOnly<SectorHierarchyData>(),
-                ComponentType.ReadOnly<NodeId>()
-            );
-
+            // Use EntityQueryBuilder to avoid managed params array allocation
+            _roomsQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RoomHierarchyData, NodeId>()
+                .Build(ref state);
+            _sectorsQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<SectorHierarchyData, NodeId>()
+                .Build(ref state);
             state.RequireForUpdate(_roomsQuery);
         }
 
