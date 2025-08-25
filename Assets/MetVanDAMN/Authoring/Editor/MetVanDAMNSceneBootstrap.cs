@@ -145,11 +145,56 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 #else
         private static void CreateBootstrapMono()
         {
-            Type bootstrapType = FindTypeAnywhere("TinyWalnutGames.MetVD.Samples.SmokeTestSceneSetup");
             GameObject go = new("Bootstrap");
+            
+            // Try to add WorldBootstrapAuthoring if available, fallback to SmokeTestSceneSetup
+            Type worldBootstrapType = FindTypeAnywhere("TinyWalnutGames.MetVD.Authoring.WorldBootstrapAuthoring");
+            if (worldBootstrapType != null)
+            {
+                Component bootstrapComp = go.AddComponent(worldBootstrapType);
+                try
+                {
+                    SerializedObject so = new(bootstrapComp);
+                    SerializedProperty seedProp = so.FindProperty("seed");
+                    if (seedProp != null) seedProp.intValue = 42;
+                    SerializedProperty worldSizeProp = so.FindProperty("worldSize");
+                    if (worldSizeProp != null)
+                    {
+                        SerializedProperty x = worldSizeProp.FindPropertyRelative("x");
+                        SerializedProperty y = worldSizeProp.FindPropertyRelative("y");
+                        if (x != null) x.intValue = 50;
+                        if (y != null) y.intValue = 50;
+                    }
+                    SerializedProperty districtCountProp = so.FindProperty("districtCount");
+                    if (districtCountProp != null)
+                    {
+                        SerializedProperty x = districtCountProp.FindPropertyRelative("x");
+                        SerializedProperty y = districtCountProp.FindPropertyRelative("y");
+                        if (x != null) x.intValue = 3;
+                        if (y != null) y.intValue = 8;
+                    }
+                    SerializedProperty sectorsPerDistrictProp = so.FindProperty("sectorsPerDistrict");
+                    if (sectorsPerDistrictProp != null)
+                    {
+                        SerializedProperty x = sectorsPerDistrictProp.FindPropertyRelative("x");
+                        SerializedProperty y = sectorsPerDistrictProp.FindPropertyRelative("y");
+                        if (x != null) x.intValue = 2;
+                        if (y != null) y.intValue = 5;
+                    }
+                    so.ApplyModifiedPropertiesWithoutUndo();
+                    Debug.Log("✅ Created WorldBootstrapAuthoring with procedural generation settings");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("WorldBootstrapAuthoring property initialization failed: " + e.Message);
+                }
+                return;
+            }
+
+            Type bootstrapType = FindTypeAnywhere("TinyWalnutGames.MetVD.Samples.SmokeTestSceneSetup");
             if (bootstrapType == null)
             {
-                Debug.LogWarning("⚠️ SmokeTestSceneSetup type not found. Baseline scene created without runtime bootstrap. (Define METVD_FULL_DOTS for direct mode.)");
+                Debug.LogWarning("⚠️ Neither WorldBootstrapAuthoring nor SmokeTestSceneSetup type found. Baseline scene created without runtime bootstrap. (Define METVD_FULL_DOTS for direct mode.)");
                 return;
             }
             Component comp = go.AddComponent(bootstrapType);
