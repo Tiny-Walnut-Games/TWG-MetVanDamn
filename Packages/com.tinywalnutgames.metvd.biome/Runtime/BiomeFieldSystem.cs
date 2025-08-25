@@ -211,7 +211,7 @@ namespace TinyWalnutGames.MetVD.Biome
     /// <summary>
     /// Utility system for biome validation and debugging
     /// </summary>
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(SimulationSystemGroup))] // moved from Presentation to Simulation so ordering attribute is valid
     public partial class BiomeValidationSystem : SystemBase
     {
         private ComponentLookup<Core.Biome> biomeLookup;
@@ -351,8 +351,8 @@ namespace TinyWalnutGames.MetVD.Biome
             if (_missingBufferQuery.IsEmptyIgnoreFilter)
                 return;
 
-            var entities = _missingBufferQuery.ToEntityArray(Allocator.Temp);
-            var ecb = new EntityCommandBuffer(Allocator.Temp);
+            var entities = _missingBufferQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
             for (int i = 0; i < entities.Length; i++)
             {
                 ecb.AddBuffer<BiomeValidationRecord>(entities[i]);

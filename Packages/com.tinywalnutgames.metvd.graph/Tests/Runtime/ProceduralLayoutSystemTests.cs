@@ -9,7 +9,7 @@ using TinyWalnutGames.MetVD.Shared;
 namespace TinyWalnutGames.MetVD.Graph.Tests
 {
     /// <summary>
-    /// Tests for the procedural layout system
+    /// Tests for the procedural layout system and rule randomization using actual unmanaged systems.
     /// </summary>
     public class ProceduralLayoutSystemTests
     {
@@ -23,15 +23,25 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _testWorld = new World("TestWorld");
             _entityManager = _testWorld.EntityManager;
             _initGroup = _testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+
+            // Create unmanaged systems (District layout -> connections -> rules -> sector/room hierarchy)
+            var layoutHandle = _testWorld.CreateSystem(typeof(DistrictLayoutSystem));
+            var connectionHandle = _testWorld.CreateSystem(typeof(ConnectionBuilderSystem));
+            var rulesHandle = _testWorld.CreateSystem(typeof(RuleRandomizationSystem));
+            var sectorRoomHandle = _testWorld.CreateSystem(typeof(SectorRoomHierarchySystem));
+
+            _initGroup.AddSystemToUpdateList(layoutHandle);
+            _initGroup.AddSystemToUpdateList(connectionHandle);
+            _initGroup.AddSystemToUpdateList(rulesHandle);
+            _initGroup.AddSystemToUpdateList(sectorRoomHandle);
+            _initGroup.SortSystems();
         }
 
         [TearDown]
         public void TearDown()
         {
             if (_testWorld != null && _testWorld.IsCreated)
-            {
                 _testWorld.Dispose();
-            }
         }
 
         [Test]
@@ -57,9 +67,6 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(district2, new WfcState());
 
             // Act
-            var layoutSystemHandle = _testWorld.CreateSystem<DistrictLayoutSystem>();
-            _initGroup.AddSystemToUpdateList(layoutSystemHandle);
-            _initGroup.SortSystems();
             _initGroup.Update();
 
             // Assert
@@ -101,12 +108,6 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddBuffer<ConnectionBufferElement>(district2);
 
             // Act - Run systems in dependency order
-            var connectionSystemHandle = _testWorld.CreateSystem<ConnectionBuilderSystem>();
-            _initGroup.AddSystemToUpdateList(connectionSystemHandle);
-            
-            var ruleSystemHandle = _testWorld.CreateSystem<RuleRandomizationSystem>();
-            _initGroup.AddSystemToUpdateList(ruleSystemHandle);
-            _initGroup.SortSystems();
             _initGroup.Update();
 
             // Assert
@@ -147,22 +148,16 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddBuffer<ConnectionBufferElement>(district2);
 
             // Act - Run systems in dependency order
-            var connectionSystemHandle2 = _testWorld.CreateSystem<ConnectionBuilderSystem>();
-            _initGroup.AddSystemToUpdateList(connectionSystemHandle2);
-            
-            var ruleSystemHandle2 = _testWorld.CreateSystem<RuleRandomizationSystem>();
-            _initGroup.AddSystemToUpdateList(ruleSystemHandle2);
-            _initGroup.SortSystems();
             _initGroup.Update();
 
             // Assert
             using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
             var ruleSet = ruleQuery.GetSingleton<WorldRuleSet>();
-            
+
             Assert.That(ruleSet.BiomePolarityMask, Is.Not.EqualTo(Polarity.None), "Should have assigned biome polarities");
             Assert.That(ruleSet.UpgradesRandomized, Is.True, "Upgrades should be randomized in Full mode");
             Assert.That(ruleSet.AvailableUpgradesMask, Is.Not.EqualTo(0u), "Should have some upgrades available");
-            
+
             // Essential upgrade should always be available (reachability guard)
             uint jumpUpgrade = 1u << 0;
             Assert.That((ruleSet.AvailableUpgradesMask & jumpUpgrade), Is.EqualTo(jumpUpgrade), "Jump upgrade should always be available");
@@ -194,20 +189,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddBuffer<ConnectionBufferElement>(district2);
 
             // Act - Run systems in dependency order
-            var connectionSystemHandle3 = _testWorld.CreateSystem<ConnectionBuilderSystem>();
-            _initGroup.AddSystemToUpdateList(connectionSystemHandle3);
-            
-            var ruleSystemHandle3 = _testWorld.CreateSystem<RuleRandomizationSystem>();
-            _initGroup.AddSystemToUpdateList(ruleSystemHandle3);
-            _initGroup.SortSystems();
             _initGroup.Update();
 
             // Assert
             using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
             var ruleSet = ruleQuery.GetSingleton<WorldRuleSet>();
-            
+
             Assert.That(ruleSet.UpgradesRandomized, Is.False, "Upgrades should not be randomized in None mode");
-            
+
             // Should have curated polarity distribution
             var expectedCuratedPolarities = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold;
             Assert.That(ruleSet.BiomePolarityMask, Is.EqualTo(expectedCuratedPolarities), "Should use curated polarity distribution");

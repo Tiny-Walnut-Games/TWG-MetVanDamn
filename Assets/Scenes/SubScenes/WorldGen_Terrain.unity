@@ -153,6 +153,7 @@ MonoBehaviour:
     x: 64
     y: 64
   targetSectors: 16
+  randomizationMode: 2
 --- !u!4 &127181569
 Transform:
   m_ObjectHideFlags: 0
