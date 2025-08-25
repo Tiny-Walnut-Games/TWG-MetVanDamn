@@ -14,26 +14,24 @@ namespace TinyWalnutGames.MetVD.Graph
     /// 
     /// Runs AFTER room content generation but BEFORE AI pathfinding systems
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(ProceduralRoomGeneratorSystem))]
-    public partial struct RoomNavigationGeneratorSystem : ISystem
+    public partial class RoomNavigationGeneratorSystem : SystemBase
     {
         private EntityQuery _roomsWithContentQuery;
         
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
             // Rooms that have content generated but no navigation generated
             _roomsWithContentQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<NodeId, RoomHierarchyData, RoomTemplate, ProceduralRoomGenerated>()
                 .WithAll<RoomNavigationElement>() // Has navigation buffer
-                .Build(ref state);
+                .Build(this);
                 
-            state.RequireForUpdate(_roomsWithContentQuery);
+            RequireForUpdate(_roomsWithContentQuery);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             using var roomEntities = _roomsWithContentQuery.ToEntityArray(Allocator.Temp);
             using var nodeIds = _roomsWithContentQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
@@ -48,15 +46,15 @@ namespace TinyWalnutGames.MetVD.Graph
                 var template = templates[i];
                 
                 // Check if navigation already generated
-                var genStatus = state.EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+                var genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
                 if (genStatus.NavigationGenerated) continue;
                 
                 // Generate navigation for this room
-                GenerateRoomNavigation(state.EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
+                GenerateRoomNavigation(EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
                 
                 // Update generation status
                 genStatus.NavigationGenerated = true;
-                state.EntityManager.SetComponentData(roomEntity, genStatus);
+                EntityManager.SetComponentData(roomEntity, genStatus);
             }
         }
 

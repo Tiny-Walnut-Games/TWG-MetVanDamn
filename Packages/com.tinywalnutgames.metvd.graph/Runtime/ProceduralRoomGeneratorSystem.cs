@@ -14,32 +14,30 @@ namespace TinyWalnutGames.MetVD.Graph
     /// 
     /// Runs after room hierarchy creation but before navigation/camera systems
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(RoomManagementSystem))]
-    public partial struct ProceduralRoomGeneratorSystem : ISystem
+    public partial class ProceduralRoomGeneratorSystem : SystemBase
     {
         private EntityQuery _roomsToGenerateQuery;
         private EntityQuery _worldConfigQuery;
         
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
             // Rooms that need procedural generation
             _roomsToGenerateQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<NodeId, RoomHierarchyData>()
                 .WithNone<ProceduralRoomGenerated>()
-                .Build(ref state);
+                .Build(this);
                 
             // World configuration for biome and rule access
             _worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<WorldConfiguration>()
-                .Build(ref state);
+                .Build(this);
                 
-            state.RequireForUpdate(_roomsToGenerateQuery);
+            RequireForUpdate(_roomsToGenerateQuery);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             if (_roomsToGenerateQuery.IsEmpty) return;
             
@@ -77,13 +75,13 @@ namespace TinyWalnutGames.MetVD.Graph
                 var roomTemplate = CreateRoomTemplate(generatorType, hierarchy, biomeAffinity, ref random);
                 
                 // Add components to mark this room for generation pipeline
-                state.EntityManager.AddComponentData(roomEntity, roomTemplate);
-                state.EntityManager.AddComponentData(roomEntity, new ProceduralRoomGenerated(roomSeed));
+                EntityManager.AddComponentData(roomEntity, roomTemplate);
+                EntityManager.AddComponentData(roomEntity, new ProceduralRoomGenerated(roomSeed));
                 
                 // Add navigation buffer for future nav generation
-                if (!state.EntityManager.HasBuffer<RoomNavigationElement>(roomEntity))
+                if (!EntityManager.HasBuffer<RoomNavigationElement>(roomEntity))
                 {
-                    state.EntityManager.AddBuffer<RoomNavigationElement>(roomEntity);
+                    EntityManager.AddBuffer<RoomNavigationElement>(roomEntity);
                 }
             }
         }

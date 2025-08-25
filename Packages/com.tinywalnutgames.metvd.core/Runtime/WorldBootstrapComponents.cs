@@ -19,6 +19,9 @@ namespace TinyWalnutGames.MetVD.Core
             BiomeCountRange = biomeCountRange;
             BiomeWeight = biomeWeight;
         }
+        
+        // Computed properties for backward compatibility
+        public readonly int BiomeCount => BiomeCountRange.y; // Use max for default count
     }
 
     public struct DistrictGenerationSettings
@@ -33,6 +36,9 @@ namespace TinyWalnutGames.MetVD.Core
             DistrictMinDistance = districtMinDistance;
             DistrictWeight = districtWeight;
         }
+        
+        // Computed properties for backward compatibility
+        public readonly int DistrictCount => DistrictCountRange.y; // Use max for default count
     }
 
     public struct SectorGenerationSettings
@@ -45,6 +51,9 @@ namespace TinyWalnutGames.MetVD.Core
             SectorsPerDistrictRange = sectorsPerDistrictRange;
             SectorGridSize = sectorGridSize;
         }
+        
+        // Computed properties for backward compatibility
+        public readonly int SectorsPerDistrict => SectorsPerDistrictRange.y; // Use max for default count
     }
 
     public struct RoomGenerationSettings
@@ -57,6 +66,9 @@ namespace TinyWalnutGames.MetVD.Core
             RoomsPerSectorRange = roomsPerSectorRange;
             TargetLoopDensity = targetLoopDensity;
         }
+        
+        // Computed properties for backward compatibility
+        public readonly int RoomsPerSector => RoomsPerSectorRange.y; // Use max for default count
     }
 
     public struct WorldBootstrapConfiguration : IComponentData

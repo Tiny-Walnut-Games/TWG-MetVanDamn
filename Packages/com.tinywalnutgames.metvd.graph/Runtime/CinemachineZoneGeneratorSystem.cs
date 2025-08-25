@@ -20,22 +20,22 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     [UpdateInGroup(typeof(PresentationSystemGroup))]
     [UpdateAfter(typeof(RoomNavigationGeneratorSystem))]
-    public partial struct CinemachineZoneGeneratorSystem : ISystem
+    public partial class CinemachineZoneGeneratorSystem : SystemBase
     {
         private EntityQuery _roomsWithNavigationQuery;
         
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
             // Rooms that have navigation generated but no cinemachine zones
             _roomsWithNavigationQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<NodeId, RoomHierarchyData, RoomTemplate, ProceduralRoomGenerated>()
                 .WithNone<CinemachineZoneData>()
-                .Build(ref state);
+                .Build(this);
                 
-            state.RequireForUpdate(_roomsWithNavigationQuery);
+            RequireForUpdate(_roomsWithNavigationQuery);
         }
 
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
             using var roomEntities = _roomsWithNavigationQuery.ToEntityArray(Allocator.Temp);
             using var nodeIds = _roomsWithNavigationQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
@@ -50,15 +50,15 @@ namespace TinyWalnutGames.MetVD.Graph
                 var template = templates[i];
                 
                 // Check if cinemachine already generated
-                var genStatus = state.EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+                var genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
                 if (genStatus.CinemachineGenerated) continue;
                 
                 // Generate cinemachine zone for this room
-                GenerateCinemachineZone(state.EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
+                GenerateCinemachineZone(EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
                 
                 // Update generation status
                 genStatus.CinemachineGenerated = true;
-                state.EntityManager.SetComponentData(roomEntity, genStatus);
+                EntityManager.SetComponentData(roomEntity, genStatus);
             }
         }
 
