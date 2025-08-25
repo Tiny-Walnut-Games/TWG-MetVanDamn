@@ -98,7 +98,6 @@ namespace TinyWalnutGames.MetVD.Graph
     /// System that creates sector and room hierarchies within each district
     /// Runs after district layout to subdivide districts into gameplay areas
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(DistrictLayoutSystem))]
     public partial struct SectorRoomHierarchySystem : ISystem
@@ -106,7 +105,6 @@ namespace TinyWalnutGames.MetVD.Graph
         private EntityQuery _districtsQuery;
         private EntityQuery _layoutDoneQuery;
 
-        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             _districtsQuery = state.GetEntityQuery(
@@ -119,7 +117,6 @@ namespace TinyWalnutGames.MetVD.Graph
             state.RequireForUpdate(_layoutDoneQuery);
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             // Wait for district layout to complete
@@ -146,7 +143,6 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Subdivide a district into sectors and rooms
         /// </summary>
-        [BurstCompile]
         private static void SubdivideDistrictIntoSectors(EntityManager entityManager, Entity districtEntity, 
             NodeId districtNodeId, SectorHierarchyData sectorHierarchy)
         {
@@ -168,7 +164,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 float jitterX = random.NextFloat(-0.3f, 0.3f);
                 float jitterY = random.NextFloat(-0.3f, 0.3f);
                 
-                int2 sectorLocalCoords = new int2(
+                int2 sectorLocalCoords = new(
                     (int)(gridX + jitterX),
                     (int)(gridY + jitterY)
                 );
@@ -185,7 +181,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 entityManager.AddComponentData(sectorEntity, sectorNodeId);
 
                 // Create rooms within this sector using BSP subdivision
-                CreateRoomsInSector(entityManager, sectorEntity, sectorNodeId, ref random);
+                CreateRoomsInSector(entityManager, sectorNodeId, ref random);
             }
 
             // Mark district as subdivided
@@ -196,16 +192,17 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Create rooms within a sector using BSP (Binary Space Partitioning) subdivision
         /// </summary>
-        [BurstCompile]
-        private static void CreateRoomsInSector(EntityManager entityManager, Entity sectorEntity, 
+        private static void CreateRoomsInSector(EntityManager entityManager, 
             NodeId sectorNodeId, ref Unity.Mathematics.Random random)
         {
             // Define sector bounds (local coordinate system)
             var sectorBounds = new RectInt(0, 0, 8, 8); // 8x8 local grid for rooms
             
             // Use BSP to create rooms
-            var roomQueue = new NativeList<RectInt>(Allocator.Temp);
-            roomQueue.Add(sectorBounds);
+            var roomQueue = new NativeList<RectInt>(Allocator.Temp)
+            {
+                sectorBounds
+            };
 
             int roomCounter = 0;
             int maxRooms = 6; // Maximum rooms per sector
@@ -272,7 +269,6 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Create a leaf room entity
         /// </summary>
-        [BurstCompile]
         private static void CreateLeafRoom(EntityManager entityManager, NodeId sectorNodeId, 
             RectInt bounds, int roomIndex, ref Unity.Mathematics.Random random)
         {

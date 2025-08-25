@@ -20,7 +20,7 @@ namespace TinyWalnutGames.MetVD.Graph
         private EntityQuery _layoutDoneQuery;
         private EntityQuery _districtsQuery;
 
-        [BurstCompile]
+        // Removed BurstCompile from OnCreate (BC1028: managed array allocation inside Burst)
         public void OnCreate(ref SystemState state)
         {
             _layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadWrite<DistrictLayoutDoneTag>());
@@ -47,8 +47,8 @@ namespace TinyWalnutGames.MetVD.Graph
             if (layoutDone.ConnectionCount > 0) return;
 
             // Get all districts
-            using var entities = _districtsQuery.ToEntityArray(Allocator.Temp);
-            using var nodeIds = _districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            var entities = _districtsQuery.ToEntityArray(Allocator.Temp);
+            var nodeIds = _districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
 
             // Filter to level 0 districts only
             var districtCount = 0;
@@ -60,18 +60,18 @@ namespace TinyWalnutGames.MetVD.Graph
             if (districtCount < 2) return; // Need at least 2 districts to connect
 
             // Create arrays for district data
-            var districtEntitiesArray = new NativeArray<Entity>(districtCount, Allocator.Temp);
-            var districtPositionsArray = new NativeArray<int2>(districtCount, Allocator.Temp);
-            var districtNodeIdsArray = new NativeArray<uint>(districtCount, Allocator.Temp);
+            var districtEntities = new NativeArray<Entity>(districtCount, Allocator.Temp);
+            var districtPositions = new NativeArray<int2>(districtCount, Allocator.Temp);
+            var districtNodeIds = new NativeArray<uint>(districtCount, Allocator.Temp);
 
             int districtIndex = 0;
             for (int i = 0; i < nodeIds.Length; i++)
             {
                 if (nodeIds[i].Level == 0)
                 {
-                    districtEntitiesArray[districtIndex] = entities[i];
-                    districtPositionsArray[districtIndex] = nodeIds[i].Coordinates;
-                    districtNodeIdsArray[districtIndex] = nodeIds[i].Value;
+                    districtEntities[districtIndex] = entities[i];
+                    districtPositions[districtIndex] = nodeIds[i].Coordinates;
+                    districtNodeIds[districtIndex] = nodeIds[i].Value;
                     districtIndex++;
                 }
             }
@@ -84,26 +84,20 @@ namespace TinyWalnutGames.MetVD.Graph
             // Build connection graph
             var connectionCount = BuildConnectionGraph(
                 state.EntityManager,
-                districtEntitiesArray,
-                districtPositionsArray,
-                districtNodeIdsArray,
+                districtEntities,
+                districtPositions,
+                districtNodeIds,
                 ref random
             );
 
             // Update layout done tag with connection count
             var layoutDoneEntity = _layoutDoneQuery.GetSingletonEntity();
             state.EntityManager.SetComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(districtCount, connectionCount));
-
-            // Dispose allocated native arrays
-            districtEntitiesArray.Dispose();
-            districtPositionsArray.Dispose();
-            districtNodeIdsArray.Dispose();
         }
 
         /// <summary>
         /// Build connection graph using K-nearest neighbors plus random long edges
         /// </summary>
-        [BurstCompile]
         private static int BuildConnectionGraph(
             EntityManager entityManager,
             NativeArray<Entity> districtEntities,
@@ -229,8 +223,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Simple bubble sort for distance entries (suitable for small arrays)
         /// </summary>
-        [BurstCompile]
-        static void SortDistanceEntries(NativeArray<DistanceEntry> distances)
+        private static void SortDistanceEntries(NativeArray<DistanceEntry> distances)
         {
             for (int i = 0; i < distances.Length - 1; i++)
             {

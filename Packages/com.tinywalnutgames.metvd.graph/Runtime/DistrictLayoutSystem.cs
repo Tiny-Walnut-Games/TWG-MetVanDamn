@@ -140,7 +140,6 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Generate district positions using the specified strategy
         /// </summary>
-        [BurstCompile]
         static void GenerateDistrictPositions(NativeArray<int2> positions, int2 worldSize,
             DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
         {
@@ -159,7 +158,6 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Generate positions using Poisson-disc sampling for organic spacing
         /// Simple rejection sampling implementation
         /// </summary>
-        [BurstCompile]
         static void GeneratePoissonDiscPositions(NativeArray<int2> positions, int2 worldSize,
             ref Unity.Mathematics.Random random)
         {
@@ -213,7 +211,6 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Generate positions using jittered grid for larger district counts
         /// </summary>
-        [BurstCompile]
         static void GenerateJitteredGridPositions(NativeArray<int2> positions, int2 worldSize,
             ref Unity.Mathematics.Random random)
         {
@@ -259,6 +256,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     math.clamp((int)finalPosition.y, 0, worldSize.y - 1)
                 );
             }
+            shuffledIndices.Dispose();
         }
     }
 }
