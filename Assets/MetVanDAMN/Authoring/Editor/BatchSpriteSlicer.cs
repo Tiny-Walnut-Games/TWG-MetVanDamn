@@ -362,7 +362,7 @@ public class BatchSpriteSlicer : EditorWindow
     /// </summary>
     private void AdjustPivotOfSelectedSlices()
     {
-        UnityEngine.Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
+        var selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
 
         // Check if any textures are selected to adjust the pivot
         foreach (UnityEngine.Object obj in selectedTextures)
