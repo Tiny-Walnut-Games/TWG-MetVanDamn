@@ -90,6 +90,11 @@ namespace TinyWalnutGames.MetVD.Graph
             // Update layout done tag with connection count
             var layoutDoneEntity = _layoutDoneQuery.GetSingletonEntity();
             EntityManager.SetComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(districtCount, connectionCount));
+
+            // Clean up temporary arrays
+            districtEntities.Dispose();
+            districtPositions.Dispose();
+            districtNodeIds.Dispose();
         }
 
         /// <summary>
