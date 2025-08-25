@@ -15,8 +15,7 @@
         "TinyWalnutGames.MetVD.Graph",
         "TinyWalnutGames.MetVD.Samples",
         "TinyWalnutGames.MetVD.Shared",
-        "TinyWalnutGames.MetVD.Utility",
-        "UnityEditor.U2D.Sprites"
+        "TinyWalnutGames.MetVD.Utility"
     ],
     "includePlatforms": [
         "Editor"

@@ -74,16 +74,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\DistrictBaker.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BatchSpriteSlicer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileEditor.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\BiomeFieldBaker.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldBootstrapBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldConfigurationBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoDrawer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoSettings.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapDemo.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVDWorldDebugWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileSamples.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\ProceduralLayoutPreview.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\GateConditionBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Sync\DistrictPlacementSyncSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapAuthoringInspector.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNSceneBootstrap.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\ProceduralLayoutGizmoDrawer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\ConnectionBaker.cs" />
@@ -610,7 +614,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.YamlDotNet">
-      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Cecil.Awesome">
@@ -626,23 +630,23 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Plastic.Antlr3.Runtime">
-      <HintPath>Library\PackageCache\com.unity.collab-proxy@8a82222c5449\Lib\Editor\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@8f3c30ecd081\Lib\Editor\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Plastic.Newtonsoft.Json">
-      <HintPath>Library\PackageCache\com.unity.collab-proxy@8a82222c5449\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@8f3c30ecd081\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="log4netPlastic">
-      <HintPath>Library\PackageCache\com.unity.collab-proxy@8a82222c5449\Lib\Editor\log4netPlastic.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@8f3c30ecd081\Lib\Editor\log4netPlastic.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.IonicZip">
-      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="unityplastic">
-      <HintPath>Library\PackageCache\com.unity.collab-proxy@8a82222c5449\Lib\Editor\unityplastic.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@8f3c30ecd081\Lib\Editor\unityplastic.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.IO.Hashing">
@@ -650,7 +654,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -662,7 +666,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
-      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
+      <HintPath>Library\PackageCache\com.unity.visualscripting@b4d700247d4b\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">
