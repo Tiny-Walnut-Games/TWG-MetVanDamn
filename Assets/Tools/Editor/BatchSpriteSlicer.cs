@@ -414,7 +414,7 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private void SliceSelectedSprites()
         {
-            UnityEngine.Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
+            var selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
 
             // Check if any textures are selected to slice
             foreach (UnityEngine.Object obj in selectedTextures)
