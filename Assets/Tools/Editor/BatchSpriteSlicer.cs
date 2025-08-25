@@ -255,9 +255,9 @@ namespace TinyWalnutGames.Tools.Editor
                 return;
             }
 
-            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            UnityEngine.Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
 
-            foreach (Object obj in selectedTextures)
+            foreach (UnityEngine.Object obj in selectedTextures)
             {
                 string path = AssetDatabase.GetAssetPath(obj);
                 TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
@@ -361,10 +361,10 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private void AdjustPivotOfSelectedSlices()
         {
-            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
+            UnityEngine.Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
 
             // Check if any textures are selected to adjust the pivot
-            foreach (Object obj in selectedTextures)
+            foreach (UnityEngine.Object obj in selectedTextures)
             {
                 string path = AssetDatabase.GetAssetPath(obj); // Get the path of the selected texture
                 TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter; // Get the TextureImporter for the selected texture
@@ -414,10 +414,10 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private void SliceSelectedSprites()
         {
-            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
+            UnityEngine.Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
 
             // Check if any textures are selected to slice
-            foreach (Object obj in selectedTextures)
+            foreach (UnityEngine.Object obj in selectedTextures)
             {
                 string path = AssetDatabase.GetAssetPath(obj); // Get the path of the selected texture
                 TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter; // Get the TextureImporter for the selected texture

@@ -20,7 +20,7 @@ namespace TinyWalnutGames.Tools.Editor
     {
         // Spritesheet and mapping inputs
         private List<Texture2D> spritesheets = new();
-        private Object biomeMaskAsset = null; // Can be Texture2D, TextAsset (JSON), or other mapping file
+        private UnityEngine.Object biomeMaskAsset = null; // Can be Texture2D, TextAsset (JSON), or other mapping file
         
         // Cell and slicing settings (reusing BatchSpriteSlicer patterns)
         private Vector2Int cellSize = new(64, 64);
@@ -134,7 +134,7 @@ namespace TinyWalnutGames.Tools.Editor
             biomeMaskAsset = EditorGUILayout.ObjectField(
                 "Biome Mask/Mapping", 
                 biomeMaskAsset, 
-                typeof(Object), 
+                typeof(UnityEngine.Object), 
                 false);
             
             EditorGUILayout.HelpBox(
@@ -448,7 +448,7 @@ namespace TinyWalnutGames.Tools.Editor
             var selected = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
             spritesheets.Clear();
             
-            foreach (Object obj in selected)
+            foreach (UnityEngine.Object obj in selected)
             {
                 if (obj is Texture2D texture)
                 {
