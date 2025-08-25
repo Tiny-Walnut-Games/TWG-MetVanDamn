@@ -470,13 +470,13 @@ namespace TinyWalnutGames.Tools.Editor
 
                 List<SpriteRect> spriteRects = new(); // Create a list to hold the sprite rectangles
                             
-                string assetPath = AssetDatabase.GetAssetPath(texture); // Get the asset path of the texture
-                TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(assetPath); // Get the TextureImporter for the texture
+                // Use the existing 'path' variable instead of creating a redundant 'assetPath' variable
+                TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(path); // Get the TextureImporter for the texture
                 bool wasReadable = texImporter.isReadable; // Check if the texture was readable
                 if (!wasReadable)
                 {
                     texImporter.isReadable = true; // Set the texture to be readable if it wasn't already
-                    AssetDatabase.ImportAsset(assetPath); // Import the asset to apply changes
+                    AssetDatabase.ImportAsset(path); // Import the asset to apply changes
                 }
 
                 // Iterate through the grid to create sprite rectangles
