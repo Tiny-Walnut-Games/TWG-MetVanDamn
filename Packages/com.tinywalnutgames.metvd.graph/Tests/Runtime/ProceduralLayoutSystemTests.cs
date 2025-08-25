@@ -83,6 +83,43 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         }
 
         [Test]
+        public void SectorRoomHierarchySystem_GeneratesSectorsAndRooms()
+        {
+            // Arrange world + districts (TargetSectors influences sectors per district)
+            var worldConfig = _entityManager.CreateEntity();
+            _entityManager.AddComponentData(worldConfig, new WorldConfiguration
+            {
+                Seed = 2222,
+                WorldSize = new int2(40, 40),
+                TargetSectors = 6,
+                RandomizationMode = RandomizationMode.None
+            });
+            for (uint i = 0; i < 3; i++)
+            {
+                var d = _entityManager.CreateEntity();
+                _entityManager.AddComponentData(d, new NodeId(i + 1, 0, 0, int2.zero));
+                _entityManager.AddComponentData(d, new WfcState());
+            }
+
+            // Act (single update should: place districts -> add DistrictLayoutDoneTag -> subdivide into sectors + rooms)
+            _initGroup.Update();
+
+            using var sectorQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<SectorHierarchyData>());
+            using var roomQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<RoomHierarchyData>());
+
+            int sectorCount = 0;
+            int roomCount = 0;
+            var sectorNodeIds = sectorQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+            for (int i = 0; i < sectorNodeIds.Length; i++) if (sectorNodeIds[i].Level == 1) sectorCount++;
+            var roomNodeIds = roomQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+            for (int i = 0; i < roomNodeIds.Length; i++) if (roomNodeIds[i].Level == 2) roomCount++;
+            sectorNodeIds.Dispose(); roomNodeIds.Dispose();
+
+            Assert.Greater(sectorCount, 0, "Should generate at least one sector");
+            Assert.Greater(roomCount, 0, "Should generate at least one room");
+        }
+
+        [Test]
         public void RuleRandomizationSystem_WithPartialMode_ShouldRandomizeBiomes()
         {
             // Arrange
