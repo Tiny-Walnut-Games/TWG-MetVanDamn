@@ -142,9 +142,10 @@ namespace TinyWalnutGames.MetVD.Graph
         public float GravityScale;         // Gravity affecting jump arcs
         public float WallJumpHeight;       // Height gained from wall jumps
         public float DashDistance;         // Horizontal dash distance
+        public float GlideSpeed;           // Gliding speed for air movement
         
         public JumpArcPhysics(float height = 3.0f, float distance = 4.0f, float doubleBonus = 1.5f,
-                             float gravity = 1.0f, float wallHeight = 2.0f, float dash = 6.0f)
+                             float gravity = 1.0f, float wallHeight = 2.0f, float dash = 6.0f, float glide = 2.0f)
         {
             JumpHeight = height;
             JumpDistance = distance;
@@ -152,6 +153,7 @@ namespace TinyWalnutGames.MetVD.Graph
             GravityScale = gravity;
             WallJumpHeight = wallHeight;
             DashDistance = dash;
+            GlideSpeed = glide;
         }
     }
 }

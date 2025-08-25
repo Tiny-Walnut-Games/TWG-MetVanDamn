@@ -356,6 +356,21 @@ namespace TinyWalnutGames.MetVD.Graph
             return tile == TileType.Platform || tile == TileType.Climbable;
         }
 
+        /// <summary>
+        /// Get tilemap generation configuration for a template
+        /// TODO: Implement proper configuration system
+        /// </summary>
+        private static TilemapConfig GetTilemapGenerationConfig(Entity template)
+        {
+            return new TilemapConfig
+            {
+                HasGroundLevel = true,
+                GroundThickness = 2,
+                WallThickness = 1,
+                PlatformFrequency = 0.3f
+            };
+        }
+
         [BurstCompile]
         private static bool IsWall(int2 position, RectInt bounds, NativeArray<TileType> tilemap)
         {
@@ -384,5 +399,17 @@ namespace TinyWalnutGames.MetVD.Graph
         Platform = 2,   // Walkable platform
         Climbable = 3,  // Wall that can be climbed
         Hazard = 4      // Dangerous tile to avoid
+    }
+
+    /// <summary>
+    /// Configuration for tilemap generation
+    /// TODO: Move to proper configuration system
+    /// </summary>
+    public struct TilemapConfig
+    {
+        public bool HasGroundLevel;
+        public int GroundThickness;
+        public int WallThickness;
+        public float PlatformFrequency;
     }
 }

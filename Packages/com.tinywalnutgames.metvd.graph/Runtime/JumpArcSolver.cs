@@ -275,5 +275,37 @@ namespace TinyWalnutGames.MetVD.Graph
             reachablePositions.Dispose();
             return allReachable;
         }
+
+        /// <summary>
+        /// Calculate minimum platform spacing for given jump physics
+        /// TODO: Implement proper physics-based calculation
+        /// </summary>
+        [BurstCompile]
+        public static float CalculateMinimumPlatformSpacing(JumpArcPhysics physics)
+        {
+            return physics.JumpDistance * 0.8f; // Conservative spacing
+        }
+
+        /// <summary>
+        /// Check if target position is reachable with basic movement
+        /// TODO: Implement proper reachability analysis
+        /// </summary>
+        [BurstCompile]
+        public static bool IsReachable(int2 fromPos, int2 toPos, JumpArcPhysics physics)
+        {
+            float2 delta = (float2)toPos - (float2)fromPos;
+            return math.length(delta) <= physics.JumpDistance;
+        }
+
+        /// <summary>
+        /// Calculate jump arc between two positions
+        /// TODO: Implement proper arc physics calculation
+        /// </summary>
+        [BurstCompile]
+        public static float2 CalculateJumpArc(int2 fromPos, int2 toPos, JumpArcPhysics physics)
+        {
+            float2 delta = (float2)toPos - (float2)fromPos;
+            return delta; // Simplified - should calculate actual arc
+        }
     }
 }
