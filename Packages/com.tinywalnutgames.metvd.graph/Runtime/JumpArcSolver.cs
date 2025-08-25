@@ -179,14 +179,33 @@ namespace TinyWalnutGames.MetVD.Graph
             // Check if target is within range
             if (math.abs(deltaX) > physics.MaxJumpDistance || deltaY > physics.MaxJumpHeight)
                 return false;
-            
+
+            // Handle vertical jump (deltaX == 0) to avoid division by zero
+            if (math.abs(deltaX) < 1e-5f)
+            {
+                // For a vertical jump, the launch angle is 90 degrees (pi/2)
+                // The required velocity is determined by the height difference and gravity
+                float g = physics.Gravity;
+                if (deltaY < 0)
+                {
+                    // Can't jump down vertically (falling, not jumping)
+                    return false;
+                }
+                // v^2 = 2 * g * deltaY
+                float v0_squared = 2f * g * deltaY;
+                if (v0_squared <= 0) return false;
+                launchVelocity = math.sqrt(v0_squared);
+                launchAngle = math.PI / 2f; // 90 degrees
+                return true;
+            }
+
             // Calculate launch parameters for parabolic trajectory
-            float g = physics.Gravity;
-            float v0_squared = g * (deltaX * deltaX) / (deltaX * math.sin(2 * math.PI/4) - 2 * deltaY * math.cos(math.PI/4) * math.cos(math.PI/4));
+            float g2 = physics.Gravity;
+            float v0_squared2 = g2 * (deltaX * deltaX) / (deltaX * math.sin(2 * math.PI/4) - 2 * deltaY * math.cos(math.PI/4) * math.cos(math.PI/4));
             
-            if (v0_squared <= 0) return false;
+            if (v0_squared2 <= 0) return false;
             
-            launchVelocity = math.sqrt(v0_squared);
+            launchVelocity = math.sqrt(v0_squared2);
             launchAngle = math.PI / 4; // 45 degrees for optimal distance
             
             return true;
