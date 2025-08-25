@@ -21,12 +21,12 @@ namespace TinyWalnutGames.MetVD.Graph
         public bool IsComplete;
         public Ability AvailableSkills;
         public uint GenerationSeed;
-        public BiomeAffinity TargetBiome;
+        public BiomeType TargetBiome;
         public Polarity TargetPolarity;
         public RoomLayoutType LayoutType;
         public int CurrentStep;
         
-        public RoomGenerationRequest(RoomGeneratorType generatorType, uint seed = 0, Ability skills = Ability.Jump, BiomeAffinity biome = BiomeAffinity.Any)
+        public RoomGenerationRequest(RoomGeneratorType generatorType, uint seed = 0, Ability skills = Ability.Jump, BiomeType biome = BiomeType.HubArea)
         {
             GeneratorType = generatorType;
             Seed = seed;
@@ -34,12 +34,12 @@ namespace TinyWalnutGames.MetVD.Graph
             AvailableSkills = skills;
             GenerationSeed = seed;
             TargetBiome = biome;
-            TargetPolarity = Polarity.Positive;
+            TargetPolarity = Polarity.None;
             LayoutType = RoomLayoutType.Linear;
             CurrentStep = 0;
         }
         
-        public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeAffinity targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
+        public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeType targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
         {
             GeneratorType = generatorType;
             Seed = seed;
@@ -211,11 +211,11 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         public float Strength;
         public int BiomeType;
-        public BiomeAffinity Biome;
+        public BiomeType Biome;
         public float Influence;
         public float Distance;
         
-        public BiomeInfluence(BiomeAffinity biome, float influence, float distance)
+        public BiomeInfluence(BiomeType biome, float influence, float distance)
         {
             Biome = biome;
             Influence = influence;
@@ -230,9 +230,9 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     public struct BiomeAffinityComponent : IComponentData
     {
-        public BiomeAffinity Affinity;
+        public BiomeType Affinity;
         
-        public BiomeAffinityComponent(BiomeAffinity affinity)
+        public BiomeAffinityComponent(BiomeType affinity)
         {
             Affinity = affinity;
         }
@@ -247,7 +247,8 @@ namespace TinyWalnutGames.MetVD.Graph
         Branched = 1,
         Open = 2,
         Vertical = 3,
-        Horizontal = 4
+        Horizontal = 4,
+        Mixed = 5
     }
 
     /// <summary>
@@ -301,7 +302,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     public struct BiomeSettings : IComponentData
     {
-        public BiomeAffinity PrimaryBiome;
+        public BiomeType PrimaryBiome;
         public float BiomeWeight;
         public int BiomeVariationCount;
     }

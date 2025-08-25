@@ -11,10 +11,9 @@ namespace TinyWalnutGames.MetVD.Graph
     /// Main pipeline system that orchestrates the 6-step room generation flow
     /// Implements the Pipeline Flow from the issue specification
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(RoomManagementSystem))]
-    public partial struct RoomGenerationPipelineSystem : ISystem
+    public partial class RoomGenerationPipelineSystem : SystemBase
     {
         private ComponentLookup<Core.Biome> _biomeLookup;
         private ComponentLookup<JumpPhysicsData> _jumpPhysicsLookup;
@@ -22,29 +21,27 @@ namespace TinyWalnutGames.MetVD.Graph
         private BufferLookup<RoomFeatureElement> _roomFeatureBufferLookup;
         private BufferLookup<RoomModuleElement> _roomModuleBufferLookup;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            _biomeLookup = state.GetComponentLookup<Core.Biome>(true);
-            _jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
-            _secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
-            _roomFeatureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
-            _roomModuleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
+            _biomeLookup = GetComponentLookup<Core.Biome>(true);
+            _jumpPhysicsLookup = GetComponentLookup<JumpPhysicsData>(true);
+            _secretConfigLookup = GetComponentLookup<SecretAreaConfig>(true);
+            _roomFeatureBufferLookup = GetBufferLookup<RoomFeatureElement>();
+            _roomModuleBufferLookup = GetBufferLookup<RoomModuleElement>(true);
             
-            state.RequireForUpdate<RoomGenerationRequest>();
+            RequireForUpdate<RoomGenerationRequest>();
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
-            _biomeLookup.Update(ref state);
-            _jumpPhysicsLookup.Update(ref state);
-            _secretConfigLookup.Update(ref state);
-            _roomFeatureBufferLookup.Update(ref state);
-            _roomModuleBufferLookup.Update(ref state);
+            _biomeLookup.Update(ref CheckedStateRef);
+            _jumpPhysicsLookup.Update(ref CheckedStateRef);
+            _secretConfigLookup.Update(ref CheckedStateRef);
+            _roomFeatureBufferLookup.Update(ref CheckedStateRef);
+            _roomModuleBufferLookup.Update(ref CheckedStateRef);
 
-            var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
-            uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000.0);
+            var deltaTime = SystemAPI.Time.DeltaTime;
+            uint baseSeed = (uint)(SystemAPI.Time.ElapsedTime * 1000.0);
             var random = new Unity.Mathematics.Random(baseSeed == 0 ? 1u : baseSeed);
 
             var pipelineJob = new RoomGenerationPipelineJob
@@ -58,7 +55,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 DeltaTime = deltaTime
             };
 
-            state.Dependency = pipelineJob.ScheduleParallel(state.Dependency);
+            Dependency = pipelineJob.ScheduleParallel(Dependency);
         }
     }
 
