@@ -276,7 +276,10 @@ namespace TinyWalnutGames.MetVD.Graph
         PowerUp = 6,
         HealthPickup = 7,
         SaveStation = 8,
-        Switch = 9
+        Switch = 9,
+        Enemy = 10,
+        Door = 11,
+        Collectible = 12
     }
     
     /// <summary>

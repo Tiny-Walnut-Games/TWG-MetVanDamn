@@ -86,11 +86,11 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     public struct RoomFeatureElement : IBufferElementData
     {
-        public RoomFeatureObjectType Type;
+        public RoomFeatureType Type;
         public int2 Position;
         public uint FeatureId;
         
-        public RoomFeatureElement(RoomFeatureObjectType type, int2 position, uint featureId = 0)
+        public RoomFeatureElement(RoomFeatureType type, int2 position, uint featureId = 0)
         {
             Type = type;
             Position = position;
@@ -99,8 +99,9 @@ namespace TinyWalnutGames.MetVD.Graph
     }
 
     /// <summary>
-    /// Types of features that can exist in rooms
+    /// Types of features that can exist in rooms (DEPRECATED - Use RoomFeatureType instead)
     /// </summary>
+    [System.Obsolete("Use RoomFeatureType instead")]
     public enum RoomFeatureObjectType : byte
     {
         Enemy = 0,
@@ -325,7 +326,7 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             // Add boss spawn point
             var bossPos = new int2(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
-            features.Add(new RoomFeatureElement(RoomFeatureObjectType.Enemy, bossPos, random.NextUInt()));
+            features.Add(new RoomFeatureElement(RoomFeatureType.Enemy, bossPos, random.NextUInt()));
 
             // Add some platforms for boss fight
             for (int i = 0; i < random.NextInt(2, 4); i++)
@@ -334,7 +335,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
                     random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
-                features.Add(new RoomFeatureElement(RoomFeatureObjectType.Platform, platformPos, random.NextUInt()));
+                features.Add(new RoomFeatureElement(RoomFeatureType.Platform, platformPos, random.NextUInt()));
             }
         }
 
@@ -348,7 +349,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
                     random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
-                var featureType = random.NextFloat() > 0.5f ? RoomFeatureObjectType.PowerUp : RoomFeatureObjectType.Collectible;
+                var featureType = random.NextFloat() > 0.5f ? RoomFeatureType.PowerUp : RoomFeatureType.Collectible;
                 features.Add(new RoomFeatureElement(featureType, treasurePos, random.NextUInt()));
             }
         }
@@ -357,7 +358,7 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             // Add save station
             var savePos = new int2(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
-            features.Add(new RoomFeatureElement(RoomFeatureObjectType.SaveStation, savePos, random.NextUInt()));
+            features.Add(new RoomFeatureElement(RoomFeatureType.SaveStation, savePos, random.NextUInt()));
         }
 
         private static void AddShopRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
@@ -370,7 +371,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     bounds.x + 1 + (i * (bounds.width - 2) / itemCount),
                     bounds.y + bounds.height / 2
                 );
-                features.Add(new RoomFeatureElement(RoomFeatureObjectType.Collectible, itemPos, random.NextUInt()));
+                features.Add(new RoomFeatureElement(RoomFeatureType.Collectible, itemPos, random.NextUInt()));
             }
         }
 
@@ -384,7 +385,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
                     random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
-                features.Add(new RoomFeatureElement(RoomFeatureObjectType.Enemy, enemyPos, random.NextUInt()));
+                features.Add(new RoomFeatureElement(RoomFeatureType.Enemy, enemyPos, random.NextUInt()));
             }
 
             // Add platforms and obstacles
@@ -395,7 +396,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
                     random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
-                var featureType = random.NextFloat() > 0.6f ? RoomFeatureObjectType.Platform : RoomFeatureObjectType.Obstacle;
+                var featureType = random.NextFloat() > 0.6f ? RoomFeatureType.Platform : RoomFeatureType.Obstacle;
                 features.Add(new RoomFeatureElement(featureType, featurePos, random.NextUInt()));
             }
 
@@ -406,7 +407,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
                     random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
-                features.Add(new RoomFeatureElement(RoomFeatureObjectType.HealthPickup, healthPos, random.NextUInt()));
+                features.Add(new RoomFeatureElement(RoomFeatureType.HealthPickup, healthPos, random.NextUInt()));
             }
         }
     }

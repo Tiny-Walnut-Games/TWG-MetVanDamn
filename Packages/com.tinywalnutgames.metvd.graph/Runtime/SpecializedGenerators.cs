@@ -372,7 +372,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Add feature to buffer
                 features.Add(new RoomFeatureElement
                 {
-                    Type = ConvertToObjectType(featureType),
+                    Type = featureType,
                     Position = pos,
                     FeatureId = (uint)(request.GenerationSeed + i)
                 });

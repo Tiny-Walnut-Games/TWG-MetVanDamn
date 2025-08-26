@@ -53,13 +53,13 @@ namespace TinyWalnutGames.MetVD.Graph
         public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
         public Unity.Mathematics.Random Random;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.StackedSegment || request.IsComplete) return;
 
-            if (!FeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!FeatureBufferLookup.HasBuffer(entity)) return;
 
-            var features = FeatureBufferLookup[nodeId.Value];
+            var features = FeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             features.Clear();
 
@@ -69,9 +69,9 @@ namespace TinyWalnutGames.MetVD.Graph
 
             // Get jump physics for coherent route planning
             var jumpHeight = 3.0f; // Default
-            if (JumpPhysicsLookup.HasComponent(nodeId.Value))
+            if (JumpPhysicsLookup.HasComponent(entity))
             {
-                jumpHeight = JumpPhysicsLookup[nodeId.Value].MaxJumpHeight;
+                jumpHeight = JumpPhysicsLookup[entity].JumpHeight;
             }
 
             // Generate each vertical segment
@@ -806,5 +806,29 @@ namespace TinyWalnutGames.MetVD.Graph
         Gusty = 1,     // Irregular wind patterns
         Conveyor = 2,  // Mechanical conveyor-like movement
         Electric = 3   // Rapid, energetic movement
+    }
+
+    /// <summary>
+    /// Utility class for type conversions
+    /// </summary>
+    public static class TypeConversionUtility
+    {
+        /// <summary>
+        /// Convert RoomFeatureType to RoomFeatureObjectType
+        /// </summary>
+        public static RoomFeatureObjectType ConvertToObjectType(RoomFeatureType featureType)
+        {
+            return featureType switch
+            {
+                RoomFeatureType.Platform => RoomFeatureObjectType.Platform,
+                RoomFeatureType.Obstacle => RoomFeatureObjectType.Obstacle,
+                RoomFeatureType.Secret => RoomFeatureObjectType.Secret,
+                RoomFeatureType.PowerUp => RoomFeatureObjectType.PowerUp,
+                RoomFeatureType.HealthPickup => RoomFeatureObjectType.HealthPickup,
+                RoomFeatureType.SaveStation => RoomFeatureObjectType.SaveStation,
+                RoomFeatureType.Switch => RoomFeatureObjectType.Switch,
+                _ => RoomFeatureObjectType.Platform // Default fallback
+            };
+        }
     }
 }
