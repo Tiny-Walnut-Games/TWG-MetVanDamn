@@ -123,6 +123,16 @@ namespace TinyWalnutGames.MetVD.Core
         public bool IsUnlocked;
         
         /// <summary>
+        /// Whether this is a default gate condition
+        /// </summary>
+        public bool isDefault;
+        
+        /// <summary>
+        /// Required connection ID for this gate
+        /// </summary>
+        public uint requiredConnectionId;
+        
+        /// <summary>
         /// Gate description for UI/debugging
         /// </summary>
         public FixedString64Bytes Description;
@@ -131,7 +141,9 @@ namespace TinyWalnutGames.MetVD.Core
                             Ability requiredAbilities = Ability.None,
                             GateSoftness softness = GateSoftness.Hard,
                             float minimumSkillLevel = 0.0f,
-                            FixedString64Bytes description = default)
+                            FixedString64Bytes description = default,
+                            bool isDefault = false,
+                            uint requiredConnectionId = 0)
         {
             RequiredPolarity = requiredPolarity;
             RequiredAbilities = requiredAbilities;
@@ -139,6 +151,8 @@ namespace TinyWalnutGames.MetVD.Core
             MinimumSkillLevel = math.clamp(minimumSkillLevel, 0.0f, 1.0f);
             IsActive = true;
             IsUnlocked = false;
+            this.isDefault = isDefault;
+            this.requiredConnectionId = requiredConnectionId;
             Description = description;
         }
 

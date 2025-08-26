@@ -6,9 +6,16 @@ namespace TinyWalnutGames.MetVD.Authoring
 {
     public class ConnectionAuthoring : MonoBehaviour
     {
+        [Header("Connection Identity")]
+        public uint connectionId;
+        
         [Header("Endpoints (DistrictAuthoring components)")]
         public DistrictAuthoring from;
         public DistrictAuthoring to;
+        
+        [Header("Node References")]
+        public uint sourceNode;
+        public uint targetNode;
 
         [Header("Connection Properties")]
         public ConnectionType type = ConnectionType.Bidirectional;

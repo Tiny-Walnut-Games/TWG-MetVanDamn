@@ -6,7 +6,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 {
     public class GateConditionAuthoring : MonoBehaviour
     {
-        [Header("Target District (optional - self if null)")] public DistrictAuthoring target;
+        [Header("Node References")]
+        public uint sourceNode;
+        public uint targetNode;
+        
+        [Header("Target District (optional - self if null)")] 
+        public DistrictAuthoring target;
         public Polarity requiredPolarity = Polarity.None;
         public Ability requiredAbilities = Ability.None;
         public GateSoftness softness = GateSoftness.Hard;

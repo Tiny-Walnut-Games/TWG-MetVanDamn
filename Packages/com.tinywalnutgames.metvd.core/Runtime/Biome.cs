@@ -56,11 +56,47 @@ namespace TinyWalnutGames.MetVD.Core
         FrozenWastes = 10,
         IceCatacombs = 11,
         CryogenicLabs = 12,
+        IcyCanyon = 13,
+        Tundra = 14,
+        
+        // Earth/Nature biomes
+        Forest = 15,
+        Mountains = 16,
+        Desert = 17,
+        
+        // Water biomes
+        Ocean = 18,
+        
+        // Space/Cosmic biomes
+        Cosmic = 19,
+        
+        // Crystal biomes
+        Crystal = 20,
+        
+        // Ruins/Ancient biomes
+        Ruins = 21,
+        AncientRuins = 22,
+        
+        // Volcanic/Fire biomes  
+        Volcanic = 23,
+        VolcanicCore = 24,
         
         // Neutral/Mixed biomes
-        HubArea = 13,
-        TransitionZone = 14,
-        AncientRuins = 15
+        HubArea = 25,
+        TransitionZone = 26
+    }
+
+    /// <summary>
+    /// District type enumeration for specialized district generation
+    /// </summary>
+    public enum DistrictType : byte
+    {
+        Standard = 0,      // Standard district with balanced generation
+        Hub = 1,           // Central hub district with high connectivity
+        Maze = 2,          // Complex maze-like district with high density
+        Linear = 3,        // Linear district with corridor-like layout
+        Circular = 4,      // Circular district with radial layout
+        Specialized = 5    // Special-purpose district with unique rules
     }
 
     /// <summary>
