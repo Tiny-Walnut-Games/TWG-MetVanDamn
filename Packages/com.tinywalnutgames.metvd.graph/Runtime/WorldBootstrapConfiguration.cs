@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
+using TinyWalnutGames.MetVD.Shared;
 
 namespace TinyWalnutGames.MetVD.Graph
 {

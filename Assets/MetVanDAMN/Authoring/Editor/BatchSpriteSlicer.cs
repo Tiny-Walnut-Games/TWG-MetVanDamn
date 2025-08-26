@@ -1,10 +1,19 @@
 //  This script is intended to be used in the Unity Editor only, stored in an Editor folder to ensure it is not included in builds.
 #if UNITY_EDITOR
+
+// Check if sprite editor assemblies are available
+#if HAS_SPRITE_EDITOR || UNITY_2D_SPRITE_EDITOR_AVAILABLE
+#define SPRITE_EDITOR_FEATURES_AVAILABLE
+#endif
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
+
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
 using UnityEditor.U2D.Sprites; // this script requires com.unity.2d.sprite package be imported to work.
+#endif
 
 namespace TinyWalnutGames.Tools.Editor
 {
@@ -55,8 +64,12 @@ namespace TinyWalnutGames.Tools.Editor
         /// List of copied sprite rectangles from the last copy operation.
         /// We're now including custom physics shapes (outlines) as well
         /// </summary>
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
         private static List<SpriteRect> copiedRects = null;
         private static readonly Dictionary<string, List<Vector2[]>> copiedOutlines = new();
+#else
+        private static bool spriteEditorNotAvailable = true;
+#endif
 
         /// <summary>
         /// Width and height of the texture from which the last copy operation was performed.
@@ -78,6 +91,20 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private void OnGUI()
         {
+#if !SPRITE_EDITOR_FEATURES_AVAILABLE
+            GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox(
+                "Sprite Editor features are not available. This tool requires Unity's 2D Sprite Editor package " +
+                "or sprite editor assemblies to be available. Please install com.unity.2d.sprite package to enable functionality.",
+                MessageType.Warning);
+            
+            if (GUILayout.Button("Open Package Manager"))
+            {
+                UnityEditor.PackageManager.UI.Window.Open("com.unity.2d.sprite");
+            }
+            return;
+#endif
+            
             GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
                 "Slice multiple sprites from selected textures in the project. " +
