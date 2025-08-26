@@ -371,6 +371,31 @@ namespace TinyWalnutGames.MetVD.Graph
             return position.x >= 0 && position.x < bounds.width &&
                    position.y >= 0 && position.y < bounds.height;
         }
+        
+        /// <summary>
+        /// Generate tilemap configuration based on room template type
+        /// </summary>
+        private static TilemapConfig GetTilemapGenerationConfig(RoomTemplate template)
+        {
+            return new TilemapConfig
+            {
+                GroundPercentage = template.GeneratorType == RoomGeneratorType.VerticalSegment ? 0.3f : 0.6f,
+                PlatformPercentage = 0.2f,
+                EmptyPercentage = template.SecretAreaPercentage + 0.1f,
+                WallThickness = 1
+            };
+        }
+    }
+    
+    /// <summary>
+    /// Configuration for tilemap generation
+    /// </summary>
+    public struct TilemapConfig
+    {
+        public float GroundPercentage;
+        public float PlatformPercentage;
+        public float EmptyPercentage;
+        public int WallThickness;
     }
 
     /// <summary>

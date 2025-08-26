@@ -349,7 +349,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public Unity.Mathematics.Random Random;
 
         public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, 
-                          in NodeId nodeId, ref RoomFeatureElement features)
+                          in NodeId nodeId, DynamicBuffer<RoomFeatureElement> features)
         {
             if (request.GeneratorType != RoomGeneratorType.WeightedTilePrefab || request.IsComplete) return;
 
@@ -368,10 +368,13 @@ namespace TinyWalnutGames.MetVD.Graph
                     Random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
                 
-                // This is simplified - in full implementation would use buffer
-                features.Type = featureType;
-                features.Position = pos;
-                features.FeatureId = (uint)(request.GenerationSeed + i);
+                // Add feature to buffer
+                features.Add(new RoomFeatureElement
+                {
+                    Type = featureType,
+                    Position = pos,
+                    FeatureId = (uint)(request.GenerationSeed + i)
+                });
             }
 
             // Add secret areas if configured

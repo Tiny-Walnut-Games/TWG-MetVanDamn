@@ -17,7 +17,9 @@ namespace TinyWalnutGames.MetVD.Graph
         VerticalSegment = 3,         // Vertical layout rooms (towers, shafts)
         HorizontalCorridor = 4,      // Horizontal layout rooms (flow platforming)
         BiomeWeightedTerrain = 5,    // Top-world terrain generation
-        SkyBiomePlatform = 6         // Sky biome with moving platforms
+        SkyBiomePlatform = 6,        // Sky biome with moving platforms
+        LinearBranchingCorridor = 7, // Linear branching corridor layout
+        StackedSegment = 8           // Stacked segment generation
     }
 
     /// <summary>
@@ -155,6 +157,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public float GravityScale;         // Gravity affecting jump arcs
         public float WallJumpHeight;       // Height gained from wall jumps
         public float DashDistance;         // Horizontal dash distance
+        public float GlideSpeed;           // Glide/fall speed reduction
         
         public JumpArcPhysics(float height = 3.0f, float distance = 4.0f, float doubleBonus = 1.5f,
                              float gravity = 1.0f, float wallHeight = 2.0f, float dash = 6.0f)
@@ -165,6 +168,7 @@ namespace TinyWalnutGames.MetVD.Graph
             GravityScale = gravity;
             WallJumpHeight = wallHeight;
             DashDistance = dash;
+            GlideSpeed = 2.0f;
         }
     }
     
@@ -228,6 +232,10 @@ namespace TinyWalnutGames.MetVD.Graph
         public Entity RoomEntity;
         public int2 RoomBounds;
         public uint Seed;
+        public uint GenerationSeed;  // Alias for Seed for compatibility
+        public Ability AvailableSkills;
+        public BiomeAffinity TargetBiome;
+        public bool IsComplete;
         
         public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed)
         {
@@ -235,6 +243,22 @@ namespace TinyWalnutGames.MetVD.Graph
             RoomEntity = roomEntity;
             RoomBounds = bounds;
             Seed = seed;
+            GenerationSeed = seed;  // Sync both fields
+            AvailableSkills = Ability.None;
+            TargetBiome = BiomeAffinity.Any;
+            IsComplete = false;
+        }
+        
+        public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed, Ability availableSkills)
+        {
+            GeneratorType = generatorType;
+            RoomEntity = roomEntity;
+            RoomBounds = bounds;
+            Seed = seed;
+            GenerationSeed = seed;
+            AvailableSkills = availableSkills;
+            TargetBiome = BiomeAffinity.Any;
+            IsComplete = false;
         }
     }
     
@@ -259,12 +283,31 @@ namespace TinyWalnutGames.MetVD.Graph
         public float JumpHeight;
         public float JumpDistance;
         public float GravityScale;
+        public float MaxFallSpeed;
+        public bool HasDoubleJump;
+        public bool HasWallJump;
+        public bool HasGlide;
         
         public JumpPhysicsData(float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
         {
             JumpHeight = height;
             JumpDistance = distance;
             GravityScale = gravity;
+            MaxFallSpeed = 10.0f;
+            HasDoubleJump = false;
+            HasWallJump = false;
+            HasGlide = false;
+        }
+        
+        public JumpPhysicsData(float height, float distance, float gravity, float maxFallSpeed, bool doubleJump, bool wallJump, bool glide)
+        {
+            JumpHeight = height;
+            JumpDistance = distance;
+            GravityScale = gravity;
+            MaxFallSpeed = maxFallSpeed;
+            HasDoubleJump = doubleJump;
+            HasWallJump = wallJump;
+            HasGlide = glide;
         }
     }
     
@@ -276,12 +319,31 @@ namespace TinyWalnutGames.MetVD.Graph
         public float SecretProbability;
         public int MaxSecretsPerRoom;
         public Ability RequiredSkillForAccess;
+        public int2 MinSecretSize;
+        public int2 MaxSecretSize;
+        public bool AllowStackedSecrets;
+        public bool RequireHiddenAccess;
         
         public SecretAreaConfig(float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
         {
             SecretProbability = probability;
             MaxSecretsPerRoom = maxSecrets;
             RequiredSkillForAccess = requiredSkill;
+            MinSecretSize = new int2(2, 2);
+            MaxSecretSize = new int2(4, 4);
+            AllowStackedSecrets = false;
+            RequireHiddenAccess = true;
+        }
+        
+        public SecretAreaConfig(float probability, int2 minSize, int2 maxSize, Ability requiredSkill, bool allowStacked, bool requireHidden)
+        {
+            SecretProbability = probability;
+            MaxSecretsPerRoom = 2;
+            RequiredSkillForAccess = requiredSkill;
+            MinSecretSize = minSize;
+            MaxSecretSize = maxSize;
+            AllowStackedSecrets = allowStacked;
+            RequireHiddenAccess = requireHidden;
         }
     }
     
