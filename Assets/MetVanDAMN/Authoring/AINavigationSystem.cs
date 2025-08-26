@@ -297,10 +297,17 @@ namespace TinyWalnutGames.MetVD.Authoring
             var toEntity = FindEntityByNodeId(ref state, toNodeId);
             
             if (fromEntity == Entity.Null || toEntity == Entity.Null)
-                return 1000.0f; // High cost for missing nodes
+            {
+                // Return maximum finite cost to indicate unreachable nodes
+                // This allows A* to continue searching for alternative paths
+                return float.MaxValue;
+            }
                 
             if (!SystemAPI.HasComponent<NavNode>(fromEntity) || !SystemAPI.HasComponent<NavNode>(toEntity))
-                return 1000.0f;
+            {
+                // Invalid node components - treat as unreachable
+                return float.MaxValue;
+            }
                 
             var fromNode = SystemAPI.GetComponent<NavNode>(fromEntity);
             var toNode = SystemAPI.GetComponent<NavNode>(toEntity);

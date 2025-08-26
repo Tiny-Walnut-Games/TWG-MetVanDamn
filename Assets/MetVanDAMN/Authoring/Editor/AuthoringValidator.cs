@@ -873,7 +873,52 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void ValidateUnusedTileAssets(HashSet<UnityEngine.Tilemaps.TileBase> referencedTiles, ValidationReport report)
         {
-            // This would ideally scan project assets, but for now we'll check if any BiomeArtProfiles have null tile references
+            // Comprehensive project asset scanning for unused tile assets
+            var allTileAssets = new HashSet<UnityEngine.Tilemaps.TileBase>();
+            
+            // Scan all tile assets in the project
+            var tileGUIDs = AssetDatabase.FindAssets("t:TileBase");
+            foreach (var guid in tileGUIDs)
+            {
+                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                var tileAsset = AssetDatabase.LoadAssetAtPath<UnityEngine.Tilemaps.TileBase>(assetPath);
+                if (tileAsset != null)
+                {
+                    allTileAssets.Add(tileAsset);
+                }
+            }
+            
+            // Also scan for ScriptableObject tiles (custom tile types)
+            var scriptableObjectGUIDs = AssetDatabase.FindAssets("t:ScriptableObject");
+            foreach (var guid in scriptableObjectGUIDs)
+            {
+                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetPath);
+                if (asset is UnityEngine.Tilemaps.TileBase tileBase)
+                {
+                    allTileAssets.Add(tileBase);
+                }
+            }
+            
+            // Find tiles that are in project but not referenced
+            var orphanedTiles = allTileAssets.Except(referencedTiles).ToList();
+            
+            foreach (var orphanedTile in orphanedTiles)
+            {
+                // Skip built-in Unity tiles
+                var assetPath = AssetDatabase.GetAssetPath(orphanedTile);
+                if (assetPath.StartsWith("Library/") || assetPath.StartsWith("Packages/com.unity."))
+                    continue;
+                    
+                report.issues.Add(new ValidationIssue(
+                    ValidationSeverity.Warning,
+                    $"Orphaned tile asset: '{orphanedTile.name}' at '{assetPath}' is not referenced by any BiomeArtProfile",
+                    "Consider removing unused tile assets or verifying they should be referenced",
+                    orphanedTile
+                ));
+            }
+            
+            // Also validate BiomeArtProfile tile references for consistency
             var allProfiles = AssetDatabase.FindAssets("t:BiomeArtProfile")
                 .Select(guid => AssetDatabase.LoadAssetAtPath<BiomeArtProfile>(AssetDatabase.GUIDToAssetPath(guid)))
                 .Where(profile => profile != null);

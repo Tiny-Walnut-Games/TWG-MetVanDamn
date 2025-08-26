@@ -320,23 +320,58 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void DrawLegendLabels(Vector3 legendPosition, float legendHeight, float minDensity, float maxDensity)
         {
-            // This would ideally use Handles.Label but that requires more complex scene view integration
-            // For now, we'll use gizmo spheres as markers at key positions
-            
+            // Use Handles.Label for proper text rendering in scene view
             float[] labelPositions = { 0f, 0.25f, 0.5f, 0.75f, 1f };
+            string[] labelTexts = { "Min", "Low", "Med", "High", "Max" };
             
-            foreach (float t in labelPositions)
+            for (int i = 0; i < labelPositions.Length; i++)
             {
-                Vector3 labelPos = legendPosition + new Vector3(1f, 0f, t * legendHeight);
+                float t = labelPositions[i];
+                Vector3 labelPos = legendPosition + new Vector3(1.2f, 0f, t * legendHeight);
                 float densityValue = Mathf.Lerp(minDensity, maxDensity, t);
                 
-                // Draw a small sphere to mark the position (in a real implementation, would show text)
-                Gizmos.color = Color.white;
-                Gizmos.DrawWireSphere(labelPos, 0.1f);
+                // Create comprehensive label with value and description
+                string labelText = $"{labelTexts[i]}\n{densityValue:F1}";
                 
-                // The density value would be displayed here in a full implementation
-                // For now, the user can infer values from the gradient and position
+                // Set up label style for better visibility
+                var labelStyle = new GUIStyle(EditorStyles.boldLabel)
+                {
+                    normal = { textColor = Color.white },
+                    fontSize = 10,
+                    alignment = TextAnchor.MiddleLeft
+                };
+                
+                // Add black outline for better readability
+                var outlineStyle = new GUIStyle(labelStyle)
+                {
+                    normal = { textColor = Color.black }
+                };
+                
+                // Draw outline (shadow effect)
+                Vector3 offset = new Vector3(0.02f, 0f, 0.02f);
+                Handles.Label(labelPos + offset, labelText, outlineStyle);
+                Handles.Label(labelPos - offset, labelText, outlineStyle);
+                Handles.Label(labelPos + new Vector3(0.02f, 0f, -0.02f), labelText, outlineStyle);
+                Handles.Label(labelPos + new Vector3(-0.02f, 0f, 0.02f), labelText, outlineStyle);
+                
+                // Draw main label
+                Handles.Label(labelPos, labelText, labelStyle);
+                
+                // Draw small sphere marker for visual reference
+                Gizmos.color = Color.white;
+                Gizmos.DrawWireSphere(labelPos + new Vector3(-0.3f, 0f, 0f), 0.05f);
             }
+            
+            // Add legend title
+            Vector3 titlePos = legendPosition + new Vector3(1.2f, 0.5f, legendHeight + 0.5f);
+            var titleStyle = new GUIStyle(EditorStyles.boldLabel)
+            {
+                normal = { textColor = Color.yellow },
+                fontSize = 12,
+                alignment = TextAnchor.MiddleLeft
+            };
+            
+            Handles.Label(titlePos, "Prop Density", titleStyle);
         }
 
         // Menu items for controlling heatmap display

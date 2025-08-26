@@ -296,11 +296,177 @@ namespace TinyWalnutGames.MetVD.Authoring
             var navGraph = navGraphQuery.GetSingleton<NavigationGraph>();
             var report = new NavigationValidationReport(navGraph.NodeCount, navGraph.LinkCount);
             
-            // TODO: Add detailed validation logic here
-            report.HasUnreachableAreas = navGraph.UnreachableAreaCount > 0;
-            report.UnreachableNodeCount = navGraph.UnreachableAreaCount;
+            // Perform comprehensive validation using the system's analysis results
+            var entityManager = world.EntityManager;
+            var navNodeQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<NavNode>(), ComponentType.ReadOnly<NavLinkBufferElement>());
+            
+            // Collect all navigation nodes for analysis
+            var allNodes = navNodeQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            report.TotalNodes = allNodes.Length;
+            
+            // Test reachability with multiple agent capability profiles
+            var testCapabilities = GetTestCapabilityProfiles();
+            var unreachableNodeIds = new NativeHashSet<uint>(allNodes.Length, Unity.Collections.Allocator.Temp);
+            
+            for (int profileIndex = 0; profileIndex < testCapabilities.Length; profileIndex++)
+            {
+                var capabilities = testCapabilities[profileIndex];
+                var reachableFromStart = PerformReachabilityAnalysis(world, capabilities, allNodes);
+                
+                // Mark unreachable nodes for this capability profile
+                for (int nodeIndex = 0; nodeIndex < allNodes.Length; nodeIndex++)
+                {
+                    var nodeEntity = allNodes[nodeIndex];
+                    if (entityManager.HasComponent<NavNode>(nodeEntity))
+                    {
+                        var navNode = entityManager.GetComponentData<NavNode>(nodeEntity);
+                        if (!reachableFromStart.Contains(navNode.NodeId))
+                        {
+                            unreachableNodeIds.Add(navNode.NodeId);
+                            
+                            // Add detailed issue for this unreachable node
+                            var issue = new NavigationIssue(
+                                NavigationIssueType.UnreachableNode,
+                                navNode.NodeId,
+                                $"Node unreachable with {capabilities.AgentType} capabilities"
+                            );
+                            report.Issues.Add(issue);
+                        }
+                    }
+                }
+                
+                reachableFromStart.Dispose();
+            }
+            
+            // Update report with final results
+            report.HasUnreachableAreas = unreachableNodeIds.Count > 0;
+            report.UnreachableNodeCount = unreachableNodeIds.Count;
+            
+            // Copy unreachable node IDs to report
+            foreach (var nodeId in unreachableNodeIds)
+            {
+                report.UnreachableNodeIds.Add(nodeId);
+            }
+            
+            // Cleanup
+            allNodes.Dispose();
+            unreachableNodeIds.Dispose();
+            testCapabilities.Dispose();
             
             return report;
+        }
+
+        /// <summary>
+        /// Performs reachability analysis from a starting node with given agent capabilities
+        /// Returns a set of reachable node IDs
+        /// </summary>
+        private static NativeHashSet<uint> PerformReachabilityAnalysis(World world, AgentCapabilities capabilities, NativeArray<Entity> allNodes)
+        {
+            var reachableNodes = new NativeHashSet<uint>(allNodes.Length, Unity.Collections.Allocator.Temp);
+            var entityManager = world.EntityManager;
+            
+            if (allNodes.Length == 0)
+                return reachableNodes;
+                
+            // Start from the first valid node
+            Entity startEntity = Entity.Null;
+            uint startNodeId = 0;
+            
+            for (int i = 0; i < allNodes.Length; i++)
+            {
+                if (entityManager.HasComponent<NavNode>(allNodes[i]))
+                {
+                    startEntity = allNodes[i];
+                    startNodeId = entityManager.GetComponentData<NavNode>(startEntity).NodeId;
+                    break;
+                }
+            }
+            
+            if (startEntity == Entity.Null)
+                return reachableNodes;
+            
+            // Flood fill algorithm to find all reachable nodes
+            var queue = new NativeQueue<uint>(Unity.Collections.Allocator.Temp);
+            queue.Enqueue(startNodeId);
+            reachableNodes.Add(startNodeId);
+            
+            while (queue.Count > 0)
+            {
+                var currentNodeId = queue.Dequeue();
+                var currentEntity = FindEntityByNodeId(world, currentNodeId);
+                
+                if (currentEntity == Entity.Null || !entityManager.HasBuffer<NavLinkBufferElement>(currentEntity))
+                    continue;
+                    
+                var linkBuffer = entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
+                
+                for (int i = 0; i < linkBuffer.Length; i++)
+                {
+                    var link = linkBuffer[i].Value;
+                    var neighborId = link.GetDestination(currentNodeId);
+                    
+                    if (neighborId == 0 || reachableNodes.Contains(neighborId))
+                        continue;
+                        
+                    // Check if this agent can traverse this link
+                    if (link.CanTraverseWith(capabilities, currentNodeId))
+                    {
+                        reachableNodes.Add(neighborId);
+                        queue.Enqueue(neighborId);
+                    }
+                }
+            }
+            
+            queue.Dispose();
+            return reachableNodes;
+        }
+
+        /// <summary>
+        /// Helper method to find entity by node ID
+        /// </summary>
+        private static Entity FindEntityByNodeId(World world, uint nodeId)
+        {
+            var entityManager = world.EntityManager;
+            var nodeQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+            var entities = nodeQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            
+            foreach (var entity in entities)
+            {
+                var id = entityManager.GetComponentData<NodeId>(entity);
+                if (id.Value == nodeId)
+                {
+                    entities.Dispose();
+                    return entity;
+                }
+            }
+            
+            entities.Dispose();
+            return Entity.Null;
+        }
+
+        /// <summary>
+        /// Get predefined test capability profiles for validation
+        /// </summary>
+        private static NativeArray<AgentCapabilities> GetTestCapabilityProfiles()
+        {
+            var profiles = new NativeArray<AgentCapabilities>(5, Unity.Collections.Allocator.Temp);
+            
+            // Basic agent - no special abilities
+            profiles[0] = new AgentCapabilities(Polarity.None, Ability.None, 0.0f, "BasicAgent");
+            
+            // Movement specialist
+            profiles[1] = new AgentCapabilities(Polarity.None, Ability.AllMovement, 0.8f, "MovementAgent");
+            
+            // Environmental specialist  
+            profiles[2] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f, "EnvironmentalAgent");
+            
+            // Polarity master
+            profiles[3] = new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1.0f, "PolarityAgent");
+            
+            // Master agent - all abilities
+            profiles[4] = new AgentCapabilities(Polarity.Any, Ability.Everything, 1.0f, "MasterAgent");
+            
+            return profiles;
         }
 
         /// <summary>
@@ -309,9 +475,20 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// </summary>
         public static bool IsPathPossible(World world, uint fromNodeId, uint toNodeId, AgentCapabilities capabilities)
         {
-            // Implementation would use AINavigationSystem pathfinding
-            // This is a simplified version for interface purposes
-            return true; // TODO: Implement actual path checking
+            // Use AINavigationSystem to perform actual pathfinding validation
+            var aiNavSystem = world.GetExistingSystemManaged<AINavigationSystem>();
+            if (aiNavSystem == null)
+                return false;
+
+            // Attempt to find a path using the navigation system
+            var pathResult = AINavigationSystem.FindPath(world, fromNodeId, toNodeId, capabilities);
+            bool isPathPossible = pathResult.IsValid && pathResult.PathNodes.Length > 1;
+            
+            // Clean up the path result
+            if (pathResult.IsValid)
+                pathResult.Dispose();
+                
+            return isPathPossible;
         }
 
         /// <summary>

@@ -320,24 +320,73 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void DrawHighlightedPath(uint fromNodeId, uint toNodeId, AgentCapabilities testCapabilities)
         {
-            // This would integrate with AINavigationSystem to get actual path
-            // For now, draw a simple direct line as placeholder
+            // Get actual calculated path from AINavigationSystem
+            var aiNavSystem = _world.GetExistingSystemManaged<AINavigationSystem>();
+            if (aiNavSystem == null)
+                return;
+
             var fromEntity = FindEntityByNodeId(fromNodeId);
             var toEntity = FindEntityByNodeId(toNodeId);
             
             if (fromEntity == Entity.Null || toEntity == Entity.Null)
                 return;
 
-            var fromNode = _entityManager.GetComponentData<NavNode>(fromEntity);
-            var toNode = _entityManager.GetComponentData<NavNode>(toEntity);
-
-            Gizmos.color = _currentColors[6];
-            Gizmos.DrawLine(fromNode.WorldPosition, toNode.WorldPosition);
+            // Get the computed path using AINavigationSystem pathfinding
+            var pathResult = AINavigationSystem.FindPath(_world, fromNodeId, toNodeId, testCapabilities);
             
-            // Draw path cost estimate
-            var midPos = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
-            var distance = math.distance(fromNode.WorldPosition, toNode.WorldPosition);
-            Handles.Label(midPos, $"Path: {distance:F1}", EditorStyles.boldLabel);
+            if (pathResult.IsValid && pathResult.PathNodes.Length > 1)
+            {
+                // Draw the actual computed path
+                Gizmos.color = _currentColors[6];
+                
+                for (int i = 0; i < pathResult.PathNodes.Length - 1; i++)
+                {
+                    var currentEntity = FindEntityByNodeId(pathResult.PathNodes[i]);
+                    var nextEntity = FindEntityByNodeId(pathResult.PathNodes[i + 1]);
+                    
+                    if (currentEntity != Entity.Null && nextEntity != Entity.Null)
+                    {
+                        var currentNode = _entityManager.GetComponentData<NavNode>(currentEntity);
+                        var nextNode = _entityManager.GetComponentData<NavNode>(nextEntity);
+                        
+                        Gizmos.DrawLine(currentNode.WorldPosition, nextNode.WorldPosition);
+                        
+                        // Draw direction arrow at midpoint
+                        var midPos = (currentNode.WorldPosition + nextNode.WorldPosition) * 0.5f;
+                        var direction = math.normalize(nextNode.WorldPosition - currentNode.WorldPosition);
+                        Gizmos.DrawWireSphere(midPos, 0.2f);
+                        Gizmos.DrawRay(midPos, direction * 0.5f);
+                    }
+                }
+                
+                // Draw path summary at midpoint
+                var startEntity = FindEntityByNodeId(pathResult.PathNodes[0]);
+                var endEntity = FindEntityByNodeId(pathResult.PathNodes[pathResult.PathNodes.Length - 1]);
+                
+                if (startEntity != Entity.Null && endEntity != Entity.Null)
+                {
+                    var startNode = _entityManager.GetComponentData<NavNode>(startEntity);
+                    var endNode = _entityManager.GetComponentData<NavNode>(endEntity);
+                    var pathMidPos = (startNode.WorldPosition + endNode.WorldPosition) * 0.5f;
+                    
+                    Handles.Label(pathMidPos, $"Path Cost: {pathResult.TotalCost:F1}\nNodes: {pathResult.PathNodes.Length}", 
+                                EditorStyles.boldLabel);
+                }
+                
+                pathResult.Dispose();
+            }
+            else
+            {
+                // No valid path found - draw failed path indication
+                var fromNode = _entityManager.GetComponentData<NavNode>(fromEntity);
+                var toNode = _entityManager.GetComponentData<NavNode>(toEntity);
+                
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireLine(fromNode.WorldPosition, toNode.WorldPosition);
+                
+                var midPos = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
+                Handles.Label(midPos, "NO PATH", EditorStyles.boldLabel);
+            }
         }
 
         private void DrawDetailedInformation()
