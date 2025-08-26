@@ -79,14 +79,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Validate biomes
             ValidateBiomes(biomeAuthorings, report);
             
-            // Validate gates
-            ValidateGates(gateAuthorings, connectionAuthorings, report);
+            // Validate gates with enhanced condition checking
+            ValidateGateConditions(gateAuthorings, connectionAuthorings, report);
             
             // Cross-validate relationships
             ValidateDistrictConnections(districtAuthorings, connectionAuthorings, report);
             
-            // Validate orphaned props and tile prototypes
-            ValidateOrphanedAssets(biomeAuthorings, report);
+            // Enhanced orphaned asset detection with project scanning
+            ValidateOrphanedAssets(report);
             
             // Auto-fix suggestions for missing NodeIds
             SuggestAutoFixes(districtAuthorings, biomeAuthorings, report);
@@ -207,6 +207,186 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     ));
                 }
             }
+        }
+
+        private static void ValidateGateConditions(GateAuthoring[] gates, ConnectionAuthoring[] connections, ValidationReport report)
+        {
+            // Enhanced gate condition validation with connection reference checking
+            var validConnectionIds = new HashSet<uint>(connections.Where(c => c != null).Select(c => c.connectionId.value));
+            
+            foreach (var gate in gates)
+            {
+                if (gate == null) continue;
+                
+                // Validate gate conditions reference existing connections
+                foreach (var condition in gate.gateConditions)
+                {
+                    if (condition.requiredConnectionId.value != 0 && !validConnectionIds.Contains(condition.requiredConnectionId.value))
+                    {
+                        report.issues.Add(new ValidationIssue(
+                            ValidationSeverity.Error,
+                            "Invalid Gate Condition Reference",
+                            $"Gate condition references connection ID {condition.requiredConnectionId.value} which does not exist.",
+                            gate,
+                            gate.transform.position
+                        ));
+                    }
+                    
+                    // Check for circular dependencies in gate conditions
+                    if (condition.requiredConnectionId.value == gate.connectionId.value)
+                    {
+                        report.issues.Add(new ValidationIssue(
+                            ValidationSeverity.Warning,
+                            "Circular Gate Dependency",
+                            "Gate condition references its own connection, creating a circular dependency.",
+                            gate,
+                            gate.transform.position
+                        ));
+                    }
+                }
+                
+                // Validate gate activation logic consistency
+                if (gate.gateConditions.Length > 0)
+                {
+                    bool hasValidCondition = false;
+                    foreach (var condition in gate.gateConditions)
+                    {
+                        if (condition.requiredConnectionId.value != 0 || condition.isDefault)
+                        {
+                            hasValidCondition = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!hasValidCondition)
+                    {
+                        report.issues.Add(new ValidationIssue(
+                            ValidationSeverity.Warning,
+                            "Ineffective Gate Configuration",
+                            "Gate has conditions but none are properly configured (no valid connection IDs or default condition).",
+                            gate,
+                            gate.transform.position
+                        ));
+                    }
+                }
+                
+                // Check for duplicate conditions
+                var conditionConnectionIds = gate.gateConditions
+                    .Where(c => c.requiredConnectionId.value != 0)
+                    .Select(c => c.requiredConnectionId.value)
+                    .ToArray();
+                    
+                var duplicateConditions = conditionConnectionIds.GroupBy(id => id)
+                    .Where(g => g.Count() > 1)
+                    .Select(g => g.Key);
+                    
+                foreach (var duplicateId in duplicateConditions)
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Warning,
+                        "Duplicate Gate Condition",
+                        $"Gate has multiple conditions referencing the same connection ID {duplicateId}.",
+                        gate,
+                        gate.transform.position
+                    ));
+                }
+            }
+        }
+
+        private static void ValidateOrphanedAssets(ValidationReport report)
+        {
+            // Enhanced orphaned asset detection with project asset scanning
+            var biomeProfiles = UnityEditor.AssetDatabase.FindAssets("t:BiomeArtProfile")
+                .Select(guid => UnityEditor.AssetDatabase.LoadAssetAtPath<BiomeArtProfile>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid)))
+                .Where(profile => profile != null)
+                .ToArray();
+                
+            var districtAuthorings = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            var biomeAuthorings = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
+            
+            // Find biome profiles not linked to any biome
+            var usedProfiles = new HashSet<BiomeArtProfile>(biomeAuthorings
+                .Where(b => b.artProfile != null)
+                .Select(b => b.artProfile));
+                
+            foreach (var profile in biomeProfiles)
+            {
+                if (!usedProfiles.Contains(profile))
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Info,
+                        "Orphaned Biome Profile",
+                        $"BiomeArtProfile '{profile.name}' exists in project but is not linked to any BiomeField.",
+                        profile
+                    ));
+                }
+            }
+            
+            // Find prop prefabs not used in any biome profile
+            var allPropPrefabs = biomeProfiles
+                .SelectMany(p => p.propPrefabs ?? new GameObject[0])
+                .Where(prefab => prefab != null)
+                .ToHashSet();
+                
+            var allPrefabsInProject = UnityEditor.AssetDatabase.FindAssets("t:GameObject")
+                .Select(guid => UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid)))
+                .Where(go => go != null && go.GetComponent<Renderer>() != null) // Likely to be props
+                .ToArray();
+                
+            foreach (var prefab in allPrefabsInProject)
+            {
+                if (!allPropPrefabs.Contains(prefab) && IsLikelyPropPrefab(prefab))
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Info,
+                        "Potentially Orphaned Prop",
+                        $"GameObject '{prefab.name}' appears to be a prop but is not used in any BiomeArtProfile.",
+                        prefab
+                    ));
+                }
+            }
+            
+            // Find tile assets not used in any biome profile
+            var allTilesInProfiles = biomeProfiles
+                .SelectMany(p => p.tiles ?? new TileBase[0])
+                .Where(tile => tile != null)
+                .ToHashSet();
+                
+            var allTilesInProject = UnityEditor.AssetDatabase.FindAssets("t:TileBase")
+                .Select(guid => UnityEditor.AssetDatabase.LoadAssetAtPath<TileBase>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid)))
+                .Where(tile => tile != null)
+                .ToArray();
+                
+            foreach (var tile in allTilesInProject)
+            {
+                if (!allTilesInProfiles.Contains(tile))
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Info,
+                        "Orphaned Tile Asset",
+                        $"Tile '{tile.name}' exists in project but is not used in any BiomeArtProfile.",
+                        tile
+                    ));
+                }
+            }
+        }
+        
+        private static bool IsLikelyPropPrefab(GameObject prefab)
+        {
+            // Heuristics to determine if a GameObject is likely a prop
+            if (prefab.GetComponent<Renderer>() == null) return false;
+            if (prefab.GetComponent<Collider>() != null) return true; // Props often have colliders
+            if (prefab.name.ToLowerInvariant().Contains("prop")) return true;
+            if (prefab.name.ToLowerInvariant().Contains("decoration")) return true;
+            if (prefab.name.ToLowerInvariant().Contains("furniture")) return true;
+            if (prefab.name.ToLowerInvariant().Contains("plant")) return true;
+            
+            // Check if it's in a typical props folder
+            string assetPath = UnityEditor.AssetDatabase.GetAssetPath(prefab);
+            if (assetPath.ToLowerInvariant().Contains("prop")) return true;
+            if (assetPath.ToLowerInvariant().Contains("decoration")) return true;
+            
+            return false;
         }
 
         private static void ValidateBiomes(BiomeFieldAuthoring[] biomes, ValidationReport report)

@@ -154,7 +154,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             if (maxDensity <= 0f) return;
             
-            // Draw heat map cells
+            // Draw heat map cells with enhanced numeric labels
             for (int x = 0; x < width; x++)
             {
                 for (int z = 0; z < height; z++)
@@ -166,11 +166,28 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     );
                     
                     float normalizedDensity = densityData[x, z] / maxDensity;
+                    float actualDensity = densityData[x, z];
                     Color heatColor = GetHeatMapColor(normalizedDensity);
                     
+                    // Draw heat map cell
                     Gizmos.color = heatColor;
                     Vector3 cellSize = new Vector3(cellWidth, 0.1f, cellHeight);
                     Gizmos.DrawCube(cellCenter, cellSize);
+                    
+                    // Draw numeric label using Handles.Label instead of sphere markers
+                    if (actualDensity > 0.1f) // Only show labels for significant density values
+                    {
+                        string densityLabel = actualDensity.ToString("F1");
+                        var labelPosition = cellCenter + Vector3.up * 0.5f;
+                        
+                        // Use contrasting color for label based on background intensity
+                        var labelStyle = new GUIStyle();
+                        labelStyle.normal.textColor = normalizedDensity > 0.5f ? Color.white : Color.black;
+                        labelStyle.fontSize = 10;
+                        labelStyle.alignment = TextAnchor.MiddleCenter;
+                        
+                        UnityEditor.Handles.Label(labelPosition, densityLabel, labelStyle);
+                    }
                 }
             }
         }
@@ -428,6 +445,21 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             s_intensityMultiplier = 3f;
             SceneView.RepaintAll();
+        }
+
+        // Legend visibility toggle
+        [MenuItem("Tools/MetVanDAMN/Heatmap/Toggle Legend Visibility")]
+        public static void ToggleLegendVisibility()
+        {
+            s_showLegend = !s_showLegend;
+            SceneView.RepaintAll();
+        }
+
+        [MenuItem("Tools/MetVanDAMN/Heatmap/Toggle Legend Visibility", true)]
+        public static bool ToggleLegendVisibility_Validate()
+        {
+            Menu.SetChecked("Tools/MetVanDAMN/Heatmap/Toggle Legend Visibility", s_showLegend);
+            return true;
         }
     }
 }

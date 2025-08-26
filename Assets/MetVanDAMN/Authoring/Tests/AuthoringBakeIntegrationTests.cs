@@ -260,5 +260,208 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             prototypes.Dispose();
             tileQuery.Dispose();
         }
+
+        [Test]
+        public void TestInvalidDataValidationFailures()
+        {
+            // Negative cases - invalid data should fail validation appropriately
+            using var world = new World("TestWorld");
+            World.DefaultGameObjectInjectionWorld = world;
+            
+            // Test invalid district with duplicate NodeId
+            var invalidDistrict1 = CreateTestDistrict("InvalidDistrict1", new NodeId { value = 999 });
+            var invalidDistrict2 = CreateTestDistrict("InvalidDistrict2", new NodeId { value = 999 }); // Duplicate!
+            
+            BakeGameObjects(world, invalidDistrict1.gameObject, invalidDistrict2.gameObject);
+            
+            var districtQuery = world.EntityManager.CreateEntityQuery(typeof(DistrictData));
+            var districts = districtQuery.ToComponentDataArray<DistrictData>(Allocator.Temp);
+            
+            // Both districts should still be created, but validation should catch the duplicate
+            Assert.AreEqual(2, districts.Length, "Both invalid districts should be baked");
+            
+            // Test invalid connection referencing non-existent districts
+            var invalidConnection = CreateTestConnection("InvalidConnection", 
+                new NodeId { value = 888 }, new NodeId { value = 777 }); // Neither exist
+            
+            BakeGameObjects(world, invalidConnection.gameObject);
+            
+            var connectionQuery = world.EntityManager.CreateEntityQuery(typeof(ConnectionData));
+            var connections = connectionQuery.ToComponentDataArray<ConnectionData>(Allocator.Temp);
+            
+            Assert.AreEqual(1, connections.Length, "Invalid connection should still be baked");
+            Assert.AreEqual(888u, connections[0].sourceNode.value);
+            Assert.AreEqual(777u, connections[0].targetNode.value);
+            
+            districts.Dispose();
+            connections.Dispose();
+            districtQuery.Dispose();
+            connectionQuery.Dispose();
+            
+            CleanupGameObjects(invalidDistrict1.gameObject, invalidDistrict2.gameObject, invalidConnection.gameObject);
+        }
+
+        [Test]
+        public void TestCrossComponentRelationshipFailures()
+        {
+            // Test cross-component relationship failures (gate ↔ connection ↔ district mismatches)
+            using var world = new World("TestWorld");
+            World.DefaultGameObjectInjectionWorld = world;
+            
+            // Create valid district and connection
+            var district = CreateTestDistrict("TestDistrict", new NodeId { value = 100 });
+            var connection = CreateTestConnection("TestConnection", new NodeId { value = 100 }, new NodeId { value = 200 });
+            
+            // Create gate with invalid connection reference
+            var gateGO = new GameObject("InvalidGate");
+            var gate = gateGO.AddComponent<GateConditionAuthoring>();
+            gate.connectionId = new NodeId { value = 500 }; // References non-existent connection
+            gate.gateConditions = new GateCondition[]
+            {
+                new GateCondition 
+                { 
+                    requiredConnectionId = new NodeId { value = 999 }, // Also invalid
+                    isDefault = false 
+                }
+            };
+            
+            BakeGameObjects(world, district.gameObject, connection.gameObject, gateGO);
+            
+            // Verify entities are created despite relationship mismatches
+            var districtQuery = world.EntityManager.CreateEntityQuery(typeof(DistrictData));
+            var connectionQuery = world.EntityManager.CreateEntityQuery(typeof(ConnectionData));
+            var gateQuery = world.EntityManager.CreateEntityQuery(typeof(GateData));
+            
+            Assert.AreEqual(1, districtQuery.CalculateEntityCount());
+            Assert.AreEqual(1, connectionQuery.CalculateEntityCount());
+            Assert.AreEqual(1, gateQuery.CalculateEntityCount());
+            
+            var gateData = gateQuery.ToComponentDataArray<GateData>(Allocator.Temp);
+            Assert.AreEqual(500u, gateData[0].connectionId.value, "Gate should reference invalid connection ID");
+            
+            gateData.Dispose();
+            districtQuery.Dispose();
+            connectionQuery.Dispose();
+            gateQuery.Dispose();
+            
+            CleanupGameObjects(district.gameObject, connection.gameObject, gateGO);
+        }
+
+        [Test]
+        public void TestBiomeArtProfileValidationFailures()
+        {
+            // Test biome with invalid or missing art profile
+            using var world = new World("TestWorld");
+            World.DefaultGameObjectInjectionWorld = world;
+            
+            var biomeGO = new GameObject("InvalidBiome");
+            var biome = biomeGO.AddComponent<BiomeFieldAuthoring>();
+            biome.nodeId = new NodeId { value = 300 };
+            biome.artProfile = null; // Invalid - null profile
+            
+            // Create another biome with profile but invalid settings
+            var invalidProfileBiomeGO = new GameObject("InvalidProfileBiome");
+            var invalidProfileBiome = invalidProfileBiomeGO.AddComponent<BiomeFieldAuthoring>();
+            invalidProfileBiome.nodeId = new NodeId { value = 301 };
+            
+            var invalidProfile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            invalidProfile.tiles = new TileBase[0]; // Empty tiles array
+            invalidProfile.propPrefabs = new GameObject[0]; // Empty props array
+            invalidProfileBiome.artProfile = invalidProfile;
+            
+            BakeGameObjects(world, biomeGO, invalidProfileBiomeGO);
+            
+            var biomeQuery = world.EntityManager.CreateEntityQuery(typeof(TinyWalnutGames.MetVD.Core.Biome));
+            var biomes = biomeQuery.ToComponentDataArray<TinyWalnutGames.MetVD.Core.Biome>(Allocator.Temp);
+            
+            // Biomes should still be created even with invalid profiles
+            Assert.AreEqual(2, biomes.Length, "Invalid biomes should still be baked");
+            
+            biomes.Dispose();
+            biomeQuery.Dispose();
+            
+            CleanupGameObjects(biomeGO, invalidProfileBiomeGO);
+            Object.DestroyImmediate(invalidProfile);
+        }
+
+        [Test]
+        public void TestComplexRelationshipIntegrity()
+        {
+            // Test complex scenario with multiple interrelated components
+            using var world = new World("TestWorld");
+            World.DefaultGameObjectInjectionWorld = world;
+            
+            // Create network: District A ↔ District B, with gates and biomes
+            var districtA = CreateTestDistrict("DistrictA", new NodeId { value = 401 });
+            var districtB = CreateTestDistrict("DistrictB", new NodeId { value = 402 });
+            
+            var connectionAB = CreateTestConnection("ConnectionAB", 
+                new NodeId { value = 401 }, new NodeId { value = 402 });
+            var connectionBA = CreateTestConnection("ConnectionBA", 
+                new NodeId { value = 402 }, new NodeId { value = 401 });
+            
+            // Create biomes for both districts
+            var biomeA = CreateTestBiome("BiomeA", new NodeId { value = 401 }, BiomeType.Forest);
+            var biomeB = CreateTestBiome("BiomeB", new NodeId { value = 402 }, BiomeType.Desert);
+            
+            // Create gate with circular reference (testing edge case)
+            var circularGateGO = new GameObject("CircularGate");
+            var circularGate = circularGateGO.AddComponent<GateConditionAuthoring>();
+            circularGate.connectionId = new NodeId { value = 401 };
+            circularGate.gateConditions = new GateCondition[]
+            {
+                new GateCondition 
+                { 
+                    requiredConnectionId = new NodeId { value = 401 }, // Self-reference!
+                    isDefault = false 
+                }
+            };
+            
+            BakeGameObjects(world, 
+                districtA.gameObject, districtB.gameObject, 
+                connectionAB.gameObject, connectionBA.gameObject,
+                biomeA.gameObject, biomeB.gameObject,
+                circularGateGO);
+            
+            // Verify all components were baked
+            var districtQuery = world.EntityManager.CreateEntityQuery(typeof(DistrictData));
+            var connectionQuery = world.EntityManager.CreateEntityQuery(typeof(ConnectionData));
+            var biomeQuery = world.EntityManager.CreateEntityQuery(typeof(TinyWalnutGames.MetVD.Core.Biome));
+            var gateQuery = world.EntityManager.CreateEntityQuery(typeof(GateData));
+            
+            Assert.AreEqual(2, districtQuery.CalculateEntityCount(), "Both districts should be baked");
+            Assert.AreEqual(2, connectionQuery.CalculateEntityCount(), "Both connections should be baked");
+            Assert.AreEqual(2, biomeQuery.CalculateEntityCount(), "Both biomes should be baked");
+            Assert.AreEqual(1, gateQuery.CalculateEntityCount(), "Circular gate should be baked");
+            
+            // Verify data integrity
+            var connections = connectionQuery.ToComponentDataArray<ConnectionData>(Allocator.Temp);
+            var gates = gateQuery.ToComponentDataArray<GateData>(Allocator.Temp);
+            
+            // Check bidirectional connections
+            bool foundAB = false, foundBA = false;
+            foreach (var conn in connections)
+            {
+                if (conn.sourceNode.value == 401 && conn.targetNode.value == 402) foundAB = true;
+                if (conn.sourceNode.value == 402 && conn.targetNode.value == 401) foundBA = true;
+            }
+            Assert.IsTrue(foundAB && foundBA, "Bidirectional connections should exist");
+            
+            // Check circular gate reference
+            Assert.AreEqual(401u, gates[0].connectionId.value, "Gate should have correct connection ID");
+            
+            connections.Dispose();
+            gates.Dispose();
+            districtQuery.Dispose();
+            connectionQuery.Dispose();
+            biomeQuery.Dispose();
+            gateQuery.Dispose();
+            
+            CleanupGameObjects(
+                districtA.gameObject, districtB.gameObject, 
+                connectionAB.gameObject, connectionBA.gameObject,
+                biomeA.gameObject, biomeB.gameObject,
+                circularGateGO);
+        }
     }
 }

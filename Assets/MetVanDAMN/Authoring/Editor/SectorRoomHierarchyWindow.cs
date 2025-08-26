@@ -17,15 +17,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     {
         private Vector2 scrollPosition;
         private string searchFilter = "";
+        private string nodeIdSearchFilter = "";
+        private string connectionTypeFilter = "";
         private string biomeFilter = "All";
         private bool showOnlyConnected = false;
         private bool groupByDistrict = true;
         private bool showDetailedInfo = false;
         private bool enableClickToSelect = true;
+        private bool enableMultiSelect = true;
         
         private List<DistrictHierarchy> districtHierarchies = new List<DistrictHierarchy>();
         private Dictionary<uint, List<uint>> connectionMap = new Dictionary<uint, List<uint>>();
         private HashSet<string> availableBiomeTypes = new HashSet<string>();
+        private HashSet<uint> selectedNodeIds = new HashSet<uint>();
+        private HashSet<GameObject> highlightedObjects = new HashSet<GameObject>();
 
         [System.Serializable]
         private class DistrictHierarchy
@@ -126,6 +131,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             GUILayout.Space(10);
             
+            // NodeId search field
+            EditorGUILayout.LabelField("NodeId:", GUILayout.Width(50));
+            nodeIdSearchFilter = EditorGUILayout.TextField(nodeIdSearchFilter, GUILayout.Width(80));
+            
+            GUILayout.Space(10);
+            
+            // Connection type filter
+            EditorGUILayout.LabelField("Connection:", GUILayout.Width(70));
+            connectionTypeFilter = EditorGUILayout.TextField(connectionTypeFilter, GUILayout.Width(100));
+            
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.BeginHorizontal();
+            
             // Biome filtering dropdown
             EditorGUILayout.LabelField("Biome:", GUILayout.Width(45));
             string[] biomeOptions = new[] { "All" }.Concat(availableBiomeTypes.OrderBy(t => t)).ToArray();
@@ -136,6 +155,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (newBiomeIndex != currentBiomeIndex && newBiomeIndex >= 0 && newBiomeIndex < biomeOptions.Length)
             {
                 biomeFilter = biomeOptions[newBiomeIndex];
+            }
+            
+            GUILayout.Space(10);
+            
+            if (GUILayout.Button("Clear Filters", GUILayout.Width(80)))
+            {
+                searchFilter = "";
+                nodeIdSearchFilter = "";
+                connectionTypeFilter = "";
+                biomeFilter = "All";
             }
             
             EditorGUILayout.EndHorizontal();
@@ -151,6 +180,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             EditorGUILayout.BeginHorizontal();
             
             enableClickToSelect = EditorGUILayout.Toggle("Click to Select", enableClickToSelect, GUILayout.Width(120));
+            enableMultiSelect = EditorGUILayout.Toggle("Multi-Select", enableMultiSelect, GUILayout.Width(100));
+            
+            GUILayout.Space(10);
+            
+            if (selectedNodeIds.Count > 0)
+            {
+                EditorGUILayout.LabelField($"Selected: {selectedNodeIds.Count}", GUILayout.Width(80));
+                
+                if (GUILayout.Button("Clear Selection", GUILayout.Width(100)))
+                {
+                    ClearSelection();
+                }
+            }
             
             GUILayout.FlexibleSpace();
             
@@ -660,10 +702,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             return districtHierarchies.Where(h => 
             {
-                // Apply search filter
+                // Apply general search filter
                 bool matchesSearch = string.IsNullOrEmpty(searchFilter) ||
                     h.district.name.ToLower().Contains(searchFilter.ToLower()) ||
                     h.district.nodeId.value.ToString().Contains(searchFilter);
+                
+                // Apply NodeId search filter
+                bool matchesNodeId = string.IsNullOrEmpty(nodeIdSearchFilter) ||
+                    h.district.nodeId.value.ToString().Contains(nodeIdSearchFilter);
+                
+                // Apply connection type filter
+                bool matchesConnectionType = string.IsNullOrEmpty(connectionTypeFilter) ||
+                    h.connections.Any(c => c.connectionType.ToLower().Contains(connectionTypeFilter.ToLower()));
                 
                 // Apply biome filter
                 bool matchesBiome = biomeFilter == "All" || h.biomeType.Contains(biomeFilter);
@@ -671,20 +721,65 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 // Apply connected filter
                 bool matchesConnected = !showOnlyConnected || h.connections.Count > 0;
                 
-                return matchesSearch && matchesBiome && matchesConnected;
+                return matchesSearch && matchesNodeId && matchesConnectionType && matchesBiome && matchesConnected;
             });
         }
 
         /// <summary>
-        /// Handles click-to-select functionality for UI elements
+        /// Clears all selections and highlights
+        /// </summary>
+        private void ClearSelection()
+        {
+            selectedNodeIds.Clear();
+            highlightedObjects.Clear();
+            Selection.objects = new UnityEngine.Object[0];
+        }
+
+        /// <summary>
+        /// Enhanced click-to-select functionality with multi-select support
         /// </summary>
         private void HandleObjectSelection(UnityEngine.Object targetObject, Event currentEvent)
         {
             if (enableClickToSelect && targetObject != null && currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
             {
-                if (currentEvent.control || currentEvent.command)
+                // Extract NodeId if available
+                uint nodeId = 0;
+                if (targetObject is Component comp)
                 {
-                    // Add to selection
+                    var districtAuth = comp.GetComponent<DistrictAuthoring>();
+                    if (districtAuth != null) nodeId = districtAuth.nodeId.value;
+                    
+                    var biomeAuth = comp.GetComponent<BiomeFieldAuthoring>();
+                    if (biomeAuth != null) nodeId = biomeAuth.nodeId.value;
+                }
+                else if (targetObject is GameObject go)
+                {
+                    var districtAuth = go.GetComponent<DistrictAuthoring>();
+                    if (districtAuth != null) nodeId = districtAuth.nodeId.value;
+                    
+                    var biomeAuth = go.GetComponent<BiomeFieldAuthoring>();
+                    if (biomeAuth != null) nodeId = biomeAuth.nodeId.value;
+                }
+                
+                if (enableMultiSelect && (currentEvent.control || currentEvent.command))
+                {
+                    // Multi-select mode
+                    if (nodeId != 0)
+                    {
+                        if (selectedNodeIds.Contains(nodeId))
+                        {
+                            selectedNodeIds.Remove(nodeId);
+                            highlightedObjects.Remove(targetObject as GameObject);
+                        }
+                        else
+                        {
+                            selectedNodeIds.Add(nodeId);
+                            if (targetObject is GameObject gameObj)
+                                highlightedObjects.Add(gameObj);
+                        }
+                    }
+                    
+                    // Add to Unity selection
                     var currentSelection = Selection.objects.ToList();
                     if (!currentSelection.Contains(targetObject))
                     {
@@ -694,22 +789,27 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 }
                 else
                 {
-                    // Replace selection
+                    // Single select mode - clear previous selections
+                    selectedNodeIds.Clear();
+                    highlightedObjects.Clear();
+                    
+                    if (nodeId != 0)
+                    {
+                        selectedNodeIds.Add(nodeId);
+                        if (targetObject is GameObject gameObj)
+                            highlightedObjects.Add(gameObj);
+                    }
+                    
+                    // Replace Unity selection
                     Selection.activeObject = targetObject;
                     EditorGUIUtility.PingObject(targetObject);
                 }
                 
                 // Focus scene view on object
-                if (targetObject is Component comp)
-                {
-                    SceneView.lastActiveSceneView?.FrameSelected();
-                }
-                else if (targetObject is GameObject go)
-                {
-                    SceneView.lastActiveSceneView?.FrameSelected();
-                }
+                SceneView.lastActiveSceneView?.FrameSelected();
                 
                 currentEvent.Use();
+                Repaint(); // Update window to show selection changes
             }
         }
     }

@@ -29,11 +29,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             public BiomeType type;
             public Color color;
+            public Color currentColor; // Runtime color (may differ from design-time)
             public string name;
             public int instanceCount;
             public Vector3 averagePosition;
             public BiomeArtProfile artProfile;
             public bool isVisible = true;
+            public bool isRuntimeActive = false; // True if found in ECS systems during play mode
+            public bool hasColorOverride = false; // True if runtime color differs from design color
+            public string colorSource = ""; // Source of current color (e.g., "TilemapRenderer", "ECS", "Design")
+            public uint nodeId = 0; // NodeId for better tracking
         }
 
         [MenuItem("Tools/MetVanDAMN/World Debugger/Biome Color Legend")]
@@ -61,8 +66,102 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (autoRefresh && EditorApplication.timeSinceStartup - lastRefreshTime > refreshInterval)
             {
                 RefreshBiomeData();
+                CheckForRuntimeColorChanges();
                 lastRefreshTime = EditorApplication.timeSinceStartup;
                 Repaint();
+            }
+        }
+
+        private void CheckForRuntimeColorChanges()
+        {
+            // Enhanced runtime synchronization with ECS biome systems and tilemap renderers
+            if (Application.isPlaying)
+            {
+                SynchronizeWithECSBiomeSystems();
+            }
+            
+            SynchronizeWithTilemapRenderers();
+        }
+
+        private void SynchronizeWithECSBiomeSystems()
+        {
+            // Runtime ECS biome system synchronization for play mode
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null) return;
+
+            // Query ECS entities with biome components for runtime color data
+            var entityManager = world.EntityManager;
+            var biomeQuery = entityManager.CreateEntityQuery(typeof(TinyWalnutGames.MetVD.Core.Biome), typeof(NodeId));
+            
+            if (biomeQuery.CalculateEntityCount() > 0)
+            {
+                var entities = biomeQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+                var biomes = biomeQuery.ToComponentDataArray<TinyWalnutGames.MetVD.Core.Biome>(Unity.Collections.Allocator.Temp);
+                var nodeIds = biomeQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+                
+                for (int i = 0; i < entities.Length; i++)
+                {
+                    var nodeId = nodeIds[i].value;
+                    var biomeType = biomes[i].Type.ToString();
+                    
+                    // Update biome data if runtime color information is available
+                    var existingEntry = biomeInfos.Find(entry => 
+                        entry.nodeId == nodeId || entry.type.ToString() == biomeType);
+                    
+                    if (existingEntry != null)
+                    {
+                        existingEntry.isRuntimeActive = true;
+                        // Additional ECS data could be pulled here for enhanced runtime info
+                    }
+                }
+                
+                entities.Dispose();
+                biomes.Dispose();
+                nodeIds.Dispose();
+            }
+            
+            biomeQuery.Dispose();
+        }
+
+        private void SynchronizeWithTilemapRenderers()
+        {
+            // TilemapRenderer color detection and updates
+            var tilemapRenderers = Object.FindObjectsByType<TilemapRenderer>(FindObjectsSortMode.None);
+            
+            foreach (var renderer in tilemapRenderers)
+            {
+                if (renderer.material != null && renderer.material.HasProperty("_Color"))
+                {
+                    Color rendererColor = renderer.material.color;
+                    
+                    // Try to match tilemap renderer to biome by checking parent hierarchy
+                    var biomeAuthoring = renderer.GetComponentInParent<BiomeFieldAuthoring>();
+                    if (biomeAuthoring != null)
+                    {
+                        var existingEntry = biomeInfos.Find(entry => entry.nodeId == biomeAuthoring.nodeId.value);
+                        if (existingEntry != null && existingEntry.currentColor != rendererColor)
+                        {
+                            existingEntry.currentColor = rendererColor;
+                            existingEntry.hasColorOverride = true;
+                            existingEntry.colorSource = "TilemapRenderer";
+                        }
+                    }
+                    else
+                    {
+                        // Try to match by name patterns
+                        string rendererName = renderer.gameObject.name.ToLowerInvariant();
+                        var matchingEntry = biomeInfos.Find(entry => 
+                            rendererName.Contains(entry.type.ToString().ToLowerInvariant()) ||
+                            rendererName.Contains(entry.nodeId.ToString()));
+                            
+                        if (matchingEntry != null && matchingEntry.currentColor != rendererColor)
+                        {
+                            matchingEntry.currentColor = rendererColor;
+                            matchingEntry.hasColorOverride = true;
+                            matchingEntry.colorSource = $"TilemapRenderer ({renderer.name})";
+                        }
+                    }
+                }
             }
         }
 

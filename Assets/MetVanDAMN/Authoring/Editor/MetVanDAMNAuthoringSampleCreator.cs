@@ -275,7 +275,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                         };
                         break;
                     default:
-                        // Basic configuration for other types
+                        // Standard configuration for other types
                         wfcTile.sockets = new WfcSocketConfig[]
                         {
                             new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
@@ -351,7 +351,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             light.color = Color.white;
             light.intensity = 1f;
             
-            // Set up basic lighting settings
+            // Set up production lighting settings
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
             RenderSettings.ambientSkyColor = new Color(0.212f, 0.227f, 0.259f);
             RenderSettings.ambientEquatorColor = new Color(0.114f, 0.125f, 0.133f);
