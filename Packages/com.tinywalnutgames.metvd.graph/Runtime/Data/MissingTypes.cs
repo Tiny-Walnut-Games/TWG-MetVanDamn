@@ -270,43 +270,6 @@ namespace TinyWalnutGames.MetVD.Graph
     }
 
     /// <summary>
-    /// World configuration component
-    /// </summary>
-    public struct WorldConfiguration : IComponentData
-    {
-        public int WorldSeed;
-        public int2 WorldSize;
-        public RandomizationMode RandomizationMode;
-        public BiomeGenerationSettings BiomeSettings;
-        public DistrictGenerationSettings DistrictSettings;
-        public SectorGenerationSettings SectorSettings;
-        public RoomGenerationSettings RoomSettings;
-        public bool EnableDebugMode;
-        public bool EnableDetailedLogging;
-        
-        public WorldConfiguration(int seed, int2 size, RandomizationMode mode, BiomeGenerationSettings biome, 
-                                DistrictGenerationSettings district, SectorGenerationSettings sector, 
-                                RoomGenerationSettings room, bool debug, bool logging)
-        {
-            WorldSeed = seed;
-            WorldSize = size;
-            RandomizationMode = mode;
-            BiomeSettings = biome;
-            DistrictSettings = district;
-            SectorSettings = sector;
-            RoomSettings = room;
-            EnableDebugMode = debug;
-            EnableDetailedLogging = logging;
-        }
-        
-        // Legacy properties for backward compatibility
-        public int2 BiomeCountRange => new int2(1, 4);
-        public int2 DistrictCountRange => new int2(2, 6);
-        public float DistrictMinDistance => 10.0f;
-        public float BiomeWeight => 1.0f;
-    }
-
-    /// <summary>
     /// World settings component (legacy compatibility)
     /// </summary>
     public struct WorldSettings : IComponentData
@@ -323,44 +286,6 @@ namespace TinyWalnutGames.MetVD.Graph
         public BiomeAffinity PrimaryBiome;
         public float BiomeWeight;
         public int BiomeVariationCount;
-    }
-
-    /// <summary>
-    /// District settings component
-    /// </summary>
-    public struct DistrictSettings : IComponentData
-    {
-        public int DistrictCount;
-        public float MinDistrictDistance;
-        public DistrictGenerationSettings GenerationSettings;
-    }
-
-    /// <summary>
-    /// Sector settings component
-    /// </summary>
-    public struct SectorSettings : IComponentData
-    {
-        public int SectorsPerDistrict;
-        public SectorGenerationSettings GenerationSettings;
-    }
-
-    /// <summary>
-    /// Debug settings component
-    /// </summary>
-    public struct DebugSettings : IComponentData
-    {
-        public bool EnableVerboseLogging;
-        public bool EnablePerformanceMetrics;
-        public bool EnableValidationChecks;
-    }
-
-    /// <summary>
-    /// World bootstrap settings component
-    /// </summary>
-    public struct WorldBootstrapSettings : IComponentData
-    {
-        public WorldConfiguration WorldConfig;
-        public DebugSettings DebugConfig;
     }
 
     /// <summary>
