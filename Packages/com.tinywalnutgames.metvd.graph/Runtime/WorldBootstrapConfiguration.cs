@@ -27,7 +27,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
         public WorldBootstrapConfiguration(uint seed, int2 worldSize, RandomizationMode randomizationMode,
             BiomeGenerationSettings biomeSettings, DistrictGenerationSettings districtSettings,
-            SectorGenerationSettings sectorSettings, RoomGenerationSettings roomSettings,
+            SectorGenerationSettings sectorGenerationSettings, RoomGenerationSettings roomSettings,
             bool enableDebugVisualization, bool logGenerationSteps)
         {
             Seed = seed;
@@ -35,13 +35,13 @@ namespace TinyWalnutGames.MetVD.Graph
             RandomizationMode = randomizationMode;
             BiomeSettings = biomeSettings;
             DistrictSettings = districtSettings;
-            SectorSettings = sectorSettings;
+            SectorSettings = sectorGenerationSettings;
             RoomSettings = roomSettings;
             EnableDebugVisualization = enableDebugVisualization;
             LogGenerationSteps = logGenerationSteps;
         }
         
-        // Alternate constructor matching test expectations
+        // Alternate constructor matching test expectations (grouped structs)
         public WorldBootstrapConfiguration(WorldSettings worldSettings, BiomeSettings biomeSettings,
             DistrictSettings districtSettings, DebugSettings debugSettings)
         {
@@ -71,6 +71,20 @@ namespace TinyWalnutGames.MetVD.Graph
             };
             EnableDebugVisualization = debugSettings.EnableDebugVisualization;
             LogGenerationSteps = debugSettings.LogGenerationSteps;
+        }
+
+        // Flat compatibility constructor (WorldBootstrapSettings)
+        public WorldBootstrapConfiguration(WorldBootstrapSettings settings)
+        {
+            Seed = settings.Seed;
+            WorldSize = settings.WorldSize;
+            RandomizationMode = settings.RandomizationMode;
+            BiomeSettings = new BiomeGenerationSettings { BiomeCountRange = settings.BiomeCountRange, BiomeWeight = settings.BiomeWeight };
+            DistrictSettings = new DistrictGenerationSettings { DistrictCountRange = settings.DistrictCountRange, DistrictMinDistance = settings.DistrictMinDistance, DistrictWeight = settings.DistrictWeight };
+            SectorSettings = new SectorGenerationSettings { SectorsPerDistrictRange = settings.SectorsPerDistrictRange, SectorGridSize = settings.SectorGridSize };
+            RoomSettings = new RoomGenerationSettings { RoomsPerSectorRange = settings.RoomsPerSectorRange, TargetLoopDensity = settings.TargetLoopDensity };
+            EnableDebugVisualization = settings.EnableDebugVisualization;
+            LogGenerationSteps = settings.LogGenerationSteps;
         }
     }
 
@@ -111,7 +125,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public float TargetLoopDensity;
     }
 
-    // Test compatibility structs
+    // Test compatibility structs (existing)
     public struct WorldSettings
     {
         public uint Seed;
@@ -202,12 +216,47 @@ namespace TinyWalnutGames.MetVD.Graph
     }
 
     /// <summary>
+    /// Flat settings struct expected by some tests (legacy)
+    /// </summary>
+    public struct WorldBootstrapSettings
+    {
+        public uint Seed;
+        public int2 WorldSize;
+        public RandomizationMode RandomizationMode;
+        public int2 BiomeCountRange;
+        public float BiomeWeight;
+        public int2 DistrictCountRange;
+        public float DistrictMinDistance;
+        public float DistrictWeight;
+        public int2 SectorsPerDistrictRange;
+        public int2 SectorGridSize;
+        public int2 RoomsPerSectorRange;
+        public float TargetLoopDensity;
+        public bool EnableDebugVisualization;
+        public bool LogGenerationSteps;
+    }
+
+    /// <summary>
     /// Tag component to mark world bootstrap in progress
     /// </summary>
     public struct WorldBootstrapInProgressTag : IComponentData { }
 
     /// <summary>
-    /// Tag component to mark world bootstrap complete
+    /// Tag component to mark world bootstrap complete (with statistics)
     /// </summary>
-    public struct WorldBootstrapCompleteTag : IComponentData { }
+    public struct WorldBootstrapCompleteTag : IComponentData
+    {
+        public int BiomesGenerated;
+        public int DistrictsGenerated;
+        public int SectorsGenerated;
+        public int RoomsGenerated;
+
+        public WorldBootstrapCompleteTag(int biomes, int districts, int sectors, int rooms)
+        {
+            BiomesGenerated = biomes;
+            DistrictsGenerated = districts;
+            SectorsGenerated = sectors;
+            RoomsGenerated = rooms;
+        }
+    }
 }
