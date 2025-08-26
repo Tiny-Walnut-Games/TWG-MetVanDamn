@@ -76,6 +76,7 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\CinemachineZoneGeneratorSystemTest.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapConfiguration.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SectorRefineSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\JumpArcSolver.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs" />
