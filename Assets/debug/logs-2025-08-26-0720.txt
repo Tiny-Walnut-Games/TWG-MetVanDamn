@@ -1018,5 +1018,5 @@ E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Editor\BatchSpri
 E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Editor\BatchSpriteSlicer.cs(466,35): error CS0246: The type or namespace name 'SpriteDataProviderFactories' could not be found (are you missing a using directive or an assembly reference?)
 E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Editor\BatchSpriteSlicer.cs(471,22): error CS0246: The type or namespace name 'SpriteRect' could not be found (are you missing a using directive or an assembly reference?)
 E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Editor\BatchSpriteSlicer.cs(546,25): error CS0246: The type or namespace name 'SpriteRect' could not be found (are you missing a using directive or an assembly reference?)
-========== Build: 14 succeeded or up-to-date, 8 failed, 0 skipped ==========
+========== Build: 14 succeeded or up-to-date, 8 failed, 0 skipped ========== 
 ========== Build completed at 1:17 PM and took 04.185 seconds ==========
