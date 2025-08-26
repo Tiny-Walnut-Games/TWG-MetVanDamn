@@ -233,7 +233,13 @@ namespace TinyWalnutGames.MetVD.Graph
             var bounds = roomData.Bounds;
 
             // Calculate optimal platform spacing based on jump physics
-            var minSpacing = JumpArcSolver.CalculateMinimumPlatformSpacing(jumpPhysics, 0.7f); // 70% difficulty
+            var minSpacing = JumpArcSolver.CalculateMinimumPlatformSpacing(new JumpArcPhysics
+            {
+                JumpHeight = jumpPhysics.JumpHeight,
+                JumpDistance = jumpPhysics.JumpDistance,
+                GravityScale = jumpPhysics.GravityScale,
+                DashDistance = 6.0f // Default dash distance
+            });
             
             // Generate platforms with physics-based constraints
             var platformPositions = new NativeList<float2>(Allocator.Temp);
@@ -252,7 +258,14 @@ namespace TinyWalnutGames.MetVD.Graph
                 if (platformPositions.Length > 0)
                 {
                     var lastPlatform = platformPositions[platformPositions.Length - 1];
-                    if (JumpArcSolver.IsReachable(lastPlatform, platformPos, jumpPhysics))
+                    var physics = new JumpArcPhysics
+                    {
+                        JumpHeight = jumpPhysics.JumpHeight,
+                        JumpDistance = jumpPhysics.JumpDistance,
+                        GravityScale = jumpPhysics.GravityScale,
+                        DashDistance = 6.0f // Default dash distance
+                    };
+                    if (JumpArcSolver.IsReachable((int2)lastPlatform, (int2)platformPos, Ability.Jump, physics))
                     {
                         platformPositions.Add(platformPos);
                     }
@@ -275,7 +288,14 @@ namespace TinyWalnutGames.MetVD.Graph
                     var from = platformPositions[i];
                     var to = platformPositions[i + 1];
                     
-                    var arcData = JumpArcSolver.CalculateJumpArc((int2)from, (int2)to, jumpPhysics);
+                    var physics = new JumpArcPhysics
+                    {
+                        JumpHeight = jumpPhysics.JumpHeight,
+                        JumpDistance = jumpPhysics.JumpDistance,
+                        GravityScale = jumpPhysics.GravityScale,
+                        DashDistance = 6.0f // Default dash distance
+                    };
+                    var arcData = JumpArcSolver.CalculateJumpArc((int2)from, (int2)to, physics);
                     float angle = math.atan2(arcData.InitialVelocity.y, arcData.InitialVelocity.x);
                     float velocity = math.length(arcData.InitialVelocity);
                     

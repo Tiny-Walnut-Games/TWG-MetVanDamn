@@ -280,9 +280,11 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Calculate minimum platform spacing based on jump physics
         /// </summary>
         [BurstCompile]
-        public static float CalculateMinimumPlatformSpacing(JumpArcPhysics physics)
+        public static float2 CalculateMinimumPlatformSpacing(JumpArcPhysics physics)
         {
-            return physics.JumpDistance * 0.8f; // 80% of max jump distance for safety margin
+            float horizontalSpacing = physics.JumpDistance * 0.8f; // 80% of max jump distance for safety margin
+            float verticalSpacing = physics.JumpHeight * 0.7f; // 70% of max jump height for safety margin
+            return new float2(horizontalSpacing, verticalSpacing);
         }
 
         /// <summary>
