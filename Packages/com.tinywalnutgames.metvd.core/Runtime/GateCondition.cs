@@ -49,17 +49,26 @@ namespace TinyWalnutGames.MetVD.Core
         LifeAccess = 1 << 24,
         TechAccess = 1 << 25,
         
+        // Cross-scale abilities (spacecraft/vehicle)
+        WarpDrive = 1 << 23,
+        HeatShielding = 1 << 24,
+        ColdShielding = 1 << 25,
+        OrbitalManeuver = 1 << 26,
+        TerrainTraversal = 1 << 27,
+        Flight = 1 << 28,
+        
         // Meta progression
-        MapUnlock = 1 << 26,
-        SaveUnlock = 1 << 27,
-        FastTravel = 1 << 28,
+        MapUnlock = 1 << 29,
+        SaveUnlock = 1 << 30,
+        FastTravel = 1 << 31,
         
         // Special combined abilities
         AllMovement = Jump | DoubleJump | WallJump | Dash | GlideSpeed | ArcJump | ChargedJump | TeleportArc,
         AllEnvironmental = Swim | Climb | HeatResistance | ColdResistance | PressureResistance,
         AllTools = Bomb | Grapple | Drill | Scan | Hack,
         AllPolarity = SunAccess | MoonAccess | HeatAccess | ColdAccess | EarthAccess | WindAccess | LifeAccess | TechAccess,
-        AllArcMovement = ArcJump | ChargedJump | TeleportArc | Grapple,
+        AllSpacecraft = WarpDrive | HeatShielding | ColdShielding | OrbitalManeuver,
+        AllVehicle = TerrainTraversal | Flight | HeatShielding | ColdShielding,
         Everything = 0xFFFFFFFF
     }
 
