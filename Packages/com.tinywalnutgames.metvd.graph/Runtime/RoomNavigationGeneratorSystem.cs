@@ -60,15 +60,6 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        public void Update(ref SystemState state, ref RoomNavigationGeneratorSystem system)
-        {
-            // state needs to be passed in for ISystem interface
-            OnUpdate(ref state);
-
-            // system needs to be passed in for BurstCompile static method
-            OnUpdate(ref system);
-        }
-
         [BurstCompile]
         private static void GenerateRoomNavigation(EntityManager entityManager, Entity roomEntity, 
                                                   RoomHierarchyData hierarchy, RoomTemplate template, 

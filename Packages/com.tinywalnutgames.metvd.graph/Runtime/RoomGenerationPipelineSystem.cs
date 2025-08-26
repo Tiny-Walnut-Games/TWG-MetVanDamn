@@ -327,15 +327,18 @@ namespace TinyWalnutGames.MetVD.Graph
             if (JumpPhysicsLookup.HasComponent(entity) && platformPositions.Length > 1)
             {
                 var jumpPhysics = JumpPhysicsLookup[entity];
-                bool isReachable = JumpArcSolver.ValidateRoomReachability(
-                    platformPositions.AsArray(), 
-                    obstaclePositions.AsArray(), 
-                    jumpPhysics);
-                
-                // If not reachable, mark for regeneration (simplified - could trigger retry)
-                if (!isReachable && features.Length > 2)
+                // Build int2 array of critical positions (platforms considered critical)
+                var critical = new NativeArray<int2>(platformPositions.Length, Allocator.Temp);
+                for (int i = 0; i < platformPositions.Length; i++)
                 {
-                    // Remove some obstacles to improve reachability
+                    var p = platformPositions[i];
+                    critical[i] = new int2((int)p.x, (int)p.y);
+                }
+                // Entrance assumed first platform
+                var entrance = critical[0];
+                bool allReachable = JumpArcSolver.ValidateRoomReachability(entrance, critical, Ability.Jump | Ability.DoubleJump, new JumpArcPhysics(), new RectInt(0,0,bounds.width,bounds.height), Allocator.Temp);
+                if (!allReachable && features.Length > 2)
+                {
                     for (int i = features.Length - 1; i >= 0; i--)
                     {
                         if (features[i].Type == RoomFeatureType.Obstacle && Random.NextFloat() < 0.3f)
@@ -344,6 +347,7 @@ namespace TinyWalnutGames.MetVD.Graph
                         }
                     }
                 }
+                critical.Dispose();
             }
             
             platformPositions.Dispose();

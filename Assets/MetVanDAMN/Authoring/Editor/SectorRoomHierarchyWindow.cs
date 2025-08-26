@@ -276,7 +276,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 filtered = filtered.Where(h => 
                     h.district.name.ToLower().Contains(searchFilter.ToLower()) ||
-                    h.district.nodeId.value.ToString().Contains(searchFilter));
+                    h.district.nodeId.ToString().Contains(searchFilter));
             }
             
             if (showOnlyConnected)
@@ -446,29 +446,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             connectionMap.Clear();
             availableBiomeTypes.Clear();
             
-            var districts = FindAnyObjectByType<DistrictAuthoring>();
-            var connections = FindAnyObjectByType<ConnectionAuthoring>();
-            var gates = FindAnyObjectByType<GateConditionAuthoring>();
-            var biomes = FindAnyObjectByType<BiomeFieldAuthoring>();
-
+            var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            var connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
+            var gates = Object.FindObjectsByType<GateConditionAuthoring>(FindObjectsSortMode.None);
+            var biomes = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
+            
             // Build biome type collection
             foreach (var biome in biomes)
             {
-                if (biome.artProfile != null && !string.IsNullOrEmpty(biome.artProfile.biomeName))
-                {
+                if (biome != null && biome.artProfile != null && !string.IsNullOrEmpty(biome.artProfile.biomeName))
                     availableBiomeTypes.Add(biome.artProfile.biomeName);
-                }
                 else
-                {
                     availableBiomeTypes.Add("Unknown");
-                }
             }
             
             // Build connection map
             foreach (var connection in connections)
             {
-                uint sourceId = connection.sourceNode.value;
-                uint targetId = connection.targetNode.value;
+                if (connection == null) continue;
+                uint sourceId = connection.sourceNode; // assuming now uint
+                uint targetId = connection.targetNode;
                 
                 if (!connectionMap.ContainsKey(sourceId))
                     connectionMap[sourceId] = new List<uint>();
@@ -479,25 +476,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Build district hierarchies with biome associations
             foreach (var district in districts)
             {
+                if (district == null) continue;
                 var hierarchy = BuildDistrictHierarchy(district, connections, gates, biomes);
                 districtHierarchies.Add(hierarchy);
             }
             
             // Sort by node ID
-            districtHierarchies.Sort((a, b) => a.district.nodeId.value.CompareTo(b.district.nodeId.value));
+            districtHierarchies.Sort((a,b)=> a.district.nodeId.CompareTo(b.district.nodeId));
         }
 
         private DistrictHierarchy BuildDistrictHierarchy(DistrictAuthoring district, ConnectionAuthoring[] connections, GateConditionAuthoring[] gates, BiomeFieldAuthoring[] biomes)
         {
-            var hierarchy = new DistrictHierarchy
-            {
-                district = district
-            };
+            var hierarchy = new DistrictHierarchy { district = district };
             
-            uint nodeId = district.nodeId.value;
+            uint nodeId = district.nodeId;
             
             // Find associated biome
-            var associatedBiome = biomes.FirstOrDefault(b => b.nodeId.value == nodeId);
+            var associatedBiome = biomes.FirstOrDefault(b=> b!=null && b.nodeId == nodeId);
             if (associatedBiome != null)
             {
                 hierarchy.associatedBiome = associatedBiome;
@@ -511,42 +506,35 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     .OrderBy(b => Vector3.Distance(district.transform.position, b.transform.position))
                     .FirstOrDefault();
                 
-                if (closestBiome != null && Vector3.Distance(district.transform.position, closestBiome.transform.position) < 10f)
+                if (closestBiome!=null && Vector3.Distance(district.transform.position, closestBiome.transform.position) < 10f)
                 {
                     hierarchy.associatedBiome = closestBiome;
                     hierarchy.biomeType = $"{closestBiome.artProfile?.biomeName ?? "Unknown"} (nearby)";
                 }
-                else
-                {
-                    hierarchy.biomeType = "No Biome";
-                }
+                else hierarchy.biomeType = "No Biome";
             }
             
             // Build connections
-            var districtConnections = connections.Where(c => c.sourceNode.value == nodeId);
+            var districtConnections = connections.Where(c=> c!=null && c.sourceNode == nodeId);
             foreach (var connection in districtConnections)
             {
-                var connectionInfo = new ConnectionInfo
+                var info = new ConnectionInfo
                 {
-                    targetNodeId = connection.targetNode.value,
+                    targetNodeId = connection.targetNode,
                     connection = connection,
-                    hasGateCondition = gates.Any(g => g.sourceNode.value == connection.sourceNode.value && 
-                                                     g.targetNode.value == connection.targetNode.value),
+                    hasGateCondition = gates.Any(g=> g!=null && g.sourceNode == connection.sourceNode && g.targetNode == connection.targetNode),
                     connectionType = DetermineConnectionType(connection)
                 };
                 
-                hierarchy.connections.Add(connectionInfo);
+                hierarchy.connections.Add(info);
             }
             
             // Build sectors (simulated based on target sector count)
             int targetSectorCount = district.targetSectorCount;
-            for (int i = 0; i < targetSectorCount; i++)
-            {
-                var sector = GenerateSectorInfo(i, district.transform.position, targetSectorCount);
-                hierarchy.sectors.Add(sector);
-            }
+            for (int i=0;i<targetSectorCount;i++)
+                hierarchy.sectors.Add(GenerateSectorInfo(i, district.transform.position, targetSectorCount));
             
-            hierarchy.totalRoomCount = hierarchy.sectors.Sum(s => s.roomCount);
+            hierarchy.totalRoomCount = hierarchy.sectors.Sum(s=> s.roomCount);
             hierarchy.averageConnectivity = CalculateConnectivity(nodeId);
             
             return hierarchy;
@@ -701,16 +689,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         /// </summary>
         private IEnumerable<DistrictHierarchy> GetFilteredHierarchies()
         {
-            return districtHierarchies.Where(h => 
+            return districtHierarchies.Where(h=>
             {
                 // Apply general search filter
                 bool matchesSearch = string.IsNullOrEmpty(searchFilter) ||
                     h.district.name.ToLower().Contains(searchFilter.ToLower()) ||
-                    h.district.nodeId.value.ToString().Contains(searchFilter);
+                    h.district.nodeId.ToString().Contains(searchFilter);
                 
                 // Apply NodeId search filter
                 bool matchesNodeId = string.IsNullOrEmpty(nodeIdSearchFilter) ||
-                    h.district.nodeId.value.ToString().Contains(nodeIdSearchFilter);
+                    h.district.nodeId.ToString().Contains(nodeIdSearchFilter);
                 
                 // Apply connection type filter
                 bool matchesConnectionType = string.IsNullOrEmpty(connectionTypeFilter) ||
