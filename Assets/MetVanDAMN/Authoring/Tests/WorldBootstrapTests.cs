@@ -224,7 +224,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             var worldConfig = new WorldConfiguration(
                 seed: 777,
                 size: new int2(80, 80),
-                mode: RandomizationMode.Partial,
+                mode: TinyWalnutGames.MetVD.Shared.RandomizationMode.Partial,
                 biome: biomeSettings,
                 district: districtSettings,
                 sector: sectorSettings,

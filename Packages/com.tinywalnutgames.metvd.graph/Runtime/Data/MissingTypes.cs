@@ -278,6 +278,16 @@ namespace TinyWalnutGames.MetVD.Graph
     }
 
     /// <summary>
+    /// District settings component
+    /// </summary>
+    public struct DistrictSettings : IComponentData
+    {
+        public int DistrictCount;
+        public float DistrictWeight;
+        public int2 DistrictSizeRange;
+    }
+
+    /// <summary>
     /// Jump arc physics configuration for calculation compatibility
     /// </summary>
     public struct JumpArcPhysics : IComponentData
