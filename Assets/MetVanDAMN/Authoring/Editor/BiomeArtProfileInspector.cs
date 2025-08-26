@@ -309,8 +309,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 4 => "B (Above Average)",
                 3 => "B- (Average)",
                 2 => "C+ (Below Average)",
-                1 => "C (Basic)",
-                _ => "C- (Minimal)"
+                1 => "C (Standard)",
+                _ => "C- (Limited)"
             };
         }
 

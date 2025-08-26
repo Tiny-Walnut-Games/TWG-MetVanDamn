@@ -269,9 +269,175 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void GeneratePreviewDistricts()
         {
-            // This would create actual district authoring objects in the scene for preview
-            Debug.Log("🏗️ Generate Preview Districts (would create scene objects)");
-            // Implementation would create DistrictAuthoring GameObjects at calculated positions
+            // Create actual district authoring objects in the scene for preview
+            Debug.Log("🏗️ Generate Preview Districts - Creating scene objects");
+            
+            if (_worldConfig == null)
+            {
+                Debug.LogWarning("Cannot generate preview districts: No WorldGenerationConfig assigned");
+                return;
+            }
+            
+            // Clear existing preview districts
+            ClearExistingPreviewDistricts();
+            
+            // Calculate district positions based on preview settings
+            var districtPositions = CalculateDistrictPositions();
+            
+            // Create parent object for organization
+            var previewParent = new GameObject("[PREVIEW] Generated Districts");
+            previewParent.transform.position = Vector3.zero;
+            Undo.RegisterCreatedObjectUndo(previewParent, "Generate Preview Districts");
+            
+            // Create district authoring objects at calculated positions
+            for (int i = 0; i < districtPositions.Count; i++)
+            {
+                var position = districtPositions[i];
+                var districtGO = new GameObject($"District_Preview_{i:D3}");
+                districtGO.transform.SetParent(previewParent.transform);
+                districtGO.transform.position = position;
+                
+                // Add DistrictAuthoring component
+                var districtAuthoring = districtGO.AddComponent<DistrictAuthoring>();
+                districtAuthoring.nodeId = (uint)(1000 + i); // Preview node IDs start from 1000
+                districtAuthoring.districtType = GetRandomDistrictType();
+                districtAuthoring.biomeType = GetRandomBiomeType();
+                districtAuthoring.size = new float2(UnityEngine.Random.Range(50f, 150f), UnityEngine.Random.Range(50f, 150f));
+                
+                // Add visual indicator for preview
+                var visualIndicator = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                visualIndicator.name = "Preview_Indicator";
+                visualIndicator.transform.SetParent(districtGO.transform);
+                visualIndicator.transform.localPosition = Vector3.zero;
+                visualIndicator.transform.localScale = new Vector3(
+                    districtAuthoring.size.x * 0.01f, 
+                    5f, 
+                    districtAuthoring.size.y * 0.01f
+                );
+                
+                // Apply preview material
+                var renderer = visualIndicator.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    var previewMaterial = CreatePreviewMaterial(districtAuthoring.biomeType);
+                    renderer.material = previewMaterial;
+                }
+                
+                // Register for undo
+                Undo.RegisterCreatedObjectUndo(districtGO, "Generate Preview District");
+                
+                Debug.Log($"Created preview district at {position} with biome {districtAuthoring.biomeType}");
+            }
+            
+            // Select the parent for easy management
+            Selection.activeGameObject = previewParent;
+            
+            Debug.Log($"🎯 Generated {districtPositions.Count} preview districts");
+        }
+        
+        private void ClearExistingPreviewDistricts()
+        {
+            // Find and remove existing preview district objects
+            var existingPreviews = GameObject.FindGameObjectsWithTag("Untagged")
+                .Where(go => go.name.Contains("[PREVIEW]") || go.name.Contains("District_Preview_"))
+                .ToArray();
+                
+            foreach (var preview in existingPreviews)
+            {
+                Undo.DestroyObjectImmediate(preview);
+            }
+        }
+        
+        private List<Vector3> CalculateDistrictPositions()
+        {
+            var positions = new List<Vector3>();
+            var random = new Unity.Mathematics.Random((uint)_previewSeed);
+            
+            // Calculate grid-based positions with some randomization
+            int gridSize = Mathf.CeilToInt(Mathf.Sqrt(_previewWorldSize.x * _previewWorldSize.y / 10000f)); // Rough district count
+            float spacingX = _previewWorldSize.x / gridSize;
+            float spacingY = _previewWorldSize.y / gridSize;
+            
+            for (int x = 0; x < gridSize; x++)
+            {
+                for (int y = 0; y < gridSize; y++)
+                {
+                    var basePosition = new Vector3(
+                        x * spacingX - _previewWorldSize.x * 0.5f,
+                        0f,
+                        y * spacingY - _previewWorldSize.y * 0.5f
+                    );
+                    
+                    // Add randomization based on mode
+                    var randomOffset = Vector3.zero;
+                    switch (_previewMode)
+                    {
+                        case RandomizationMode.Low:
+                            randomOffset = new Vector3(
+                                random.NextFloat(-spacingX * 0.1f, spacingX * 0.1f),
+                                0f,
+                                random.NextFloat(-spacingY * 0.1f, spacingY * 0.1f)
+                            );
+                            break;
+                        case RandomizationMode.Medium:
+                            randomOffset = new Vector3(
+                                random.NextFloat(-spacingX * 0.25f, spacingX * 0.25f),
+                                0f,
+                                random.NextFloat(-spacingY * 0.25f, spacingY * 0.25f)
+                            );
+                            break;
+                        case RandomizationMode.High:
+                            randomOffset = new Vector3(
+                                random.NextFloat(-spacingX * 0.4f, spacingX * 0.4f),
+                                0f,
+                                random.NextFloat(-spacingY * 0.4f, spacingY * 0.4f)
+                            );
+                            break;
+                    }
+                    
+                    positions.Add(basePosition + randomOffset);
+                }
+            }
+            
+            return positions;
+        }
+        
+        private DistrictType GetRandomDistrictType()
+        {
+            var values = System.Enum.GetValues(typeof(DistrictType));
+            return (DistrictType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+        }
+        
+        private BiomeType GetRandomBiomeType()
+        {
+            var values = System.Enum.GetValues(typeof(BiomeType));
+            return (BiomeType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
+        }
+        
+        private Material CreatePreviewMaterial(BiomeType biomeType)
+        {
+            var material = new Material(Shader.Find("Standard"));
+            
+            // Assign colors based on biome type
+            Color biomeColor = biomeType switch
+            {
+                BiomeType.Forest => Color.green,
+                BiomeType.Desert => Color.yellow,
+                BiomeType.Mountains => Color.gray,
+                BiomeType.Ocean => Color.blue,
+                BiomeType.Tundra => Color.cyan,
+                BiomeType.Volcanic => Color.red,
+                BiomeType.Crystal => Color.magenta,
+                BiomeType.Ruins => new Color(0.5f, 0.3f, 0.1f), // Brown
+                BiomeType.Cosmic => new Color(0.1f, 0.1f, 0.3f), // Dark blue
+                _ => Color.white
+            };
+            
+            material.color = biomeColor;
+            material.SetFloat("_Metallic", 0.0f);
+            material.SetFloat("_Glossiness", 0.5f);
+            
+            return material;
         }
 
         private void ApplyPreviewSettingsToScene()

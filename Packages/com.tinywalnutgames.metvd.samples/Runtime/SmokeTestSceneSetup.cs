@@ -17,7 +17,7 @@ namespace TinyWalnutGames.MetVD.Samples
         [Header("World Generation Parameters")]
         [SerializeField] private uint worldSeed = 42;
         [SerializeField] private int2 worldSize = new(50, 50);
-        [SerializeField] private int targetSectorCount = 5; // TODO: integrate with generation pipeline
+        [SerializeField] private int targetSectorCount = 5;
         [SerializeField] private float biomeTransitionRadius = 10.0f;
         
         [Header("Debug Visualization")]
@@ -91,10 +91,22 @@ namespace TinyWalnutGames.MetVD.Samples
                 Min = new int2(-worldSize.x / 2, -worldSize.y / 2),
                 Max = new int2(worldSize.x / 2, worldSize.y / 2)
             });
+            
+            // Integrate targetSectorCount with generation pipeline
+            entityManager.AddComponentData(configEntity, new WorldGenerationConfig
+            {
+                TargetSectorCount = targetSectorCount,
+                MaxDistrictCount = targetSectorCount * 4, // Allow room for subdivision
+                BiomeTransitionRadius = biomeTransitionRadius
+            });
         }
         
         void CreateDistrictEntities()
         {
+            // Use targetSectorCount to determine how many districts to create
+            int actualDistrictCount = math.min(targetSectorCount, 24); // Reasonable upper limit
+            int gridSize = (int)math.ceil(math.sqrt(actualDistrictCount));
+            
             var hubEntity = entityManager.CreateEntity();
             entityManager.SetName(hubEntity, "HubDistrict");
             
@@ -111,11 +123,14 @@ namespace TinyWalnutGames.MetVD.Samples
             entityManager.AddBuffer<ConnectionBufferElement>(hubEntity);
             
             int districtId = 1;
-            for (int x = -2; x <= 2; x++)
+            int districtsCreated = 0;
+            int halfGrid = gridSize / 2;
+            
+            for (int x = -halfGrid; x <= halfGrid && districtsCreated < actualDistrictCount; x++)
             {
-                for (int y = -2; y <= 2; y++)
+                for (int y = -halfGrid; y <= halfGrid && districtsCreated < actualDistrictCount; y++)
                 {
-                    if (x == 0 && y == 0) continue;
+                    if (x == 0 && y == 0) continue; // Skip hub position
                     
                     var districtEntity = entityManager.CreateEntity();
                     entityManager.SetName(districtEntity, $"District_{x}_{y}");
@@ -133,7 +148,14 @@ namespace TinyWalnutGames.MetVD.Samples
                     entityManager.AddBuffer<ConnectionBufferElement>(districtEntity);
                     entityManager.AddComponentData(districtEntity, new SectorRefinementData(0.3f));
                     entityManager.AddBuffer<GateConditionBufferElement>(districtEntity);
+                    
+                    districtsCreated++;
                 }
+            }
+            
+            if (logGenerationSteps)
+            {
+                Debug.Log($"Created {districtsCreated} districts based on targetSectorCount ({targetSectorCount})");
             }
         }
         
@@ -195,5 +217,15 @@ namespace TinyWalnutGames.MetVD.Samples
         public float2 Center;
         public float Radius;
         public float Strength;
+    }
+    
+    /// <summary>
+    /// World generation configuration that integrates targetSectorCount with the generation pipeline
+    /// </summary>
+    public struct WorldGenerationConfig : IComponentData
+    {
+        public int TargetSectorCount;
+        public int MaxDistrictCount;
+        public float BiomeTransitionRadius;
     }
 }
