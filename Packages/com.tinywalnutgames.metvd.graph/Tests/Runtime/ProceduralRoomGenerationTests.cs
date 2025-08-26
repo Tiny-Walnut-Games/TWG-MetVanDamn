@@ -41,10 +41,12 @@ namespace TinyWalnutGames.MetVD.Tests
             var roomEntity = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 10, 8));
             var worldConfig = CreateWorldConfiguration();
             
-            // Create and update the procedural room generator system
-            var simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
-            // ProceduralRoomGeneratorSystem is automatically part of InitializationSystemGroup via [UpdateInGroup]
-            simGroup.Update(_world.Unmanaged);
+            // Create and update the procedural room generator system using proper ISystem pattern
+            var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            var roomGenHandle = _world.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
+            initGroup.AddSystemToUpdateList(roomGenHandle);
+            initGroup.SortSystems();
+            initGroup.Update();
 
             // Assert
             Assert.IsTrue(_entityManager.HasComponent<RoomTemplate>(roomEntity));
@@ -72,10 +74,14 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange
             var roomEntity = CreateTestRoomWithTemplate();
             
-            // Create and update systems in order
-            var simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
-            // Both systems are automatically part of InitializationSystemGroup via [UpdateInGroup]
-            simGroup.Update(_world.Unmanaged);
+            // Create and update systems in order using proper ISystem pattern
+            var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            var roomGenHandle = _world.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
+            var navGenHandle = _world.GetOrCreateSystem<RoomNavigationGeneratorSystem>();
+            initGroup.AddSystemToUpdateList(roomGenHandle);
+            initGroup.AddSystemToUpdateList(navGenHandle);
+            initGroup.SortSystems();
+            initGroup.Update();
 
             // Assert
             Assert.IsTrue(_entityManager.HasBuffer<RoomNavigationElement>(roomEntity));
@@ -106,14 +112,25 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange
             var roomEntity = CreateTestRoomWithTemplate();
             
-            // Create and update all systems in pipeline order
-            var simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            // Create and update all systems in pipeline order using proper ISystem pattern
+            var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
             var presGroup = _world.GetOrCreateSystemManaged<PresentationSystemGroup>();
             
-            // ProceduralRoomGeneratorSystem and RoomNavigationGeneratorSystem are in InitializationSystemGroup
-            simGroup.Update(_world.Unmanaged);
-            // CinemachineZoneGeneratorSystem is in PresentationSystemGroup
-            presGroup.Update(_world.Unmanaged);
+            var roomGenHandle = _world.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
+            var navGenHandle = _world.GetOrCreateSystem<RoomNavigationGeneratorSystem>();
+            var cameraGenHandle = _world.GetOrCreateSystem<CinemachineZoneGeneratorSystem>();
+            
+            // Add systems to appropriate groups
+            initGroup.AddSystemToUpdateList(roomGenHandle);
+            initGroup.AddSystemToUpdateList(navGenHandle);
+            presGroup.AddSystemToUpdateList(cameraGenHandle);
+            
+            initGroup.SortSystems();
+            presGroup.SortSystems();
+            
+            // Update groups in order
+            initGroup.Update();
+            presGroup.Update();
 
             // Assert
             Assert.IsTrue(_entityManager.HasComponent<CinemachineZoneData>(roomEntity));
@@ -210,13 +227,25 @@ namespace TinyWalnutGames.MetVD.Tests
             var roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
             CreateWorldConfiguration();
 
-            // Act - Run complete pipeline
-            var simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            // Act - Run complete pipeline using proper ISystem pattern
+            var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
             var presGroup = _world.GetOrCreateSystemManaged<PresentationSystemGroup>();
             
-            // Run systems in correct group order
-            simGroup.Update(_world.Unmanaged);
-            presGroup.Update(_world.Unmanaged);
+            var roomGenHandle = _world.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
+            var navGenHandle = _world.GetOrCreateSystem<RoomNavigationGeneratorSystem>();
+            var cameraGenHandle = _world.GetOrCreateSystem<CinemachineZoneGeneratorSystem>();
+            
+            // Add systems to appropriate groups
+            initGroup.AddSystemToUpdateList(roomGenHandle);
+            initGroup.AddSystemToUpdateList(navGenHandle);
+            presGroup.AddSystemToUpdateList(cameraGenHandle);
+            
+            initGroup.SortSystems();
+            presGroup.SortSystems();
+            
+            // Update groups in order
+            initGroup.Update();
+            presGroup.Update();
 
             // Assert - All pipeline stages should be complete
             var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
