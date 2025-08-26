@@ -58,6 +58,19 @@ namespace TinyWalnutGames.MetVD.Graph
     }
 
     /// <summary>
+    /// Component wrapper for BiomeAffinity
+    /// </summary>
+    public struct BiomeAffinityComponent : IComponentData
+    {
+        public BiomeAffinity Affinity;
+        
+        public BiomeAffinityComponent(BiomeAffinity affinity)
+        {
+            Affinity = affinity;
+        }
+    }
+
+    /// <summary>
     /// Room template data for procedural generation
     /// Contains layout patterns and skill requirements
     /// </summary>
@@ -152,6 +165,157 @@ namespace TinyWalnutGames.MetVD.Graph
             GravityScale = gravity;
             WallJumpHeight = wallHeight;
             DashDistance = dash;
+        }
+    }
+    
+    /// <summary>
+    /// Component to tag entities with skill requirements
+    /// </summary>
+    public struct SkillTag : IComponentData
+    {
+        public Ability RequiredSkills;
+        public Ability OptionalSkills;
+        
+        public SkillTag(Ability required, Ability optional = Ability.None)
+        {
+            RequiredSkills = required;
+            OptionalSkills = optional;
+        }
+    }
+    
+    /// <summary>
+    /// Buffer element for room pattern generation data
+    /// </summary>
+    public struct RoomPatternElement : IBufferElementData
+    {
+        public int2 Position;
+        public RoomFeatureType FeatureType;
+        public uint Seed;
+        public Ability RequiredAbility;
+        
+        public RoomPatternElement(int2 position, RoomFeatureType featureType, uint seed, Ability requiredAbility = Ability.None)
+        {
+            Position = position;
+            FeatureType = featureType;
+            Seed = seed;
+            RequiredAbility = requiredAbility;
+        }
+    }
+    
+    /// <summary>
+    /// Buffer element for room module references
+    /// </summary>
+    public struct RoomModuleElement : IBufferElementData
+    {
+        public Entity ModulePrefab;
+        public int2 Position;
+        public float Weight;
+        
+        public RoomModuleElement(Entity modulePrefab, int2 position, float weight = 1.0f)
+        {
+            ModulePrefab = modulePrefab;
+            Position = position;
+            Weight = weight;
+        }
+    }
+    
+    /// <summary>
+    /// Component for room generation requests
+    /// </summary>
+    public struct RoomGenerationRequest : IComponentData
+    {
+        public RoomGeneratorType GeneratorType;
+        public Entity RoomEntity;
+        public int2 RoomBounds;
+        public uint Seed;
+        
+        public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed)
+        {
+            GeneratorType = generatorType;
+            RoomEntity = roomEntity;
+            RoomBounds = bounds;
+            Seed = seed;
+        }
+    }
+    
+    /// <summary>
+    /// Feature types for room pattern generation
+    /// </summary>
+    public enum RoomFeatureType : byte
+    {
+        Platform = 0,
+        Obstacle = 1,
+        GrapplePoint = 2,
+        SkillGate = 3,
+        Secret = 4,
+        Hazard = 5
+    }
+    
+    /// <summary>
+    /// Jump physics data for room generation
+    /// </summary>
+    public struct JumpPhysicsData : IComponentData
+    {
+        public float JumpHeight;
+        public float JumpDistance;
+        public float GravityScale;
+        
+        public JumpPhysicsData(float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
+        {
+            JumpHeight = height;
+            JumpDistance = distance;
+            GravityScale = gravity;
+        }
+    }
+    
+    /// <summary>
+    /// Configuration for secret areas in rooms
+    /// </summary>
+    public struct SecretAreaConfig : IComponentData
+    {
+        public float SecretProbability;
+        public int MaxSecretsPerRoom;
+        public Ability RequiredSkillForAccess;
+        
+        public SecretAreaConfig(float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
+        {
+            SecretProbability = probability;
+            MaxSecretsPerRoom = maxSecrets;
+            RequiredSkillForAccess = requiredSkill;
+        }
+    }
+    
+    /// <summary>
+    /// Jump arc validation component
+    /// </summary>
+    public struct JumpArcValidation : IComponentData
+    {
+        public bool IsValid;
+        public float MaxJumpDistance;
+        public float MinJumpHeight;
+        
+        public JumpArcValidation(bool isValid = true, float maxDistance = 8.0f, float minHeight = 2.0f)
+        {
+            IsValid = isValid;
+            MaxJumpDistance = maxDistance;
+            MinJumpHeight = minHeight;
+        }
+    }
+    
+    /// <summary>
+    /// Buffer element for jump connections
+    /// </summary>
+    public struct JumpConnectionElement : IBufferElementData
+    {
+        public int2 StartPosition;
+        public int2 EndPosition;
+        public Ability RequiredAbility;
+        
+        public JumpConnectionElement(int2 start, int2 end, Ability requiredAbility = Ability.None)
+        {
+            StartPosition = start;
+            EndPosition = end;
+            RequiredAbility = requiredAbility;
         }
     }
 }

@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Graph
@@ -307,14 +308,14 @@ namespace TinyWalnutGames.MetVD.Graph
     public partial struct WeightedTilePrefabGenerator : ISystem
     {
         private ComponentLookup<SecretAreaConfig> _secretConfigLookup;
-        private ComponentLookup<BiomeAffinity> _biomeAffinityLookup;
+        private ComponentLookup<BiomeAffinityComponent> _biomeAffinityLookup;
         private BufferLookup<RoomModuleElement> _moduleBufferLookup;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             _secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
-            _biomeAffinityLookup = state.GetComponentLookup<BiomeAffinity>(true);
+            _biomeAffinityLookup = state.GetComponentLookup<BiomeAffinityComponent>(true);
             _moduleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
         }
 
@@ -343,7 +344,7 @@ namespace TinyWalnutGames.MetVD.Graph
     public partial struct WeightedTilePrefabJob : IJobEntity
     {
         [ReadOnly] public ComponentLookup<SecretAreaConfig> SecretConfigLookup;
-        [ReadOnly] public ComponentLookup<BiomeAffinity> BiomeAffinityLookup;
+        [ReadOnly] public ComponentLookup<BiomeAffinityComponent> BiomeAffinityLookup;
         [ReadOnly] public BufferLookup<RoomModuleElement> ModuleBufferLookup;
         public Unity.Mathematics.Random Random;
 

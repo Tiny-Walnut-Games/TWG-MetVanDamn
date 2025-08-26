@@ -72,9 +72,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.2d.common": "11.0.1",
         "com.unity.2d.sprite": "1.0.0",
         "com.unity.2d.tilemap": "1.0.0",
-        "com.unity.2d.common": "11.0.1",
         "com.unity.mathematics": "1.2.6",
         "com.unity.modules.animation": "1.0.0"
       },
@@ -85,11 +85,11 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
+        "com.unity.burst": "1.8.4",
         "com.unity.2d.sprite": "1.0.0",
         "com.unity.mathematics": "1.1.0",
-        "com.unity.modules.uielements": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
-        "com.unity.burst": "1.8.4"
+        "com.unity.modules.uielements": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -136,8 +136,8 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.mathematics": "1.1.0",
         "com.unity.2d.common": "11.0.1",
+        "com.unity.mathematics": "1.1.0",
         "com.unity.modules.physics2d": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -156,8 +156,8 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.modules.tilemap": "1.0.0",
         "com.unity.2d.tilemap": "1.0.0",
+        "com.unity.modules.tilemap": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -216,8 +216,8 @@
       "dependencies": {
         "com.unity.burst": "1.8.19",
         "com.unity.mathematics": "1.3.2",
-        "com.unity.nuget.mono-cecil": "1.11.5",
         "com.unity.test-framework": "1.4.6",
+        "com.unity.nuget.mono-cecil": "1.11.5",
         "com.unity.test-framework.performance": "3.0.3"
       },
       "url": "https://packages.unity.com"
@@ -230,17 +230,28 @@
         "com.unity.burst": "1.8.19",
         "com.unity.collections": "2.5.7",
         "com.unity.mathematics": "1.3.2",
-        "com.unity.nuget.mono-cecil": "1.11.5",
-        "com.unity.profiling.core": "1.0.2",
-        "com.unity.scriptablebuildpipeline": "1.21.25",
-        "com.unity.serialization": "3.1.2",
-        "com.unity.test-framework.performance": "3.0.3",
-        "com.unity.modules.assetbundle": "1.0.0",
         "com.unity.modules.audio": "1.0.0",
+        "com.unity.serialization": "3.1.2",
+        "com.unity.profiling.core": "1.0.2",
         "com.unity.modules.physics": "1.0.0",
+        "com.unity.nuget.mono-cecil": "1.11.5",
         "com.unity.modules.uielements": "1.0.0",
+        "com.unity.modules.assetbundle": "1.0.0",
         "com.unity.modules.unityanalytics": "1.0.0",
-        "com.unity.modules.unitywebrequest": "1.0.0"
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.scriptablebuildpipeline": "1.21.25",
+        "com.unity.test-framework.performance": "3.0.3"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.entities.graphics": {
+      "version": "1.4.12",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.entities": "1.3.14",
+        "com.unity.modules.particlesystem": "1.0.0",
+        "com.unity.render-pipelines.core": "14.0.10"
       },
       "url": "https://packages.unity.com"
     },
@@ -393,8 +404,8 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.collections": "2.4.2",
-        "com.unity.burst": "1.7.2"
+        "com.unity.burst": "1.7.2",
+        "com.unity.collections": "2.4.2"
       },
       "url": "https://packages.unity.com"
     },
@@ -439,9 +450,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"

@@ -7,7 +7,8 @@
         "Unity.Entities",
         "Unity.Mathematics",
         "TinyWalnutGames.MetVD.Core",
-        "TinyWalnutGames.MetVD.Shared"
+        "TinyWalnutGames.MetVD.Shared",
+        "TinyWalnutGames.MetVD.Biome"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

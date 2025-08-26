@@ -60,10 +60,11 @@ namespace TinyWalnutGames.MetVD.Core
         // Meta progression
         MapUnlock = 1 << 29,
         SaveUnlock = 1 << 30,
-        FastTravel = 1 << 31,
+        FastTravel = 0x80000000,
         
         // Special combined abilities
         AllMovement = Jump | DoubleJump | WallJump | Dash | GlideSpeed | ArcJump | ChargedJump | TeleportArc,
+        AllArcMovement = ArcJump | ChargedJump | TeleportArc,
         AllEnvironmental = Swim | Climb | HeatResistance | ColdResistance | PressureResistance,
         AllTools = Bomb | Grapple | Drill | Scan | Hack,
         AllPolarity = SunAccess | MoonAccess | HeatAccess | ColdAccess | EarthAccess | WindAccess | LifeAccess | TechAccess,
