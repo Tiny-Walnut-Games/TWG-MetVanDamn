@@ -261,6 +261,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 biomesByType[biomeType].Add(biomeAuthoring);
             }
             
+            // Sync with runtime ECS data if available
+            SyncWithRuntimeBiomeData(biomesByType);
+            
             // Create biome info entries
             foreach (var kvp in biomesByType)
             {
@@ -285,6 +288,122 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 biomeInfos.Add(biomeInfo);
                 biomeColors[type] = biomeColor;
             }
+        }
+
+        /// <summary>
+        /// Syncs biome color data with runtime ECS systems when available
+        /// </summary>
+        private void SyncWithRuntimeBiomeData(Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
+        {
+            // Sync with runtime biome field system if available during play mode
+            if (Application.isPlaying && World.DefaultGameObjectInjectionWorld != null)
+            {
+                var world = World.DefaultGameObjectInjectionWorld;
+                var biomeSystem = world.GetExistingSystemManaged<BiomeFieldSystem>();
+                
+                if (biomeSystem != null)
+                {
+                    // Access runtime biome data through ECS query
+                    SyncWithECSBiomeData(world, biomesByType);
+                }
+            }
+            
+            // Also sync with any runtime tile renderers that may have modified colors
+            SyncWithTileMapRenderers(biomesByType);
+        }
+
+        private void SyncWithECSBiomeData(World world, Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
+        {
+            try
+            {
+                var entityManager = world.EntityManager;
+                
+                // Query all biome entities with art profile references
+                using var query = entityManager.CreateEntityQuery(
+                    ComponentType.ReadOnly<TinyWalnutGames.MetVD.Core.Biome>(),
+                    ComponentType.ReadOnly<BiomeArtProfileReference>()
+                );
+                
+                using var entities = query.ToEntityArray(Allocator.Temp);
+                using var biomeComponents = query.ToComponentDataArray<TinyWalnutGames.MetVD.Core.Biome>(Allocator.Temp);
+                using var artProfileRefs = query.ToComponentDataArray<BiomeArtProfileReference>(Allocator.Temp);
+                
+                for (int i = 0; i < entities.Length; i++)
+                {
+                    var biomeComponent = biomeComponents[i];
+                    var artProfileRef = artProfileRefs[i];
+                    
+                    if (artProfileRef.ProfileRef.IsValid && artProfileRef.ProfileRef.Value != null)
+                    {
+                        var profile = artProfileRef.ProfileRef.Value;
+                        
+                        // Update biome color information based on runtime state
+                        if (profile.debugColor.a > 0f)
+                        {
+                            // Runtime debug color takes precedence
+                            UpdateBiomeColorFromRuntime(biomeComponent.Type, profile.debugColor);
+                        }
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                // Handle potential ECS access issues gracefully
+                Debug.LogWarning($"Could not sync with ECS biome data: {ex.Message}");
+            }
+        }
+
+        private void SyncWithTileMapRenderers(Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
+        {
+            var tilemapRenderers = FindObjectsOfType<UnityEngine.Tilemaps.TilemapRenderer>();
+            
+            foreach (var renderer in tilemapRenderers)
+            {
+                if (renderer.material != null && renderer.material.HasProperty("_Color"))
+                {
+                    // Check if this tilemap is associated with any biome
+                    var associatedBiome = FindBiomeForTilemap(renderer, biomesByType);
+                    if (associatedBiome != null)
+                    {
+                        // Update color from runtime material
+                        Color runtimeColor = renderer.material.color;
+                        if (runtimeColor.a > 0f) // Valid color
+                        {
+                            UpdateBiomeColorFromRuntime(associatedBiome.biomeType, runtimeColor);
+                        }
+                    }
+                }
+            }
+        }
+
+        private BiomeFieldAuthoring FindBiomeForTilemap(UnityEngine.Tilemaps.TilemapRenderer renderer, Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
+        {
+            // Find biome by proximity to tilemap or by name matching
+            foreach (var kvp in biomesByType)
+            {
+                foreach (var biome in kvp.Value)
+                {
+                    if (biome.artProfile?.biomeName != null && 
+                        renderer.name.Contains(biome.artProfile.biomeName))
+                    {
+                        return biome;
+                    }
+                    
+                    // Or by proximity
+                    float distance = Vector3.Distance(biome.transform.position, renderer.transform.position);
+                    if (distance < biome.fieldRadius + 5f) // Within biome influence + buffer
+                    {
+                        return biome;
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        private void UpdateBiomeColorFromRuntime(BiomeType biomeType, Color runtimeColor)
+        {
+            biomeColors[biomeType] = runtimeColor;
         }
 
         private Color GetBiomeColor(BiomeType type, List<BiomeFieldAuthoring> instances)

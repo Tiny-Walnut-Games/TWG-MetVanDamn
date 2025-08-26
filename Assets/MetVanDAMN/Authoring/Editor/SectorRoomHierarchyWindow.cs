@@ -17,17 +17,22 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     {
         private Vector2 scrollPosition;
         private string searchFilter = "";
+        private string biomeFilter = "All";
         private bool showOnlyConnected = false;
         private bool groupByDistrict = true;
         private bool showDetailedInfo = false;
+        private bool enableClickToSelect = true;
         
         private List<DistrictHierarchy> districtHierarchies = new List<DistrictHierarchy>();
         private Dictionary<uint, List<uint>> connectionMap = new Dictionary<uint, List<uint>>();
+        private HashSet<string> availableBiomeTypes = new HashSet<string>();
 
         [System.Serializable]
         private class DistrictHierarchy
         {
             public DistrictAuthoring district;
+            public BiomeFieldAuthoring associatedBiome;
+            public string biomeType = "Unknown";
             public List<SectorInfo> sectors = new List<SectorInfo>();
             public List<ConnectionInfo> connections = new List<ConnectionInfo>();
             public int totalRoomCount;
@@ -121,14 +126,31 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             GUILayout.Space(10);
             
-            showOnlyConnected = EditorGUILayout.Toggle("Connected Only", showOnlyConnected, GUILayout.Width(120));
+            // Biome filtering dropdown
+            EditorGUILayout.LabelField("Biome:", GUILayout.Width(45));
+            string[] biomeOptions = new[] { "All" }.Concat(availableBiomeTypes.OrderBy(t => t)).ToArray();
+            int currentBiomeIndex = System.Array.IndexOf(biomeOptions, biomeFilter);
+            if (currentBiomeIndex < 0) currentBiomeIndex = 0;
+            
+            int newBiomeIndex = EditorGUILayout.Popup(currentBiomeIndex, biomeOptions, GUILayout.Width(100));
+            if (newBiomeIndex != currentBiomeIndex && newBiomeIndex >= 0 && newBiomeIndex < biomeOptions.Length)
+            {
+                biomeFilter = biomeOptions[newBiomeIndex];
+            }
             
             EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.BeginHorizontal();
             
+            showOnlyConnected = EditorGUILayout.Toggle("Connected Only", showOnlyConnected, GUILayout.Width(120));
             groupByDistrict = EditorGUILayout.Toggle("Group by District", groupByDistrict, GUILayout.Width(130));
             showDetailedInfo = EditorGUILayout.Toggle("Show Details", showDetailedInfo, GUILayout.Width(100));
+            
+            EditorGUILayout.EndHorizontal();
+            
+            EditorGUILayout.BeginHorizontal();
+            
+            enableClickToSelect = EditorGUILayout.Toggle("Click to Select", enableClickToSelect, GUILayout.Width(120));
             
             GUILayout.FlexibleSpace();
             
@@ -154,6 +176,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                         sector.isExpanded = false;
                     }
                 }
+            }
+            
+            if (GUILayout.Button("Select All Visible", GUILayout.Width(100)))
+            {
+                SelectAllVisibleObjects();
             }
             
             EditorGUILayout.EndHorizontal();
@@ -374,10 +401,25 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             districtHierarchies.Clear();
             connectionMap.Clear();
+            availableBiomeTypes.Clear();
             
             var districts = FindObjectsOfType<DistrictAuthoring>();
             var connections = FindObjectsOfType<ConnectionAuthoring>();
             var gates = FindObjectsOfType<GateConditionAuthoring>();
+            var biomes = FindObjectsOfType<BiomeFieldAuthoring>();
+            
+            // Build biome type collection
+            foreach (var biome in biomes)
+            {
+                if (biome.artProfile != null && !string.IsNullOrEmpty(biome.artProfile.biomeName))
+                {
+                    availableBiomeTypes.Add(biome.artProfile.biomeName);
+                }
+                else
+                {
+                    availableBiomeTypes.Add("Unknown");
+                }
+            }
             
             // Build connection map
             foreach (var connection in connections)
@@ -391,10 +433,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 connectionMap[sourceId].Add(targetId);
             }
             
-            // Build district hierarchies
+            // Build district hierarchies with biome associations
             foreach (var district in districts)
             {
-                var hierarchy = BuildDistrictHierarchy(district, connections, gates);
+                var hierarchy = BuildDistrictHierarchy(district, connections, gates, biomes);
                 districtHierarchies.Add(hierarchy);
             }
             
@@ -402,7 +444,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             districtHierarchies.Sort((a, b) => a.district.nodeId.value.CompareTo(b.district.nodeId.value));
         }
 
-        private DistrictHierarchy BuildDistrictHierarchy(DistrictAuthoring district, ConnectionAuthoring[] connections, GateConditionAuthoring[] gates)
+        private DistrictHierarchy BuildDistrictHierarchy(DistrictAuthoring district, ConnectionAuthoring[] connections, GateConditionAuthoring[] gates, BiomeFieldAuthoring[] biomes)
         {
             var hierarchy = new DistrictHierarchy
             {
@@ -410,6 +452,32 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             };
             
             uint nodeId = district.nodeId.value;
+            
+            // Find associated biome
+            var associatedBiome = biomes.FirstOrDefault(b => b.nodeId.value == nodeId);
+            if (associatedBiome != null)
+            {
+                hierarchy.associatedBiome = associatedBiome;
+                hierarchy.biomeType = associatedBiome.artProfile?.biomeName ?? "Unknown";
+            }
+            else
+            {
+                // Try to find by proximity if no exact match
+                var closestBiome = biomes
+                    .Where(b => b != null)
+                    .OrderBy(b => Vector3.Distance(district.transform.position, b.transform.position))
+                    .FirstOrDefault();
+                
+                if (closestBiome != null && Vector3.Distance(district.transform.position, closestBiome.transform.position) < 10f)
+                {
+                    hierarchy.associatedBiome = closestBiome;
+                    hierarchy.biomeType = $"{closestBiome.artProfile?.biomeName ?? "Unknown"} (nearby)";
+                }
+                else
+                {
+                    hierarchy.biomeType = "No Biome";
+                }
+            }
             
             // Build connections
             var districtConnections = connections.Where(c => c.sourceNode.value == nodeId);
@@ -518,7 +586,131 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (!connectionMap.ContainsKey(nodeId))
                 return 0f;
             
-            return connectionMap[nodeId].Count; // Simple connectivity metric
+            // Advanced connectivity analysis using graph theory metrics
+            var connections = connectionMap[nodeId];
+            float baseConnectivity = connections.Count;
+            
+            // Calculate connectivity quality based on connection types and weights
+            float qualityScore = 0f;
+            float redundancyBonus = 0f;
+            
+            foreach (var connection in connections)
+            {
+                // Weight connections based on target node importance
+                float targetConnectivity = connectionMap.ContainsKey(connection) ? 
+                    connectionMap[connection].Count : 0f;
+                
+                // More connected targets are more valuable
+                qualityScore += 1f + (targetConnectivity * 0.1f);
+                
+                // Bidirectional connections get bonus (redundancy)
+                if (connectionMap.ContainsKey(connection) && 
+                    connectionMap[connection].Contains(nodeId))
+                {
+                    redundancyBonus += 0.5f;
+                }
+            }
+            
+            // Normalize and combine metrics
+            float normalizedQuality = qualityScore / Mathf.Max(1f, connections.Count);
+            float normalizedRedundancy = redundancyBonus / Mathf.Max(1f, connections.Count);
+            
+            return baseConnectivity * (0.6f + normalizedQuality * 0.3f + normalizedRedundancy * 0.1f);
+        }
+
+        /// <summary>
+        /// Selects all visible objects in the hierarchy based on current filters
+        /// </summary>
+        private void SelectAllVisibleObjects()
+        {
+            var objectsToSelect = new List<UnityEngine.Object>();
+            
+            foreach (var hierarchy in GetFilteredHierarchies())
+            {
+                if (hierarchy.district != null)
+                {
+                    objectsToSelect.Add(hierarchy.district.gameObject);
+                }
+                
+                if (hierarchy.associatedBiome != null)
+                {
+                    objectsToSelect.Add(hierarchy.associatedBiome.gameObject);
+                }
+                
+                foreach (var connection in hierarchy.connections)
+                {
+                    if (connection.connection != null)
+                    {
+                        objectsToSelect.Add(connection.connection.gameObject);
+                    }
+                }
+            }
+            
+            if (objectsToSelect.Count > 0)
+            {
+                Selection.objects = objectsToSelect.ToArray();
+                EditorGUIUtility.PingObject(objectsToSelect[0]);
+            }
+        }
+
+        /// <summary>
+        /// Gets filtered hierarchies based on current search and biome filters
+        /// </summary>
+        private IEnumerable<DistrictHierarchy> GetFilteredHierarchies()
+        {
+            return districtHierarchies.Where(h => 
+            {
+                // Apply search filter
+                bool matchesSearch = string.IsNullOrEmpty(searchFilter) ||
+                    h.district.name.ToLower().Contains(searchFilter.ToLower()) ||
+                    h.district.nodeId.value.ToString().Contains(searchFilter);
+                
+                // Apply biome filter
+                bool matchesBiome = biomeFilter == "All" || h.biomeType.Contains(biomeFilter);
+                
+                // Apply connected filter
+                bool matchesConnected = !showOnlyConnected || h.connections.Count > 0;
+                
+                return matchesSearch && matchesBiome && matchesConnected;
+            });
+        }
+
+        /// <summary>
+        /// Handles click-to-select functionality for UI elements
+        /// </summary>
+        private void HandleObjectSelection(UnityEngine.Object targetObject, Event currentEvent)
+        {
+            if (enableClickToSelect && targetObject != null && currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
+            {
+                if (currentEvent.control || currentEvent.command)
+                {
+                    // Add to selection
+                    var currentSelection = Selection.objects.ToList();
+                    if (!currentSelection.Contains(targetObject))
+                    {
+                        currentSelection.Add(targetObject);
+                        Selection.objects = currentSelection.ToArray();
+                    }
+                }
+                else
+                {
+                    // Replace selection
+                    Selection.activeObject = targetObject;
+                    EditorGUIUtility.PingObject(targetObject);
+                }
+                
+                // Focus scene view on object
+                if (targetObject is Component comp)
+                {
+                    SceneView.lastActiveSceneView?.FrameSelected();
+                }
+                else if (targetObject is GameObject go)
+                {
+                    SceneView.lastActiveSceneView?.FrameSelected();
+                }
+                
+                currentEvent.Use();
+            }
         }
     }
 }

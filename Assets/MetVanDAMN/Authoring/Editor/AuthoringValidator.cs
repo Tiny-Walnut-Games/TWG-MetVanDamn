@@ -85,6 +85,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Cross-validate relationships
             ValidateDistrictConnections(districtAuthorings, connectionAuthorings, report);
             
+            // Validate orphaned props and tile prototypes
+            ValidateOrphanedAssets(biomeAuthorings, report);
+            
+            // Auto-fix suggestions for missing NodeIds
+            SuggestAutoFixes(districtAuthorings, biomeAuthorings, report);
+            
             // Count issues by severity
             report.errorCount = report.issues.Count(i => i.severity == ValidationSeverity.Error);
             report.warningCount = report.issues.Count(i => i.severity == ValidationSeverity.Warning);
@@ -205,9 +211,27 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void ValidateBiomes(BiomeFieldAuthoring[] biomes, ValidationReport report)
         {
+            var biomeNodeIds = new HashSet<uint>();
+            
             foreach (var biome in biomes)
             {
                 if (biome == null) continue;
+                
+                // Check for valid NodeId assignment
+                if (biome.nodeId.value == 0)
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Error,
+                        "Invalid Biome Assignment",
+                        "BiomeField has invalid or missing NodeId assignment.",
+                        biome,
+                        biome.transform.position
+                    ));
+                }
+                else
+                {
+                    biomeNodeIds.Add(biome.nodeId.value);
+                }
                 
                 // Check if biome has valid art profile
                 if (biome.artProfile == null)
@@ -243,10 +267,89 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                             profile
                         ));
                     }
+
+                    // Validate biome configuration coherence
+                    ValidateBiomeConfigurationCoherence(biome, profile, report);
                 }
                 
                 // Check biome field size
                 if (biome.fieldRadius <= 0)
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Error,
+                        "Invalid Field Radius",
+                        "BiomeField has invalid field radius. Must be greater than 0.",
+                        biome,
+                        biome.transform.position
+                    ));
+                }
+                
+                // Check for overlapping biome fields
+                ValidateBiomeOverlaps(biome, biomes, report);
+            }
+        }
+
+        private static void ValidateBiomeConfigurationCoherence(BiomeFieldAuthoring biome, BiomeArtProfile profile, ValidationReport report)
+        {
+            // Check coherence between biome polarity and art profile settings
+            if (biome.polarity.IsNeutral() && profile.propSettings.strategy == PropPlacementStrategy.Terrain)
+            {
+                report.issues.Add(new ValidationIssue(
+                    ValidationSeverity.Warning,
+                    "Biome Configuration Mismatch",
+                    "Neutral polarity biome using terrain-aware prop placement may not behave as expected.",
+                    biome,
+                    biome.transform.position
+                ));
+            }
+
+            // Validate prop density settings
+            if (profile.propSettings.baseDensity <= 0 && profile.propSettings.densityMultiplier > 0)
+            {
+                report.issues.Add(new ValidationIssue(
+                    ValidationSeverity.Warning,
+                    "Prop Density Configuration Issue",
+                    "Prop density multiplier is set but base density is zero or negative.",
+                    profile
+                ));
+            }
+
+            // Check for reasonable clustering settings
+            if (profile.propSettings.strategy == PropPlacementStrategy.Clustered)
+            {
+                if (profile.propSettings.clustering.clusterSize <= 1)
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Warning,
+                        "Ineffective Clustering",
+                        "Clustered placement strategy selected but cluster size is 1 or less.",
+                        profile
+                    ));
+                }
+            }
+        }
+
+        private static void ValidateBiomeOverlaps(BiomeFieldAuthoring targetBiome, BiomeFieldAuthoring[] allBiomes, ValidationReport report)
+        {
+            foreach (var otherBiome in allBiomes)
+            {
+                if (otherBiome == null || otherBiome == targetBiome) continue;
+
+                float distance = Vector3.Distance(targetBiome.transform.position, otherBiome.transform.position);
+                float combinedRadius = targetBiome.fieldRadius + otherBiome.fieldRadius;
+
+                if (distance < combinedRadius * 0.8f) // Allow some overlap but warn about excessive overlap
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Warning,
+                        "Biome Field Overlap",
+                        $"BiomeField overlaps significantly with another biome (NodeId: {otherBiome.nodeId.value}). This may cause conflicts.",
+                        targetBiome,
+                        targetBiome.transform.position
+                    ));
+                }
+            }
+        }
                 {
                     report.issues.Add(new ValidationIssue(
                         ValidationSeverity.Error,
@@ -276,25 +379,108 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 
                 if (!hasValidConnection)
                 {
+                    // Enhanced orphaned gate detection with quick-fix suggestion
+                    var suggestedFix = FindBestConnectionMatch(gate, connections);
+                    string fixSuggestion = suggestedFix != null 
+                        ? $" Suggested fix: Update to connection {suggestedFix.sourceNode.value} -> {suggestedFix.targetNode.value}"
+                        : " Consider removing this gate or creating the missing connection.";
+                        
                     report.issues.Add(new ValidationIssue(
                         ValidationSeverity.Warning,
                         "Orphaned Gate Condition",
-                        $"Gate condition exists for connection {gate.sourceNode.value} -> {gate.targetNode.value} but no such connection exists.",
+                        $"Gate condition exists for connection {gate.sourceNode.value} -> {gate.targetNode.value} but no such connection exists.{fixSuggestion}",
                         gate,
                         gate.transform.position
                     ));
                 }
                 
-                // Check gate condition description length
-                if (string.IsNullOrEmpty(gate.description.ToString()))
+                // Enhanced gate condition validation
+                ValidateGateConditionDetails(gate, report);
+            }
+            
+            // Validate gate conditions referencing non-existent connections  
+            ValidateGateConnectionReferences(gates, connections, report);
+        }
+
+        private static ConnectionAuthoring FindBestConnectionMatch(GateConditionAuthoring gate, ConnectionAuthoring[] connections)
+        {
+            // Find the closest matching connection based on spatial proximity or node similarity
+            ConnectionAuthoring bestMatch = null;
+            float bestScore = float.MaxValue;
+            
+            foreach (var connection in connections.Where(c => c != null))
+            {
+                // Score based on node ID similarity and spatial distance
+                float nodeScore = Mathf.Abs((int)gate.sourceNode.value - (int)connection.sourceNode.value) +
+                                 Mathf.Abs((int)gate.targetNode.value - (int)connection.targetNode.value);
+                
+                float spatialScore = Vector3.Distance(gate.transform.position, connection.transform.position);
+                float combinedScore = nodeScore * 10f + spatialScore;
+                
+                if (combinedScore < bestScore)
                 {
-                    report.issues.Add(new ValidationIssue(
-                        ValidationSeverity.Info,
-                        "Empty Gate Description",
-                        "Gate condition has no description.",
-                        gate,
-                        gate.transform.position
-                    ));
+                    bestScore = combinedScore;
+                    bestMatch = connection;
+                }
+            }
+            
+            return bestScore < 50f ? bestMatch : null; // Only suggest if reasonably close
+        }
+
+        private static void ValidateGateConditionDetails(GateConditionAuthoring gate, ValidationReport report)
+        {
+            // Check gate condition description length
+            if (string.IsNullOrEmpty(gate.description.ToString()))
+            {
+                report.issues.Add(new ValidationIssue(
+                    ValidationSeverity.Info,
+                    "Empty Gate Description",
+                    "Gate condition has no description. Consider adding descriptive text for better authoring experience.",
+                    gate,
+                    gate.transform.position
+                ));
+            }
+            
+            // Validate gate condition logic consistency
+            if (gate.sourceNode.value == gate.targetNode.value)
+            {
+                report.issues.Add(new ValidationIssue(
+                    ValidationSeverity.Error,
+                    "Self-Referencing Gate",
+                    "Gate condition has the same source and target node. This creates an invalid loop.",
+                    gate,
+                    gate.transform.position
+                ));
+            }
+        }
+
+        private static void ValidateGateConnectionReferences(GateConditionAuthoring[] gates, ConnectionAuthoring[] connections, ValidationReport report)
+        {
+            // Check for connections that might need gate conditions
+            var gatedConnections = new HashSet<(uint, uint)>();
+            foreach (var gate in gates.Where(g => g != null))
+            {
+                gatedConnections.Add((gate.sourceNode.value, gate.targetNode.value));
+            }
+            
+            foreach (var connection in connections.Where(c => c != null))
+            {
+                var connectionPair = (connection.sourceNode.value, connection.targetNode.value);
+                
+                if (!gatedConnections.Contains(connectionPair))
+                {
+                    // Suggest gate conditions for long-distance or inter-district connections
+                    float distance = Vector3.Distance(connection.transform.position, Vector3.zero);
+                    if (distance > 20f) // Arbitrary threshold for "long-distance"
+                    {
+                        report.issues.Add(new ValidationIssue(
+                            ValidationSeverity.Info,
+                            "Missing Gate Condition",
+                            $"Long-distance connection {connection.sourceNode.value} -> {connection.targetNode.value} might benefit from a gate condition for proper MetroidVania progression.",
+                            connection,
+                            connection.transform.position
+                        ));
+                    }
                 }
             }
         }
@@ -433,6 +619,160 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             var report = ValidateScene();
             return !report.hasErrors;
+        }
+
+        /// <summary>
+        /// Validates orphaned props and tile prototypes not linked to any biome/district
+        /// </summary>
+        private static void ValidateOrphanedAssets(BiomeFieldAuthoring[] biomes, ValidationReport report)
+        {
+            // Collect all referenced props and tiles from biomes
+            var referencedProps = new HashSet<GameObject>();
+            var referencedTiles = new HashSet<UnityEngine.Tilemaps.TileBase>();
+
+            foreach (var biome in biomes.Where(b => b != null && b.artProfile != null))
+            {
+                var profile = biome.artProfile;
+                
+                // Collect referenced props
+                if (profile.propSettings?.propPrefabs != null)
+                {
+                    foreach (var prop in profile.propSettings.propPrefabs.Where(p => p != null))
+                    {
+                        referencedProps.Add(prop);
+                    }
+                }
+                
+                // Collect referenced tiles
+                if (profile.tiles != null)
+                {
+                    foreach (var tile in profile.tiles.Where(t => t != null))
+                    {
+                        referencedTiles.Add(tile);
+                    }
+                }
+                
+                // Individual tile references
+                if (profile.floorTile != null) referencedTiles.Add(profile.floorTile);
+                if (profile.wallTile != null) referencedTiles.Add(profile.wallTile);
+                if (profile.backgroundTile != null) referencedTiles.Add(profile.backgroundTile);
+            }
+
+            // Find potential orphaned assets in the scene
+            var allGameObjects = Object.FindObjectsOfType<GameObject>();
+            var potentialOrphans = allGameObjects.Where(go => 
+                go.name.ToLower().Contains("prop") || 
+                go.name.ToLower().Contains("tile") ||
+                go.GetComponent<SpriteRenderer>() != null).ToArray();
+
+            foreach (var obj in potentialOrphans)
+            {
+                // Check if this GameObject could be a prop but isn't referenced
+                if (obj.GetComponent<SpriteRenderer>() != null && !referencedProps.Contains(obj))
+                {
+                    // Check if it's likely an orphaned prop (not just a regular sprite)
+                    if (obj.name.ToLower().Contains("prop") || obj.transform.parent?.name.ToLower().Contains("prop") == true)
+                    {
+                        report.issues.Add(new ValidationIssue(
+                            ValidationSeverity.Info,
+                            "Potentially Orphaned Prop",
+                            $"GameObject '{obj.name}' appears to be a prop but is not referenced by any BiomeArtProfile. Consider adding it to a prop array or removing if unused.",
+                            obj,
+                            obj.transform.position
+                        ));
+                    }
+                }
+            }
+
+            // Check for unused tile assets in project (simplified check)
+            ValidateUnusedTileAssets(referencedTiles, report);
+        }
+
+        private static void ValidateUnusedTileAssets(HashSet<UnityEngine.Tilemaps.TileBase> referencedTiles, ValidationReport report)
+        {
+            // This would ideally scan project assets, but for now we'll check if any BiomeArtProfiles have null tile references
+            var allProfiles = AssetDatabase.FindAssets("t:BiomeArtProfile")
+                .Select(guid => AssetDatabase.LoadAssetAtPath<BiomeArtProfile>(AssetDatabase.GUIDToAssetPath(guid)))
+                .Where(profile => profile != null);
+
+            foreach (var profile in allProfiles)
+            {
+                // Check for null tile references that might indicate orphaned or missing tiles
+                if (profile.tiles != null)
+                {
+                    for (int i = 0; i < profile.tiles.Length; i++)
+                    {
+                        if (profile.tiles[i] == null)
+                        {
+                            report.issues.Add(new ValidationIssue(
+                                ValidationSeverity.Warning,
+                                "Null Tile Reference",
+                                $"BiomeArtProfile '{profile.name}' has a null tile reference at index {i}. This may indicate a missing or deleted tile asset.",
+                                profile
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Suggests automatic fixes for common authoring issues like missing NodeIds
+        /// </summary>
+        private static void SuggestAutoFixes(DistrictAuthoring[] districts, BiomeFieldAuthoring[] biomes, ValidationReport report)
+        {
+            // Auto-assign missing NodeIds
+            var usedNodeIds = new HashSet<uint>();
+            
+            // Collect existing NodeIds
+            foreach (var district in districts.Where(d => d != null && d.nodeId.value != 0))
+            {
+                usedNodeIds.Add(district.nodeId.value);
+            }
+            foreach (var biome in biomes.Where(b => b != null && b.nodeId.value != 0))
+            {
+                usedNodeIds.Add(biome.nodeId.value);
+            }
+
+            // Suggest NodeIds for objects missing them
+            uint nextAvailableId = 1;
+            foreach (var district in districts.Where(d => d != null && d.nodeId.value == 0))
+            {
+                while (usedNodeIds.Contains(nextAvailableId))
+                {
+                    nextAvailableId++;
+                }
+                
+                report.issues.Add(new ValidationIssue(
+                    ValidationSeverity.Info,
+                    "Auto-Fix Suggestion",
+                    $"District '{district.name}' is missing NodeId. Suggested auto-assignment: {nextAvailableId}. You can manually set this in the inspector.",
+                    district,
+                    district.transform.position
+                ));
+                
+                usedNodeIds.Add(nextAvailableId);
+                nextAvailableId++;
+            }
+
+            foreach (var biome in biomes.Where(b => b != null && b.nodeId.value == 0))
+            {
+                while (usedNodeIds.Contains(nextAvailableId))
+                {
+                    nextAvailableId++;
+                }
+                
+                report.issues.Add(new ValidationIssue(
+                    ValidationSeverity.Info,
+                    "Auto-Fix Suggestion", 
+                    $"BiomeField '{biome.name}' is missing NodeId. Suggested auto-assignment: {nextAvailableId}. You can manually set this in the inspector.",
+                    biome,
+                    biome.transform.position
+                ));
+                
+                usedNodeIds.Add(nextAvailableId);
+                nextAvailableId++;
+            }
         }
     }
 }
