@@ -387,14 +387,14 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private RoomFeatureType SelectWeightedFeatureType(float weight, BiomeType biome)
+        private RoomFeatureType SelectWeightedFeatureType(float weight, Core.BiomeType biome)
         {
             // Biome-specific weighting
             return biome switch
             {
-                BiomeType.ShadowRealms => weight > 0.4f ? RoomFeatureType.Obstacle : RoomFeatureType.Platform,
-                BiomeType.SkyGardens => weight > 0.7f ? RoomFeatureType.Platform : RoomFeatureType.PowerUp,
-                BiomeType.HubArea => weight > 0.8f ? RoomFeatureType.SaveStation : RoomFeatureType.Platform,
+                Core.BiomeType.ShadowRealms => weight > 0.4f ? RoomFeatureType.Obstacle : RoomFeatureType.Platform,
+                Core.BiomeType.SkyGardens => weight > 0.7f ? RoomFeatureType.Platform : RoomFeatureType.PowerUp,
+                Core.BiomeType.HubArea => weight > 0.8f ? RoomFeatureType.SaveStation : RoomFeatureType.Platform,
                 _ => weight > 0.6f ? RoomFeatureType.Platform : RoomFeatureType.Obstacle
             };
         }

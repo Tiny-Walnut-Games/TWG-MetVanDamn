@@ -22,7 +22,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public bool IsComplete;
         public Ability AvailableSkills;
         public uint GenerationSeed;
-        public BiomeType TargetBiome;
+        public Core.BiomeType TargetBiome;
         public Polarity TargetPolarity;
         public RoomLayoutType LayoutType;
         public int CurrentStep;
@@ -54,20 +54,9 @@ namespace TinyWalnutGames.MetVD.Graph
         }
         
         // Conversion helper
-        private static BiomeType ConvertAffinityToBiomeType(BiomeAffinity affinity)
+        private static Core.BiomeType ConvertAffinityToBiomeType(BiomeAffinity affinity)
         {
-            return affinity switch
-            {
-                BiomeAffinity.Forest => BiomeType.SolarPlains,
-                BiomeAffinity.Desert => BiomeType.VolcanicCore,
-                BiomeAffinity.Mountain => BiomeType.CrystalCaverns,
-                BiomeAffinity.Ocean => BiomeType.DeepUnderwater,
-                BiomeAffinity.Sky => BiomeType.SkyGardens,
-                BiomeAffinity.Underground => BiomeType.ShadowRealms,
-                BiomeAffinity.TechZone => BiomeType.PowerPlant,
-                BiomeAffinity.Volcanic => BiomeType.VolcanicCore,
-                _ => BiomeType.HubArea
-            };
+            return GraphTypeUtilities.ToCore(affinity);
         }
     }
 
@@ -335,21 +324,21 @@ namespace TinyWalnutGames.MetVD.Graph
         }
 
         /// <summary>
-        /// Safe conversion from BiomeAffinity enum to BiomeType
+        /// Safe conversion from BiomeAffinity enum to BiomeType  
         /// </summary>
-        public static BiomeType ToCore(BiomeAffinity affinity)
+        public static Core.BiomeType ToCore(BiomeAffinity affinity)
         {
             return affinity switch
             {
-                BiomeAffinity.Forest => BiomeType.SolarPlains,
-                BiomeAffinity.Desert => BiomeType.VolcanicCore,
-                BiomeAffinity.Mountain => BiomeType.CrystalCaverns,
-                BiomeAffinity.Ocean => BiomeType.DeepUnderwater,
-                BiomeAffinity.Sky => BiomeType.SkyGardens,
-                BiomeAffinity.Underground => BiomeType.ShadowRealms,
-                BiomeAffinity.TechZone => BiomeType.PowerPlant,
-                BiomeAffinity.Volcanic => BiomeType.VolcanicCore,
-                _ => BiomeType.HubArea
+                BiomeAffinity.Forest => Core.BiomeType.SolarPlains,
+                BiomeAffinity.Desert => Core.BiomeType.VolcanicCore,
+                BiomeAffinity.Mountain => Core.BiomeType.CrystalCaverns,
+                BiomeAffinity.Ocean => Core.BiomeType.DeepUnderwater,
+                BiomeAffinity.Sky => Core.BiomeType.SkyGardens,
+                BiomeAffinity.Underground => Core.BiomeType.ShadowRealms,
+                BiomeAffinity.TechZone => Core.BiomeType.PowerPlant,
+                BiomeAffinity.Volcanic => Core.BiomeType.VolcanicCore,
+                _ => Core.BiomeType.HubArea
             };
         }
 
