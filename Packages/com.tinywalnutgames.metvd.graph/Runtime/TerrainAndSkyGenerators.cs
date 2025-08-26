@@ -279,7 +279,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private BeatType DetermineBeatType(int beatIndex, int totalBeats)
+        private readonly BeatType DetermineBeatType(int beatIndex, int totalBeats)
         {
             // Create rhythm pattern: Challenge, Rest, Secret, Challenge, Rest, etc.
             return (beatIndex % 3) switch
@@ -555,7 +555,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private float GetBiomeNoiseScale(BiomeType biome)
+        private readonly float GetBiomeNoiseScale(BiomeType biome)
         {
             return biome switch
             {
@@ -567,7 +567,7 @@ namespace TinyWalnutGames.MetVD.Graph
             };
         }
 
-        private float GetBiomeHeightVariation(BiomeType biome)
+        private readonly float GetBiomeHeightVariation(BiomeType biome)
         {
             return biome switch
             {
@@ -579,7 +579,7 @@ namespace TinyWalnutGames.MetVD.Graph
             };
         }
 
-        private bool ShouldAddBiomeFeature(int x, Core.Biome biome, uint seed)
+        private readonly bool ShouldAddBiomeFeature(int x, Core.Biome biome, uint seed)
         {
             var random = new Unity.Mathematics.Random(seed + (uint)x);
             var featureChance = biome.Type switch
@@ -594,7 +594,7 @@ namespace TinyWalnutGames.MetVD.Graph
             return random.NextFloat() < featureChance;
         }
 
-        private RoomFeatureType GetBiomeSpecificFeature(BiomeType biome)
+        private readonly RoomFeatureType GetBiomeSpecificFeature(BiomeType biome)
         {
             return biome switch
             {
@@ -736,7 +736,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private CloudMotionType GetCloudMotionType(BiomeType biome, Polarity polarity)
+        private readonly CloudMotionType GetCloudMotionType(BiomeType biome, Polarity polarity)
         {
             return biome switch
             {

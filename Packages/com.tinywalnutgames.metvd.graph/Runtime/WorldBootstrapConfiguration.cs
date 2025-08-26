@@ -21,9 +21,9 @@ namespace TinyWalnutGames.MetVD.Graph
         public bool LogGenerationSteps;
 
         // Convenience properties for backward compatibility
-        public int2 BiomeCountRange => BiomeSettings.BiomeCountRange;
-        public int2 DistrictCountRange => DistrictSettings.DistrictCountRange;
-        public float DistrictMinDistance => DistrictSettings.DistrictMinDistance;
+        public readonly int2 BiomeCountRange => BiomeSettings.BiomeCountRange;
+        public readonly int2 DistrictCountRange => DistrictSettings.DistrictCountRange;
+        public readonly float DistrictMinDistance => DistrictSettings.DistrictMinDistance;
 
         public WorldBootstrapConfiguration(uint seed, int2 worldSize, RandomizationMode randomizationMode,
             BiomeGenerationSettings biomeSettings, DistrictGenerationSettings districtSettings,

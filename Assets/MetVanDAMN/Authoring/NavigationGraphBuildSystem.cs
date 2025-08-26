@@ -179,7 +179,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
+        private readonly Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
         {
             foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
             {
@@ -190,7 +190,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private GateConditionCollection CollectGateConditions(ref SystemState state, Entity sourceEntity, Entity destEntity)
+        private readonly GateConditionCollection CollectGateConditions(ref SystemState state, Entity sourceEntity, Entity destEntity)
         {
             var gateConditions = new GateConditionCollection();
             
@@ -218,7 +218,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private NavLink CreateNavLinkFromConnection(Connection connection, GateConditionCollection gates)
+        private readonly NavLink CreateNavLinkFromConnection(Connection connection, GateConditionCollection gates)
         {
             // Determine combined requirements from all gate conditions
             var combinedPolarity = Polarity.None;
@@ -276,7 +276,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             private GateCondition _gate3;
             private int _count;
 
-            public int Count => _count;
+            public readonly int Count => _count;
 
             public void Add(GateCondition gate)
             {
@@ -290,7 +290,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 if (_count < 4) _count++;
             }
 
-            public GateCondition this[int index]
+            public readonly GateCondition this[int index]
             {
                 get
                 {

@@ -83,7 +83,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private NativeArray<AgentCapabilities> GetTestCapabilityProfiles()
+        private readonly NativeArray<AgentCapabilities> GetTestCapabilityProfiles()
         {
             var profiles = new NativeArray<AgentCapabilities>(5, Allocator.Temp);
             
@@ -183,7 +183,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
+        private readonly Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
         {
             foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
             {

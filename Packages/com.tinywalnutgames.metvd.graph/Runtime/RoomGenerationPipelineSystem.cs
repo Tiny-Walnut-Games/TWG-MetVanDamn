@@ -142,7 +142,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessLayoutTypeDecision(ref RoomGenerationRequest request, RoomHierarchyData roomData)
+        private readonly void ProcessLayoutTypeDecision(ref RoomGenerationRequest request, RoomHierarchyData roomData)
         {
             // Step 2: Decide vertical vs. horizontal orientation
             // Factor in biome constraints (e.g., sky biome favors verticality)
@@ -172,7 +172,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessRoomGeneratorChoice(ref RoomGenerationRequest request, RoomHierarchyData roomData)
+        private readonly void ProcessRoomGeneratorChoice(ref RoomGenerationRequest request, RoomHierarchyData roomData)
         {
             // Step 3: Pick generator type and filter modules by biome and required skills
             
@@ -580,7 +580,7 @@ namespace TinyWalnutGames.MetVD.Graph
                    biome == BiomeType.CrystalCaverns;
         }
 
-        private RoomFeatureType SelectSkillSpecificFeature(Ability availableSkills)
+        private readonly RoomFeatureType SelectSkillSpecificFeature(Ability availableSkills)
         {
             if ((availableSkills & Ability.Dash) != 0) return RoomFeatureType.Obstacle;
             if ((availableSkills & Ability.WallJump) != 0) return RoomFeatureType.Platform;

@@ -273,7 +273,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private uint GetLowestFScoreNode(NativeList<uint> openSet, NativeHashMap<uint, float> fScore)
+        private readonly uint GetLowestFScoreNode(NativeList<uint> openSet, NativeHashMap<uint, float> fScore)
         {
             var bestNodeId = openSet[0];
             var bestScore = fScore.ContainsKey(bestNodeId) ? fScore[bestNodeId] : float.MaxValue;
@@ -357,7 +357,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// Uses simplified parabolic trajectory physics for cost estimation
         /// </summary>
         [BurstCompile]
-        private float CalculateJumpArcMultiplier(float horizontalDistance, float verticalDistance)
+        private readonly float CalculateJumpArcMultiplier(float horizontalDistance, float verticalDistance)
         {
             if (verticalDistance <= 0) return 1.0f;
             
@@ -417,7 +417,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
+        private readonly Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
         {
             foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
             {

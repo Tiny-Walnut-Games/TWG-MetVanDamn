@@ -204,7 +204,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
                 while (!validPosition && attempts < maxAttempts)
                 {
-                    float2 candidate = new float2(
+                    float2 candidate = new(
                         random.NextFloat(-worldSize.x * 0.4f, worldSize.x * 0.4f),
                         random.NextFloat(-worldSize.y * 0.4f, worldSize.y * 0.4f)
                     );

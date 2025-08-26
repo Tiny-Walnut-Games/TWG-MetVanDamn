@@ -105,7 +105,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// <summary>
         /// Convert to runtime WfcSocket
         /// </summary>
-        public WfcSocket ToWfcSocket()
+        public readonly WfcSocket ToWfcSocket()
         {
             return new WfcSocket(socketId, direction, requiredPolarity, isOpen);
         }
