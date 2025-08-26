@@ -55,7 +55,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (GUILayout.Button("Frame All Districts"))
             {
                 // With this line:
-                DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+                DistrictAuthoring[] districts = UnityEngine.Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
                 if (districts.Length > 0)
                 {
                     Bounds b = new(districts[0].transform.position, Vector3.one);

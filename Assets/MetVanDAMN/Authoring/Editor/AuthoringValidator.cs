@@ -30,10 +30,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             public ValidationSeverity severity;
             public string category;
             public string message;
-            public Object targetObject;
+            public UnityEngine.Object targetObject;
             public Vector3 worldPosition;
 
-            public ValidationIssue(ValidationSeverity severity, string category, string message, Object target = null, Vector3 position = default)
+            public ValidationIssue(ValidationSeverity severity, string category, string message, UnityEngine.Object target = null, Vector3 position = default)
             {
                 this.severity = severity;
                 this.category = category;
@@ -65,10 +65,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var report = new ValidationReport();
             
             // Find all authoring components
-            var districtAuthorings = Object.FindObjectsOfType<DistrictAuthoring>();
-            var connectionAuthorings = Object.FindObjectsOfType<ConnectionAuthoring>();
-            var biomeAuthorings = Object.FindObjectsOfType<BiomeFieldAuthoring>();
-            var gateAuthorings = Object.FindObjectsOfType<GateConditionAuthoring>();
+            var districtAuthorings = UnityEngine.Object.FindObjectsOfType<DistrictAuthoring>();
+            var connectionAuthorings = UnityEngine.Object.FindObjectsOfType<ConnectionAuthoring>();
+            var biomeAuthorings = UnityEngine.Object.FindObjectsOfType<BiomeFieldAuthoring>();
+            var gateAuthorings = UnityEngine.Object.FindObjectsOfType<GateConditionAuthoring>();
             
             // Validate districts
             ValidateDistricts(districtAuthorings, report);
@@ -304,8 +304,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 .Where(profile => profile != null)
                 .ToArray();
                 
-            var districtAuthorings = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
-            var biomeAuthorings = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
+            var districtAuthorings = UnityEngine.Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            var biomeAuthorings = UnityEngine.Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
             
             // Find biome profiles not linked to any biome
             var usedProfiles = new HashSet<BiomeArtProfile>(biomeAuthorings
@@ -842,7 +842,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
 
             // Find potential orphaned assets in the scene
-            var allGameObjects = Object.FindObjectsOfType<GameObject>();
+            var allGameObjects = UnityEngine.Object.FindObjectsOfType<GameObject>();
             var potentialOrphans = allGameObjects.Where(go => 
                 go.name.ToLower().Contains("prop") || 
                 go.name.ToLower().Contains("tile") ||

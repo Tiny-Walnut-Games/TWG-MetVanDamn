@@ -606,10 +606,10 @@ namespace TinyWalnutGames.MetVD.Authoring
             string[] layerNames = GetLayerNamesForProjection(projectionType);
 
             // Create grid with appropriate projection settings (factory methods are void; capture before/after set)
-            var existing = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
+            var existing = UnityEngine.Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
             HashSet<Grid> before = new(existing);
             InvokeProjectionCreation(projectionType);
-            Grid createdGrid = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
+            Grid createdGrid = UnityEngine.Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
                 .Where(g => !before.Contains(g))
                 .OrderByDescending(g => g.GetInstanceID())
                 .FirstOrDefault();
@@ -638,7 +638,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                         if (artProfile.materialOverride == null && r.sharedMaterial != null && r.sharedMaterial.HasProperty("_Color"))
                         {
                             // Duplicate material instance to avoid editing shared asset at runtime
-                            var instMat = Object.Instantiate(r.sharedMaterial);
+                            var instMat = UnityEngine.Object.Instantiate(r.sharedMaterial);
                             instMat.name = r.sharedMaterial.name + " (BiomeTint)";
                             instMat.color = artProfile.debugColor;
                             r.material = instMat;
