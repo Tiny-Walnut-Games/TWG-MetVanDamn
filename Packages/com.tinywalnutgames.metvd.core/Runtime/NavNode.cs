@@ -212,12 +212,17 @@ namespace TinyWalnutGames.MetVD.Core
                 }
             }
             
-            // Apply ability mismatch penalty
+            // Apply ability mismatch penalty with jump-specific considerations
             if (RequiredAbilities != Ability.None)
             {
                 if ((capabilities.AvailableAbilities & RequiredAbilities) != RequiredAbilities)
                 {
                     effectiveCost *= PolarityMismatchCostMultiplier;
+                }
+                else
+                {
+                    // Apply movement efficiency bonuses for specific abilities
+                    effectiveCost *= CalculateMovementEfficiencyMultiplier(capabilities.AvailableAbilities);
                 }
             }
             
@@ -234,6 +239,183 @@ namespace TinyWalnutGames.MetVD.Core
             };
             
             return effectiveCost * softnessMultiplier;
+        }
+
+        /// <summary>
+        /// Calculate the effective traversal cost for this link with arc trajectory analysis
+        /// </summary>
+        public readonly float CalculateTraversalCost(AgentCapabilities capabilities, float3 fromPosition, float3 toPosition)
+        {
+            float baseCost = CalculateTraversalCost(capabilities);
+            if (baseCost >= float.MaxValue) return baseCost;
+            
+            // Add arc trajectory cost for jump-based movements
+            if (HasJumpMovementRequirement())
+            {
+                float arcCost = CalculateArcTraversalCost(fromPosition, toPosition, capabilities.AvailableAbilities);
+                baseCost *= arcCost;
+            }
+            
+            return baseCost;
+        }
+
+        /// <summary>
+        /// Calculate movement efficiency multiplier based on available abilities
+        /// </summary>
+        private readonly float CalculateMovementEfficiencyMultiplier(Ability availableAbilities)
+        {
+            float multiplier = 1.0f;
+            
+            // Check for movement ability efficiency bonuses
+            if ((RequiredAbilities & Ability.Jump) != 0 && (availableAbilities & Ability.DoubleJump) != 0)
+            {
+                multiplier *= 0.8f; // Double jump makes regular jumps more efficient
+            }
+            
+            if ((RequiredAbilities & Ability.WallJump) != 0 && (availableAbilities & Ability.Climb) != 0)
+            {
+                multiplier *= 0.7f; // Climbing ability improves wall jump efficiency
+            }
+            
+            if ((RequiredAbilities & Ability.Dash) != 0 && (availableAbilities & Ability.GlideSpeed) != 0)
+            {
+                multiplier *= 0.9f; // Glide extends dash effectiveness
+            }
+            
+            // Arc-based ability synergies
+            if ((RequiredAbilities & Ability.Jump) != 0 && (availableAbilities & Ability.ArcJump) != 0)
+            {
+                multiplier *= 0.75f; // Arc jump provides superior jump control
+            }
+            
+            if ((RequiredAbilities & Ability.DoubleJump) != 0 && (availableAbilities & Ability.ChargedJump) != 0)
+            {
+                multiplier *= 0.85f; // Charged jump reduces double jump necessity
+            }
+            
+            if ((RequiredAbilities & Ability.Grapple) != 0 && (availableAbilities & Ability.AllArcMovement) != 0)
+            {
+                multiplier *= 0.8f; // Arc movement abilities complement grappling
+            }
+            
+            // Precision movement combinations
+            if ((availableAbilities & Ability.ArcJump) != 0 && (availableAbilities & Ability.TeleportArc) != 0)
+            {
+                multiplier *= 0.9f; // Advanced arc abilities work together
+            }
+            
+            return multiplier;
+        }
+
+        /// <summary>
+        /// Check if this link requires jump-based movement
+        /// </summary>
+        private readonly bool HasJumpMovementRequirement()
+        {
+            return (RequiredAbilities & (Ability.Jump | Ability.DoubleJump | Ability.WallJump | Ability.Dash | 
+                                        Ability.ArcJump | Ability.ChargedJump | Ability.TeleportArc | Ability.Grapple)) != 0;
+        }
+
+        /// <summary>
+        /// Calculate arc traversal cost based on trajectory physics
+        /// </summary>
+        private readonly float CalculateArcTraversalCost(float3 fromPos, float3 toPos, Ability availableAbilities)
+        {
+            float3 displacement = toPos - fromPos;
+            float horizontalDistance = math.length(displacement.xz);
+            float verticalDistance = displacement.y;
+            
+            // Base arc difficulty
+            float arcMultiplier = 1.0f;
+            
+            if (verticalDistance > 0.1f) // Upward movement
+            {
+                // Calculate jump arc requirements with enhanced ability support
+                const float maxSingleJumpHeight = 2.0f;
+                const float maxDoubleJumpHeight = 4.0f;
+                const float maxWallJumpReach = 3.0f;
+                const float maxArcJumpHeight = 6.0f;        // Enhanced arc control
+                const float maxChargedJumpHeight = 8.0f;    // Variable jump power
+                const float maxTeleportRange = 10.0f;       // Teleport range
+                const float maxGrappleRange = 12.0f;        // Grappling hook range
+                
+                if ((availableAbilities & Ability.TeleportArc) != 0 && 
+                    math.length(displacement) <= maxTeleportRange)
+                {
+                    // Teleportation - instantaneous but high energy cost
+                    arcMultiplier = 2.0f + (math.length(displacement) / maxTeleportRange) * 1.0f;
+                }
+                else if ((availableAbilities & Ability.Grapple) != 0 && 
+                         math.length(displacement) <= maxGrappleRange)
+                {
+                    // Grappling hook - smooth arc with moderate cost
+                    arcMultiplier = 1.3f + (math.length(displacement) / maxGrappleRange) * 0.7f;
+                }
+                else if (verticalDistance <= maxChargedJumpHeight && (availableAbilities & Ability.ChargedJump) != 0)
+                {
+                    // Charged jump - variable power with precision control
+                    float chargeLevel = verticalDistance / maxChargedJumpHeight;
+                    arcMultiplier = 1.1f + chargeLevel * 0.6f;
+                }
+                else if (verticalDistance <= maxArcJumpHeight && (availableAbilities & Ability.ArcJump) != 0)
+                {
+                    // Arc jump - precise parabolic control
+                    arcMultiplier = 1.0f + (verticalDistance / maxArcJumpHeight) * 0.4f;
+                }
+                else if (verticalDistance <= maxSingleJumpHeight && (availableAbilities & Ability.Jump) != 0)
+                {
+                    // Regular jump trajectory
+                    arcMultiplier = 1.0f + (verticalDistance / maxSingleJumpHeight) * 0.5f;
+                }
+                else if (verticalDistance <= maxDoubleJumpHeight && (availableAbilities & Ability.DoubleJump) != 0)
+                {
+                    // Double jump trajectory - more complex arc
+                    arcMultiplier = 1.2f + (verticalDistance / maxDoubleJumpHeight) * 0.8f;
+                }
+                else if (horizontalDistance <= maxWallJumpReach && (availableAbilities & Ability.WallJump) != 0)
+                {
+                    // Wall jump - requires precise timing
+                    arcMultiplier = 1.5f + (verticalDistance / maxSingleJumpHeight) * 1.0f;
+                }
+                else
+                {
+                    // Impossible trajectory
+                    return 10.0f;
+                }
+                
+                // Add horizontal distance penalty for arc complexity
+                if (horizontalDistance > 1.0f)
+                {
+                    float horizontalComplexity = math.min(horizontalDistance / 5.0f, 2.0f);
+                    arcMultiplier *= (1.0f + horizontalComplexity * 0.3f);
+                }
+                
+                // Apply precision bonuses for advanced movement abilities
+                if ((availableAbilities & Ability.ArcJump) != 0)
+                {
+                    arcMultiplier *= 0.9f; // Arc jump provides better control
+                }
+                
+                if ((availableAbilities & Ability.GlideSpeed) != 0)
+                {
+                    arcMultiplier *= 0.85f; // Gliding extends effective range
+                }
+            }
+            else if (verticalDistance < -0.1f) // Downward movement
+            {
+                // Falling arc - easier but requires fall time consideration
+                float fallMultiplier = 1.0f + math.min(math.abs(verticalDistance) / 10.0f, 0.5f);
+                
+                // Gliding abilities reduce fall cost
+                if ((availableAbilities & Ability.GlideSpeed) != 0)
+                {
+                    fallMultiplier *= 0.7f;
+                }
+                
+                arcMultiplier = fallMultiplier;
+            }
+            
+            return arcMultiplier;
         }
 
         /// <summary>

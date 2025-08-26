@@ -237,7 +237,9 @@ namespace TinyWalnutGames.MetVD.Authoring
                         if (!link.CanTraverseWith(capabilities, currentNodeId))
                             continue;
 
-                        var tentativeGScore = gScore[currentNodeId] + link.CalculateTraversalCost(capabilities);
+                        // Calculate arc-aware traversal cost using node positions
+                        float traversalCost = CalculateArcAwareTraversalCost(link, capabilities, currentNodeId, neighborId, ref state);
+                        var tentativeGScore = gScore[currentNodeId] + traversalCost;
                         
                         if (!openSet.Contains(neighborId))
                         {
@@ -312,9 +314,106 @@ namespace TinyWalnutGames.MetVD.Authoring
             var fromNode = SystemAPI.GetComponent<NavNode>(fromEntity);
             var toNode = SystemAPI.GetComponent<NavNode>(toEntity);
             
-            // Manhattan distance as heuristic
-            return math.abs(fromNode.WorldPosition.x - toNode.WorldPosition.x) + 
-                   math.abs(fromNode.WorldPosition.z - toNode.WorldPosition.z);
+            // Enhanced heuristic with arc trajectory and vertical movement considerations
+            return CalculateMovementHeuristic(fromNode.WorldPosition, toNode.WorldPosition);
+        }
+
+        /// <summary>
+        /// Calculate movement heuristic considering jump arcs and vertical traversal
+        /// </summary>
+        [BurstCompile]
+        private float CalculateMovementHeuristic(float3 fromPos, float3 toPos)
+        {
+            float3 displacement = toPos - fromPos;
+            float horizontalDistance = math.length(displacement.xz);
+            float verticalDistance = displacement.y;
+            
+            // Base horizontal movement cost
+            float baseCost = horizontalDistance;
+            
+            // Add vertical movement cost with arc trajectory considerations
+            if (math.abs(verticalDistance) > 0.1f)
+            {
+                // Upward movement requires jump energy - use parabolic arc estimation
+                if (verticalDistance > 0)
+                {
+                    // Arc trajectory cost: accounts for both horizontal and vertical components
+                    // Uses physics-based parabolic arc calculation for jump estimation
+                    float arcMultiplier = CalculateJumpArcMultiplier(horizontalDistance, verticalDistance);
+                    baseCost *= arcMultiplier;
+                }
+                else
+                {
+                    // Downward movement is easier but still requires fall time
+                    baseCost += math.abs(verticalDistance) * 0.3f;
+                }
+            }
+            
+            return baseCost;
+        }
+
+        /// <summary>
+        /// Calculate jump arc multiplier based on horizontal and vertical distance
+        /// Uses simplified parabolic trajectory physics for cost estimation
+        /// </summary>
+        [BurstCompile]
+        private float CalculateJumpArcMultiplier(float horizontalDistance, float verticalDistance)
+        {
+            if (verticalDistance <= 0) return 1.0f;
+            
+            // Simplified jump physics constants (adjustable for game feel)
+            const float gravity = 9.81f;
+            const float baseJumpVelocity = 5.0f;
+            const float maxJumpHeight = 3.0f;
+            
+            // Check if jump is physically possible with current abilities
+            float requiredJumpHeight = verticalDistance;
+            if (requiredJumpHeight > maxJumpHeight)
+            {
+                // Impossible jump - high cost penalty
+                return 10.0f;
+            }
+            
+            // Calculate time to reach peak and total arc time
+            float timeToReachHeight = math.sqrt(2.0f * requiredJumpHeight / gravity);
+            float requiredHorizontalVelocity = horizontalDistance / (timeToReachHeight * 2.0f);
+            
+            // Arc efficiency: ratio of required velocity to available velocity
+            float velocityRatio = requiredHorizontalVelocity / baseJumpVelocity;
+            
+            // Cost increases quadratically with velocity requirement
+            return 1.0f + (velocityRatio * velocityRatio * 2.0f);
+        }
+
+        /// <summary>
+        /// Calculate arc-aware traversal cost using node positions for trajectory analysis
+        /// </summary>
+        [BurstCompile]
+        private float CalculateArcAwareTraversalCost(NavLink link, AgentCapabilities capabilities, 
+                                                    uint fromNodeId, uint toNodeId, ref SystemState state)
+        {
+            // Get base traversal cost
+            float baseCost = link.CalculateTraversalCost(capabilities);
+            
+            // For jump-based movements, enhance with trajectory analysis
+            if ((link.RequiredAbilities & (Ability.Jump | Ability.DoubleJump | Ability.WallJump | Ability.Dash |
+                                          Ability.ArcJump | Ability.ChargedJump | Ability.TeleportArc | Ability.Grapple)) != 0)
+            {
+                var fromEntity = FindEntityByNodeId(ref state, fromNodeId);
+                var toEntity = FindEntityByNodeId(ref state, toNodeId);
+                
+                if (fromEntity != Entity.Null && toEntity != Entity.Null &&
+                    SystemAPI.HasComponent<NavNode>(fromEntity) && SystemAPI.HasComponent<NavNode>(toEntity))
+                {
+                    var fromNode = SystemAPI.GetComponent<NavNode>(fromEntity);
+                    var toNode = SystemAPI.GetComponent<NavNode>(toEntity);
+                    
+                    // Use the enhanced NavLink arc calculation
+                    return link.CalculateTraversalCost(capabilities, fromNode.WorldPosition, toNode.WorldPosition);
+                }
+            }
+            
+            return baseCost;
         }
 
         [BurstCompile]
