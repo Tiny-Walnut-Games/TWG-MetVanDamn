@@ -210,6 +210,9 @@ namespace TinyWalnutGames.MetVD.Graph
                 random.NextUInt()
             );
             
+            // Set the correct room entity
+            generationRequest.RoomEntity = roomEntity;
+            
             entityManager.AddComponentData(roomEntity, generationRequest);
             
             // Add additional components needed for specialized generators

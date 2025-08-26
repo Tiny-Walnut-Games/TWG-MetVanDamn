@@ -159,5 +159,27 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         [Tooltip("Optional material override for biome visuals.")]
         public Material materialOverride;
+        
+        // Convenience properties for compatibility with existing code
+        /// <summary>
+        /// Convenient access to prop prefabs for backward compatibility
+        /// </summary>
+        public GameObject[] propPrefabs => propSettings?.propPrefabs ?? new GameObject[0];
+        
+        /// <summary>
+        /// Convenient access to all tiles for backward compatibility
+        /// </summary>
+        public TileBase[] tiles
+        {
+            get
+            {
+                var tileList = new List<TileBase>();
+                if (floorTile != null) tileList.Add(floorTile);
+                if (wallTile != null) tileList.Add(wallTile);
+                if (backgroundTile != null) tileList.Add(backgroundTile);
+                if (transitionTiles != null) tileList.AddRange(transitionTiles);
+                return tileList.ToArray();
+            }
+        }
     }
 }

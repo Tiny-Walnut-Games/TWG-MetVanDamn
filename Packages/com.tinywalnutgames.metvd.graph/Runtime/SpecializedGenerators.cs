@@ -63,13 +63,13 @@ namespace TinyWalnutGames.MetVD.Graph
         [ReadOnly] public BufferLookup<RoomModuleElement> ModuleBufferLookup;
         public Unity.Mathematics.Random Random;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.PatternDrivenModular || request.IsComplete) return;
 
-            if (!PatternBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!PatternBufferLookup.HasBuffer(entity)) return;
 
-            var patterns = PatternBufferLookup[nodeId.Value];
+            var patterns = PatternBufferLookup[entity];
             var bounds = roomData.Bounds;
 
             // Clear existing patterns

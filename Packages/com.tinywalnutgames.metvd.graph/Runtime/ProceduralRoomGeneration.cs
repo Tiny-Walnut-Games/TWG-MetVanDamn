@@ -260,6 +260,38 @@ namespace TinyWalnutGames.MetVD.Graph
             TargetBiome = BiomeAffinity.Any;
             IsComplete = false;
         }
+        
+        // Alternative constructor matching the calling pattern in RoomManagementSystem.cs
+        public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeType targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
+        {
+            GeneratorType = generatorType;
+            RoomEntity = Entity.Null; // Will be set by caller
+            RoomBounds = new int2(16, 16); // Default bounds
+            Seed = seed;
+            GenerationSeed = seed;
+            AvailableSkills = availableSkills;
+            TargetBiome = ConvertBiomeTypeToAffinity(targetBiome);
+            IsComplete = false;
+        }
+        
+        private static BiomeAffinity ConvertBiomeTypeToAffinity(BiomeType biomeType)
+        {
+            return biomeType switch
+            {
+                BiomeType.Forest => BiomeAffinity.Forest,
+                BiomeType.Desert => BiomeAffinity.Desert,
+                BiomeType.Mountains => BiomeAffinity.Mountain,
+                BiomeType.Ocean => BiomeAffinity.Ocean,
+                BiomeType.SkyGardens => BiomeAffinity.Sky,
+                BiomeType.CrystalCaverns => BiomeAffinity.Underground,
+                BiomeType.IceCatacombs => BiomeAffinity.Underground,
+                BiomeType.PowerPlant => BiomeAffinity.TechZone,
+                BiomeType.CryogenicLabs => BiomeAffinity.TechZone,
+                BiomeType.VolcanicCore => BiomeAffinity.Volcanic,
+                BiomeType.Volcanic => BiomeAffinity.Volcanic,
+                _ => BiomeAffinity.Any
+            };
+        }
     }
     
     /// <summary>
