@@ -268,23 +268,31 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
         }
 
-        private List<DistrictHierarchy> GetFilteredHierarchies()
+        private IEnumerable<DistrictHierarchy> GetFilteredHierarchies()
         {
-            var filtered = districtHierarchies.AsEnumerable();
-            
-            if (!string.IsNullOrEmpty(searchFilter))
+            return districtHierarchies.Where(h=>
             {
-                filtered = filtered.Where(h => 
+                // Apply general search filter
+                bool matchesSearch = string.IsNullOrEmpty(searchFilter) ||
                     h.district.name.ToLower().Contains(searchFilter.ToLower()) ||
-                    h.district.nodeId.ToString().Contains(searchFilter));
-            }
-            
-            if (showOnlyConnected)
-            {
-                filtered = filtered.Where(h => h.connections.Count > 0);
-            }
-            
-            return filtered.ToList();
+                    h.district.nodeId.ToString().Contains(searchFilter);
+                
+                // Apply NodeId search filter
+                bool matchesNodeId = string.IsNullOrEmpty(nodeIdSearchFilter) ||
+                    h.district.nodeId.ToString().Contains(nodeIdSearchFilter);
+                
+                // Apply connection type filter
+                bool matchesConnectionType = string.IsNullOrEmpty(connectionTypeFilter) ||
+                    h.connections.Any(c => c.connectionType.ToLower().Contains(connectionTypeFilter.ToLower()));
+                
+                // Apply biome filter
+                bool matchesBiome = biomeFilter == "All" || h.biomeType.Contains(biomeFilter);
+                
+                // Apply connected filter
+                bool matchesConnected = !showOnlyConnected || h.connections.Count > 0;
+                
+                return matchesSearch && matchesNodeId && matchesConnectionType && matchesBiome && matchesConnected;
+            });
         }
 
         private void DrawDistrictHierarchy(DistrictHierarchy hierarchy)

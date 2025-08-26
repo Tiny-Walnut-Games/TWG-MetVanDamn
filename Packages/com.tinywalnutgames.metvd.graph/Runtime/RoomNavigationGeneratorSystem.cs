@@ -390,6 +390,11 @@ namespace TinyWalnutGames.MetVD.Graph
                 WallThickness = 1
             };
         }
+
+        public void Update(ref SystemState state, ref RoomNavigationGeneratorSystem system)
+        {
+            OnUpdate(ref state);
+        }
     }
 
     /// <summary>

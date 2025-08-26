@@ -4,10 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 #if UNITY_TRANSFORMS_LOCALTRANSFORM
-using LocalTransformType = Unity.Transforms.LocalTransform;
-#else
-using TinyWalnutGames.MetVD.Core.Compat;
-using LocalTransformType = TinyWalnutGames.MetVD.Core.Compat.LocalTransformCompat;
+using Unity.Transforms;
 #endif
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
@@ -253,23 +250,10 @@ namespace TinyWalnutGames.MetVD.Graph
             state.EntityManager.AddComponentData(entity, new BiomeFieldData { PrimaryBiome = biomeType, SecondaryBiome = secondaryBiome, Strength = strength, Gradient = gradient });
             var (primaryPolarity, secondaryPolarity) = GetBiomePolarities(biomeType, secondaryBiome);
             var difficultyModifier = CalculateBiomeDifficulty(biomeType, ref random);
-            state.EntityManager.AddComponentData(entity, new TinyWalnutGames.MetVD.Core.Biome(
-                biomeType,
-                primaryPolarity,
-                strength,
-                secondaryPolarity,
-                difficultyModifier));
-            state.EntityManager.AddComponentData(entity, new LocalTransformType
-            {
-                Position = new float3(position.x, 0, position.y),
+            state.EntityManager.AddComponentData(entity, new TinyWalnutGames.MetVD.Core.Biome(biomeType, primaryPolarity, strength, secondaryPolarity, difficultyModifier));
 #if UNITY_TRANSFORMS_LOCALTRANSFORM
-                Rotation = quaternion.identity,
-                Scale = CalculateBiomeInfluenceRadius(biomeType, config.WorldSize)
-#else
-                Rotation = quaternion.identity,
-                Scale = CalculateBiomeInfluenceRadius(biomeType, config.WorldSize)
+            state.EntityManager.AddComponentData(entity, new LocalTransform { Position = new float3(position.x, 0, position.y), Rotation = quaternion.identity, Scale = CalculateBiomeInfluenceRadius(biomeType, config.WorldSize) });
 #endif
-            });
             var influenceBuffer = state.EntityManager.AddBuffer<BiomeInfluence>(entity);
             PopulateBiomeInfluences(influenceBuffer, biomeType, secondaryBiome, strength, gradient);
 

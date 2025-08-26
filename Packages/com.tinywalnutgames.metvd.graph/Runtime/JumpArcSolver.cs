@@ -189,6 +189,36 @@ namespace TinyWalnutGames.MetVD.Graph
                 ApexHeight = start.y + (initialVerticalVelocity * initialVerticalVelocity) / (2.0f * physics.GravityScale)
             };
         }
+        /// <summary>
+        /// Validate room reachability from platform and obstacle positions using legacy JumpPhysicsData.
+        /// </summary>
+        public static bool ValidateRoomReachability(NativeArray<float2> platformPositions, NativeArray<int2> obstaclePositions, JumpPhysicsData jumpPhysics)
+        {
+            if (platformPositions.Length == 0) return true;
+            var entrance = new int2((int)platformPositions[0].x, (int)platformPositions[0].y);
+            var critical = new NativeArray<int2>(platformPositions.Length, Allocator.Temp);
+            for (int i = 0; i < platformPositions.Length; i++)
+            {
+                var p = platformPositions[i];
+                critical[i] = new int2((int)p.x, (int)p.y);
+            }
+            var bounds = CalculateBounds(critical);
+            bool ok = ValidateRoomReachability(entrance, critical, Ability.Jump | Ability.DoubleJump, new JumpArcPhysics
+            {
+                JumpHeight = jumpPhysics.JumpHeight,
+                JumpDistance = jumpPhysics.JumpDistance,
+                DashDistance = jumpPhysics.DashDistance,
+                WallJumpHeight = jumpPhysics.WallJumpHeight
+            }, bounds, Allocator.Temp);
+            critical.Dispose();
+            return ok;
+        }
+        private static RectInt CalculateBounds(NativeArray<int2> points)
+        {
+            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+            for (int i = 0; i < points.Length; i++) { var p = points[i]; minX = math.min(minX, p.x); maxX = math.max(maxX, p.x); minY = math.min(minY, p.y); maxY = math.max(maxY, p.y); }
+            return new RectInt(minX, minY, math.max(1, (maxX - minX)+1), math.max(1, (maxY - minY)+1));
+        }
     }
     public struct JumpArcData { public float2 StartPosition; public float2 EndPosition; public float2 InitialVelocity; public float FlightTime; public float ApexHeight; }
 }
