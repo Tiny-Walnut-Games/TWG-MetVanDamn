@@ -6,8 +6,13 @@
         "UnityEditor.TestRunner",
         "Unity.Entities",
         "Unity.Collections",
+        "Unity.Mathematics",
+        "Unity.Transforms",
         "TinyWalnutGames.MetVD.Core",
-        "TinyWalnutGames.MetVD.Authoring"
+        "TinyWalnutGames.MetVD.Authoring",
+        "TinyWalnutGames.MetVD.Shared",
+        "TinyWalnutGames.MetVD.Samples",
+        "TinyWalnutGames.MetVD.Graph"
     ],
     "includePlatforms": [
         "Editor"

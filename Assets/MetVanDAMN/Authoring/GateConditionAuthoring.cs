@@ -10,8 +10,13 @@ namespace TinyWalnutGames.MetVD.Authoring
         public uint sourceNode;
         public uint targetNode;
         
-        [Header("Target District (optional - self if null)")] 
-        public DistrictAuthoring target;
+        [Header("Associated Connection (for tests / baking)")]
+        public NodeId connectionId; // Added for integration tests
+        
+        [Header("Gate Conditions (array for tests)")] 
+        public GateCondition[] gateConditions = System.Array.Empty<GateCondition>();
+        
+        [Header("Requirements")]
         public Polarity requiredPolarity = Polarity.None;
         public Ability requiredAbilities = Ability.None;
         public GateSoftness softness = GateSoftness.Hard;

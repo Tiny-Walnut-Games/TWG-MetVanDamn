@@ -1,13 +1,14 @@
 {
     "name": "TinyWalnutGames.MetVD.Core.Tests",
-    "rootNamespace": "TinyWalnutGames.MetVD.Core",
+    "rootNamespace": "TinyWalnutGames.MetVD.Core.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "TinyWalnutGames.MetVD.Core",
         "Unity.Entities",
         "Unity.Mathematics",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.Cinemachine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

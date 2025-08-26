@@ -19,7 +19,19 @@ namespace TinyWalnutGames.MetVD.Graph
         BiomeWeightedTerrain = 5,    // Top-world terrain generation
         SkyBiomePlatform = 6,        // Sky biome with moving platforms
         LinearBranchingCorridor = 7, // Linear branching corridor layout
-        StackedSegment = 8           // Stacked segment generation
+        StackedSegment = 8,         // Stacked segment generation
+        LayeredPlatformCloud = 9,    // Layered platforms with cloud effects
+        BiomeWeightedHeightmap = 10   // Terrain heightmaps weighted by biome
+    }
+
+    /// <summary>
+    /// Room layout types for procedural generation
+    /// </summary>
+    public enum RoomLayoutType : byte
+    {
+        Horizontal = 0,    // Horizontal room layout
+        Vertical = 1,      // Vertical room layout
+        Mixed = 2          // Mixed orientation layout
     }
 
     /// <summary>
@@ -234,19 +246,27 @@ namespace TinyWalnutGames.MetVD.Graph
         public uint Seed;
         public uint GenerationSeed;  // Alias for Seed for compatibility
         public Ability AvailableSkills;
-        public BiomeAffinity TargetBiome;
+        public BiomeAffinity TargetBiomeAffinity;
+        public BiomeType TargetBiome; // explicit biome for tests
+        public Polarity TargetPolarity;
         public bool IsComplete;
-        
+        public int CurrentStep; // 1..6 pipeline
+        public RoomLayoutType LayoutType;
+
         public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed)
         {
             GeneratorType = generatorType;
             RoomEntity = roomEntity;
             RoomBounds = bounds;
             Seed = seed;
-            GenerationSeed = seed;  // Sync both fields
+            GenerationSeed = seed;
             AvailableSkills = Ability.None;
-            TargetBiome = BiomeAffinity.Any;
+            TargetBiomeAffinity = BiomeAffinity.Any;
+            TargetBiome = BiomeType.Unknown;
+            TargetPolarity = Polarity.None;
             IsComplete = false;
+            CurrentStep = 1;
+            LayoutType = RoomLayoutType.Horizontal;
         }
         
         public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed, Ability availableSkills)
@@ -257,8 +277,12 @@ namespace TinyWalnutGames.MetVD.Graph
             Seed = seed;
             GenerationSeed = seed;
             AvailableSkills = availableSkills;
-            TargetBiome = BiomeAffinity.Any;
+            TargetBiomeAffinity = BiomeAffinity.Any;
+            TargetBiome = BiomeType.Unknown;
+            TargetPolarity = Polarity.None;
             IsComplete = false;
+            CurrentStep = 1;
+            LayoutType = RoomLayoutType.Horizontal;
         }
         
         // Alternative constructor matching the calling pattern in RoomManagementSystem.cs
@@ -270,8 +294,12 @@ namespace TinyWalnutGames.MetVD.Graph
             Seed = seed;
             GenerationSeed = seed;
             AvailableSkills = availableSkills;
-            TargetBiome = ConvertBiomeTypeToAffinity(targetBiome);
+            TargetBiomeAffinity = ConvertBiomeTypeToAffinity(targetBiome);
+            TargetBiome = targetBiome;
+            TargetPolarity = targetPolarity;
             IsComplete = false;
+            CurrentStep = 1;
+            LayoutType = RoomLayoutType.Horizontal;
         }
         
         private static BiomeAffinity ConvertBiomeTypeToAffinity(BiomeType biomeType)
@@ -326,6 +354,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public bool HasDoubleJump;
         public bool HasWallJump;
         public bool HasGlide;
+        public float MaxJumpHeight => JumpHeight; // compatibility
         
         public JumpPhysicsData(float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
         {
@@ -365,6 +394,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public float SecretAreaPercentage;
         public bool UseAlternateRoutes;
         public bool UseDestructibleWalls;
+        public Ability SecretSkillRequirement => RequiredSkillForAccess; // test compatibility
         
         public SecretAreaConfig(float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
         {
@@ -422,6 +452,8 @@ namespace TinyWalnutGames.MetVD.Graph
         public Ability RequiredAbility;
         public float Angle;
         public float Velocity;
+        public int2 FromPosition => StartPosition; // compatibility
+        public int2 ToPosition => EndPosition; // compatibility
         
         public JumpConnectionElement(int2 start, int2 end, Ability requiredAbility = Ability.None)
         {

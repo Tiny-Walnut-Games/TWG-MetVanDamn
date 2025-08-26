@@ -54,6 +54,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 biomeSettings: biomeSettings,
                 districtSettings: districtSettings,
                 sectorSettings: sectorSettings,
+                roomSettings: roomSettings,
                 enableDebugVisualization: true,
                 logGenerationSteps: true
             );

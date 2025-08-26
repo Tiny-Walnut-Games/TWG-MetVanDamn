@@ -7,6 +7,9 @@ using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Authoring;
 using TinyWalnutGames.MetVD.Shared;
+using System.Linq; // Added for LINQ extension methods
+using System.Collections.Generic; // Added for List<>
+
 
 namespace TinyWalnutGames.MetVD.Authoring.Editor
 {
@@ -372,25 +375,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     var randomOffset = Vector3.zero;
                     switch (_previewMode)
                     {
-                        case RandomizationMode.Low:
-                            randomOffset = new Vector3(
-                                random.NextFloat(-spacingX * 0.1f, spacingX * 0.1f),
-                                0f,
-                                random.NextFloat(-spacingY * 0.1f, spacingY * 0.1f)
-                            );
-                            break;
-                        case RandomizationMode.Medium:
+                        case RandomizationMode.Partial:
                             randomOffset = new Vector3(
                                 random.NextFloat(-spacingX * 0.25f, spacingX * 0.25f),
                                 0f,
                                 random.NextFloat(-spacingY * 0.25f, spacingY * 0.25f)
                             );
                             break;
-                        case RandomizationMode.High:
+                        case RandomizationMode.Full:
                             randomOffset = new Vector3(
                                 random.NextFloat(-spacingX * 0.4f, spacingX * 0.4f),
                                 0f,
                                 random.NextFloat(-spacingY * 0.4f, spacingY * 0.4f)
+                            );
+                            break;
+                        case RandomizationMode.None:
+                        default:
+                            randomOffset = new Vector3(
+                                random.NextFloat(-spacingX * 0.1f, spacingX * 0.1f),
+                                0f,
+                                random.NextFloat(-spacingY * 0.1f, spacingY * 0.1f)
                             );
                             break;
                     }

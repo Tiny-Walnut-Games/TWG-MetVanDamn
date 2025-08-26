@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Entities;
 using TinyWalnutGames.MetVD.Core;
@@ -445,11 +446,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             connectionMap.Clear();
             availableBiomeTypes.Clear();
             
-            var districts = FindObjectsOfType<DistrictAuthoring>();
-            var connections = FindObjectsOfType<ConnectionAuthoring>();
-            var gates = FindObjectsOfType<GateConditionAuthoring>();
-            var biomes = FindObjectsOfType<BiomeFieldAuthoring>();
-            
+            var districts = FindAnyObjectByType<DistrictAuthoring>();
+            var connections = FindAnyObjectByType<ConnectionAuthoring>();
+            var gates = FindAnyObjectByType<GateConditionAuthoring>();
+            var biomes = FindAnyObjectByType<BiomeFieldAuthoring>();
+
             // Build biome type collection
             foreach (var biome in biomes)
             {
@@ -557,7 +558,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 sectorId = sectorId,
                 estimatedPosition = CalculateSectorPosition(districtPosition, sectorId, totalSectors),
-                roomCount = Random.Range(2, 8) // Simulated room count
+                roomCount = UnityEngine.Random.Range(2, 8) // Simulated room count
             };
             
             // Generate rooms for this sector
@@ -566,7 +567,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 var room = new RoomInfo
                 {
                     roomId = i,
-                    position = sector.estimatedPosition + Random.insideUnitSphere * 5f,
+                    position = sector.estimatedPosition + UnityEngine.Random.insideUnitSphere * 5f,
                     roomType = GenerateRoomType(),
                     connections = GenerateRoomConnections(i, sector.roomCount)
                 };
@@ -595,7 +596,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private string GenerateRoomType()
         {
             string[] roomTypes = { "Standard", "Challenge", "Treasure", "Boss", "Hub", "Secret" };
-            return roomTypes[Random.Range(0, roomTypes.Length)];
+            return roomTypes[UnityEngine.Random.Range(0, roomTypes.Length)];
         }
 
         private List<string> GenerateRoomConnections(int roomId, int totalRooms)
@@ -603,11 +604,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var connections = new List<string>();
             
             // Most rooms connect to at least one other room
-            int connectionCount = Random.Range(1, Mathf.Min(4, totalRooms));
-            
+            int connectionCount = UnityEngine.Random.Range(1, Mathf.Min(4, totalRooms));
+
             for (int i = 0; i < connectionCount; i++)
             {
-                int targetRoom = Random.Range(0, totalRooms);
+                int targetRoom = UnityEngine.Random.Range(0, totalRooms);
                 if (targetRoom != roomId)
                 {
                     connections.Add($"Room {targetRoom}");

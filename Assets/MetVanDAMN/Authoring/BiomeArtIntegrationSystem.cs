@@ -125,7 +125,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
         {
-            if (!artProfileLookup.TryGetComponent(entity, out var artProfileRef) || !artProfileRef.ProfileRef.IsValid)
+            if (!artProfileLookup.TryGetComponent(entity, out var artProfileRef) || !artProfileRef.ProfileRef.IsValid())
                 return;
 
             var profile = artProfileRef.ProfileRef.Value;
@@ -180,7 +180,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Avoidance settings add complexity
             if (settings.avoidance.minimumPropDistance > 0)
                 score *= 1.2f;
-            if (settings.avoidance.avoidHazards)
+            // Replaced nonexistent avoidance.avoidHazards with avoidance.avoidTransitions flag
+            if (settings.avoidance.avoidTransitions)
                 score *= 1.1f;
             if (settings.avoidance.avoidOvercrowding)
                 score *= 1.1f;

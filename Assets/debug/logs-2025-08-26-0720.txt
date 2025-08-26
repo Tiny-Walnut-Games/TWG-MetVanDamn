@@ -1,62 +1,114 @@
 ##UnityConsole##
-Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapSystem.cs(265,62): error CS0118: 'Biome' is a namespace but is used like a type
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(467,24): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(819,23): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
 Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapSystem.cs(273,79): error CS0234: The type or namespace name 'LocalTransform' does not exist in the namespace 'Unity.Transforms' (are you missing an assembly reference?)
+
 Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystem.cs(35,26): error CS0246: The type or namespace name 'WorldConfiguration' could not be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(83,29): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'CurrentStep' and no accessible extension method 'CurrentStep' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(108,21): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'CurrentStep' and no accessible extension method 'CurrentStep' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(109,25): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'CurrentStep' and no accessible extension method 'CurrentStep' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
+
 Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystem.cs(47,13): error CS0246: The type or namespace name 'WorldConfiguration' could not be found (are you missing a using directive or an assembly reference?)
+
 Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystem.cs(50,62): error CS0246: The type or namespace name 'WorldConfiguration' could not be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(123,39): error CS0266: Cannot implicitly convert type 'TinyWalnutGames.MetVD.Core.BiomeType' to 'TinyWalnutGames.MetVD.Graph.BiomeAffinity'. An explicit conversion exists (are you missing a cast?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(124,25): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'TargetPolarity' and no accessible extension method 'TargetPolarity' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(129,35): error CS0266: Cannot implicitly convert type 'TinyWalnutGames.MetVD.Core.BiomeType' to 'TinyWalnutGames.MetVD.Graph.BiomeAffinity'. An explicit conversion exists (are you missing a cast?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(130,21): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'TargetPolarity' and no accessible extension method 'TargetPolarity' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(136,39): error CS0266: Cannot implicitly convert type 'TinyWalnutGames.MetVD.Core.BiomeType' to 'TinyWalnutGames.MetVD.Graph.BiomeAffinity'. An explicit conversion exists (are you missing a cast?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(141,39): error CS0266: Cannot implicitly convert type 'TinyWalnutGames.MetVD.Core.BiomeType' to 'TinyWalnutGames.MetVD.Graph.BiomeAffinity'. An explicit conversion exists (are you missing a cast?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(154,28): error CS1503: Argument 1: cannot convert from 'TinyWalnutGames.MetVD.Graph.BiomeAffinity' to 'TinyWalnutGames.MetVD.Core.BiomeType'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(156,25): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'LayoutType' and no accessible extension method 'LayoutType' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(156,38): error CS0103: The name 'RoomLayoutType' does not exist in the current context
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(161,25): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'LayoutType' and no accessible extension method 'LayoutType' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(161,38): error CS0103: The name 'RoomLayoutType' does not exist in the current context
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(166,25): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'LayoutType' and no accessible extension method 'LayoutType' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(166,38): error CS0103: The name 'RoomLayoutType' does not exist in the current context
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(171,25): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'LayoutType' and no accessible extension method 'LayoutType' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(171,38): error CS0103: The name 'RoomLayoutType' does not exist in the current context
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(197,33): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'LayoutType' and no accessible extension method 'LayoutType' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(197,47): error CS0103: The name 'RoomLayoutType' does not exist in the current context
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(199,38): error CS1061: 'RoomGenerationRequest' does not contain a definition for 'LayoutType' and no accessible extension method 'LayoutType' accepting a first argument of type 'RoomGenerationRequest' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(199,52): error CS0103: The name 'RoomLayoutType' does not exist in the current context
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(207,28): error CS1503: Argument 1: cannot convert from 'TinyWalnutGames.MetVD.Graph.BiomeAffinity' to 'TinyWalnutGames.MetVD.Core.BiomeType'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(209,59): error CS0117: 'RoomGeneratorType' does not contain a definition for 'LayeredPlatformCloud'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(211,37): error CS1503: Argument 1: cannot convert from 'TinyWalnutGames.MetVD.Graph.BiomeAffinity' to 'TinyWalnutGames.MetVD.Core.BiomeType'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(213,59): error CS0117: 'RoomGeneratorType' does not contain a definition for 'BiomeWeightedHeightmap'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(248,40): error CS0117: 'RoomGeneratorType' does not contain a definition for 'LayeredPlatformCloud'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(251,40): error CS0117: 'RoomGeneratorType' does not contain a definition for 'BiomeWeightedHeightmap'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(279,32): error CS1503: Argument 1: cannot convert from 'TinyWalnutGames.MetVD.Graph.BiomeAffinity' to 'TinyWalnutGames.MetVD.Core.BiomeType'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(287,21): error CS0019: Operator '==' cannot be applied to operands of type 'BiomeAffinity' and 'BiomeType'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(287,68): error CS0019: Operator '==' cannot be applied to operands of type 'BiomeAffinity' and 'BiomeType'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystem.cs(97,81): error CS1061: 'SystemState' does not contain a definition for 'Entity' and no accessible extension method 'Entity' accepting a first argument of type 'SystemState' could be found (are you missing a using directive or an assembly reference?)
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystem.cs(99,50): error CS0246: The type or namespace name 'RoomGenerationCompleteTag' could not be found (are you missing a using directive or an assembly reference?)
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystem.cs(99,83): error CS1061: 'SystemState' does not contain a definition for 'Entity' and no accessible extension method 'Entity' accepting a first argument of type 'SystemState' could be found (are you missing a using directive or an assembly reference?)
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(69,26): error CS1503: Argument 1: cannot convert from 'ref TinyWalnutGames.MetVD.Graph.RoomNavigationGeneratorSystem' to 'ref Unity.Entities.SystemState'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(160,33): error CS1061: 'TilemapConfig' does not contain a definition for 'HasGroundLevel' and no accessible extension method 'HasGroundLevel' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(161,33): error CS1061: 'TilemapConfig' does not contain a definition for 'HasWalls' and no accessible extension method 'HasWalls' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(163,37): error CS1061: 'TilemapConfig' does not contain a definition for 'HasGroundLevel' and no accessible extension method 'HasGroundLevel' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(165,58): error CS1061: 'TilemapConfig' does not contain a definition for 'PlatformProbability' and no accessible extension method 'PlatformProbability' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(167,58): error CS1061: 'TilemapConfig' does not contain a definition for 'ClimbableProbability' and no accessible extension method 'ClimbableProbability' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
+
 Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs(330,50): error CS7036: There is no argument given that corresponds to the required formal parameter 'physics' of 'JumpArcSolver.ValidateRoomReachability(int2, NativeArray<int2>, Ability, JumpArcPhysics, RectInt, Allocator)'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(151,33): error CS1061: 'TilemapConfig' does not contain a definition for 'HasGroundLevel' and no accessible extension method 'HasGroundLevel' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(152,33): error CS1061: 'TilemapConfig' does not contain a definition for 'HasWalls' and no accessible extension method 'HasWalls' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(154,37): error CS1061: 'TilemapConfig' does not contain a definition for 'HasGroundLevel' and no accessible extension method 'HasGroundLevel' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(156,58): error CS1061: 'TilemapConfig' does not contain a definition for 'PlatformProbability' and no accessible extension method 'PlatformProbability' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs(158,58): error CS1061: 'TilemapConfig' does not contain a definition for 'ClimbableProbability' and no accessible extension method 'ClimbableProbability' accepting a first argument of type 'TilemapConfig' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs(207,17): error CS1503: Argument 2: cannot convert from 'TinyWalnutGames.MetVD.Core.BiomeType' to 'Unity.Entities.Entity'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs(208,17): error CS1503: Argument 3: cannot convert from 'TinyWalnutGames.MetVD.Core.Polarity' to 'Unity.Mathematics.int2'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs(209,17): error CS1503: Argument 4: cannot convert from 'TinyWalnutGames.MetVD.Core.Ability' to 'uint'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs(210,17): error CS1503: Argument 5: cannot convert from 'uint' to 'TinyWalnutGames.MetVD.Core.Ability'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(70,48): error CS1503: Argument 1: cannot convert from 'uint' to 'Unity.Entities.Entity'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(72,48): error CS1503: Argument 1: cannot convert from 'uint' to 'Unity.Entities.Entity'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(236,44): error CS1501: No overload for method 'CalculateMinimumPlatformSpacing' takes 2 arguments
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(245,54): error CS1061: 'float' does not contain a definition for 'x' and no accessible extension method 'x' accepting a first argument of type 'float' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(248,90): error CS1061: 'float' does not contain a definition for 'y' and no accessible extension method 'y' accepting a first argument of type 'float' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(255,39): error CS7036: There is no argument given that corresponds to the required formal parameter 'physics' of 'JumpArcSolver.IsReachable(int2, int2, Ability, JumpArcPhysics)'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(261,40): error CS1061: 'float' does not contain a definition for 'x' and no accessible extension method 'x' accepting a first argument of type 'float' could be found (are you missing a using directive or an assembly reference?)
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(278,88): error CS1503: Argument 3: cannot convert from 'TinyWalnutGames.MetVD.Graph.JumpPhysicsData' to 'TinyWalnutGames.MetVD.Graph.JumpArcPhysics'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(365,69): error CS1503: Argument 2: cannot convert from 'TinyWalnutGames.MetVD.Graph.BiomeAffinity' to 'TinyWalnutGames.MetVD.Core.BiomeType'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(654,60): error CS0117: 'RoomGeneratorType' does not contain a definition for 'LayeredPlatformCloud'
-Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(499,60): error CS0117: 'RoomGeneratorType' does not contain a definition for 'BiomeWeightedHeightmap'
-A meta data file (.meta) exists but its asset 'Assets/debug/logs-2025-08-26-0720.xml' can't be found. When moving or deleting files outside of Unity, please ensure that the corresponding .meta file is moved or deleted along with it.
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(471,45): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(472,45): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(473,43): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(474,44): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(475,49): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(476,48): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(477,43): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs(478,22): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(823,45): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(824,45): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(825,43): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(826,44): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(827,49): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(828,48): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(829,43): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs(830,22): warning CS0618: 'RoomFeatureObjectType' is obsolete: 'Use RoomFeatureType instead'
+
+Failed to find entry-points:
+Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'TinyWalnutGames.MetVD.Samples, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null' ---> System.Exception: Failed to resolve assembly 'TinyWalnutGames.MetVD.Samples, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null' in directories: C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\MonoBleedingEdge\lib\mono\unityjit-win32
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\MonoBleedingEdge\lib\mono\unityjit-win32\Facades
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.collab-proxy@8a82222c5449\Lib\Editor
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\EditorAssetResources
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.ide.rider@4d374c7eb6db\Rider\Editor
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Managed
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.LowLevel.ILSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities.CodeGen
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\DotNetZip
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\WebGLSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.burst@f7a407abf4d5
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.burst@f7a407abf4d5\Unity.Burst.CodeGen
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\LinuxStandaloneSupport
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\MetroSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\YamlDotNet
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.ai.toolkit@97783faabe3b\Modules\Sdk\Editor
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\AOT
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\iOSSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\AndroidPlayer
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Managed\UnityEngine
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies ---> Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'TinyWalnutGames.MetVD.Samples, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null'
+  at Mono.Cecil.BaseAssemblyResolver.Resolve (Mono.Cecil.AssemblyNameReference name, Mono.Cecil.ReaderParameters parameters) [0x00105] in <853812ae52c341daaef3c62ecdb86b32>:0 
+  at zzzUnity.Burst.CodeGen.AssemblyResolver.Resolve (Mono.Cecil.AssemblyNameReference name) [0x00007] in <e6b852d46e1e4bfb963d02704699e755>:0 
+   --- End of inner exception stack trace ---
+  at zzzUnity.Burst.CodeGen.AssemblyResolver.Resolve (Mono.Cecil.AssemblyNameReference name) [0x00054] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.AssemblyLoader.Resolve (Mono.Cecil.AssemblyNameReference name) [0x0007e] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.EntryPointMethodFinder.FindEntryPoints (System.String[] rootAssemblyNames, Burst.Compiler.IL.Hashing.CacheRuntime.HashCacheAssemblyStore assemblyStore, Burst.Compiler.IL.AssemblyLoader assemblyLoader, Burst.Compiler.IL.NativeCompilerOptions options, Burst.Compiler.IL.Server.ProfileDelegate profileCallback, System.Boolean includeRootAssemblyReferences, System.Boolean splitTargets) [0x00055] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer+<>c__DisplayClass18_1.<FindMethods>b__0 (Burst.Compiler.IL.Server.Caching.CacheManager cacheManager) [0x0005e] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer+<>c__DisplayClass26_0`1[TResult].<RunTask>b__0 () [0x00145] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer.RunTask[TResult] (Burst.Compiler.IL.Server.TargetKey target, System.String taskName, System.String[] assemblyFolders, System.Threading.CancellationToken cancellationToken, System.Func`2[T,TResult] function) [0x00131] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer.FindMethods (Burst.Compiler.IL.Server.CompilerServerOptions options, Burst.Compiler.IL.Aot.AotCompilerOptions aotOptions, Burst.Compiler.IL.AssemblyDefinesDict assemblyDefines, Burst.Compiler.IL.Server.TargetKey target, Burst.Compiler.IL.Server.Caching.CacheManager cacheManager, Burst.Compiler.IL.CompilerStatistics stats, System.Threading.CancellationToken cancellationToken) [0x00299] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer+<>c__DisplayClass26_0`1[TResult].<RunTask>b__0 () [0x00145] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer.RunTask[TResult] (Burst.Compiler.IL.Server.TargetKey target, System.String taskName, System.String[] assemblyFolders, System.Threading.CancellationToken cancellationToken, System.Func`2[T,TResult] function) [0x00131] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer.Compile (Burst.Compiler.IL.Server.CompilerServerOptions options, Burst.Compiler.IL.Server.CompilationMessageStreamer streamer, System.Threading.CancellationToken cancellationToken) [0x001ca] in <e6b852d46e1e4bfb963d02704699e755>:0 
+
+While compiling job:
+
 
 ##VS Error List##
 Severity	Code	Description	Project	File	Line	Suppression State	Details

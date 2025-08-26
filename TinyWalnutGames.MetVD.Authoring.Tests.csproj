@@ -1139,6 +1139,14 @@
       <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Transforms">
+      <HintPath>Library\ScriptAssemblies\Unity.Transforms.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
       <Private>False</Private>
@@ -1156,6 +1164,18 @@
     <ProjectReference Include="TinyWalnutGames.MetVD.Authoring.csproj">
       <Project>{1C947371-7B21-A5C5-A553-6A4F3D0F5CFC}</Project>
       <Name>TinyWalnutGames.MetVD.Authoring</Name>
+    </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Shared.csproj">
+      <Project>{6BEF65E0-E1A3-6D7E-9453-DA8D0FDF65FD}</Project>
+      <Name>TinyWalnutGames.MetVD.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Samples.csproj">
+      <Project>{077B9EBE-F88F-C8BA-6798-C73D2EAC959F}</Project>
+      <Name>TinyWalnutGames.MetVD.Samples</Name>
+    </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Graph.csproj">
+      <Project>{E4E50120-3677-2516-6933-2F6698D8F8BC}</Project>
+      <Name>TinyWalnutGames.MetVD.Graph</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

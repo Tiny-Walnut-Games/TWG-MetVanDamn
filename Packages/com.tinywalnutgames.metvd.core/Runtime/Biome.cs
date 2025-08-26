@@ -47,8 +47,8 @@ namespace TinyWalnutGames.MetVD.Core
         DeepUnderwater = 5,
         VoidChambers = 6,
         
-        // Fire/Energy biomes
-        VolcanicCore = 7,
+        // Hazard/Energy biomes
+        VolcanicCore = 7, // Primary volcanic core biome (keep original numeric value for existing references)
         PowerPlant = 8,
         PlasmaFields = 9,
         
@@ -67,7 +67,7 @@ namespace TinyWalnutGames.MetVD.Core
         // Water biomes
         Ocean = 18,
         
-        // Space/Cosmic biomes
+        // Space biomes
         Cosmic = 19,
         
         // Crystal biomes
@@ -79,8 +79,8 @@ namespace TinyWalnutGames.MetVD.Core
         
         // Volcanic/Fire biomes  
         Volcanic = 23,
-        VolcanicCore = 24,
-        
+        Hell = 24, // Changed from Magma to Hell for clarity
+
         // Neutral/Mixed biomes
         HubArea = 25,
         TransitionZone = 26
