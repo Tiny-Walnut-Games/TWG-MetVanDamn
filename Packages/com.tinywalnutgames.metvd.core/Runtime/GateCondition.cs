@@ -20,40 +20,46 @@ namespace TinyWalnutGames.MetVD.Core
         Dash = 1 << 3,
         GlideSpeed = 1 << 4,
         
+        // Arc-based movement abilities
+        ArcJump = 1 << 5,      // Precise parabolic jump control
+        ChargedJump = 1 << 6,  // Variable jump height/distance
+        TeleportArc = 1 << 7,  // Short-range teleportation with arc visualization
+        
         // Environmental abilities  
-        Swim = 1 << 5,
-        Climb = 1 << 6,
-        HeatResistance = 1 << 7,
-        ColdResistance = 1 << 8,
-        PressureResistance = 1 << 9,
+        Swim = 1 << 8,
+        Climb = 1 << 9,
+        HeatResistance = 1 << 10,
+        ColdResistance = 1 << 11,
+        PressureResistance = 1 << 12,
         
         // Tool abilities
-        Bomb = 1 << 10,
-        Grapple = 1 << 11,
-        Drill = 1 << 12,
-        Scan = 1 << 13,
-        Hack = 1 << 14,
+        Bomb = 1 << 13,
+        Grapple = 1 << 14,     // Grappling hook with arc trajectory
+        Drill = 1 << 15,
+        Scan = 1 << 16,
+        Hack = 1 << 17,
         
         // Polarity abilities (match Polarity enum)
-        SunAccess = 1 << 15,
-        MoonAccess = 1 << 16,
-        HeatAccess = 1 << 17,
-        ColdAccess = 1 << 18,
-        EarthAccess = 1 << 19,
-        WindAccess = 1 << 20,
-        LifeAccess = 1 << 21,
-        TechAccess = 1 << 22,
+        SunAccess = 1 << 18,
+        MoonAccess = 1 << 19,
+        HeatAccess = 1 << 20,
+        ColdAccess = 1 << 21,
+        EarthAccess = 1 << 22,
+        WindAccess = 1 << 23,
+        LifeAccess = 1 << 24,
+        TechAccess = 1 << 25,
         
         // Meta progression
-        MapUnlock = 1 << 23,
-        SaveUnlock = 1 << 24,
-        FastTravel = 1 << 25,
+        MapUnlock = 1 << 26,
+        SaveUnlock = 1 << 27,
+        FastTravel = 1 << 28,
         
         // Special combined abilities
-        AllMovement = Jump | DoubleJump | WallJump | Dash | GlideSpeed,
+        AllMovement = Jump | DoubleJump | WallJump | Dash | GlideSpeed | ArcJump | ChargedJump | TeleportArc,
         AllEnvironmental = Swim | Climb | HeatResistance | ColdResistance | PressureResistance,
         AllTools = Bomb | Grapple | Drill | Scan | Hack,
         AllPolarity = SunAccess | MoonAccess | HeatAccess | ColdAccess | EarthAccess | WindAccess | LifeAccess | TechAccess,
+        AllArcMovement = ArcJump | ChargedJump | TeleportArc | Grapple,
         Everything = 0xFFFFFFFF
     }
 

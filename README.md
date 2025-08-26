@@ -34,6 +34,14 @@
 - **Wave Function Collapse (WFC)**: Constraint-solving algorithm for coherent world layout
 - **Biome Field System**: Dynamic environmental influences across the world
 - **Gate Condition System**: MetroidVania-style progression gating with configurable unlock conditions
+- **AI Navigation System**: Runtime pathfinding with polarized gate handling for intelligent agent movement
+
+#### **🤖 AI Navigation & Pathfinding**
+- **Navigation Graph**: Runtime graph built from districts, connections, and gates
+- **Agent Capabilities**: Polarity and ability-based agent configuration system
+- **Polarized Gate Handling**: Dual-mode support for hard blocking vs. soft cost-based gating
+- **Reachability Validation**: Automated detection of unreachable areas and connectivity issues
+- **Editor Visualization**: Interactive navigation graph debugging with cost overlays
 
 #### **🏛️ ECS/DOTS Foundation**
 - **Pure ECS Architecture**: All game logic implemented as performant, data-oriented systems

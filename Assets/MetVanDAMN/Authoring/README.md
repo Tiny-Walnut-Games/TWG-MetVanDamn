@@ -114,9 +114,15 @@ Gizmos respect play/edit toggles so you can disable noise when not needed.
 - ConnectionAuthoring duplicates bidirectional links; one-way adds only forward edge.
 - Gate descriptions truncated to 64 chars by FixedString64Bytes.
 
-## TODO
-- Additional gizmo overlays (prop preview density heatmap)
-- Validation warnings for duplicate nodeIds (editor utility)
-- Authoring validation report (missing connections, unreferenced districts)
-- Sector / room hierarchy drill-down visualization
-- Quick biome color legend panel in World Debugger
+## ✅ Implemented Features
+- ✅ Additional gizmo overlays (prop preview density heatmap) - see `PropDensityHeatmapGizmo.cs`
+- ✅ Validation warnings for duplicate nodeIds (editor utility) - see `AuthoringValidator.cs`
+- ✅ Authoring validation report (missing connections, unreferenced districts) - see `AuthoringValidator.cs`
+- ✅ Sector / room hierarchy drill-down visualization - see `SectorRoomHierarchyWindow.cs`
+- ✅ Quick biome color legend panel in World Debugger - see `BiomeColorLegendWindow.cs`
+
+## Future Enhancements
+- Advanced terrain mesh analysis for placement optimization
+- Real-time prop placement preview in scene view
+- Automated biome transition zone detection
+- Performance profiling tools for complex biomes
