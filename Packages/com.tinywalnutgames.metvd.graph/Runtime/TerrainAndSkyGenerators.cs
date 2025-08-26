@@ -249,13 +249,13 @@ namespace TinyWalnutGames.MetVD.Graph
         [ReadOnly] public ComponentLookup<SecretAreaConfig> SecretConfigLookup;
         public Unity.Mathematics.Random Random;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.LinearBranchingCorridor || request.IsComplete) return;
 
-            if (!FeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!FeatureBufferLookup.HasBuffer(entity)) return;
 
-            var features = FeatureBufferLookup[nodeId.Value];
+            var features = FeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             features.Clear();
 
@@ -272,9 +272,9 @@ namespace TinyWalnutGames.MetVD.Graph
             }
 
             // Add branching paths for secrets
-            if (SecretConfigLookup.HasComponent(nodeId.Value))
+            if (SecretConfigLookup.HasComponent(entity))
             {
-                var secretConfig = SecretConfigLookup[nodeId.Value];
+                var secretConfig = SecretConfigLookup[entity];
                 GenerateBranchingPaths(features, bounds, secretConfig, request.GenerationSeed);
             }
         }
@@ -494,18 +494,18 @@ namespace TinyWalnutGames.MetVD.Graph
         [ReadOnly] public ComponentLookup<Core.Biome> BiomeLookup;
         public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.BiomeWeightedHeightmap || request.IsComplete) return;
 
-            if (!FeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!FeatureBufferLookup.HasBuffer(entity)) return;
 
-            var features = FeatureBufferLookup[nodeId.Value];
+            var features = FeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             features.Clear();
 
             // Get biome information for terrain characteristics
-            var biome = BiomeLookup.HasComponent(nodeId.Value) ? BiomeLookup[nodeId.Value] : 
+            var biome = BiomeLookup.HasComponent(entity) ? BiomeLookup[entity] : 
                        new Core.Biome(BiomeType.SolarPlains, Polarity.Sun);
 
             // Generate heightmap using biome-specific noise
@@ -649,18 +649,18 @@ namespace TinyWalnutGames.MetVD.Graph
         public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
         [ReadOnly] public ComponentLookup<Core.Biome> BiomeLookup;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.LayeredPlatformCloud || request.IsComplete) return;
 
-            if (!FeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!FeatureBufferLookup.HasBuffer(entity)) return;
 
-            var features = FeatureBufferLookup[nodeId.Value];
+            var features = FeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             features.Clear();
 
             // Get biome for motion pattern determination
-            var biome = BiomeLookup.HasComponent(nodeId.Value) ? BiomeLookup[nodeId.Value] : 
+            var biome = BiomeLookup.HasComponent(entity) ? BiomeLookup[entity] : 
                        new Core.Biome(BiomeType.SkyGardens, Polarity.Wind);
 
             // Generate layered cloud platforms

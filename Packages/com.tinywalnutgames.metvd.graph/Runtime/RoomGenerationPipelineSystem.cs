@@ -76,14 +76,14 @@ namespace TinyWalnutGames.MetVD.Graph
         public Unity.Mathematics.Random Random;
         public float DeltaTime;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.IsComplete) return;
 
             switch (request.CurrentStep)
             {
                 case 1: // Biome Selection
-                    ProcessBiomeSelection(ref request, roomData, nodeId);
+                    ProcessBiomeSelection(entity, ref request, roomData, nodeId);
                     break;
                 case 2: // Layout Type Decision
                     ProcessLayoutTypeDecision(ref request, roomData);
@@ -92,13 +92,13 @@ namespace TinyWalnutGames.MetVD.Graph
                     ProcessRoomGeneratorChoice(ref request, roomData);
                     break;
                 case 4: // Content Pass
-                    ProcessContentPass(ref request, roomData, nodeId);
+                    ProcessContentPass(entity, ref request, roomData, nodeId);
                     break;
                 case 5: // Biome-Specific Overrides
-                    ProcessBiomeOverrides(ref request, roomData, nodeId);
+                    ProcessBiomeOverrides(entity, ref request, roomData, nodeId);
                     break;
                 case 6: // Nav Generation
-                    ProcessNavGeneration(ref request, roomData, nodeId);
+                    ProcessNavGeneration(entity, ref request, roomData, nodeId);
                     break;
                 default:
                     request.IsComplete = true;
@@ -112,20 +112,20 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessBiomeSelection(ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
+        private void ProcessBiomeSelection(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
         {
             // Step 1: Choose biome & sub-biome based on world gen rules
             // Apply biome-specific prop/hazard sets
             
             // If we don't have biome data, use fallback
-            if (!BiomeLookup.HasComponent(nodeId.Value))
+            if (!BiomeLookup.HasComponent(entity))
             {
                 request.TargetBiome = BiomeType.HubArea;
                 request.TargetPolarity = Polarity.None;
                 return;
             }
 
-            var biome = BiomeLookup[nodeId.Value];
+            var biome = BiomeLookup[entity];
             request.TargetBiome = biome.Type;
             request.TargetPolarity = biome.PrimaryPolarity;
 
@@ -214,13 +214,13 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessContentPass(ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
+        private void ProcessContentPass(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
         {
             // Step 4: Place hazards, props, secrets + Run Jump Arc Solver
             
-            if (!RoomFeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!RoomFeatureBufferLookup.HasBuffer(entity)) return;
             
-            var features = RoomFeatureBufferLookup[nodeId.Value];
+            var features = RoomFeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             var area = bounds.width * bounds.height;
             
@@ -254,21 +254,21 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             
             // Add secret areas if configured
-            if (SecretConfigLookup.HasComponent(nodeId.Value))
+            if (SecretConfigLookup.HasComponent(entity))
             {
-                var secretConfig = SecretConfigLookup[nodeId.Value];
+                var secretConfig = SecretConfigLookup[entity];
                 AddSecretAreas(features, bounds, secretConfig, request);
             }
         }
 
-        private void ProcessBiomeOverrides(ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
+        private void ProcessBiomeOverrides(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
         {
             // Step 5: Apply visual and mechanical overrides
             // (e.g., moving clouds in sky biome, tech zone hazards)
             
-            if (!RoomFeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!RoomFeatureBufferLookup.HasBuffer(entity)) return;
             
-            var features = RoomFeatureBufferLookup[nodeId.Value];
+            var features = RoomFeatureBufferLookup[entity];
             
             // Apply biome-specific modifications
             for (int i = 0; i < features.Length; i++)
@@ -296,14 +296,14 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessNavGeneration(ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
+        private void ProcessNavGeneration(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
         {
             // Step 6: Mark empty tiles above traversable tiles as navigable
             // Calculate jump vectors and add movement-type-aware nav edges
             
-            if (!RoomFeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!RoomFeatureBufferLookup.HasBuffer(entity)) return;
             
-            var features = RoomFeatureBufferLookup[nodeId.Value];
+            var features = RoomFeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             
             // Collect platform positions for jump arc validation
@@ -324,9 +324,9 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             
             // Run Jump Arc Solver validation if we have jump physics data
-            if (JumpPhysicsLookup.HasComponent(nodeId.Value) && platformPositions.Length > 1)
+            if (JumpPhysicsLookup.HasComponent(entity) && platformPositions.Length > 1)
             {
-                var jumpPhysics = JumpPhysicsLookup[nodeId.Value];
+                var jumpPhysics = JumpPhysicsLookup[entity];
                 bool isReachable = JumpArcSolver.ValidateRoomReachability(
                     platformPositions.AsArray(), 
                     obstaclePositions.AsArray(), 
