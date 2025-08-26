@@ -10,7 +10,9 @@
         "Unity.Entities",
         "Unity.Mathematics",
         "Unity.Collections",
-        "Unity.Burst"
+        "Unity.Burst",
+        "Unity.Cinemachine",
+        "Unity.Cinemachine.Editor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

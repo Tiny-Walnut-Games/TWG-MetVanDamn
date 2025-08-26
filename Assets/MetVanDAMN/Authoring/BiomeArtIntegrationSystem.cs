@@ -125,7 +125,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
         {
-            if (!artProfileLookup.TryGetComponent(entity, out var artProfileRef) || !artProfileRef.ProfileRef.IsValid)
+            if (!artProfileLookup.TryGetComponent(entity, out var artProfileRef) || !artProfileRef.ProfileRef.IsValid())
                 return;
 
             var profile = artProfileRef.ProfileRef.Value;
@@ -180,7 +180,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Avoidance settings add complexity
             if (settings.avoidance.minimumPropDistance > 0)
                 score *= 1.2f;
-            if (settings.avoidance.avoidHazards)
+            // Replaced nonexistent avoidance.avoidHazards with avoidance.avoidTransitions flag
+            if (settings.avoidance.avoidTransitions)
                 score *= 1.1f;
             if (settings.avoidance.avoidOvercrowding)
                 score *= 1.1f;
@@ -606,10 +607,10 @@ namespace TinyWalnutGames.MetVD.Authoring
             string[] layerNames = GetLayerNamesForProjection(projectionType);
 
             // Create grid with appropriate projection settings (factory methods are void; capture before/after set)
-            var existing = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
+            var existing = UnityEngine.Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
             HashSet<Grid> before = new(existing);
             InvokeProjectionCreation(projectionType);
-            Grid createdGrid = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
+            Grid createdGrid = UnityEngine.Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
                 .Where(g => !before.Contains(g))
                 .OrderByDescending(g => g.GetInstanceID())
                 .FirstOrDefault();
@@ -638,7 +639,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                         if (artProfile.materialOverride == null && r.sharedMaterial != null && r.sharedMaterial.HasProperty("_Color"))
                         {
                             // Duplicate material instance to avoid editing shared asset at runtime
-                            var instMat = Object.Instantiate(r.sharedMaterial);
+                            var instMat = UnityEngine.Object.Instantiate(r.sharedMaterial);
                             instMat.name = r.sharedMaterial.name + " (BiomeTint)";
                             instMat.color = artProfile.debugColor;
                             r.material = instMat;

@@ -69,7 +69,7 @@ namespace TinyWalnutGames.MetVD.Graph
             navBuffer.Clear();
             
             var bounds = hierarchy.Bounds;
-            var random = new Unity.Mathematics.Random(genStatus.GenerationSeed);
+            var random = new Unity.Mathematics.Random(genStatus.GenerationSeed == 0 ? 1u : genStatus.GenerationSeed);
             
             // Generate basic physics parameters for this room type
             var physics = GeneratePhysicsForRoom(template, ref random);
@@ -371,6 +371,45 @@ namespace TinyWalnutGames.MetVD.Graph
             return position.x >= 0 && position.x < bounds.width &&
                    position.y >= 0 && position.y < bounds.height;
         }
+        
+        /// <summary>
+        /// Generate tilemap configuration based on room template type
+        /// </summary>
+        private static TilemapConfig GetTilemapGenerationConfig(RoomTemplate template)
+        {
+            bool vertical = template.GeneratorType == RoomGeneratorType.VerticalSegment;
+            return new TilemapConfig
+            {
+                HasGroundLevel = true,
+                HasWalls = true,
+                PlatformProbability = vertical ? 0.15f : 0.10f,
+                ClimbableProbability = vertical ? 0.08f : 0.04f,
+                GroundPercentage = vertical ? 0.3f : 0.6f,
+                PlatformPercentage = 0.2f,
+                EmptyPercentage = template.SecretAreaPercentage + 0.1f,
+                WallThickness = 1
+            };
+        }
+
+        public void Update(ref SystemState state, ref RoomNavigationGeneratorSystem system)
+        {
+            OnUpdate(ref state);
+        }
+    }
+
+    /// <summary>
+    /// Configuration for tilemap generation
+    /// </summary>
+    public struct TilemapConfig
+    {
+        public bool HasGroundLevel;
+        public bool HasWalls;
+        public float PlatformProbability;
+        public float ClimbableProbability;
+        public float GroundPercentage;
+        public float PlatformPercentage;
+        public float EmptyPercentage;
+        public int WallThickness;
     }
 
     /// <summary>

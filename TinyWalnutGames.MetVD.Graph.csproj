@@ -73,15 +73,29 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\CinemachineZoneGeneratorSystemTest.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapConfiguration.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SectorRefineSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\JumpArcSolver.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\DistrictLayoutSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\Data\SampleWfcData.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystemTest.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WfcComponents.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneration.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ConnectionBuilderSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RuleRandomizationSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\CinemachineZoneGeneratorSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SectorRoomHierarchySystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystemTest.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\DistrictWfcSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\CinemachineZoneGeneratorSystemTestWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\TinyWalnutGames.MetVD.Graph.asmdef" />
@@ -1200,6 +1214,10 @@
     <ProjectReference Include="TinyWalnutGames.MetVD.Shared.csproj">
       <Project>{6BEF65E0-E1A3-6D7E-9453-DA8D0FDF65FD}</Project>
       <Name>TinyWalnutGames.MetVD.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Biome.csproj">
+      <Project>{657EBCB1-E90D-F326-9D47-83652F99795B}</Project>
+      <Name>TinyWalnutGames.MetVD.Biome</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

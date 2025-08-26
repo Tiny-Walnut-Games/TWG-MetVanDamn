@@ -3,7 +3,9 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+#if UNITY_TRANSFORMS_LOCALTRANSFORM
 using Unity.Transforms;
+#endif
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Biome;
@@ -242,51 +244,23 @@ namespace TinyWalnutGames.MetVD.Graph
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             state.EntityManager.SetName(entity, $"BiomeField_{biomeType}_{position.x:F0}_{position.y:F0}");
 #endif
-
-            // Enhanced biome field with improved metadata and configuration
             var strength = math.lerp(0.7f, 1.0f, config.BiomeSettings.BiomeWeight);
             var gradient = random.NextFloat(0.3f, 0.8f);
-            
-            // Determine secondary biome for transition zones
             var secondaryBiome = DetermineSecondaryBiome(biomeType, ref random);
-            
-            state.EntityManager.AddComponentData(entity, new BiomeFieldData
-            {
-                PrimaryBiome = biomeType,
-                SecondaryBiome = secondaryBiome,
-                Strength = strength,
-                Gradient = gradient
-            });
-
-            // Add comprehensive biome component with polarity data
+            state.EntityManager.AddComponentData(entity, new BiomeFieldData { PrimaryBiome = biomeType, SecondaryBiome = secondaryBiome, Strength = strength, Gradient = gradient });
             var (primaryPolarity, secondaryPolarity) = GetBiomePolarities(biomeType, secondaryBiome);
             var difficultyModifier = CalculateBiomeDifficulty(biomeType, ref random);
-            
-            state.EntityManager.AddComponentData(entity, new Biome(
-                biomeType, 
-                primaryPolarity, 
-                strength,
-                secondaryPolarity,
-                difficultyModifier));
-
-            // Store position data for spatial queries and district assignment
-            state.EntityManager.AddComponentData(entity, new Unity.Transforms.LocalTransform
-            {
-                Position = new float3(position.x, 0, position.y),
-                Rotation = quaternion.identity,
-                Scale = CalculateBiomeInfluenceRadius(biomeType, config.WorldSize)
-            });
-
-            // Add biome influence buffer for dynamic blending support
+            state.EntityManager.AddComponentData(entity, new TinyWalnutGames.MetVD.Core.Biome(biomeType, primaryPolarity, strength, secondaryPolarity, difficultyModifier));
+#if UNITY_TRANSFORMS_LOCALTRANSFORM
+            state.EntityManager.AddComponentData(entity, new LocalTransform { Position = new float3(position.x, 0, position.y), Rotation = quaternion.identity, Scale = CalculateBiomeInfluenceRadius(biomeType, config.WorldSize) });
+#endif
             var influenceBuffer = state.EntityManager.AddBuffer<BiomeInfluence>(entity);
             PopulateBiomeInfluences(influenceBuffer, biomeType, secondaryBiome, strength, gradient);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (config.LogGenerationSteps)
             {
-                UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} " +
-                                    $"(Strength: {strength:F2}, Gradient: {gradient:F2}, " +
-                                    $"Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:F2})");
+                UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} (Strength: {strength:F2}, Gradient: {gradient:F2}, Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:F2})");
             }
 #endif
         }

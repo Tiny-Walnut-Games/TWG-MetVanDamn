@@ -148,6 +148,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           testMode: EditMode
           checkName: Unity Edit Mode Tests
+          unityVersion: '6000.2.0f1'  # Unity 6.2, fallback to newest if unavailable
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
 
       # Unity Play Mode Tests  
@@ -163,6 +164,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           testMode: PlayMode
           checkName: Unity Play Mode Tests
+          unityVersion: '6000.2.0f1'  # Unity 6.2, fallback to newest if unavailable
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;generateBadgeReport'
 
       # Upload test results

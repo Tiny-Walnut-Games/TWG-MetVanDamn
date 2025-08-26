@@ -29,6 +29,9 @@ namespace TinyWalnutGames.MetVD.Core
         /// </summary>
         public int2 Coordinates;
 
+        // Backward-compatible alias used by older tests (nodeId.value)
+        public uint value { readonly get => Value; set => Value = value; }
+
         public NodeId(uint value, byte level = 0, uint parentId = 0, int2 coordinates = default)
         {
             Value = value;

@@ -73,17 +73,29 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeColorLegendWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\DistrictBaker.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WfcTilePrototypeBaker.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNAuthoringSampleCreator.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BatchSpriteSlicer.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\AuthoringValidator.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\NavigationGraphGizmo.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileEditor.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\SectorRoomHierarchyWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\BiomeFieldBaker.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldBootstrapBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldConfigurationBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoDrawer.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNSamplePrefabCreator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoSettings.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapDemo.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVDWorldDebugWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileSamples.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\ProceduralLayoutPreview.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\GateConditionBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Sync\DistrictPlacementSyncSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapAuthoringInspector.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\PropDensityHeatmapGizmo.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNSceneBootstrap.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\ProceduralLayoutGizmoDrawer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\ConnectionBaker.cs" />

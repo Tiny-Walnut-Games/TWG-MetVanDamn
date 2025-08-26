@@ -26,7 +26,7 @@ namespace TinyWalnutGames.MetVD.Samples
             ));
             
             // Room biome
-            entityManager.AddComponentData(roomEntity, new Biome(
+            entityManager.AddComponentData(roomEntity, new TinyWalnutGames.MetVD.Core.Biome(
                 type: BiomeType.VolcanicCore,
                 primaryPolarity: Polarity.Heat,
                 polarityStrength: 0.8f,
@@ -56,7 +56,7 @@ namespace TinyWalnutGames.MetVD.Samples
             ));
             
             // System biome (plasma storms - same polarity system!)
-            entityManager.AddComponentData(systemEntity, new Biome(
+            entityManager.AddComponentData(systemEntity, new TinyWalnutGames.MetVD.Core.Biome(
                 type: BiomeType.PlasmaFields,  // AstroECS equivalent of VolcanicCore
                 primaryPolarity: Polarity.Heat,
                 polarityStrength: 0.9f,

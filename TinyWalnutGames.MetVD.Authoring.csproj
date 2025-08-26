@@ -74,10 +74,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\MetVanDAMN\Authoring\WorldConfigurationAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\AINavigationSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfile.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\WorldBootstrapAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\NavigationValidationSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\GateConditionAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\NavigationGraphBuildSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileReference.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeTransitionSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\WfcTilePrototypeAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeFieldAuthoring.cs" />

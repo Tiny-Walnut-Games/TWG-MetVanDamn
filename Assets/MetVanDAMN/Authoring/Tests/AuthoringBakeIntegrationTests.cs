@@ -1,4 +1,6 @@
 using NUnit.Framework;
+using UnityEngine; // Added for GameObject, ScriptableObject, Object
+using UnityEngine.Tilemaps;
 using Unity.Entities;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -17,6 +19,22 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         private World _testWorld;
         private EntityManager _entityManager;
 
+        // Minimal runtime data components used by tests (lightweight extraction of baked state)
+        public struct DistrictData : IComponentData
+        {
+            public NodeId nodeId;
+        }
+        public struct ConnectionData : IComponentData
+        {
+            public NodeId sourceNode;
+            public NodeId targetNode;
+            public ConnectionType type;
+        }
+        public struct GateData : IComponentData
+        {
+            public NodeId connectionId; // Stored as node identifier reference (per test expectation)
+        }
+
         [SetUp]
         public void SetUp()
         {
@@ -31,13 +49,137 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 _testWorld.Dispose();
         }
 
+        // Factory helpers ----------------------------------------------------
+        private static DistrictAuthoring CreateTestDistrict(string name, NodeId nodeId)
+        {
+            var go = new GameObject(name);
+            var da = go.AddComponent<DistrictAuthoring>();
+            da.nodeId = nodeId.Value;
+            da.level = nodeId.Level;
+            da.parentId = nodeId.ParentId;
+            da.gridCoordinates = nodeId.Coordinates;
+            return da;
+        }
+        private static ConnectionAuthoring CreateTestConnection(string name, NodeId from, NodeId to)
+        {
+            var go = new GameObject(name);
+            var ca = go.AddComponent<ConnectionAuthoring>();
+            ca.sourceNode = from.Value;
+            ca.targetNode = to.Value;
+            ca.type = ConnectionType.Bidirectional;
+            return ca;
+        }
+        private static BiomeFieldAuthoring CreateTestBiome(string name, NodeId nodeId, BiomeType biome)
+        {
+            var go = new GameObject(name);
+            var bf = go.AddComponent<BiomeFieldAuthoring>();
+            bf.nodeId = nodeId.Value;
+            bf.biomeType = biome;
+            bf.primaryBiome = biome;
+            bf.fieldRadius = 10f;
+            return bf;
+        }
+
+        // Baking simulation (authoring -> ECS) --------------------------------
+        private static void BakeGameObjects(World world, params GameObject[] gameObjects)
+        {
+            var em = world.EntityManager;
+            foreach (var go in gameObjects)
+            {
+                if (go == null) continue;
+
+                // District
+                var district = go.GetComponent<DistrictAuthoring>();
+                if (district != null)
+                {
+                    var e = em.CreateEntity();
+                    var node = new NodeId(district.nodeId, district.level, district.parentId, district.gridCoordinates);
+                    em.AddComponentData(e, node);
+                    em.AddComponentData(e, new WfcState(WfcGenerationState.Initialized));
+                    em.AddComponentData(e, new SectorRefinementData(district.targetLoopDensity));
+                    em.AddBuffer<WfcCandidateBufferElement>(e); // candidate placeholder buffer
+                    em.AddBuffer<ConnectionBufferElement>(e);    // connection placeholder buffer (from core graph)
+                    em.AddComponentData(e, new DistrictData { nodeId = node });
+                }
+
+                // Connection
+                var connection = go.GetComponent<ConnectionAuthoring>();
+                if (connection != null)
+                {
+                    var e = em.CreateEntity();
+                    var sourceNode = new NodeId(connection.sourceNode);
+                    var targetNode = new NodeId(connection.targetNode);
+                    em.AddComponentData(e, new ConnectionEdge
+                    {
+                        From = Entity.Null, // endpoints not explicitly referenced in this minimal bake
+                        To = Entity.Null,
+                        Type = connection.type,
+                        RequiredPolarity = connection.requiredPolarity,
+                        TraversalCost = connection.traversalCost
+                    });
+                    em.AddComponentData(e, new ConnectionData
+                    {
+                        sourceNode = sourceNode,
+                        targetNode = targetNode,
+                        type = connection.type
+                    });
+                }
+
+                // Gate
+                var gate = go.GetComponent<GateConditionAuthoring>();
+                if (gate != null)
+                {
+                    var e = em.CreateEntity();
+                    var buffer = em.AddBuffer<GateConditionBufferElement>(e);
+                    if (gate.gateConditions != null && gate.gateConditions.Length > 0)
+                    {
+                        foreach (var cond in gate.gateConditions)
+                            buffer.Add(cond);
+                    }
+                    else
+                    {
+                        var gc = new GateCondition(gate.requiredPolarity, gate.requiredAbilities, gate.softness, gate.minimumSkillLevel, gate.description);
+                        buffer.Add(gc);
+                    }
+                    em.AddComponentData(e, new GateData { connectionId = gate.connectionId });
+                }
+
+                // Biome Field
+                var biomeField = go.GetComponent<BiomeFieldAuthoring>();
+                if (biomeField != null)
+                {
+                    var e = em.CreateEntity();
+                    var biomeComp = new TinyWalnutGames.MetVD.Core.Biome(
+                        biomeField.primaryBiome,
+                        biomeField.polarity,
+                        1.0f);
+                    em.AddComponentData(e, biomeComp);
+                    em.AddComponentData(e, new NodeId(biomeField.nodeId));
+                }
+            }
+        }
+
+        private static void CleanupGameObjects(params GameObject[] gameObjects)
+        {
+            foreach (var go in gameObjects)
+            {
+                if (go != null)
+                {
+#if UNITY_EDITOR
+                    Object.DestroyImmediate(go);
+#else
+                    Object.Destroy(go);
+#endif
+                }
+            }
+        }
+
+        // Existing tests follow ------------------------------------------------
         [Test]
         public void WfcTilePrototypeBaking_CreatesCorrectComponents()
         {
             // Test the WfcTilePrototypeAuthoring -> ECS baking pipeline
             var tileEntity = _entityManager.CreateEntity();
-            
-            // Simulate baked data (what the baker would create)
             _entityManager.AddComponentData(tileEntity, new WfcTilePrototype(
                 tileId: 42,
                 weight: 1.5f,
@@ -46,16 +188,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 minConnections: 2,
                 maxConnections: 4
             ));
-            
-            // Add socket buffer
             var socketBuffer = _entityManager.AddBuffer<WfcSocketBufferElement>(tileEntity);
             socketBuffer.Add(new WfcSocketBufferElement { Value = new WfcSocket(1, 0, Polarity.Sun, true) });
             socketBuffer.Add(new WfcSocketBufferElement { Value = new WfcSocket(1, 2, Polarity.Sun, true) });
-            
-            // Validate components exist and have correct data
             Assert.IsTrue(_entityManager.HasComponent<WfcTilePrototype>(tileEntity));
             Assert.IsTrue(_entityManager.HasBuffer<WfcSocketBufferElement>(tileEntity));
-            
             var prototype = _entityManager.GetComponentData<WfcTilePrototype>(tileEntity);
             Assert.AreEqual(42u, prototype.TileId);
             Assert.AreEqual(1.5f, prototype.Weight, 0.001f);
@@ -63,7 +200,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(Polarity.Sun, prototype.PrimaryPolarity);
             Assert.AreEqual(2, prototype.MinConnections);
             Assert.AreEqual(4, prototype.MaxConnections);
-            
             var sockets = _entityManager.GetBuffer<WfcSocketBufferElement>(tileEntity);
             Assert.AreEqual(2, sockets.Length);
             Assert.AreEqual(1u, sockets[0].Value.SocketId);
@@ -75,10 +211,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void DistrictBaking_CreatesAllRequiredComponents()
         {
-            // Test DistrictAuthoring -> ECS baking
             var districtEntity = _entityManager.CreateEntity();
-            
-            // Simulate baked data
             _entityManager.AddComponentData(districtEntity, new NodeId(
                 value: 123,
                 level: 2,
@@ -89,23 +222,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             _entityManager.AddComponentData(districtEntity, new SectorRefinementData(0.4f));
             _entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);
             _entityManager.AddBuffer<ConnectionBufferElement>(districtEntity);
-            
-            // Validate all expected components exist
             Assert.IsTrue(_entityManager.HasComponent<NodeId>(districtEntity));
             Assert.IsTrue(_entityManager.HasComponent<WfcState>(districtEntity));
             Assert.IsTrue(_entityManager.HasComponent<SectorRefinementData>(districtEntity));
             Assert.IsTrue(_entityManager.HasBuffer<WfcCandidateBufferElement>(districtEntity));
             Assert.IsTrue(_entityManager.HasBuffer<ConnectionBufferElement>(districtEntity));
-            
             var nodeId = _entityManager.GetComponentData<NodeId>(districtEntity);
             Assert.AreEqual(123u, nodeId.Value);
             Assert.AreEqual(2, nodeId.Level);
             Assert.AreEqual(456u, nodeId.ParentId);
             Assert.AreEqual(new int2(10, 20), nodeId.Coordinates);
-            
             var wfcState = _entityManager.GetComponentData<WfcState>(districtEntity);
             Assert.AreEqual(WfcGenerationState.Initialized, wfcState.State);
-            
             var refinementData = _entityManager.GetComponentData<SectorRefinementData>(districtEntity);
             Assert.AreEqual(0.4f, refinementData.TargetLoopDensity, 0.001f);
         }
@@ -151,7 +279,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             var gateCondition = new GateCondition(
                 Polarity.Heat,
                 Ability.Flight,
-                GateSoftness.Soft,
+                GateSoftness.Easy,
                 0.75f,
                 "Heat Gate"
             );
@@ -161,7 +289,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             var gate = gateBuffer[0].Value;
             Assert.AreEqual(Polarity.Heat, gate.RequiredPolarity);
             Assert.AreEqual(Ability.Flight, gate.RequiredAbilities);
-            Assert.AreEqual(GateSoftness.Soft, gate.Softness);
+            Assert.AreEqual(GateSoftness.Easy, gate.Softness);
             Assert.AreEqual(0.75f, gate.MinimumSkillLevel, 0.001f);
             Assert.IsTrue(gate.Description.ToString().Contains("Heat Gate"));
         }
@@ -269,8 +397,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             World.DefaultGameObjectInjectionWorld = world;
             
             // Test invalid district with duplicate NodeId
-            var invalidDistrict1 = CreateTestDistrict("InvalidDistrict1", new NodeId { value = 999 });
-            var invalidDistrict2 = CreateTestDistrict("InvalidDistrict2", new NodeId { value = 999 }); // Duplicate!
+            var invalidDistrict1 = CreateTestDistrict("InvalidDistrict1", new NodeId { Value = 999 });
+            var invalidDistrict2 = CreateTestDistrict("InvalidDistrict2", new NodeId { Value = 999 }); // Duplicate!
             
             BakeGameObjects(world, invalidDistrict1.gameObject, invalidDistrict2.gameObject);
             
@@ -365,8 +493,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             invalidProfileBiome.nodeId = new NodeId { value = 301 };
             
             var invalidProfile = ScriptableObject.CreateInstance<BiomeArtProfile>();
-            invalidProfile.tiles = new TileBase[0]; // Empty tiles array
-            invalidProfile.propPrefabs = new GameObject[0]; // Empty props array
+            // Intentionally leave tiles / prop arrays empty (not assignable via convenience properties)
             invalidProfileBiome.artProfile = invalidProfile;
             
             BakeGameObjects(world, biomeGO, invalidProfileBiomeGO);

@@ -24,256 +24,201 @@ namespace TinyWalnutGames.MetVD.Graph
             float2 start = startPos;
             float2 target = targetPos;
             float2 delta = target - start;
-            
-            // Direct horizontal movement check
-            if (math.abs(delta.y) < 0.1f && math.abs(delta.x) <= physics.JumpDistance)
-                return true;
-                
-            // Check if dash can bridge the gap
-            if ((availableMovement & Ability.Dash) != 0 && math.abs(delta.x) <= physics.DashDistance && math.abs(delta.y) < 1.0f)
-                return true;
-                
-            // Standard jump arc calculation
+            if (math.abs(delta.y) < 0.1f && math.abs(delta.x) <= physics.JumpDistance) return true;
+            if ((availableMovement & Ability.Dash) != 0 && math.abs(delta.x) <= physics.DashDistance && math.abs(delta.y) < 1.0f) return true;
             if ((availableMovement & Ability.Jump) != 0)
             {
-                if (CanReachWithJump(delta, physics, false))
-                    return true;
-                    
-                // Try double jump if available
-                if ((availableMovement & Ability.DoubleJump) != 0 && CanReachWithJump(delta, physics, true))
-                    return true;
+                if (CanReachWithJump(delta, physics, false)) return true;
+                if ((availableMovement & Ability.DoubleJump) != 0 && CanReachWithJump(delta, physics, true)) return true;
             }
-            
-            // Wall jump sequences for vertical movement
             if ((availableMovement & Ability.WallJump) != 0 && delta.y > 0)
-            {
                 return CanReachWithWallJumps(delta, physics);
-            }
-            
-            // Grapple point connections (simplified - assumes grapple points exist)
             if ((availableMovement & Ability.Grapple) != 0)
             {
-                float grappleRange = physics.JumpDistance * 2.0f; // Grapple has longer range
+                float grappleRange = physics.JumpDistance * 2.0f;
                 return math.length(delta) <= grappleRange;
             }
-            
             return false;
         }
-
-        /// <summary>
-        /// Calculate if a jump arc can reach the target position
-        /// </summary>
         [BurstCompile]
         private static bool CanReachWithJump(float2 delta, JumpArcPhysics physics, bool doubleJump)
         {
-            float horizontalDistance = math.abs(delta.x);
-            float verticalDistance = delta.y;
-            
-            float maxJumpHeight = physics.JumpHeight;
-            float maxJumpDistance = physics.JumpDistance;
-            
-            if (doubleJump)
-            {
-                maxJumpHeight *= physics.DoubleJumpBonus;
-                maxJumpDistance *= physics.DoubleJumpBonus;
-            }
-            
-            // Simple ballistic trajectory check
-            if (horizontalDistance > maxJumpDistance)
-                return false;
-                
-            // For upward movement, check if we have enough height
-            if (verticalDistance > 0 && verticalDistance > maxJumpHeight)
-                return false;
-                
-            // For downward movement, gravity helps - use parabolic trajectory
+            float horizontalDistance = math.abs(delta.x); float verticalDistance = delta.y;
+            float maxJumpHeight = physics.JumpHeight; float maxJumpDistance = physics.JumpDistance;
+            if (doubleJump) { maxJumpHeight *= physics.DoubleJumpBonus; maxJumpDistance *= physics.DoubleJumpBonus; }
+            if (horizontalDistance > maxJumpDistance) return false;
+            if (verticalDistance > 0 && verticalDistance > maxJumpHeight) return false;
             if (verticalDistance < 0)
             {
                 float timeToFall = math.sqrt(2.0f * math.abs(verticalDistance) / physics.GravityScale);
-                float maxHorizontalInTime = maxJumpDistance; // Simplified horizontal velocity
+                float maxHorizontalInTime = maxJumpDistance;
                 return horizontalDistance <= maxHorizontalInTime;
             }
-            
-            // Parabolic trajectory for upward arcs
             float discriminant = maxJumpHeight * maxJumpHeight - 2.0f * physics.GravityScale * verticalDistance * horizontalDistance * horizontalDistance / (maxJumpDistance * maxJumpDistance);
             return discriminant >= 0;
         }
-
-        /// <summary>
-        /// Check if wall jumping can reach the target (simplified wall jump chain)
-        /// </summary>
         [BurstCompile]
         private static bool CanReachWithWallJumps(float2 delta, JumpArcPhysics physics)
         {
-            float verticalGain = physics.WallJumpHeight;
-            int maxWallJumps = (int)math.ceil(delta.y / verticalGain);
-            
-            // Assume we can wall jump up to a reasonable limit
-            if (maxWallJumps <= 3 && math.abs(delta.x) <= physics.JumpDistance * maxWallJumps)
-                return true;
-                
-            return false;
+            float verticalGain = physics.WallJumpHeight; int maxWallJumps = (int)math.ceil(delta.y / verticalGain);
+            return maxWallJumps <= 3 && math.abs(delta.x) <= physics.JumpDistance * maxWallJumps;
         }
-
-        /// <summary>
-        /// Generate reachable positions from a starting point using breadth-first search
-        /// Used for room validation and navigation graph generation
-        /// </summary>
         [BurstCompile]
-        /// <param name="maxPositions">Optional limit on the number of positions to explore (prevents excessive search in large rooms).</param>
-        public static void GenerateReachablePositions(int2 startPos, Ability availableMovement, JumpArcPhysics physics, 
-                                                     RectInt roomBounds, NativeList<int2> reachablePositions, Allocator allocator, int maxPositions = int.MaxValue)
+        public static void GenerateReachablePositions(int2 startPos, Ability availableMovement, JumpArcPhysics physics,
+                                                       RectInt roomBounds, NativeList<int2> reachablePositions, Allocator allocator, int maxPositions = int.MaxValue)
         {
-            if (!reachablePositions.IsCreated)
-                return;
-                
+            if (!reachablePositions.IsCreated) return;
             var visited = new NativeHashSet<int2>(roomBounds.width * roomBounds.height, allocator);
             var queue = new NativeQueue<int2>(allocator);
-            
-            queue.Enqueue(startPos);
-            visited.Add(startPos);
-            reachablePositions.Add(startPos);
-            
-            // Movement offsets for different abilities
+            queue.Enqueue(startPos); visited.Add(startPos); reachablePositions.Add(startPos);
             var basicMovement = new NativeArray<int2>(8, allocator);
-            basicMovement[0] = new int2(1, 0);   // Right
-            basicMovement[1] = new int2(-1, 0);  // Left
-            basicMovement[2] = new int2(0, 1);   // Up
-            basicMovement[3] = new int2(0, -1);  // Down
-            basicMovement[4] = new int2(1, 1);   // Diagonal up-right
-            basicMovement[5] = new int2(-1, 1);  // Diagonal up-left
-            basicMovement[6] = new int2(1, -1);  // Diagonal down-right
-            basicMovement[7] = new int2(-1, -1); // Diagonal down-left
-            
+            basicMovement[0] = new int2(1, 0); basicMovement[1] = new int2(-1, 0); basicMovement[2] = new int2(0, 1); basicMovement[3] = new int2(0, -1);
+            basicMovement[4] = new int2(1, 1); basicMovement[5] = new int2(-1, 1); basicMovement[6] = new int2(1, -1); basicMovement[7] = new int2(-1, -1);
             while (queue.TryDequeue(out int2 currentPos))
             {
-                // Check all basic movement directions
                 for (int i = 0; i < basicMovement.Length; i++)
                 {
-                    var offset = basicMovement[i];
-                    var newPos = currentPos + offset;
-                    
-                    if (!IsWithinBounds(newPos, roomBounds) || visited.Contains(newPos))
-                        continue;
-                        
-                    if (IsPositionReachable(currentPos, newPos, availableMovement, physics))
-                    {
-                        visited.Add(newPos);
-                        queue.Enqueue(newPos);
-                        reachablePositions.Add(newPos);
-                    }
+                    var newPos = currentPos + basicMovement[i];
+                    if (!IsWithinBounds(newPos, roomBounds) || visited.Contains(newPos)) continue;
+                    if (IsPositionReachable(currentPos, newPos, availableMovement, physics)) { visited.Add(newPos); queue.Enqueue(newPos); reachablePositions.Add(newPos); }
                 }
-                
-                // Check jump-specific positions
                 if ((availableMovement & Ability.Jump) != 0)
-                {
                     AddJumpReachablePositions(currentPos, physics, roomBounds, availableMovement, visited, queue, reachablePositions);
-                }
-                
-                // Check dash-specific positions
                 if ((availableMovement & Ability.Dash) != 0)
-                {
                     AddDashReachablePositions(currentPos, physics, roomBounds, visited, queue, reachablePositions);
-                }
+                if (reachablePositions.Length >= maxPositions) break;
             }
-            
-            basicMovement.Dispose();
-            visited.Dispose();
-            queue.Dispose();
+            basicMovement.Dispose(); visited.Dispose(); queue.Dispose();
         }
-
+        [BurstCompile] private static bool IsWithinBounds(int2 p, RectInt b) => p.x >= b.x && p.x < b.x + b.width && p.y >= b.y && p.y < b.y + b.height;
         [BurstCompile]
-        private static bool IsWithinBounds(int2 position, RectInt bounds)
+        private static void AddJumpReachablePositions(int2 currentPos, JumpArcPhysics physics, RectInt roomBounds,
+                                                       Ability availableMovement, NativeHashSet<int2> visited,
+                                                       NativeQueue<int2> queue, NativeList<int2> reachablePositions)
         {
-            return position.x >= bounds.x && position.x < bounds.x + bounds.width &&
-                   position.y >= bounds.y && position.y < bounds.y + bounds.height;
-        }
-
-        [BurstCompile]
-        private static void AddJumpReachablePositions(int2 currentPos, JumpArcPhysics physics, RectInt roomBounds, 
-                                                     Ability availableMovement, NativeHashSet<int2> visited, 
-                                                     NativeQueue<int2> queue, NativeList<int2> reachablePositions)
-        {
-            int jumpRange = (int)physics.JumpDistance;
-            int jumpHeight = (int)physics.JumpHeight;
-            
-            // Check positions within jump range
+            int jumpRange = (int)physics.JumpDistance; int jumpHeight = (int)physics.JumpHeight;
             for (int x = -jumpRange; x <= jumpRange; x++)
-            {
                 for (int y = -jumpHeight; y <= jumpHeight; y++)
                 {
-                    if (x == 0 && y == 0) continue;
-                    
-                    var targetPos = currentPos + new int2(x, y);
-                    
-                    if (!IsWithinBounds(targetPos, roomBounds) || visited.Contains(targetPos))
-                        continue;
-                        
-                    if (IsPositionReachable(currentPos, targetPos, availableMovement, physics))
-                    {
-                        visited.Add(targetPos);
-                        queue.Enqueue(targetPos);
-                        reachablePositions.Add(targetPos);
-                    }
+                    if (x == 0 && y == 0) continue; var targetPos = currentPos + new int2(x, y);
+                    if (!IsWithinBounds(targetPos, roomBounds) || visited.Contains(targetPos)) continue;
+                    if (IsPositionReachable(currentPos, targetPos, availableMovement, physics)) { visited.Add(targetPos); queue.Enqueue(targetPos); reachablePositions.Add(targetPos); }
                 }
-            }
         }
-
         [BurstCompile]
         private static void AddDashReachablePositions(int2 currentPos, JumpArcPhysics physics, RectInt roomBounds,
-                                                     NativeHashSet<int2> visited, NativeQueue<int2> queue, 
-                                                     NativeList<int2> reachablePositions)
+                                                       NativeHashSet<int2> visited, NativeQueue<int2> queue, NativeList<int2> reachablePositions)
         {
             int dashRange = (int)physics.DashDistance;
-            
-            // Horizontal dash positions
             for (int x = -dashRange; x <= dashRange; x++)
             {
-                if (x == 0) continue;
-                
-                var targetPos = currentPos + new int2(x, 0);
-                
-                if (IsWithinBounds(targetPos, roomBounds) && !visited.Contains(targetPos))
-                {
-                    visited.Add(targetPos);
-                    queue.Enqueue(targetPos);
-                    reachablePositions.Add(targetPos);
-                }
+                if (x == 0) continue; var targetPos = currentPos + new int2(x, 0);
+                if (IsWithinBounds(targetPos, roomBounds) && !visited.Contains(targetPos)) { visited.Add(targetPos); queue.Enqueue(targetPos); reachablePositions.Add(targetPos); }
             }
         }
-
         /// <summary>
         /// Validate that all critical positions in a room are reachable from the entrance
         /// Used during room generation to ensure completability
         /// </summary>
         [BurstCompile]
-        public static bool ValidateRoomReachability(int2 entrancePos, NativeArray<int2> criticalPositions, 
-                                                   Ability playerMovement, JumpArcPhysics physics, RectInt roomBounds, Allocator allocator)
+        public static bool ValidateRoomReachability(int2 entrancePos, NativeArray<int2> criticalPositions,
+                                                     Ability playerMovement, JumpArcPhysics physics, RectInt roomBounds, Allocator allocator)
         {
             var reachablePositions = new NativeList<int2>(roomBounds.width * roomBounds.height, allocator);
             GenerateReachablePositions(entrancePos, playerMovement, physics, roomBounds, reachablePositions, allocator);
-            
             bool allReachable = true;
             for (int i = 0; i < criticalPositions.Length; i++)
             {
                 bool found = false;
                 for (int j = 0; j < reachablePositions.Length; j++)
                 {
-                    if (math.all(reachablePositions[j] == criticalPositions[i]))
-                    {
-                        found = true;
-                        break;
-                    }
+                    if (math.all(reachablePositions[j] == criticalPositions[i])) { found = true; break; }
                 }
-                if (!found)
-                {
-                    allReachable = false;
-                    break;
-                }
+                if (!found) { allReachable = false; break; }
             }
-            
             reachablePositions.Dispose();
             return allReachable;
         }
+        /// <summary>
+        /// Convenience overload supplying a default JumpArcPhysics when physics values are not provided.
+        /// </summary>
+        public static bool IsPositionReachable(int2 startPos, int2 targetPos, Ability availableMovement) => IsPositionReachable(startPos, targetPos, availableMovement, new JumpArcPhysics());
+        /// <summary>
+        /// Overload for tests that previously called ValidateRoomReachability without physics parameter.
+        /// Uses default JumpArcPhysics configuration.
+        /// </summary>
+        public static bool ValidateRoomReachability(int2 entrancePos, NativeArray<int2> criticalPositions,
+                                                     Ability playerMovement, RectInt roomBounds, Allocator allocator) =>
+            ValidateRoomReachability(entrancePos, criticalPositions, playerMovement, new JumpArcPhysics(), roomBounds, allocator);
+        /// <summary>
+        /// Legacy 3-argument overload used by early pipeline code (derives bounds & uses Temp allocator).
+        /// </summary>
+        public static bool ValidateRoomReachability(int2 entrancePos, NativeArray<int2> criticalPositions, Ability playerMovement)
+        {
+            int minX = entrancePos.x, maxX = entrancePos.x, minY = entrancePos.y, maxY = entrancePos.y;
+            for (int i = 0; i < criticalPositions.Length; i++)
+            { var p = criticalPositions[i]; minX = math.min(minX, p.x); maxX = math.max(maxX, p.x); minY = math.min(minY, p.y); maxY = math.max(maxY, p.y); }
+            var bounds = new RectInt(minX, minY, math.max(1, (maxX - minX) + 1), math.max(1, (maxY - minY) + 1));
+            return ValidateRoomReachability(entrancePos, criticalPositions, playerMovement, new JumpArcPhysics(), bounds, Allocator.Temp);
+        }
+        /// <summary>Minimum safe platform spacing heuristic for generation.</summary>
+        [BurstCompile]
+        public static float2 CalculateMinimumPlatformSpacing(JumpArcPhysics physics)
+        {
+            float horizontalSpacing = physics.JumpDistance * 0.8f;
+            float verticalSpacing = physics.JumpHeight * 0.7f;
+            return new float2(horizontalSpacing, verticalSpacing);
+        }
+        /// <summary>Alias retained for backward compatibility.</summary>
+        [BurstCompile]
+        public static bool IsReachable(int2 fromPos, int2 toPos, Ability playerMovement, JumpArcPhysics physics) => IsPositionReachable(fromPos, toPos, playerMovement, physics);
+        /// <summary>Compute jump arc data between two grid positions.</summary>
+        [BurstCompile]
+        public static JumpArcData CalculateJumpArc(int2 startPos, int2 endPos, JumpArcPhysics physics)
+        {
+            float2 start = startPos; float2 end = endPos; float2 delta = end - start;
+            float horizontalDistance = math.abs(delta.x); float verticalDistance = delta.y;
+            float timeToReach = math.max(0.0001f, horizontalDistance / math.max(0.0001f, physics.JumpDistance));
+            float initialVerticalVelocity = (verticalDistance + 0.5f * physics.GravityScale * timeToReach * timeToReach) / timeToReach;
+            return new JumpArcData
+            {
+                StartPosition = start,
+                EndPosition = end,
+                InitialVelocity = new float2(physics.JumpDistance / timeToReach, initialVerticalVelocity),
+                FlightTime = timeToReach,
+                ApexHeight = start.y + (initialVerticalVelocity * initialVerticalVelocity) / (2.0f * physics.GravityScale)
+            };
+        }
+        /// <summary>
+        /// Validate room reachability from platform and obstacle positions using legacy JumpPhysicsData.
+        /// </summary>
+        public static bool ValidateRoomReachability(NativeArray<float2> platformPositions, NativeArray<int2> obstaclePositions, JumpPhysicsData jumpPhysics)
+        {
+            if (platformPositions.Length == 0) return true;
+            var entrance = new int2((int)platformPositions[0].x, (int)platformPositions[0].y);
+            var critical = new NativeArray<int2>(platformPositions.Length, Allocator.Temp);
+            for (int i = 0; i < platformPositions.Length; i++)
+            {
+                var p = platformPositions[i];
+                critical[i] = new int2((int)p.x, (int)p.y);
+            }
+            var bounds = CalculateBounds(critical);
+            bool ok = ValidateRoomReachability(entrance, critical, Ability.Jump | Ability.DoubleJump, new JumpArcPhysics
+            {
+                JumpHeight = jumpPhysics.JumpHeight,
+                JumpDistance = jumpPhysics.JumpDistance,
+                DashDistance = jumpPhysics.DashDistance,
+                WallJumpHeight = jumpPhysics.WallJumpHeight
+            }, bounds, Allocator.Temp);
+            critical.Dispose();
+            return ok;
+        }
+        private static RectInt CalculateBounds(NativeArray<int2> points)
+        {
+            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+            for (int i = 0; i < points.Length; i++) { var p = points[i]; minX = math.min(minX, p.x); maxX = math.max(maxX, p.x); minY = math.min(minY, p.y); maxY = math.max(maxY, p.y); }
+            return new RectInt(minX, minY, math.max(1, (maxX - minX)+1), math.max(1, (maxY - minY)+1));
+        }
     }
+    public struct JumpArcData { public float2 StartPosition; public float2 EndPosition; public float2 InitialVelocity; public float FlightTime; public float ApexHeight; }
 }

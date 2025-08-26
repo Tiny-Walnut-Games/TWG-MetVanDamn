@@ -8,12 +8,20 @@ namespace TinyWalnutGames.MetVD.Authoring
 {
     public class DistrictAuthoring : MonoBehaviour
     {
-        [Header("Identification")] public uint nodeId = 1;
+        [Header("Identification")] 
+        public uint nodeId = 1;
         [Tooltip("Hierarchy level (0=district)")] public byte level = 0;
         public uint parentId = 0;
         public int2 gridCoordinates;
 
-        [Header("Generation Settings")] [Range(0.1f,1f)] public float targetLoopDensity = 0.3f;
+        [Header("District Configuration")]
+        public BiomeType biomeType = BiomeType.SolarPlains;
+        public DistrictType districtType = DistrictType.Standard;
+        public float2 size = new float2(100f, 100f);
+        public int targetSectorCount = 4;
+
+        [Header("Generation Settings")] 
+        [Range(0.1f,1f)] public float targetLoopDensity = 0.3f;
         [Tooltip("Initial WFC state")] public WfcGenerationState initialWfcState = WfcGenerationState.Initialized;
 
         private void OnValidate()

@@ -400,11 +400,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 var world = World.DefaultGameObjectInjectionWorld;
                 var biomeSystem = world.GetExistingSystemManaged<BiomeFieldSystem>();
                 
-                if (biomeSystem != null)
-                {
-                    // Access runtime biome data through ECS query
-                    SyncWithECSBiomeData(world, biomesByType);
-                }
+                // Access runtime biome data through ECS query
+                SyncWithECSBiomeData(world, biomesByType);
             }
             
             // Also sync with any runtime tile renderers that may have modified colors
@@ -432,15 +429,36 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     var biomeComponent = biomeComponents[i];
                     var artProfileRef = artProfileRefs[i];
                     
-                    if (artProfileRef.ProfileRef.IsValid && artProfileRef.ProfileRef.Value != null)
-                    {
+                    if (artProfileRef.ProfileRef.IsValid)
+                        {
+                            var profile = artProfileRef.ProfileRef.Value;
+                        
+                            // Update biome color information based on runtime state
+                            if (profile.debugColor.a > 0f)
+                            {
+                                // Runtime debug color takes precedence
+                                UpdateBiomeColorFromRuntime(biomeComponent.Type, profile.debugColor);
+                            }                            
+                        }
+                    if (artProfileRef.ProfileRef.Value != null)
+                        {
                         var profile = artProfileRef.ProfileRef.Value;
                         
-                        // Update biome color information based on runtime state
-                        if (profile.debugColor.a > 0f)
+                        // Update biome info entry if it exists
+                        var existingEntry = biomeInfos.Find(entry => entry.type == biomeComponent.Type);
+                        if (existingEntry != null)
                         {
-                            // Runtime debug color takes precedence
-                            UpdateBiomeColorFromRuntime(biomeComponent.Type, profile.debugColor);
+                            existingEntry.isRuntimeActive = true;
+                            existingEntry.artProfile = profile;
+                            existingEntry.name = GetBiomeDisplayName(biomeComponent.Type, profile);
+                            
+                            // If runtime color differs from design color, mark as override
+                            if (existingEntry.color != profile.debugColor && profile.debugColor.a > 0f)
+                            {
+                                existingEntry.currentColor = profile.debugColor;
+                                existingEntry.hasColorOverride = true;
+                                existingEntry.colorSource = "ECS BiomeArtProfile";
+                            }
                         }
                     }
                 }

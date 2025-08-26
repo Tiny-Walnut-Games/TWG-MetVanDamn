@@ -17,7 +17,21 @@ namespace TinyWalnutGames.MetVD.Graph
         VerticalSegment = 3,         // Vertical layout rooms (towers, shafts)
         HorizontalCorridor = 4,      // Horizontal layout rooms (flow platforming)
         BiomeWeightedTerrain = 5,    // Top-world terrain generation
-        SkyBiomePlatform = 6         // Sky biome with moving platforms
+        SkyBiomePlatform = 6,        // Sky biome with moving platforms
+        LinearBranchingCorridor = 7, // Linear branching corridor layout
+        StackedSegment = 8,         // Stacked segment generation
+        LayeredPlatformCloud = 9,    // Layered platforms with cloud effects
+        BiomeWeightedHeightmap = 10   // Terrain heightmaps weighted by biome
+    }
+
+    /// <summary>
+    /// Room layout types for procedural generation
+    /// </summary>
+    public enum RoomLayoutType : byte
+    {
+        Horizontal = 0,    // Horizontal room layout
+        Vertical = 1,      // Vertical room layout
+        Mixed = 2          // Mixed orientation layout
     }
 
     /// <summary>
@@ -55,6 +69,19 @@ namespace TinyWalnutGames.MetVD.Graph
         Underground = 6,
         TechZone = 7,
         Volcanic = 8
+    }
+
+    /// <summary>
+    /// Component wrapper for BiomeAffinity
+    /// </summary>
+    public struct BiomeAffinityComponent : IComponentData
+    {
+        public BiomeAffinity Affinity;
+        
+        public BiomeAffinityComponent(BiomeAffinity affinity)
+        {
+            Affinity = affinity;
+        }
     }
 
     /// <summary>
@@ -142,6 +169,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public float GravityScale;         // Gravity affecting jump arcs
         public float WallJumpHeight;       // Height gained from wall jumps
         public float DashDistance;         // Horizontal dash distance
+        public float GlideSpeed;           // Glide/fall speed reduction
         
         public JumpArcPhysics(float height = 3.0f, float distance = 4.0f, float doubleBonus = 1.5f,
                              float gravity = 1.0f, float wallHeight = 2.0f, float dash = 6.0f)
@@ -152,6 +180,301 @@ namespace TinyWalnutGames.MetVD.Graph
             GravityScale = gravity;
             WallJumpHeight = wallHeight;
             DashDistance = dash;
+            GlideSpeed = 2.0f;
+        }
+    }
+    
+    /// <summary>
+    /// Component to tag entities with skill requirements
+    /// </summary>
+    public struct SkillTag : IComponentData
+    {
+        public Ability RequiredSkills;
+        public Ability OptionalSkills;
+        
+        public SkillTag(Ability required, Ability optional = Ability.None)
+        {
+            RequiredSkills = required;
+            OptionalSkills = optional;
+        }
+    }
+    
+    /// <summary>
+    /// Buffer element for room pattern generation data
+    /// </summary>
+    public struct RoomPatternElement : IBufferElementData
+    {
+        public int2 Position;
+        public RoomFeatureType FeatureType;
+        public uint Seed;
+        public Ability RequiredAbility;
+        
+        public RoomPatternElement(int2 position, RoomFeatureType featureType, uint seed, Ability requiredAbility = Ability.None)
+        {
+            Position = position;
+            FeatureType = featureType;
+            Seed = seed;
+            RequiredAbility = requiredAbility;
+        }
+    }
+    
+    /// <summary>
+    /// Buffer element for room module references
+    /// </summary>
+    public struct RoomModuleElement : IBufferElementData
+    {
+        public Entity ModulePrefab;
+        public int2 Position;
+        public float Weight;
+        
+        public RoomModuleElement(Entity modulePrefab, int2 position, float weight = 1.0f)
+        {
+            ModulePrefab = modulePrefab;
+            Position = position;
+            Weight = weight;
+        }
+    }
+    
+    /// <summary>
+    /// Component for room generation requests
+    /// </summary>
+    public struct RoomGenerationRequest : IComponentData
+    {
+        public RoomGeneratorType GeneratorType;
+        public Entity RoomEntity;
+        public int2 RoomBounds;
+        public uint Seed;
+        public uint GenerationSeed;  // Alias for Seed for compatibility
+        public Ability AvailableSkills;
+        public BiomeAffinity TargetBiomeAffinity;
+        public BiomeType TargetBiome; // explicit biome for tests
+        public Polarity TargetPolarity;
+        public bool IsComplete;
+        public int CurrentStep; // 1..6 pipeline
+        public RoomLayoutType LayoutType;
+
+        public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed)
+        {
+            GeneratorType = generatorType;
+            RoomEntity = roomEntity;
+            RoomBounds = bounds;
+            Seed = seed;
+            GenerationSeed = seed;
+            AvailableSkills = Ability.None;
+            TargetBiomeAffinity = BiomeAffinity.Any;
+            TargetBiome = BiomeType.Unknown;
+            TargetPolarity = Polarity.None;
+            IsComplete = false;
+            CurrentStep = 1;
+            LayoutType = RoomLayoutType.Horizontal;
+        }
+        
+        public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed, Ability availableSkills)
+        {
+            GeneratorType = generatorType;
+            RoomEntity = roomEntity;
+            RoomBounds = bounds;
+            Seed = seed;
+            GenerationSeed = seed;
+            AvailableSkills = availableSkills;
+            TargetBiomeAffinity = BiomeAffinity.Any;
+            TargetBiome = BiomeType.Unknown;
+            TargetPolarity = Polarity.None;
+            IsComplete = false;
+            CurrentStep = 1;
+            LayoutType = RoomLayoutType.Horizontal;
+        }
+        
+        // Alternative constructor matching the calling pattern in RoomManagementSystem.cs
+        public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeType targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
+        {
+            GeneratorType = generatorType;
+            RoomEntity = Entity.Null; // Will be set by caller
+            RoomBounds = new int2(16, 16); // Default bounds
+            Seed = seed;
+            GenerationSeed = seed;
+            AvailableSkills = availableSkills;
+            TargetBiomeAffinity = ConvertBiomeTypeToAffinity(targetBiome);
+            TargetBiome = targetBiome;
+            TargetPolarity = targetPolarity;
+            IsComplete = false;
+            CurrentStep = 1;
+            LayoutType = RoomLayoutType.Horizontal;
+        }
+        
+        private static BiomeAffinity ConvertBiomeTypeToAffinity(BiomeType biomeType)
+        {
+            return biomeType switch
+            {
+                BiomeType.Forest => BiomeAffinity.Forest,
+                BiomeType.Desert => BiomeAffinity.Desert,
+                BiomeType.Mountains => BiomeAffinity.Mountain,
+                BiomeType.Ocean => BiomeAffinity.Ocean,
+                BiomeType.SkyGardens => BiomeAffinity.Sky,
+                BiomeType.CrystalCaverns => BiomeAffinity.Underground,
+                BiomeType.IceCatacombs => BiomeAffinity.Underground,
+                BiomeType.PowerPlant => BiomeAffinity.TechZone,
+                BiomeType.CryogenicLabs => BiomeAffinity.TechZone,
+                BiomeType.VolcanicCore => BiomeAffinity.Volcanic,
+                BiomeType.Volcanic => BiomeAffinity.Volcanic,
+                _ => BiomeAffinity.Any
+            };
+        }
+    }
+    
+    /// <summary>
+    /// Feature types for room pattern generation
+    /// </summary>
+    public enum RoomFeatureType : byte
+    {
+        Platform = 0,
+        Obstacle = 1,
+        GrapplePoint = 2,
+        SkillGate = 3,
+        Secret = 4,
+        Hazard = 5,
+        PowerUp = 6,
+        HealthPickup = 7,
+        SaveStation = 8,
+        Switch = 9,
+        Enemy = 10,
+        Door = 11,
+        Collectible = 12
+    }
+    
+    /// <summary>
+    /// Jump physics data for room generation
+    /// </summary>
+    public struct JumpPhysicsData : IComponentData
+    {
+        public float JumpHeight;
+        public float JumpDistance;
+        public float GravityScale;
+        public float MaxFallSpeed;
+        public bool HasDoubleJump;
+        public bool HasWallJump;
+        public bool HasGlide;
+        
+        // Compatibility shims for JumpArcSolver usage
+        public float MaxJumpHeight => JumpHeight; // compatibility
+        public float DashDistance => HasGlide ? 6.0f : 4.0f; // compatibility shim
+        public float WallJumpHeight => HasWallJump ? JumpHeight * 0.8f : 0.0f; // compatibility shim
+        
+        public JumpPhysicsData(float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
+        {
+            JumpHeight = height;
+            JumpDistance = distance;
+            GravityScale = gravity;
+            MaxFallSpeed = 10.0f;
+            HasDoubleJump = false;
+            HasWallJump = false;
+            HasGlide = false;
+        }
+        
+        public JumpPhysicsData(float height, float distance, float gravity, float maxFallSpeed, bool doubleJump, bool wallJump, bool glide)
+        {
+            JumpHeight = height;
+            JumpDistance = distance;
+            GravityScale = gravity;
+            MaxFallSpeed = maxFallSpeed;
+            HasDoubleJump = doubleJump;
+            HasWallJump = wallJump;
+            HasGlide = glide;
+        }
+    }
+    
+    /// <summary>
+    /// Configuration for secret areas in rooms
+    /// </summary>
+    public struct SecretAreaConfig : IComponentData
+    {
+        public float SecretProbability;
+        public int MaxSecretsPerRoom;
+        public Ability RequiredSkillForAccess;
+        public int2 MinSecretSize;
+        public int2 MaxSecretSize;
+        public bool AllowStackedSecrets;
+        public bool RequireHiddenAccess;
+        public float SecretAreaPercentage;
+        public bool UseAlternateRoutes;
+        public bool UseDestructibleWalls;
+        public Ability SecretSkillRequirement => RequiredSkillForAccess; // test compatibility
+        
+        public SecretAreaConfig(float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
+        {
+            SecretProbability = probability;
+            MaxSecretsPerRoom = maxSecrets;
+            RequiredSkillForAccess = requiredSkill;
+            MinSecretSize = new int2(2, 2);
+            MaxSecretSize = new int2(4, 4);
+            AllowStackedSecrets = false;
+            RequireHiddenAccess = true;
+            SecretAreaPercentage = 0.15f;
+            UseAlternateRoutes = false;
+            UseDestructibleWalls = false;
+        }
+        
+        public SecretAreaConfig(float probability, int2 minSize, int2 maxSize, Ability requiredSkill, bool allowStacked, bool requireHidden)
+        {
+            SecretProbability = probability;
+            MaxSecretsPerRoom = 2;
+            RequiredSkillForAccess = requiredSkill;
+            MinSecretSize = minSize;
+            MaxSecretSize = maxSize;
+            AllowStackedSecrets = allowStacked;
+            RequireHiddenAccess = requireHidden;
+            SecretAreaPercentage = 0.15f;
+            UseAlternateRoutes = false;
+            UseDestructibleWalls = false;
+        }
+    }
+    
+    /// <summary>
+    /// Jump arc validation component
+    /// </summary>
+    public struct JumpArcValidation : IComponentData
+    {
+        public bool IsValid;
+        public float MaxJumpDistance;
+        public float MinJumpHeight;
+        
+        public JumpArcValidation(bool isValid = true, float maxDistance = 8.0f, float minHeight = 2.0f)
+        {
+            IsValid = isValid;
+            MaxJumpDistance = maxDistance;
+            MinJumpHeight = minHeight;
+        }
+    }
+    
+    /// <summary>
+    /// Buffer element for jump connections
+    /// </summary>
+    public struct JumpConnectionElement : IBufferElementData
+    {
+        public int2 StartPosition;
+        public int2 EndPosition;
+        public Ability RequiredAbility;
+        public float Angle;
+        public float Velocity;
+        public int2 FromPosition => StartPosition; // compatibility
+        public int2 ToPosition => EndPosition; // compatibility
+        
+        public JumpConnectionElement(int2 start, int2 end, Ability requiredAbility = Ability.None)
+        {
+            StartPosition = start;
+            EndPosition = end;
+            RequiredAbility = requiredAbility;
+            Angle = 0f;
+            Velocity = 0f;
+        }
+        
+        public JumpConnectionElement(int2 start, int2 end, float angle, float velocity)
+        {
+            StartPosition = start;
+            EndPosition = end;
+            RequiredAbility = Ability.Jump;
+            Angle = angle;
+            Velocity = velocity;
         }
     }
 }

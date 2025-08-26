@@ -75,9 +75,11 @@
   <ItemGroup>
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\DistrictSectorRoomFeaturesTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\WfcSystemTests.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\ProceduralRoomGenerationTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\SectorRefineSystemTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\ProceduralLayoutSystemTests.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\DistrictWfcSystemTests.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\ProceduralRoomGenerationIntegrationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\TinyWalnutGames.MetVD.Graph.Tests.asmdef" />
@@ -913,6 +915,10 @@
     </Reference>
     <Reference Include="Unity.Burst">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Cinemachine">
+      <HintPath>Library\ScriptAssemblies\Unity.Cinemachine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">

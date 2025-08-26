@@ -99,9 +99,10 @@ namespace TinyWalnutGames.MetVD.Graph
     }
 
     /// <summary>
-    /// Types of features that can exist in rooms
+    /// Types of features that can exist in rooms (DEPRECATED - Use RoomFeatureType instead)
     /// </summary>
-    public enum RoomFeatureType : byte
+    [System.Obsolete("Use RoomFeatureType instead")]
+    public enum RoomFeatureObjectType : byte
     {
         Enemy = 0,
         PowerUp = 1,
@@ -208,6 +209,9 @@ namespace TinyWalnutGames.MetVD.Graph
                 availableSkills, 
                 random.NextUInt()
             );
+            
+            // Set the correct room entity
+            generationRequest.RoomEntity = roomEntity;
             
             entityManager.AddComponentData(roomEntity, generationRequest);
             

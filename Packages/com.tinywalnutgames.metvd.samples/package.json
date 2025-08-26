@@ -5,10 +5,12 @@
   "description": "Sample scenes and demo content for MetVanDAMN procedural Metroidvania engine. Includes smoke-test scene for immediate 'hit Play -> see map' experience.",
   "unity": "6000.2",
   "dependencies": {
-    "com.tinywalnutgames.metvd.core": "1.0.0",
-    "com.tinywalnutgames.metvd.graph": "1.0.0",
-    "com.tinywalnutgames.metvd.biome": "1.0.0",
-    "com.unity.entities": "1.2.0"
+    "com.tinywalnutgames.metvd.core": "0.1.0",
+    "com.tinywalnutgames.metvd.graph": "0.1.0",
+    "com.tinywalnutgames.metvd.biome": "0.1.0",
+    "com.unity.entities": "1.2.0",
+    "com.unity.collections": "1.2.4",
+    "com.unity.mathematics": "1.2.6"
   },
   "keywords": [
     "metroidvania",

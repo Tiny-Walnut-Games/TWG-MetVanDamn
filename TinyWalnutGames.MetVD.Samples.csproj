@@ -75,6 +75,8 @@
   <ItemGroup>
     <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\ProceduralLayoutDemo.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\SmokeTestSceneSetup.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\CrossScaleIntegrationExample.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\ProceduralRoomGenerationDemo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\TinyWalnutGames.MetVD.Samples.asmdef" />

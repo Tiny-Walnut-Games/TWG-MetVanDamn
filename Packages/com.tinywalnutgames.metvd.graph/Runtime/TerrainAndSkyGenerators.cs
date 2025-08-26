@@ -2,6 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Graph
@@ -52,13 +53,13 @@ namespace TinyWalnutGames.MetVD.Graph
         public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
         public Unity.Mathematics.Random Random;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.StackedSegment || request.IsComplete) return;
 
-            if (!FeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!FeatureBufferLookup.HasBuffer(entity)) return;
 
-            var features = FeatureBufferLookup[nodeId.Value];
+            var features = FeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             features.Clear();
 
@@ -68,9 +69,9 @@ namespace TinyWalnutGames.MetVD.Graph
 
             // Get jump physics for coherent route planning
             var jumpHeight = 3.0f; // Default
-            if (JumpPhysicsLookup.HasComponent(nodeId.Value))
+            if (JumpPhysicsLookup.HasComponent(entity))
             {
-                jumpHeight = JumpPhysicsLookup[nodeId.Value].MaxJumpHeight;
+                jumpHeight = JumpPhysicsLookup[entity].JumpHeight;
             }
 
             // Generate each vertical segment
@@ -248,13 +249,13 @@ namespace TinyWalnutGames.MetVD.Graph
         [ReadOnly] public ComponentLookup<SecretAreaConfig> SecretConfigLookup;
         public Unity.Mathematics.Random Random;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.LinearBranchingCorridor || request.IsComplete) return;
 
-            if (!FeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!FeatureBufferLookup.HasBuffer(entity)) return;
 
-            var features = FeatureBufferLookup[nodeId.Value];
+            var features = FeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             features.Clear();
 
@@ -271,9 +272,9 @@ namespace TinyWalnutGames.MetVD.Graph
             }
 
             // Add branching paths for secrets
-            if (SecretConfigLookup.HasComponent(nodeId.Value))
+            if (SecretConfigLookup.HasComponent(entity))
             {
-                var secretConfig = SecretConfigLookup[nodeId.Value];
+                var secretConfig = SecretConfigLookup[entity];
                 GenerateBranchingPaths(features, bounds, secretConfig, request.GenerationSeed);
             }
         }
@@ -493,18 +494,18 @@ namespace TinyWalnutGames.MetVD.Graph
         [ReadOnly] public ComponentLookup<Core.Biome> BiomeLookup;
         public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.BiomeWeightedHeightmap || request.IsComplete) return;
 
-            if (!FeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!FeatureBufferLookup.HasBuffer(entity)) return;
 
-            var features = FeatureBufferLookup[nodeId.Value];
+            var features = FeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             features.Clear();
 
             // Get biome information for terrain characteristics
-            var biome = BiomeLookup.HasComponent(nodeId.Value) ? BiomeLookup[nodeId.Value] : 
+            var biome = BiomeLookup.HasComponent(entity) ? BiomeLookup[entity] : 
                        new Core.Biome(BiomeType.SolarPlains, Polarity.Sun);
 
             // Generate heightmap using biome-specific noise
@@ -648,18 +649,18 @@ namespace TinyWalnutGames.MetVD.Graph
         public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
         [ReadOnly] public ComponentLookup<Core.Biome> BiomeLookup;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.LayeredPlatformCloud || request.IsComplete) return;
 
-            if (!FeatureBufferLookup.HasBuffer(nodeId.Value)) return;
+            if (!FeatureBufferLookup.HasBuffer(entity)) return;
 
-            var features = FeatureBufferLookup[nodeId.Value];
+            var features = FeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             features.Clear();
 
             // Get biome for motion pattern determination
-            var biome = BiomeLookup.HasComponent(nodeId.Value) ? BiomeLookup[nodeId.Value] : 
+            var biome = BiomeLookup.HasComponent(entity) ? BiomeLookup[entity] : 
                        new Core.Biome(BiomeType.SkyGardens, Polarity.Wind);
 
             // Generate layered cloud platforms
@@ -805,5 +806,38 @@ namespace TinyWalnutGames.MetVD.Graph
         Gusty = 1,     // Irregular wind patterns
         Conveyor = 2,  // Mechanical conveyor-like movement
         Electric = 3   // Rapid, energetic movement
+    }
+
+    /// <summary>
+    /// Utility class for type conversions
+    /// </summary>
+    public static class TypeConversionUtility
+    {
+        /// <summary>
+        /// Convert RoomFeatureType to RoomFeatureObjectType (DEPRECATED - compatibility shim)
+        /// </summary>
+        [System.Obsolete("Use RoomFeatureType directly instead")]
+        public static RoomFeatureObjectType ConvertToObjectType(RoomFeatureType featureType)
+        {
+            return featureType switch
+            {
+                RoomFeatureType.Platform => RoomFeatureObjectType.Platform,
+                RoomFeatureType.Obstacle => RoomFeatureObjectType.Obstacle,
+                RoomFeatureType.Secret => RoomFeatureObjectType.Secret,
+                RoomFeatureType.PowerUp => RoomFeatureObjectType.PowerUp,
+                RoomFeatureType.HealthPickup => RoomFeatureObjectType.HealthPickup,
+                RoomFeatureType.SaveStation => RoomFeatureObjectType.SaveStation,
+                RoomFeatureType.Switch => RoomFeatureObjectType.Switch,
+                _ => RoomFeatureObjectType.Platform // Default fallback
+            };
+        }
+        
+        /// <summary>
+        /// Compatibility shim - Use RoomFeatureType directly for new code
+        /// </summary>
+        public static RoomFeatureType NormalizeFeatureType(RoomFeatureType featureType)
+        {
+            return featureType; // Pass-through for compatibility
+        }
     }
 }

@@ -12,28 +12,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         public override void Bake(WorldBootstrapAuthoring authoring)
         {
             var entity = GetEntity(TransformUsageFlags.None);
-            
-            // Convert authoring settings to component data
-            // Grouped settings structs for new constructor signature
+            // Map authoring ranges to *Range fields
             var biomeSettings = new BiomeGenerationSettings
             {
-                BiomeCount = new int2(authoring.biomeCount.x, authoring.biomeCount.y),
+                BiomeCountRange = new int2(authoring.biomeCount.x, authoring.biomeCount.y),
                 BiomeWeight = authoring.biomeWeight
             };
             var districtSettings = new DistrictGenerationSettings
             {
-                DistrictCount = new int2(authoring.districtCount.x, authoring.districtCount.y),
+                DistrictCountRange = new int2(authoring.districtCount.x, authoring.districtCount.y),
                 DistrictMinDistance = authoring.districtMinDistance,
                 DistrictWeight = authoring.districtWeight
             };
             var sectorSettings = new SectorGenerationSettings
             {
-                SectorsPerDistrict = new int2(authoring.sectorsPerDistrict.x, authoring.sectorsPerDistrict.y),
+                SectorsPerDistrictRange = new int2(authoring.sectorsPerDistrict.x, authoring.sectorsPerDistrict.y),
                 SectorGridSize = authoring.sectorGridSize
             };
             var roomSettings = new RoomGenerationSettings
             {
-                RoomsPerSector = new int2(authoring.roomsPerSector.x, authoring.roomsPerSector.y),
+                RoomsPerSectorRange = new int2(authoring.roomsPerSector.x, authoring.roomsPerSector.y),
                 TargetLoopDensity = authoring.targetLoopDensity
             };
             var bootstrapConfig = new WorldBootstrapConfiguration(
@@ -47,15 +45,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 authoring.enableDebugVisualization,
                 authoring.logGenerationSteps
             );
-            
             AddComponent(entity, bootstrapConfig);
-            
-            // Also create the standard WorldConfiguration for compatibility with existing systems
             AddComponent(entity, new WorldConfiguration
             {
                 Seed = authoring.seed,
                 WorldSize = authoring.worldSize,
-                TargetSectors = authoring.sectorsPerDistrict.y * authoring.districtCount.y, // Max possible sectors
+                TargetSectors = authoring.sectorsPerDistrict.y * authoring.districtCount.y,
                 RandomizationMode = authoring.randomizationMode
             });
         }

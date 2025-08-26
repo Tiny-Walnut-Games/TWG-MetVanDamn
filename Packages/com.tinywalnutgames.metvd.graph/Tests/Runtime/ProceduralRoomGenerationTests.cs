@@ -1,5 +1,11 @@
 using NUnit.Framework;
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Collections;
+using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Cinemachine;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -7,7 +13,7 @@ using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Shared;
 
-namespace TinyWalnutGames.MetVD.Tests
+namespace TinyWalnutGames.MetVD.Graph.Tests
 {
     /// <summary>
     /// Tests for the Procedural Room Generation Master Spec implementation

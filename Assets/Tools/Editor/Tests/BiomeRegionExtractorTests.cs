@@ -97,7 +97,7 @@ namespace TinyWalnutGames.Tools.Editor.Tests
 
             string json = JsonUtility.ToJson(metadata);
             Assert.IsNotEmpty(json);
-            Assert.Contains("TestBiome", json);
+            Assert.IsTrue(json.Contains("TestBiome"));
 
             var deserialized = JsonUtility.FromJson<BiomeRegionExtractor.BiomeMetadata>(json);
             Assert.AreEqual("TestBiome", deserialized.biomeName);

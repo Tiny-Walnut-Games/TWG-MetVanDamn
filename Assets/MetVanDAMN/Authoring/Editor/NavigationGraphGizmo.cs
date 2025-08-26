@@ -47,13 +47,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static readonly Color[] HighContrastColors = new Color[]
         {
-            new Color(0.2f, 0.8f, 0.2f),  // Bright green
-            new Color(0.8f, 0.2f, 0.2f),  // Bright red
-            new Color(0.2f, 0.4f, 0.8f),  // Deep blue
-            new Color(1.0f, 0.6f, 0.2f),  // Orange
-            new Color(0.8f, 0.2f, 0.8f),  // Magenta
-            new Color(0.9f, 0.9f, 0.2f),  // Bright yellow
-            new Color(0.2f, 0.9f, 0.9f)   // Bright cyan
+            new(0.2f, 0.8f, 0.2f),  // Bright green
+            new(0.8f, 0.2f, 0.2f),  // Bright red
+            new(0.2f, 0.4f, 0.8f),  // Deep blue
+            new(1.0f, 0.6f, 0.2f),  // Orange
+            new(0.8f, 0.2f, 0.8f),  // Magenta
+            new(0.9f, 0.9f, 0.2f),  // Bright yellow
+            new(0.2f, 0.9f, 0.9f)   // Bright cyan
         };
 
         private Color[] _currentColors;
@@ -80,12 +80,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         public static void ToggleNavigationGraphVisualization()
         {
             var gizmos = FindObjectsOfType<NavigationGraphGizmo>();
-            bool newState = true;
-            
-            if (gizmos.Length > 0)
-            {
-                newState = !gizmos[0].showNavigationGraph;
-            }
+            bool newState = gizmos.Length == 0 || !gizmos[0].showNavigationGraph;
             
             foreach (var gizmo in gizmos)
             {
@@ -194,81 +189,79 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Draw highlighted path if specified
             if (highlightPathFromNode != 0 && highlightPathToNode != 0)
             {
-                DrawHighlightedPath(highlightPathFromNode, highlightPathToNode, testCapabilities);
+                DrawHighlightedPathFallback(highlightPathFromNode, highlightPathToNode, testCapabilities);
             }
         }
 
-        private void DrawNavigationNodes(AgentCapabilities testCapabilities)
+        private void DrawNavigationNodes(AgentCapabilities caps)
         {
-            var navNodeQuery = _entityManager.CreateEntityQuery(
+            var q = _entityManager.CreateEntityQuery(
                 ComponentType.ReadOnly<NavNode>(),
                 ComponentType.ReadOnly<NodeId>());
 
-            using var entities = navNodeQuery.ToEntityArray(Allocator.Temp);
+            using var entities = q.ToEntityArray(Allocator.Temp);
             
             for (int i = 0; i < entities.Length; i++)
             {
-                var entity = entities[i];
-                var navNode = _entityManager.GetComponentData<NavNode>(entity);
-                var nodeId = _entityManager.GetComponentData<NodeId>(entity);
+                var e = entities[i];
+                var navNode = _entityManager.GetComponentData<NavNode>(e);
+                var nodeId = _entityManager.GetComponentData<NodeId>(e);
 
-                var worldPos = navNode.WorldPosition;
-                var isReachable = navNode.IsCompatibleWith(testCapabilities);
+                var wp = navNode.WorldPosition;
+                bool reachable = navNode.IsCompatibleWith(caps);
 
                 // Choose color based on reachability
-                Gizmos.color = isReachable ? _currentColors[0] : _currentColors[1];
+                Gizmos.color = reachable ? _currentColors[0] : _currentColors[1];
 
                 // Draw node sphere
-                Gizmos.DrawWireSphere(worldPos, nodeRadius);
+                Gizmos.DrawWireSphere(wp, nodeRadius);
                 
-                if (!isReachable && showUnreachableAreas)
+                if (!reachable && showUnreachableAreas)
                 {
                     Gizmos.color = Color.red;
-                    Gizmos.DrawSphere(worldPos, nodeRadius * 0.3f);
+                    Gizmos.DrawSphere(wp, nodeRadius * 0.3f);
                 }
 
                 // Draw node labels
                 if (showNodeLabels)
                 {
-                    var labelPos = worldPos + new float3(0, labelOffset, 0);
-                    var labelText = $"N{nodeId.Value}\n{navNode.BiomeType}\n{navNode.PrimaryPolarity}";
-                    
-                    Handles.Label(labelPos, labelText, GetLabelStyle(isReachable));
+                    var lp = wp + new float3(0, labelOffset, 0);
+                    Handles.Label(lp, $"N{nodeId.Value}\n{navNode.BiomeType}\n{navNode.PrimaryPolarity}", GetLabelStyle(reachable));
                 }
             }
         }
 
-        private void DrawNavigationLinks(AgentCapabilities testCapabilities)
+        private void DrawNavigationLinks(AgentCapabilities caps)
         {
-            var linkQuery = _entityManager.CreateEntityQuery(
+            var linkQ = _entityManager.CreateEntityQuery(
                 ComponentType.ReadOnly<NavNode>(),
                 ComponentType.ReadOnly<NavLinkBufferElement>());
 
-            using var entities = linkQuery.ToEntityArray(Allocator.Temp);
+            using var entities = linkQ.ToEntityArray(Allocator.Temp);
 
             for (int i = 0; i < entities.Length; i++)
             {
-                var entity = entities[i];
-                var navNode = _entityManager.GetComponentData<NavNode>(entity);
-                var linkBuffer = _entityManager.GetBuffer<NavLinkBufferElement>(entity);
+                var e = entities[i];
+                var navNode = _entityManager.GetComponentData<NavNode>(e);
+                var buffer = _entityManager.GetBuffer<NavLinkBufferElement>(e);
 
-                for (int j = 0; j < linkBuffer.Length; j++)
+                for (int j = 0; j < buffer.Length; j++)
                 {
-                    var link = linkBuffer[j].Value;
-                    DrawNavigationLink(navNode, link, testCapabilities);
+                    var link = buffer[j].Value;
+                    DrawNavigationLink(navNode, link, caps);
                 }
             }
         }
 
-        private void DrawNavigationLink(NavNode sourceNode, NavLink link, AgentCapabilities testCapabilities)
+        private void DrawNavigationLink(NavNode source, NavLink link, AgentCapabilities caps)
         {
             var targetEntity = FindEntityByNodeId(link.ToNodeId);
             if (targetEntity == Entity.Null || !_entityManager.HasComponent<NavNode>(targetEntity))
                 return;
 
-            var targetNode = _entityManager.GetComponentData<NavNode>(targetEntity);
-            var canTraverse = link.CanTraverseWith(testCapabilities, sourceNode.NodeId);
-            var traversalCost = link.CalculateTraversalCost(testCapabilities);
+            var target = _entityManager.GetComponentData<NavNode>(targetEntity);
+            bool canTraverse = link.CanTraverseWith(caps, source.NodeId);
+            float cost = link.CalculateTraversalCost(caps);
 
             // Choose link color based on gate requirements and traversability
             Color linkColor;
@@ -288,112 +281,56 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
             // Draw link line
             Gizmos.color = linkColor;
-            var startPos = sourceNode.WorldPosition;
-            var endPos = targetNode.WorldPosition;
+            var a = source.WorldPosition;
+            var b = target.WorldPosition;
             
             // Draw arrow for directional links
             if (link.ConnectionType != ConnectionType.Bidirectional)
             {
-                DrawArrowLine(startPos, endPos, linkWidth * 0.01f);
+                DrawArrowLine(a, b, linkWidth * 0.01f);
             }
             else
             {
-                Gizmos.DrawLine(startPos, endPos);
+                Gizmos.DrawLine(a, b);
             }
 
             // Draw link cost labels
             if (showLinkCosts)
             {
-                var midPos = (startPos + endPos) * 0.5f;
-                var costText = $"Cost: {traversalCost:F1}";
+                var mid = (a + b) * 0.5f;
+                var txt = $"Cost: {cost:F1}";
                 
                 if (showGateRequirements && (link.RequiredPolarity != Polarity.None || link.RequiredAbilities != Ability.None))
                 {
-                    costText += $"\n{link.RequiredPolarity}";
+                    txt += $"\n{link.RequiredPolarity}";
                     if (link.RequiredAbilities != Ability.None)
-                        costText += $"\n{link.RequiredAbilities}";
+                        txt += $"\n{link.RequiredAbilities}";
                 }
 
-                Handles.Label(midPos, costText, GetLinkLabelStyle(canTraverse));
+                Handles.Label(mid, txt, GetLinkLabelStyle(canTraverse));
             }
         }
 
-        private void DrawHighlightedPath(uint fromNodeId, uint toNodeId, AgentCapabilities testCapabilities)
+        private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps) // TODO: find a use for caps - a valid and meaningful use.
         {
-            // Get actual calculated path from AINavigationSystem
-            var aiNavSystem = _world.GetExistingSystemManaged<AINavigationSystem>();
-            if (aiNavSystem == null)
+            // Fallback simple straight line highlight until path API exposed
+            var fromE = FindEntityByNodeId(fromId);
+            var toE = FindEntityByNodeId(toId);
+            if (fromE == Entity.Null || toE == Entity.Null)
                 return;
 
-            var fromEntity = FindEntityByNodeId(fromNodeId);
-            var toEntity = FindEntityByNodeId(toNodeId);
+            var fromNode = _entityManager.GetComponentData<NavNode>(fromE);
+            var toNode = _entityManager.GetComponentData<NavNode>(toE);
             
-            if (fromEntity == Entity.Null || toEntity == Entity.Null)
-                return;
-
-            // Get the computed path using AINavigationSystem pathfinding
-            var pathResult = AINavigationSystem.FindPath(_world, fromNodeId, toNodeId, testCapabilities);
+            Gizmos.color = _currentColors[6];
+            Gizmos.DrawLine(fromNode.WorldPosition, toNode.WorldPosition);
             
-            if (pathResult.IsValid && pathResult.PathNodes.Length > 1)
-            {
-                // Draw the actual computed path
-                Gizmos.color = _currentColors[6];
-                
-                for (int i = 0; i < pathResult.PathNodes.Length - 1; i++)
-                {
-                    var currentEntity = FindEntityByNodeId(pathResult.PathNodes[i]);
-                    var nextEntity = FindEntityByNodeId(pathResult.PathNodes[i + 1]);
-                    
-                    if (currentEntity != Entity.Null && nextEntity != Entity.Null)
-                    {
-                        var currentNode = _entityManager.GetComponentData<NavNode>(currentEntity);
-                        var nextNode = _entityManager.GetComponentData<NavNode>(nextEntity);
-                        
-                        Gizmos.DrawLine(currentNode.WorldPosition, nextNode.WorldPosition);
-                        
-                        // Draw direction arrow at midpoint
-                        var midPos = (currentNode.WorldPosition + nextNode.WorldPosition) * 0.5f;
-                        var direction = math.normalize(nextNode.WorldPosition - currentNode.WorldPosition);
-                        Gizmos.DrawWireSphere(midPos, 0.2f);
-                        Gizmos.DrawRay(midPos, direction * 0.5f);
-                    }
-                }
-                
-                // Draw path summary at midpoint
-                var startEntity = FindEntityByNodeId(pathResult.PathNodes[0]);
-                var endEntity = FindEntityByNodeId(pathResult.PathNodes[pathResult.PathNodes.Length - 1]);
-                
-                if (startEntity != Entity.Null && endEntity != Entity.Null)
-                {
-                    var startNode = _entityManager.GetComponentData<NavNode>(startEntity);
-                    var endNode = _entityManager.GetComponentData<NavNode>(endEntity);
-                    var pathMidPos = (startNode.WorldPosition + endNode.WorldPosition) * 0.5f;
-                    
-                    Handles.Label(pathMidPos, $"Path Cost: {pathResult.TotalCost:F1}\nNodes: {pathResult.PathNodes.Length}", 
-                                EditorStyles.boldLabel);
-                }
-                
-                pathResult.Dispose();
-            }
-            else
-            {
-                // No valid path found - draw failed path indication
-                var fromNode = _entityManager.GetComponentData<NavNode>(fromEntity);
-                var toNode = _entityManager.GetComponentData<NavNode>(toEntity);
-                
-                Gizmos.color = Color.red;
-                Gizmos.DrawWireLine(fromNode.WorldPosition, toNode.WorldPosition);
-                
-                var midPos = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
-                Handles.Label(midPos, "NO PATH", EditorStyles.boldLabel);
-            }
+            var mid = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
+            Handles.Label(mid, $"(Preview Path) {fromId}->{toId}", EditorStyles.boldLabel);
         }
 
         private void DrawDetailedInformation()
         {
-            if (_world == null || !_world.IsCreated)
-                return;
-
             var navGraphQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
             if (navGraphQuery.IsEmpty)
                 return;
@@ -406,42 +343,40 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var rect = new Rect(10, 10, 300, 150);
             GUI.Box(rect, "Navigation Graph Info");
             
-            var contentRect = new Rect(rect.x + 10, rect.y + 20, rect.width - 20, rect.height - 30);
+            var info = $"Nodes: {navGraph.NodeCount}\n" +
+                       $"Links: {navGraph.LinkCount}\n" +
+                       $"Ready: {navGraph.IsReady}\n" +
+                       $"Unreachable Areas: {navGraph.UnreachableAreaCount}\n" +
+                       $"Test Agent: {testAgentProfile}\n" +
+                       $"Last Rebuild: {navGraph.LastRebuildTime:F2}s";
             
-            var infoText = $"Nodes: {navGraph.NodeCount}\n" +
-                          $"Links: {navGraph.LinkCount}\n" +
-                          $"Ready: {navGraph.IsReady}\n" +
-                          $"Unreachable Areas: {navGraph.UnreachableAreaCount}\n" +
-                          $"Test Agent: {testAgentProfile}\n" +
-                          $"Last Rebuild: {navGraph.LastRebuildTime:F2}s";
-            
-            GUI.Label(contentRect, infoText);
+            GUI.Label(new Rect(rect.x + 10, rect.y + 20, rect.width - 20, rect.height - 30), info);
             
             Handles.EndGUI();
         }
 
-        private void DrawArrowLine(float3 start, float3 end, float arrowSize)
+        private void DrawArrowLine(float3 s, float3 e, float size)
         {
-            Gizmos.DrawLine(start, end);
+            Gizmos.DrawLine(s, e);
             
-            var direction = math.normalize(end - start);
-            var right = math.cross(direction, new float3(0, 1, 0));
-            var arrowHead1 = end - direction * arrowSize + right * arrowSize * 0.5f;
-            var arrowHead2 = end - direction * arrowSize - right * arrowSize * 0.5f;
+            var dir = math.normalize(e - s);
+            var right = math.cross(dir, new float3(0, 1, 0));
+            var h1 = e - dir * size + 0.5f * size * right;
+            var h2 = e - dir * size - 0.5f * size * right;
             
-            Gizmos.DrawLine(end, arrowHead1);
-            Gizmos.DrawLine(end, arrowHead2);
+            Gizmos.DrawLine(e, h1);
+            Gizmos.DrawLine(e, h2);
         }
 
         private Entity FindEntityByNodeId(uint nodeId)
         {
-            var query = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
-            using var entities = query.ToEntityArray(Allocator.Temp);
-            using var nodeIds = query.ToComponentDataArray<NodeId>(Allocator.Temp);
+            var q = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+            using var entities = q.ToEntityArray(Allocator.Temp);
+            using var ids = q.ToComponentDataArray<NodeId>(Allocator.Temp);
             
-            for (int i = 0; i < nodeIds.Length; i++)
+            for (int i = 0; i < ids.Length; i++)
             {
-                if (nodeIds[i].Value == nodeId)
+                if (ids[i].Value == nodeId)
                     return entities[i];
             }
             
@@ -452,29 +387,29 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             return testAgentProfile switch
             {
-                AgentCapabilityProfile.BasicAgent => new AgentCapabilities(Polarity.None, Ability.None, 0.0f, "BasicAgent"),
+                AgentCapabilityProfile.BasicAgent => new AgentCapabilities(Polarity.None, Ability.None, 0f, "BasicAgent"),
                 AgentCapabilityProfile.MovementAgent => new AgentCapabilities(Polarity.None, Ability.AllMovement, 0.8f, "MovementAgent"),
                 AgentCapabilityProfile.EnvironmentalAgent => new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f, "EnvironmentalAgent"),
-                AgentCapabilityProfile.PolarityAgent => new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1.0f, "PolarityAgent"),
-                AgentCapabilityProfile.MasterAgent => new AgentCapabilities(Polarity.Any, Ability.Everything, 1.0f, "MasterAgent"),
+                AgentCapabilityProfile.PolarityAgent => new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1f, "PolarityAgent"),
+                AgentCapabilityProfile.MasterAgent => new AgentCapabilities(Polarity.Any, Ability.Everything, 1f, "MasterAgent"),
                 _ => new AgentCapabilities()
             };
         }
 
-        private GUIStyle GetLabelStyle(bool isReachable)
+        private GUIStyle GetLabelStyle(bool r)
         {
-            var style = new GUIStyle(EditorStyles.label);
-            style.normal.textColor = isReachable ? Color.green : Color.red;
-            style.fontSize = 10;
-            return style;
+            var s = new GUIStyle(EditorStyles.label);
+            s.normal.textColor = r ? Color.green : Color.red;
+            s.fontSize = 10;
+            return s;
         }
 
-        private GUIStyle GetLinkLabelStyle(bool canTraverse)
+        private GUIStyle GetLinkLabelStyle(bool t)
         {
-            var style = new GUIStyle(EditorStyles.miniLabel);
-            style.normal.textColor = canTraverse ? Color.blue : Color.red;
-            style.fontSize = 9;
-            return style;
+            var s = new GUIStyle(EditorStyles.miniLabel);
+            s.normal.textColor = t ? Color.blue : Color.red;
+            s.fontSize = 9;
+            return s;
         }
     }
 
