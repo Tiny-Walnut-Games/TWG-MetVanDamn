@@ -1,3 +1,4 @@
+using System.Linq;
 using Unity.Entities;
 
 namespace TinyWalnutGames.MetVD.Graph
@@ -22,7 +23,8 @@ namespace TinyWalnutGames.MetVD.Graph
             // Ensure production system exists (managed variant in editor/test builds)
             _managedSystem = World.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
             // Add once to group if not already scheduled
-            if (!_initGroup.Systems.Contains(_managedSystem))
+            // Use ManagedSystems property instead of non-existent Systems property
+            if (!_initGroup.ManagedSystems.Contains(_managedSystem))
             {
                 _initGroup.AddSystemToUpdateList(_managedSystem);
                 _addedToGroup = true;
