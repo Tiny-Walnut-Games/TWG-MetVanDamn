@@ -1,7 +1,9 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Collections;
 using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
+using TinyWalnutGames.MetVD.Shared;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
@@ -383,6 +385,55 @@ namespace TinyWalnutGames.MetVD.Graph
             WallJumpHeight = wallJumpHeight;
             DashDistance = dashDistance;
             GlideSpeed = glideSpeed;
+        }
+    }
+
+    /// <summary>
+    /// Utility methods for type conversions and ECS operations
+    /// </summary>
+    public static class GraphTypeUtilities
+    {
+        /// <summary>
+        /// Convert uint to Entity for safe ECS operations
+        /// </summary>
+        public static Entity ToEntity(uint value)
+        {
+            return new Entity { Index = (int)(value & 0x7FFFFFFF), Version = (int)(value >> 31) };
+        }
+
+        /// <summary>
+        /// Convert Entity to uint for serialization
+        /// </summary>
+        public static uint FromEntity(Entity entity)
+        {
+            return (uint)entity.Index | ((uint)entity.Version << 31);
+        }
+
+        /// <summary>
+        /// Safe conversion from BiomeAffinity enum to BiomeType
+        /// </summary>
+        public static BiomeType ToCore(BiomeAffinity affinity)
+        {
+            return affinity switch
+            {
+                BiomeAffinity.Forest => BiomeType.SolarPlains,
+                BiomeAffinity.Desert => BiomeType.VolcanicCore,
+                BiomeAffinity.Mountain => BiomeType.CrystalCaverns,
+                BiomeAffinity.Ocean => BiomeType.DeepUnderwater,
+                BiomeAffinity.Sky => BiomeType.SkyGardens,
+                BiomeAffinity.Underground => BiomeType.ShadowRealms,
+                BiomeAffinity.TechZone => BiomeType.PowerPlant,
+                BiomeAffinity.Volcanic => BiomeType.VolcanicCore,
+                _ => BiomeType.HubArea
+            };
+        }
+
+        /// <summary>
+        /// Create BiomeAffinityComponent from BiomeAffinity enum
+        /// </summary>
+        public static BiomeAffinityComponent CreateComponent(BiomeAffinity affinity)
+        {
+            return new BiomeAffinityComponent(affinity);
         }
     }
 }
