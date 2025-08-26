@@ -15,6 +15,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         [Header("Target Reference (for baker)")]
         public GameObject target; // added for baker compatibility
+        public DistrictAuthoring districtTarget; // added for test compatibility
         
         [Header("Gate Conditions (array for tests)")] 
         public GateCondition[] gateConditions = System.Array.Empty<GateCondition>();

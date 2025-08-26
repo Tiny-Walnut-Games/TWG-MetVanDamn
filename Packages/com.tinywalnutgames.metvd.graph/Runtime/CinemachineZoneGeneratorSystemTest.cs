@@ -3,12 +3,12 @@ using Unity.Entities;
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>
-    /// SystemBase test wrapper for CinemachineZoneGeneratorSystem (production ISystem).
+    /// Test alias for CinemachineZoneGeneratorSystem.
+    /// Since CinemachineZoneGeneratorSystem is already a SystemBase, tests can use it directly.
+    /// This provides name compatibility for any tests expecting CinemachineZoneGeneratorSystemTest.
     /// </summary>
-    [DisableAutoCreation]
-    public partial class CinemachineZoneGeneratorSystemTest : SystemBase
+    public class CinemachineZoneGeneratorSystemTest : CinemachineZoneGeneratorSystem
     {
-        protected override void OnCreate() { }
-        protected override void OnUpdate() { }
+        // Inherits all functionality from CinemachineZoneGeneratorSystem
     }
 }
