@@ -78,6 +78,7 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\WorldBootstrapComponents.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\NavNode.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BuildConnectionBuffersSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Compat\LocalTransformCompat.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\NodeId.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Biome.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\ConnectionEdge.cs" />
