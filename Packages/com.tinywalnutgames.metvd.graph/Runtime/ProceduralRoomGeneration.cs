@@ -272,7 +272,11 @@ namespace TinyWalnutGames.MetVD.Graph
         GrapplePoint = 2,
         SkillGate = 3,
         Secret = 4,
-        Hazard = 5
+        Hazard = 5,
+        PowerUp = 6,
+        HealthPickup = 7,
+        SaveStation = 8,
+        Switch = 9
     }
     
     /// <summary>
@@ -323,6 +327,9 @@ namespace TinyWalnutGames.MetVD.Graph
         public int2 MaxSecretSize;
         public bool AllowStackedSecrets;
         public bool RequireHiddenAccess;
+        public float SecretAreaPercentage;
+        public bool UseAlternateRoutes;
+        public bool UseDestructibleWalls;
         
         public SecretAreaConfig(float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
         {
@@ -333,6 +340,9 @@ namespace TinyWalnutGames.MetVD.Graph
             MaxSecretSize = new int2(4, 4);
             AllowStackedSecrets = false;
             RequireHiddenAccess = true;
+            SecretAreaPercentage = 0.15f;
+            UseAlternateRoutes = false;
+            UseDestructibleWalls = false;
         }
         
         public SecretAreaConfig(float probability, int2 minSize, int2 maxSize, Ability requiredSkill, bool allowStacked, bool requireHidden)
@@ -344,6 +354,9 @@ namespace TinyWalnutGames.MetVD.Graph
             MaxSecretSize = maxSize;
             AllowStackedSecrets = allowStacked;
             RequireHiddenAccess = requireHidden;
+            SecretAreaPercentage = 0.15f;
+            UseAlternateRoutes = false;
+            UseDestructibleWalls = false;
         }
     }
     
@@ -372,12 +385,25 @@ namespace TinyWalnutGames.MetVD.Graph
         public int2 StartPosition;
         public int2 EndPosition;
         public Ability RequiredAbility;
+        public float Angle;
+        public float Velocity;
         
         public JumpConnectionElement(int2 start, int2 end, Ability requiredAbility = Ability.None)
         {
             StartPosition = start;
             EndPosition = end;
             RequiredAbility = requiredAbility;
+            Angle = 0f;
+            Velocity = 0f;
+        }
+        
+        public JumpConnectionElement(int2 start, int2 end, float angle, float velocity)
+        {
+            StartPosition = start;
+            EndPosition = end;
+            RequiredAbility = Ability.Jump;
+            Angle = angle;
+            Velocity = velocity;
         }
     }
 }

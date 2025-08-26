@@ -275,5 +275,62 @@ namespace TinyWalnutGames.MetVD.Graph
             reachablePositions.Dispose();
             return allReachable;
         }
+
+        /// <summary>
+        /// Calculate minimum platform spacing based on jump physics
+        /// </summary>
+        [BurstCompile]
+        public static float CalculateMinimumPlatformSpacing(JumpArcPhysics physics)
+        {
+            return physics.JumpDistance * 0.8f; // 80% of max jump distance for safety margin
+        }
+
+        /// <summary>
+        /// Check if a position is reachable from another position
+        /// </summary>
+        [BurstCompile]
+        public static bool IsReachable(int2 fromPos, int2 toPos, Ability playerMovement, JumpArcPhysics physics)
+        {
+            return IsPositionReachable(fromPos, toPos, playerMovement, physics);
+        }
+
+        /// <summary>
+        /// Calculate jump arc between two positions
+        /// </summary>
+        [BurstCompile]
+        public static JumpArcData CalculateJumpArc(int2 startPos, int2 endPos, JumpArcPhysics physics)
+        {
+            float2 start = startPos;
+            float2 end = endPos;
+            float2 delta = end - start;
+            
+            float horizontalDistance = math.abs(delta.x);
+            float verticalDistance = delta.y;
+            
+            // Calculate initial velocity components
+            float timeToReach = horizontalDistance / physics.JumpDistance;
+            float initialVerticalVelocity = (verticalDistance + 0.5f * physics.GravityScale * timeToReach * timeToReach) / timeToReach;
+            
+            return new JumpArcData
+            {
+                StartPosition = start,
+                EndPosition = end,
+                InitialVelocity = new float2(physics.JumpDistance / timeToReach, initialVerticalVelocity),
+                FlightTime = timeToReach,
+                ApexHeight = start.y + (initialVerticalVelocity * initialVerticalVelocity) / (2.0f * physics.GravityScale)
+            };
+        }
+    }
+
+    /// <summary>
+    /// Data structure for jump arc calculations
+    /// </summary>
+    public struct JumpArcData
+    {
+        public float2 StartPosition;
+        public float2 EndPosition;
+        public float2 InitialVelocity;
+        public float FlightTime;
+        public float ApexHeight;
     }
 }

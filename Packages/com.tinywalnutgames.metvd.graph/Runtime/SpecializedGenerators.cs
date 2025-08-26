@@ -223,13 +223,13 @@ namespace TinyWalnutGames.MetVD.Graph
         public ComponentLookup<JumpArcValidation> ValidationLookup;
         public BufferLookup<JumpConnectionElement> JumpConnectionLookup;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
         {
             if (request.GeneratorType != RoomGeneratorType.ParametricChallenge || request.IsComplete) return;
 
-            if (!JumpPhysicsLookup.HasComponent(nodeId.Value)) return;
+            if (!JumpPhysicsLookup.HasComponent(entity)) return;
 
-            var jumpPhysics = JumpPhysicsLookup[nodeId.Value];
+            var jumpPhysics = JumpPhysicsLookup[entity];
             var bounds = roomData.Bounds;
 
             // Calculate optimal platform spacing based on jump physics
@@ -265,9 +265,9 @@ namespace TinyWalnutGames.MetVD.Graph
             platformPositions.Add(new float2(bounds.x + bounds.width - 1, bounds.y + 1));
 
             // Calculate and store jump connections
-            if (JumpConnectionLookup.HasBuffer(nodeId.Value))
+            if (JumpConnectionLookup.HasBuffer(entity))
             {
-                var connections = JumpConnectionLookup[nodeId.Value];
+                var connections = JumpConnectionLookup[entity];
                 connections.Clear();
                 
                 for (int i = 0; i < platformPositions.Length - 1; i++)
@@ -275,22 +275,23 @@ namespace TinyWalnutGames.MetVD.Graph
                     var from = platformPositions[i];
                     var to = platformPositions[i + 1];
                     
-                    if (JumpArcSolver.CalculateJumpArc(from, to, jumpPhysics, out float angle, out float velocity))
-                    {
-                        connections.Add(new JumpConnectionElement(from, to, angle, velocity));
-                    }
+                    var arcData = JumpArcSolver.CalculateJumpArc((int2)from, (int2)to, jumpPhysics);
+                    float angle = math.atan2(arcData.InitialVelocity.y, arcData.InitialVelocity.x);
+                    float velocity = math.length(arcData.InitialVelocity);
+                    
+                    connections.Add(new JumpConnectionElement((int2)from, (int2)to, angle, velocity));
                 }
             }
 
             // Store validation results
-            if (ValidationLookup.HasComponent(nodeId.Value))
+            if (ValidationLookup.HasComponent(entity))
             {
                 var validation = new JumpArcValidation(
                     platformPositions.Length > 2,
-                    platformPositions.Length,
-                    platformPositions.Length - 1
+                    jumpPhysics.JumpDistance,
+                    jumpPhysics.JumpHeight
                 );
-                ValidationLookup[nodeId.Value] = validation;
+                ValidationLookup[entity] = validation;
             }
 
             platformPositions.Dispose();
@@ -348,7 +349,7 @@ namespace TinyWalnutGames.MetVD.Graph
         [ReadOnly] public BufferLookup<RoomModuleElement> ModuleBufferLookup;
         public Unity.Mathematics.Random Random;
 
-        public void Execute(ref RoomGenerationRequest request, ref RoomHierarchyData roomData, 
+        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, 
                           in NodeId nodeId, DynamicBuffer<RoomFeatureElement> features)
         {
             if (request.GeneratorType != RoomGeneratorType.WeightedTilePrefab || request.IsComplete) return;
@@ -371,16 +372,16 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Add feature to buffer
                 features.Add(new RoomFeatureElement
                 {
-                    Type = featureType,
+                    Type = ConvertToObjectType(featureType),
                     Position = pos,
                     FeatureId = (uint)(request.GenerationSeed + i)
                 });
             }
 
             // Add secret areas if configured
-            if (SecretConfigLookup.HasComponent(nodeId.Value))
+            if (SecretConfigLookup.HasComponent(entity))
             {
-                var secretConfig = SecretConfigLookup[nodeId.Value];
+                var secretConfig = SecretConfigLookup[entity];
                 GenerateSecretAreas(bounds, secretConfig, request);
             }
         }
@@ -438,6 +439,24 @@ namespace TinyWalnutGames.MetVD.Graph
             );
             
             // This would create destructible wall geometry in full implementation
+        }
+
+        /// <summary>
+        /// Convert RoomFeatureType to RoomFeatureObjectType
+        /// </summary>
+        private static RoomFeatureObjectType ConvertToObjectType(RoomFeatureType featureType)
+        {
+            return featureType switch
+            {
+                RoomFeatureType.Platform => RoomFeatureObjectType.Platform,
+                RoomFeatureType.Obstacle => RoomFeatureObjectType.Obstacle,
+                RoomFeatureType.Secret => RoomFeatureObjectType.Secret,
+                RoomFeatureType.PowerUp => RoomFeatureObjectType.PowerUp,
+                RoomFeatureType.HealthPickup => RoomFeatureObjectType.HealthPickup,
+                RoomFeatureType.SaveStation => RoomFeatureObjectType.SaveStation,
+                RoomFeatureType.Switch => RoomFeatureObjectType.Switch,
+                _ => RoomFeatureObjectType.Platform // Default fallback
+            };
         }
     }
 }
