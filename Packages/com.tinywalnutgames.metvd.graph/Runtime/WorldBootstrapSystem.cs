@@ -262,7 +262,7 @@ namespace TinyWalnutGames.MetVD.Graph
             var (primaryPolarity, secondaryPolarity) = GetBiomePolarities(biomeType, secondaryBiome);
             var difficultyModifier = CalculateBiomeDifficulty(biomeType, ref random);
             
-            state.EntityManager.AddComponentData(entity, new Biome(
+            state.EntityManager.AddComponentData(entity, new TinyWalnutGames.MetVD.Core.Biome(
                 biomeType, 
                 primaryPolarity, 
                 strength,

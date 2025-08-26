@@ -99,9 +99,9 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var biomeType = BiomeType.Unknown;
                 var primaryPolarity = Polarity.None;
                 
-                if (SystemAPI.HasComponent<Biome>(entity))
+                if (SystemAPI.HasComponent<TinyWalnutGames.MetVD.Core.Biome>(entity))
                 {
-                    var biome = SystemAPI.GetComponent<Biome>(entity);
+                    var biome = SystemAPI.GetComponent<TinyWalnutGames.MetVD.Core.Biome>(entity);
                     biomeType = biome.Type;
                     primaryPolarity = biome.PrimaryPolarity;
                 }
