@@ -73,7 +73,11 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\AuthoringBakeIntegrationTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtProfileTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WorldBootstrapTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\AINavigationTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WfcDeterminismTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\MetVanDAMN\Authoring\Tests\TinyWalnutGames.MetVD.Authoring.Tests.asmdef" />

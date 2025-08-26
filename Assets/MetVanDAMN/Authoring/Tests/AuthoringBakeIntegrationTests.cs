@@ -151,7 +151,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             var gateCondition = new GateCondition(
                 Polarity.Heat,
                 Ability.Flight,
-                GateSoftness.Soft,
+                GateSoftness.Easy,
                 0.75f,
                 "Heat Gate"
             );
@@ -161,7 +161,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             var gate = gateBuffer[0].Value;
             Assert.AreEqual(Polarity.Heat, gate.RequiredPolarity);
             Assert.AreEqual(Ability.Flight, gate.RequiredAbilities);
-            Assert.AreEqual(GateSoftness.Soft, gate.Softness);
+            Assert.AreEqual(GateSoftness.Easy, gate.Softness);
             Assert.AreEqual(0.75f, gate.MinimumSkillLevel, 0.001f);
             Assert.IsTrue(gate.Description.ToString().Contains("Heat Gate"));
         }
@@ -269,8 +269,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             World.DefaultGameObjectInjectionWorld = world;
             
             // Test invalid district with duplicate NodeId
-            var invalidDistrict1 = CreateTestDistrict("InvalidDistrict1", new NodeId { value = 999 });
-            var invalidDistrict2 = CreateTestDistrict("InvalidDistrict2", new NodeId { value = 999 }); // Duplicate!
+            var invalidDistrict1 = CreateTestDistrict("InvalidDistrict1", new NodeId { Value = 999 });
+            var invalidDistrict2 = CreateTestDistrict("InvalidDistrict2", new NodeId { Value = 999 }); // Duplicate!
             
             BakeGameObjects(world, invalidDistrict1.gameObject, invalidDistrict2.gameObject);
             
