@@ -1,4 +1,4 @@
-name: Living Dev Agent CI
+name: MetVD CI
 
 # Optimized CI with concurrency controls, path filters, and Guarded Pass system
 on:
@@ -91,6 +91,12 @@ jobs:
           echo "🔐 Validating CI token scopes for minimal permissions..."
           echo "GITHUB_TOKEN scopes: repo, workflow (read-only where possible)"
           echo "⚠️  Manual verification required: Ensure tokens have minimal required scopes"
+      - name: Activate Unity License
+        run: |
+          unity-editor -batchmode -nographics -quit -manualLicenseFile UnityLicenseFile.ulf
+          rm -f UnityLicenseFile.ulf
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           
   # 🎮 Unity test runner for MetVanDAMN - Edit mode, Play mode tests  
   unity-tests:
