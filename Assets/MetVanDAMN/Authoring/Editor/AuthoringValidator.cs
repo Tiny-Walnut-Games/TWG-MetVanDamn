@@ -91,6 +91,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Auto-fix suggestions for missing NodeIds
             SuggestAutoFixes(districtAuthorings, biomeAuthorings, report);
             
+            // Validate navigation graph connectivity and reachability
+            ValidateNavigationConnectivity(report);
+            
             // Count issues by severity
             report.errorCount = report.issues.Count(i => i.severity == ValidationSeverity.Error);
             report.warningCount = report.issues.Count(i => i.severity == ValidationSeverity.Warning);
@@ -952,6 +955,96 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 
                 usedNodeIds.Add(nextAvailableId);
                 nextAvailableId++;
+            }
+        }
+
+        /// <summary>
+        /// Validates navigation graph connectivity and identifies unreachable areas
+        /// Integrates with NavigationValidationSystem to provide comprehensive reachability analysis
+        /// </summary>
+        private static void ValidateNavigationConnectivity(ValidationReport report)
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+            {
+                report.issues.Add(new ValidationIssue(
+                    ValidationSeverity.Warning,
+                    "Navigation Validation Skipped",
+                    "World not available for navigation validation. This may be normal during scene load.",
+                    null
+                ));
+                return;
+            }
+
+            // Generate navigation validation report
+            var navReport = NavigationValidationUtility.GenerateValidationReport(world);
+            
+            try
+            {
+                // Check for unreachable areas
+                if (navReport.HasUnreachableAreas)
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Warning,
+                        "Unreachable Navigation Areas",
+                        $"Found {navReport.UnreachableNodeCount} unreachable navigation nodes. Some areas may be inaccessible to AI agents.",
+                        null
+                    ));
+                }
+
+                // Report on isolated components
+                if (navReport.IsolatedComponentCount > 1)
+                {
+                    report.issues.Add(new ValidationIssue(
+                        ValidationSeverity.Warning,
+                        "Isolated Navigation Components",
+                        $"Navigation graph has {navReport.IsolatedComponentCount} isolated components. Consider adding connections between disconnected areas.",
+                        null
+                    ));
+                }
+
+                // Check for specific navigation issues
+                for (int i = 0; i < navReport.Issues.Length; i++)
+                {
+                    var issue = navReport.Issues[i];
+                    var severity = issue.Type switch
+                    {
+                        NavigationIssueType.HardGateBlocking => ValidationSeverity.Error,
+                        NavigationIssueType.UnreachableNode => ValidationSeverity.Warning,
+                        NavigationIssueType.RequiresUnavailablePolarity => ValidationSeverity.Warning,
+                        NavigationIssueType.RequiresUnavailableAbility => ValidationSeverity.Info,
+                        _ => ValidationSeverity.Info
+                    };
+
+                    report.issues.Add(new ValidationIssue(
+                        severity,
+                        $"Navigation Issue: {issue.Type}",
+                        issue.Description.ToString(),
+                        null
+                    ));
+                }
+
+                // Generate and suggest navigation quick fixes
+                var quickFixes = NavigationValidationUtility.GenerateQuickFixSuggestions(navReport);
+                for (int i = 0; i < quickFixes.Length; i++)
+                {
+                    var fix = quickFixes[i];
+                    if (fix.Type != NavigationQuickFixType.None)
+                    {
+                        report.issues.Add(new ValidationIssue(
+                            ValidationSeverity.Info,
+                            "Navigation Quick-Fix Suggestion",
+                            $"Node {fix.TargetNodeId}: {fix.Description}",
+                            null
+                        ));
+                    }
+                }
+
+                quickFixes.Dispose();
+            }
+            finally
+            {
+                navReport.Dispose();
             }
         }
     }
