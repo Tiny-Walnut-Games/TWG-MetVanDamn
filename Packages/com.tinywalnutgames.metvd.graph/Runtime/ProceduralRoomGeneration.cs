@@ -354,7 +354,11 @@ namespace TinyWalnutGames.MetVD.Graph
         public bool HasDoubleJump;
         public bool HasWallJump;
         public bool HasGlide;
+        
+        // Compatibility shims for JumpArcSolver usage
         public float MaxJumpHeight => JumpHeight; // compatibility
+        public float DashDistance => HasGlide ? 6.0f : 4.0f; // compatibility shim
+        public float WallJumpHeight => HasWallJump ? JumpHeight * 0.8f : 0.0f; // compatibility shim
         
         public JumpPhysicsData(float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
         {

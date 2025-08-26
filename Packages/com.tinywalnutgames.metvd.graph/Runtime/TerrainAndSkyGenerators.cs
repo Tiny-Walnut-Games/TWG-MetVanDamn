@@ -814,8 +814,9 @@ namespace TinyWalnutGames.MetVD.Graph
     public static class TypeConversionUtility
     {
         /// <summary>
-        /// Convert RoomFeatureType to RoomFeatureObjectType
+        /// Convert RoomFeatureType to RoomFeatureObjectType (DEPRECATED - compatibility shim)
         /// </summary>
+        [System.Obsolete("Use RoomFeatureType directly instead")]
         public static RoomFeatureObjectType ConvertToObjectType(RoomFeatureType featureType)
         {
             return featureType switch
@@ -829,6 +830,14 @@ namespace TinyWalnutGames.MetVD.Graph
                 RoomFeatureType.Switch => RoomFeatureObjectType.Switch,
                 _ => RoomFeatureObjectType.Platform // Default fallback
             };
+        }
+        
+        /// <summary>
+        /// Compatibility shim - Use RoomFeatureType directly for new code
+        /// </summary>
+        public static RoomFeatureType NormalizeFeatureType(RoomFeatureType featureType)
+        {
+            return featureType; // Pass-through for compatibility
         }
     }
 }
