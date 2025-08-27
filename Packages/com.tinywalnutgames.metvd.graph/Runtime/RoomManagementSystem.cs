@@ -7,11 +7,6 @@ using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
-    // Stubs to avoid compile errors (replace with real implementations when available)
-    public struct RoomBiomeData : IComponentData { public bool IsResolved; public BiomeType BiomeType; public Polarity PrimaryPolarity; }
-    public struct BiomeDataRequest : IComponentData { public int Priority; public bool AllowDefaults; public BiomeDataRequest(int priority, bool allowDefaults) { Priority = priority; AllowDefaults = allowDefaults; } }
-    public static class PlayerStateUtility { public static Ability GetCurrentPlayerAbilities(EntityManager em) => Ability.None; }
-
     /// <summary>
     /// Component for tracking room state and features
     /// </summary>
