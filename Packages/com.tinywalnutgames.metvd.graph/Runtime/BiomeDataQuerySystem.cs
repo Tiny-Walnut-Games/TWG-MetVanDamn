@@ -11,37 +11,14 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     public struct RoomBiomeData : IComponentData
     {
-        /// <summary>
-        /// The resolved biome type for this room
-        /// </summary>
         public BiomeType BiomeType;
-        
-        /// <summary>
-        /// Primary polarity inherited from parent district
-        /// </summary>
         public Polarity PrimaryPolarity;
-        
-        /// <summary>
-        /// Secondary polarity for transition zones
-        /// </summary>
         public Polarity SecondaryPolarity;
-        
-        /// <summary>
-        /// Biome difficulty modifier
-        /// </summary>
         public float DifficultyModifier;
-        
-        /// <summary>
-        /// Whether this data has been resolved from parent hierarchy
-        /// </summary>
         public bool IsResolved;
-        
-        /// <summary>
-        /// Entity reference to parent district (for hierarchy queries)
-        /// </summary>
         public Entity ParentDistrict;
 
-        public RoomBiomeData(BiomeType biomeType, Polarity primaryPolarity, Entity parentDistrict, 
+        public RoomBiomeData(BiomeType biomeType, Polarity primaryPolarity, Entity parentDistrict,
                            float difficultyModifier = 1f, Polarity secondaryPolarity = Polarity.None)
         {
             BiomeType = biomeType;
@@ -71,19 +48,8 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     public struct BiomeDataRequest : IComponentData
     {
-        /// <summary>
-        /// Priority of this request (higher = process first)
-        /// </summary>
         public int Priority;
-        
-        /// <summary>
-        /// Whether to fallback to defaults if parent data unavailable
-        /// </summary>
         public bool AllowDefaults;
-        
-        /// <summary>
-        /// Maximum distance to search for parent biome data
-        /// </summary>
         public int MaxSearchDepth;
 
         public BiomeDataRequest(int priority = 0, bool allowDefaults = true, int maxSearchDepth = 3)
@@ -96,14 +62,14 @@ namespace TinyWalnutGames.MetVD.Graph
 
     /// <summary>
     /// System that resolves biome data for rooms by querying parent district/sector hierarchy
-    /// Replaces hardcoded default values in RoomManagementSystem
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateBefore(typeof(RoomManagementSystem))]
     public partial struct BiomeDataQuerySystem : ISystem
     {
-        private ComponentLookup<Biome> _biomeLookup;
+        // NOTE: Fully qualify Core.Biome to avoid ambiguity with any Biome namespace
+        private ComponentLookup<TinyWalnutGames.MetVD.Core.Biome> _biomeLookup;
         private ComponentLookup<RoomBiomeData> _roomBiomeDataLookup;
         private BufferLookup<ConnectionBufferElement> _connectionLookup;
         private EntityQuery _requestQuery;
@@ -111,10 +77,10 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _biomeLookup = state.GetComponentLookup<Biome>(true);
+            _biomeLookup = state.GetComponentLookup<TinyWalnutGames.MetVD.Core.Biome>(true);
             _roomBiomeDataLookup = state.GetComponentLookup<RoomBiomeData>();
             _connectionLookup = state.GetBufferLookup<ConnectionBufferElement>(true);
-            
+
             _requestQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<BiomeDataRequest>()
                 .WithNone<RoomBiomeData>()
@@ -147,23 +113,20 @@ namespace TinyWalnutGames.MetVD.Graph
     [BurstCompile]
     public partial struct BiomeDataResolveJob : IJobEntity
     {
-        [ReadOnly] public ComponentLookup<Biome> BiomeLookup;
+        [ReadOnly] public ComponentLookup<TinyWalnutGames.MetVD.Core.Biome> BiomeLookup;
         public ComponentLookup<RoomBiomeData> RoomBiomeDataLookup;
         [ReadOnly] public BufferLookup<ConnectionBufferElement> ConnectionLookup;
 
         public void Execute(Entity entity, in BiomeDataRequest request, in NodeId nodeId)
         {
             var resolvedData = ResolveFromHierarchy(entity, request, nodeId);
-            
-            // Add the resolved biome data component
             RoomBiomeDataLookup[entity] = resolvedData;
         }
 
         private RoomBiomeData ResolveFromHierarchy(Entity roomEntity, BiomeDataRequest request, NodeId nodeId)
         {
-            // Try to find parent district with biome data
             var parentDistrict = FindParentDistrict(roomEntity, request.MaxSearchDepth);
-            
+
             if (parentDistrict != Entity.Null && BiomeLookup.HasComponent(parentDistrict))
             {
                 var parentBiome = BiomeLookup[parentDistrict];
@@ -175,72 +138,46 @@ namespace TinyWalnutGames.MetVD.Graph
                     parentBiome.SecondaryPolarity
                 );
             }
-            
-            // Try to infer from sibling rooms
+
             var siblingBiome = FindSiblingBiome(roomEntity, nodeId);
             if (siblingBiome.BiomeType != BiomeType.Unknown)
-            {
                 return siblingBiome;
-            }
-            
-            // Fallback to intelligent defaults based on node position or characteristics
+
             if (request.AllowDefaults)
-            {
                 return CreateIntelligentDefault(nodeId, parentDistrict);
-            }
-            
-            // Return unresolved marker
+
             return RoomBiomeData.CreateUnresolved(parentDistrict);
         }
 
         private Entity FindParentDistrict(Entity roomEntity, int maxDepth)
         {
-            // Walk up the hierarchy looking for a district entity with biome data
-            // This would use actual hierarchy traversal in a full implementation
-            // For now, return Entity.Null to indicate no parent found
-            
-            // In practice, this would:
-            // 1. Check if roomEntity has a parent component/reference
-            // 2. Traverse up the hierarchy checking each parent for Biome component
-            // 3. Return the first entity found with biome data
-            // 4. Respect maxDepth to avoid infinite loops
-            
-            return Entity.Null;
+            return Entity.Null; // Placeholder traversal
         }
 
         private RoomBiomeData FindSiblingBiome(Entity roomEntity, NodeId nodeId)
         {
-            // Look at connected/nearby rooms to infer biome type
-            // This would use the connection system in a full implementation
-            
             if (ConnectionLookup.HasBuffer(roomEntity))
             {
                 var connections = ConnectionLookup[roomEntity];
                 foreach (var connection in connections)
                 {
-                    // Check connected nodes for biome data
-                    // In practice, would resolve connection.ToNodeId to entity and check biome
+                    // Future: inspect connected entities for existing biome data
                 }
             }
-            
             return RoomBiomeData.CreateUnresolved(Entity.Null);
         }
 
         private RoomBiomeData CreateIntelligentDefault(NodeId nodeId, Entity parentDistrict)
         {
-            // Create intelligent defaults based on node characteristics
             var biomeType = InferBiomeFromNodeId(nodeId);
             var polarity = InferPolarityFromBiome(biomeType);
-            
             return new RoomBiomeData(biomeType, polarity, parentDistrict, 1f);
         }
 
         private BiomeType InferBiomeFromNodeId(NodeId nodeId)
         {
-            // Use node ID to deterministically assign biome types
             var hash = nodeId.Value;
-            var biomeIndex = hash % 8; // Distribute across common biome types
-            
+            var biomeIndex = hash % 8;
             return biomeIndex switch
             {
                 0 => BiomeType.HubArea,
@@ -251,25 +188,22 @@ namespace TinyWalnutGames.MetVD.Graph
                 5 => BiomeType.FrozenWastes,
                 6 => BiomeType.Forest,
                 7 => BiomeType.VolcanicCore,
-                _ => BiomeType.HubArea // Fallback
+                _ => BiomeType.HubArea
             };
         }
 
-        private Polarity InferPolarityFromBiome(BiomeType biomeType)
+        private Polarity InferPolarityFromBiome(BiomeType biomeType) => biomeType switch
         {
-            return biomeType switch
-            {
-                BiomeType.SkyGardens => Polarity.Sun | Polarity.Wind,
-                BiomeType.ShadowRealms => Polarity.Moon,
-                BiomeType.CrystalCaverns => Polarity.Cold | Polarity.Earth,
-                BiomeType.PowerPlant => Polarity.Tech | Polarity.Heat,
-                BiomeType.FrozenWastes => Polarity.Cold | Polarity.Wind,
-                BiomeType.Forest => Polarity.Life | Polarity.Earth,
-                BiomeType.VolcanicCore => Polarity.Heat | Polarity.Earth,
-                BiomeType.HubArea => Polarity.None,
-                _ => Polarity.None
-            };
-        }
+            BiomeType.SkyGardens => Polarity.Wind,
+            BiomeType.ShadowRealms => Polarity.Moon,
+            BiomeType.CrystalCaverns => Polarity.Cold | Polarity.Earth,
+            BiomeType.PowerPlant => Polarity.Tech | Polarity.Heat,
+            BiomeType.FrozenWastes => Polarity.Cold | Polarity.Wind,
+            BiomeType.Forest => Polarity.Life | Polarity.Earth,
+            BiomeType.VolcanicCore => Polarity.Heat | Polarity.Earth,
+            BiomeType.HubArea => Polarity.None,
+            _ => Polarity.None
+        };
     }
 
     /// <summary>
@@ -296,16 +230,23 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             if (_roomsNeedingBiomeData.IsEmpty) return;
 
+            // NOTE: Original playback pattern (ecb.Playback(state.EntityManager, state.Dependency)) removed because
+            // the overload with JobHandle does not exist in the current Entities version. We complete the scheduled
+            // job then playback/dispose explicitly. (Original code kept in comment for reference.)
+            // ORIGINAL (legacy):
+            // state.Dependency = addRequestJob.ScheduleParallel(_roomsNeedingBiomeData, state.Dependency);
+            // state.Dependency = ecb.Playback(state.EntityManager, state.Dependency);
+            // ecb.Dispose(state.Dependency);
+
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
-            
             var addRequestJob = new AddBiomeDataRequestJob
             {
                 ECB = ecb.AsParallelWriter()
             };
-
             state.Dependency = addRequestJob.ScheduleParallel(_roomsNeedingBiomeData, state.Dependency);
-            state.Dependency = ecb.Playback(state.EntityManager, state.Dependency);
-            ecb.Dispose(state.Dependency);
+            state.Dependency.Complete(); // Ensure job finished before playback (non-destructive deterministic pattern)
+            ecb.Playback(state.EntityManager);
+            ecb.Dispose();
         }
     }
 
@@ -319,24 +260,25 @@ namespace TinyWalnutGames.MetVD.Graph
 
         public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, in RoomHierarchyData roomData)
         {
-            // Add request with priority based on room type
             var priority = GetRequestPriority(roomData.Type);
             var request = new BiomeDataRequest(priority, allowDefaults: true, maxSearchDepth: 3);
-            
             ECB.AddComponent(chunkIndex, entity, request);
         }
 
         private int GetRequestPriority(RoomType roomType)
         {
+            // Updated to reflect current RoomType enum (removed: Special, Secret, Standard, Corridor)
             return roomType switch
             {
-                RoomType.Boss => 10,      // High priority
-                RoomType.Special => 8,    // High priority
-                RoomType.Secret => 6,     // Medium priority
-                RoomType.Save => 5,       // Medium priority
-                RoomType.Standard => 3,   // Normal priority
-                RoomType.Corridor => 1,   // Low priority
-                _ => 0                    // Default priority
+                RoomType.Boss => 10,
+                RoomType.Treasure => 8,
+                RoomType.Entrance => 7,
+                RoomType.Exit => 7,
+                RoomType.Save => 5,
+                RoomType.Shop => 5,
+                RoomType.Normal => 3,
+                RoomType.Hub => 2,
+                _ => 1
             };
         }
     }
