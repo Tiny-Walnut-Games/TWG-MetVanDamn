@@ -103,7 +103,7 @@ namespace TinyWalnutGames.MetVD.Graph
     [UpdateBefore(typeof(RoomManagementSystem))]
     public partial struct BiomeDataQuerySystem : ISystem
     {
-        private ComponentLookup<Biome> _biomeLookup;
+        private ComponentLookup<TinyWalnutGames.MetVD.Core.Biome> _biomeLookup;
         private ComponentLookup<RoomBiomeData> _roomBiomeDataLookup;
         private BufferLookup<ConnectionBufferElement> _connectionLookup;
         private EntityQuery _requestQuery;
@@ -111,7 +111,7 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _biomeLookup = state.GetComponentLookup<Biome>(true);
+            _biomeLookup = state.GetComponentLookup<TinyWalnutGames.MetVD.Core.Biome>(true);
             _roomBiomeDataLookup = state.GetComponentLookup<RoomBiomeData>();
             _connectionLookup = state.GetBufferLookup<ConnectionBufferElement>(true);
             
@@ -147,7 +147,7 @@ namespace TinyWalnutGames.MetVD.Graph
     [BurstCompile]
     public partial struct BiomeDataResolveJob : IJobEntity
     {
-        [ReadOnly] public ComponentLookup<Biome> BiomeLookup;
+        [ReadOnly] public ComponentLookup<TinyWalnutGames.MetVD.Core.Biome> BiomeLookup;
         public ComponentLookup<RoomBiomeData> RoomBiomeDataLookup;
         [ReadOnly] public BufferLookup<ConnectionBufferElement> ConnectionLookup;
 
@@ -201,7 +201,7 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int depth = 0; depth < maxDepth; depth++)
             {
                 // Check if current entity has biome data
-                if (SystemAPI.HasComponent<Biome>(currentEntity))
+                if (SystemAPI.HasComponent<TinyWalnutGames.MetVD.Core.Biome>(currentEntity))
                 {
                     return currentEntity;
                 }
@@ -362,11 +362,13 @@ namespace TinyWalnutGames.MetVD.Graph
             return roomType switch
             {
                 RoomType.Boss => 10,      // High priority
-                RoomType.Special => 8,    // High priority
-                RoomType.Secret => 6,     // Medium priority
+                RoomType.Treasure => 8,   // High priority (was Special)
+                RoomType.Shop => 6,       // Medium priority (was Secret)
                 RoomType.Save => 5,       // Medium priority
-                RoomType.Standard => 3,   // Normal priority
-                RoomType.Corridor => 1,   // Low priority
+                RoomType.Normal => 3,     // Normal priority (was Standard)
+                RoomType.Hub => 4,        // Normal priority (was Corridor)
+                RoomType.Entrance => 7,   // High priority
+                RoomType.Exit => 7,       // High priority
                 _ => 0                    // Default priority
             };
         }

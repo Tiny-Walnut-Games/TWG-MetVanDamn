@@ -40,6 +40,16 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Maximum ability energy
         /// </summary>
         public float MaxAbilityEnergy;
+        
+        /// <summary>
+        /// Timer for temporary abilities (countdown in seconds)
+        /// </summary>
+        public float TemporaryAbilityTimer;
+        
+        /// <summary>
+        /// Rate of energy regeneration per second
+        /// </summary>
+        public float EnergyRegenRate;
 
         public PlayerSkillState(Ability initialAbilities = Ability.Jump | Ability.DoubleJump, int level = 1)
         {
@@ -49,6 +59,8 @@ namespace TinyWalnutGames.MetVD.Graph
             ExperiencePoints = 0f;
             AbilityEnergy = 100f;
             MaxAbilityEnergy = 100f;
+            TemporaryAbilityTimer = 0f;
+            EnergyRegenRate = 10f; // 10 energy per second default
         }
 
         /// <summary>
@@ -252,16 +264,16 @@ namespace TinyWalnutGames.MetVD.Graph
             if (skillState.TemporaryAbilityTimer <= 0f)
             {
                 // Remove temporary abilities that have expired
-                skillState.TemporaryAbilities = PlayerAbility.None;
+                skillState.TemporaryAbilities = Ability.None;
                 skillState.TemporaryAbilityTimer = 0f;
             }
             
             // Update energy regeneration
-            if (skillState.CurrentEnergy < skillState.MaxEnergy)
+            if (skillState.AbilityEnergy < skillState.MaxAbilityEnergy)
             {
-                skillState.CurrentEnergy = math.min(
-                    skillState.MaxEnergy,
-                    skillState.CurrentEnergy + skillState.EnergyRegenRate * DeltaTime
+                skillState.AbilityEnergy = math.min(
+                    skillState.MaxAbilityEnergy,
+                    skillState.AbilityEnergy + skillState.EnergyRegenRate * DeltaTime
                 );
             }
         }
