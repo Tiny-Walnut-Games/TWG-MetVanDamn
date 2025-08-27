@@ -178,7 +178,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 PopulateRoomFeatures(featuresBuffer, in roomData, ref random);
 
                 // Initialize room generation request for new procedural pipeline
-                InitializeRoomGenerationRequest(state.EntityManager, entity, roomData, nodeId, ref random);
+                InitializeRoomGenerationRequest(state.EntityManager, entity, roomData, nodeId, ref random, ref state);
             }
         }
 
@@ -187,20 +187,30 @@ namespace TinyWalnutGames.MetVD.Graph
         /// </summary>
         private static void InitializeRoomGenerationRequest(EntityManager entityManager, Entity roomEntity, 
                                                            RoomHierarchyData roomData, NodeId nodeId, 
-                                                           ref Unity.Mathematics.Random random)
+                                                           ref Unity.Mathematics.Random random, ref SystemState state)
         {
             // Determine generator type based on room type and characteristics
             var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
             
-            // Get biome information if available
+            // Get biome information from parent hierarchy
             var targetBiome = BiomeType.HubArea;
             var targetPolarity = Polarity.None;
             
-            // In a full implementation, would query for biome data from parent district/sector
-            // For now, use default values
+            // Request biome data resolution from parent district/sector hierarchy
+            var biomeRequest = new BiomeDataRequest(roomEntity, new NodeId(nodeId.ParentId, 0), new NodeId(nodeId.ParentId, 1), false);
+            entityManager.AddComponentData(roomEntity, biomeRequest);
             
-            // Determine available skills (in full implementation, would come from player state)
-            var availableSkills = Ability.Jump | Ability.DoubleJump; // Basic starting abilities
+            // If immediate biome data is needed, try to resolve synchronously
+            if (TryGetImmediateBiomeData(nodeId, out var immediateData))
+            {
+                targetBiome = immediateData.BiomeType;
+                targetPolarity = immediateData.Polarity;
+                entityManager.AddComponentData(roomEntity, immediateData);
+            }
+            
+            // Get available skills from player state system  
+            var playerEntity = FindPlayerEntity(ref state);
+            var availableSkills = GetPlayerAvailableSkills(ref state, playerEntity);
             
             var generationRequest = new RoomGenerationRequest(
                 generatorType, 
@@ -412,6 +422,48 @@ namespace TinyWalnutGames.MetVD.Graph
                 );
                 features.Add(new RoomFeatureElement(RoomFeatureType.HealthPickup, healthPos, random.NextUInt()));
             }
+        }
+
+        /// <summary>
+        /// Find the player entity in the world
+        /// </summary>
+        private static Entity FindPlayerEntity(ref SystemState state)
+        {
+            // In a full implementation, this would use a player tag or singleton
+            // For now, try to find entity with PlayerSkillState component
+            var playerQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<PlayerSkillState>()
+                .Build(ref state);
+                
+            if (playerQuery.IsEmpty)
+                return Entity.Null;
+                
+            return playerQuery.GetSingletonEntity();
+        }
+
+        /// <summary>
+        /// Try to get immediate biome data from cached sources
+        /// </summary>
+        private static bool TryGetImmediateBiomeData(NodeId nodeId, out RoomBiomeData biomeData)
+        {
+            biomeData = default;
+            // In a full implementation, this would check caches or immediate parent lookups
+            // For now, return false to use async resolution
+            return false;
+        }
+
+        /// <summary>
+        /// Get available skills from player state system
+        /// </summary>
+        private static Ability GetPlayerAvailableSkills(ref SystemState state, Entity playerEntity)
+        {
+            if (playerEntity != Entity.Null)
+            {
+                return PlayerStateUtility.GetAvailableAbilities(ref state, playerEntity);
+            }
+            
+            // Default starting abilities if no player found
+            return Ability.Jump | Ability.DoubleJump;
         }
     }
 }

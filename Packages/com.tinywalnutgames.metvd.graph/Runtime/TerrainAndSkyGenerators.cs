@@ -755,21 +755,38 @@ namespace TinyWalnutGames.MetVD.Graph
         private void AddCloudMotionFeature(DynamicBuffer<RoomFeatureElement> features, int cloudX, int cloudY, 
                                          CloudMotionType motionType, uint seed, int layerIndex, int cloudIndex)
         {
-            // In a full implementation, this would add motion components
-            // For now, we'll add a marker feature to indicate motion type
-            var motionFeatureType = motionType switch
+            // Create the cloud platform feature
+            var featureType = motionType switch
             {
-                CloudMotionType.Conveyor => RoomFeatureType.Platform, // Could be ConveyorPlatform
-                CloudMotionType.Electric => RoomFeatureType.Obstacle, // Could be ElectricCloud
+                CloudMotionType.Conveyor => RoomFeatureType.Platform,
+                CloudMotionType.Electric => RoomFeatureType.Obstacle,
                 _ => RoomFeatureType.Platform
             };
             
-            // Add motion indicator (in practice this would be a separate motion component)
+            var cloudFeature = new RoomFeatureElement
+            {
+                Type = featureType,
+                Position = new int2(cloudX, cloudY),
+                FeatureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100)
+            };
+            
+            features.Add(cloudFeature);
+            
+            // Request cloud motion component to be added to the generated entity
+            var motionRequest = new CloudMotionFeatureRequest
+            {
+                MotionType = motionType,
+                Position = new float3(cloudX, cloudY, 0),
+                MovementBounds = new RectInt(cloudX - 10, cloudY - 5, 20, 10), // 20x10 movement area
+                FeatureId = cloudFeature.FeatureId
+            };
+            
             features.Add(new RoomFeatureElement
             {
-                Type = motionFeatureType,
+                Type = RoomFeatureType.MotionComponent, // Special marker for motion system
                 Position = new int2(cloudX, cloudY + 1),
-                FeatureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100 + 50) // Motion feature ID
+                FeatureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100 + 50), // Motion feature ID
+                CustomData = math.asint(motionRequest.MotionType) // Store motion type in custom data
             });
         }
 
@@ -806,6 +823,17 @@ namespace TinyWalnutGames.MetVD.Graph
         Gusty = 1,     // Irregular wind patterns
         Conveyor = 2,  // Mechanical conveyor-like movement
         Electric = 3   // Rapid, energetic movement
+    }
+
+    /// <summary>
+    /// Request structure for adding cloud motion components
+    /// </summary>
+    public struct CloudMotionFeatureRequest
+    {
+        public CloudMotionType MotionType;
+        public float3 Position;
+        public RectInt MovementBounds;
+        public uint FeatureId;
     }
 
     /// <summary>

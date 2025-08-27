@@ -447,7 +447,51 @@ namespace TinyWalnutGames.MetVD.Graph
                 Random.NextInt(bounds.y, bounds.y + bounds.height - config.MinSecretSize.y)
             );
             
-            // This would create actual alternate geometry in full implementation
+            // Create actual alternate geometry with L-shaped path
+            var secretArea = new RectInt(
+                routeStart.x,
+                routeStart.y,
+                config.MaxSecretSize.x,
+                config.MaxSecretSize.y
+            );
+            
+            // Create horizontal segment of L-shape
+            for (int x = secretArea.xMin; x < secretArea.xMax; x++)
+            {
+                Features.Add(new RoomFeatureElement
+                {
+                    Type = RoomFeatureType.Platform,
+                    Position = new int2(x, secretArea.yMin),
+                    FeatureId = (uint)(request.GenerationSeed + index * 1000 + x)
+                });
+            }
+            
+            // Create vertical segment of L-shape
+            for (int y = secretArea.yMin; y < secretArea.yMax; y++)
+            {
+                Features.Add(new RoomFeatureElement
+                {
+                    Type = RoomFeatureType.Platform,
+                    Position = new int2(secretArea.xMax - 1, y),
+                    FeatureId = (uint)(request.GenerationSeed + index * 1000 + 100 + y)
+                });
+            }
+            
+            // Add connection points to main path
+            Features.Add(new RoomFeatureElement
+            {
+                Type = RoomFeatureType.GrapplePoint,
+                Position = new int2(secretArea.xMin - 1, secretArea.yMin + 1),
+                FeatureId = (uint)(request.GenerationSeed + index * 1000 + 500)
+            });
+            
+            // Add secret reward at the end
+            Features.Add(new RoomFeatureElement
+            {
+                Type = RoomFeatureType.Secret,
+                Position = new int2(secretArea.xMax - 1, secretArea.yMax - 1),
+                FeatureId = (uint)(request.GenerationSeed + index * 1000 + 600)
+            });
         }
 
         private void GenerateDestructibleWall(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, int index)
@@ -458,7 +502,61 @@ namespace TinyWalnutGames.MetVD.Graph
                 Random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
             );
             
-            // This would create destructible wall geometry in full implementation
+            // Create destructible wall cluster with secret area behind it
+            var wallClusterSize = new int2(3, 2); // 3x2 wall cluster
+            var secretAreaBehind = new RectInt(
+                wallPos.x + wallClusterSize.x,
+                wallPos.y - 1,
+                config.MinSecretSize.x,
+                config.MinSecretSize.y
+            );
+            
+            // Generate wall tiles that can be destroyed
+            for (int x = 0; x < wallClusterSize.x; x++)
+            {
+                for (int y = 0; y < wallClusterSize.y; y++)
+                {
+                    var wallTilePos = wallPos + new int2(x, y);
+                    Features.Add(new RoomFeatureElement
+                    {
+                        Type = RoomFeatureType.Obstacle,
+                        Position = wallTilePos,
+                        FeatureId = (uint)(request.GenerationSeed + index * 2000 + x * 10 + y),
+                        CustomData = 1 // Mark as destructible (custom data = 1)
+                    });
+                }
+            }
+            
+            // Create the secret area behind the wall
+            for (int x = secretAreaBehind.xMin; x < secretAreaBehind.xMax; x++)
+            {
+                // Floor platform
+                Features.Add(new RoomFeatureElement
+                {
+                    Type = RoomFeatureType.Platform,
+                    Position = new int2(x, secretAreaBehind.yMin),
+                    FeatureId = (uint)(request.GenerationSeed + index * 2000 + 500 + x)
+                });
+            }
+            
+            // Add secret treasure in the hidden area
+            Features.Add(new RoomFeatureElement
+            {
+                Type = RoomFeatureType.Secret,
+                Position = new int2(secretAreaBehind.center.x, secretAreaBehind.yMin + 1),
+                FeatureId = (uint)(request.GenerationSeed + index * 2000 + 700)
+            });
+            
+            // Optional: Add a health pickup as additional reward
+            if (Random.NextFloat() < 0.3f)
+            {
+                Features.Add(new RoomFeatureElement
+                {
+                    Type = RoomFeatureType.HealthPickup,
+                    Position = new int2(secretAreaBehind.xMax - 1, secretAreaBehind.yMin + 1),
+                    FeatureId = (uint)(request.GenerationSeed + index * 2000 + 800)
+                });
+            }
         }
 
         /// <summary>
