@@ -335,8 +335,9 @@ namespace TinyWalnutGames.MetVD.Graph
             };
 
             state.Dependency = addRequestJob.ScheduleParallel(_roomsNeedingBiomeData, state.Dependency);
-            state.Dependency = ecb.Playback(state.EntityManager, state.Dependency);
-            ecb.Dispose(state.Dependency);
+            state.Dependency.Complete(); // Complete job before playback
+            ecb.Playback(state.EntityManager);
+            ecb.Dispose();
         }
     }
 
