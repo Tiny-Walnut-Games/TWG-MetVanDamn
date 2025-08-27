@@ -95,95 +95,158 @@ namespace TinyWalnutGames.MetVD.Authoring
         private EntityQuery _navigationRequestQuery;
         private EntityQuery _navNodeQuery;
 
+        // Added: fast lookup for nodeId -> Entity
+        private NativeParallelHashMap<uint, Entity> _nodeIndex;
+        private int _lastNodeCount;
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            // Query for entities requesting pathfinding
             _navigationRequestQuery = SystemAPI.QueryBuilder()
                 .WithAll<AINavigationState, AgentCapabilities>()
                 .WithAny<PathNodeBufferElement>()
                 .Build();
 
-            // Query for navigation nodes
             _navNodeQuery = SystemAPI.QueryBuilder()
-                .WithAll<NavNode, NavLinkBufferElement>()
+                .WithAll<NavNode, NavLinkBufferElement, NodeId>()
                 .Build();
+
+            _nodeIndex = new NativeParallelHashMap<uint, Entity>(128, Allocator.Persistent);
+            _lastNodeCount = 0;
 
             state.RequireForUpdate(_navigationRequestQuery);
             state.RequireForUpdate<NavigationGraph>();
         }
 
         [BurstCompile]
+        public void OnDestroy(ref SystemState state)
+        {
+            if (_nodeIndex.IsCreated)
+                _nodeIndex.Dispose();
+        }
+
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            int currentCount = _navNodeQuery.CalculateEntityCount();
+            if (currentCount != _lastNodeCount)
+            {
+                RebuildNodeIndex(ref state, currentCount);
+                _lastNodeCount = currentCount;
+            }
+
             var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
             if (!navGraph.IsReady)
                 return;
 
-            // Process navigation requests
+            // Prepare lookups once (meaningful SystemState use)
+            var navNodeLookup = state.GetComponentLookup<NavNode>(true);
+            var nodeIdLookup  = state.GetComponentLookup<NodeId>(true);
+            var linkBufferLookup = state.GetBufferLookup<NavLinkBufferElement>(true);
+
             foreach (var (navState, capabilities, pathBuffer, entity) in 
                      SystemAPI.Query<RefRW<AINavigationState>, RefRO<AgentCapabilities>, DynamicBuffer<PathNodeBufferElement>>()
                      .WithEntityAccess())
             {
                 var nav = navState.ValueRW;
-                
-                // Skip if no target or already at target
                 if (nav.TargetNodeId == 0 || nav.CurrentNodeId == nav.TargetNodeId)
                 {
                     nav.Status = PathfindingStatus.Idle;
                     continue;
                 }
-                
-                // Skip if currently pathfinding
                 if (nav.Status == PathfindingStatus.Searching)
                     continue;
 
-                // Start pathfinding
                 nav.Status = PathfindingStatus.Searching;
                 nav.LastPathfindTime = SystemAPI.Time.ElapsedTime;
-                
-                var pathfindingResult = FindPath(ref state, nav.CurrentNodeId, nav.TargetNodeId, capabilities.ValueRO);
-                
-                // Update navigation state based on result
+
+                var pathfindingResult = FindPath(
+                    ref state,
+                    nav.CurrentNodeId,
+                    nav.TargetNodeId,
+                    capabilities.ValueRO,
+                    navNodeLookup,
+                    nodeIdLookup,
+                    linkBufferLookup
+                );
+
                 if (pathfindingResult.Success)
                 {
                     nav.Status = PathfindingStatus.PathFound;
                     nav.PathLength = pathfindingResult.PathLength;
                     nav.PathCost = pathfindingResult.TotalCost;
                     nav.CurrentPathStep = 0;
-                    
-                    // Clear existing path and add new one
                     pathBuffer.Clear();
                     for (int i = 0; i < pathfindingResult.PathLength; i++)
                     {
-                        pathBuffer.Add(new PathNodeBufferElement 
-                        { 
+                        pathBuffer.Add(new PathNodeBufferElement
+                        {
                             NodeId = pathfindingResult.Path[i],
-                            TraversalCost = i < pathfindingResult.PathLength - 1 ? 
-                                           pathfindingResult.PathCosts[i] : 0.0f
+                            TraversalCost = i < pathfindingResult.PathLength - 1
+                                ? pathfindingResult.PathCosts[i]
+                                : 0.0f
                         });
                     }
                 }
                 else
                 {
-                    nav.Status = pathfindingResult.PathLength == 0 ? 
-                                 PathfindingStatus.TargetUnreachable : 
-                                 PathfindingStatus.NoPathFound;
+                    nav.Status = pathfindingResult.PathLength == 0
+                        ? PathfindingStatus.TargetUnreachable
+                        : PathfindingStatus.NoPathFound;
                     nav.PathLength = 0;
                     nav.PathCost = float.MaxValue;
                     pathBuffer.Clear();
                 }
 
-                // Dispose temporary path arrays
-                if (pathfindingResult.Path.IsCreated)
-                    pathfindingResult.Path.Dispose();
-                if (pathfindingResult.PathCosts.IsCreated)
-                    pathfindingResult.PathCosts.Dispose();
+                if (pathfindingResult.Path.IsCreated) pathfindingResult.Path.Dispose();
+                if (pathfindingResult.PathCosts.IsCreated) pathfindingResult.PathCosts.Dispose();
+
+                navState.ValueRW = nav;
             }
         }
 
         [BurstCompile]
-        private PathfindingResult FindPath(ref SystemState state, uint startNodeId, uint targetNodeId, AgentCapabilities capabilities)
+        private Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
+        {
+            if (nodeId == 0)
+                return Entity.Null;
+
+            // Fast path: cache hit + validation
+            if (_nodeIndex.IsCreated && _nodeIndex.TryGetValue(nodeId, out var e))
+            {
+                var em = state.EntityManager;
+                if (em.Exists(e) && em.HasComponent<NodeId>(e))
+                    return e;
+
+                // Stale entry: remove and fall through to recovery
+                _nodeIndex.Remove(nodeId);
+            }
+
+            if (!_nodeIndex.IsCreated)
+                return Entity.Null;
+
+            // Recovery / lazy rebuild if structural change slipped past counter heuristic
+            int count = _navNodeQuery.CalculateEntityCount();
+            if (count != _lastNodeCount)
+            {
+                RebuildNodeIndex(ref state, count);
+                _lastNodeCount = count;
+                if (_nodeIndex.TryGetValue(nodeId, out var rebuilt))
+                    return rebuilt;
+            }
+
+            return Entity.Null;
+        }
+
+        [BurstCompile]
+        private PathfindingResult FindPath(
+            ref SystemState state,
+            uint startNodeId,
+            uint targetNodeId,
+            AgentCapabilities capabilities,
+            ComponentLookup<NavNode> navNodeLookup,
+            ComponentLookup<NodeId> nodeIdLookup,
+            BufferLookup<NavLinkBufferElement> linkBufferLookup)
         {
             var maxNodes = 1000; // Reasonable limit for pathfinding
             
@@ -221,10 +284,10 @@ namespace TinyWalnutGames.MetVD.Authoring
 
                     // Process neighbors
                     var currentEntity = FindEntityByNodeId(ref state, currentNodeId);
-                    if (currentEntity == Entity.Null || !SystemAPI.HasBuffer<NavLinkBufferElement>(currentEntity))
+                    if (currentEntity == Entity.Null || !linkBufferLookup.HasBuffer(currentEntity))
                         continue;
 
-                    var linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(currentEntity);
+                    var linkBuffer = linkBufferLookup[currentEntity];
                     for (int i = 0; i < linkBuffer.Length; i++)
                     {
                         var link = linkBuffer[i].Value;
@@ -417,13 +480,48 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
+        private void RebuildNodeIndex(ref SystemState state, int estimatedCapacity)
+        {
+            if (!_nodeIndex.IsCreated)
+            {
+                _nodeIndex = new NativeParallelHashMap<uint, Entity>(estimatedCapacity, Allocator.Persistent);
+            }
+            else
+            {
+                _nodeIndex.Clear();
+                // Grow if needed
+                if (_nodeIndex.Capacity < estimatedCapacity)
+                    _nodeIndex.Capacity = estimatedCapacity;
+            }
+
+            var entities = _navNodeQuery.ToEntityArray(Allocator.Temp);
+            var nodeIds = _navNodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+
+            for (int i = 0; i < entities.Length; i++)
+            {
+                // Safe TryAdd; duplicate IDs (should not happen) are ignored
+                _nodeIndex.TryAdd(nodeIds[i].Value, entities[i]);
+            }
+
+            entities.Dispose();
+            nodeIds.Dispose();
+        }
+
+        [BurstCompile]
         private readonly Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
         {
-            foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
-            {
-                if (id.ValueRO.Value == nodeId)
-                    return entity;
-            }
+            if (nodeId == 0)
+                return Entity.Null;
+
+            // Fast O(1) lookup
+            if (_nodeIndex.IsCreated && _nodeIndex.TryGetValue(nodeId, out var e))
+                return e;
+
+            // Fallback: attempt a lazy rebuild if index missing or stale
+            // (rare path; keeps method robust if called earlier than expected)
+            if (!_nodeIndex.IsCreated)
+                return Entity.Null;
+
             return Entity.Null;
         }
 

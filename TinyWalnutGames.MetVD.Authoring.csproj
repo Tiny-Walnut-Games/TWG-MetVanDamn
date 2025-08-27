@@ -93,6 +93,9 @@
     <None Include="Assets\MetVanDAMN\Authoring\TinyWalnutGames.MetVD.Authoring.asmdef" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Unity.Transforms">
+      <HintPath>Library\ScriptAssemblies\Unity.Transforms.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
       <Private>False</Private>
