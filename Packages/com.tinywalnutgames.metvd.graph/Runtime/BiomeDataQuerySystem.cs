@@ -106,6 +106,7 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         private ComponentLookup<Core.Biome> _biomeLookup;
         private ComponentLookup<RoomBiomeData> _roomBiomeDataLookup;
+        private ComponentLookup<NodeId> _nodeIdLookup;
         private BufferLookup<ConnectionBufferElement> _connectionLookup;
         private EntityQuery _requestQuery;
 
@@ -114,6 +115,7 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             _biomeLookup = state.GetComponentLookup<Core.Biome>(true);
             _roomBiomeDataLookup = state.GetComponentLookup<RoomBiomeData>();
+            _nodeIdLookup = state.GetComponentLookup<NodeId>(true);
             _connectionLookup = state.GetBufferLookup<ConnectionBufferElement>(true);
             
             _requestQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -129,6 +131,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
             _biomeLookup.Update(ref state);
             _roomBiomeDataLookup.Update(ref state);
+            _nodeIdLookup.Update(ref state);
             _connectionLookup.Update(ref state);
 
             // Process biome data requests using manual EntityQuery iteration
@@ -197,9 +200,9 @@ namespace TinyWalnutGames.MetVD.Graph
                 }
                 
                 // Try to find parent entity through NodeId hierarchy
-                if (SystemAPI.HasComponent<NodeId>(currentEntity))
+                if (_nodeIdLookup.HasComponent(currentEntity))
                 {
-                    var nodeId = SystemAPI.GetComponent<NodeId>(currentEntity);
+                    var nodeId = _nodeIdLookup[currentEntity];
                     
                     // If this entity has a parent reference, continue traversal
                     if (nodeId.ParentId != 0 && nodeId.Level > 0)
@@ -319,15 +322,23 @@ namespace TinyWalnutGames.MetVD.Graph
 
             var ecb = new EntityCommandBuffer(Allocator.TempJob);
             
-            // Use SystemAPI.Query instead of IJobEntity
-            foreach (var (entity, roomData, nodeId) in SystemAPI.Query<RefRO<RoomHierarchyData>, RefRO<NodeId>>().WithEntityAccess().WithAll<RoomHierarchyData>().WithNone<RoomBiomeData, BiomeDataRequest>())
+            // Convert to manual EntityQuery iteration for source generator compatibility
+            var entities = _roomsNeedingBiomeData.ToEntityArray(Allocator.Temp);
+            var roomData = _roomsNeedingBiomeData.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+            var nodeIds = _roomsNeedingBiomeData.ToComponentDataArray<NodeId>(Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
             {
-                ecb.AddComponent(entity, new BiomeDataRequest(
-                    priority: GetRequestPriority(roomData.ValueRO.Type),
+                ecb.AddComponent(entities[i], new BiomeDataRequest(
+                    priority: GetRequestPriority(roomData[i].Type),
                     allowDefaults: true,
                     maxSearchDepth: 5
                 ));
             }
+            
+            entities.Dispose();
+            roomData.Dispose();
+            nodeIds.Dispose();
             
             ecb.Playback(state.EntityManager);
             ecb.Dispose();

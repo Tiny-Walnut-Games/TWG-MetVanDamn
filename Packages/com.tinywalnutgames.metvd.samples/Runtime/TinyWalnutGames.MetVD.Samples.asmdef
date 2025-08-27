@@ -12,9 +12,7 @@
         "TinyWalnutGames.MetVD.Shared",
         "TinyWalnutGames.MetVD.Authoring"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
