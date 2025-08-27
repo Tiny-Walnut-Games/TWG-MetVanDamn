@@ -141,7 +141,7 @@ namespace TinyWalnutGames.MetVD.Graph
             
             for (int i = 0; i < entities.Length; i++)
             {
-                var resolvedData = ResolveFromHierarchy(entities[i], requests[i], nodeIds[i]);
+                var resolvedData = ResolveFromHierarchy(ref state, entities[i], requests[i], nodeIds[i]);
                 
                 // Add the resolved biome data component
                 _roomBiomeDataLookup[entities[i]] = resolvedData;
@@ -152,10 +152,10 @@ namespace TinyWalnutGames.MetVD.Graph
             nodeIds.Dispose();
         }
 
-        private RoomBiomeData ResolveFromHierarchy(Entity roomEntity, BiomeDataRequest request, NodeId nodeId)
+        private RoomBiomeData ResolveFromHierarchy(ref SystemState state, Entity roomEntity, BiomeDataRequest request, NodeId nodeId)
         {
             // Try to find parent district with biome data
-            var parentDistrict = FindParentDistrict(roomEntity, request.MaxSearchDepth);
+            var parentDistrict = FindParentDistrict(ref state, roomEntity, request.MaxSearchDepth);
             
             if (parentDistrict != Entity.Null && _biomeLookup.HasComponent(parentDistrict))
             {
@@ -170,7 +170,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             
             // Try to infer from sibling rooms
-            var siblingBiome = FindSiblingBiome(roomEntity, nodeId);
+            var siblingBiome = FindSiblingBiome(ref state, roomEntity, nodeId);
             if (siblingBiome.BiomeType != BiomeType.Unknown)
             {
                 return siblingBiome;
@@ -186,7 +186,7 @@ namespace TinyWalnutGames.MetVD.Graph
             return RoomBiomeData.CreateUnresolved(parentDistrict);
         }
 
-        private Entity FindParentDistrict(Entity roomEntity, int maxDepth)
+        private Entity FindParentDistrict(ref SystemState state, Entity roomEntity, int maxDepth)
         {
             // Walk up the hierarchy looking for a district entity with biome data
             Entity currentEntity = roomEntity;
@@ -208,7 +208,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     if (nodeId.ParentId != 0 && nodeId.Level > 0)
                     {
                         // Find entity with parent NodeId
-                        var parentEntity = FindEntityByNodeId(nodeId.ParentId);
+                        var parentEntity = FindEntityByNodeId(ref state, nodeId.ParentId);
                         if (parentEntity != Entity.Null)
                         {
                             currentEntity = parentEntity;
@@ -224,15 +224,35 @@ namespace TinyWalnutGames.MetVD.Graph
             return Entity.Null;
         }
 
-        private readonly Entity FindEntityByNodeId(uint parentId)
+        private readonly Entity FindEntityByNodeId(ref SystemState state, uint parentId)
         {
-            // TODO: This would typically use a lookup table or entity query
-            // For now, return Entity.Null - in practice this would be optimized
-            // with a cached lookup from NodeId.Value to Entity
+            // Implement efficient entity lookup by NodeId using EntityQuery
+            var nodeQuery = SystemAPI.QueryBuilder()
+                .WithAll<NodeId>()
+                .Build();
+                
+            if (nodeQuery.IsEmpty)
+                return Entity.Null;
+                
+            var entities = nodeQuery.ToEntityArray(Allocator.Temp);
+            var nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
+            {
+                if (nodeIds[i].Value == parentId)
+                {
+                    entities.Dispose();
+                    nodeIds.Dispose();
+                    return entities[i];
+                }
+            }
+            
+            entities.Dispose();
+            nodeIds.Dispose();
             return Entity.Null;
         }
 
-        private RoomBiomeData FindSiblingBiome(Entity roomEntity, NodeId nodeId)
+        private RoomBiomeData FindSiblingBiome(ref SystemState state, Entity roomEntity, NodeId nodeId)
         {
             // Look at connected/nearby rooms to infer biome type
             // Complete implementation using connection system for biome propagation
@@ -243,7 +263,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 foreach (var connection in connections)
                 {
                     // Resolve connection to target entity and check for biome data
-                    var targetEntity = FindEntityByNodeId(connection.ToNodeId);
+                    var targetEntity = FindEntityByNodeId(ref state, connection.ToNodeId.Value);
                     if (targetEntity != Entity.Null && _biomeLookup.HasComponent(targetEntity))
                     {
                         var targetBiome = _biomeLookup[targetEntity];
@@ -277,29 +297,7 @@ namespace TinyWalnutGames.MetVD.Graph
             
             return RoomBiomeData.CreateUnresolved(Entity.Null);
         }
-        
-        private Entity FindEntityByNodeId(NodeId targetNodeId)
-        {
-            // Query entities with NodeId component to find matching entity
-            var query = EntityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
-            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
-            var nodeIds = query.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
-            
-            for (int i = 0; i < entities.Length; i++)
-            {
-                if (nodeIds[i].Value == targetNodeId.Value)
-                {
-                    var result = entities[i];
-                    entities.Dispose();
-                    nodeIds.Dispose();
-                    return result;
-                }
-            }
-            
-            entities.Dispose();
-            nodeIds.Dispose();
-            return Entity.Null;
-        }
+
         
         private float CalculateConnectionInfluence(ConnectionBufferElement connection)
         {

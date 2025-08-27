@@ -130,7 +130,12 @@ namespace TinyWalnutGames.MetVD.Core
         /// <summary>
         /// Required connection ID for this gate
         /// </summary>
-        public uint requiredConnectionId;
+        public NodeId requiredConnectionId;
+        
+        /// <summary>
+        /// Allows self-referencing gate conditions for testing circular dependency detection
+        /// </summary>
+        public bool allowSelfReference;
         
         /// <summary>
         /// Gate description for UI/debugging
@@ -143,7 +148,8 @@ namespace TinyWalnutGames.MetVD.Core
                             float minimumSkillLevel = 0.0f,
                             FixedString64Bytes description = default,
                             bool isDefault = false,
-                            uint requiredConnectionId = 0)
+                            NodeId requiredConnectionId = default,
+                            bool allowSelfReference = false)
         {
             RequiredPolarity = requiredPolarity;
             RequiredAbilities = requiredAbilities;
@@ -153,6 +159,7 @@ namespace TinyWalnutGames.MetVD.Core
             IsUnlocked = false;
             this.isDefault = isDefault;
             this.requiredConnectionId = requiredConnectionId;
+            this.allowSelfReference = allowSelfReference;
             Description = description;
         }
 

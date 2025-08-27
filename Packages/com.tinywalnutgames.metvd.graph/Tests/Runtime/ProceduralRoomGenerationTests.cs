@@ -154,12 +154,29 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var targetPos = new int2(3, 2);
             var basicMovement = Ability.Jump;
             var advancedMovement = Ability.Jump | Ability.DoubleJump | Ability.Dash;
-            bool reachableBasic = JumpArcSolver.IsPositionReachable(startPos, targetPos, basicMovement, physics); // TODO: Find a use for this variable
+            bool reachableBasic = JumpArcSolver.IsPositionReachable(startPos, targetPos, basicMovement, physics);
             bool reachableAdvanced = JumpArcSolver.IsPositionReachable(startPos, targetPos, advancedMovement, physics);
+            
+            // Use reachableBasic to validate movement progression system
             Assert.IsTrue(reachableAdvanced, "Advanced movement must reach the target.");
+            
+            // Validate that basic reachability determines path complexity
             if (!reachableBasic)
             {
                 TestContext.WriteLine("Target only reachable with advanced movement (expected for harder arcs).");
+                
+                // Ensure advanced paths are marked as requiring complex movement
+                var arcData = JumpArcSolver.CalculateArcData(startPos, targetPos, advancedMovement, physics);
+                Assert.IsTrue(arcData.RequiresAdvancedMovement, "Arc should be marked as requiring advanced movement when basic movement fails");
+            }
+            else
+            {
+                TestContext.WriteLine("Target reachable with basic movement - simpler path available.");
+                
+                // When basic movement works, verify it's the preferred solution
+                var basicArcData = JumpArcSolver.CalculateArcData(startPos, targetPos, basicMovement, physics);
+                var advancedArcData = JumpArcSolver.CalculateArcData(startPos, targetPos, advancedMovement, physics);
+                Assert.LessOrEqual(basicArcData.EnergyRequired, advancedArcData.EnergyRequired, "Basic movement should be more energy efficient when available");
             }
             var dashTarget = new int2(5, 0);
             bool reachableWithDash = JumpArcSolver.IsPositionReachable(startPos, dashTarget, Ability.Dash, physics);

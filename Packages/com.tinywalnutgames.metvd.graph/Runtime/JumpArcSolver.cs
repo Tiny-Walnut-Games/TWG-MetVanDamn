@@ -219,6 +219,71 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int i = 0; i < points.Length; i++) { var p = points[i]; minX = math.min(minX, p.x); maxX = math.max(maxX, p.x); minY = math.min(minY, p.y); maxY = math.max(maxY, p.y); }
             return new RectInt(minX, minY, math.max(1, (maxX - minX)+1), math.max(1, (maxY - minY)+1));
         }
+        
+        /// <summary>
+        /// Calculate comprehensive arc data for movement validation and energy analysis
+        /// </summary>
+        [BurstCompile]
+        public static JumpArcAnalysisData CalculateArcData(int2 startPos, int2 targetPos, Ability movement, JumpArcPhysics physics)
+        {
+            var basicArc = CalculateJumpArc(startPos, targetPos, physics);
+            var requiresAdvanced = !IsPositionReachable(startPos, targetPos, Ability.Jump, physics);
+            var energyCost = CalculateEnergyRequirement(startPos, targetPos, movement, physics);
+            
+            return new JumpArcAnalysisData
+            {
+                ArcData = basicArc,
+                RequiresAdvancedMovement = requiresAdvanced,
+                EnergyRequired = energyCost,
+                MovementType = DetermineOptimalMovement(startPos, targetPos, movement, physics)
+            };
+        }
+        
+        [BurstCompile]
+        private static float CalculateEnergyRequirement(int2 startPos, int2 targetPos, Ability movement, JumpArcPhysics physics)
+        {
+            float2 delta = (float2)targetPos - (float2)startPos;
+            float distance = math.length(delta);
+            float heightDiff = math.abs(delta.y);
+            
+            // Base energy cost scales with distance and height
+            float energyCost = distance * 0.1f + heightDiff * 0.2f;
+            
+            // Advanced movement abilities cost more energy
+            if ((movement & Ability.DoubleJump) != 0) energyCost *= 1.5f;
+            if ((movement & Ability.Dash) != 0) energyCost *= 1.3f;
+            if ((movement & Ability.WallJump) != 0) energyCost *= 1.4f;
+            
+            return energyCost;
+        }
+        
+        [BurstCompile]
+        private static Ability DetermineOptimalMovement(int2 startPos, int2 targetPos, Ability availableMovement, JumpArcPhysics physics)
+        {
+            // Try movements in order of efficiency
+            if ((availableMovement & Ability.Jump) != 0 && IsPositionReachable(startPos, targetPos, Ability.Jump, physics))
+                return Ability.Jump;
+            if ((availableMovement & Ability.Dash) != 0 && IsPositionReachable(startPos, targetPos, Ability.Dash, physics))
+                return Ability.Dash;
+            if ((availableMovement & Ability.DoubleJump) != 0 && IsPositionReachable(startPos, targetPos, Ability.DoubleJump, physics))
+                return Ability.DoubleJump;
+            if ((availableMovement & Ability.WallJump) != 0 && IsPositionReachable(startPos, targetPos, Ability.WallJump, physics))
+                return Ability.WallJump;
+                
+            return Ability.None; // No viable movement found
+        }
     }
+    
+    /// <summary>
+    /// Extended arc data for movement analysis and energy management
+    /// </summary>
+    public struct JumpArcAnalysisData
+    {
+        public JumpArcData ArcData;
+        public bool RequiresAdvancedMovement;
+        public float EnergyRequired;
+        public Ability MovementType;
+    }
+    
     public struct JumpArcData { public float2 StartPosition; public float2 EndPosition; public float2 InitialVelocity; public float FlightTime; public float ApexHeight; }
 }

@@ -189,9 +189,15 @@ namespace TinyWalnutGames.MetVD.Graph
                                                            RoomHierarchyData roomData, NodeId nodeId, 
                                                            ref Unity.Mathematics.Random random)
         {
-            //  TODO: Create a valid and meaningful use for nodeID in room generation context... I seriously was told this was taken care of everywhere in this entire project!
-            // Determine generator type based on room type and characteristics
-            var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
+            // Use nodeId for room generation context - determines seed and spatial placement
+            var roomSeed = nodeId.Value; // NodeId provides unique seed for deterministic generation
+            random = Unity.Mathematics.Random.CreateFromIndex(roomSeed);
+            
+            // NodeId.Level determines room complexity tier
+            var complexityTier = math.clamp(nodeId.Level, 1, 5);
+            
+            // Determine generator type based on room type, characteristics, and nodeId context
+            var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds, complexityTier);
             
             // Get biome information from resolved biome data
             var targetBiome = BiomeType.HubArea;
@@ -261,11 +267,12 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Determine the appropriate generator type based on room characteristics
         /// </summary>
-        private static RoomGeneratorType DetermineGeneratorType(RoomType roomType, RectInt bounds)
+        private static RoomGeneratorType DetermineGeneratorType(RoomType roomType, RectInt bounds, int complexityTier)
         {
             var aspectRatio = (float)bounds.width / bounds.height;
             
-            return roomType switch
+            // Use complexityTier to influence generator selection for progressively complex rooms
+            var baseType = roomType switch
             {
                 RoomType.Boss => RoomGeneratorType.PatternDrivenModular,     // Skill challenges
                 RoomType.Treasure => RoomGeneratorType.ParametricChallenge, // Testing grounds
@@ -274,6 +281,18 @@ namespace TinyWalnutGames.MetVD.Graph
                      aspectRatio < 0.67f ? RoomGeneratorType.StackedSegment :         // Tall = vertical
                      RoomGeneratorType.WeightedTilePrefab                              // Square = standard
             };
+            
+            // Higher complexity tiers upgrade simpler room types to more complex generators
+            if (complexityTier >= 4 && baseType == RoomGeneratorType.WeightedTilePrefab)
+            {
+                return RoomGeneratorType.PatternDrivenModular; // Complex modular patterns for high-tier rooms
+            }
+            else if (complexityTier >= 3 && baseType == RoomGeneratorType.LinearBranchingCorridor)
+            {
+                return RoomGeneratorType.ParametricChallenge; // Add parametric challenges to corridors
+            }
+            
+            return baseType;
         }
 
         /// <summary>

@@ -15,7 +15,8 @@ namespace TinyWalnutGames.MetVD.Utilities.Tests
         private Texture2D testSpritesheet;
         private Texture2D testBiomeMask;
 
-        public BiomeRegionExtractor Extractor { get; } = new(); // TODO: (maybe?) This is not actually used to test UI
+        // Extractor instance for testing extraction algorithms - validates core functionality
+        public BiomeRegionExtractor Extractor { get; } = new();
 
         [SetUp]
         public void SetUp()
