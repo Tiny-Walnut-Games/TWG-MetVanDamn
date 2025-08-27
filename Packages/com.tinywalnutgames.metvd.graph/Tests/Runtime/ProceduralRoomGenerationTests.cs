@@ -1,3 +1,5 @@
+// This file is part of Metroidvania Dungeon (MetVD) by Tiny Walnut Games
+// Cleaned by @jmeyer1980
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -46,11 +48,12 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             // Arrange
             var roomEntity = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 10, 8));
             var worldConfig = CreateWorldConfiguration();
+            _ = worldConfig; // suppress unused
             
-            // Create and update the procedural room generator system using proper ISystem pattern
+            // Create and update the procedural room generator system
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var roomGenHandle = _world.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
-            initGroup.AddUnmanagedSystemToUpdateList(roomGenHandle);
+            var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
+            initGroup.AddSystemToUpdateList(roomGenSystem);
             initGroup.SortSystems();
             initGroup.Update();
 
@@ -61,14 +64,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var template = _entityManager.GetComponentData<RoomTemplate>(roomEntity);
             var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             
-            // Boss rooms should use pattern-driven generation
             Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, template.GeneratorType);
-            
-            // Should have movement capability requirements
             Assert.AreNotEqual(Ability.None, template.CapabilityTags.RequiredSkills);
             Assert.IsTrue(template.RequiresJumpValidation);
-            
-            // Generation status should be initialized
             Assert.IsFalse(genStatus.NavigationGenerated);
             Assert.IsFalse(genStatus.CinemachineGenerated);
             Assert.AreNotEqual(0u, genStatus.GenerationSeed);
@@ -80,12 +78,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             // Arrange
             var roomEntity = CreateTestRoomWithTemplate();
             
-            // Create and update systems in order using proper ISystem pattern
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var roomGenHandle = _world.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
-            var navGenHandle = _world.GetOrCreateUnmanagedSystem<RoomNavigationGeneratorSystem>();
-            initGroup.AddUnmanagedSystemToUpdateList(roomGenHandle);
-            initGroup.AddUnmanagedSystemToUpdateList(navGenHandle);
+            var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
+            // var navGenHandle = _world.GetOrCreateSystem<RoomNavigationGeneratorSystem>(); // unmanaged
+
+            var navGenHandle = _world.GetOrCreateSystem(typeof(RoomNavigationGeneratorSystem));
+            initGroup.AddSystemToUpdateList(roomGenSystem);           // managed system
+            initGroup.AddSystemToUpdateList(navGenHandle);   // managed system
             initGroup.SortSystems();
             initGroup.Update();
 
@@ -98,12 +97,10 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             Assert.IsTrue(genStatus.NavigationGenerated);
             
-            // Check that navigation connections have movement type tags
             bool hasJumpConnection = false;
             for (int i = 0; i < navBuffer.Length; i++)
             {
-                var connection = navBuffer[i];
-                if ((connection.RequiredMovement & Ability.Jump) != 0)
+                if ((navBuffer[i].RequiredMovement & Ability.Jump) != 0)
                 {
                     hasJumpConnection = true;
                     break;
@@ -118,27 +115,21 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             // Arrange
             var roomEntity = CreateTestRoomWithTemplate();
             
-            // Create and update all systems in pipeline order using proper ISystem pattern
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
             var presGroup = _world.GetOrCreateSystemManaged<PresentationSystemGroup>();
             
-            var roomGenHandle = _world.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
-            var navGenHandle = _world.GetOrCreateUnmanagedSystem<RoomNavigationGeneratorSystem>();
-            var cameraGenHandle = _world.GetOrCreateUnmanagedSystem<CinemachineZoneGeneratorSystem>();
+            var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
+            var navGenHandle = _world.GetOrCreateSystem(typeof(RoomNavigationGeneratorSystem));
+            var cameraGenSystem = _world.GetOrCreateSystemManaged<CinemachineZoneGeneratorSystem>();
             
-            // Add systems to appropriate groups
-            initGroup.AddUnmanagedSystemToUpdateList(roomGenHandle);
-            initGroup.AddUnmanagedSystemToUpdateList(navGenHandle);
-            presGroup.AddUnmanagedSystemToUpdateList(cameraGenHandle);
-            
+            initGroup.AddSystemToUpdateList(roomGenSystem);
+            initGroup.AddSystemToUpdateList(navGenHandle);
+            presGroup.AddSystemToUpdateList(cameraGenSystem);
             initGroup.SortSystems();
             presGroup.SortSystems();
-            
-            // Update groups in order
             initGroup.Update();
             presGroup.Update();
 
-            // Assert
             Assert.IsTrue(_entityManager.HasComponent<CinemachineZoneData>(roomEntity));
             Assert.IsTrue(_entityManager.HasComponent<CinemachineGameObjectReference>(roomEntity));
             
@@ -149,7 +140,6 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             Assert.Greater(cameraZone.Priority, 0);
             Assert.Greater(cameraZone.BlendTime, 0.0f);
             
-            // Camera should be positioned within reasonable bounds
             var roomData = _entityManager.GetComponentData<RoomHierarchyData>(roomEntity);
             var roomBounds = roomData.Bounds;
             Assert.IsTrue(cameraZone.CameraPosition.x >= roomBounds.x - 5 && 
@@ -159,24 +149,19 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         [Test]
         public void JumpArcSolver_ValidatesReachability_WithDifferentMovementTypes()
         {
-            // Arrange
             var physics = new JumpArcPhysics();
             var startPos = new int2(0, 0);
             var targetPos = new int2(3, 2);
-            
-            // Test different movement capabilities
             var basicMovement = Ability.Jump;
             var advancedMovement = Ability.Jump | Ability.DoubleJump | Ability.Dash;
-            
-            // Act & Assert
-            bool reachableBasic = JumpArcSolver.IsPositionReachable(startPos, targetPos, basicMovement, physics);
+            bool reachableBasic = JumpArcSolver.IsPositionReachable(startPos, targetPos, basicMovement, physics); // TODO: Find a use for this variable
             bool reachableAdvanced = JumpArcSolver.IsPositionReachable(startPos, targetPos, advancedMovement, physics);
-            
-            // Advanced movement should allow reaching more positions
-            Assert.IsTrue(reachableAdvanced);
-            
-            // Test dash reachability
-            var dashTarget = new int2(5, 0); // Horizontal dash target
+            Assert.IsTrue(reachableAdvanced, "Advanced movement must reach the target.");
+            if (!reachableBasic)
+            {
+                TestContext.WriteLine("Target only reachable with advanced movement (expected for harder arcs).");
+            }
+            var dashTarget = new int2(5, 0);
             bool reachableWithDash = JumpArcSolver.IsPositionReachable(startPos, dashTarget, Ability.Dash, physics);
             Assert.IsTrue(reachableWithDash);
         }
@@ -184,15 +169,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         [Test]
         public void MovementCapabilityTags_DetermineCorrectSkillRequirements()
         {
-            // Arrange & Act
-            var movementTags = new MovementCapabilityTags(
-                Ability.Dash | Ability.WallJump,
-                Ability.DoubleJump,
-                BiomeAffinity.Mountain,
-                0.8f
-            );
-
-            // Assert
+            var movementTags = new MovementCapabilityTags(Ability.Dash | Ability.WallJump, Ability.DoubleJump, BiomeAffinity.Mountain, 0.8f);
             Assert.AreEqual(Ability.Dash | Ability.WallJump, movementTags.RequiredSkills);
             Assert.AreEqual(Ability.DoubleJump, movementTags.OptionalSkills);
             Assert.AreEqual(BiomeAffinity.Mountain, movementTags.BiomeType);
@@ -202,23 +179,10 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         [Test]
         public void RoomTemplate_InitializesWithCorrectDefaults()
         {
-            // Arrange
             var capabilityTags = new MovementCapabilityTags(Ability.Jump, Ability.None, BiomeAffinity.Forest, 0.5f);
             var minSize = new int2(4, 4);
             var maxSize = new int2(12, 8);
-
-            // Act
-            var template = new RoomTemplate(
-                RoomGeneratorType.WeightedTilePrefab,
-                capabilityTags,
-                minSize,
-                maxSize,
-                0.2f,
-                true,
-                123u
-            );
-
-            // Assert
+            var template = new RoomTemplate(RoomGeneratorType.WeightedTilePrefab, capabilityTags, minSize, maxSize, 0.2f, true, 123u);
             Assert.AreEqual(RoomGeneratorType.WeightedTilePrefab, template.GeneratorType);
             Assert.AreEqual(0.2f, template.SecretAreaPercentage);
             Assert.IsTrue(template.RequiresJumpValidation);
@@ -229,37 +193,27 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         [Test]
         public void CompleteGenerationPipeline_ProcessesRoomCorrectly()
         {
-            // Arrange - Create a room and world configuration
             var roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
             CreateWorldConfiguration();
 
-            // Act - Run complete pipeline using proper ISystem pattern
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
             var presGroup = _world.GetOrCreateSystemManaged<PresentationSystemGroup>();
-            
-            var roomGenHandle = _world.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
-            var navGenHandle = _world.GetOrCreateUnmanagedSystem<RoomNavigationGeneratorSystem>();
-            var cameraGenHandle = _world.GetOrCreateUnmanagedSystem<CinemachineZoneGeneratorSystem>();
-            
-            // Add systems to appropriate groups
-            initGroup.AddUnmanagedSystemToUpdateList(roomGenHandle);
-            initGroup.AddUnmanagedSystemToUpdateList(navGenHandle);
-            presGroup.AddUnmanagedSystemToUpdateList(cameraGenHandle);
-            
+            var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
+            var navGenHandle = _world.GetOrCreateSystem(typeof(RoomNavigationGeneratorSystem));
+            var cameraGenSystem = _world.GetOrCreateSystemManaged<CinemachineZoneGeneratorSystem>();
+
+            initGroup.AddSystemToUpdateList(roomGenSystem);
+            initGroup.AddSystemToUpdateList(navGenHandle);
+            presGroup.AddSystemToUpdateList(cameraGenSystem);
             initGroup.SortSystems();
             presGroup.SortSystems();
-            
-            // Update groups in order
             initGroup.Update();
             presGroup.Update();
 
-            // Assert - All pipeline stages should be complete
             var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             Assert.IsTrue(genStatus.ContentGenerated || _entityManager.HasComponent<RoomTemplate>(roomEntity));
             Assert.IsTrue(genStatus.NavigationGenerated);
             Assert.IsTrue(genStatus.CinemachineGenerated);
-            
-            // Should have all expected components
             Assert.IsTrue(_entityManager.HasComponent<RoomTemplate>(roomEntity));
             Assert.IsTrue(_entityManager.HasBuffer<RoomNavigationElement>(roomEntity));
             Assert.IsTrue(_entityManager.HasComponent<CinemachineZoneData>(roomEntity));
@@ -271,46 +225,26 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var roomEntity = _entityManager.CreateEntity();
             var nodeId = new NodeId(12345u, 2, 1000u, new int2(bounds.x, bounds.y));
             var roomData = new RoomHierarchyData(bounds, roomType, true);
-            
             _entityManager.AddComponentData(roomEntity, nodeId);
             _entityManager.AddComponentData(roomEntity, roomData);
             _entityManager.AddBuffer<RoomNavigationElement>(roomEntity);
-            
             return roomEntity;
         }
 
         private Entity CreateTestRoomWithTemplate()
         {
             var roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
-            
             var capabilityTags = new MovementCapabilityTags(Ability.Jump, Ability.DoubleJump, BiomeAffinity.Forest, 0.5f);
-            var template = new RoomTemplate(
-                RoomGeneratorType.WeightedTilePrefab,
-                capabilityTags,
-                new int2(4, 3),
-                new int2(8, 6),
-                0.15f,
-                true,
-                999u
-            );
-            
+            var template = new RoomTemplate(RoomGeneratorType.WeightedTilePrefab, capabilityTags, new int2(4, 3), new int2(8, 6), 0.15f, true, 999u);
             _entityManager.AddComponentData(roomEntity, template);
             _entityManager.AddComponentData(roomEntity, new ProceduralRoomGenerated(12345u));
-            
             return roomEntity;
         }
 
         private Entity CreateWorldConfiguration()
         {
             var configEntity = _entityManager.CreateEntity();
-            var worldConfig = new WorldConfiguration
-            {
-                Seed = 12345,
-                WorldSize = new int2(50, 50),
-                TargetSectors = 8,
-                RandomizationMode = RandomizationMode.Partial
-            };
-            
+            var worldConfig = new WorldConfiguration { Seed = 12345, WorldSize = new int2(50, 50), TargetSectors = 8, RandomizationMode = RandomizationMode.Partial };
             _entityManager.AddComponentData(configEntity, worldConfig);
             return configEntity;
         }
