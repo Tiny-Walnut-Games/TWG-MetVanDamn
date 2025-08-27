@@ -106,7 +106,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private NativeArray<bool> AnalyzeReachability(ref SystemState state, AgentCapabilities capabilities)
+        private readonly NativeArray<bool> AnalyzeReachability(ref SystemState state, AgentCapabilities capabilities)
         {
             // Collect all navigation nodes
             var nodeIds = new NativeList<uint>(256, Allocator.Temp);
@@ -143,7 +143,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private NativeHashSet<uint> FloodFillReachability(ref SystemState state, uint startNodeId, AgentCapabilities capabilities)
+        private readonly NativeHashSet<uint> FloodFillReachability(ref SystemState state, uint startNodeId, AgentCapabilities capabilities)
         {
             var reachableNodes = new NativeHashSet<uint>(1000, Allocator.Temp);
             var queue = new NativeQueue<uint>(Allocator.Temp);

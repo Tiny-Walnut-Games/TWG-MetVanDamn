@@ -293,7 +293,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private float HeuristicCostEstimate(uint fromNodeId, uint toNodeId, ref SystemState state)
+        private readonly float HeuristicCostEstimate(uint fromNodeId, uint toNodeId, ref SystemState state)
         {
             var fromEntity = FindEntityByNodeId(ref state, fromNodeId);
             var toEntity = FindEntityByNodeId(ref state, toNodeId);
@@ -322,7 +322,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// Calculate movement heuristic considering jump arcs and vertical traversal
         /// </summary>
         [BurstCompile]
-        private float CalculateMovementHeuristic(float3 fromPos, float3 toPos)
+        private readonly float CalculateMovementHeuristic(float3 fromPos, float3 toPos)
         {
             float3 displacement = toPos - fromPos;
             float horizontalDistance = math.length(displacement.xz);
@@ -389,7 +389,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// Calculate arc-aware traversal cost using node positions for trajectory analysis
         /// </summary>
         [BurstCompile]
-        private float CalculateArcAwareTraversalCost(NavLink link, AgentCapabilities capabilities, 
+        private readonly float CalculateArcAwareTraversalCost(NavLink link, AgentCapabilities capabilities, 
                                                     uint fromNodeId, uint toNodeId, ref SystemState state)
         {
             // Get base traversal cost

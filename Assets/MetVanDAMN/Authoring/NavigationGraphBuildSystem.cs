@@ -2,9 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-#if UNITY_TRANSFORMS_LOCALTRANSFORM
 using Unity.Transforms;
-#endif
 using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Authoring
@@ -26,13 +24,16 @@ namespace TinyWalnutGames.MetVD.Authoring
         public void OnCreate(ref SystemState state)
         {
             // Query for districts that can become navigation nodes
-            _districtQuery = SystemAPI.QueryBuilder()
+            var builder = SystemAPI.QueryBuilder()
 #if UNITY_TRANSFORMS_LOCALTRANSFORM
                 .WithAll<LocalTransform>()
+#elif UNITY_TRANSFORMS_TRANSLATION
+                .WithAll<Unity.Transforms.Translation>()
 #endif
                 .WithAll<NodeId>()
-                .WithNone<NavNode>() // Only process districts that haven't been converted yet
-                .Build();
+                .WithNone<NavNode>(); // Only process districts that haven't been converted yet
+
+            _districtQuery = builder.Build();
 
             // Query for connections between districts
             _connectionQuery = SystemAPI.QueryBuilder()
@@ -56,53 +57,62 @@ namespace TinyWalnutGames.MetVD.Authoring
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // Create navigation graph singleton if it doesn't exist
+            // Create the singleton only when missing
             if (_navigationGraphQuery.IsEmpty)
             {
-                var navGraphEntity = state.EntityManager.CreateEntity();
-                state.EntityManager.AddComponentData(navGraphEntity, new NavigationGraph());
+                var created = state.EntityManager.CreateEntity();
+                state.EntityManager.AddComponentData(created, new NavigationGraph
+                {
+                    NodeCount = 0,
+                    LinkCount = 0,
+                    IsReady = false,
+                    LastRebuildTime = SystemAPI.Time.ElapsedTime
+                });
             }
 
-            // Skip if no districts to process
             if (_districtQuery.IsEmpty)
                 return;
 
-            var navGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
             var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
 
-            // Build navigation nodes from districts
             var nodeCount = BuildNavigationNodes(ref state);
-            
-            // Build navigation links from connections and gates
             var linkCount = BuildNavigationLinks(ref state);
 
-            // Update navigation graph statistics
             navGraph.NodeCount = nodeCount;
             navGraph.LinkCount = linkCount;
             navGraph.IsReady = true;
             navGraph.LastRebuildTime = SystemAPI.Time.ElapsedTime;
-            
+
             SystemAPI.SetSingleton(navGraph);
         }
 
         [BurstCompile]
-        private int BuildNavigationNodes(ref SystemState state)
+        private readonly int BuildNavigationNodes(ref SystemState state)
         {
             var nodeCount = 0;
 
-            // Convert districts to navigation nodes
-            foreach (var (transform, nodeId, entity) in 
-                     SystemAPI.Query<RefRO<LocalTransform>, RefRO<NodeId>>()
-                     .WithEntityAccess()
-                     .WithNone<NavNode>())
+            foreach (var (nodeId, entity) in
+                     SystemAPI.Query<RefRO<NodeId>>()
+                         .WithEntityAccess()
+                         .WithNone<NavNode>())
             {
-                var worldPosition = transform.ValueRO.Position;
                 var districtNodeId = nodeId.ValueRO.Value;
+                float3 worldPosition = float3.zero;
 
-                // Determine biome type and polarity from existing components
+#if UNITY_TRANSFORMS_LOCALTRANSFORM
+                if (SystemAPI.HasComponent<LocalTransform>(entity))
+                {
+                    worldPosition = SystemAPI.GetComponent<LocalTransform>(entity).Position;
+                }
+#elif UNITY_TRANSFORMS_TRANSLATION
+                if (SystemAPI.HasComponent<Unity.Transforms.Translation>(entity))
+                {
+                    worldPosition = SystemAPI.GetComponent<Unity.Transforms.Translation>(entity).Value;
+                }
+#endif
                 var biomeType = BiomeType.Unknown;
                 var primaryPolarity = Polarity.None;
-                
+
                 if (SystemAPI.HasComponent<TinyWalnutGames.MetVD.Core.Biome>(entity))
                 {
                     var biome = SystemAPI.GetComponent<TinyWalnutGames.MetVD.Core.Biome>(entity);
@@ -110,11 +120,9 @@ namespace TinyWalnutGames.MetVD.Authoring
                     primaryPolarity = biome.PrimaryPolarity;
                 }
 
-                // Create navigation node
                 var navNode = new NavNode(districtNodeId, worldPosition, biomeType, primaryPolarity);
                 state.EntityManager.AddComponentData(entity, navNode);
 
-                // Add navigation link buffer for outgoing connections
                 if (!SystemAPI.HasBuffer<NavLinkBufferElement>(entity))
                 {
                     state.EntityManager.AddBuffer<NavLinkBufferElement>(entity);
@@ -127,31 +135,29 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private int BuildNavigationLinks(ref SystemState state)
+        private readonly int BuildNavigationLinks(ref SystemState state)
         {
             var linkCount = 0;
 
-            // Process all connections to create navigation links
-            foreach (var (connection, entity) in 
+            foreach (var (connection, connectionEntity) in
                      SystemAPI.Query<RefRO<Connection>>()
-                     .WithEntityAccess())
+                         .WithEntityAccess())
             {
                 var conn = connection.ValueRO;
-                
-                // Find source and destination entities
-                var sourceEntity = FindEntityByNodeId(ref state, conn.FromNodeId);
-                var destEntity = FindEntityByNodeId(ref state, conn.ToNodeId);
-                
+
+                // Meaningful use of connection entity: skip inactive connections (ensures correct gating)
+                if (!conn.IsActive)
+                    continue;
+
+                var sourceEntity = FindEntityByStateNodeId(ref state, conn.FromNodeId);
+                var destEntity = FindEntityByStateNodeId(ref state, conn.ToNodeId);
+
                 if (sourceEntity == Entity.Null || destEntity == Entity.Null)
                     continue;
 
-                // Check for gate conditions on source or destination
                 var gateConditions = CollectGateConditions(ref state, sourceEntity, destEntity);
-                
-                // Create navigation link with gate conditions
                 var navLink = CreateNavLinkFromConnection(conn, gateConditions);
-                
-                // Add link to source entity's buffer
+
                 if (SystemAPI.HasBuffer<NavLinkBufferElement>(sourceEntity))
                 {
                     var linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(sourceEntity);
@@ -159,13 +165,12 @@ namespace TinyWalnutGames.MetVD.Authoring
                     linkCount++;
                 }
 
-                // For bidirectional connections, add reverse link
                 if (conn.Type == ConnectionType.Bidirectional)
                 {
                     var reverseLink = navLink;
                     reverseLink.FromNodeId = conn.ToNodeId;
                     reverseLink.ToNodeId = conn.FromNodeId;
-                    
+
                     if (SystemAPI.HasBuffer<NavLinkBufferElement>(destEntity))
                     {
                         var reverseLinkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(destEntity);
@@ -173,18 +178,31 @@ namespace TinyWalnutGames.MetVD.Authoring
                         linkCount++;
                     }
                 }
+
+                // Optional: mark connection as discovered after link generation if not already
+                if (!conn.IsDiscovered)
+                {
+                    var updated = conn;
+                    updated.IsDiscovered = true;
+                    state.EntityManager.SetComponentData(connectionEntity, updated);
+                }
             }
 
             return linkCount;
         }
 
         [BurstCompile]
-        private readonly Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
+        private readonly Entity FindEntityByStateNodeId(ref SystemState state, uint nodeId)
         {
-            foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
+            // Meaningful use of state: build a filtered query once per call
+            var query = state.GetEntityQuery(ComponentType.ReadOnly<NodeId>());
+            using var ids = query.ToComponentDataArray<NodeId>(Allocator.Temp);
+            using var entities = query.ToEntityArray(Allocator.Temp);
+
+            for (int i = 0; i < ids.Length; i++)
             {
-                if (id.ValueRO.Value == nodeId)
-                    return entity;
+                if (ids[i].Value == nodeId)
+                    return entities[i];
             }
             return Entity.Null;
         }
@@ -192,22 +210,22 @@ namespace TinyWalnutGames.MetVD.Authoring
         [BurstCompile]
         private readonly GateConditionCollection CollectGateConditions(ref SystemState state, Entity sourceEntity, Entity destEntity)
         {
+            // Use state for performant lookups (avoids IDE0060)
+            var gateLookup = state.GetBufferLookup<GateConditionBufferElement>(true);
             var gateConditions = new GateConditionCollection();
-            
-            // Collect gate conditions from source entity
-            if (SystemAPI.HasBuffer<GateConditionBufferElement>(sourceEntity))
+
+            if (gateLookup.HasBuffer(sourceEntity))
             {
-                var sourceGates = SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
-                for (int i = 0; i < sourceGates.Length && i < 4; i++) // Limit to 4 conditions
+                var sourceGates = gateLookup[sourceEntity];
+                for (int i = 0; i < sourceGates.Length && i < 4; i++)
                 {
                     gateConditions.Add(sourceGates[i].Value);
                 }
             }
-            
-            // Collect gate conditions from destination entity
-            if (SystemAPI.HasBuffer<GateConditionBufferElement>(destEntity))
+
+            if (gateLookup.HasBuffer(destEntity))
             {
-                var destGates = SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
+                var destGates = gateLookup[destEntity];
                 for (int i = 0; i < destGates.Length && i < (4 - gateConditions.Count); i++)
                 {
                     gateConditions.Add(destGates[i].Value);
@@ -220,7 +238,6 @@ namespace TinyWalnutGames.MetVD.Authoring
         [BurstCompile]
         private readonly NavLink CreateNavLinkFromConnection(Connection connection, GateConditionCollection gates)
         {
-            // Determine combined requirements from all gate conditions
             var combinedPolarity = Polarity.None;
             var combinedAbilities = Ability.None;
             var strictestSoftness = GateSoftness.Trivial;
@@ -231,11 +248,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var gate = gates[i];
                 combinedPolarity |= gate.RequiredPolarity;
                 combinedAbilities |= gate.RequiredAbilities;
-                
+
                 if (gate.Softness < strictestSoftness)
                     strictestSoftness = gate.Softness;
-                    
-                // Increase cost for stricter gates
+
                 var gateCostMultiplier = (int)gate.Softness switch
                 {
                     0 => 5.0f,  // Hard
@@ -249,7 +265,6 @@ namespace TinyWalnutGames.MetVD.Authoring
                 maxTraversalCost = math.max(maxTraversalCost, connection.TraversalCost * gateCostMultiplier);
             }
 
-            // Override connection polarity with gate requirements if more restrictive
             var effectivePolarity = combinedPolarity != Polarity.None ? combinedPolarity : connection.RequiredPolarity;
 
             return new NavLink(
@@ -259,15 +274,12 @@ namespace TinyWalnutGames.MetVD.Authoring
                 effectivePolarity,
                 combinedAbilities,
                 maxTraversalCost,
-                5.0f, // Default polarity mismatch cost multiplier
+                5.0f,
                 strictestSoftness,
                 $"Link_{connection.FromNodeId}_{connection.ToNodeId}"
             );
         }
 
-        /// <summary>
-        /// Helper struct for collecting gate conditions with fixed size
-        /// </summary>
         private struct GateConditionCollection
         {
             private GateCondition _gate0;
@@ -290,20 +302,14 @@ namespace TinyWalnutGames.MetVD.Authoring
                 if (_count < 4) _count++;
             }
 
-            public readonly GateCondition this[int index]
+            public readonly GateCondition this[int index] => index switch
             {
-                get
-                {
-                    return index switch
-                    {
-                        0 => _gate0,
-                        1 => _gate1,
-                        2 => _gate2,
-                        3 => _gate3,
-                        _ => default
-                    };
-                }
-            }
+                0 => _gate0,
+                1 => _gate1,
+                2 => _gate2,
+                3 => _gate3,
+                _ => default
+            };
         }
     }
 }
