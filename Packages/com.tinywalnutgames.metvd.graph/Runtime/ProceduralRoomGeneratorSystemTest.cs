@@ -15,14 +15,14 @@ namespace TinyWalnutGames.MetVD.Graph
         protected override void OnCreate()
         {
             // Ensure the unmanaged system is created
-            World.Unmanaged.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
+            World.Unmanaged.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
         }
         
         protected override void OnUpdate()
         {
             // Forward to the unmanaged system
             ref var system = ref World.Unmanaged.GetUnsafeSystemRef<ProceduralRoomGeneratorSystem>(
-                World.Unmanaged.GetExistingUnmanagedSystem<ProceduralRoomGeneratorSystem>());
+                World.Unmanaged.GetExistingSystem<ProceduralRoomGeneratorSystem>());
             system.OnUpdate(ref CheckedStateRef);
         }
     }

@@ -418,8 +418,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             var connections = connectionQuery.ToComponentDataArray<ConnectionData>(Allocator.Temp);
             
             Assert.AreEqual(1, connections.Length, "Invalid connection should still be baked");
-            Assert.AreEqual(888u, connections[0].sourceNode.value);
-            Assert.AreEqual(777u, connections[0].targetNode.value);
+            Assert.AreEqual(888u, connections[0].sourceNode.Value);
+            Assert.AreEqual(777u, connections[0].targetNode.Value);
             
             districts.Dispose();
             connections.Dispose();
@@ -465,7 +465,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(1, gateQuery.CalculateEntityCount());
             
             var gateData = gateQuery.ToComponentDataArray<GateData>(Allocator.Temp);
-            Assert.AreEqual(500u, gateData[0].connectionId.value, "Gate should reference invalid connection ID");
+            Assert.AreEqual(500u, gateData[0].connectionId.Value, "Gate should reference invalid connection ID");
             
             gateData.Dispose();
             districtQuery.Dispose();
@@ -569,13 +569,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             bool foundAB = false, foundBA = false;
             foreach (var conn in connections)
             {
-                if (conn.sourceNode.value == 401 && conn.targetNode.value == 402) foundAB = true;
-                if (conn.sourceNode.value == 402 && conn.targetNode.value == 401) foundBA = true;
+                if (conn.sourceNode.Value == 401 && conn.targetNode.Value == 402) foundAB = true;
+                if (conn.sourceNode.Value == 402 && conn.targetNode.Value == 401) foundBA = true;
             }
             Assert.IsTrue(foundAB && foundBA, "Bidirectional connections should exist");
             
             // Check circular gate reference
-            Assert.AreEqual(401u, gates[0].connectionId.value, "Gate should have correct connection ID");
+            Assert.AreEqual(401u, gates[0].connectionId.Value, "Gate should have correct connection ID");
             
             connections.Dispose();
             gates.Dispose();

@@ -101,7 +101,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    var nodeId = nodeIds[i].value;
+                    var nodeId = nodeIds[i].Value;
                     var biomeType = biomes[i].Type.ToString();
                     
                     // Update biome data if runtime color information is available
@@ -138,7 +138,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     var biomeAuthoring = renderer.GetComponentInParent<BiomeFieldAuthoring>();
                     if (biomeAuthoring != null)
                     {
-                        var existingEntry = biomeInfos.Find(entry => entry.nodeId == biomeAuthoring.nodeId.value);
+                        var existingEntry = biomeInfos.Find(entry => entry.nodeId == biomeAuthoring.nodeId.Value);
                         if (existingEntry != null && existingEntry.currentColor != rendererColor)
                         {
                             existingEntry.currentColor = rendererColor;

@@ -30,6 +30,8 @@ namespace TinyWalnutGames.MetVD.Core
         public int2 Coordinates;
 
         // Backward-compatible alias used by older tests (nodeId.value)
+        [System.Obsolete("Use Value", false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public uint value { readonly get => Value; set => Value = value; }
 
         public NodeId(uint value, byte level = 0, uint parentId = 0, int2 coordinates = default)

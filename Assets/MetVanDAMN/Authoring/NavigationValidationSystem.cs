@@ -386,7 +386,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             while (queue.Count > 0)
             {
                 var currentNodeId = queue.Dequeue();
-                var currentEntity = FindEntityByNodeId(world, currentNodeId);
+                var currentEntity = FindEntityByNodeIdForValidation(world, currentNodeId);
                 
                 if (currentEntity == Entity.Null || !entityManager.HasBuffer<NavLinkBufferElement>(currentEntity))
                     continue;
@@ -415,9 +415,9 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         /// <summary>
-        /// Helper method to find entity by node ID
+        /// Helper method to find entity by node ID for utility validation
         /// </summary>
-        private static Entity FindEntityByNodeId(World world, uint nodeId)
+        private static Entity FindEntityByNodeIdForValidation(World world, uint nodeId)
         {
             var entityManager = world.EntityManager;
             var nodeQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
