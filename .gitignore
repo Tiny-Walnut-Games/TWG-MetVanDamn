@@ -157,6 +157,7 @@ Generated/
 # Force include debug/copilot directory for debugging logs
 !Assets/debug/copilot/
 !debug/copilot/
+!Assets/debug/
 
 /.vs
 /Assets/samvieten

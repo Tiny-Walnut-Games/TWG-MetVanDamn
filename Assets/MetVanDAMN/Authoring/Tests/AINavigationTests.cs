@@ -17,6 +17,13 @@ namespace TinyWalnutGames.MetVD.Tests
         private World _testWorld;
         private EntityManager _entityManager;
 
+        // Helper to obtain unmanaged ISystem in current Entities API (non-destructive addition)
+        private SystemHandle GetOrCreateUnmanagedSystem<T>() where T : unmanaged, ISystem
+        {
+            // Use World extension for unmanaged ISystem creation (Entities 1.x)
+            return _testWorld.GetOrCreateSystem<T>();
+        }
+
         [SetUp]
         public void SetUp()
         {
@@ -236,33 +243,30 @@ namespace TinyWalnutGames.MetVD.Tests
         [Test]
         public void NavigationGraphBuildSystem_Creation_DoesNotThrow()
         {
-            // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateUnmanagedSystem<NavigationGraphBuildSystem>();
-                Assert.IsNotNull(system);
+                var handle = GetOrCreateUnmanagedSystem<NavigationGraphBuildSystem>();
+                Assert.AreNotEqual(default(SystemHandle), handle);
             });
         }
 
         [Test]
         public void AINavigationSystem_Creation_DoesNotThrow()
         {
-            // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateUnmanagedSystem<AINavigationSystem>();
-                Assert.IsNotNull(system);
+                var handle = GetOrCreateUnmanagedSystem<AINavigationSystem>();
+                Assert.AreNotEqual(default(SystemHandle), handle);
             });
         }
 
         [Test]
         public void NavigationValidationSystem_Creation_DoesNotThrow()
         {
-            // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateUnmanagedSystem<NavigationValidationSystem>();
-                Assert.IsNotNull(system);
+                var handle = GetOrCreateUnmanagedSystem<NavigationValidationSystem>();
+                Assert.AreNotEqual(default(SystemHandle), handle);
             });
         }
 
@@ -665,20 +669,12 @@ namespace TinyWalnutGames.MetVD.Tests
         [Test]
         public void AINavigationSystem_CalculateMovementHeuristic_AccountsForVerticalMovement()
         {
-            // This tests the enhanced heuristic calculation indirectly
-            // by verifying it produces different costs for horizontal vs vertical movement
-            
-            // Arrange
-            var system = _testWorld.GetOrCreateUnmanagedSystem<AINavigationSystem>();
-            
-            // Simulate horizontal and vertical movements
+            var handle = GetOrCreateUnmanagedSystem<AINavigationSystem>();
+            Assert.AreNotEqual(default(SystemHandle), handle);
             var horizontalMove = new float3(5, 0, 0);
             var verticalMove = new float3(0, 5, 0);
             var arcMove = new float3(3, 4, 0);
-
-            // The actual calculation happens inside the private method,
-            // but we can verify the system exists and doesn't throw
-            Assert.IsNotNull(system);
+            _ = horizontalMove; _ = verticalMove; _ = arcMove;
         }
 
         [Test]

@@ -283,7 +283,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 EditorGUIUtility.PingObject(hierarchy.district);
             }
             
-            EditorGUILayout.LabelField($"District {hierarchy.district.nodeId.Value}: {hierarchy.district.name}", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField($"District {hierarchy.district.nodeId}: {hierarchy.district.name}", EditorStyles.boldLabel);
             
             GUILayout.FlexibleSpace();
             

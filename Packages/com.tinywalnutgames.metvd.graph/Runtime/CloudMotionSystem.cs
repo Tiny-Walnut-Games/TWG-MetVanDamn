@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using TinyWalnutGames.MetVD.Core; // Added for Polarity enum
 #if !UNITY_TRANSFORMS_LOCALTRANSFORM
 using LocalTransform = TinyWalnutGames.MetVD.Core.Compat.LocalTransformCompat;
 #endif
@@ -64,7 +65,7 @@ namespace TinyWalnutGames.MetVD.Graph
             motion.Velocity.y = math.cos(time * 0.3f + phaseOffset) * 0.2f;
         }
 
-        private static void UpdateGustyMotion(ref CloudMotionComponent motion, float time)
+        public static void UpdateGustyMotion(ref CloudMotionComponent motion, float time)
         {
             // Irregular gusts with varying intensity
             var basePhase = motion.Phase;
@@ -83,7 +84,7 @@ namespace TinyWalnutGames.MetVD.Graph
             );
         }
 
-        private static void UpdateConveyorMotion(ref CloudMotionComponent motion, float time)
+        public static void UpdateConveyorMotion(ref CloudMotionComponent motion, float time)
         {
             // Steady directional flow with periodic acceleration
             var phase = motion.Phase;
@@ -198,7 +199,7 @@ namespace TinyWalnutGames.MetVD.Graph
         private EntityQuery _electricCloudQuery;
         
         [BurstCompile]
-        public readonly void OnCreate(ref SystemState state)
+        public void OnCreate(ref SystemState state) // removed readonly
         {
             _electricCloudQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<ElectricCloudComponent, LocalTransform>()
@@ -207,14 +208,14 @@ namespace TinyWalnutGames.MetVD.Graph
         }
 
         [BurstCompile]
-        public readonly void OnUpdate(ref SystemState state)
+        public void OnUpdate(ref SystemState state) // removed readonly
         {
             var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
             var time = (float)state.WorldUnmanaged.Time.ElapsedTime;
             
             if (_electricCloudQuery.IsEmpty)
                 return;
-                
+            
             // Process electric cloud discharges using manual EntityQuery
             var entities = _electricCloudQuery.ToEntityArray(Allocator.Temp);
             var transforms = _electricCloudQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
@@ -429,9 +430,7 @@ namespace TinyWalnutGames.MetVD.Graph
             {
                 var position = conveyorTransforms[i].Position;
                 var conveyor = conveyorComponents[i];
-                
-                ApplyConveyorForces(ref state, position, conveyor.ConveyorDirection, conveyor.ConveyorSpeed, 
-                                  conveyor.PlatformBounds, deltaTime);
+                ApplyConveyorForces(ref state, position, conveyor.Direction, conveyor.Speed, conveyor.PlatformBounds, deltaTime);
             }
             
             conveyorEntities.Dispose();
@@ -439,70 +438,69 @@ namespace TinyWalnutGames.MetVD.Graph
             conveyorComponents.Dispose();
         }
 
-        private static void ApplyConveyorForces(ref SystemState state, float3 position, float3 direction, float speed, 
-                                               RectInt platformBounds, float deltaTime)
+        private void ApplyConveyorForces(ref SystemState state, float3 position, float3 direction, float speed, RectInt platformBounds, float deltaTime)
         {
             // Comprehensive conveyor force implementation
-            
+
             // 1. Detect entities overlapping platform bounds
             var affectedEntities = DetectEntitiesOnPlatform(ref state, position, platformBounds);
-            
+
             // 2. Apply directional forces to detected entities
             for (int i = 0; i < affectedEntities.Length; i++)
             {
                 var entity = affectedEntities[i];
                 if (!SystemAPI.HasComponent<LocalTransform>(entity))
                     continue;
-                    
+
                 var entityTransform = SystemAPI.GetComponent<LocalTransform>(entity);
                 var distanceFromCenter = math.distance(entityTransform.Position, position);
-                
+
                 // 3. Apply edge fall-off smoothing and stickiness logic
                 var edgeFalloff = CalculateEdgeFalloff(entityTransform.Position, position, platformBounds);
                 var stickinessModifier = CalculateStickinessEffect(distanceFromCenter, deltaTime);
-                
+
                 // 4. Apply velocity with friction and weight considerations
                 ApplyConveyorVelocity(ref state, entity, direction, speed, edgeFalloff, stickinessModifier, deltaTime);
-                
+
                 // 5. Surface force feedback effects
                 TriggerSurfaceFeedback(entityTransform.Position, speed * edgeFalloff);
             }
-            
+
             if (affectedEntities.IsCreated)
                 affectedEntities.Dispose();
         }
         
-        private static NativeArray<Entity> DetectEntitiesOnPlatform(ref SystemState state, float3 platformPosition, RectInt bounds)
+        NativeArray<Entity> DetectEntitiesOnPlatform(ref SystemState state, float3 platformPosition, RectInt bounds)
         {
             // Spatial query for entities within conveyor influence area
             var affectedEntities = new NativeList<Entity>(64, Allocator.Temp);
-            
+
             // Create query for potentially affected entities
             var detectionQuery = SystemAPI.QueryBuilder()
                 .WithAll<LocalTransform>()
                 .WithAny<PlayerTag, PhysicsBodyTag>()
                 .Build();
-                
+
             if (!detectionQuery.IsEmpty)
             {
                 var entities = detectionQuery.ToEntityArray(Allocator.Temp);
                 var transforms = detectionQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
-                
+
                 for (int i = 0; i < entities.Length; i++)
                 {
                     var entityPos = transforms[i].Position;
-                    
+
                     // Check if entity is within platform bounds
                     if (IsWithinPlatformBounds(entityPos, platformPosition, bounds))
                     {
                         affectedEntities.Add(entities[i]);
                     }
                 }
-                
+
                 entities.Dispose();
                 transforms.Dispose();
             }
-            
+
             return affectedEntities.AsArray();
         }
         
@@ -542,95 +540,58 @@ namespace TinyWalnutGames.MetVD.Graph
             return 1.0f + stickinessStrength * deltaTime * 2.0f;
         }
         
-        private static void ApplyConveyorVelocity(ref SystemState state, Entity entity, float3 direction, float speed,
-                                                 float edgeFalloff, float stickinessModifier, float deltaTime)
+        private void ApplyConveyorVelocity(ref SystemState state, Entity entity, float3 direction, float speed, float edgeFalloff, float stickinessModifier, float deltaTime)
         {
-            // Project entity velocity onto conveyor direction and blend based on weight
             var currentTransform = SystemAPI.GetComponent<LocalTransform>(entity);
             var currentVelocity = float3.zero;
-            
-            // Get current velocity if entity has velocity component
             if (SystemAPI.HasComponent<VelocityComponent>(entity))
             {
                 currentVelocity = SystemAPI.GetComponent<VelocityComponent>(entity).Value;
             }
-            
-            // Calculate desired conveyor velocity
             var conveyorVelocity = math.normalize(direction) * speed * edgeFalloff * stickinessModifier;
-            
-            // Apply uphill/downhill modifiers for vertical variance
             var heightModifier = CalculateHeightModifier(direction);
             conveyorVelocity *= heightModifier;
-            
-            // Blend with existing velocity (additive impulse with friction consideration)
-            var frictionCoefficient = GetEntityFriction(entity);
+            var frictionCoefficient = GetEntityFriction(ref state, entity); // updated call
             var blendedVelocity = math.lerp(currentVelocity, conveyorVelocity, frictionCoefficient * deltaTime);
-            
-            // Cap maximum induced speed to prevent exploitation
-            var maxAllowedSpeed = speed * 2.0f; // Max 2x conveyor speed
+            var maxAllowedSpeed = speed * 2.0f;
             var finalSpeed = math.length(blendedVelocity);
             if (finalSpeed > maxAllowedSpeed)
             {
                 blendedVelocity = math.normalize(blendedVelocity) * maxAllowedSpeed;
             }
-            
-            // Apply final velocity
             if (SystemAPI.HasComponent<VelocityComponent>(entity))
             {
                 SystemAPI.SetComponent(entity, new VelocityComponent { Value = blendedVelocity });
             }
-            
-            // Apply polarity charge transfer and other scripted effects
             ApplyConveyorScriptedEffects(ref state, entity, conveyorVelocity, deltaTime);
         }
-        
         private static float CalculateHeightModifier(float3 direction)
         {
-            // Adjust for uphill/downhill modifiers if vertical component exists
             var verticalComponent = direction.y;
-            
-            if (verticalComponent > 0.1f) // Going uphill
-            {
-                return 0.7f; // Reduced effectiveness uphill
-            }
-            else if (verticalComponent < -0.1f) // Going downhill
-            {
-                return 1.3f; // Increased effectiveness downhill
-            }
-            
-            return 1.0f; // Flat surface
+            if (verticalComponent > 0.1f) return 0.7f;
+            if (verticalComponent < -0.1f) return 1.3f;
+            return 1.0f;
         }
-        
-        private static float GetEntityFriction(Entity entity)
+        private float GetEntityFriction(ref SystemState state, Entity entity) // added ref SystemState per analyzer requirement
         {
-            // Get entity-specific friction coefficient
             if (SystemAPI.HasComponent<FrictionComponent>(entity))
             {
                 return SystemAPI.GetComponent<FrictionComponent>(entity).Value;
             }
-            
-            return 0.8f; // Default friction
+            return 0.8f;
         }
-        
-        private static void ApplyConveyorScriptedEffects(ref SystemState state, Entity entity, float3 velocity, float deltaTime)
+        private void ApplyConveyorScriptedEffects(ref SystemState state, Entity entity, float3 velocity, float deltaTime)
         {
-            // Author hook for scripting additional effects (polarity charge transfer, etc.)
             var effectStrength = math.length(velocity) * deltaTime;
-            
-            // Polarity charge transfer
             if (SystemAPI.HasComponent<PolarityComponent>(entity))
             {
                 var polarity = SystemAPI.GetComponent<PolarityComponent>(entity);
-                // Modify entity polarity based on conveyor interaction
-                // In full implementation, would apply specific polarity effects
                 _ = polarity; _ = effectStrength;
             }
-            
-            // Energy transfer effects
             if (SystemAPI.HasComponent<EnergyComponent>(entity))
             {
                 var energy = SystemAPI.GetComponent<EnergyComponent>(entity);
-                energy.Value += effectStrength * 0.1f; // Slight energy gain from conveyor
+                energy.Value += effectStrength * 0.1f;
                 SystemAPI.SetComponent(entity, energy);
             }
         }
@@ -685,6 +646,7 @@ namespace TinyWalnutGames.MetVD.Graph
             public float DischargeDamage;
             public float DischargeInterval;
             public float LastDischargeTime;
+            public float DischargeTimer;
         }
         
         public struct ConveyorCloudComponent : IComponentData

@@ -1,0 +1,30 @@
+{
+    "name": "TinyWalnutGames.MetVD.Utility.Editor",
+    "rootNamespace": "TinyWalnutGames.MetVD.Utility.Editor",
+    "references": [
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Entities",
+        "Unity.Mathematics",
+        "TinyWalnutGames.MetVD.Utility"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "HAS_SPRITE_EDITOR"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.2d.sprite",
+            "expression": "1.0.0",
+            "define": "HAS_SPRITE_EDITOR"
+        }
+    ],
+    "noEngineReferences": false
+}
