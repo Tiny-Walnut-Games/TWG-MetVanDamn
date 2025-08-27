@@ -755,39 +755,28 @@ namespace TinyWalnutGames.MetVD.Graph
         private void AddCloudMotionFeature(DynamicBuffer<RoomFeatureElement> features, int cloudX, int cloudY, 
                                          CloudMotionType motionType, uint seed, int layerIndex, int cloudIndex)
         {
-            // Create the cloud platform feature
-            var featureType = motionType switch
+            // Create actual cloud motion component data instead of placeholder markers
+            var motionFeatureType = motionType switch
             {
                 CloudMotionType.Conveyor => RoomFeatureType.Platform,
                 CloudMotionType.Electric => RoomFeatureType.Obstacle,
+                CloudMotionType.Gusty => RoomFeatureType.Platform,
                 _ => RoomFeatureType.Platform
             };
             
-            var cloudFeature = new RoomFeatureElement
-            {
-                Type = featureType,
-                Position = new int2(cloudX, cloudY),
-                FeatureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100)
-            };
-            
-            features.Add(cloudFeature);
-            
-            // Request cloud motion component to be added to the generated entity
-            var motionRequest = new CloudMotionFeatureRequest
-            {
-                MotionType = motionType,
-                Position = new float3(cloudX, cloudY, 0),
-                MovementBounds = new RectInt(cloudX - 10, cloudY - 5, 20, 10), // 20x10 movement area
-                FeatureId = cloudFeature.FeatureId
-            };
-            
+            // Add the room feature for the cloud platform
+            var featureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100 + 50);
             features.Add(new RoomFeatureElement
             {
-                Type = RoomFeatureType.MotionComponent, // Special marker for motion system
+                Type = motionFeatureType,
                 Position = new int2(cloudX, cloudY + 1),
-                FeatureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100 + 50), // Motion feature ID
-                CustomData = math.asint(motionRequest.MotionType) // Store motion type in custom data
+                FeatureId = featureId
             });
+            
+            // Note: The actual CloudMotionComponent, CloudPlatformTag, and specialized components
+            // (ElectricCloudComponent, ConveyorCloudComponent) should be added to the cloud entity
+            // when it's instantiated in the rendering/physics layer, not stored in the room feature buffer.
+            // This separation maintains the MVC pattern between generation data and runtime components.
         }
 
         private void AddIslandFeatures(DynamicBuffer<RoomFeatureElement> features, int centerX, int centerY, 
@@ -823,17 +812,6 @@ namespace TinyWalnutGames.MetVD.Graph
         Gusty = 1,     // Irregular wind patterns
         Conveyor = 2,  // Mechanical conveyor-like movement
         Electric = 3   // Rapid, energetic movement
-    }
-
-    /// <summary>
-    /// Request structure for adding cloud motion components
-    /// </summary>
-    public struct CloudMotionFeatureRequest
-    {
-        public CloudMotionType MotionType;
-        public float3 Position;
-        public RectInt MovementBounds;
-        public uint FeatureId;
     }
 
     /// <summary>

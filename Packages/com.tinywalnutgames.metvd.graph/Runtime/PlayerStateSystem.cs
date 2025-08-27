@@ -7,93 +7,184 @@ using TinyWalnutGames.MetVD.Core;
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>
-    /// Component that tracks player skill progression and unlocked abilities
+    /// Component that tracks player skill progression and abilities
     /// </summary>
     public struct PlayerSkillState : IComponentData
     {
-        public Ability UnlockedAbilities;          // Currently unlocked abilities
-        public Ability TemporaryPowerups;          // Temporary powerups (expire over time)
-        public float ExperiencePoints;             // Total XP accumulated
-        public float EnergyLevel;                  // Current energy for abilities (0-1)
-        public float EnergyRegenRate;              // Energy regeneration per second
-        public int SkillPointsAvailable;           // Skill points to spend
-        public bool HasRecentlyUnlockedAbility;    // Flag for UI notifications
+        /// <summary>
+        /// Currently unlocked abilities
+        /// </summary>
+        public Ability UnlockedAbilities;
         
-        public PlayerSkillState(Ability startingAbilities = Ability.Jump)
+        /// <summary>
+        /// Abilities that are temporarily available (from powerups, etc.)
+        /// </summary>
+        public Ability TemporaryAbilities;
+        
+        /// <summary>
+        /// Player level or progression marker
+        /// </summary>
+        public int ProgressionLevel;
+        
+        /// <summary>
+        /// Experience points for skill advancement
+        /// </summary>
+        public float ExperiencePoints;
+        
+        /// <summary>
+        /// Health/energy for abilities that require it
+        /// </summary>
+        public float AbilityEnergy;
+        
+        /// <summary>
+        /// Maximum ability energy
+        /// </summary>
+        public float MaxAbilityEnergy;
+        
+        /// <summary>
+        /// Timer for temporary abilities (countdown in seconds)
+        /// </summary>
+        public float TemporaryAbilityTimer;
+        
+        /// <summary>
+        /// Rate of energy regeneration per second
+        /// </summary>
+        public float EnergyRegenRate;
+
+        public PlayerSkillState(Ability initialAbilities = Ability.Jump | Ability.DoubleJump, int level = 1)
         {
-            UnlockedAbilities = startingAbilities;
-            TemporaryPowerups = Ability.None;
+            UnlockedAbilities = initialAbilities;
+            TemporaryAbilities = Ability.None;
+            ProgressionLevel = math.max(1, level);
             ExperiencePoints = 0f;
-            EnergyLevel = 1f;
-            EnergyRegenRate = 0.2f; // 20% per second
-            SkillPointsAvailable = 0;
-            HasRecentlyUnlockedAbility = false;
+            AbilityEnergy = 100f;
+            MaxAbilityEnergy = 100f;
+            TemporaryAbilityTimer = 0f;
+            EnergyRegenRate = 10f; // 10 energy per second default
         }
-    }
 
-    /// <summary>
-    /// Component for tracking ability unlock requirements
-    /// </summary>
-    public struct AbilityUnlockRequirement : IComponentData
-    {
-        public Ability RequiredPrerequisites;     // Abilities needed before unlocking
-        public float ExperienceRequired;          // XP needed to unlock
-        public int SkillPointsCost;              // Skill points needed
-        public bool IsUnlocked;                  // Whether this has been unlocked
-        
-        public AbilityUnlockRequirement(Ability prerequisites, float xpRequired, int skillCost = 1)
+        /// <summary>
+        /// Get all currently available abilities (unlocked + temporary)
+        /// </summary>
+        public readonly Ability GetAvailableAbilities()
         {
-            RequiredPrerequisites = prerequisites;
-            ExperienceRequired = xpRequired;
-            SkillPointsCost = skillCost;
-            IsUnlocked = false;
+            return UnlockedAbilities | TemporaryAbilities;
+        }
+
+        /// <summary>
+        /// Check if a specific ability is available
+        /// </summary>
+        public readonly bool HasAbility(Ability ability)
+        {
+            return (GetAvailableAbilities() & ability) != 0;
+        }
+
+        /// <summary>
+        /// Unlock a new ability permanently
+        /// </summary>
+        public void UnlockAbility(Ability ability)
+        {
+            UnlockedAbilities |= ability;
+        }
+
+        /// <summary>
+        /// Grant a temporary ability (from powerup, etc.)
+        /// </summary>
+        public void GrantTemporaryAbility(Ability ability)
+        {
+            TemporaryAbilities |= ability;
+        }
+
+        /// <summary>
+        /// Remove a temporary ability
+        /// </summary>
+        public void RemoveTemporaryAbility(Ability ability)
+        {
+            TemporaryAbilities &= ~ability;
         }
     }
 
     /// <summary>
-    /// Singleton component for managing global player state
+    /// Component for ability upgrade/unlock events
     /// </summary>
-    public struct PlayerStateManager : IComponentData
+    public struct AbilityUnlockEvent : IComponentData
     {
+        /// <summary>
+        /// The ability being unlocked
+        /// </summary>
+        public Ability NewAbility;
+        
+        /// <summary>
+        /// Whether this is a permanent unlock or temporary grant
+        /// </summary>
+        public bool IsPermanent;
+        
+        /// <summary>
+        /// Duration for temporary abilities (in seconds, -1 for permanent)
+        /// </summary>
+        public float Duration;
+
+        public AbilityUnlockEvent(Ability ability, bool isPermanent = true, float duration = -1f)
+        {
+            NewAbility = ability;
+            IsPermanent = isPermanent;
+            Duration = isPermanent ? -1f : math.max(0f, duration);
+        }
+    }
+
+    /// <summary>
+    /// Singleton component for global player state
+    /// </summary>
+    public struct GlobalPlayerState : IComponentData
+    {
+        /// <summary>
+        /// Reference to the main player entity
+        /// </summary>
         public Entity PlayerEntity;
-        public float GlobalDifficultyModifier;     // Adjusts challenge based on player progress
-        public bool EnableProgressiveSkillGating;  // Whether rooms gate based on skills
-        public float LastSkillUpdateTime;         // For tracking progression rate
         
-        public PlayerStateManager(Entity player, float difficulty = 1.0f)
+        /// <summary>
+        /// Current save game progression flags
+        /// </summary>
+        public int SaveProgressionFlags;
+        
+        /// <summary>
+        /// Game completion percentage
+        /// </summary>
+        public float CompletionPercentage;
+
+        public GlobalPlayerState(Entity playerEntity)
         {
-            PlayerEntity = player;
-            GlobalDifficultyModifier = difficulty;
-            EnableProgressiveSkillGating = true;
-            LastSkillUpdateTime = 0f;
+            PlayerEntity = playerEntity;
+            SaveProgressionFlags = 0;
+            CompletionPercentage = 0f;
         }
     }
 
     /// <summary>
-    /// System that tracks skill progression and manages ability unlocks
+    /// System that manages player skill progression and state
+    /// Provides centralized access to player abilities for room generation
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial struct PlayerStateSystem : ISystem
     {
         private ComponentLookup<PlayerSkillState> _skillStateLookup;
-        private ComponentLookup<AbilityUnlockRequirement> _unlockRequirementLookup;
+        private ComponentLookup<GlobalPlayerState> _globalStateLookup;
         private EntityQuery _playerQuery;
-        private EntityQuery _unlockableAbilityQuery;
+        private EntityQuery _unlockEventQuery;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             _skillStateLookup = state.GetComponentLookup<PlayerSkillState>();
-            _unlockRequirementLookup = state.GetComponentLookup<AbilityUnlockRequirement>();
+            _globalStateLookup = state.GetComponentLookup<GlobalPlayerState>();
             
             _playerQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<PlayerSkillState>()
                 .Build(ref state);
-
-            _unlockableAbilityQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<AbilityUnlockRequirement>()
-                .WithNone<PlayerSkillState>() // Abilities are separate entities
+                
+            _unlockEventQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<AbilityUnlockEvent>()
                 .Build(ref state);
         }
 
@@ -101,173 +192,153 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
         {
             _skillStateLookup.Update(ref state);
-            _unlockRequirementLookup.Update(ref state);
+            _globalStateLookup.Update(ref state);
 
-            var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
-            var time = (float)state.WorldUnmanaged.Time.ElapsedTime;
-
-            // Update player skill progression
-            var progressionJob = new SkillProgressionJob
+            // Process ability unlock events
+            if (!_unlockEventQuery.IsEmpty)
             {
-                DeltaTime = deltaTime,
-                CurrentTime = time,
-                UnlockRequirementLookup = _unlockRequirementLookup,
-                EntityCommandBuffer = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>()
-                    .CreateCommandBuffer(state.WorldUnmanaged)
+                var processUnlockJob = new ProcessAbilityUnlockJob
+                {
+                    SkillStateLookup = _skillStateLookup,
+                    DeltaTime = state.WorldUnmanaged.Time.DeltaTime
+                };
+
+                state.Dependency = processUnlockJob.ScheduleParallel(_unlockEventQuery, state.Dependency);
+                
+                // Clean up processed events
+                state.EntityManager.DestroyEntity(_unlockEventQuery);
+            }
+
+            // Update temporary ability timers (would be implemented for timed powerups)
+            var updateTimersJob = new UpdateTemporaryAbilityTimersJob
+            {
+                DeltaTime = state.WorldUnmanaged.Time.DeltaTime
             };
 
-            state.Dependency = progressionJob.ScheduleParallel(_playerQuery, state.Dependency);
-
-            // Process ability unlocks
-            var unlockJob = new AbilityUnlockJob
-            {
-                SkillStateLookup = _skillStateLookup,
-                EntityCommandBuffer = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>()
-                    .CreateCommandBuffer(state.WorldUnmanaged)
-            };
-
-            state.Dependency = unlockJob.ScheduleParallel(_unlockableAbilityQuery, state.Dependency);
+            state.Dependency = updateTimersJob.ScheduleParallel(_playerQuery, state.Dependency);
         }
     }
 
     /// <summary>
-    /// Job that updates player skill progression and energy regeneration
+    /// Job that processes ability unlock events
     /// </summary>
     [BurstCompile]
-    public partial struct SkillProgressionJob : IJobEntity
+    public partial struct ProcessAbilityUnlockJob : IJobEntity
+    {
+        public ComponentLookup<PlayerSkillState> SkillStateLookup;
+        public float DeltaTime;
+
+        public void Execute(Entity entity, in AbilityUnlockEvent unlockEvent, in GlobalPlayerState globalState)
+        {
+            if (SkillStateLookup.HasComponent(globalState.PlayerEntity))
+            {
+                var skillState = SkillStateLookup[globalState.PlayerEntity];
+                
+                if (unlockEvent.IsPermanent)
+                {
+                    skillState.UnlockAbility(unlockEvent.NewAbility);
+                }
+                else
+                {
+                    skillState.GrantTemporaryAbility(unlockEvent.NewAbility);
+                }
+                
+                SkillStateLookup[globalState.PlayerEntity] = skillState;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Job that updates temporary ability timers
+    /// </summary>
+    [BurstCompile]
+    public partial struct UpdateTemporaryAbilityTimersJob : IJobEntity
     {
         public float DeltaTime;
-        public float CurrentTime;
-        [ReadOnly] public ComponentLookup<AbilityUnlockRequirement> UnlockRequirementLookup;
-        public EntityCommandBuffer EntityCommandBuffer;
 
-        public void Execute(Entity entity, ref PlayerSkillState skillState, ref PlayerStateManager manager)
+        public void Execute(ref PlayerSkillState skillState)
         {
-            // Regenerate energy
-            if (skillState.EnergyLevel < 1f)
+            // Update temporary ability timers and remove expired ones
+            skillState.TemporaryAbilityTimer -= DeltaTime;
+            
+            if (skillState.TemporaryAbilityTimer <= 0f)
             {
-                skillState.EnergyLevel = math.min(1f, skillState.EnergyLevel + skillState.EnergyRegenRate * DeltaTime);
+                // Remove temporary abilities that have expired
+                skillState.TemporaryAbilities = Ability.None;
+                skillState.TemporaryAbilityTimer = 0f;
             }
-
-            // Award XP for continued play (passive progression)
-            skillState.ExperiencePoints += 1.0f * DeltaTime; // 1 XP per second base rate
-
-            // Check for skill point awards based on XP thresholds
-            var skillPointThreshold = (skillState.SkillPointsAvailable + 1) * 100f; // 100, 200, 300 XP...
-            if (skillState.ExperiencePoints >= skillPointThreshold)
+            
+            // Update energy regeneration
+            if (skillState.AbilityEnergy < skillState.MaxAbilityEnergy)
             {
-                skillState.SkillPointsAvailable++;
+                skillState.AbilityEnergy = math.min(
+                    skillState.MaxAbilityEnergy,
+                    skillState.AbilityEnergy + skillState.EnergyRegenRate * DeltaTime
+                );
             }
-
-            // Update manager timestamp
-            manager.LastSkillUpdateTime = CurrentTime;
-
-            // Adjust global difficulty based on player progression
-            var progressionRatio = skillState.ExperiencePoints / 1000f; // Normalize to 1000 XP
-            manager.GlobalDifficultyModifier = 1f + math.min(progressionRatio * 0.5f, 2f); // Cap at 3x difficulty
         }
     }
 
     /// <summary>
-    /// Job that processes ability unlock requirements
-    /// </summary>
-    [BurstCompile]
-    public partial struct AbilityUnlockJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<PlayerSkillState> SkillStateLookup;
-        public EntityCommandBuffer EntityCommandBuffer;
-
-        public void Execute(Entity abilityEntity, ref AbilityUnlockRequirement requirement)
-        {
-            if (requirement.IsUnlocked)
-                return;
-
-            // Find player entity (in practice, this would be cached or passed in)
-            var playerEntity = FindPlayerEntity();
-            if (playerEntity == Entity.Null || !SkillStateLookup.HasComponent(playerEntity))
-                return;
-
-            var playerSkills = SkillStateLookup[playerEntity];
-
-            // Check if unlock requirements are met
-            bool prerequisitesMet = (playerSkills.UnlockedAbilities & requirement.RequiredPrerequisites) == requirement.RequiredPrerequisites;
-            bool hasXP = playerSkills.ExperiencePoints >= requirement.ExperienceRequired;
-            bool hasSkillPoints = playerSkills.SkillPointsAvailable >= requirement.SkillPointsCost;
-
-            if (prerequisitesMet && hasXP && hasSkillPoints)
-            {
-                // Unlock the ability (would need to know which ability this requirement represents)
-                requirement.IsUnlocked = true;
-                
-                // This would typically trigger an event or update the player's skill state
-                // For now, mark that an unlock happened
-                EntityCommandBuffer.SetComponent(playerEntity, new PlayerSkillState
-                {
-                    UnlockedAbilities = playerSkills.UnlockedAbilities, // Would add new ability here
-                    TemporaryPowerups = playerSkills.TemporaryPowerups,
-                    ExperiencePoints = playerSkills.ExperiencePoints,
-                    EnergyLevel = playerSkills.EnergyLevel,
-                    EnergyRegenRate = playerSkills.EnergyRegenRate,
-                    SkillPointsAvailable = playerSkills.SkillPointsAvailable - requirement.SkillPointsCost,
-                    HasRecentlyUnlockedAbility = true
-                });
-            }
-        }
-
-        private Entity FindPlayerEntity()
-        {
-            // In a full implementation, this would use a singleton or cached reference
-            // For now, return Entity.Null as placeholder
-            return Entity.Null;
-        }
-    }
-
-    /// <summary>
-    /// Utility class for querying player skills from other systems
+    /// Static utility class for querying player state from other systems
     /// </summary>
     public static class PlayerStateUtility
     {
         /// <summary>
-        /// Get currently available abilities for room generation systems
+        /// Get currently available player abilities from any system
         /// </summary>
-        public static Ability GetAvailableAbilities(ref SystemState state, Entity playerEntity)
+        public static Ability GetCurrentPlayerAbilities(EntityManager entityManager)
         {
-            var skillLookup = state.GetComponentLookup<PlayerSkillState>(true);
-            if (skillLookup.HasComponent(playerEntity))
+            // Find the global player state
+            using var globalStateQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<GlobalPlayerState>()
+                .Build(entityManager);
+
+            if (!globalStateQuery.IsEmpty)
             {
-                var skills = skillLookup[playerEntity];
-                return skills.UnlockedAbilities | skills.TemporaryPowerups;
+                var globalState = globalStateQuery.GetSingleton<GlobalPlayerState>();
+                
+                if (entityManager.HasComponent<PlayerSkillState>(globalState.PlayerEntity))
+                {
+                    var skillState = entityManager.GetComponentData<PlayerSkillState>(globalState.PlayerEntity);
+                    return skillState.GetAvailableAbilities();
+                }
             }
-            
-            // Default starting abilities if no player state found
+
+            // Fallback to basic abilities if no player state found
             return Ability.Jump | Ability.DoubleJump;
         }
 
         /// <summary>
-        /// Get current difficulty modifier based on player progression
+        /// Check if player has a specific ability
         /// </summary>
-        public static float GetDifficultyModifier(ref SystemState state)
+        public static bool PlayerHasAbility(EntityManager entityManager, Ability ability)
         {
-            var managerLookup = state.GetComponentLookup<PlayerStateManager>(true);
-            
-            // Find player state manager (would typically be a singleton)
-            // For now, return default difficulty
-            return 1.0f;
+            var availableAbilities = GetCurrentPlayerAbilities(entityManager);
+            return (availableAbilities & ability) != 0;
         }
 
         /// <summary>
-        /// Check if player has sufficient energy for an ability
+        /// Get player progression level
         /// </summary>
-        public static bool HasSufficientEnergy(ref SystemState state, Entity playerEntity, float energyCost)
+        public static int GetPlayerLevel(EntityManager entityManager)
         {
-            var skillLookup = state.GetComponentLookup<PlayerSkillState>(true);
-            if (skillLookup.HasComponent(playerEntity))
+            using var globalStateQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<GlobalPlayerState>()
+                .Build(entityManager);
+
+            if (!globalStateQuery.IsEmpty)
             {
-                var skills = skillLookup[playerEntity];
-                return skills.EnergyLevel >= energyCost;
+                var globalState = globalStateQuery.GetSingleton<GlobalPlayerState>();
+                
+                if (entityManager.HasComponent<PlayerSkillState>(globalState.PlayerEntity))
+                {
+                    var skillState = entityManager.GetComponentData<PlayerSkillState>(globalState.PlayerEntity);
+                    return skillState.ProgressionLevel;
+                }
             }
-            
-            return true; // Assume sufficient energy if no player state
+
+            return 1; // Default starting level
         }
     }
 }
