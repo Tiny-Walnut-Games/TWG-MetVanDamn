@@ -322,11 +322,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var fromNode = _entityManager.GetComponentData<NavNode>(fromE);
             var toNode = _entityManager.GetComponentData<NavNode>(toE);
 
-            // If capabilities cannot even stand on start or end, abort
             if (!fromNode.IsCompatibleWith(caps) || !toNode.IsCompatibleWith(caps))
                 return;
 
-            // Build nodeId -> entity map (single pass arrays)
+            // Build node lookup
             var nodeQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
             using var nodeEntities = nodeQuery.ToEntityArray(Allocator.Temp);
             using var nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
@@ -338,24 +337,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     entityLookup.Add(nid, nodeEntities[i]);
             }
 
-            // Dijkstra (simple list-based priority selection)
-            var open = new List<uint> { fromId };
+            // A* data
+            var open = new List<uint> { fromId }; // acts as priority queue (small graphs acceptable)
             var cameFrom = new Dictionary<uint, uint>();
             var gScore = new Dictionary<uint, float> { [fromId] = 0f };
+            var fScore = new Dictionary<uint, float> { [fromId] = math.distance(fromNode.WorldPosition, toNode.WorldPosition) };
+            var closed = new HashSet<uint>();
 
             while (open.Count > 0)
             {
-                // Find lowest cost node in open
+                // Select node with lowest fScore
                 uint current = open[0];
-                float bestCost = gScore[current];
+                float bestF = fScore[current];
                 for (int i = 1; i < open.Count; i++)
                 {
-                    var cand = open[i];
-                    var candCost = gScore[cand];
-                    if (candCost < bestCost)
+                    var candidate = open[i];
+                    var f = fScore[candidate];
+                    if (f < bestF)
                     {
-                        current = cand;
-                        bestCost = candCost;
+                        current = candidate;
+                        bestF = f;
                     }
                 }
 
@@ -363,14 +364,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     break; // path found
 
                 open.Remove(current);
+                closed.Add(current);
 
-                // Expand neighbors
                 if (!entityLookup.TryGetValue(current, out var currentEntity) || !_entityManager.HasComponent<NavLinkBufferElement>(currentEntity))
                     continue;
 
                 var currentNode = _entityManager.GetComponentData<NavNode>(currentEntity);
                 if (!currentNode.IsCompatibleWith(caps))
-                    continue; // cannot stand here with given capabilities
+                    continue;
 
                 var links = _entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
                 for (int li = 0; li < links.Length; li++)
@@ -379,7 +380,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     if (!link.CanTraverseWith(caps, current))
                         continue;
 
-                    // Determine destination respecting directionality
+                    // Resolve destination respecting direction
                     uint dest = current;
                     if (link.ConnectionType == ConnectionType.Bidirectional)
                     {
@@ -391,31 +392,32 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     }
                     else
                     {
-                        continue; // not a valid outgoing direction
+                        continue;
                     }
 
-                    if (dest == current || !entityLookup.TryGetValue(dest, out var destEntity) || !_entityManager.HasComponent<NavNode>(destEntity))
+                    if (dest == current || closed.Contains(dest) || !entityLookup.TryGetValue(dest, out var destEntity) || !_entityManager.HasComponent<NavNode>(destEntity))
                         continue;
 
                     var destNode = _entityManager.GetComponentData<NavNode>(destEntity);
                     if (!destNode.IsCompatibleWith(caps))
                         continue;
 
-                    float tentative = gScore[current] + link.CalculateTraversalCost(caps);
-                    if (!gScore.TryGetValue(dest, out var existing) || tentative < existing)
+                    float tentativeG = gScore[current] + link.CalculateTraversalCost(caps);
+                    if (!gScore.TryGetValue(dest, out var existingG) || tentativeG < existingG)
                     {
-                        gScore[dest] = tentative;
                         cameFrom[dest] = current;
+                        gScore[dest] = tentativeG;
+                        float h = math.distance(destNode.WorldPosition, toNode.WorldPosition);
+                        fScore[dest] = tentativeG + h;
                         if (!open.Contains(dest))
                             open.Add(dest);
                     }
                 }
             }
 
-            // Reconstruct path
             if (!cameFrom.ContainsKey(toId) && fromId != toId)
             {
-                // No path: draw fallback straight line (dashed effect via segments)
+                // No path: dashed straight line
                 Gizmos.color = Color.gray;
                 var a = fromNode.WorldPosition;
                 var b = toNode.WorldPosition;
@@ -431,6 +433,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 return;
             }
 
+            // Reconstruct path (includes destination)
             var pathIds = new List<uint>();
             uint cur = toId;
             pathIds.Add(cur);
@@ -440,12 +443,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 pathIds.Add(cur);
             }
             pathIds.Reverse();
-
             if (pathIds.Count < 2)
                 return;
 
-            // Draw path polyline with gradient by relative cost fraction
-            float totalCost = gScore[toId];
+            float totalCost = gScore.TryGetValue(toId, out var finalCost) ? finalCost : 0f;
             for (int i = 0; i < pathIds.Count - 1; i++)
             {
                 var aId = pathIds[i];
@@ -455,19 +456,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 var aNode = _entityManager.GetComponentData<NavNode>(aEntity);
                 var bNode = _entityManager.GetComponentData<NavNode>(bEntity);
 
-                // Fractional cost up to segment end for heat coloring
-                float segCost = gScore[bId];
-                float fraction = totalCost > 0f ? math.saturate(segCost / totalCost) : 0f;
-                // Lerp between highlight color and yellow based on fraction (higher cost later => warmer)
+                float segAccumCost = gScore[bId];
+                float fraction = totalCost > 0f ? math.saturate(segAccumCost / totalCost) : 0f;
                 var baseCol = _currentColors[6];
                 var heatCol = Color.Lerp(baseCol, Color.yellow, fraction);
                 Gizmos.color = heatCol;
                 Gizmos.DrawLine(aNode.WorldPosition, bNode.WorldPosition);
             }
 
-            // Annotate path summary
             var midPoint = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
-            Handles.Label(midPoint + new float3(0, labelOffset * 0.5f, 0), $"Path {fromId}->{toId}\nCost:{gScore[toId]:F1} Nodes:{pathIds.Count}", EditorStyles.boldLabel);
+            Handles.Label(midPoint + new float3(0, labelOffset * 0.5f, 0), $"Path {fromId}->{toId}\nCost:{totalCost:F1} Nodes:{pathIds.Count}", EditorStyles.boldLabel);
         }
 
         private void DrawDetailedInformation()
