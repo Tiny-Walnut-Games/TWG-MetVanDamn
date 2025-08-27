@@ -95,7 +95,7 @@ namespace TinyWalnutGames.MetVD.Graph
             
             // Periodic speed variation
             var speedModulation = 1.0f + math.sin(periodTime) * 0.3f;
-            motion.Velocity = direction * speedModulation * 2.0f;
+            motion.Velocity = 2.0f * speedModulation * direction;
             
             // Slight vertical bobbing for visual interest
             motion.Velocity.y += math.sin(periodTime * 2.0f) * 0.1f;
@@ -470,7 +470,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 affectedEntities.Dispose();
         }
         
-        NativeArray<Entity> DetectEntitiesOnPlatform(ref SystemState state, float3 platformPosition, RectInt bounds)
+        readonly NativeArray<Entity> DetectEntitiesOnPlatform(ref SystemState state, float3 platformPosition, RectInt bounds)
         {
             // Spatial query for entities within conveyor influence area
             var affectedEntities = new NativeList<Entity>(64, Allocator.Temp);
@@ -548,7 +548,7 @@ namespace TinyWalnutGames.MetVD.Graph
             {
                 currentVelocity = SystemAPI.GetComponent<VelocityComponent>(entity).Value;
             }
-            var conveyorVelocity = math.normalize(direction) * speed * edgeFalloff * stickinessModifier;
+            var conveyorVelocity = edgeFalloff * speed * stickinessModifier * math.normalize(direction);
             var heightModifier = CalculateHeightModifier(direction);
             conveyorVelocity *= heightModifier;
             var frictionCoefficient = GetEntityFriction(ref state, entity); // updated call
@@ -572,7 +572,7 @@ namespace TinyWalnutGames.MetVD.Graph
             if (verticalComponent < -0.1f) return 1.3f;
             return 1.0f;
         }
-        private float GetEntityFriction(ref SystemState state, Entity entity) // added ref SystemState per analyzer requirement
+        private readonly float GetEntityFriction(ref SystemState state, Entity entity) // added ref SystemState per analyzer requirement
         {
             if (SystemAPI.HasComponent<FrictionComponent>(entity))
             {
@@ -580,7 +580,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             return 0.8f;
         }
-        private void ApplyConveyorScriptedEffects(ref SystemState state, Entity entity, float3 velocity, float deltaTime)
+        private readonly void ApplyConveyorScriptedEffects(ref SystemState state, Entity entity, float3 velocity, float deltaTime)
         {
             var effectStrength = math.length(velocity) * deltaTime;
             if (SystemAPI.HasComponent<PolarityComponent>(entity))

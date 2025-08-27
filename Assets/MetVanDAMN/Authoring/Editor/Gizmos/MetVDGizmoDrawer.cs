@@ -9,7 +9,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     [InitializeOnLoad]
     public static class MetVDGizmoDrawer
     {
-        private static MetVDGizmoSettings _settings;
+        private static readonly MetVDGizmoSettings _settings;
         private const string SettingsAssetName = "MetVDGizmoSettings";
 
         static MetVDGizmoDrawer()

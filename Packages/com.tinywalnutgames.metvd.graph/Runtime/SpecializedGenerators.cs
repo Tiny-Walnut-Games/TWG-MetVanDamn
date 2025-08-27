@@ -95,7 +95,7 @@ namespace TinyWalnutGames.MetVD.Graph
             GenerateSkillGates(patterns, bounds, request.AvailableSkills, request.GenerationSeed);
         }
 
-        private void GenerateDashGaps(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
+        private readonly void GenerateDashGaps(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
         {
             var random = new Unity.Mathematics.Random(seed + 1);
             var gapCount = math.max(1, bounds.width / 8);
@@ -116,7 +116,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void GenerateWallClimbShafts(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
+        private readonly void GenerateWallClimbShafts(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
         {
             var random = new Unity.Mathematics.Random(seed + 2);
             var shaftCount = math.max(1, bounds.height / 8);
@@ -135,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void GenerateGrapplePoints(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
+        private readonly void GenerateGrapplePoints(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
         {
             var random = new Unity.Mathematics.Random(seed + 3);
             var pointCount = math.max(1, (bounds.width * bounds.height) / 32);
@@ -158,7 +158,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void GenerateSkillGates(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, Ability availableSkills, uint seed)
+        private readonly void GenerateSkillGates(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, Ability availableSkills, uint seed)
         {
             var random = new Unity.Mathematics.Random(seed + 4);
             
@@ -242,10 +242,11 @@ namespace TinyWalnutGames.MetVD.Graph
             });
             
             // Generate platforms with physics-based constraints
-            var platformPositions = new NativeList<float2>(Allocator.Temp);
-            
-            // Start platform
-            platformPositions.Add(new float2(bounds.x + 1, bounds.y + 1));
+            var platformPositions = new NativeList<float2>(Allocator.Temp)
+            {
+                // Start platform
+                new(bounds.x + 1, bounds.y + 1)
+            };
             
             // Intermediate platforms based on jump constraints
             var currentX = bounds.x + 1 + minSpacing.x;
@@ -257,7 +258,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Validate this platform is reachable from the previous one
                 if (platformPositions.Length > 0)
                 {
-                    var lastPlatform = platformPositions[platformPositions.Length - 1];
+                    var lastPlatform = platformPositions[^1];
                     var physics = new JumpArcPhysics
                     {
                         JumpHeight = jumpPhysics.JumpHeight,
@@ -406,7 +407,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private RoomFeatureType SelectWeightedFeatureType(float weight, BiomeType biome)
+        private readonly RoomFeatureType SelectWeightedFeatureType(float weight, BiomeType biome)
         {
             // Biome-specific weighting
             return biome switch
@@ -541,7 +542,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// <summary>
         /// Helper method to check if a position is within the room bounds
         /// </summary>
-        private bool IsWithinBounds(int2 position, RectInt bounds)
+        private readonly bool IsWithinBounds(int2 position, RectInt bounds)
         {
             return position.x >= bounds.x && position.x < bounds.x + bounds.width &&
                    position.y >= bounds.y && position.y < bounds.y + bounds.height;

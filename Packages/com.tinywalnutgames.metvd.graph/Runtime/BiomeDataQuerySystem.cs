@@ -224,9 +224,9 @@ namespace TinyWalnutGames.MetVD.Graph
             return Entity.Null;
         }
 
-        private Entity FindEntityByNodeId(uint parentId)
+        private readonly Entity FindEntityByNodeId(uint parentId)
         {
-            // This would typically use a lookup table or entity query
+            // TODO: This would typically use a lookup table or entity query
             // For now, return Entity.Null - in practice this would be optimized
             // with a cached lookup from NodeId.Value to Entity
             return Entity.Null;
@@ -235,15 +235,15 @@ namespace TinyWalnutGames.MetVD.Graph
         private RoomBiomeData FindSiblingBiome(Entity roomEntity, NodeId nodeId)
         {
             // Look at connected/nearby rooms to infer biome type
-            // This would use the connection system in a full implementation
-            
+            // TODO: This would use the connection system in a full implementation
+
             if (_connectionLookup.HasBuffer(roomEntity))
             {
                 var connections = _connectionLookup[roomEntity];
                 foreach (var connection in connections)
                 {
                     // Check connected nodes for biome data
-                    // In practice, would resolve connection.ToNodeId to entity and check biome
+                    // TODO: WHY ARE THERE SO MANY TODOS LEFT OVER????????? In practice, would resolve connection.ToNodeId to entity and check biome
                 }
             }
             

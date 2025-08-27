@@ -22,8 +22,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private float refreshInterval = 1f;
         private double lastRefreshTime;
         
-        private List<BiomeInfo> biomeInfos = new();
-        private Dictionary<BiomeType, Color> biomeColors = new();
+        private readonly List<BiomeInfo> biomeInfos = new();
+        private readonly Dictionary<BiomeType, Color> biomeColors = new();
 
         [System.Serializable]
         private class BiomeInfo
@@ -342,38 +342,38 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             biomeInfos.Clear();
             biomeColors.Clear();
-            
-            var biomeAuthorings = FindObjectsOfType<BiomeFieldAuthoring>();
+
+            var biomeAuthorings = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
             var biomesByType = new Dictionary<BiomeType, List<BiomeFieldAuthoring>>();
-            
+
             // Group biomes by type
             foreach (var biomeAuthoring in biomeAuthorings)
             {
                 if (biomeAuthoring == null) continue;
-                
+
                 BiomeType biomeType = biomeAuthoring.biomeType;
-                
+
                 if (!biomesByType.ContainsKey(biomeType))
                 {
                     biomesByType[biomeType] = new List<BiomeFieldAuthoring>();
                 }
-                
+
                 biomesByType[biomeType].Add(biomeAuthoring);
             }
-            
+
             // Sync with runtime ECS data if available
             SyncWithRuntimeBiomeData(biomesByType);
-            
+
             // Create biome info entries
             foreach (var kvp in biomesByType)
             {
                 BiomeType type = kvp.Key;
                 List<BiomeFieldAuthoring> instances = kvp.Value;
-                
+
                 Color biomeColor = GetBiomeColor(type, instances);
                 Vector3 averagePosition = CalculateAveragePosition(instances);
                 BiomeArtProfile artProfile = GetMostCommonArtProfile(instances);
-                
+
                 var biomeInfo = new BiomeInfo
                 {
                     type = type,
@@ -384,7 +384,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     artProfile = artProfile,
                     isVisible = true
                 };
-                
+
                 biomeInfos.Add(biomeInfo);
                 biomeColors[type] = biomeColor;
             }
@@ -399,6 +399,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (Application.isPlaying && World.DefaultGameObjectInjectionWorld != null)
             {
                 var world = World.DefaultGameObjectInjectionWorld;
+                // TODO: Re-enable when BiomeFieldSystem is converted to ComponentSystemBase
                 // Removed: var biomeSystem = world.GetExistingSystemManaged<BiomeFieldSystem>();
                 // The line above caused CS0315 because BiomeFieldSystem is an ISystem, not a ComponentSystemBase.
                 // If you need to interact with the system, use the unmanaged API or just access the EntityManager as below.
@@ -415,6 +416,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             try
             {
+                // TODO: Use the queried ECS biome data to update biome info entries
                 var entityManager = world.EntityManager;
                 
                 // Query all biome entities with art profile references
@@ -426,7 +428,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 using var entities = query.ToEntityArray(Allocator.Temp);
                 using var biomeComponents = query.ToComponentDataArray<TinyWalnutGames.MetVD.Core.Biome>(Allocator.Temp);
                 using var artProfileRefs = query.ToComponentDataArray<BiomeArtProfileReference>(Allocator.Temp);
-                
+
+                biomesByType ??= new Dictionary<BiomeType, List<BiomeFieldAuthoring>>(); // Ensure dictionary is initialized
+
                 for (int i = 0; i < entities.Length; i++)
                 {
                     var biomeComponent = biomeComponents[i];
@@ -508,8 +512,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void SyncWithTileMapRenderers(Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
         {
-            var tilemapRenderers = FindObjectsOfType<UnityEngine.Tilemaps.TilemapRenderer>();
-            
+            var tilemapRenderers = Object.FindObjectsByType<UnityEngine.Tilemaps.TilemapRenderer>(FindObjectsSortMode.None);
+
             foreach (var renderer in tilemapRenderers)
             {
                 if (renderer.material != null && renderer.material.HasProperty("_Color"))
@@ -536,15 +540,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 foreach (var biome in kvp.Value)
                 {
-                    if (biome.artProfile?.biomeName != null && 
-                        renderer.name.Contains(biome.artProfile.biomeName))
+                    if ((biome.artProfile != null ? biome.artProfile.biomeName : null) == null || !renderer.name.Contains(biome.artProfile.biomeName))
                     {
-                        return biome;
+                        // Or by proximity
+                        float distance = Vector3.Distance(biome.transform.position, renderer.transform.position);
+                        if (distance < biome.fieldRadius + 5f) // Within biome influence + buffer
+                        {
+                            return biome;
+                        }
                     }
-                    
-                    // Or by proximity
-                    float distance = Vector3.Distance(biome.transform.position, renderer.transform.position);
-                    if (distance < biome.fieldRadius + 5f) // Within biome influence + buffer
+                    else
                     {
                         return biome;
                     }
@@ -563,7 +568,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             // Try to get color from art profile first
             var profileWithColor = instances.FirstOrDefault(i => i.artProfile != null);
-            if (profileWithColor?.artProfile != null)
+            if (profileWithColor != null ? profileWithColor.artProfile : null != null)
             {
                 return profileWithColor.artProfile.debugColor;
             }
@@ -628,14 +633,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void FocusBiome(BiomeInfo biomeInfo)
         {
-            var instances = FindObjectsOfType<BiomeFieldAuthoring>()
+            var instances = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None)
                 .Where(b => b.biomeType.Equals(biomeInfo.type))
                 .ToArray();
-            
+
             if (instances.Length > 0)
             {
                 Selection.objects = instances.Cast<Object>().ToArray();
-                
+
                 if (instances.Length == 1)
                 {
                     SceneView.FrameLastActiveSceneView();
@@ -648,7 +653,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     {
                         bounds.Encapsulate(instance.transform.position);
                     }
-                    
+
                     SceneView.lastActiveSceneView.Frame(bounds, false);
                 }
             }
@@ -656,33 +661,33 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void FocusAllBiomes()
         {
-            var allBiomes = FindObjectsOfType<BiomeFieldAuthoring>();
-            
+            var allBiomes = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
+
             if (allBiomes.Length > 0)
             {
                 Selection.objects = allBiomes.Cast<Object>().ToArray();
-                
+
                 var bounds = new Bounds(allBiomes[0].transform.position, Vector3.zero);
                 foreach (var biome in allBiomes)
                 {
                     bounds.Encapsulate(biome.transform.position);
                 }
-                
+
                 SceneView.lastActiveSceneView.Frame(bounds, false);
             }
         }
 
         private void UpdateBiomeVisibility(BiomeInfo biomeInfo)
         {
-            var instances = FindObjectsOfType<BiomeFieldAuthoring>()
+            var instances = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None)
                 .Where(b => b.biomeType.Equals(biomeInfo.type))
                 .ToArray();
-            
+
             foreach (var instance in instances)
             {
                 instance.gameObject.SetActive(biomeInfo.isVisible);
             }
-            
+
             SceneView.RepaintAll();
         }
 
@@ -692,7 +697,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         public static Dictionary<BiomeType, Color> GetBiomeColorMapping()
         {
             var window = Resources.FindObjectsOfTypeAll<BiomeColorLegendWindow>().FirstOrDefault();
-            return window?.biomeColors ?? new Dictionary<BiomeType, Color>();
+            return window != null ? window.biomeColors : null ?? new Dictionary<BiomeType, Color>();
         }
     }
 }

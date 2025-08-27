@@ -15,24 +15,24 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     public class NavigationGraphGizmo : MonoBehaviour
     {
         [Header("Display Settings")]
-        [SerializeField] private bool showNavigationGraph = true;
-        [SerializeField] private bool showNodeLabels = true;
-        [SerializeField] private bool showLinkCosts = true;
-        [SerializeField] private bool showGateRequirements = true;
-        [SerializeField] private bool showUnreachableAreas = true;
+        private bool showNavigationGraph = true;
+        private readonly bool showNodeLabels = true;
+        private readonly bool showLinkCosts = true;
+        private readonly bool showGateRequirements = true;
+        private readonly bool showUnreachableAreas = true;
 
         [Header("Visual Configuration")]
-        [SerializeField] private float nodeRadius = 0.5f;
-        [SerializeField] private float linkWidth = 2.0f;
-        [SerializeField] private float labelOffset = 1.0f;
+        private readonly float nodeRadius = 0.5f;
+        readonly float linkWidth = 2.0f;
+        private readonly float labelOffset = 1.0f;
 
         [Header("Agent Testing")]
-        [SerializeField] private AgentCapabilityProfile testAgentProfile = AgentCapabilityProfile.BasicAgent;
-        [SerializeField] private uint highlightPathFromNode = 0;
-        [SerializeField] private uint highlightPathToNode = 0;
+        private readonly AgentCapabilityProfile testAgentProfile = AgentCapabilityProfile.BasicAgent;
+        private readonly uint highlightPathFromNode = 0;
+        private readonly uint highlightPathToNode = 0;
 
         [Header("Color Scheme")]
-        [SerializeField] private NavigationColorScheme colorScheme = NavigationColorScheme.Default;
+        private readonly NavigationColorScheme colorScheme = NavigationColorScheme.Default;
 
         private static readonly Color[] DefaultColors = new Color[]
         {
@@ -79,15 +79,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [MenuItem("Tools/MetVanDAMN/Toggle Navigation Graph Visualization")]
         public static void ToggleNavigationGraphVisualization()
         {
-            var gizmos = FindObjectsOfType<NavigationGraphGizmo>();
-            bool newState = gizmos.Length == 0 || !gizmos[0].showNavigationGraph;
-            
-            foreach (var gizmo in gizmos)
+            var gizmo = FindFirstObjectByType<NavigationGraphGizmo>();
+            bool newState = gizmo == null || !gizmo.showNavigationGraph;
+
+            if (gizmo != null)
             {
                 gizmo.showNavigationGraph = newState;
             }
-            
-            Debug.Log($"Navigation graph visualization {(newState ? "enabled" : "disabled")} for {gizmos.Length} gizmos.");
+
+            Debug.Log($"Navigation graph visualization {(newState ? "enabled" : "disabled")} for {(gizmo != null ? 1 : 0)} gizmos.");
         }
 
         /// <summary>
@@ -311,8 +311,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
         }
 
-        private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps) // TODO: find a use for caps - a valid and meaningful use.
+        private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps)
         {
+            // TODO: find a valid and meaningful use for caps when pathfinding API is exposed
+            // TODO: Why isn't A* exposed yet? Is A* being ignored in favor of another algorithm?
             // Fallback simple straight line highlight until path API exposed
             var fromE = FindEntityByNodeId(fromId);
             var toE = FindEntityByNodeId(toId);

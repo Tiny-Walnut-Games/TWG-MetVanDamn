@@ -89,8 +89,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 if (go == null) continue;
 
                 // District
-                var district = go.GetComponent<DistrictAuthoring>();
-                if (district != null)
+                if (go.TryGetComponent<DistrictAuthoring>(out var district))
                 {
                     var e = em.CreateEntity();
                     var node = new NodeId(district.nodeId, district.level, district.parentId, district.gridCoordinates);
@@ -103,8 +102,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 }
 
                 // Connection
-                var connection = go.GetComponent<ConnectionAuthoring>();
-                if (connection != null)
+                if (go.TryGetComponent<ConnectionAuthoring>(out var connection))
                 {
                     var e = em.CreateEntity();
                     var sourceNode = new NodeId(connection.sourceNode);
@@ -126,8 +124,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 }
 
                 // Gate
-                var gate = go.GetComponent<GateConditionAuthoring>();
-                if (gate != null)
+                if (go.TryGetComponent<GateConditionAuthoring>(out var gate))
                 {
                     var e = em.CreateEntity();
                     var buffer = em.AddBuffer<GateConditionBufferElement>(e);
@@ -145,8 +142,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 }
 
                 // Biome Field
-                var biomeField = go.GetComponent<BiomeFieldAuthoring>();
-                if (biomeField != null)
+                if (go.TryGetComponent<BiomeFieldAuthoring>(out var biomeField))
                 {
                     var e = em.CreateEntity();
                     var biomeComp = new TinyWalnutGames.MetVD.Core.Biome(
@@ -409,9 +405,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(2, districts.Length, "Both invalid districts should be baked");
             
             // Test invalid connection referencing non-existent districts
-            var invalidConnection = CreateTestConnection("InvalidConnection", 
-                new NodeId { value = 888 }, new NodeId { value = 777 }); // Neither exist
-            
+            var invalidConnection = CreateTestConnection("InvalidConnection",
+                new NodeId { Value = 888 }, new NodeId { Value = 777 }); // Neither exist
+
             BakeGameObjects(world, invalidConnection.gameObject);
             
             var connectionQuery = world.EntityManager.CreateEntityQuery(typeof(ConnectionData));
@@ -437,17 +433,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             World.DefaultGameObjectInjectionWorld = world;
             
             // Create valid district and connection
-            var district = CreateTestDistrict("TestDistrict", new NodeId { value = 100 });
-            var connection = CreateTestConnection("TestConnection", new NodeId { value = 100 }, new NodeId { value = 200 });
-            
+            var district = CreateTestDistrict("TestDistrict", new NodeId { Value = 100 });
+            var connection = CreateTestConnection("TestConnection", new NodeId { Value = 100 }, new NodeId { Value = 200 });
+
             // Create gate with invalid connection reference
             var gateGO = new GameObject("InvalidGate");
             var gate = gateGO.AddComponent<GateConditionAuthoring>();
-            gate.connectionId = new NodeId { value = 500 }; // References non-existent connection
+            gate.connectionId = new NodeId { Value = 500 }; // References non-existent connection
             gate.gateConditions = new GateCondition[]
             {
-                new() { 
-                    requiredConnectionId = new NodeId { value = 999 }, // Also invalid
+                new() {
+                    requiredConnectionId = new NodeId { Value = 999 }, // Also invalid
                     isDefault = false 
                 }
             };
@@ -483,14 +479,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             
             var biomeGO = new GameObject("InvalidBiome");
             var biome = biomeGO.AddComponent<BiomeFieldAuthoring>();
-            biome.nodeId = new NodeId { value = 300 };
+            biome.nodeId = new NodeId { Value = 300 };
             biome.artProfile = null; // Invalid - null profile
             
             // Create another biome with profile but invalid settings
             var invalidProfileBiomeGO = new GameObject("InvalidProfileBiome");
             var invalidProfileBiome = invalidProfileBiomeGO.AddComponent<BiomeFieldAuthoring>();
-            invalidProfileBiome.nodeId = new NodeId { value = 301 };
-            
+            invalidProfileBiome.nodeId = new NodeId { Value = 301 };
+
             var invalidProfile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             // Intentionally leave tiles / prop arrays empty (not assignable via convenience properties)
             invalidProfileBiome.artProfile = invalidProfile;
@@ -518,27 +514,27 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             World.DefaultGameObjectInjectionWorld = world;
             
             // Create network: District A ↔ District B, with gates and biomes
-            var districtA = CreateTestDistrict("DistrictA", new NodeId { value = 401 });
-            var districtB = CreateTestDistrict("DistrictB", new NodeId { value = 402 });
-            
-            var connectionAB = CreateTestConnection("ConnectionAB", 
-                new NodeId { value = 401 }, new NodeId { value = 402 });
-            var connectionBA = CreateTestConnection("ConnectionBA", 
-                new NodeId { value = 402 }, new NodeId { value = 401 });
-            
+            var districtA = CreateTestDistrict("DistrictA", new NodeId { Value = 401 });
+            var districtB = CreateTestDistrict("DistrictB", new NodeId { Value = 402 });
+
+            var connectionAB = CreateTestConnection("ConnectionAB",
+                new NodeId { Value = 401 }, new NodeId { Value = 402 });
+            var connectionBA = CreateTestConnection("ConnectionBA",
+                new NodeId { Value = 402 }, new NodeId { Value = 401 });
+
             // Create biomes for both districts
-            var biomeA = CreateTestBiome("BiomeA", new NodeId { value = 401 }, BiomeType.Forest);
-            var biomeB = CreateTestBiome("BiomeB", new NodeId { value = 402 }, BiomeType.Desert);
+            var biomeA = CreateTestBiome("BiomeA", new NodeId { Value = 401 }, BiomeType.Forest);
+            var biomeB = CreateTestBiome("BiomeB", new NodeId { Value = 402 }, BiomeType.Desert);
             
             // Create gate with circular reference (testing edge case)
             var circularGateGO = new GameObject("CircularGate");
             var circularGate = circularGateGO.AddComponent<GateConditionAuthoring>();
-            circularGate.connectionId = new NodeId { value = 401 };
+            circularGate.connectionId = new NodeId { Value = 401 };
             circularGate.gateConditions = new GateCondition[]
             {
-                new() { 
-                    requiredConnectionId = new NodeId { value = 401 }, // Self-reference!
-                    isDefault = false 
+                new() {
+                    requiredConnectionId = new NodeId { Value = 401 }, // Self-reference! TODO: handle gracefully
+                    isDefault = false
                 }
             };
             

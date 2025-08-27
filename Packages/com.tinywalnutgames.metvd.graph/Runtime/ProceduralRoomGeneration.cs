@@ -356,9 +356,9 @@ namespace TinyWalnutGames.MetVD.Graph
         public bool HasGlide;
         
         // Compatibility shims for JumpArcSolver usage
-        public float MaxJumpHeight => JumpHeight; // compatibility
-        public float DashDistance => HasGlide ? 6.0f : 4.0f; // compatibility shim
-        public float WallJumpHeight => HasWallJump ? JumpHeight * 0.8f : 0.0f; // compatibility shim
+        public readonly float MaxJumpHeight => JumpHeight; // compatibility
+        public readonly float DashDistance => HasGlide ? 6.0f : 4.0f; // compatibility shim
+        public readonly float WallJumpHeight => HasWallJump ? JumpHeight * 0.8f : 0.0f; // compatibility shim
         
         public JumpPhysicsData(float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
         {
@@ -398,7 +398,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public float SecretAreaPercentage;
         public bool UseAlternateRoutes;
         public bool UseDestructibleWalls;
-        public Ability SecretSkillRequirement => RequiredSkillForAccess; // test compatibility
+        public readonly Ability SecretSkillRequirement => RequiredSkillForAccess; // test compatibility
         
         public SecretAreaConfig(float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
         {
@@ -456,8 +456,8 @@ namespace TinyWalnutGames.MetVD.Graph
         public Ability RequiredAbility;
         public float Angle;
         public float Velocity;
-        public int2 FromPosition => StartPosition; // compatibility
-        public int2 ToPosition => EndPosition; // compatibility
+        public readonly int2 FromPosition => StartPosition; // compatibility
+        public readonly int2 ToPosition => EndPosition; // compatibility
         
         public JumpConnectionElement(int2 start, int2 end, Ability requiredAbility = Ability.None)
         {

@@ -12,11 +12,10 @@ namespace TinyWalnutGames.MetVD.Utilities.Tests
     /// </summary>
     public class BiomeRegionExtractorTests
     {
-        private readonly BiomeRegionExtractor extractor;
         private Texture2D testSpritesheet;
         private Texture2D testBiomeMask;
 
-        public BiomeRegionExtractor Extractor => extractor;
+        public BiomeRegionExtractor Extractor { get; } = new(); // TODO: (maybe?) This is not actually used to test UI
 
         [SetUp]
         public void SetUp()

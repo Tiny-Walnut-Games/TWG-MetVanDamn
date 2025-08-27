@@ -316,7 +316,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
     /// </summary>
     internal static class WorldBootstrapConfigAccess
     {
-        private static BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        private static readonly BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         public static int2 GetBiomeCountRange(CoreBootstrap cfg) =>
             TryGet<int2>(cfg, "BiomeCountRange") ??

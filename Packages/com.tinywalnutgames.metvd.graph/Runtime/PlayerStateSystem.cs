@@ -256,7 +256,7 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         public float DeltaTime;
 
-        public void Execute(ref PlayerSkillState skillState)
+        public readonly void Execute(ref PlayerSkillState skillState)
         {
             // Update temporary ability timers and remove expired ones
             skillState.TemporaryAbilityTimer -= DeltaTime;

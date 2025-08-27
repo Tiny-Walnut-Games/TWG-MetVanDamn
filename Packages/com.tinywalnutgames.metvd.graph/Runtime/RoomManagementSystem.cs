@@ -189,6 +189,7 @@ namespace TinyWalnutGames.MetVD.Graph
                                                            RoomHierarchyData roomData, NodeId nodeId, 
                                                            ref Unity.Mathematics.Random random)
         {
+            //  TODO: Create a valid and meaningful use for nodeID in room generation context... I seriously was told this was taken care of everywhere in this entire project!
             // Determine generator type based on room type and characteristics
             var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
             
@@ -218,18 +219,19 @@ namespace TinyWalnutGames.MetVD.Graph
             
             // Determine available skills from player state system
             var availableSkills = GetPlayerAvailableSkills(entityManager);
-            
+
             var generationRequest = new RoomGenerationRequest(
-                generatorType, 
-                targetBiome, 
-                targetPolarity, 
-                availableSkills, 
+                generatorType,
+                targetBiome,
+                targetPolarity,
+                availableSkills,
                 random.NextUInt()
-            );
-            
-            // Set the correct room entity
-            generationRequest.RoomEntity = roomEntity;
-            
+            )
+            {
+                // Set the correct room entity
+                RoomEntity = roomEntity
+            };
+
             entityManager.AddComponentData(roomEntity, generationRequest);
             
             // Add additional components needed for specialized generators

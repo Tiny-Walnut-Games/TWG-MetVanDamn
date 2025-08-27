@@ -22,7 +22,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         private const float ColorComparisonTolerance = 0.01f;
         
         // Spritesheet and mapping inputs
-        private List<Texture2D> spritesheets = new();
+        private readonly List<Texture2D> spritesheets = new();
         private UnityEngine.Object biomeMaskAsset = null; // Can be Texture2D, TextAsset (JSON), or other mapping file
         
         // Cell and slicing settings (reusing BatchSpriteSlicer patterns)
@@ -40,7 +40,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
             public string exportFolderSuffix = "";
         }
         
-        private List<BiomeMapping> detectedBiomes = new();
+        private readonly List<BiomeMapping> detectedBiomes = new();
         private bool showPreviewOverlay = true;
         private Vector2 biomeListScrollPos;
         
@@ -51,7 +51,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         private bool embedBiomeMetadata = true;
         
         // Validation and preview
-        private List<string> validationWarnings = new();
+        private readonly List<string> validationWarnings = new();
         private Vector2 validationScrollPos;
         private Vector2 previewScrollPos;
         private float previewZoom = 1f;
@@ -289,7 +289,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
                 var path = EditorUtility.SaveFolderPanel("Select Output Folder", outputFolderPath, "");
                 if (!string.IsNullOrEmpty(path) && path.StartsWith(Application.dataPath))
                 {
-                    outputFolderPath = "Assets" + path.Substring(Application.dataPath.Length);
+                    outputFolderPath = "Assets" + path[Application.dataPath.Length..];
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -426,6 +426,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         
         private void DrawPreviewGrid(Rect previewRect, Texture2D spritesheet, int columns, int rows)
         {
+            // TODO: find a use for spritesheet. It is listed, so it should be used.
             Color gridColor = Color.white;
             gridColor.a = 0.5f;
             
@@ -597,13 +598,13 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
             if (string.IsNullOrEmpty(hexColor)) return Color.white;
             
             if (hexColor.StartsWith("#"))
-                hexColor = hexColor.Substring(1);
+                hexColor = hexColor[1..];
             
             if (hexColor.Length == 6)
             {
-                if (int.TryParse(hexColor.Substring(0, 2), System.Globalization.NumberStyles.HexNumber, null, out int r) &&
-                    int.TryParse(hexColor.Substring(2, 2), System.Globalization.NumberStyles.HexNumber, null, out int g) &&
-                    int.TryParse(hexColor.Substring(4, 2), System.Globalization.NumberStyles.HexNumber, null, out int b))
+                if (int.TryParse(hexColor[..2], System.Globalization.NumberStyles.HexNumber, null, out int r) &&
+                    int.TryParse(hexColor[2..4], System.Globalization.NumberStyles.HexNumber, null, out int g) &&
+                    int.TryParse(hexColor[4..6], System.Globalization.NumberStyles.HexNumber, null, out int b))
                 {
                     return new Color(r / 255f, g / 255f, b / 255f, 1f);
                 }
@@ -1116,7 +1117,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         /// <summary>
         /// Metadata structure for biome information storage in sprite assets.
         /// </summary>
-        [System.Serializable]
+        [Serializable]
         public class BiomeMetadata
         {
             public string biomeName;
@@ -1126,7 +1127,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         /// <summary>
         /// JSON data structure for biome mapping files.
         /// </summary>
-        [System.Serializable]
+        [Serializable]
         public class BiomeMapData
         {
             public BiomeDefinition[] biomes;

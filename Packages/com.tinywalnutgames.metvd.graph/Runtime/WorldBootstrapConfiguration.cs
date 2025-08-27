@@ -21,9 +21,9 @@ namespace TinyWalnutGames.MetVD.Graph
         public bool LogGenerationSteps;
 
         // Convenience properties for backward compatibility
-        public int2 BiomeCountRange => BiomeSettings.BiomeCountRange;
-        public int2 DistrictCountRange => DistrictSettings.DistrictCountRange;
-        public float DistrictMinDistance => DistrictSettings.DistrictMinDistance;
+        public readonly int2 BiomeCountRange => BiomeSettings.BiomeCountRange;
+        public readonly int2 DistrictCountRange => DistrictSettings.DistrictCountRange;
+        public readonly float DistrictMinDistance => DistrictSettings.DistrictMinDistance;
 
         public WorldBootstrapConfiguration(uint seed, int2 worldSize, RandomizationMode randomizationMode,
             BiomeGenerationSettings biomeSettings, DistrictGenerationSettings districtSettings,
@@ -132,8 +132,8 @@ namespace TinyWalnutGames.MetVD.Graph
         public float BiomeWeight;
         
         // Alias properties for test compatibility
-        public int2 CountRange { get => BiomeCountRange; set => BiomeCountRange = value; }
-        public float Weight { get => BiomeWeight; set => BiomeWeight = value; }
+        public int2 CountRange { readonly get => BiomeCountRange; set => BiomeCountRange = value; }
+        public float Weight { readonly get => BiomeWeight; set => BiomeWeight = value; }
         
         public BiomeSettings(int2 biomeCountRange, float biomeWeight)
         {
@@ -153,9 +153,9 @@ namespace TinyWalnutGames.MetVD.Graph
         public float TargetLoopDensity;
         
         // Alias properties for test compatibility
-        public int2 CountRange { get => DistrictCountRange; set => DistrictCountRange = value; }
-        public float MinDistance { get => DistrictMinDistance; set => DistrictMinDistance = value; }
-        public float Weight { get => DistrictWeight; set => DistrictWeight = value; }
+        public int2 CountRange { readonly get => DistrictCountRange; set => DistrictCountRange = value; }
+        public float MinDistance { readonly get => DistrictMinDistance; set => DistrictMinDistance = value; }
+        public float Weight { readonly get => DistrictWeight; set => DistrictWeight = value; }
         
         public DistrictSettings(int2 districtCountRange, float districtMinDistance, float districtWeight,
             int2 sectorsPerDistrictRange, int2 sectorGridSize, int2 roomsPerSectorRange, float targetLoopDensity)
@@ -178,7 +178,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public float TargetLoopDensity;
         
         // Alias property for test compatibility
-        public int2 GridSize { get => SectorGridSize; set => SectorGridSize = value; }
+        public int2 GridSize { readonly get => SectorGridSize; set => SectorGridSize = value; }
         
         public SectorSettings(int2 sectorsPerDistrictRange, int2 sectorGridSize, int2 roomsPerSectorRange, float targetLoopDensity)
         {

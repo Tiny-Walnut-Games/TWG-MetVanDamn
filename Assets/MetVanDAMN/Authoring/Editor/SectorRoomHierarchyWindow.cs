@@ -27,11 +27,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private bool enableClickToSelect = true;
         private bool enableMultiSelect = true;
         
-        private List<DistrictHierarchy> districtHierarchies = new();
-        private Dictionary<uint, List<uint>> connectionMap = new();
-        private HashSet<string> availableBiomeTypes = new();
-        private HashSet<uint> selectedNodeIds = new();
-        private HashSet<GameObject> highlightedObjects = new();
+        private readonly List<DistrictHierarchy> districtHierarchies = new();
+        private readonly Dictionary<uint, List<uint>> connectionMap = new();
+        private readonly HashSet<string> availableBiomeTypes = new();
+        private readonly HashSet<uint> selectedNodeIds = new();
+        private readonly HashSet<GameObject> highlightedObjects = new();
 
         [System.Serializable]
         private class DistrictHierarchy

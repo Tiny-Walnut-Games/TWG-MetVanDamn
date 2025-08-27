@@ -12,7 +12,7 @@ namespace TinyWalnutGames.MetVD.Authoring
     public class WorldBootstrapDemo : MonoBehaviour
     {
         [Header("Demo Configurations")]
-        [SerializeField] private DemoType demoType = DemoType.SmallWorld;
+        private readonly DemoType demoType = DemoType.SmallWorld;
         
         [Header("Generated Configuration")]
         [SerializeField] private WorldBootstrapAuthoring targetBootstrap;
@@ -32,7 +32,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             if (targetBootstrap == null)
             {
-                targetBootstrap = FindObjectOfType<WorldBootstrapAuthoring>();
+                targetBootstrap = FindFirstObjectByType<WorldBootstrapAuthoring>();
                 if (targetBootstrap == null)
                 {
                     Debug.LogError("No WorldBootstrapAuthoring found in scene. Add one first.");
@@ -182,7 +182,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             if (targetBootstrap == null)
             {
-                targetBootstrap = FindObjectOfType<WorldBootstrapAuthoring>();
+                targetBootstrap = FindFirstObjectByType<WorldBootstrapAuthoring>();
                 if (targetBootstrap == null)
                 {
                     Debug.LogError("No WorldBootstrapAuthoring found in scene.");

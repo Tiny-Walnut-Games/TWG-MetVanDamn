@@ -98,8 +98,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var connectionsParent = new GameObject("Connections");
             
             // Find all district authoring components
-            var districts = UnityEngine.Object.FindObjectsOfType<DistrictAuthoring>();
-            
+            var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+
             // Create connections between adjacent districts
             foreach (var district1 in districts)
             {
@@ -153,8 +153,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             visual.transform.Rotate(90, 0, 0);
             
             var renderer = visual.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            renderer.material.color = new Color(0.8f, 0.3f, 0.8f);
+            renderer.material = new(Shader.Find("Universal Render Pipeline/Lit"))
+            {
+                color = new Color(0.8f, 0.3f, 0.8f)
+            };
         }
         
         private static void CreateSampleBiomeFields()
@@ -172,19 +174,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             for (int i = 0; i < biomeConfigs.Length; i++)
             {
-                var config = biomeConfigs[i];
+                var (position, primary, secondary, strength, gradient) = biomeConfigs[i];
                 var biomeFieldGO = new GameObject($"BiomeField_{i + 1}");
                 biomeFieldGO.transform.SetParent(biomeFieldsParent.transform);
-                biomeFieldGO.transform.position = config.position;
+                biomeFieldGO.transform.position = position;
                 
                 var biomeField = biomeFieldGO.AddComponent<BiomeFieldAuthoring>();
-                biomeField.primaryBiome = config.primary;
-                biomeField.secondaryBiome = config.secondary;
-                biomeField.strength = config.strength;
-                biomeField.gradient = config.gradient;
+                biomeField.primaryBiome = primary;
+                biomeField.secondaryBiome = secondary;
+                biomeField.strength = strength;
+                biomeField.gradient = gradient;
                 
                 // Add visual representation
-                CreateBiomeFieldVisual(biomeFieldGO, config.primary, config.strength);
+                CreateBiomeFieldVisual(biomeFieldGO, primary, strength);
             }
             
             Debug.Log("Created 4 sample biome fields");
@@ -242,50 +244,43 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             for (int i = 0; i < tileConfigs.Length; i++)
             {
-                var config = tileConfigs[i];
-                var tileGO = new GameObject($"WfcTilePrototype_{config.name}");
+                var (name, id, weight, biome, polarity, minConn, maxConn) = tileConfigs[i];
+                var tileGO = new GameObject($"WfcTilePrototype_{name}");
                 tileGO.transform.SetParent(wfcLibraryParent.transform);
                 tileGO.transform.position = new Vector3(i * 2f, 0, 0);
                 
                 var wfcTile = tileGO.AddComponent<WfcTilePrototypeAuthoring>();
-                wfcTile.tileId = config.id;
-                wfcTile.weight = config.weight;
-                wfcTile.biomeType = config.biome;
-                wfcTile.primaryPolarity = config.polarity;
-                wfcTile.minConnections = config.minConn;
-                wfcTile.maxConnections = config.maxConn;
-                
+                wfcTile.tileId = id;
+                wfcTile.weight = weight;
+                wfcTile.biomeType = biome;
+                wfcTile.primaryPolarity = polarity;
+                wfcTile.minConnections = minConn;
+                wfcTile.maxConnections = maxConn;
+
                 // Configure sockets (simplified for sample)
-                switch (config.name)
+                wfcTile.sockets = name switch
                 {
-                    case "Hub":
-                        wfcTile.sockets = new WfcSocketConfig[]
-                        {
+                    "Hub" => new WfcSocketConfig[]
+                                            {
                             new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
                             new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
                             new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
                             new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
-                        };
-                        break;
-                    case "Corridor":
-                        wfcTile.sockets = new WfcSocketConfig[]
+                                            },
+                    "Corridor" => new WfcSocketConfig[]
                         {
                             new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
                             new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
-                        };
-                        break;
-                    default:
-                        // Standard configuration for other types
-                        wfcTile.sockets = new WfcSocketConfig[]
+                        },
+                    _ => new WfcSocketConfig[]
                         {
                             new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
                             new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true }
-                        };
-                        break;
-                }
-                
+                        },// Standard configuration for other types
+                };
+
                 // Add visual representation
-                CreateWfcTileVisual(tileGO, config.name, config.biome);
+                CreateWfcTileVisual(tileGO, name, biome);
             }
             
             Debug.Log("Created WFC tile prototype library with 4 tile types");
@@ -293,6 +288,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         
         private static void CreateWfcTileVisual(GameObject parent, string typeName, BiomeType biomeType)
         {
+            // TODO: create a valid and meaningful use for biomeType in the visual
             GameObject visual = typeName switch
             {
                 "Hub" => GameObject.CreatePrimitive(PrimitiveType.Sphere),

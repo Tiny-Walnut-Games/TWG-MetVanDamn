@@ -11,12 +11,29 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 {
     public static class AuthoringValidator
     {
-        [System.Serializable] public class ValidationReport { public List<ValidationIssue> issues=new(); public int errorCount; public int warningCount; public bool hasErrors=>errorCount>0; public bool hasWarnings=>warningCount>0; }
+        [System.Serializable] public class ValidationReport { public List<ValidationIssue> issues=new(); public int errorCount; public int warningCount; public bool HasErrors=>errorCount>0; public bool HasWarnings=>warningCount>0; }
         [System.Serializable] public class ValidationIssue { public ValidationSeverity severity; public string category; public string message; public Object targetObject; public Vector3 worldPosition; public ValidationIssue(ValidationSeverity s,string c,string m,Object target=null,Vector3 pos=default){severity=s;category=c;message=m;targetObject=target;worldPosition=pos;} }
         public enum ValidationSeverity { Error, Warning, Info }
 
         [MenuItem("Tools/MetVanDAMN/Validate Scene Authoring")] public static void ValidateSceneAuthoring(){ var report=ValidateScene(); DisplayValidationReport(report); }
-        public static ValidationReport ValidateScene(){ var report=new ValidationReport(); var districts=Object.FindObjectsOfType<DistrictAuthoring>(); var connections=Object.FindObjectsOfType<ConnectionAuthoring>(); var biomes=Object.FindObjectsOfType<BiomeFieldAuthoring>(); var gates=Object.FindObjectsOfType<GateConditionAuthoring>(); ValidateDistricts(districts,report); ValidateConnections(connections,districts,report); ValidateBiomes(biomes,report); ValidateGateConditions(gates,connections,report); ValidateDistrictConnections(districts,connections,report); SuggestAutoFixes(districts,biomes,report); ValidateNavigationConnectivity(report); report.errorCount=report.issues.Count(i=>i.severity==ValidationSeverity.Error); report.warningCount=report.issues.Count(i=>i.severity==ValidationSeverity.Warning); return report; }
+        public static ValidationReport ValidateScene()
+        {
+            var report = new ValidationReport();
+            var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            var connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
+            var biomes = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
+            var gates = Object.FindObjectsByType<GateConditionAuthoring>(FindObjectsSortMode.None);
+            ValidateDistricts(districts, report);
+            ValidateConnections(connections, districts, report);
+            ValidateBiomes(biomes, report);
+            ValidateGateConditions(gates, connections, report);
+            ValidateDistrictConnections(districts, connections, report);
+            SuggestAutoFixes(districts, biomes, report);
+            ValidateNavigationConnectivity(report);
+            report.errorCount = report.issues.Count(i => i.severity == ValidationSeverity.Error);
+            report.warningCount = report.issues.Count(i => i.severity == ValidationSeverity.Warning);
+            return report;
+        }
 
         private static void ValidateDistricts(DistrictAuthoring[] districts, ValidationReport report){ var ids=new HashSet<uint>(); var dup=new HashSet<uint>(); foreach(var d in districts){ if(d==null) continue; uint id=d.nodeId; if(ids.Contains(id)) { dup.Add(id); report.issues.Add(new ValidationIssue(ValidationSeverity.Error,"Duplicate NodeId",$"District NodeId {id} is used by multiple districts.",d,d.transform.position)); } else ids.Add(id); if(id==0) report.issues.Add(new ValidationIssue(ValidationSeverity.Warning,"Invalid NodeId","District has NodeId 0.",d,d.transform.position)); if(d.targetSectorCount<=0) report.issues.Add(new ValidationIssue(ValidationSeverity.Error,"Invalid Sector Count","District has zero or negative target sector count.",d,d.transform.position)); } foreach(var id in dup){ var conflicts=districts.Where(x=>x!=null && x.nodeId==id).Select(x=>x.name); report.issues.Add(new ValidationIssue(ValidationSeverity.Error,"NodeId Conflict Summary",$"NodeId {id} used by: {string.Join(", ",conflicts)}")); } }
 
