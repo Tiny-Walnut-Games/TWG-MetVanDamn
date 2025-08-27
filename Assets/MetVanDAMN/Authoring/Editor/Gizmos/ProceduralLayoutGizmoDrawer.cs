@@ -47,21 +47,36 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
         }
 
-        private static void OnSceneGUI(SceneView _) // underscore to indicate unused parameter
+        private static void OnSceneGUI(SceneView sceneView)
         {
             if (_settings == null)
             {
                 LoadSettings();
                 if (_settings == null) return;
             }
-            DrawDebugControls();
-            DrawProceduralLayoutGizmos();
+            
+            // Use sceneView for camera-relative positioning and visibility culling
+            DrawDebugControls(sceneView);
+            DrawProceduralLayoutGizmos(sceneView);
         }
 
-        private static void DrawDebugControls()
+        private static void DrawDebugControls(SceneView sceneView)
         {
             Handles.BeginGUI();
-            GUILayout.BeginArea(new Rect(10, 10, 270, 260));
+            
+            // Position controls relative to scene view size for better UX
+            var controlWidth = 270f;
+            var controlHeight = 260f;
+            var margin = 10f;
+            var rect = new Rect(margin, margin, controlWidth, controlHeight);
+            
+            // Adjust position if scene view is too small
+            if (sceneView.position.width < controlWidth + margin * 2)
+            {
+                rect.width = sceneView.position.width - margin * 2;
+            }
+            
+            GUILayout.BeginArea(rect);
             GUILayout.BeginVertical("box");
             GUILayout.Label("Procedural Layout Debug", EditorStyles.boldLabel);
             _showUnplacedDistricts = GUILayout.Toggle(_showUnplacedDistricts, "Show Unplaced Districts (0,0)");
@@ -78,25 +93,40 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
             if (GUILayout.Button("Frame All Districts"))
             {
-                FrameAllDistricts();
+                FrameAllDistricts(sceneView);
             }
             GUILayout.EndVertical();
             GUILayout.EndArea();
             Handles.EndGUI();
         }
 
-        private static void DrawProceduralLayoutGizmos()
+        private static void DrawProceduralLayoutGizmos(SceneView sceneView)
         {
             var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
             var worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
+            
             if (_showRandomizationMode && worldConfig != null)
             {
                 DrawRandomizationModeInfo(worldConfig);
             }
+            
+            // Use scene view camera for distance-based LOD culling
+            var cameraPos = sceneView.camera.transform.position;
+            var viewDistance = Vector3.Distance(cameraPos, Vector3.zero);
+            
             foreach (var district in districts)
             {
-                DrawDistrictGizmos(district);
+                // Only draw detailed gizmos if close enough or if explicitly enabled
+                var districtPos = GetGizmoPosition(district);
+                var distanceToCamera = Vector3.Distance(cameraPos, districtPos);
+                var showDetailedGizmos = distanceToCamera < viewDistance * 0.5f || _showPlacedDistricts;
+                
+                if (showDetailedGizmos)
+                {
+                    DrawDistrictGizmos(district);
+                }
             }
+            
             if (_showConnections) DrawConnectionGizmos();
             if (Application.isPlaying)
             {
@@ -369,13 +399,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
         }
 
-        private static void FrameAllDistricts()
+        private static void FrameAllDistricts(SceneView sceneView)
         {
-            var sceneView = SceneView.lastActiveSceneView;
-            if (sceneView == null) return;
             var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
             if (districts.Length == 0) return;
-            Bounds bounds = new(); bool init = false;
+            
+            Bounds bounds = new(); 
+            bool init = false;
             foreach (var d in districts)
             {
                 Vector3 pos = GetGizmoPosition(d);
@@ -383,6 +413,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 else bounds.Encapsulate(pos);
             }
             bounds.Expand(10f);
+            
+            // Use provided sceneView instead of finding it
             sceneView.Frame(bounds, false);
         }
     }

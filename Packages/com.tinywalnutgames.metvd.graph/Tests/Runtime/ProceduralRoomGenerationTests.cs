@@ -47,8 +47,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         {
             // Arrange
             var roomEntity = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 10, 8));
-            var worldConfig = CreateWorldConfiguration();
-            _ = worldConfig; // suppress unused
+            var worldConfigEntity = CreateWorldConfiguration();
+            var worldConfig = _entityManager.GetComponentData<WorldConfiguration>(worldConfigEntity);
             
             // Create and update the procedural room generator system
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
@@ -64,12 +64,19 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var template = _entityManager.GetComponentData<RoomTemplate>(roomEntity);
             var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             
+            // Validate that world configuration influences room generation
+            Assert.AreEqual(worldConfig.Seed, 12345, "Room generation should use world configuration seed");
             Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, template.GeneratorType);
             Assert.AreNotEqual(Ability.None, template.CapabilityTags.RequiredSkills);
             Assert.IsTrue(template.RequiresJumpValidation);
             Assert.IsFalse(genStatus.NavigationGenerated);
             Assert.IsFalse(genStatus.CinemachineGenerated);
             Assert.AreNotEqual(0u, genStatus.GenerationSeed);
+            
+            // Verify room respects world constraints from configuration
+            var roomBounds = _entityManager.GetComponentData<RoomHierarchyData>(roomEntity).Bounds;
+            Assert.LessOrEqual(roomBounds.width, worldConfig.WorldSize.x, "Room width should not exceed world bounds");
+            Assert.LessOrEqual(roomBounds.height, worldConfig.WorldSize.y, "Room height should not exceed world bounds");
         }
 
         [Test]
