@@ -283,7 +283,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                     visited.Add(currentNodeId);
 
                     // Process neighbors
-                    var currentEntity = FindEntityByNodeId(ref state, currentNodeId);
+                    var currentEntity = FindEntityByStateAndNodeId(ref state, currentNodeId);
                     if (currentEntity == Entity.Null || !linkBufferLookup.HasBuffer(currentEntity))
                         continue;
 

@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Collections;
 using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
+using System.Collections.Generic; // Needed for pathfinding data structures
 
 namespace TinyWalnutGames.MetVD.Authoring.Editor
 {
@@ -79,7 +80,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [MenuItem("Tools/MetVanDAMN/Toggle Navigation Graph Visualization")]
         public static void ToggleNavigationGraphVisualization()
         {
-            var gizmos = FindObjectsOfType<NavigationGraphGizmo>();
+            var gizmos = FindObjectsByType<NavigationGraphGizmo>(FindObjectsSortMode.None);
             bool newState = gizmos.Length == 0 || !gizmos[0].showNavigationGraph;
             
             foreach (var gizmo in gizmos)
@@ -111,7 +112,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 var message = $"Navigation Graph Status:\n" +
                              $"• Total Nodes: {report.TotalNodes}\n" +
                              $"• Total Links: {report.TotalLinks}\n" +
-                             $"• Unreachable Areas: {(report.HasUnreachableAreas ? "Yes" : "None")}\n" +
+                             $"• Unreachable Areas: {(report.HasUnreachableAreas ? "Yes" : "None") }\n" +
                              $"• Unreachable Node Count: {report.UnreachableNodeCount}\n" +
                              $"• Isolated Components: {report.IsolatedComponentCount}\n\n";
 
@@ -311,9 +312,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
         }
 
-        private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps) // TODO: find a use for caps - a valid and meaningful use.
+        private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps)
         {
-            // Fallback simple straight line highlight until path API exposed
             var fromE = FindEntityByNodeId(fromId);
             var toE = FindEntityByNodeId(toId);
             if (fromE == Entity.Null || toE == Entity.Null)
@@ -321,12 +321,153 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
             var fromNode = _entityManager.GetComponentData<NavNode>(fromE);
             var toNode = _entityManager.GetComponentData<NavNode>(toE);
-            
-            Gizmos.color = _currentColors[6];
-            Gizmos.DrawLine(fromNode.WorldPosition, toNode.WorldPosition);
-            
-            var mid = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
-            Handles.Label(mid, $"(Preview Path) {fromId}->{toId}", EditorStyles.boldLabel);
+
+            // If capabilities cannot even stand on start or end, abort
+            if (!fromNode.IsCompatibleWith(caps) || !toNode.IsCompatibleWith(caps))
+                return;
+
+            // Build nodeId -> entity map (single pass arrays)
+            var nodeQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+            using var nodeEntities = nodeQuery.ToEntityArray(Allocator.Temp);
+            using var nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            var entityLookup = new Dictionary<uint, Entity>(nodeEntities.Length);
+            for (int i = 0; i < nodeIds.Length; i++)
+            {
+                var nid = nodeIds[i].Value;
+                if (!entityLookup.ContainsKey(nid))
+                    entityLookup.Add(nid, nodeEntities[i]);
+            }
+
+            // Dijkstra (simple list-based priority selection)
+            var open = new List<uint> { fromId };
+            var cameFrom = new Dictionary<uint, uint>();
+            var gScore = new Dictionary<uint, float> { [fromId] = 0f };
+
+            while (open.Count > 0)
+            {
+                // Find lowest cost node in open
+                uint current = open[0];
+                float bestCost = gScore[current];
+                for (int i = 1; i < open.Count; i++)
+                {
+                    var cand = open[i];
+                    var candCost = gScore[cand];
+                    if (candCost < bestCost)
+                    {
+                        current = cand;
+                        bestCost = candCost;
+                    }
+                }
+
+                if (current == toId)
+                    break; // path found
+
+                open.Remove(current);
+
+                // Expand neighbors
+                if (!entityLookup.TryGetValue(current, out var currentEntity) || !_entityManager.HasComponent<NavLinkBufferElement>(currentEntity))
+                    continue;
+
+                var currentNode = _entityManager.GetComponentData<NavNode>(currentEntity);
+                if (!currentNode.IsCompatibleWith(caps))
+                    continue; // cannot stand here with given capabilities
+
+                var links = _entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
+                for (int li = 0; li < links.Length; li++)
+                {
+                    var link = links[li].Value;
+                    if (!link.CanTraverseWith(caps, current))
+                        continue;
+
+                    // Determine destination respecting directionality
+                    uint dest = current;
+                    if (link.ConnectionType == ConnectionType.Bidirectional)
+                    {
+                        dest = link.FromNodeId == current ? link.ToNodeId : (link.ToNodeId == current ? link.FromNodeId : current);
+                    }
+                    else if (link.FromNodeId == current)
+                    {
+                        dest = link.ToNodeId;
+                    }
+                    else
+                    {
+                        continue; // not a valid outgoing direction
+                    }
+
+                    if (dest == current || !entityLookup.TryGetValue(dest, out var destEntity) || !_entityManager.HasComponent<NavNode>(destEntity))
+                        continue;
+
+                    var destNode = _entityManager.GetComponentData<NavNode>(destEntity);
+                    if (!destNode.IsCompatibleWith(caps))
+                        continue;
+
+                    float tentative = gScore[current] + link.CalculateTraversalCost(caps);
+                    if (!gScore.TryGetValue(dest, out var existing) || tentative < existing)
+                    {
+                        gScore[dest] = tentative;
+                        cameFrom[dest] = current;
+                        if (!open.Contains(dest))
+                            open.Add(dest);
+                    }
+                }
+            }
+
+            // Reconstruct path
+            if (!cameFrom.ContainsKey(toId) && fromId != toId)
+            {
+                // No path: draw fallback straight line (dashed effect via segments)
+                Gizmos.color = Color.gray;
+                var a = fromNode.WorldPosition;
+                var b = toNode.WorldPosition;
+                const int segments = 16;
+                for (int i = 0; i < segments; i += 2)
+                {
+                    float t0 = (float)i / segments;
+                    float t1 = (float)(i + 1) / segments;
+                    Gizmos.DrawLine(math.lerp(a, b, t0), math.lerp(a, b, t1));
+                }
+                var midNoPath = (a + b) * 0.5f;
+                Handles.Label(midNoPath, $"No traversable path {fromId}->{toId}", EditorStyles.miniBoldLabel);
+                return;
+            }
+
+            var pathIds = new List<uint>();
+            uint cur = toId;
+            pathIds.Add(cur);
+            while (cur != fromId && cameFrom.TryGetValue(cur, out var prev))
+            {
+                cur = prev;
+                pathIds.Add(cur);
+            }
+            pathIds.Reverse();
+
+            if (pathIds.Count < 2)
+                return;
+
+            // Draw path polyline with gradient by relative cost fraction
+            float totalCost = gScore[toId];
+            for (int i = 0; i < pathIds.Count - 1; i++)
+            {
+                var aId = pathIds[i];
+                var bId = pathIds[i + 1];
+                var aEntity = entityLookup[aId];
+                var bEntity = entityLookup[bId];
+                var aNode = _entityManager.GetComponentData<NavNode>(aEntity);
+                var bNode = _entityManager.GetComponentData<NavNode>(bEntity);
+
+                // Fractional cost up to segment end for heat coloring
+                float segCost = gScore[bId];
+                float fraction = totalCost > 0f ? math.saturate(segCost / totalCost) : 0f;
+                // Lerp between highlight color and yellow based on fraction (higher cost later => warmer)
+                var baseCol = _currentColors[6];
+                var heatCol = Color.Lerp(baseCol, Color.yellow, fraction);
+                Gizmos.color = heatCol;
+                Gizmos.DrawLine(aNode.WorldPosition, bNode.WorldPosition);
+            }
+
+            // Annotate path summary
+            var midPoint = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
+            Handles.Label(midPoint + new float3(0, labelOffset * 0.5f, 0), $"Path {fromId}->{toId}\nCost:{gScore[toId]:F1} Nodes:{pathIds.Count}", EditorStyles.boldLabel);
         }
 
         private void DrawDetailedInformation()
@@ -398,17 +539,21 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private GUIStyle GetLabelStyle(bool r)
         {
-            var s = new GUIStyle(EditorStyles.label);
-            s.normal.textColor = r ? Color.green : Color.red;
-            s.fontSize = 10;
+            var s = new GUIStyle(EditorStyles.label)
+            {
+                normal = { textColor = r ? Color.green : Color.red },
+                fontSize = 10
+            };
             return s;
         }
 
         private GUIStyle GetLinkLabelStyle(bool t)
         {
-            var s = new GUIStyle(EditorStyles.miniLabel);
-            s.normal.textColor = t ? Color.blue : Color.red;
-            s.fontSize = 9;
+            var s = new GUIStyle(EditorStyles.miniLabel)
+            {
+                normal = { textColor = t ? Color.blue : Color.red },
+                fontSize = 9
+            };
             return s;
         }
     }
