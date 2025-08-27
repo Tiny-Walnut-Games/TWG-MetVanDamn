@@ -17,6 +17,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.transforms",
+            "expression": "1.0.0",
+            "define": "HAS_UNITY_LOCAL_TRANSFORM"
+        }
+    ],
     "noEngineReferences": false
 }

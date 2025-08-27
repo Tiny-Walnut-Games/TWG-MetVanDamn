@@ -5,8 +5,7 @@
         "Unity.Burst",
         "Unity.Collections",
         "Unity.Entities",
-        "Unity.Mathematics",
-        "Unity.2D.Sprite.Editor"
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -17,6 +16,12 @@
     "defineConstraints": [
         "HAS_SPRITE_EDITOR"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.2d.sprite",
+            "expression": "1.0.0",
+            "define": "HAS_SPRITE_EDITOR"
+        }
+    ],
     "noEngineReferences": false
 }

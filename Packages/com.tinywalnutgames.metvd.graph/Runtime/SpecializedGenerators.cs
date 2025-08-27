@@ -547,22 +547,5 @@ namespace TinyWalnutGames.MetVD.Graph
                    position.y >= bounds.y && position.y < bounds.y + bounds.height;
         }
 
-        /// <summary>
-        /// Convert RoomFeatureType to RoomFeatureObjectType
-        /// </summary>
-        private static RoomFeatureObjectType ConvertToObjectType(RoomFeatureType featureType)
-        {
-            return featureType switch
-            {
-                RoomFeatureType.Platform => RoomFeatureObjectType.Platform,
-                RoomFeatureType.Obstacle => RoomFeatureObjectType.Obstacle,
-                RoomFeatureType.Secret => RoomFeatureObjectType.Secret,
-                RoomFeatureType.PowerUp => RoomFeatureObjectType.PowerUp,
-                RoomFeatureType.HealthPickup => RoomFeatureObjectType.HealthPickup,
-                RoomFeatureType.SaveStation => RoomFeatureObjectType.SaveStation,
-                RoomFeatureType.Switch => RoomFeatureObjectType.Switch,
-                _ => RoomFeatureObjectType.Platform // Default fallback
-            };
-        }
     }
 }

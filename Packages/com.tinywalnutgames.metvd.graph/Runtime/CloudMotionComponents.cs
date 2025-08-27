@@ -38,13 +38,15 @@ namespace TinyWalnutGames.MetVD.Graph
         public float DischargeTimer;
         public float DischargeInterval;
         public float DischargeRange;
+        public float DischargeDamage;
         public bool IsCharging;
         
-        public ElectricCloudComponent(float interval = 3.0f, float range = 5.0f)
+        public ElectricCloudComponent(float interval = 3.0f, float range = 5.0f, float damage = 10.0f)
         {
             DischargeTimer = 0f;
             DischargeInterval = interval;
             DischargeRange = range;
+            DischargeDamage = damage;
             IsCharging = false;
         }
     }
@@ -56,12 +58,14 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         public float3 ConveyorDirection;
         public float ConveyorSpeed;
+        public RectInt PlatformBounds;
         public bool ReverseDirection;
         
-        public ConveyorCloudComponent(float3 direction, float speed = 2.0f)
+        public ConveyorCloudComponent(float3 direction, float speed = 2.0f, RectInt bounds = default)
         {
             ConveyorDirection = direction;
             ConveyorSpeed = speed;
+            PlatformBounds = bounds.width == 0 ? new RectInt(-5, -5, 10, 10) : bounds; // Default 10x10 platform
             ReverseDirection = false;
         }
     }
