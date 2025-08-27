@@ -46,7 +46,7 @@ namespace TinyWalnutGames.MetVD.Graph
             if (_worldConfigQuery.IsEmptyIgnoreFilter)
             {
                 worldConfig = new WorldConfiguration { Seed = (int)(state.WorldUnmanaged.Time.ElapsedTime * 1000 + 1), WorldSize = new int2(64, 64), TargetSectors = 0, RandomizationMode = RandomizationMode.None };
-                if (!_loggedFallback && SystemAPI.Time.ElapsedTime > 0)
+                if (!_loggedFallback && state.WorldUnmanaged.Time.ElapsedTime > 0)
                 {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                     UnityEngine.Debug.LogWarning("DistrictLayoutSystem: WorldConfiguration missing. Using fallback defaults (64x64, all sectors).");

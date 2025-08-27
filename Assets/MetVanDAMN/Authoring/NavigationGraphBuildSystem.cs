@@ -27,7 +27,6 @@ namespace TinyWalnutGames.MetVD.Authoring
         private EntityQuery _gateConditionQuery;
         private EntityQuery _navigationGraphQuery;
 
-        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             // Districts that have not yet been converted to NavNodes
@@ -58,7 +57,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             state.RequireForUpdate(_districtQuery);
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             // Ensure singleton exists
@@ -125,7 +123,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             return map;
         }
 
-        [BurstCompile]
         private int BuildNavigationNodes(ref SystemState state)
         {
             if (_districtQuery.IsEmpty)
@@ -179,7 +176,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             return created;
         }
 
-        [BurstCompile]
         private int BuildNavigationLinks(ref SystemState state, NativeParallelHashMap<uint, Entity> nodeLookup)
         {
             if (_connectionQuery.IsEmpty)
@@ -227,7 +223,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             return linkCount;
         }
 
-        [BurstCompile]
         private GateConditionCollection CollectGateConditions(ref SystemState state, Entity sourceEntity, Entity destEntity)
         {
             var gateConditions = new GateConditionCollection();
