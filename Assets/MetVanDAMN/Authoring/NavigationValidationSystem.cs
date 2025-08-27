@@ -1,3 +1,4 @@
+using System;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -33,7 +34,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        public readonly void OnUpdate(ref SystemState state)
         {
             var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
             if (!navGraph.IsReady)
@@ -54,7 +55,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private int PerformReachabilityAnalysis(ref SystemState state)
+        private readonly int PerformReachabilityAnalysis(ref SystemState state)
         {
             var unreachableCount = 0;
             
@@ -112,6 +113,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             var nodeIds = new NativeList<uint>(256, Allocator.Temp);
             foreach (var (navNode, entity) in SystemAPI.Query<RefRO<NavNode>>().WithEntityAccess())
             {
+                if (entity == Entity.Null)
+                    continue; // entity access safeguard
                 if (navNode.ValueRO.IsActive)
                 {
                     nodeIds.Add(navNode.ValueRO.NodeId);
@@ -154,8 +157,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             while (queue.Count > 0)
             {
                 var currentNodeId = queue.Dequeue();
-                var currentEntity = FindEntityByNodeId(ref state, currentNodeId);
-                
+                var currentEntity = NavigationValidationUtility.FindEntityByNodeId(state.World, currentNodeId);
+
                 if (currentEntity == Entity.Null || !SystemAPI.HasBuffer<NavLinkBufferElement>(currentEntity))
                     continue;
                     
@@ -180,17 +183,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             
             queue.Dispose();
             return reachableNodes;
-        }
-
-        [BurstCompile]
-        private readonly Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
-        {
-            foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
-            {
-                if (id.ValueRO.Value == nodeId)
-                    return entity;
-            }
-            return Entity.Null;
         }
     }
 
@@ -248,7 +240,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             NodeId = nodeId;
             RelatedNodeId = relatedNodeId;
             RequiredPolarity = requiredPolarity;
-            RequiredAbilities = requiredAbilities;
+            RequiredAbilities = RequiredAbilities = requiredAbilities;
             Description = description;
         }
     }
@@ -387,7 +379,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             {
                 var currentNodeId = queue.Dequeue();
                 var currentEntity = FindEntityByNodeId(world, currentNodeId);
-                
+
                 if (currentEntity == Entity.Null || !entityManager.HasBuffer<NavLinkBufferElement>(currentEntity))
                     continue;
                     
@@ -417,7 +409,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// <summary>
         /// Helper method to find entity by node ID
         /// </summary>
-        private static Entity FindEntityByNodeId(World world, uint nodeId)
+        public static Entity FindEntityByNodeId(World world, uint nodeId)
         {
             var entityManager = world.EntityManager;
             var nodeQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
@@ -463,13 +455,83 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         /// <summary>
-        /// Check if a specific path is possible with given capabilities
-        /// Useful for editor validation and debugging
+        /// Check if a specific path is possible with given capabilities between two nodes.
+        /// Uses a capability-aware breadth-first search (no allocation-heavy path reconstruction) for fast editor/runtime validation.
         /// </summary>
+        /// <remarks>
+        /// TODO(PathFuture): Promote shared pathfinding utility.
+        ///  - Extract A* (currently in NavigationGraphGizmo.DrawHighlightedPathFallback) here as optional detailed solver.
+        ///  - Provide overload returning path list + total cost (NativeList<uint>, float cost).
+        ///  - Keep this BFS for ultra-fast yes/no queries & validation passes.
+        ///  - Add heuristics selector (Euclidean / Manhattan / DomainWeighted) when grid metrics formalized.
+        ///  - Burst-optimize A* variant once allocations consolidated (use NativePriorityQueue or custom min-heap).
+        /// </remarks>
         public static bool IsPathPossible(World world, uint fromNodeId, uint toNodeId, AgentCapabilities capabilities)
         {
-            // Path API not exposed yet; return false to avoid compile errors
-            return false;
+            if (world == null || !world.IsCreated)
+                return false;
+            if (fromNodeId == 0 || toNodeId == 0)
+                return false;
+
+            var em = world.EntityManager;
+            var fromEntity = FindEntityByNodeId(world, fromNodeId);
+            var toEntity = FindEntityByNodeId(world, toNodeId);
+            if (fromEntity == Entity.Null || toEntity == Entity.Null)
+                return false;
+            if (!em.HasComponent<NavNode>(fromEntity) || !em.HasComponent<NavNode>(toEntity))
+                return false;
+
+            var fromNode = em.GetComponentData<NavNode>(fromEntity);
+            var toNode = em.GetComponentData<NavNode>(toEntity);
+            if (!fromNode.IsCompatibleWith(capabilities) || !toNode.IsCompatibleWith(capabilities))
+                return false;
+            if (fromNodeId == toNodeId)
+                return true;
+
+            var visited = new NativeHashSet<uint>(128, Allocator.Temp);
+            var queue = new NativeQueue<uint>(Allocator.Temp);
+            visited.Add(fromNodeId);
+            queue.Enqueue(fromNodeId);
+
+            bool found = false;
+            while (queue.Count > 0 && !found)
+            {
+                var current = queue.Dequeue();
+                var currentEntity = FindEntityByNodeId(world, current);
+                if (currentEntity == Entity.Null || !em.HasBuffer<NavLinkBufferElement>(currentEntity))
+                    continue;
+
+                var links = em.GetBuffer<NavLinkBufferElement>(currentEntity);
+                for (int i = 0; i < links.Length; i++)
+                {
+                    var link = links[i].Value;
+                    if (!link.CanTraverseWith(capabilities, current))
+                        continue;
+                    var neighbor = link.GetDestination(current);
+                    if (neighbor == 0 || visited.Contains(neighbor))
+                        continue;
+
+                    var neighborEntity = FindEntityByNodeId(world, neighbor);
+                    if (neighborEntity == Entity.Null || !em.HasComponent<NavNode>(neighborEntity))
+                        continue;
+                    var neighborNode = em.GetComponentData<NavNode>(neighborEntity);
+                    if (!neighborNode.IsCompatibleWith(capabilities))
+                        return false;
+
+                    if (neighbor == toNodeId)
+                    {
+                        found = true;
+                        break;
+                    }
+
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+
+            queue.Dispose();
+            visited.Dispose();
+            return found;
         }
 
         /// <summary>
@@ -522,3 +584,4 @@ namespace TinyWalnutGames.MetVD.Authoring
         AddAlternativePath = 4
     }
 }
+

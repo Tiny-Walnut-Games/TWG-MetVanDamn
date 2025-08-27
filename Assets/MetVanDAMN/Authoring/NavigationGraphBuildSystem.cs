@@ -149,8 +149,8 @@ namespace TinyWalnutGames.MetVD.Authoring
                 if (!conn.IsActive)
                     continue;
 
-                var sourceEntity = FindEntityByStateNodeId(ref state, conn.FromNodeId);
-                var destEntity = FindEntityByStateNodeId(ref state, conn.ToNodeId);
+                var sourceEntity = FindEntityByNodeId(ref state, conn.FromNodeId);
+                var destEntity = FindEntityByNodeId(ref state, conn.ToNodeId);
 
                 if (sourceEntity == Entity.Null || destEntity == Entity.Null)
                     continue;
@@ -192,7 +192,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         [BurstCompile]
-        private readonly Entity FindEntityByStateNodeId(ref SystemState state, uint nodeId)
+        public readonly Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
         {
             // Meaningful use of state: build a filtered query once per call
             var query = state.GetEntityQuery(ComponentType.ReadOnly<NodeId>());
