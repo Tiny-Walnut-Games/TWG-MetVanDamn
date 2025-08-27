@@ -192,15 +192,32 @@ namespace TinyWalnutGames.MetVD.Graph
             // Determine generator type based on room type and characteristics
             var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
             
-            // Get biome information if available
+            // Get biome information from resolved biome data
             var targetBiome = BiomeType.HubArea;
             var targetPolarity = Polarity.None;
             
-            // In a full implementation, would query for biome data from parent district/sector
-            // For now, use default values
+            // Query for resolved biome data from parent district/sector hierarchy
+            if (entityManager.HasComponent<RoomBiomeData>(roomEntity))
+            {
+                var biomeData = entityManager.GetComponentData<RoomBiomeData>(roomEntity);
+                if (biomeData.IsResolved)
+                {
+                    targetBiome = biomeData.BiomeType;
+                    targetPolarity = biomeData.PrimaryPolarity;
+                }
+            }
+            else
+            {
+                // If no biome data is available yet, add a request for it
+                if (!entityManager.HasComponent<BiomeDataRequest>(roomEntity))
+                {
+                    entityManager.AddComponentData(roomEntity, new BiomeDataRequest(priority: 5, allowDefaults: true));
+                    return; // Wait for biome data to be resolved
+                }
+            }
             
-            // Determine available skills (in full implementation, would come from player state)
-            var availableSkills = Ability.Jump | Ability.DoubleJump; // Basic starting abilities
+            // Determine available skills from player state system
+            var availableSkills = GetPlayerAvailableSkills(entityManager);
             
             var generationRequest = new RoomGenerationRequest(
                 generatorType, 
@@ -412,6 +429,14 @@ namespace TinyWalnutGames.MetVD.Graph
                 );
                 features.Add(new RoomFeatureElement(RoomFeatureType.HealthPickup, healthPos, random.NextUInt()));
             }
+        }
+
+        /// <summary>
+        /// Get currently available player skills from the player state system
+        /// </summary>
+        private static Ability GetPlayerAvailableSkills(EntityManager entityManager)
+        {
+            return PlayerStateUtility.GetCurrentPlayerAbilities(entityManager);
         }
     }
 }
