@@ -5,7 +5,7 @@
 #if HAS_SPRITE_EDITOR || UNITY_2D_SPRITE_EDITOR_AVAILABLE
 // This comment is a visual indicator that the sprite editor features are available
 // If grey, no. If commenting color, yes.
-#define SPRITE_EDITOR_FEATURES_AVAILABLE
+#define HAS_SPRITE_EDITOR
 #endif
 
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEditor;
 
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
+#if HAS_SPRITE_EDITOR
 using UnityEditor.U2D.Sprites; // this script requires com.unity.2d.sprite package be imported to work.
 #endif
 
@@ -37,7 +37,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         private SpriteAlignment pivotAlignment = SpriteAlignment.BottomCenter; // Pivot alignment
         private bool ignoreEmptyRects = true;            // Skip fully transparent cells
 
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
+#if HAS_SPRITE_EDITOR
         private static List<SpriteRect> copiedRects = null;                             // Copied rects
         private static readonly Dictionary<string, List<Vector2[]>> copiedOutlines = new(); // Copied outlines keyed by original rect GUID
 #else
@@ -51,7 +51,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
 
         private void OnGUI()
         {
-#if !SPRITE_EDITOR_FEATURES_AVAILABLE
+#if !HAS_SPRITE_EDITOR
             GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
                 "Sprite Editor features are not available. This tool requires Unity's 2D Sprite Editor package " +
@@ -86,7 +86,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
 
             EditorGUILayout.Space();
             GUILayout.Label("Slice Layout Operations", EditorStyles.boldLabel);
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
+#if HAS_SPRITE_EDITOR
             if (GUILayout.Button(new GUIContent("Copy Rect Layout", "Copy slice rectangles (and outlines) from first selected texture.")))
                 CopySlicesFromSelected();
             using (new EditorGUI.DisabledScope(copiedRects == null))
@@ -107,7 +107,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
 
             EditorGUILayout.Space();
             GUILayout.Label("Pivot Adjustment", EditorStyles.boldLabel);
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
+#if HAS_SPRITE_EDITOR
             if (GUILayout.Button(new GUIContent("Adjust Pivot Of Selected Slices", "Overwrite pivots for all slices on selected textures.")))
             {
                 if (Selection.objects.Length == 0)
@@ -125,7 +125,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
 
             EditorGUILayout.Space();
             GUILayout.Label("Batch Slicing", EditorStyles.boldLabel);
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
+#if HAS_SPRITE_EDITOR
             if (GUILayout.Button(new GUIContent("Slice Selected Sprites (Grid)", "Slice selected textures using current grid settings.")))
             {
                 if (Selection.objects.Length == 0)
@@ -142,7 +142,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
 #endif
         }
 
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
+#if HAS_SPRITE_EDITOR
         private void CopySlicesFromSelected()
         {
             Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
@@ -379,7 +379,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
             }
         }
 
-    #endif // SPRITE_EDITOR_FEATURES_AVAILABLE
+    #endif // HAS_SPRITE_EDITOR
 
         private Vector2 GetPivotForAlignment(SpriteAlignment alignment) => alignment switch
         {

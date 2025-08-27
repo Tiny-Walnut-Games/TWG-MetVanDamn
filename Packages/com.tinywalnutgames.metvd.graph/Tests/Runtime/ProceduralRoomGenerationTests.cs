@@ -49,8 +49,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             
             // Create and update the procedural room generator system using proper ISystem pattern
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var roomGenHandle = _world.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
-            initGroup.AddSystemToUpdateList(roomGenHandle);
+            var roomGenHandle = _world.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
+            initGroup.AddUnmanagedSystemToUpdateList(roomGenHandle);
             initGroup.SortSystems();
             initGroup.Update();
 
@@ -82,10 +82,10 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             
             // Create and update systems in order using proper ISystem pattern
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var roomGenHandle = _world.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
-            var navGenHandle = _world.GetOrCreateSystem<RoomNavigationGeneratorSystem>();
-            initGroup.AddSystemToUpdateList(roomGenHandle);
-            initGroup.AddSystemToUpdateList(navGenHandle);
+            var roomGenHandle = _world.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
+            var navGenHandle = _world.GetOrCreateUnmanagedSystem<RoomNavigationGeneratorSystem>();
+            initGroup.AddUnmanagedSystemToUpdateList(roomGenHandle);
+            initGroup.AddUnmanagedSystemToUpdateList(navGenHandle);
             initGroup.SortSystems();
             initGroup.Update();
 
@@ -122,14 +122,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
             var presGroup = _world.GetOrCreateSystemManaged<PresentationSystemGroup>();
             
-            var roomGenHandle = _world.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
-            var navGenHandle = _world.GetOrCreateSystem<RoomNavigationGeneratorSystem>();
-            var cameraGenHandle = _world.GetOrCreateSystem<CinemachineZoneGeneratorSystem>();
+            var roomGenHandle = _world.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
+            var navGenHandle = _world.GetOrCreateUnmanagedSystem<RoomNavigationGeneratorSystem>();
+            var cameraGenHandle = _world.GetOrCreateUnmanagedSystem<CinemachineZoneGeneratorSystem>();
             
             // Add systems to appropriate groups
-            initGroup.AddSystemToUpdateList(roomGenHandle);
-            initGroup.AddSystemToUpdateList(navGenHandle);
-            presGroup.AddSystemToUpdateList(cameraGenHandle);
+            initGroup.AddUnmanagedSystemToUpdateList(roomGenHandle);
+            initGroup.AddUnmanagedSystemToUpdateList(navGenHandle);
+            presGroup.AddUnmanagedSystemToUpdateList(cameraGenHandle);
             
             initGroup.SortSystems();
             presGroup.SortSystems();
@@ -237,14 +237,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
             var presGroup = _world.GetOrCreateSystemManaged<PresentationSystemGroup>();
             
-            var roomGenHandle = _world.GetOrCreateSystem<ProceduralRoomGeneratorSystem>();
-            var navGenHandle = _world.GetOrCreateSystem<RoomNavigationGeneratorSystem>();
-            var cameraGenHandle = _world.GetOrCreateSystem<CinemachineZoneGeneratorSystem>();
+            var roomGenHandle = _world.GetOrCreateUnmanagedSystem<ProceduralRoomGeneratorSystem>();
+            var navGenHandle = _world.GetOrCreateUnmanagedSystem<RoomNavigationGeneratorSystem>();
+            var cameraGenHandle = _world.GetOrCreateUnmanagedSystem<CinemachineZoneGeneratorSystem>();
             
             // Add systems to appropriate groups
-            initGroup.AddSystemToUpdateList(roomGenHandle);
-            initGroup.AddSystemToUpdateList(navGenHandle);
-            presGroup.AddSystemToUpdateList(cameraGenHandle);
+            initGroup.AddUnmanagedSystemToUpdateList(roomGenHandle);
+            initGroup.AddUnmanagedSystemToUpdateList(navGenHandle);
+            presGroup.AddUnmanagedSystemToUpdateList(cameraGenHandle);
             
             initGroup.SortSystems();
             presGroup.SortSystems();

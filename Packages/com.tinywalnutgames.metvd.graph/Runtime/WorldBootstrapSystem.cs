@@ -68,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
             // Mark bootstrap as complete
             state.EntityManager.RemoveComponent<WorldBootstrapInProgressTag>(bootstrapEntity);
-            var completeTag = new WorldBootstrapCompleteTag(
+            var completeTag = new Core.WorldBootstrapCompleteTag(
                 biomes: CalculateGeneratedBiomes(config),
                 districts: CalculateGeneratedDistricts(config),
                 sectors: CalculateGeneratedSectors(config),

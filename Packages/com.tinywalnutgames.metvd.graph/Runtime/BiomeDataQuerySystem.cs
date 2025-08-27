@@ -104,7 +104,7 @@ namespace TinyWalnutGames.MetVD.Graph
     [UpdateBefore(typeof(RoomManagementSystem))]
     public partial struct BiomeDataQuerySystem : ISystem
     {
-        private ComponentLookup<BiomeFieldData> _biomeLookup;
+        private ComponentLookup<Core.Biome> _biomeLookup;
         private ComponentLookup<RoomBiomeData> _roomBiomeDataLookup;
         private BufferLookup<ConnectionBufferElement> _connectionLookup;
         private EntityQuery _requestQuery;
@@ -112,7 +112,7 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _biomeLookup = state.GetComponentLookup<BiomeFieldData>(true);
+            _biomeLookup = state.GetComponentLookup<Core.Biome>(true);
             _roomBiomeDataLookup = state.GetComponentLookup<RoomBiomeData>();
             _connectionLookup = state.GetBufferLookup<ConnectionBufferElement>(true);
             
@@ -194,10 +194,10 @@ namespace TinyWalnutGames.MetVD.Graph
                     var nodeId = SystemAPI.GetComponent<NodeId>(currentEntity);
                     
                     // If this entity has a parent reference, continue traversal
-                    if (nodeId.Parent != 0 && nodeId.Level > 0)
+                    if (nodeId.ParentId != 0 && nodeId.Level > 0)
                     {
                         // Find entity with parent NodeId
-                        var parentEntity = FindEntityByNodeId(nodeId.Parent);
+                        var parentEntity = FindEntityByNodeId(nodeId.ParentId);
                         if (parentEntity != Entity.Null)
                         {
                             currentEntity = parentEntity;
@@ -330,9 +330,9 @@ namespace TinyWalnutGames.MetVD.Graph
             return hierarchyType switch
             {
                 RoomType.Hub => RoomType.Hub,
-                RoomType.Basic => RoomType.Basic,
+                RoomType.Normal => RoomType.Normal,
                 RoomType.Boss => RoomType.Boss,
-                _ => RoomType.Basic
+                _ => RoomType.Normal
             };
         }
 

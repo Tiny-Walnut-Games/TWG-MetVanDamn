@@ -52,15 +52,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Use positional args to avoid named parameter mismatch (roomsPerSectorRange name changed in API)
             var sectorSettings = new CoreSectorSettings(
                 new int2(2, 8),          // sectorsPerDistrictRange
-                new int2(6, 6),          // sectorGridSize
-                new int2(3, 12),         // roomsPerSectorRange (positional to survive rename)
-                0.3f                     // targetLoopDensity
+                new int2(6, 6)           // sectorGridSize
             );
-            // RoomGenerationSettings API changed (no maxAttempts named parameter). Use positional.
+            // RoomGenerationSettings API changed - use correct parameters
             var roomSettings = new TinyWalnutGames.MetVD.Core.RoomGenerationSettings(
-                new int2(4, 4),          // minRoomSize
-                new int2(12, 12),        // maxRoomSize
-                2                        // corridorWidth (remaining defaults internal)
+                new int2(3, 12),         // roomsPerSectorRange
+                0.3f,                    // targetLoopDensity
+                2                        // corridorWidth
             );
             var config = new CoreBootstrap(
                 seed: 42,
@@ -119,13 +117,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 districtSettings: new CoreDistrictSettings(districtSettings.DistrictCountRange, districtSettings.DistrictMinDistance, districtSettings.DistrictWeight),
                 sectorSettings: new CoreSectorSettings(
                     districtSettings.SectorsPerDistrictRange,
-                    districtSettings.SectorGridSize,
-                    districtSettings.RoomsPerSectorRange,
-                    districtSettings.TargetLoopDensity
+                    districtSettings.SectorGridSize
                 ),
                 roomSettings: new TinyWalnutGames.MetVD.Core.RoomGenerationSettings(
-                    new int2(4, 4), // min
-                    new int2(12, 12), // max
+                    districtSettings.RoomsPerSectorRange,
+                    districtSettings.TargetLoopDensity,
                     2 // corridorWidth
                 ),
                 enableDebugVisualization: debugSettings.EnableDebugVisualization,
@@ -204,14 +200,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 sectorSettings: new CoreSectorSettings
                 (
                     sectorSettings.SectorsPerDistrictRange,
-                    sectorSettings.GridSize,
-                    sectorSettings.RoomsPerSectorRange,
-                    sectorSettings.TargetLoopDensity
+                    sectorSettings.GridSize
                 ),
                 roomSettings: new TinyWalnutGames.MetVD.Core.RoomGenerationSettings
                 (
-                    new int2(4, 4),
-                    new int2(10, 10),
+                    sectorSettings.RoomsPerSectorRange,
+                    sectorSettings.TargetLoopDensity,
                     2
                 ),
                 enableDebugVisualization: true,
@@ -282,14 +276,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 sectorSettings: new CoreSectorSettings
                 (
                     districtSettings.SectorsPerDistrictRange,
-                    districtSettings.SectorGridSize,
-                    districtSettings.RoomsPerSectorRange,
-                    districtSettings.TargetLoopDensity
+                    districtSettings.SectorGridSize
                 ),
                 roomSettings: new Core.RoomGenerationSettings
                 (
-                    new int2(4, 4),
-                    new int2(12, 12),
+                    districtSettings.RoomsPerSectorRange,
+                    districtSettings.TargetLoopDensity,
                     2
                 ),
                 enableDebugVisualization: debugSettings.EnableDebugVisualization,

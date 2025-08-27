@@ -23,8 +23,7 @@ namespace TinyWalnutGames.MetVD.Graph
             // Forward to the unmanaged system using correct API
             var systemHandle = World.Unmanaged.GetExistingUnmanagedSystem<ProceduralRoomGeneratorSystem>();
             ref var system = ref World.Unmanaged.GetUnsafeSystemRef<ProceduralRoomGeneratorSystem>(systemHandle);
-            ref var state = ref World.Unmanaged.ResolveSystemState(systemHandle);
-            system.OnUpdate(ref state);
+            system.OnUpdate(ref CheckedStateRef);
         }
     }
 }

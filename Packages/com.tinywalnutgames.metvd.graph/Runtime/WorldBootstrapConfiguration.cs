@@ -188,8 +188,6 @@ namespace TinyWalnutGames.MetVD.Graph
             TargetLoopDensity = targetLoopDensity;
         }
     }
-        }
-    }
 
     public struct RoomSettings
     {
