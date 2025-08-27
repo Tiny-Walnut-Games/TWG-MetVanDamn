@@ -918,6 +918,10 @@
       <Project>{9891ACE8-EE1A-59D1-CC4D-251A5A062472}</Project>
       <Name>TinyWalnutGames.MetVD.Core.Player</Name>
     </ProjectReference>
+    <ProjectReference Include="TinyWalnutGames.MetVD.Utility.Player.csproj">
+      <Project>{42CE9A5A-151F-11C2-CF3F-733E043831F5}</Project>
+      <Name>TinyWalnutGames.MetVD.Utility.Player</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

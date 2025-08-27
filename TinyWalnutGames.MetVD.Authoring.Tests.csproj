@@ -77,7 +77,6 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtProfileTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WorldBootstrapTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\AINavigationTests.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WorldBootstrapTests.Legacy.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WfcDeterminismTests.cs" />
   </ItemGroup>
   <ItemGroup>

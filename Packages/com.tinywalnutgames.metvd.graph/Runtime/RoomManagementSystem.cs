@@ -7,19 +7,10 @@ using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
-    // ----------------------------------------------------------------------------
-    // NOTE (Non-Destructive Preservation):
-    // The following stub types previously caused duplicate definition errors because
-    // real implementations already exist elsewhere in the Graph package.
-    // They are now wrapped in a compile symbol so they can be re-enabled for isolated
-    // experimentation without breaking the main build. Define EXPERIMENTAL_GRAPH_STUBS
-    // if you explicitly need these fallback placeholders.
-    // ----------------------------------------------------------------------------
-#if EXPERIMENTAL_GRAPH_STUBS
+    // Stubs to avoid compile errors (replace with real implementations when available)
     public struct RoomBiomeData : IComponentData { public bool IsResolved; public BiomeType BiomeType; public Polarity PrimaryPolarity; }
     public struct BiomeDataRequest : IComponentData { public int Priority; public bool AllowDefaults; public BiomeDataRequest(int priority, bool allowDefaults) { Priority = priority; AllowDefaults = allowDefaults; } }
     public static class PlayerStateUtility { public static Ability GetCurrentPlayerAbilities(EntityManager em) => Ability.None; }
-#endif
 
     /// <summary>
     /// Component for tracking room state and features
