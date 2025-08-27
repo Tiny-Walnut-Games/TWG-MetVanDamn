@@ -153,6 +153,11 @@ Generated/
 *.Generated.cs
 
 # --- End Unity / DOTS ignores ---
+
+# Force include debug/copilot directory for debugging logs
+!Assets/debug/copilot/
+!debug/copilot/
+
 /.vs
 /Assets/samvieten
 /Assets/Platformer World
