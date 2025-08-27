@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Shared;
+using CoreBootstrap = TinyWalnutGames.MetVD.Core.WorldBootstrapConfiguration;
 
 namespace TinyWalnutGames.MetVD.Authoring.Tests
 {
@@ -47,7 +48,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 roomsPerSectorRange: new int2(3, 12),
                 targetLoopDensity: 0.3f
             );
-            var config = new WorldBootstrapConfiguration(
+            var config = new CoreBootstrap(
                 seed: 42,
                 worldSize: new int2(64, 64),
                 randomizationMode: RandomizationMode.Partial,
@@ -93,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 enableDebugVisualization: false,
                 logGenerationSteps: false
             );
-            var config = new WorldBootstrapConfiguration(
+            var config = new CoreBootstrap(
                 worldSettings,
                 biomeSettings,
                 districtSettings,
@@ -102,9 +103,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
             entityManager.AddComponentData(entity, config);
 
-            Assert.IsTrue(entityManager.HasComponent<WorldBootstrapConfiguration>(entity));
+            Assert.IsTrue(entityManager.HasComponent<CoreBootstrap>(entity));
 
-            var retrievedConfig = entityManager.GetComponentData<WorldBootstrapConfiguration>(entity);
+            var retrievedConfig = entityManager.GetComponentData<CoreBootstrap>(entity);
             Assert.AreEqual(12345, retrievedConfig.Seed);
             Assert.AreEqual(new int2(32, 32), retrievedConfig.WorldSize);
             Assert.AreEqual(RandomizationMode.Full, retrievedConfig.RandomizationMode);
@@ -159,7 +160,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 RoomsPerSectorRange = new int2(1, 8),
                 TargetLoopDensity = 0.2f
             };
-            var config = new WorldBootstrapConfiguration(
+            var config = new CoreBootstrap(
                 seed: 999,
                 worldSize: new int2(50, 50),
                 randomizationMode: RandomizationMode.None,
@@ -173,11 +174,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             entityManager.AddComponentData(bootstrapEntity, config);
 
             // Verify the bootstrap entity has the required configuration
-            Assert.IsTrue(entityManager.HasComponent<WorldBootstrapConfiguration>(bootstrapEntity));
+            Assert.IsTrue(entityManager.HasComponent<CoreBootstrap>(bootstrapEntity));
             Assert.IsFalse(entityManager.HasComponent<WorldBootstrapInProgressTag>(bootstrapEntity));
             Assert.IsFalse(entityManager.HasComponent<WorldBootstrapCompleteTag>(bootstrapEntity));
 
-            var storedConfig = entityManager.GetComponentData<WorldBootstrapConfiguration>(bootstrapEntity);
+            var storedConfig = entityManager.GetComponentData<CoreBootstrap>(bootstrapEntity);
             Assert.AreEqual(999, storedConfig.Seed);
             Assert.AreEqual(new int2(50, 50), storedConfig.WorldSize);
         }
@@ -206,7 +207,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 LogGenerationSteps = true
             };
 
-            var bootstrapConfig = new WorldBootstrapConfiguration(bootstrapSettings);
+            var bootstrapConfig = new CoreBootstrap(bootstrapSettings);
             var worldConfig = new WorldConfiguration
             {
                 Seed = 777,
@@ -218,10 +219,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             entityManager.AddComponentData(entity, bootstrapConfig);
             entityManager.AddComponentData(entity, worldConfig);
 
-            Assert.IsTrue(entityManager.HasComponent<WorldBootstrapConfiguration>(entity));
+            Assert.IsTrue(entityManager.HasComponent<CoreBootstrap>(entity));
             Assert.IsTrue(entityManager.HasComponent<WorldConfiguration>(entity));
 
-            var retrievedBootstrap = entityManager.GetComponentData<WorldBootstrapConfiguration>(entity);
+            var retrievedBootstrap = entityManager.GetComponentData<CoreBootstrap>(entity);
             var retrievedWorld = entityManager.GetComponentData<WorldConfiguration>(entity);
 
             Assert.AreEqual(retrievedBootstrap.Seed, retrievedWorld.Seed);
