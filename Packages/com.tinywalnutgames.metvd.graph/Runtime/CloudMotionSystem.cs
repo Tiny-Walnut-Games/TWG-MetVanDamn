@@ -4,10 +4,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
-#if UNITY_TRANSFORMS_LOCALTRANSFORM
-using Unity.Transforms;
-#endif
-
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>

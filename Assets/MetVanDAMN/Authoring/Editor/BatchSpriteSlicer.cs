@@ -151,13 +151,236 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
                 Debug.LogWarning("No texture selected to copy slices from.");
                 return;
             }
+            
             string path = AssetDatabase.GetAssetPath(selectedTextures[0]);
-            if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning("Texture importer not found."); return; }
+            if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) 
+            { 
+                Debug.LogWarning("Texture importer not found."); 
+                return; 
+            }
+            
             Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-            if (!texture) { Debug.LogWarning("Could not load texture asset."); return; }
+            if (!texture) 
+            { 
+                Debug.LogWarning("Could not load texture asset."); 
+                return; 
+            }
 
-            var factory = new SpriteDataProviderFactories();
-            factory.Init();
+            // Store texture dimensions for scaling
+            copiedTexWidth = texture.width;
+            copiedTexHeight = texture.height;
+            
+            // Copy sprite rects from importer
+            var spriteMetaData = importer.spritesheet;
+            copiedRects = new List<SpriteRect>();
+            
+            foreach (var sprite in spriteMetaData)
+            {
+                var spriteRect = new SpriteRect();
+                spriteRect.name = sprite.name;
+                spriteRect.rect = sprite.rect;
+                spriteRect.alignment = sprite.alignment;
+                spriteRect.pivot = sprite.pivot;
+                spriteRect.border = sprite.border;
+                copiedRects.Add(spriteRect);
+            }
+            
+            Debug.Log($"Copied {copiedRects.Count} slice rectangles from {texture.name}");
+        }
+
+        private void PasteSlicesToSelected()
+        {
+            if (copiedRects == null || copiedRects.Count == 0)
+            {
+                Debug.LogWarning("No rects copied to paste.");
+                return;
+            }
+
+            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            foreach (Object obj in selectedTextures)
+            {
+                string path = AssetDatabase.GetAssetPath(obj);
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) continue;
+                
+                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+                if (!texture) continue;
+
+                // Scale rects based on texture size
+                float scaleX = (float)texture.width / copiedTexWidth;
+                float scaleY = (float)texture.height / copiedTexHeight;
+                
+                var newSprites = new List<SpriteMetaData>();
+                foreach (var copiedRect in copiedRects)
+                {
+                    var sprite = new SpriteMetaData();
+                    sprite.name = copiedRect.name;
+                    sprite.rect = new Rect(
+                        copiedRect.rect.x * scaleX,
+                        copiedRect.rect.y * scaleY,
+                        copiedRect.rect.width * scaleX,
+                        copiedRect.rect.height * scaleY
+                    );
+                    sprite.alignment = copiedRect.alignment;
+                    sprite.pivot = copiedRect.pivot;
+                    sprite.border = copiedRect.border;
+                    newSprites.Add(sprite);
+                }
+                
+                importer.spritesheet = newSprites.ToArray();
+                EditorUtility.SetDirty(importer);
+                importer.SaveAndReimport();
+            }
+            
+            Debug.Log($"Pasted slice layout to {selectedTextures.Length} textures");
+        }
+
+        private void AdjustPivotOfSelectedSlices()
+        {
+            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            foreach (Object obj in selectedTextures)
+            {
+                string path = AssetDatabase.GetAssetPath(obj);
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) continue;
+
+                var sprites = importer.spritesheet;
+                for (int i = 0; i < sprites.Length; i++)
+                {
+                    sprites[i].alignment = (int)pivotAlignment;
+                    // Custom pivot adjustment based on alignment
+                    switch (pivotAlignment)
+                    {
+                        case SpriteAlignment.BottomCenter:
+                            sprites[i].pivot = new Vector2(0.5f, 0f);
+                            break;
+                        case SpriteAlignment.Center:
+                            sprites[i].pivot = new Vector2(0.5f, 0.5f);
+                            break;
+                        case SpriteAlignment.TopCenter:
+                            sprites[i].pivot = new Vector2(0.5f, 1f);
+                            break;
+                        // Add more cases as needed
+                    }
+                }
+                
+                importer.spritesheet = sprites;
+                EditorUtility.SetDirty(importer);
+                importer.SaveAndReimport();
+            }
+            
+            Debug.Log($"Adjusted pivots for {selectedTextures.Length} textures");
+        }
+
+        private void SliceSelectedSprites()
+        {
+            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            foreach (Object obj in selectedTextures)
+            {
+                string path = AssetDatabase.GetAssetPath(obj);
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) continue;
+                
+                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+                if (!texture) continue;
+
+                // Generate slice rectangles based on grid settings
+                var sprites = new List<SpriteMetaData>();
+                
+                if (useCellSize)
+                {
+                    // Use cell size
+                    int colCount = Mathf.FloorToInt(texture.width / cellSize.x);
+                    int rowCount = Mathf.FloorToInt(texture.height / cellSize.y);
+                    
+                    for (int row = 0; row < rowCount; row++)
+                    {
+                        for (int col = 0; col < colCount; col++)
+                        {
+                            var rect = new Rect(
+                                col * cellSize.x,
+                                (rowCount - row - 1) * cellSize.y, // Flip Y
+                                cellSize.x,
+                                cellSize.y
+                            );
+                            
+                            var sprite = new SpriteMetaData();
+                            sprite.name = $"{texture.name}_{row}_{col}";
+                            sprite.rect = rect;
+                            sprite.alignment = (int)pivotAlignment;
+                            SetPivotForAlignment(ref sprite, pivotAlignment);
+                            sprites.Add(sprite);
+                        }
+                    }
+                }
+                else
+                {
+                    // Use rows/columns
+                    float cellWidth = (float)texture.width / columns;
+                    float cellHeight = (float)texture.height / rows;
+                    
+                    for (int row = 0; row < rows; row++)
+                    {
+                        for (int col = 0; col < columns; col++)
+                        {
+                            var rect = new Rect(
+                                col * cellWidth,
+                                (rows - row - 1) * cellHeight, // Flip Y
+                                cellWidth,
+                                cellHeight
+                            );
+                            
+                            var sprite = new SpriteMetaData();
+                            sprite.name = $"{texture.name}_{row}_{col}";
+                            sprite.rect = rect;
+                            sprite.alignment = (int)pivotAlignment;
+                            SetPivotForAlignment(ref sprite, pivotAlignment);
+                            sprites.Add(sprite);
+                        }
+                    }
+                }
+                
+                importer.spritesheet = sprites.ToArray();
+                EditorUtility.SetDirty(importer);
+                importer.SaveAndReimport();
+            }
+            
+            Debug.Log($"Sliced {selectedTextures.Length} textures");
+        }
+
+        private void SetPivotForAlignment(ref SpriteMetaData sprite, SpriteAlignment alignment)
+        {
+            switch (alignment)
+            {
+                case SpriteAlignment.BottomCenter:
+                    sprite.pivot = new Vector2(0.5f, 0f);
+                    break;
+                case SpriteAlignment.Center:
+                    sprite.pivot = new Vector2(0.5f, 0.5f);
+                    break;
+                case SpriteAlignment.TopCenter:
+                    sprite.pivot = new Vector2(0.5f, 1f);
+                    break;
+                case SpriteAlignment.BottomLeft:
+                    sprite.pivot = new Vector2(0f, 0f);
+                    break;
+                case SpriteAlignment.BottomRight:
+                    sprite.pivot = new Vector2(1f, 0f);
+                    break;
+                case SpriteAlignment.LeftCenter:
+                    sprite.pivot = new Vector2(0f, 0.5f);
+                    break;
+                case SpriteAlignment.RightCenter:
+                    sprite.pivot = new Vector2(1f, 0.5f);
+                    break;
+                case SpriteAlignment.TopLeft:
+                    sprite.pivot = new Vector2(0f, 1f);
+                    break;
+                case SpriteAlignment.TopRight:
+                    sprite.pivot = new Vector2(1f, 1f);
+                    break;
+            }
+        }
+#endif
+    }
+}
             var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
             dataProvider.InitSpriteEditorDataProvider();
             var rects = new List<SpriteRect>(dataProvider.GetSpriteRects());
