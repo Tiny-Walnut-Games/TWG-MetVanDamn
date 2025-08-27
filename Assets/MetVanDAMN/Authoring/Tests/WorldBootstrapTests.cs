@@ -53,6 +53,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 roomsPerSectorRange: new int2(3, 12),
                 targetLoopDensity: 0.3f
             );
+            var roomSettings = new TinyWalnutGames.MetVD.Core.RoomGenerationSettings(
+                maxAttempts: 50,
+                minRoomSize: new int2(4, 4),
+                maxRoomSize: new int2(12, 12),
+                corridorWidth: 2
+            );
             var config = new CoreBootstrap(
                 seed: 42,
                 worldSize: new int2(64, 64),

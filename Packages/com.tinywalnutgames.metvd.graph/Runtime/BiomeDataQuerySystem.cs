@@ -3,7 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
-using BiomeFieldData = TinyWalnutGames.MetVD.Core.Biome;
+using BiomeFieldData = TinyWalnutGames.MetVD.Biome.BiomeFieldData;
 
 namespace TinyWalnutGames.MetVD.Graph
 {

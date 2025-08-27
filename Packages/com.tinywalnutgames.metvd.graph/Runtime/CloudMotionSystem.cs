@@ -3,6 +3,9 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+#if !UNITY_TRANSFORMS_LOCALTRANSFORM
+using LocalTransform = TinyWalnutGames.MetVD.Core.Compat.LocalTransformCompat;
+#endif
 
 namespace TinyWalnutGames.MetVD.Graph
 {
