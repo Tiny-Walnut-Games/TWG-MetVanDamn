@@ -755,28 +755,22 @@ namespace TinyWalnutGames.MetVD.Graph
         private void AddCloudMotionFeature(DynamicBuffer<RoomFeatureElement> features, int cloudX, int cloudY, 
                                          CloudMotionType motionType, uint seed, int layerIndex, int cloudIndex)
         {
-            // Create actual cloud motion component data instead of placeholder markers
+            // In a full implementation, this would add motion components
+            // For now, we'll add a marker feature to indicate motion type
             var motionFeatureType = motionType switch
             {
-                CloudMotionType.Conveyor => RoomFeatureType.Platform,
-                CloudMotionType.Electric => RoomFeatureType.Obstacle,
-                CloudMotionType.Gusty => RoomFeatureType.Platform,
+                CloudMotionType.Conveyor => RoomFeatureType.Platform, // Could be ConveyorPlatform
+                CloudMotionType.Electric => RoomFeatureType.Obstacle, // Could be ElectricCloud
                 _ => RoomFeatureType.Platform
             };
             
-            // Add the room feature for the cloud platform
-            var featureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100 + 50);
+            // Add motion indicator (in practice this would be a separate motion component)
             features.Add(new RoomFeatureElement
             {
                 Type = motionFeatureType,
                 Position = new int2(cloudX, cloudY + 1),
-                FeatureId = featureId
+                FeatureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100 + 50) // Motion feature ID
             });
-            
-            // Note: The actual CloudMotionComponent, CloudPlatformTag, and specialized components
-            // (ElectricCloudComponent, ConveyorCloudComponent) should be added to the cloud entity
-            // when it's instantiated in the rendering/physics layer, not stored in the room feature buffer.
-            // This separation maintains the MVC pattern between generation data and runtime components.
         }
 
         private void AddIslandFeatures(DynamicBuffer<RoomFeatureElement> features, int centerX, int centerY, 
