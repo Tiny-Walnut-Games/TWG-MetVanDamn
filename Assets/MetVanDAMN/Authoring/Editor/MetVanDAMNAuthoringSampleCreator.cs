@@ -288,7 +288,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         
         private static void CreateWfcTileVisual(GameObject parent, string typeName, BiomeType biomeType)
         {
-            // TODO: create a valid and meaningful use for biomeType in the visual
+            // Create biome-specific visual based on biome type and tile type combination
             GameObject visual = typeName switch
             {
                 "Hub" => GameObject.CreatePrimitive(PrimitiveType.Sphere),
@@ -298,25 +298,72 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 _ => GameObject.CreatePrimitive(PrimitiveType.Cube)
             };
             
-            visual.name = "Visual";
+            visual.name = $"Visual_{biomeType}";
             visual.transform.SetParent(parent.transform);
             visual.transform.localPosition = Vector3.zero;
             visual.transform.localScale = Vector3.one * 0.8f;
             
+            // Apply biome-specific material and scaling based on biome characteristics
             var renderer = visual.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            
-            // Color by type
-            Color typeColor = typeName switch
+            if (renderer != null)
             {
-                "Hub" => Color.blue,
-                "Corridor" => Color.gray,
-                "Chamber" => Color.yellow,
-                "Specialist" => Color.red,
-                _ => Color.white
+                // Create biome-specific material configuration
+                var material = new Material(Shader.Find("Standard"));
+                
+                // Configure material based on biome type
+                switch (biomeType)
+                {
+                    case BiomeType.SkyGardens:
+                        material.color = new Color(0.5f, 0.8f, 0.3f); // Nature green
+                        material.SetFloat("_Metallic", 0.1f);
+                        material.SetFloat("_Smoothness", 0.3f);
+                        break;
+                    case BiomeType.ShadowRealms:
+                        material.color = new Color(0.2f, 0.1f, 0.4f); // Dark purple
+                        material.SetFloat("_Metallic", 0.8f);
+                        material.SetFloat("_Smoothness", 0.9f);
+                        break;
+                    case BiomeType.HubArea:
+                        material.color = new Color(0.7f, 0.7f, 0.9f); // Neutral blue-gray
+                        material.SetFloat("_Metallic", 0.5f);
+                        material.SetFloat("_Smoothness", 0.7f);
+                        break;
+                    default:
+                        material.color = Color.white;
+                        break;
+                }
+                
+                renderer.material = material;
+                
+                // Scale based on biome importance/density
+                var biomeSizeModifier = GetBiomeSizeModifier(biomeType);
+                visual.transform.localScale *= biomeSizeModifier;
+                
+                // Apply type-specific color overlay to biome material
+                Color typeColor = typeName switch
+                {
+                    "Hub" => Color.blue,
+                    "Corridor" => Color.gray,
+                    "Chamber" => Color.yellow,
+                    "Specialist" => Color.red,
+                    _ => Color.white
+                };
+                
+                // Blend biome color with type color
+                material.color = Color.Lerp(material.color, typeColor, 0.3f);
+            }
+        }
+        
+        private static float GetBiomeSizeModifier(BiomeType biomeType)
+        {
+            // Return size modifiers based on biome characteristics
+            return biomeType switch
+            {
+                BiomeType.HubArea => 1.2f,        // Hub areas are larger/more important
+                BiomeType.SkyGardens => 0.9f,     // Sky gardens are more delicate/smaller
+                BiomeType.ShadowRealms => 1.1f,   // Shadow realms are imposing
+                _ => 1.0f                         // Default size
             };
-            
-            renderer.material.color = typeColor;
         }
         
         private static void CreateSampleCamera()

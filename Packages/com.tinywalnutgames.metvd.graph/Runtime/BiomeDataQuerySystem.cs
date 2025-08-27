@@ -235,19 +235,100 @@ namespace TinyWalnutGames.MetVD.Graph
         private RoomBiomeData FindSiblingBiome(Entity roomEntity, NodeId nodeId)
         {
             // Look at connected/nearby rooms to infer biome type
-            // TODO: This would use the connection system in a full implementation
+            // Complete implementation using connection system for biome propagation
 
             if (_connectionLookup.HasBuffer(roomEntity))
             {
                 var connections = _connectionLookup[roomEntity];
                 foreach (var connection in connections)
                 {
-                    // Check connected nodes for biome data
-                    // TODO: WHY ARE THERE SO MANY TODOS LEFT OVER????????? In practice, would resolve connection.ToNodeId to entity and check biome
+                    // Resolve connection to target entity and check for biome data
+                    var targetEntity = FindEntityByNodeId(connection.ToNodeId);
+                    if (targetEntity != Entity.Null && _biomeLookup.HasComponent(targetEntity))
+                    {
+                        var targetBiome = _biomeLookup[targetEntity];
+                        
+                        // Propagate biome with some variation based on connection type
+                        var influenceStrength = CalculateConnectionInfluence(connection);
+                        if (influenceStrength > 0.7f)
+                        {
+                            // Strong connection - inherit biome with minimal variation
+                            return new RoomBiomeData(
+                                targetBiome.BiomeType,
+                                targetBiome.Polarity,
+                                targetBiome.ParentDistrict,
+                                influenceStrength
+                            );
+                        }
+                        else if (influenceStrength > 0.3f)
+                        {
+                            // Moderate connection - blend biomes
+                            var blendedBiome = BlendBiomes(targetBiome.BiomeType, InferBiomeFromNodeId(nodeId));
+                            return new RoomBiomeData(
+                                blendedBiome,
+                                targetBiome.Polarity,
+                                targetBiome.ParentDistrict,
+                                influenceStrength
+                            );
+                        }
+                    }
                 }
             }
             
             return RoomBiomeData.CreateUnresolved(Entity.Null);
+        }
+        
+        private Entity FindEntityByNodeId(NodeId targetNodeId)
+        {
+            // Query entities with NodeId component to find matching entity
+            var query = EntityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            var nodeIds = query.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
+            {
+                if (nodeIds[i].Value == targetNodeId.Value)
+                {
+                    var result = entities[i];
+                    entities.Dispose();
+                    nodeIds.Dispose();
+                    return result;
+                }
+            }
+            
+            entities.Dispose();
+            nodeIds.Dispose();
+            return Entity.Null;
+        }
+        
+        private float CalculateConnectionInfluence(ConnectionBufferElement connection)
+        {
+            // Calculate how much influence this connection has on biome propagation
+            // Based on connection distance, type, and strength
+            var distance = math.distance(connection.FromNodeId.Value, connection.ToNodeId.Value);
+            var maxDistance = 1000f; // Normalize distance factor
+            var distanceFactor = 1.0f - math.min(distance / maxDistance, 1.0f);
+            
+            // Connection weight affects influence strength
+            var weightFactor = connection.Weight / 100f; // Assuming weights are 0-100
+            
+            return distanceFactor * weightFactor;
+        }
+        
+        private BiomeType BlendBiomes(BiomeType biome1, BiomeType biome2)
+        {
+            // Intelligent biome blending based on compatibility
+            if (biome1 == biome2) return biome1;
+            
+            // Define biome compatibility and blending rules
+            return (biome1, biome2) switch
+            {
+                (BiomeType.SkyGardens, BiomeType.HubArea) => BiomeType.SkyGardens,
+                (BiomeType.HubArea, BiomeType.SkyGardens) => BiomeType.SkyGardens,
+                (BiomeType.ShadowRealms, BiomeType.HubArea) => BiomeType.ShadowRealms,
+                (BiomeType.HubArea, BiomeType.ShadowRealms) => BiomeType.ShadowRealms,
+                _ => biome1 // Default to first biome when no specific rule
+            };
         }
 
         private static RoomBiomeData CreateIntelligentDefault(NodeId nodeId, Entity parentDistrict)

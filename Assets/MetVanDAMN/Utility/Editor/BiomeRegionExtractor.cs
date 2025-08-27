@@ -426,7 +426,35 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         
         private void DrawPreviewGrid(Rect previewRect, Texture2D spritesheet, int columns, int rows)
         {
-            // TODO: find a use for spritesheet. It is listed, so it should be used.
+            // Use spritesheet as background overlay for the grid preview
+            if (spritesheet != null)
+            {
+                // Draw the spritesheet as a tiled background to show how the grid aligns with the texture
+                var aspectRatio = (float)spritesheet.width / spritesheet.height;
+                var scaledWidth = previewRect.width;
+                var scaledHeight = previewRect.width / aspectRatio;
+                
+                // Adjust if height exceeds preview area
+                if (scaledHeight > previewRect.height)
+                {
+                    scaledHeight = previewRect.height;
+                    scaledWidth = previewRect.height * aspectRatio;
+                }
+                
+                var textureRect = new Rect(
+                    previewRect.x + (previewRect.width - scaledWidth) / 2,
+                    previewRect.y + (previewRect.height - scaledHeight) / 2,
+                    scaledWidth,
+                    scaledHeight
+                );
+                
+                // Draw spritesheet with reduced opacity to show grid overlay
+                var originalColor = GUI.color;
+                GUI.color = new Color(1f, 1f, 1f, 0.3f);
+                GUI.DrawTexture(textureRect, spritesheet, ScaleMode.ScaleToFit);
+                GUI.color = originalColor;
+            }
+            
             Color gridColor = Color.white;
             gridColor.a = 0.5f;
             

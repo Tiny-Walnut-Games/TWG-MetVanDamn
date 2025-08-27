@@ -443,11 +443,30 @@ namespace TinyWalnutGames.MetVD.Authoring
         [BurstCompile]
         private Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
         {
-            foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
+            // Use manual EntityQuery to avoid source generator compatibility issues
+            var nodeQuery = SystemAPI.QueryBuilder()
+                .WithAll<NodeId>()
+                .Build();
+            
+            if (nodeQuery.IsEmpty)
+                return Entity.Null;
+                
+            var entities = nodeQuery.ToEntityArray(Allocator.Temp);
+            var nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
             {
-                if (id.ValueRO.Value == nodeId)
-                    return entity;
+                if (nodeIds[i].Value == nodeId)
+                {
+                    var foundEntity = entities[i];
+                    entities.Dispose();
+                    nodeIds.Dispose();
+                    return foundEntity;
+                }
             }
+            
+            entities.Dispose();
+            nodeIds.Dispose();
             return Entity.Null;
         }
 
