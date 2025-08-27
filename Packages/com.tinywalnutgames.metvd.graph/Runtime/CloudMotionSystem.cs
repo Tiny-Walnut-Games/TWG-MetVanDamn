@@ -56,7 +56,10 @@ namespace TinyWalnutGames.MetVD.Graph
                 
                 // Apply velocity to position
                 var newPosition = transform.ValueRO.Position;
-                newPosition.xy += motion.ValueRO.Velocity * motion.ValueRO.Speed * deltaTime;
+                // (Historical diff note retained) Replace this line:
+                // newPosition.xy += deltaTime * motion.ValueRO.Speed * motion.ValueRO.Velocity;
+                // With this line:
+                newPosition.xy += deltaTime * motion.ValueRO.Speed * motion.ValueRO.Velocity.xy;
                 
                 // Apply bounds constraints
                 newPosition.x = math.clamp(newPosition.x, motion.ValueRO.MovementBounds.x, motion.ValueRO.MovementBounds.x + motion.ValueRO.MovementBounds.width);
@@ -91,13 +94,13 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static void UpdateConveyorMotion(ref CloudMotionComponent motion, float time)
         {
+            // MISSED TODO: Utilize `time` meaningfully (e.g., periodic acceleration, direction modulation, phase-based pattern)
             // Mechanical, predictable movement
             var direction = math.normalize(motion.Velocity);
             if (math.length(direction) < 0.1f)
             {
-                direction = new float2(1, 0); // Default right movement
+                direction = new float3(1, 0, 0); // Default right movement as float3
             }
-            
             motion.Velocity = direction * 0.8f; // Constant speed
         }
 
@@ -117,6 +120,7 @@ namespace TinyWalnutGames.MetVD.Graph
             {
                 motion.Velocity *= 2.0f; // Sudden acceleration
             }
+            // MISSED TODO: Add decay/reset logic for post-jolt stabilization or energy charge accumulation mechanic
         }
     }
 
@@ -129,13 +133,13 @@ namespace TinyWalnutGames.MetVD.Graph
     public partial struct ElectricCloudSystem : ISystem
     {
         [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        public readonly void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<ElectricCloudComponent>();
         }
 
         [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        public readonly void OnUpdate(ref SystemState state)
         {
             var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
             
@@ -149,7 +153,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     // Reset discharge timer
                     electric.ValueRW.DischargeTimer = electric.ValueRO.DischargeInterval;
                     
-                    // Trigger discharge effects - create electrical particles and affect nearby entities
+                    // MISSED TODO: Invoke actual discharge effects (particles, damage, area influence, status effects)
                     TriggerElectricalDischarge(transform.ValueRO.Position, electric.ValueRO.DischargeRange);
                 }
             }
@@ -157,15 +161,11 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static void TriggerElectricalDischarge(float3 position, float range)
         {
-            // Create electrical discharge effect
-            // This would typically:
-            // 1. Spawn electrical particle effects
-            // 2. Apply electrical damage to nearby entities
-            // 3. Create temporary electromagnetic field effects
-            // 4. Trigger audio/visual feedback
-            
-            // For gameplay systems, this would query for entities within range
-            // and apply electrical effects based on entity type and distance
+            // MISSED TODO: Implement discharge VFX (particle system / sprite flash / light pulse)
+            // MISSED TODO: Apply radial damage / stun / polarity interaction within `range`
+            // MISSED TODO: Query spatial partition or physics system for affected entities
+            // MISSED TODO: Emit gameplay event (e.g., CloudDischargeEvent) for downstream systems (sound, achievements)
+            // MISSED TODO: Integrate cooldown modulation via biome polarity or weather intensity
         }
     }
 
@@ -191,22 +191,22 @@ namespace TinyWalnutGames.MetVD.Graph
             // Process conveyor forces using SystemAPI.Query
             foreach (var (transform, conveyor, platform) in SystemAPI.Query<RefRO<LocalTransform>, RefRO<ConveyorCloudComponent>, RefRO<CloudPlatformTag>>())
             {
-                // Apply conveyor forces to entities within range
-                ApplyConveyorForces(transform.ValueRO.Position, conveyor.ValueRO.ConveyorDirection, conveyor.ValueRO.ConveyorSpeed);
+                // MISSED TODO: Detect entities (player / physics bodies) overlapping platform bounds
+                // MISSED TODO: Apply directional velocity override or additive impulse respecting friction
+                // MISSED TODO: Handle edge fall-off smoothing / stickiness logic
+                // MISSED TODO: Surface force feedback (camera shake, controller rumble, sound trigger)
+                ApplyConveyorForces(transform.ValueRO.Position, conveyor.ValueRO.ConveyorDirection, conveyor.ValueRO.ConveyorSpeed, deltaTime);
             }
         }
 
-        private static void ApplyConveyorForces(float3 position, float3 direction, float speed)
+        private static void ApplyConveyorForces(float3 position, float3 direction, float speed, float deltaTime)
         {
-            // Apply conveyor belt forces to entities within range
-            // This would typically:
-            // 1. Query for entities within conveyor range
-            // 2. Apply forces based on conveyor direction and speed
-            // 3. Handle player movement physics interactions
-            // 4. Create visual feedback effects
-            
-            // For gameplay systems, this would modify entity velocities
-            // based on their proximity to the conveyor cloud
+            // MISSED TODO: Spatial query for affected entities within conveyor influence area
+            // MISSED TODO: Project entity velocity onto conveyor direction and blend based on weight
+            // MISSED TODO: Adjust for uphill / downhill modifiers if vertical variance is introduced
+            // MISSED TODO: Cap maximum induced speed to prevent exploitation
+            // MISSED TODO: Author hook for scripting additional effects (e.g., polarity charge transfer)
+            _ = position; _ = direction; _ = speed; _ = deltaTime; // Intentional no-op placeholders
         }
     }
 }

@@ -65,6 +65,7 @@
     <Compile Include="Assets\Plugins\TLDA\Editor\TLDLScribeWindow.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Plugins\TLDA\Editor\LivingDevAgent.Editor.asmdef.csc.rsp" />
     <None Include="Assets\Plugins\TLDA\Editor\LivingDevAgent.Editor.asmdef" />
   </ItemGroup>
   <ItemGroup>

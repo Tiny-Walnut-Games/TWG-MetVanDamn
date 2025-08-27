@@ -76,6 +76,7 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.shared\Runtime\WorldConfigurationShared.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Packages\com.tinywalnutgames.metvd.shared\Runtime\TinyWalnutGames.MetVD.Shared.asmdef.csc.rsp" />
     <None Include="Packages\com.tinywalnutgames.metvd.shared\Runtime\TinyWalnutGames.MetVD.Shared.asmdef" />
   </ItemGroup>
   <ItemGroup>

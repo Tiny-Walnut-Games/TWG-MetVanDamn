@@ -77,6 +77,7 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.biome\Runtime\BiomeFieldSystem.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Packages\com.tinywalnutgames.metvd.biome\Runtime\TinyWalnutGames.MetVD.Biome.asmdef.csc.rsp" />
     <None Include="Packages\com.tinywalnutgames.metvd.biome\Runtime\TinyWalnutGames.MetVD.Biome.asmdef" />
   </ItemGroup>
   <ItemGroup>

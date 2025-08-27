@@ -5,6 +5,8 @@ using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Shared;
+using System;
+using System.Reflection;
 using CoreBootstrap = TinyWalnutGames.MetVD.Core.WorldBootstrapConfiguration;
 using CoreInProgress = TinyWalnutGames.MetVD.Core.WorldBootstrapInProgressTag;
 using CoreComplete = TinyWalnutGames.MetVD.Core.WorldBootstrapCompleteTag;
@@ -47,17 +49,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 districtMinDistance: 15f,
                 districtWeight: 1.0f
             );
+            // Use positional args to avoid named parameter mismatch (roomsPerSectorRange name changed in API)
             var sectorSettings = new CoreSectorSettings(
-                sectorsPerDistrictRange: new int2(2, 8),
-                sectorGridSize: new int2(6, 6),
-                roomsPerSectorRange: new int2(3, 12),
-                targetLoopDensity: 0.3f
+                new int2(2, 8),          // sectorsPerDistrictRange
+                new int2(6, 6),          // sectorGridSize
+                new int2(3, 12),         // roomsPerSectorRange (positional to survive rename)
+                0.3f                     // targetLoopDensity
             );
+            // RoomGenerationSettings API changed (no maxAttempts named parameter). Use positional.
             var roomSettings = new TinyWalnutGames.MetVD.Core.RoomGenerationSettings(
-                maxAttempts: 50,
-                minRoomSize: new int2(4, 4),
-                maxRoomSize: new int2(12, 12),
-                corridorWidth: 2
+                new int2(4, 4),          // minRoomSize
+                new int2(12, 12),        // maxRoomSize
+                2                        // corridorWidth (remaining defaults internal)
             );
             var config = new CoreBootstrap(
                 seed: 42,
@@ -74,9 +77,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(42, config.Seed);
             Assert.AreEqual(new int2(64, 64), config.WorldSize);
             Assert.AreEqual(RandomizationMode.Partial, config.RandomizationMode);
-            Assert.AreEqual(new int2(3, 6), config.BiomeCountRange);
-            Assert.AreEqual(new int2(4, 12), config.DistrictCountRange);
-            Assert.AreEqual(15f, config.DistrictMinDistance, 0.001f);
+
+            // Adapt to flattened API (original top-level properties may have moved into nested settings)
+            Assert.AreEqual(new int2(3, 6), WorldBootstrapConfigAccess.GetBiomeCountRange(config));
+            Assert.AreEqual(new int2(4, 12), WorldBootstrapConfigAccess.GetDistrictCountRange(config));
+            Assert.AreEqual(15f, WorldBootstrapConfigAccess.GetDistrictMinDistance(config), 0.001f);
         }
 
         [Test]
@@ -105,11 +110,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 enableDebugVisualization: false,
                 logGenerationSteps: false
             );
+            // Updated to pass all required settings explicitly (constructor overload mismatch fix)
             var config = new CoreBootstrap(
-                worldSettings,
-                biomeSettings,
-                districtSettings,
-                debugSettings
+                seed: (int)worldSettings.Seed,
+                worldSize: worldSettings.WorldSize,
+                randomizationMode: worldSettings.RandomizationMode,
+                biomeSettings: new CoreBiomeSettings(biomeSettings.BiomeCountRange, biomeSettings.BiomeWeight),
+                districtSettings: new CoreDistrictSettings(districtSettings.DistrictCountRange, districtSettings.DistrictMinDistance, districtSettings.DistrictWeight),
+                sectorSettings: new CoreSectorSettings(
+                    districtSettings.SectorsPerDistrictRange,
+                    districtSettings.SectorGridSize,
+                    districtSettings.RoomsPerSectorRange,
+                    districtSettings.TargetLoopDensity
+                ),
+                roomSettings: new TinyWalnutGames.MetVD.Core.RoomGenerationSettings(
+                    new int2(4, 4), // min
+                    new int2(12, 12), // max
+                    2 // corridorWidth
+                ),
+                enableDebugVisualization: debugSettings.EnableDebugVisualization,
+                logGenerationSteps: debugSettings.LogGenerationSteps
             );
 
             entityManager.AddComponentData(entity, config);
@@ -120,7 +140,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(12345, retrievedConfig.Seed);
             Assert.AreEqual(new int2(32, 32), retrievedConfig.WorldSize);
             Assert.AreEqual(RandomizationMode.Full, retrievedConfig.RandomizationMode);
-            Assert.AreEqual(0.8f, retrievedConfig.BiomeWeight, 0.001f);
+            Assert.AreEqual(0.8f, WorldBootstrapConfigAccess.GetBiomeWeight(retrievedConfig), 0.001f);
             Assert.IsFalse(retrievedConfig.EnableDebugVisualization);
         }
 
@@ -129,11 +149,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         {
             var entity = entityManager.CreateEntity();
 
-            // Test in-progress tag
             entityManager.AddComponentData(entity, new CoreInProgress());
             Assert.IsTrue(entityManager.HasComponent<CoreInProgress>(entity));
 
-            // Test complete tag
             entityManager.RemoveComponent<CoreInProgress>(entity);
             var completeTag = new CoreComplete(biomes: 4, districts: 8, sectors: 24, rooms: 120);
             entityManager.AddComponentData(entity, completeTag);
@@ -149,20 +167,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void WorldBootstrapSystem_RequiresCorrectComponents()
         {
-            // This test validates that the system setup would work correctly
-            // without running the actual system update (which requires Unity runtime)
-            
             var bootstrapEntity = entityManager.CreateEntity();
             var biomeSettings = new BiomeSettings
             {
-                CountRange = new int2(1, 3),
-                Weight = 1.0f
+                BiomeCountRange = new int2(1, 3),
+                BiomeWeight = 1.0f
             };
             var districtSettings = new DistrictSettings
             {
-                CountRange = new int2(2, 5),
-                MinDistance = 20f,
-                Weight = 1.0f
+                DistrictCountRange = new int2(2, 5),
+                DistrictMinDistance = 20f,
+                DistrictWeight = 1.0f
             };
             var sectorSettings = new SectorSettings
             {
@@ -175,16 +190,36 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 seed: 999,
                 worldSize: new int2(50, 50),
                 randomizationMode: RandomizationMode.None,
-                biomeSettings: biomeSettings,
-                districtSettings: districtSettings,
-                sectorSettings: sectorSettings,
+                biomeSettings: new CoreBiomeSettings
+                {
+                    BiomeCountRange = biomeSettings.BiomeCountRange,
+                    BiomeWeight = biomeSettings.BiomeWeight
+                },
+                districtSettings: new CoreDistrictSettings
+                {
+                    DistrictCountRange = districtSettings.DistrictCountRange,
+                    DistrictMinDistance = districtSettings.DistrictMinDistance,
+                    DistrictWeight = districtSettings.DistrictWeight
+                },
+                sectorSettings: new CoreSectorSettings
+                (
+                    sectorSettings.SectorsPerDistrictRange,
+                    sectorSettings.GridSize,
+                    sectorSettings.RoomsPerSectorRange,
+                    sectorSettings.TargetLoopDensity
+                ),
+                roomSettings: new TinyWalnutGames.MetVD.Core.RoomGenerationSettings
+                (
+                    new int2(4, 4),
+                    new int2(10, 10),
+                    2
+                ),
                 enableDebugVisualization: true,
                 logGenerationSteps: true
             );
 
             entityManager.AddComponentData(bootstrapEntity, config);
 
-            // Verify the bootstrap entity has the required configuration
             Assert.IsTrue(entityManager.HasComponent<CoreBootstrap>(bootstrapEntity));
             Assert.IsFalse(entityManager.HasComponent<CoreInProgress>(bootstrapEntity));
             Assert.IsFalse(entityManager.HasComponent<CoreComplete>(bootstrapEntity));
@@ -197,7 +232,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void WorldConfiguration_IsCompatibleWithBootstrap()
         {
-            // Test that WorldBootstrapConfiguration can coexist with WorldConfiguration
             var entity = entityManager.CreateEntity();
 
             var worldSettings = new WorldSettings
@@ -219,7 +253,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 DistrictMinDistance = 25f,
                 DistrictWeight = 0.9f,
                 SectorsPerDistrictRange = new int2(3, 10),
-                SectorGridSize = new int2(10, 10)
+                SectorGridSize = new int2(10, 10),
+                RoomsPerSectorRange = new int2(4, 12),
+                TargetLoopDensity = 0.4f
             };
             
             var debugSettings = new DebugSettings
@@ -229,7 +265,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             };
 
             var bootstrapConfig = new CoreBootstrap(
-                seed: worldSettings.Seed,
+                seed: (int)worldSettings.Seed,
                 worldSize: worldSettings.WorldSize,
                 randomizationMode: worldSettings.RandomizationMode,
                 biomeSettings: new CoreBiomeSettings
@@ -244,15 +280,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                     DistrictWeight = districtSettings.DistrictWeight
                 },
                 sectorSettings: new CoreSectorSettings
-                {
-                    SectorsPerDistrictRange = districtSettings.SectorsPerDistrictRange,
-                    SectorGridSize = districtSettings.SectorGridSize
-                },
-                roomSettings: new RoomGenerationSettings
-                {
-                    RoomsPerSectorRange = new int2(4, 15),
-                    TargetLoopDensity = 0.7f
-                },
+                (
+                    districtSettings.SectorsPerDistrictRange,
+                    districtSettings.SectorGridSize,
+                    districtSettings.RoomsPerSectorRange,
+                    districtSettings.TargetLoopDensity
+                ),
+                roomSettings: new Core.RoomGenerationSettings
+                (
+                    new int2(4, 4),
+                    new int2(12, 12),
+                    2
+                ),
                 enableDebugVisualization: debugSettings.EnableDebugVisualization,
                 logGenerationSteps: debugSettings.LogGenerationSteps
             );
@@ -260,7 +299,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             {
                 Seed = 777,
                 WorldSize = new int2(80, 80),
-                TargetSectors = 150, // Max possible: 15 districts * 10 sectors
+                TargetSectors = 150,
                 RandomizationMode = RandomizationMode.Partial
             };
 
@@ -276,6 +315,67 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(retrievedBootstrap.Seed, retrievedWorld.Seed);
             Assert.AreEqual(retrievedBootstrap.WorldSize, retrievedWorld.WorldSize);
             Assert.AreEqual(retrievedBootstrap.RandomizationMode, retrievedWorld.RandomizationMode);
+        }
+    }
+
+    /// <summary>
+    /// Reflection-based accessors to maintain backward compatibility with renamed / flattened properties
+    /// ADDITIVE ONLY – does not modify production code.
+    /// </summary>
+    internal static class WorldBootstrapConfigAccess
+    {
+        private static BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+        public static int2 GetBiomeCountRange(CoreBootstrap cfg) =>
+            TryGet<int2>(cfg, "BiomeCountRange") ??
+            TryNested<int2>(cfg, "BiomeSettings", "BiomeCountRange") ??
+            default;
+
+        public static int2 GetDistrictCountRange(CoreBootstrap cfg) =>
+            TryGet<int2>(cfg, "DistrictCountRange") ??
+            TryNested<int2>(cfg, "DistrictSettings", "DistrictCountRange") ??
+            default;
+
+        public static float GetDistrictMinDistance(CoreBootstrap cfg) =>
+            TryGet<float>(cfg, "DistrictMinDistance") ??
+            TryNested<float>(cfg, "DistrictSettings", "DistrictMinDistance") ??
+            0f;
+
+        public static float GetBiomeWeight(CoreBootstrap cfg) =>
+            TryGet<float>(cfg, "BiomeWeight") ??
+            TryNested<float>(cfg, "BiomeSettings", "BiomeWeight") ??
+            0f;
+
+        private static T? TryGet<T>(CoreBootstrap cfg, string name) where T : struct
+        {
+            var type = cfg.GetType();
+            var f = type.GetField(name, Flags);
+            if (f != null && f.FieldType == typeof(T)) return (T)f.GetValue(cfg);
+            var p = type.GetProperty(name, Flags);
+            if (p != null && p.PropertyType == typeof(T)) return (T)p.GetValue(cfg);
+            return null;
+        }
+
+        private static T? TryNested<T>(CoreBootstrap cfg, string containerName, string memberName) where T : struct
+        {
+            object container = GetObject(cfg, containerName);
+            if (container == null) return null;
+            var type = container.GetType();
+            var f = type.GetField(memberName, Flags);
+            if (f != null && f.FieldType == typeof(T)) return (T)f.GetValue(container);
+            var p = type.GetProperty(memberName, Flags);
+            if (p != null && p.PropertyType == typeof(T)) return (T)p.GetValue(container);
+            return null;
+        }
+
+        private static object GetObject(CoreBootstrap cfg, string name)
+        {
+            var type = cfg.GetType();
+            var f = type.GetField(name, Flags);
+            if (f != null) return f.GetValue(cfg);
+            var p = type.GetProperty(name, Flags);
+            if (p != null) return p.GetValue(cfg);
+            return null;
         }
     }
 }

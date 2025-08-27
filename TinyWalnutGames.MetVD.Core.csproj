@@ -85,6 +85,7 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\GateCondition.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Packages\com.tinywalnutgames.metvd.core\Runtime\TinyWalnutGames.MetVD.Core.asmdef.csc.rsp" />
     <None Include="Packages\com.tinywalnutgames.metvd.core\Runtime\TinyWalnutGames.MetVD.Core.asmdef" />
   </ItemGroup>
   <ItemGroup>

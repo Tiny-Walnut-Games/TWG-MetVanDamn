@@ -90,6 +90,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\DistrictAuthoring.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\MetVanDAMN\Authoring\TinyWalnutGames.MetVD.Authoring.asmdef.csc.rsp" />
     <None Include="Assets\MetVanDAMN\Authoring\TinyWalnutGames.MetVD.Authoring.asmdef" />
   </ItemGroup>
   <ItemGroup>

@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\TinyWalnutGames.MetVD.Graph.asmdef" />
+    <None Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\TinyWalnutGames.MetVD.Graph.asmdef.csc.rsp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

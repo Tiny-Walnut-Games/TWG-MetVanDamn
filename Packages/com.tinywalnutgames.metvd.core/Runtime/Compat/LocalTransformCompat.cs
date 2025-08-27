@@ -8,7 +8,7 @@ namespace TinyWalnutGames.MetVD.Core.Compat
     /// Compatibility shim for Unity.Transforms.LocalTransform when the Transforms package / struct is unavailable.
     /// Provides minimal fields used by gameplay code. Do NOT use in new production code. 
     /// </summary>
-    internal struct LocalTransformCompat : IComponentData
+    public struct LocalTransformCompat : IComponentData
     {
         public float3 Position;
         public quaternion Rotation;

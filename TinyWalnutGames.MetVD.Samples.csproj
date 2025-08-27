@@ -79,6 +79,7 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\ProceduralRoomGenerationDemo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\TinyWalnutGames.MetVD.Samples.asmdef.csc.rsp" />
     <None Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\TinyWalnutGames.MetVD.Samples.asmdef" />
   </ItemGroup>
   <ItemGroup>

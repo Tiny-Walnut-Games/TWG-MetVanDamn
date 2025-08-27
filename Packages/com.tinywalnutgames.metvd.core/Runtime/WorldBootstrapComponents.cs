@@ -51,11 +51,21 @@ namespace TinyWalnutGames.MetVD.Core
     {
         public int2 RoomsPerSectorRange;  // x = min, y = max
         public float TargetLoopDensity;
+        public int CorridorWidth; // Add this field
 
         public RoomGenerationSettings(int2 roomsPerSectorRange, float targetLoopDensity)
         {
             RoomsPerSectorRange = roomsPerSectorRange;
             TargetLoopDensity = targetLoopDensity;
+            CorridorWidth = 0; // Default value
+        }
+
+        // three argument constructor for convenience
+        public RoomGenerationSettings(int2 roomsPerSectorRange, float targetLoopDensity, int corridorWidth)
+        {
+            RoomsPerSectorRange = roomsPerSectorRange;
+            TargetLoopDensity = targetLoopDensity;
+            CorridorWidth = corridorWidth;
         }
     }
 

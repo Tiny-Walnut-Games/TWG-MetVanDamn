@@ -82,6 +82,7 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\ProceduralRoomGenerationIntegrationTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\TinyWalnutGames.MetVD.Graph.Tests.asmdef.csc.rsp" />
     <None Include="Packages\com.tinywalnutgames.metvd.graph\Tests\Runtime\TinyWalnutGames.MetVD.Graph.Tests.asmdef" />
   </ItemGroup>
   <ItemGroup>

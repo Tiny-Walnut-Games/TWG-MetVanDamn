@@ -81,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\MetVanDAMN\Authoring\Tests\TinyWalnutGames.MetVD.Authoring.Tests.asmdef" />
+    <None Include="Assets\MetVanDAMN\Authoring\Tests\TinyWalnutGames.MetVD.Authoring.Tests.asmdef.csc.rsp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
