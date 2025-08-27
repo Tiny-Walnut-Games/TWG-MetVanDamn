@@ -109,6 +109,7 @@ namespace TinyWalnutGames.MetVD.Graph
         private ComponentLookup<NodeId> _nodeIdLookup;
         private BufferLookup<ConnectionBufferElement> _connectionLookup;
         private EntityQuery _requestQuery;
+        private EntityQuery _nodeIdQuery;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -121,6 +122,10 @@ namespace TinyWalnutGames.MetVD.Graph
             _requestQuery = new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<BiomeDataRequest>()
                 .WithNone<RoomBiomeData>()
+                .Build(ref state);
+                
+            _nodeIdQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<NodeId>()
                 .Build(ref state);
         }
 
@@ -226,24 +231,21 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private readonly Entity FindEntityByNodeId(ref SystemState state, uint parentId)
         {
-            // Implement efficient entity lookup by NodeId using EntityQuery
-            var nodeQuery = SystemAPI.QueryBuilder()
-                .WithAll<NodeId>()
-                .Build();
-                
-            if (nodeQuery.IsEmpty)
+            // Use cached query for Burst compatibility
+            if (_nodeIdQuery.IsEmpty)
                 return Entity.Null;
                 
-            var entities = nodeQuery.ToEntityArray(Allocator.Temp);
-            var nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            var entities = _nodeIdQuery.ToEntityArray(Allocator.Temp);
+            var nodeIds = _nodeIdQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
             
             for (int i = 0; i < entities.Length; i++)
             {
                 if (nodeIds[i].Value == parentId)
                 {
+                    var foundEntity = entities[i];
                     entities.Dispose();
                     nodeIds.Dispose();
-                    return entities[i];
+                    return foundEntity;
                 }
             }
             

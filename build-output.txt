@@ -1,0 +1,10 @@
+MSBuild version 17.8.32+74df0b3f5 for .NET
+/home/runner/work/TWG-MetVanDamn/TWG-MetVanDamn/TWG-MetVanDamn.sln : Solution file error MSB5004: The solution file has two projects named "TinyWalnutGames.MetVD.Utility".
+
+Build FAILED.
+
+/home/runner/work/TWG-MetVanDamn/TWG-MetVanDamn/TWG-MetVanDamn.sln : Solution file error MSB5004: The solution file has two projects named "TinyWalnutGames.MetVD.Utility".
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.12
