@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Graph
     public static class HierarchyConstants { public const uint SectorIdMultiplier = 1000; public const uint RoomsPerSectorMultiplier = 100; }
     public struct SectorHierarchyData : IComponentData { public int2 LocalGridSize; public int SectorCount; public bool IsSubdivided; public uint SectorSeed; public SectorHierarchyData(int2 localGridSize, int sectorCount, uint sectorSeed){ LocalGridSize = localGridSize; SectorCount = sectorCount; IsSubdivided = false; SectorSeed = sectorSeed; } }
     public struct RoomHierarchyData : IComponentData { public RectInt Bounds; public RoomType Type; public bool IsLeafRoom; public RoomHierarchyData(RectInt bounds, RoomType type, bool isLeafRoom=false){ Bounds=bounds; Type=type; IsLeafRoom=isLeafRoom; } }
-    public enum RoomType : byte { Normal, Entrance, Exit, Boss, Treasure, Shop, Save, Hub }
+    public enum RoomType : byte { Normal, Entrance, Exit, Boss, Treasure, Shop, Save, Hub, Special, Secret, Standard, Corridor }
 
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(DistrictLayoutSystem))]

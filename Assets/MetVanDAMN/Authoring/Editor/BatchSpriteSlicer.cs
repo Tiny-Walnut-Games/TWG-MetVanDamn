@@ -46,11 +46,11 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         private static List<SpriteRect> copiedRects = null;
         // Outlines per sprite name (List<Vector2[]> matches ISpriteOutlineDataProvider contract)
         private static readonly Dictionary<string, List<Vector2[]>> copiedOutlines = new();
+        private static int copiedTexWidth = 0;
+        private static int copiedTexHeight = 0;
 #else
         private static bool spriteEditorNotAvailable = true;
 #endif
-        private static int copiedTexWidth = 0;
-        private static int copiedTexHeight = 0;
 
         /// <summary>
         /// Opens the Batch Sprite Slicer editor window.

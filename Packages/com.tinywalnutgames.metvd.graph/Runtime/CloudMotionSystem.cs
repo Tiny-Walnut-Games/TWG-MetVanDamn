@@ -881,6 +881,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     public enum BiomeType
     {
+        Unknown = -1,
         Neutral = 0,
         Storm = 1,
         Desert = 2,
