@@ -2,9 +2,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using TinyWalnutGames.Tools.Editor;
+using TinyWalnutGames.MetVD.Utilities;
 
-namespace TinyWalnutGames.Tools.Editor.Tests
+namespace TinyWalnutGames.MetVD.Utilities.Tests
 {
     /// <summary>
     /// Tests for BiomeRegionExtractor editor tool functionality

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using Unity.Collections;
 using Unity.Entities;
+using UnityEngine.Tilemaps;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Authoring;
 using TinyWalnutGames.MetVD.Biome;
@@ -138,7 +139,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     var biomeAuthoring = renderer.GetComponentInParent<BiomeFieldAuthoring>();
                     if (biomeAuthoring != null)
                     {
-                        var existingEntry = biomeInfos.Find(entry => entry.nodeId == biomeAuthoring.nodeId.Value);
+                        var existingEntry = biomeInfos.Find(entry => entry.nodeId == biomeAuthoring.nodeId);
                         if (existingEntry != null && existingEntry.currentColor != rendererColor)
                         {
                             existingEntry.currentColor = rendererColor;
@@ -398,12 +399,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (Application.isPlaying && World.DefaultGameObjectInjectionWorld != null)
             {
                 var world = World.DefaultGameObjectInjectionWorld;
-                var biomeSystem = world.GetExistingSystemManaged<BiomeFieldSystem>();
-                
+                // Removed: var biomeSystem = world.GetExistingSystemManaged<BiomeFieldSystem>();
+                // The line above caused CS0315 because BiomeFieldSystem is an ISystem, not a ComponentSystemBase.
+                // If you need to interact with the system, use the unmanaged API or just access the EntityManager as below.
+
                 // Access runtime biome data through ECS query
                 SyncWithECSBiomeData(world, biomesByType);
             }
-            
+
             // Also sync with any runtime tile renderers that may have modified colors
             SyncWithTileMapRenderers(biomesByType);
         }
@@ -427,9 +430,42 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 for (int i = 0; i < entities.Length; i++)
                 {
                     var biomeComponent = biomeComponents[i];
-                    var artProfileRef = artProfileRefs[i];
-                    
-                    if (artProfileRef.ProfileRef.IsValid)
+                    var artProfileRef = artProfileRefs[i];                    
+
+                    // Example fix in SyncWithECSBiomeData:
+                    if (artProfileRef.ProfileRef.IsValid())
+                    {
+                        var profile = artProfileRef.ProfileRef.Value;
+
+                        // Update biome color information based on runtime state
+                        if (profile.debugColor.a > 0f)
+                        {
+                            // Runtime debug color takes precedence
+                            UpdateBiomeColorFromRuntime(biomeComponent.Type, profile.debugColor);
+                        }
+                    }
+                    if (artProfileRef.ProfileRef.Value != null)
+                    {
+                        var profile = artProfileRef.ProfileRef.Value;
+
+                        // Update biome info entry if it exists
+                        var existingEntry = biomeInfos.Find(entry => entry.type == biomeComponent.Type);
+                        if (existingEntry != null)
+                        {
+                            existingEntry.isRuntimeActive = true;
+                            existingEntry.artProfile = profile;
+                            existingEntry.name = GetBiomeDisplayName(biomeComponent.Type, profile);
+
+                            // If runtime color differs from design color, mark as override
+                            if (existingEntry.color != profile.debugColor && profile.debugColor.a > 0f)
+                            {
+                                existingEntry.currentColor = profile.debugColor;
+                                existingEntry.hasColorOverride = true;
+                                existingEntry.colorSource = "ECS BiomeArtProfile";
+                            }
+                        }
+                    }
+                    if (artProfileRef.ProfileRef)
                         {
                             var profile = artProfileRef.ProfileRef.Value;
                         

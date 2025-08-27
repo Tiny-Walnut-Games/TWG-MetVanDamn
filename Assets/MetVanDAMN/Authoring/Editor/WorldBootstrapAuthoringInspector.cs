@@ -89,8 +89,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             EditorGUILayout.LabelField("World Configuration", EditorStyles.boldLabel);
             
             bootstrap.seed = EditorGUILayout.IntField(new GUIContent("Seed", "Seed for deterministic generation (0 = random)"), bootstrap.seed);
-            bootstrap.worldSize = EditorGUILayout.Vector2IntField(new GUIContent("World Size", "World bounds size (X,Z)"), 
-                new Vector2Int(bootstrap.worldSize.x, bootstrap.worldSize.y));
+            // Fix: worldSize is int2; use a temporary Vector2Int for editing then assign back
+            var worldSizeVec2 = new Vector2Int(bootstrap.worldSize.x, bootstrap.worldSize.y);
+            worldSizeVec2 = EditorGUILayout.Vector2IntField(new GUIContent("World Size", "World bounds size (X,Z)"), worldSizeVec2);
+            bootstrap.worldSize = new int2(worldSizeVec2.x, worldSizeVec2.y);
             bootstrap.randomizationMode = (TinyWalnutGames.MetVD.Shared.RandomizationMode)EditorGUILayout.EnumPopup(
                 new GUIContent("Randomization Mode", "Rule randomization mode"), bootstrap.randomizationMode);
         }
