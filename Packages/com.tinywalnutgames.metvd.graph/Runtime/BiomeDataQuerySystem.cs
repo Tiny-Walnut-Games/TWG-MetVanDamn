@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
+using BiomeFieldData = TinyWalnutGames.MetVD.Core.Biome;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
@@ -103,7 +104,7 @@ namespace TinyWalnutGames.MetVD.Graph
     [UpdateBefore(typeof(RoomManagementSystem))]
     public partial struct BiomeDataQuerySystem : ISystem
     {
-        private ComponentLookup<TinyWalnutGames.MetVD.Core.Biome> _biomeLookup;
+        private ComponentLookup<BiomeFieldData> _biomeLookup;
         private ComponentLookup<RoomBiomeData> _roomBiomeDataLookup;
         private BufferLookup<ConnectionBufferElement> _connectionLookup;
         private EntityQuery _requestQuery;
@@ -111,7 +112,7 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _biomeLookup = state.GetComponentLookup<TinyWalnutGames.MetVD.Core.Biome>(true);
+            _biomeLookup = state.GetComponentLookup<BiomeFieldData>(true);
             _roomBiomeDataLookup = state.GetComponentLookup<RoomBiomeData>();
             _connectionLookup = state.GetBufferLookup<ConnectionBufferElement>(true);
             
@@ -147,7 +148,7 @@ namespace TinyWalnutGames.MetVD.Graph
     [BurstCompile]
     public partial struct BiomeDataResolveJob : IJobEntity
     {
-        [ReadOnly] public ComponentLookup<TinyWalnutGames.MetVD.Core.Biome> BiomeLookup;
+        [ReadOnly] public ComponentLookup<BiomeFieldData> BiomeLookup;
         public ComponentLookup<RoomBiomeData> RoomBiomeDataLookup;
         [ReadOnly] public BufferLookup<ConnectionBufferElement> ConnectionLookup;
 

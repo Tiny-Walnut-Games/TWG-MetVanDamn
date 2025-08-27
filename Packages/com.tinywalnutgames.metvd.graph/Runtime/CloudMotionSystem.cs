@@ -4,6 +4,10 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
+#if UNITY_TRANSFORMS_LOCALTRANSFORM
+using Unity.Transforms;
+#endif
+
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>
@@ -24,62 +28,46 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
         {
             var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
+            var time = (float)state.WorldUnmanaged.Time.ElapsedTime;
             
-            var motionJob = new CloudMotionJob
+            // Process cloud motion using SystemAPI.Query instead of IJobEntity
+            foreach (var (transform, motion) in SystemAPI.Query<RefRW<LocalTransform>, RefRW<CloudMotionComponent>>())
             {
-                DeltaTime = deltaTime,
-                Time = (float)state.WorldUnmanaged.Time.ElapsedTime
-            };
-            
-            state.Dependency = motionJob.ScheduleParallel(state.Dependency);
-        }
-    }
-
-    /// <summary>
-    /// Job that processes cloud motion for all cloud entities
-    /// </summary>
-    [BurstCompile]
-    public partial struct CloudMotionJob : IJobEntity
-    {
-        public float DeltaTime;
-        public float Time;
-
-        public void Execute(RefRW<LocalTransform> transform, ref CloudMotionComponent motion)
-        {
-            motion.TimeAccumulator += DeltaTime;
-            
-            // Update velocity based on motion type
-            switch (motion.MotionType)
-            {
-                case CloudMotionType.Gentle:
-                    UpdateGentleMotion(ref motion, Time);
-                    break;
-                    
-                case CloudMotionType.Gusty:
-                    UpdateGustyMotion(ref motion, Time);
-                    break;
-                    
-                case CloudMotionType.Conveyor:
-                    UpdateConveyorMotion(ref motion, Time);
-                    break;
-                    
-                case CloudMotionType.Electric:
-                    UpdateElectricMotion(ref motion, Time);
-                    break;
+                motion.ValueRW.TimeAccumulator += deltaTime;
+                
+                // Update velocity based on motion type
+                switch (motion.ValueRO.MotionType)
+                {
+                    case CloudMotionType.Gentle:
+                        UpdateGentleMotion(ref motion.ValueRW, time);
+                        break;
+                        
+                    case CloudMotionType.Gusty:
+                        UpdateGustyMotion(ref motion.ValueRW, time);
+                        break;
+                        
+                    case CloudMotionType.Conveyor:
+                        UpdateConveyorMotion(ref motion.ValueRW, time);
+                        break;
+                        
+                    case CloudMotionType.Electric:
+                        UpdateElectricMotion(ref motion.ValueRW, time);
+                        break;
+                }
+                
+                // Apply velocity to position
+                var newPosition = transform.ValueRO.Position;
+                newPosition.xy += motion.ValueRO.Velocity * motion.ValueRO.Speed * deltaTime;
+                
+                // Apply bounds constraints
+                newPosition.x = math.clamp(newPosition.x, motion.ValueRO.MovementBounds.x, motion.ValueRO.MovementBounds.x + motion.ValueRO.MovementBounds.width);
+                newPosition.y = math.clamp(newPosition.y, motion.ValueRO.MovementBounds.y, motion.ValueRO.MovementBounds.y + motion.ValueRO.MovementBounds.height);
+                
+                transform.ValueRW.Position = newPosition;
             }
-            
-            // Apply velocity to position
-            var newPosition = transform.ValueRO.Position;
-            newPosition.xy += motion.Velocity * motion.Speed * DeltaTime;
-            
-            // Apply bounds constraints
-            newPosition.x = math.clamp(newPosition.x, motion.MovementBounds.x, motion.MovementBounds.x + motion.MovementBounds.width);
-            newPosition.y = math.clamp(newPosition.y, motion.MovementBounds.y, motion.MovementBounds.y + motion.MovementBounds.height);
-            
-            transform.ValueRW.Position = newPosition;
         }
 
-        private void UpdateGentleMotion(ref CloudMotionComponent motion, float time)
+        private static void UpdateGentleMotion(ref CloudMotionComponent motion, float time)
         {
             // Slow, predictable sinusoidal motion
             var phaseOffset = motion.Phase;
@@ -87,25 +75,22 @@ namespace TinyWalnutGames.MetVD.Graph
             motion.Velocity.y = math.cos(time * 0.3f + phaseOffset) * 0.2f;
         }
 
-        private void UpdateGustyMotion(ref CloudMotionComponent motion, float time)
+        private static void UpdateGustyMotion(ref CloudMotionComponent motion, float time)
         {
-            // Irregular wind patterns with random gusts
+            // Irregular gusts with varying intensity
             var basePhase = motion.Phase;
-            var gustPhase = time * 2.0f + basePhase;
+            var gustPhase = time * 1.2f + basePhase;
             
-            // Base wind
-            motion.Velocity.x = math.sin(gustPhase * 0.7f) * 0.4f;
-            motion.Velocity.y = math.cos(gustPhase * 0.5f) * 0.3f;
+            // Base gentle motion
+            motion.Velocity.x = math.sin(gustPhase * 0.8f) * 0.4f;
+            motion.Velocity.y = math.cos(gustPhase * 0.6f) * 0.3f;
             
-            // Add random gusts
-            var gustStrength = math.sin(gustPhase * 3.0f) * math.sin(gustPhase * 1.7f);
-            if (gustStrength > 0.6f)
-            {
-                motion.Velocity *= 1.0f + gustStrength;
-            }
+            // Add gusts
+            var gustIntensity = math.sin(gustPhase * 3.0f) * 0.5f + 0.5f;
+            motion.Velocity *= (1.0f + gustIntensity);
         }
 
-        private void UpdateConveyorMotion(ref CloudMotionComponent motion, float time)
+        private static void UpdateConveyorMotion(ref CloudMotionComponent motion, float time)
         {
             // Mechanical, predictable movement
             var direction = math.normalize(motion.Velocity);
@@ -117,7 +102,7 @@ namespace TinyWalnutGames.MetVD.Graph
             motion.Velocity = direction * 0.8f; // Constant speed
         }
 
-        private void UpdateElectricMotion(ref CloudMotionComponent motion, float time)
+        private static void UpdateElectricMotion(ref CloudMotionComponent motion, float time)
         {
             // Rapid, energetic movement with electrical jolts
             var basePhase = motion.Phase;
@@ -155,38 +140,23 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
             
-            var dischargeJob = new ElectricDischargeJob
+            // Process electric cloud discharges using SystemAPI.Query
+            foreach (var (transform, electric) in SystemAPI.Query<RefRO<LocalTransform>, RefRW<ElectricCloudComponent>>())
             {
-                DeltaTime = deltaTime
-            };
-            
-            state.Dependency = dischargeJob.ScheduleParallel(state.Dependency);
-        }
-    }
-
-    /// <summary>
-    /// Job that processes electric cloud discharge timing
-    /// </summary>
-    [BurstCompile]
-    public partial struct ElectricDischargeJob : IJobEntity
-    {
-        public float DeltaTime;
-
-        public void Execute(in RefRO<LocalTransform> transform, ref ElectricCloudComponent electric)
-        {
-            electric.DischargeTimer -= DeltaTime;
-            
-            if (electric.DischargeTimer <= 0f)
-            {
-                // Reset discharge timer
-                electric.DischargeTimer = electric.DischargeInterval;
+                electric.ValueRW.DischargeTimer -= deltaTime;
                 
-                // Trigger discharge effects - create electrical particles and affect nearby entities
-                TriggerElectricalDischarge(transform.ValueRO.Position, electric.DischargeRange);
+                if (electric.ValueRW.DischargeTimer <= 0f)
+                {
+                    // Reset discharge timer
+                    electric.ValueRW.DischargeTimer = electric.ValueRO.DischargeInterval;
+                    
+                    // Trigger discharge effects - create electrical particles and affect nearby entities
+                    TriggerElectricalDischarge(transform.ValueRO.Position, electric.ValueRO.DischargeRange);
+                }
             }
         }
 
-        private void TriggerElectricalDischarge(float3 position, float range)
+        private static void TriggerElectricalDischarge(float3 position, float range)
         {
             // Create electrical discharge effect
             // This would typically:
@@ -208,56 +178,36 @@ namespace TinyWalnutGames.MetVD.Graph
     [UpdateAfter(typeof(CloudMotionSystem))]
     public partial struct ConveyorForceSystem : ISystem
     {
-        private ComponentLookup<LocalTransform> _transformLookup;
-
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<ConveyorCloudComponent>();
-            _transformLookup = state.GetComponentLookup<LocalTransform>(true);
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            _transformLookup.Update(ref state);
+            var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
             
-            var conveyorJob = new ConveyorForceJob
+            // Process conveyor forces using SystemAPI.Query
+            foreach (var (transform, conveyor, platform) in SystemAPI.Query<RefRO<LocalTransform>, RefRO<ConveyorCloudComponent>, RefRO<CloudPlatformTag>>())
             {
-                TransformLookup = _transformLookup,
-                DeltaTime = state.WorldUnmanaged.Time.DeltaTime
-            };
-            
-            state.Dependency = conveyorJob.ScheduleParallel(state.Dependency);
-        }
-    }
-
-    /// <summary>
-    /// Job that applies conveyor forces (would interact with player physics in full implementation)
-    /// </summary>
-    [BurstCompile]
-    public partial struct ConveyorForceJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<LocalTransform> TransformLookup;
-        public float DeltaTime;
-
-        public void Execute(in RefRO<LocalTransform> transform, in ConveyorCloudComponent conveyor, in CloudPlatformTag platform)
-        {
-            // Apply conveyor forces to entities within range
-            ApplyConveyorForces(transform.ValueRO.Position, conveyor.ConveyorDirection, conveyor.ConveyorSpeed);
+                // Apply conveyor forces to entities within range
+                ApplyConveyorForces(transform.ValueRO.Position, conveyor.ValueRO.ConveyorDirection, conveyor.ValueRO.ConveyorSpeed);
+            }
         }
 
-        private void ApplyConveyorForces(float3 position, float3 direction, float speed)
+        private static void ApplyConveyorForces(float3 position, float3 direction, float speed)
         {
-            // Apply conveyor belt forces to nearby entities
+            // Apply conveyor belt forces to entities within range
             // This would typically:
-            // 1. Query for player/physics entities within platform range
-            // 2. Check if entities are standing on or near the platform
-            // 3. Apply horizontal velocity in the conveyor direction
-            // 4. Handle platform-specific physics interactions
+            // 1. Query for entities within conveyor range
+            // 2. Apply forces based on conveyor direction and speed
+            // 3. Handle player movement physics interactions
+            // 4. Create visual feedback effects
             
-            // For gameplay systems, this would modify velocity components
-            // of entities within the conveyor's influence area
+            // For gameplay systems, this would modify entity velocities
+            // based on their proximity to the conveyor cloud
         }
     }
 }
