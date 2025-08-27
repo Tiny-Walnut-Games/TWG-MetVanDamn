@@ -1,0 +1,107 @@
+##UnityConsole##
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(577,192): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_FrictionComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(579,199): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_FrictionComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(586,192): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_PolarityComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(588,207): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_PolarityComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(591,190): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(593,203): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(595,174): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RW_ComponentLookup' as a ref or out value because it is read-only
+
+Error building Player because scripts have compile errors in the editor
+
+Build completed with a result of 'Unknown' in 0 seconds (0 ms) [8/27/2025 4:55:44 PM -> 8/27/2025 4:55:44 PM, 00s]
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+Error: UserUnauthorized -  -- Result type: SettingsResult -- Url: https://generators-beta.ai.unity.com
+UnityEngine.Debug:Log (object)
+Unity.AI.Toolkit.Accounts.Services.Core.AccountApi/<Request>d__9`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>:MoveNext () (at ./Library/PackageCache/com.unity.ai.toolkit@97783faabe3b/Modules/Accounts/Services/Core/AccountApi.cs:52)
+System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<AiEditorToolsSdk.Components.Common.Responses.Wrappers.OperationResult`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>>:SetResult (AiEditorToolsSdk.Components.Common.Responses.Wrappers.OperationResult`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>)
+AiEditorToolsSdk.Components.Organization.OrganizationComponent/<GetSettings>d__5:MoveNext ()
+System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<AiEditorToolsSdk.Components.Common.Responses.Wrappers.OperationResult`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>>:SetResult (AiEditorToolsSdk.Components.Common.Responses.Wrappers.OperationResult`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>)
+AiEditorToolsSdk.Application.InternalServices.SdkOperation.SdkOperationService/<ExecuteRequest>d__4`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>:MoveNext ()
+System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<AiEditorToolsSdk.Components.Common.Responses.Wrappers.OperationResult`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>>:SetResult (AiEditorToolsSdk.Components.Common.Responses.Wrappers.OperationResult`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>)
+AiEditorToolsSdk.Components.Organization.OrganizationComponent/<<GetSettings>b__5_0>d:MoveNext ()
+System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<AiEditorToolsSdk.Components.Common.Responses.Wrappers.OperationResult`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>>:SetResult (AiEditorToolsSdk.Components.Common.Responses.Wrappers.OperationResult`1<AiEditorToolsSdk.Components.Organization.Responses.SettingsResult>)
+AiEditorToolsSdk.Application.Gateways.Organization.Settings.V1.SettingsGatewayV1/<GetSettings>d__3:MoveNext ()
+System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<AiEditorToolsSdk.Domain.Core.Results.Result`2<SuperProxyClientV1Namespace.SettingsResponseV1, AiEditorToolsSdk.Domain.Core.Errors.ApiError>>:SetResult (AiEditorToolsSdk.Domain.Core.Results.Result`2<SuperProxyClientV1Namespace.SettingsResponseV1, AiEditorToolsSdk.Domain.Core.Errors.ApiError>)
+AiEditorToolsSdk.Application.InternalServices.ApiClientProcessor.ApiClientProcessorService/<ProcessApiRequest>d__5`1<SuperProxyClientV1Namespace.SettingsResponseV1>:MoveNext ()
+System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<SuperProxyClientV1Namespace.SettingsResponseV1>:SetException (System.Exception)
+AiEditorToolsSdk.Application.Gateways.Organization.Settings.V1.SettingsGatewayV1/<<GetSettings>b__3_0>d:MoveNext ()
+UnityEngine.UnitySynchronizationContext:ExecuteTasks ()
+
+-------------------------------------------------------------------------------------------------------------
+
+##VS Logs##
+
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS1605	Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RW_ComponentLookup' as a ref or out value because it is read-only	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	155		
+Error (active)	CS1605	Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RO_ComponentLookup' as a ref or out value because it is read-only	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	147		
+Error (active)	CS1605	Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RO_ComponentLookup' as a ref or out value because it is read-only	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	151		
+Error (active)	CS1605	Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_FrictionComponent_RO_ComponentLookup' as a ref or out value because it is read-only	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	119		
+Error (active)	CS1605	Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_FrictionComponent_RO_ComponentLookup' as a ref or out value because it is read-only	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	123		
+Error (active)	CS1605	Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_PolarityComponent_RO_ComponentLookup' as a ref or out value because it is read-only	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	136		
+Error (active)	CS1605	Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_PolarityComponent_RO_ComponentLookup' as a ref or out value because it is read-only	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	140		
+Message (active)	IDE0060	Avoid unused parameters in your code. If the parameter cannot be removed, then change its name so it starts with an underscore and is optionally followed by an integer, such as '_', '_1', '_2', etc. These are treated as special discard symbol names.	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs	305		
+Message (active)	IDE0060	Avoid unused parameters in your code. If the parameter cannot be removed, then change its name so it starts with an underscore and is optionally followed by an integer, such as '_', '_1', '_2', etc. These are treated as special discard symbol names.	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs	305		
+Message (active)	IDE0060	Avoid unused parameters in your code. If the parameter cannot be removed, then change its name so it starts with an underscore and is optionally followed by an integer, such as '_', '_1', '_2', etc. These are treated as special discard symbol names.	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs	335		
+Message (active)	IDE0060	Avoid unused parameters in your code. If the parameter cannot be removed, then change its name so it starts with an underscore and is optionally followed by an integer, such as '_', '_1', '_2', etc. These are treated as special discard symbol names.	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs	473		
+Message (active)	IDE0060	Avoid unused parameters in your code. If the parameter cannot be removed, then change its name so it starts with an underscore and is optionally followed by an integer, such as '_', '_1', '_2', etc. These are treated as special discard symbol names.	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs	575		
+Message (active)	IDE0060	Avoid unused parameters in your code. If the parameter cannot be removed, then change its name so it starts with an underscore and is optionally followed by an integer, such as '_', '_1', '_2', etc. These are treated as special discard symbol names.	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs	583		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\AINavigationSystem__System_10720213750.g.cs	422		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\NavigationValidationSystem__System_309206640.g.cs	225		
+Message (active)	IDE0059	Avoid unnecessary value assignments in your code, as these likely indicate redundant value computations. If the value computation is not redundant and you intend to retain the assignment, then change the assignment target to a local variable whose name starts with an underscore and is optionally followed by an integer, such as '_', '_1', '_2', etc. These are treated as special discard symbol names.	TinyWalnutGames.MetVD.Graph, TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs	545		
+
+
+-------------------------------------------------------------------------------------------------------------
+
+##Build Log##
+
+Build started at 5:02 PM...
+------ Build started: Project: TinyWalnutGames.MetVD.Shared.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Utility, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Utility.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Utility.Editor, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Shared, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Tests.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Biome.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.GridLayerEditor, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Player, Configuration: Debug Any CPU ------
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(577,192): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_FrictionComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(579,199): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_FrictionComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(586,192): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_PolarityComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(588,207): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_PolarityComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(591,190): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(593,203): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(595,174): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RW_ComponentLookup' as a ref or out value because it is read-only
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Biome, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Player, Configuration: Debug Any CPU ------
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Authoring/NavigationValidationSystem__System_309206640.g.cs(225,396): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Authoring/AINavigationSystem__System_10720213750.g.cs(421,396): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Tests.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph, Configuration: Debug Any CPU ------
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(577,192): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_FrictionComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(579,199): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_FrictionComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(586,192): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_PolarityComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(588,207): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_PolarityComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(591,190): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(593,203): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RO_ComponentLookup' as a ref or out value because it is read-only
+E:/Tiny_Walnut_Games/TWG-MetVanDamn/Packages/com.tinywalnutgames.metvd.graph/Runtime/CloudMotionSystem.cs(595,174): error CS1605: Cannot use '__TypeHandle.__TinyWalnutGames_MetVD_Graph_ConveyorForceSystem_EnergyComponent_RW_ComponentLookup' as a ref or out value because it is read-only
+------ Build started: Project: TinyWalnutGames.MetVD.Samples.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: LivingDevAgent.Editor, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Samples, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Editor, Configuration: Debug Any CPU ------
+========== Build: 20 succeeded or up-to-date, 3 failed, 0 skipped ==========
+========== Build completed at 5:02 PM and took 05.366 seconds ==========

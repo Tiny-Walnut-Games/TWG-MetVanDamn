@@ -1,23 +1,6 @@
 ##UnityConsole##
-Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(47,48): error SGJE0010: IJobEntity.Execute() parameter 'transform' of type LocalTransform is not supported.
 
-Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(231,47): error SGJE0010: IJobEntity.Execute() parameter 'transform' of type LocalTransform is not supported.
-
-Packages\com.tinywalnutgames.metvd.graph\Runtime\BiomeDataQuerySystem.cs(106,33): error CS0118: 'Biome' is a namespace but is used like a type
-
-Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(64,71): error CS0426: The type name 'InternalCompilerQueryAndHandleData' does not exist in the type 'CloudMotionJob'
-
-Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(47,33): error CS0246: The type or namespace name 'LocalTransform' could not be found (are you missing a using directive or an assembly reference?)
-
-Packages\com.tinywalnutgames.metvd.graph\Runtime\BiomeDataQuerySystem.cs(150,43): error CS0118: 'Biome' is a namespace but is used like a type
-
-Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(198,33): error CS0246: The type or namespace name 'LocalTransform' could not be found (are you missing a using directive or an assembly reference?)
-
-Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(248,73): error CS0426: The type name 'InternalCompilerQueryAndHandleData' does not exist in the type 'ConveyorForceJob'
-
-Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(231,32): error CS0246: The type or namespace name 'LocalTransform' could not be found (are you missing a using directive or an assembly reference?)
-
-Packages\com.tinywalnutgames.metvd.graph\Runtime\CloudMotionSystem.cs(228,43): error CS0246: The type or namespace name 'LocalTransform' could not be found (are you missing a using directive or an assembly reference?)
+Packages\com.tinywalnutgames.metvd.graph\Runtime\WfcComponents.cs(112,99): error CS1061: 'BiomeType' does not contain a definition for 'Unknown' and no accessible extension method 'Unknown' accepting a first argument of type 'BiomeType' could be found (are you missing a using directive or an assembly reference?)
 
 -------------------------------------------------------------------------------------------------------------
 
