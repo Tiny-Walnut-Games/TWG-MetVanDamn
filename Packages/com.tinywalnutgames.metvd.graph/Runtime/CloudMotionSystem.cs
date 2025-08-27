@@ -1,8 +1,10 @@
 using Unity.Burst;
+using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 #if !UNITY_TRANSFORMS_LOCALTRANSFORM
 using LocalTransform = TinyWalnutGames.MetVD.Core.Compat.LocalTransformCompat;
 #endif
@@ -52,6 +54,76 @@ namespace TinyWalnutGames.MetVD.Graph
                 MotionHandle = _motionHandle
             };
             cloudJob.ScheduleParallel(_cloudMotionQuery, state.Dependency).Complete();
+        }
+
+        public static void UpdateGentleMotion(ref CloudMotionComponent motion, float time)
+        {
+            // Slow, predictable sinusoidal motion
+            var phaseOffset = motion.Phase;
+            motion.Velocity.x = math.sin(time * 0.5f + phaseOffset) * 0.3f;
+            motion.Velocity.y = math.cos(time * 0.3f + phaseOffset) * 0.2f;
+        }
+
+        private static void UpdateGustyMotion(ref CloudMotionComponent motion, float time)
+        {
+            // Irregular gusts with varying intensity
+            var basePhase = motion.Phase;
+            var gustPhase = time * 1.2f + basePhase;
+            
+            // Base gentle motion
+            motion.Velocity.x = math.sin(gustPhase * 0.8f) * 0.4f;
+            motion.Velocity.y = math.cos(gustPhase * 0.6f) * 0.3f;
+            
+            // Add random gusts
+            var gustStrength = math.sin(gustPhase * 2.0f) * 0.6f;
+            motion.Velocity += new float3(
+                math.sin(gustPhase * 3.0f) * gustStrength,
+                math.cos(gustPhase * 2.5f) * gustStrength,
+                0
+            );
+        }
+
+        private static void UpdateConveyorMotion(ref CloudMotionComponent motion, float time)
+        {
+            // Steady directional flow with periodic acceleration
+            var phase = motion.Phase;
+            var periodTime = time * 0.8f + phase;
+            
+            // Base conveyor direction (could be configured per cloud)
+            var direction = new float3(1.0f, 0.0f, 0.0f);
+            
+            // Periodic speed variation
+            var speedModulation = 1.0f + math.sin(periodTime) * 0.3f;
+            motion.Velocity = direction * speedModulation * 2.0f;
+            
+            // Slight vertical bobbing for visual interest
+            motion.Velocity.y += math.sin(periodTime * 2.0f) * 0.1f;
+        }
+
+        public static void UpdateElectricMotion(ref CloudMotionComponent motion, float time)
+        {
+            // Erratic motion with sudden direction changes
+            var phase = motion.Phase;
+            var electricPhase = time * 1.5f + phase;
+            
+            // Base chaotic motion
+            motion.Velocity.x = math.sin(electricPhase * 2.0f) * 0.8f;
+            motion.Velocity.y = math.cos(electricPhase * 1.8f) * 0.6f;
+            
+            // Add electrical "jolts" - sudden direction changes
+            if (math.sin(electricPhase * 5.0f) > 0.9f)
+            {
+                var joltDirection = new float3(
+                    math.sin(electricPhase * 7.0f),
+                    math.cos(electricPhase * 6.0f),
+                    0
+                ) * 1.5f;
+                motion.Velocity += joltDirection;
+            }
+            
+            // Energy buildup over time affects motion intensity
+            var energyModifier = 1.0f + motion.TimeAccumulator * 0.5f;
+            motion.Velocity *= energyModifier;
         }
     }
 
@@ -111,88 +183,6 @@ namespace TinyWalnutGames.MetVD.Graph
                 
                 transforms[i] = transform;
                 motions[i] = motion;
-            }
-        }
-    }
-
-        public static void UpdateGentleMotion(ref CloudMotionComponent motion, float time)
-        {
-            // Slow, predictable sinusoidal motion
-            var phaseOffset = motion.Phase;
-            motion.Velocity.x = math.sin(time * 0.5f + phaseOffset) * 0.3f;
-            motion.Velocity.y = math.cos(time * 0.3f + phaseOffset) * 0.2f;
-        }
-
-        private static void UpdateGustyMotion(ref CloudMotionComponent motion, float time)
-        {
-            // Irregular gusts with varying intensity
-            var basePhase = motion.Phase;
-            var gustPhase = time * 1.2f + basePhase;
-            
-            // Base gentle motion
-            motion.Velocity.x = math.sin(gustPhase * 0.8f) * 0.4f;
-            motion.Velocity.y = math.cos(gustPhase * 0.6f) * 0.3f;
-            
-            // Add gusts
-            var gustIntensity = math.sin(gustPhase * 3.0f) * 0.5f + 0.5f;
-            motion.Velocity *= (1.0f + gustIntensity);
-        }
-
-        private static void UpdateConveyorMotion(ref CloudMotionComponent motion, float time)
-        {
-            // Implement meaningful time-based periodic acceleration and direction modulation
-            var basePhase = motion.Phase;
-            var conveyorPhase = time * 0.8f + basePhase;
-            
-            // Base mechanical movement direction
-            var direction = math.normalize(motion.Velocity);
-            if (math.length(direction) < 0.1f)
-            {
-                direction = new float3(1, 0, 0); // Default right movement
-            }
-            
-            // Add periodic acceleration patterns
-            var accelerationModifier = 1.0f + math.sin(conveyorPhase * 2.0f) * 0.2f; // ±20% speed variation
-            
-            // Add subtle direction modulation for more natural movement
-            var directionNoise = math.sin(conveyorPhase * 0.5f) * 0.1f;
-            direction.y += directionNoise;
-            direction = math.normalize(direction);
-            
-            // Apply final velocity with time-based modulation
-            motion.Velocity = direction * (0.8f * accelerationModifier);
-        }
-
-        public static void UpdateElectricMotion(ref CloudMotionComponent motion, float time)
-        {
-            // Rapid, energetic movement with electrical jolts
-            var basePhase = motion.Phase;
-            var electricPhase = time * 4.0f + basePhase;
-            
-            // Rapid oscillation
-            motion.Velocity.x = math.sin(electricPhase * 2.3f) * 0.6f;
-            motion.Velocity.y = math.cos(electricPhase * 1.9f) * 0.5f;
-            
-            // Add electrical jolts with decay/reset logic
-            var joltPhase = time * 8.0f + basePhase;
-            var joltTrigger = math.sin(joltPhase);
-            
-            if (joltTrigger > 0.9f)
-            {
-                // Sudden electrical jolt acceleration
-                motion.Velocity *= 2.0f;
-                // Set energy accumulation for decay tracking
-                motion.TimeAccumulator = 1.0f; // Use as energy charge indicator
-            }
-            else if (motion.TimeAccumulator > 0.0f)
-            {
-                // Post-jolt stabilization - exponential decay
-                var decayRate = 3.0f; // How quickly energy dissipates
-                motion.TimeAccumulator = math.max(0.0f, motion.TimeAccumulator - decayRate * time);
-                
-                // Apply energy-based speed modifier (charged clouds move faster)
-                var energyModifier = 1.0f + motion.TimeAccumulator * 0.5f;
-                motion.Velocity *= energyModifier;
             }
         }
     }
@@ -687,6 +677,25 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             public float Value;
         }
+        
+        public struct ElectricCloudComponent : IComponentData
+        {
+            public float DischargePower;
+            public float DischargeRange;
+            public float DischargeDamage;
+            public float DischargeInterval;
+            public float LastDischargeTime;
+        }
+        
+        public struct ConveyorCloudComponent : IComponentData
+        {
+            public float3 Direction;
+            public float Speed;
+            public RectInt PlatformBounds;
+            public bool IsActive;
+        }
+        
+        public struct CloudPlatformTag : IComponentData { }
         
         public struct PlayerTag : IComponentData { }
         public struct PhysicsBodyTag : IComponentData { }
