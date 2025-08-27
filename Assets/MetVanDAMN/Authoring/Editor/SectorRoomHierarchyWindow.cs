@@ -283,7 +283,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 EditorGUIUtility.PingObject(hierarchy.district);
             }
             
-            EditorGUILayout.LabelField($"District {hierarchy.district.nodeId.Value}: {hierarchy.district.name}", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField($"District {hierarchy.district.nodeId}: {hierarchy.district.name}", EditorStyles.boldLabel);
             
             GUILayout.FlexibleSpace();
             
@@ -717,18 +717,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 if (targetObject is Component comp)
                 {
                     var districtAuth = comp.GetComponent<DistrictAuthoring>();
-                    if (districtAuth != null) nodeId = districtAuth.nodeId.Value;
+                    if (districtAuth != null) nodeId = districtAuth.nodeId;
                     
                     var biomeAuth = comp.GetComponent<BiomeFieldAuthoring>();
-                    if (biomeAuth != null) nodeId = biomeAuth.nodeId.Value;
+                    if (biomeAuth != null) nodeId = biomeAuth.nodeId;
                 }
                 else if (targetObject is GameObject go)
                 {
                     var districtAuth = go.GetComponent<DistrictAuthoring>();
-                    if (districtAuth != null) nodeId = districtAuth.nodeId.Value;
+                    if (districtAuth != null) nodeId = districtAuth.nodeId;
                     
                     var biomeAuth = go.GetComponent<BiomeFieldAuthoring>();
-                    if (biomeAuth != null) nodeId = biomeAuth.nodeId.Value;
+                    if (biomeAuth != null) nodeId = biomeAuth.nodeId;
                 }
                 
                 if (enableMultiSelect && (currentEvent.control || currentEvent.command))

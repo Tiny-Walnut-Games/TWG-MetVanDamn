@@ -1,10 +1,7 @@
 //  This script is intended to be used in the Unity Editor only, stored in an Editor folder to ensure it is not included in builds.
 #if UNITY_EDITOR
 
-// Check if sprite editor assemblies are available
 #if HAS_SPRITE_EDITOR || UNITY_2D_SPRITE_EDITOR_AVAILABLE
-// This comment is a visual indicator that the sprite editor features are available
-// If grey, no. If commenting color, yes.
 #define SPRITE_EDITOR_FEATURES_AVAILABLE
 #endif
 
@@ -14,37 +11,27 @@ using UnityEngine;
 using UnityEditor;
 
 #if SPRITE_EDITOR_FEATURES_AVAILABLE
-using UnityEditor.U2D.Sprites; // this script requires com.unity.2d.sprite package be imported to work.
+using UnityEditor.U2D.Sprites;
 #endif
 
 namespace TinyWalnutGames.MetVD.Utility.Editor
 {
-    /// <summary>
-    /// Batch Sprite Slicer
-    /// Use this tool to slice multiple sprites from selected textures in the project.
-    /// I personally like to run a search for all textures in the project
-    /// and then slice the ones I want to slice. I work in smallish batches of twenty or so as to not overwhelm the editor.
-    /// I wanted to thread the tasks, but I am understanding that the Unity API is not thread-safe,
-    /// so I had to use the ISpriteEditorDataProvider interface instead.
-    /// see https://docs.unity3d.com/Packages/com.unity.2d.sprite@latest/manual/SpriteEditorDataProvider.html
-    /// </summary>
     public class BatchSpriteSlicer : EditorWindow
     {
-        private bool useCellSize = false;               // Choose between cell size or rows/columns
-        private Vector2 cellSize = new(64, 64);          // Cell size when useCellSize is true
-        private int columns = 12;                        // Grid columns when useCellSize is false
-        private int rows = 8;                            // Grid rows when useCellSize is false
-        private SpriteAlignment pivotAlignment = SpriteAlignment.BottomCenter; // Pivot alignment
-        private bool ignoreEmptyRects = true;            // Skip fully transparent cells
-
+        private bool useCellSize = false;
+        private Vector2 cellSize = new(64, 64);
+        private int columns = 12;
+        private int rows = 8;
+        private SpriteAlignment pivotAlignment = SpriteAlignment.BottomCenter;
+        private bool ignoreEmptyRects = true;
 #if SPRITE_EDITOR_FEATURES_AVAILABLE
-        private static List<SpriteRect> copiedRects = null;                             // Copied rects
-        private static readonly Dictionary<string, List<Vector2[]>> copiedOutlines = new(); // Copied outlines keyed by original rect GUID
+        private static List<SpriteRect> copiedRects = null;
+        private static readonly Dictionary<string, List<Vector2[]>> copiedOutlines = new();
 #else
-        private static bool spriteEditorNotAvailable = true; // Silence unused warnings when features unavailable
+        private static bool spriteEditorNotAvailable = true;
 #endif
-        private static int copiedTexWidth = 0;  // Source texture width for copy layout scaling
-        private static int copiedTexHeight = 0; // Source texture height for copy layout scaling
+        private static int copiedTexWidth = 0;
+        private static int copiedTexHeight = 0;
 
         [MenuItem("Tools/Batch Sprite Slicer")]
         public static void OpenWindow() => GetWindow<BatchSpriteSlicer>("Batch Sprite Slicer");
@@ -53,263 +40,148 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         {
 #if !SPRITE_EDITOR_FEATURES_AVAILABLE
             GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox(
-                "Sprite Editor features are not available. This tool requires Unity's 2D Sprite Editor package " +
-                "or sprite editor assemblies to be available. Please install com.unity.2d.sprite package to enable functionality.",
-                MessageType.Warning);
-            if (GUILayout.Button("Open Package Manager"))
-            {
-                UnityEditor.PackageManager.UI.Window.Open("com.unity.2d.sprite");
-            }
+            EditorGUILayout.HelpBox("Sprite Editor package not available (com.unity.2d.sprite). Install to enable slicing.", MessageType.Warning);
+            if (GUILayout.Button("Open Package Manager")) UnityEditor.PackageManager.UI.Window.Open("com.unity.2d.sprite");
             return;
-#endif
+#else
             GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox(
-                "Slice multiple sprites from selected textures. Copy/paste slice layouts, adjust pivots, or grid-slice textures in batches.",
-                MessageType.Info);
-
+            EditorGUILayout.HelpBox("Slice multiple sprites. Copy/paste layouts or grid slice.", MessageType.Info);
             useCellSize = EditorGUILayout.Toggle("Use Cell Size", useCellSize);
             if (useCellSize)
             {
                 cellSize = EditorGUILayout.Vector2Field("Cell Size", cellSize);
-                EditorGUILayout.HelpBox("Specify width/height for each cell; grid size inferred from texture dimensions.", MessageType.None);
             }
             else
             {
-                GUILayout.Label("Grid Settings", EditorStyles.boldLabel);
                 columns = EditorGUILayout.IntField("Columns", columns);
                 rows = EditorGUILayout.IntField("Rows", rows);
             }
-
             pivotAlignment = (SpriteAlignment)EditorGUILayout.EnumPopup("Pivot Alignment", pivotAlignment);
             ignoreEmptyRects = EditorGUILayout.Toggle("Ignore Empty Rects", ignoreEmptyRects);
-
-            EditorGUILayout.Space();
-            GUILayout.Label("Slice Layout Operations", EditorStyles.boldLabel);
-            if (GUILayout.Button(new GUIContent("Copy Rect Layout", "Copy slice rectangles (and outlines) from first selected texture.")))
-                CopySlicesFromSelected();
+            GUILayout.Space(4);
+            if (GUILayout.Button("Copy Rect Layout")) CopySlicesFromSelected();
             using (new EditorGUI.DisabledScope(copiedRects == null))
             {
-                if (GUILayout.Button(new GUIContent("Paste Rect Layout", "Paste copied slice layout (scaled) to all selected textures.")))
+                if (GUILayout.Button("Paste Rect Layout"))
                 {
-                    if (Selection.objects.Length == 0)
-                    {
-                        Debug.LogWarning("No textures selected. Select textures to paste slices.");
-                        return;
-                    }
-                    PasteSlicesToSelected();
+                    if (Selection.objects.Length == 0) Debug.LogWarning("No textures selected."); else PasteSlicesToSelected();
                 }
             }
-
-            EditorGUILayout.Space();
-            GUILayout.Label("Pivot Adjustment", EditorStyles.boldLabel);
-            if (GUILayout.Button(new GUIContent("Adjust Pivot Of Selected Slices", "Overwrite pivots for all slices on selected textures.")))
+            if (GUILayout.Button("Adjust Pivot Of Selected Slices"))
             {
-                if (Selection.objects.Length == 0)
-                {
-                    Debug.LogWarning("No textures selected. Select textures to adjust pivots.");
-                }
-                else
-                {
-                    AdjustPivotOfSelectedSlices();
-                }
+                if (Selection.objects.Length == 0) Debug.LogWarning("No textures selected."); else AdjustPivotOfSelectedSlices();
             }
-
-            EditorGUILayout.Space();
-            GUILayout.Label("Batch Slicing", EditorStyles.boldLabel);
-            if (GUILayout.Button(new GUIContent("Slice Selected Sprites (Grid)", "Slice selected textures using current grid settings.")))
+            if (GUILayout.Button("Slice Selected Sprites (Grid)"))
             {
-                if (Selection.objects.Length == 0)
-                {
-                    Debug.LogWarning("No textures selected. Select textures to slice.");
-                }
-                else
-                {
-                    SliceSelectedSprites();
-                }
+                if (Selection.objects.Length == 0) Debug.LogWarning("No textures selected."); else SliceSelectedSprites();
             }
+#endif
         }
 
 #if SPRITE_EDITOR_FEATURES_AVAILABLE
         private void CopySlicesFromSelected()
         {
             Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
-            if (selectedTextures.Length == 0)
-            {
-                Debug.LogWarning("No texture selected to copy slices from.");
-                return;
-            }
+            if (selectedTextures.Length == 0) { Debug.LogWarning("No texture selected."); return; }
             string path = AssetDatabase.GetAssetPath(selectedTextures[0]);
-            if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning("Texture importer not found."); return; }
-            Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-            if (!texture) { Debug.LogWarning("Could not load texture asset."); return; }
-
-            var factory = new SpriteDataProviderFactories();
-            factory.Init();
-            var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
-            dataProvider.InitSpriteEditorDataProvider();
-            var rects = new List<SpriteRect>(dataProvider.GetSpriteRects());
-            if (rects.Count == 0) { Debug.LogWarning("No custom slices found on selected texture."); return; }
-
+            if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning("Importer missing"); return; }
+            var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path); if (!texture) { Debug.LogWarning("Texture load failed"); return; }
+            var factory = new SpriteDataProviderFactories(); factory.Init();
+            var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); dataProvider.InitSpriteEditorDataProvider();
+            var rectList = new List<SpriteRect>(dataProvider.GetSpriteRects()); if (rectList.Count == 0) { Debug.LogWarning("No slices found"); return; }
             copiedOutlines.Clear();
             var outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
-            foreach (var rect in rects)
+            foreach (var r in rectList)
             {
-                var outlines = outlineProvider.GetOutlines(rect.spriteID);
-                copiedOutlines[rect.spriteID.ToString()] = outlines != null ? outlines.Select(o => o.ToArray()).ToList() : new List<Vector2[]>();
+                var outlines = outlineProvider.GetOutlines(r.spriteID);
+                copiedOutlines[r.spriteID.ToString()] = outlines != null ? outlines.Select(o => o.ToArray()).ToList() : new List<Vector2[]>();
             }
-            copiedRects = rects;
-            copiedTexWidth = texture.width;
-            copiedTexHeight = texture.height;
-            Debug.Log($"Copied {rects.Count} sprite rects (and outlines) from '{texture.name}' ({copiedTexWidth}x{copiedTexHeight}).");
+            copiedRects = rectList; copiedTexWidth = texture.width; copiedTexHeight = texture.height;
+            Debug.Log($"Copied {rectList.Count} rects from {texture.name}");
         }
 
         private void PasteSlicesToSelected()
         {
-            if (copiedRects == null || copiedRects.Count == 0) { Debug.LogWarning("No copied slices to paste."); return; }
-            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
-            foreach (Object obj in selectedTextures)
+            if (copiedRects == null || copiedRects.Count == 0) { Debug.LogWarning("Nothing copied"); return; }
+            foreach (var obj in Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets))
             {
                 string path = AssetDatabase.GetAssetPath(obj);
-                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning($"Skipping '{obj.name}', texture importer not found."); continue; }
-                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-                if (!texture) { Debug.LogWarning($"Skipping '{obj.name}', could not load texture asset."); continue; }
-                int texWidth = texture.width; int texHeight = texture.height;
-
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning($"Skip {obj.name}"); continue; }
+                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path); if (!texture) { Debug.LogWarning($"Skip {obj.name}"); continue; }
+                int texW = texture.width, texH = texture.height;
                 var factory = new SpriteDataProviderFactories(); factory.Init();
                 var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); dataProvider.InitSpriteEditorDataProvider();
-
-                List<SpriteRect> newRects = new();
-                float scaleX = (float)texWidth / copiedTexWidth;
-                float scaleY = (float)texHeight / copiedTexHeight;
-                Dictionary<string, SpriteRect> guidToNewRect = new();
-                foreach (var srcRect in copiedRects)
+                float scaleX = (float)texW / copiedTexWidth, scaleY = (float)texH / copiedTexHeight;
+                var newRects = new List<SpriteRect>(); var guidMap = new Dictionary<string, SpriteRect>();
+                foreach (var src in copiedRects)
                 {
-                    var r = srcRect.rect;
-                    var scaledRect = new Rect(
-                        Mathf.RoundToInt(r.x * scaleX),
-                        Mathf.RoundToInt(r.y * scaleY),
-                        Mathf.RoundToInt(r.width * scaleX),
-                        Mathf.RoundToInt(r.height * scaleY));
-                    if (scaledRect.width <= 0 || scaledRect.height <= 0) continue;
-                    SpriteRect newRect = new() { name = srcRect.name, rect = scaledRect, alignment = srcRect.alignment, pivot = srcRect.pivot };
-                    newRects.Add(newRect); guidToNewRect[srcRect.spriteID.ToString()] = newRect;
+                    var r = src.rect; var scaled = new Rect(Mathf.RoundToInt(r.x * scaleX), Mathf.RoundToInt(r.y * scaleY), Mathf.RoundToInt(r.width * scaleX), Mathf.RoundToInt(r.height * scaleY));
+                    if (scaled.width <= 0 || scaled.height <= 0) continue;
+                    var nr = new SpriteRect { name = src.name, rect = scaled, alignment = src.alignment, pivot = src.pivot }; newRects.Add(nr); guidMap[src.spriteID.ToString()] = nr;
                 }
-
-                dataProvider.SetSpriteRects(System.Array.Empty<SpriteRect>()); dataProvider.Apply(); // clear
+                dataProvider.SetSpriteRects(System.Array.Empty<SpriteRect>()); dataProvider.Apply();
                 dataProvider.SetSpriteRects(newRects.ToArray()); dataProvider.Apply();
-
                 var outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
-                foreach (var srcRect in copiedRects)
+                foreach (var src in copiedRects)
                 {
-                    if (!guidToNewRect.TryGetValue(srcRect.spriteID.ToString(), out var newRect)) continue;
-                    if (copiedOutlines.TryGetValue(srcRect.spriteID.ToString(), out var outlines) && outlines != null && outlines.Count > 0)
+                    if (!guidMap.TryGetValue(src.spriteID.ToString(), out var nr)) continue;
+                    if (copiedOutlines.TryGetValue(src.spriteID.ToString(), out var outlines) && outlines != null && outlines.Count > 0)
                     {
-                        var srcR = srcRect.rect; var dstR = newRect.rect;
-                        float outlineScaleX = dstR.width / srcR.width; float outlineScaleY = dstR.height / srcR.height;
-                        List<Vector2[]> scaled = new();
-                        foreach (var outline in outlines)
-                        {
-                            Vector2[] arr = new Vector2[outline.Length];
-                            for (int i = 0; i < outline.Length; i++) arr[i] = new Vector2(outline[i].x * outlineScaleX, outline[i].y * outlineScaleY);
-                            scaled.Add(arr);
-                        }
-                        outlineProvider.SetOutlines(newRect.spriteID, scaled);
+                        var srcR = src.rect; var dstR = nr.rect; float ox = dstR.width / srcR.width, oy = dstR.height / srcR.height; var scaledOut = new List<Vector2[]>();
+                        foreach (var o in outlines) { var arr = new Vector2[o.Length]; for (int i = 0; i < o.Length; i++) arr[i] = new Vector2(o[i].x * ox, o[i].y * oy); scaledOut.Add(arr); }
+                        outlineProvider.SetOutlines(nr.spriteID, scaledOut);
                     }
                 }
-                dataProvider.Apply();
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-                Debug.Log($"Pasted {newRects.Count} slices (and outlines) to '{texture.name}' ({texWidth}x{texHeight}).");
+                dataProvider.Apply(); AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                Debug.Log($"Pasted {newRects.Count} slices to {texture.name}");
             }
         }
 
         private void AdjustPivotOfSelectedSlices()
         {
-            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
-            foreach (Object obj in selectedTextures)
+            foreach (var obj in Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets))
             {
                 string path = AssetDatabase.GetAssetPath(obj);
-                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning($"Skipping '{obj.name}', texture importer not found."); continue; }
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning($"Skip {obj.name}"); continue; }
                 var factory = new SpriteDataProviderFactories(); factory.Init();
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); dataProvider.InitSpriteEditorDataProvider();
-                var rects = new List<SpriteRect>(dataProvider.GetSpriteRects());
-                if (rects.Count == 0) { Debug.LogWarning($"No slices found on '{obj.name}'."); continue; }
+                var dp = factory.GetSpriteEditorDataProviderFromObject(importer); dp.InitSpriteEditorDataProvider();
+                var rects = new List<SpriteRect>(dp.GetSpriteRects()); if (rects.Count == 0) continue;
                 for (int i = 0; i < rects.Count; i++) { rects[i].alignment = pivotAlignment; rects[i].pivot = GetPivotForAlignment(pivotAlignment); }
-                dataProvider.SetSpriteRects(rects.ToArray()); dataProvider.Apply();
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-                Debug.Log($"Adjusted pivot for {rects.Count} slices on '{obj.name}'.");
+                dp.SetSpriteRects(rects.ToArray()); dp.Apply(); AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             }
         }
 
         private void SliceSelectedSprites()
         {
-            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
-            foreach (Object obj in selectedTextures)
+            foreach (var obj in Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets))
             {
                 string path = AssetDatabase.GetAssetPath(obj);
-                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning($"Skipping '{obj.name}', texture importer not found."); continue; }
-                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-                if (!texture) { Debug.LogWarning($"Skipping '{obj.name}', could not load texture asset."); continue; }
-                int texWidth = texture.width; int texHeight = texture.height;
-                int actualColumns, actualRows, spriteWidth, spriteHeight;
-                if (useCellSize)
-                {
-                    spriteWidth = Mathf.Max(1, Mathf.RoundToInt(cellSize.x));
-                    spriteHeight = Mathf.Max(1, Mathf.RoundToInt(cellSize.y));
-                    actualColumns = Mathf.Max(1, texWidth / spriteWidth);
-                    actualRows = Mathf.Max(1, texHeight / spriteHeight);
-                }
-                else
-                {
-                    actualColumns = Mathf.Max(1, columns);
-                    actualRows = Mathf.Max(1, rows);
-                    spriteWidth = texWidth / actualColumns;
-                    spriteHeight = texHeight / actualRows;
-                }
+                if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) { Debug.LogWarning($"Skip {obj.name}"); continue; }
+                var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path); if (!texture) continue;
+                int texW = texture.width, texH = texture.height; int actualCols, actualRows, spriteW, spriteH;
+                if (useCellSize) { spriteW = Mathf.Max(1, Mathf.RoundToInt(cellSize.x)); spriteH = Mathf.Max(1, Mathf.RoundToInt(cellSize.y)); actualCols = Mathf.Max(1, texW / spriteW); actualRows = Mathf.Max(1, texH / spriteH); }
+                else { actualCols = Mathf.Max(1, columns); actualRows = Mathf.Max(1, rows); spriteW = texW / actualCols; spriteH = texH / actualRows; }
                 var factory = new SpriteDataProviderFactories(); factory.Init();
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); dataProvider.InitSpriteEditorDataProvider();
-
-                List<SpriteRect> spriteRects = new();
-                TextureImporter texImporter = importer; bool wasReadable = texImporter.isReadable;
-                if (!wasReadable) { texImporter.isReadable = true; AssetDatabase.ImportAsset(path); }
-
+                var dp = factory.GetSpriteEditorDataProviderFromObject(importer); dp.InitSpriteEditorDataProvider();
+                var rects = new List<SpriteRect>(); var texImp = importer; bool readable = texImp.isReadable; if (!readable) { texImp.isReadable = true; AssetDatabase.ImportAsset(path); }
                 for (int y = 0; y < actualRows; y++)
                 {
-                    for (int x = 0; x < actualColumns; x++)
+                    for (int x = 0; x < actualCols; x++)
                     {
-                        int rectX = x * spriteWidth; int rectY = y * spriteHeight; int rectW = spriteWidth; int rectH = spriteHeight;
-                        if (x == actualColumns - 1) rectW = texWidth - rectX;
-                        if (y == actualRows - 1) rectH = texHeight - rectY;
-                        rectW = Mathf.Clamp(rectW, 0, texWidth - rectX); rectH = Mathf.Clamp(rectH, 0, texHeight - rectY);
-                        if (rectW <= 0 || rectH <= 0) continue;
-                        int flippedY = texHeight - (rectY + rectH);
-                        Rect cellRect = new(rectX, flippedY, rectW, rectH);
-                        bool isEmpty = false;
+                        int rx = x * spriteW, ry = y * spriteH, rw = spriteW, rh = spriteH; if (x == actualCols - 1) rw = texW - rx; if (y == actualRows - 1) rh = texH - ry;
+                        rw = Mathf.Clamp(rw, 0, texW - rx); rh = Mathf.Clamp(rh, 0, texH - ry); if (rw <= 0 || rh <= 0) continue;
+                        int flippedY = texH - (ry + rh); var cell = new Rect(rx, flippedY, rw, rh); bool empty = false;
                         if (ignoreEmptyRects)
                         {
-                            Color[] pixels = texture.GetPixels(
-                                Mathf.RoundToInt(cellRect.x),
-                                Mathf.RoundToInt(cellRect.y),
-                                Mathf.RoundToInt(cellRect.width),
-                                Mathf.RoundToInt(cellRect.height));
-                            isEmpty = true;
-                            foreach (var pixel in pixels) { if (pixel.a > 0f) { isEmpty = false; break; } }
+                            var pixels = texture.GetPixels(Mathf.RoundToInt(cell.x), Mathf.RoundToInt(cell.y), Mathf.RoundToInt(cell.width), Mathf.RoundToInt(cell.height));
+                            empty = true; foreach (var p in pixels) { if (p.a > 0f) { empty = false; break; } }
                         }
-                        if (ignoreEmptyRects && isEmpty) continue;
-                        SpriteRect rect = new()
-                        {
-                            name = $"{obj.name}_{x}_{y}",
-                            rect = cellRect,
-                            alignment = pivotAlignment,
-                            pivot = GetPivotForAlignment(pivotAlignment)
-                        };
-                        spriteRects.Add(rect);
+                        if (ignoreEmptyRects && empty) continue;
+                        rects.Add(new SpriteRect { name = $"{obj.name}_{x}_{y}", rect = cell, alignment = pivotAlignment, pivot = GetPivotForAlignment(pivotAlignment) });
                     }
                 }
-                dataProvider.SetSpriteRects(spriteRects.ToArray()); dataProvider.Apply();
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                dp.SetSpriteRects(rects.ToArray()); dp.Apply(); AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             }
-            Debug.Log("Batch slicing completed using ISpriteEditorDataProvider!");
         }
 #endif // SPRITE_EDITOR_FEATURES_AVAILABLE
 
@@ -325,7 +197,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
             SpriteAlignment.BottomLeft => new Vector2(0f, 0f),
             SpriteAlignment.BottomRight => new Vector2(1f, 0f),
             SpriteAlignment.Custom => new Vector2(0.5f, 0f),
-            _ => new Vector2(0.5f, 0.5f),
+            _ => new Vector2(0.5f, 0.5f)
         };
     }
 }

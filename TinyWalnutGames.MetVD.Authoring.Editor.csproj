@@ -1275,10 +1275,6 @@
       <Project>{6BEF65E0-E1A3-6D7E-9453-DA8D0FDF65FD}</Project>
       <Name>TinyWalnutGames.MetVD.Shared</Name>
     </ProjectReference>
-    <ProjectReference Include="TinyWalnutGames.MetVD.Utility.csproj">
-      <Project>{B929F59F-9716-BF18-93BC-E56A67BCECDE}</Project>
-      <Name>TinyWalnutGames.MetVD.Utility</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

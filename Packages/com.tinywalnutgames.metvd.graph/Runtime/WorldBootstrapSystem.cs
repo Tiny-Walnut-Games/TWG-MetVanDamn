@@ -7,8 +7,10 @@ using Unity.Mathematics;
 using Unity.Transforms;
 #endif
 using TinyWalnutGames.MetVD.Core;
-using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Biome;
+using CoreBootstrapConfig = TinyWalnutGames.MetVD.Core.WorldBootstrapConfiguration;
+using CoreCompleteTag = TinyWalnutGames.MetVD.Core.WorldBootstrapCompleteTag;
+using CoreInProgressTag = TinyWalnutGames.MetVD.Core.WorldBootstrapInProgressTag;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
@@ -30,16 +32,16 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnCreate(ref SystemState state)
         {
             _bootstrapQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<WorldBootstrapConfiguration>()
-                .WithNone<WorldBootstrapInProgressTag, WorldBootstrapCompleteTag>()
+                .WithAll<CoreBootstrapConfig>()
+                .WithNone<CoreInProgressTag, CoreCompleteTag>()
                 .Build(ref state);
                 
             _inProgressQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<WorldBootstrapConfiguration, WorldBootstrapInProgressTag>()
+                .WithAll<CoreBootstrapConfig, CoreInProgressTag>()
                 .Build(ref state);
                 
             _completeQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<WorldBootstrapCompleteTag>()
+                .WithAll<CoreCompleteTag>()
                 .Build(ref state);
 
             state.RequireForUpdate(_bootstrapQuery);
@@ -58,21 +60,21 @@ namespace TinyWalnutGames.MetVD.Graph
 
             // Get the bootstrap configuration
             var bootstrapEntity = _bootstrapQuery.GetSingletonEntity();
-            var config = _bootstrapQuery.GetSingleton<WorldBootstrapConfiguration>();
+            var config = _bootstrapQuery.GetSingleton<CoreBootstrapConfig>();
 
             // Mark bootstrap as in progress
-            state.EntityManager.AddComponentData(bootstrapEntity, new WorldBootstrapInProgressTag());
+            state.EntityManager.AddComponentData(bootstrapEntity, new CoreInProgressTag());
 
             // Generate the world hierarchy
             GenerateWorldHierarchy(ref state, config);
 
             // Mark bootstrap as complete
-            state.EntityManager.RemoveComponent<WorldBootstrapInProgressTag>(bootstrapEntity);
-            var completeTag = new WorldBootstrapCompleteTag(
-                biomes: CalculateGeneratedBiomes(config),
-                districts: CalculateGeneratedDistricts(config),
-                sectors: CalculateGeneratedSectors(config),
-                rooms: CalculateGeneratedRooms(config)
+            state.EntityManager.RemoveComponent<CoreInProgressTag>(bootstrapEntity);
+            var completeTag = new CoreCompleteTag(
+                CalculateGeneratedBiomes(config),
+                CalculateGeneratedDistricts(config),
+                CalculateGeneratedSectors(config),
+                CalculateGeneratedRooms(config)
             );
             state.EntityManager.AddComponentData(bootstrapEntity, completeTag);
 
@@ -85,7 +87,7 @@ namespace TinyWalnutGames.MetVD.Graph
 #endif
         }
 
-        private static void GenerateWorldHierarchy(ref SystemState state, WorldBootstrapConfiguration config)
+        private static void GenerateWorldHierarchy(ref SystemState state, CoreBootstrapConfig config)
         {
             // Use seed or generate random one
             uint actualSeed = config.Seed == 0 ? (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000 + 1) : (uint)config.Seed;
@@ -108,7 +110,7 @@ namespace TinyWalnutGames.MetVD.Graph
             // once the DistrictLayoutSystem places the districts we just created
         }
 
-        private static void GenerateBiomeFields(ref SystemState state, WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
+        private static void GenerateBiomeFields(ref SystemState state, CoreBootstrapConfig config, ref Unity.Mathematics.Random random)
         {
             int biomeCount = random.NextInt(config.BiomeSettings.BiomeCountRange.x, config.BiomeSettings.BiomeCountRange.y + 1);
             
@@ -143,7 +145,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private static void GenerateDistricts(ref SystemState state, WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
+        private static void GenerateDistricts(ref SystemState state, CoreBootstrapConfig config, ref Unity.Mathematics.Random random)
         {
             int districtCount = random.NextInt(config.DistrictSettings.DistrictCountRange.x, config.DistrictSettings.DistrictCountRange.y + 1);
             
@@ -237,7 +239,7 @@ namespace TinyWalnutGames.MetVD.Graph
         }
 
         private static void CreateBiomeFieldEntity(ref SystemState state, BiomeType biomeType, float2 position, 
-                                                 WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
+                                                 CoreBootstrapConfig config, ref Unity.Mathematics.Random random)
         {
             var entity = state.EntityManager.CreateEntity();
             
@@ -364,7 +366,7 @@ namespace TinyWalnutGames.MetVD.Graph
         }
 
         private static void CreateDistrictEntity(ref SystemState state, uint nodeId, 
-                                               WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
+                                               CoreBootstrapConfig config, ref Unity.Mathematics.Random random)
         {
             var entity = state.EntityManager.CreateEntity();
             
@@ -390,24 +392,24 @@ namespace TinyWalnutGames.MetVD.Graph
             state.EntityManager.AddBuffer<GateConditionBufferElement>(entity);
         }
 
-        private static int CalculateGeneratedBiomes(WorldBootstrapConfiguration config)
+        private static int CalculateGeneratedBiomes(CoreBootstrapConfig config)
         {
             return (config.BiomeSettings.BiomeCountRange.x + config.BiomeSettings.BiomeCountRange.y) / 2;
         }
 
-        private static int CalculateGeneratedDistricts(WorldBootstrapConfiguration config)
+        private static int CalculateGeneratedDistricts(CoreBootstrapConfig config)
         {
             return (config.DistrictSettings.DistrictCountRange.x + config.DistrictSettings.DistrictCountRange.y) / 2;
         }
 
-        private static int CalculateGeneratedSectors(WorldBootstrapConfiguration config)
+        private static int CalculateGeneratedSectors(CoreBootstrapConfig config)
         {
             int avgDistricts = CalculateGeneratedDistricts(config);
             int avgSectorsPerDistrict = (config.SectorSettings.SectorsPerDistrictRange.x + config.SectorSettings.SectorsPerDistrictRange.y) / 2;
             return avgDistricts * avgSectorsPerDistrict;
         }
 
-        private static int CalculateGeneratedRooms(WorldBootstrapConfiguration config)
+        private static int CalculateGeneratedRooms(CoreBootstrapConfig config)
         {
             int avgSectors = CalculateGeneratedSectors(config);
             int avgRoomsPerSector = (config.RoomSettings.RoomsPerSectorRange.x + config.RoomSettings.RoomsPerSectorRange.y) / 2;
