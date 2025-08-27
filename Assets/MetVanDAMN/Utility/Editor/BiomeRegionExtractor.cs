@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.U2D.Sprites; // this script requires com.unity.2d.sprite package be imported to work.
 
-namespace TinyWalnutGames.MetVD.Utilities
+namespace TinyWalnutGames.MetVD.Utility.Editor
 {
     /// <summary>
     /// Biome Region Extractor

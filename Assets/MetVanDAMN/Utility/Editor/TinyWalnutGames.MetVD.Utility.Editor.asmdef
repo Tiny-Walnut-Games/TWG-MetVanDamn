@@ -6,6 +6,8 @@
         "Unity.Collections",
         "Unity.Entities",
         "Unity.Mathematics",
+        "Unity.2D.Sprite",
+        "Unity.2D.Sprite.Editor",
         "TinyWalnutGames.MetVD.Utility"
     ],
     "includePlatforms": [
