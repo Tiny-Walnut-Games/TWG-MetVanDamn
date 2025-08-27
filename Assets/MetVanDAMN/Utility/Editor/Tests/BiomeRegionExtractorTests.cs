@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using TinyWalnutGames.MetVD.Utilities;
+using TinyWalnutGames.MetVD.Utility.Editor;
 
 namespace TinyWalnutGames.MetVD.Utilities.Tests
 {
@@ -11,9 +12,11 @@ namespace TinyWalnutGames.MetVD.Utilities.Tests
     /// </summary>
     public class BiomeRegionExtractorTests
     {
-        private BiomeRegionExtractor extractor;
+        private readonly BiomeRegionExtractor extractor;
         private Texture2D testSpritesheet;
         private Texture2D testBiomeMask;
+
+        public BiomeRegionExtractor Extractor => extractor;
 
         [SetUp]
         public void SetUp()
@@ -108,9 +111,9 @@ namespace TinyWalnutGames.MetVD.Utilities.Tests
         public void ColorComparison_WithTolerance_WorksCorrectly()
         {
             // Test the color matching logic used in biome detection
-            Color color1 = new Color(1f, 0f, 0f, 1f);      // Pure red
-            Color color2 = new Color(0.95f, 0.05f, 0.05f, 1f); // Nearly red
-            Color color3 = new Color(0f, 1f, 0f, 1f);      // Pure green
+            Color color1 = new(1f, 0f, 0f, 1f);      // Pure red
+            Color color2 = new(0.95f, 0.05f, 0.05f, 1f); // Nearly red
+            Color color3 = new(0f, 1f, 0f, 1f);      // Pure green
 
             float tolerance = 0.1f;
 
@@ -144,9 +147,9 @@ namespace TinyWalnutGames.MetVD.Utilities.Tests
         public void CellSizeValidation_DetectsInvalidValues()
         {
             // Test validation logic for cell sizes
-            Vector2Int validCellSize = new Vector2Int(64, 64);
-            Vector2Int invalidCellSize1 = new Vector2Int(0, 64);
-            Vector2Int invalidCellSize2 = new Vector2Int(64, -1);
+            Vector2Int validCellSize = new(64, 64);
+            Vector2Int invalidCellSize1 = new(0, 64);
+            Vector2Int invalidCellSize2 = new(64, -1);
 
             Assert.IsTrue(IsCellSizeValid(validCellSize));
             Assert.IsFalse(IsCellSizeValid(invalidCellSize1));
@@ -163,7 +166,7 @@ namespace TinyWalnutGames.MetVD.Utilities.Tests
         {
             int textureWidth = 128;
             int textureHeight = 128;
-            Vector2Int cellSize = new Vector2Int(32, 32);
+            Vector2Int cellSize = new(32, 32);
 
             int expectedColumns = textureWidth / cellSize.x;  // 4
             int expectedRows = textureHeight / cellSize.y;    // 4
@@ -172,7 +175,7 @@ namespace TinyWalnutGames.MetVD.Utilities.Tests
             Assert.AreEqual(4, expectedRows);
 
             // Test with non-divisible dimensions
-            Vector2Int oddCellSize = new Vector2Int(30, 30);
+            Vector2Int oddCellSize = new(30, 30);
             int oddColumns = textureWidth / oddCellSize.x;  // 4 (truncated)
             int oddRows = textureHeight / oddCellSize.y;    // 4 (truncated)
 

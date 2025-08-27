@@ -22,8 +22,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private float refreshInterval = 1f;
         private double lastRefreshTime;
         
-        private List<BiomeInfo> biomeInfos = new List<BiomeInfo>();
-        private Dictionary<BiomeType, Color> biomeColors = new Dictionary<BiomeType, Color>();
+        private List<BiomeInfo> biomeInfos = new();
+        private Dictionary<BiomeType, Color> biomeColors = new();
 
         [System.Serializable]
         private class BiomeInfo
@@ -231,7 +231,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             GUILayout.FlexibleSpace();
             
-            GUIStyle centeredStyle = new GUIStyle(EditorStyles.label)
+            GUIStyle centeredStyle = new(EditorStyles.label)
             {
                 alignment = TextAnchor.MiddleCenter,
                 fontSize = 14,
@@ -241,7 +241,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             GUILayout.Label("No biomes found in scene", centeredStyle);
             GUILayout.Space(5);
             
-            GUIStyle smallCenteredStyle = new GUIStyle(EditorStyles.label)
+            GUIStyle smallCenteredStyle = new(EditorStyles.label)
             {
                 alignment = TextAnchor.MiddleCenter,
                 fontSize = 11

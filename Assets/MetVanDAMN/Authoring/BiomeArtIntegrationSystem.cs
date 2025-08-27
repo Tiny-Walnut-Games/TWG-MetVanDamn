@@ -477,9 +477,9 @@ namespace TinyWalnutGames.MetVD.Authoring
                 
                 // Check reflection across center for various axes
                 int2[] reflections = {
-                    new int2(center.x * 2 - position.x, position.y), // Horizontal reflection
-                    new int2(position.x, center.y * 2 - position.y), // Vertical reflection
-                    new int2(center.x * 2 - position.x, center.y * 2 - position.y) // Point reflection
+                    new(center.x * 2 - position.x, position.y), // Horizontal reflection
+                    new(position.x, center.y * 2 - position.y), // Vertical reflection
+                    new(center.x * 2 - position.x, center.y * 2 - position.y) // Point reflection
                 };
                 
                 foreach (var reflection in reflections)
@@ -1436,7 +1436,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             for (int angle = 0; angle < 8; angle++)
             {
                 float angleRad = angle * Mathf.PI / 4f;
-                Vector3 direction = new Vector3(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad));
+                Vector3 direction = new(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad));
                 
                 float corridorScore = 0f;
                 for (float distance = 1f; distance <= 5f; distance += 1f)

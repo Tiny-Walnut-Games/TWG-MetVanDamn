@@ -150,7 +150,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 
                 while (!validPosition && attempts < maxAttempts)
                 {
-                    int2 candidate = new int2(
+                    int2 candidate = new(
                         random.NextInt(0, worldSize.x),
                         random.NextInt(0, worldSize.y)
                     );
@@ -196,7 +196,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 int gridY = i / gridDim;
 
                 float2 cellCenter = new float2(gridX + 0.5f, gridY + 0.5f) * cellSize;
-                float2 jitter = new float2(
+                float2 jitter = new(
                     random.NextFloat(-jitterAmount, jitterAmount),
                     random.NextFloat(-jitterAmount, jitterAmount)
                 );

@@ -17,7 +17,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         [Header("District Configuration")]
         public BiomeType biomeType = BiomeType.SolarPlains;
         public DistrictType districtType = DistrictType.Standard;
-        public float2 size = new float2(100f, 100f);
+        public float2 size = new(100f, 100f);
         public int targetSectorCount = 4;
 
         [Header("Generation Settings")] 

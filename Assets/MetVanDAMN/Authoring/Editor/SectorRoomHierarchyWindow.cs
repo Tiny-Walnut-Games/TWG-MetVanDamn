@@ -27,11 +27,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private bool enableClickToSelect = true;
         private bool enableMultiSelect = true;
         
-        private List<DistrictHierarchy> districtHierarchies = new List<DistrictHierarchy>();
-        private Dictionary<uint, List<uint>> connectionMap = new Dictionary<uint, List<uint>>();
-        private HashSet<string> availableBiomeTypes = new HashSet<string>();
-        private HashSet<uint> selectedNodeIds = new HashSet<uint>();
-        private HashSet<GameObject> highlightedObjects = new HashSet<GameObject>();
+        private List<DistrictHierarchy> districtHierarchies = new();
+        private Dictionary<uint, List<uint>> connectionMap = new();
+        private HashSet<string> availableBiomeTypes = new();
+        private HashSet<uint> selectedNodeIds = new();
+        private HashSet<GameObject> highlightedObjects = new();
 
         [System.Serializable]
         private class DistrictHierarchy
@@ -39,8 +39,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             public DistrictAuthoring district;
             public BiomeFieldAuthoring associatedBiome;
             public string biomeType = "Unknown";
-            public List<SectorInfo> sectors = new List<SectorInfo>();
-            public List<ConnectionInfo> connections = new List<ConnectionInfo>();
+            public List<SectorInfo> sectors = new();
+            public List<ConnectionInfo> connections = new();
             public int totalRoomCount;
             public float averageConnectivity;
             public bool isExpanded = true;
@@ -52,7 +52,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             public int sectorId;
             public Vector3 estimatedPosition;
             public int roomCount;
-            public List<RoomInfo> rooms = new List<RoomInfo>();
+            public List<RoomInfo> rooms = new();
             public bool isExpanded = false;
         }
 
@@ -62,7 +62,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             public int roomId;
             public Vector3 position;
             public string roomType;
-            public List<string> connections = new List<string>();
+            public List<string> connections = new();
         }
 
         [System.Serializable]
@@ -235,7 +235,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             GUILayout.FlexibleSpace();
             
-            GUIStyle centeredStyle = new GUIStyle(EditorStyles.label)
+            GUIStyle centeredStyle = new(EditorStyles.label)
             {
                 alignment = TextAnchor.MiddleCenter,
                 fontSize = 14,
@@ -245,7 +245,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             GUILayout.Label("No districts found in scene", centeredStyle);
             GUILayout.Space(5);
             
-            GUIStyle smallCenteredStyle = new GUIStyle(EditorStyles.label)
+            GUIStyle smallCenteredStyle = new(EditorStyles.label)
             {
                 alignment = TextAnchor.MiddleCenter,
                 fontSize = 11

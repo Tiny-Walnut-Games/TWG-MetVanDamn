@@ -446,8 +446,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             gate.connectionId = new NodeId { value = 500 }; // References non-existent connection
             gate.gateConditions = new GateCondition[]
             {
-                new GateCondition 
-                { 
+                new() { 
                     requiredConnectionId = new NodeId { value = 999 }, // Also invalid
                     isDefault = false 
                 }
@@ -537,8 +536,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             circularGate.connectionId = new NodeId { value = 401 };
             circularGate.gateConditions = new GateCondition[]
             {
-                new GateCondition 
-                { 
+                new() { 
                     requiredConnectionId = new NodeId { value = 401 }, // Self-reference!
                     isDefault = false 
                 }

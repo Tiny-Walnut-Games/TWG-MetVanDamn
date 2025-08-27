@@ -389,7 +389,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
                             float cellScreenWidth = cellSize.x * previewZoom;
                             float cellScreenHeight = cellSize.y * previewZoom;
                             
-                            Rect cellRect = new Rect(cellScreenX, cellScreenY, cellScreenWidth, cellScreenHeight);
+                            Rect cellRect = new(cellScreenX, cellScreenY, cellScreenWidth, cellScreenHeight);
                             
                             // Draw semi-transparent biome color overlay
                             Color overlayColor = matchingBiome.maskColor;
@@ -433,7 +433,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
             for (int col = 0; col <= columns; col++)
             {
                 float x = previewRect.x + (col * cellSize.x * previewZoom);
-                Rect lineRect = new Rect(x, previewRect.y, 1, previewRect.height);
+                Rect lineRect = new(x, previewRect.y, 1, previewRect.height);
                 EditorGUI.DrawRect(lineRect, gridColor);
             }
             
@@ -441,7 +441,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
             for (int row = 0; row <= rows; row++)
             {
                 float y = previewRect.y + (row * cellSize.y * previewZoom);
-                Rect lineRect = new Rect(previewRect.x, y, previewRect.width, 1);
+                Rect lineRect = new(previewRect.x, y, previewRect.width, 1);
                 EditorGUI.DrawRect(lineRect, gridColor);
             }
         }
@@ -966,12 +966,12 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
                             int rectX = col * cellSize.x;
                             int rectY = spritesheet.height - ((row + 1) * cellSize.y); // Flip Y coordinate
                             
-                            Rect cellRect = new Rect(rectX, rectY, cellSize.x, cellSize.y);
+                            Rect cellRect = new(rectX, rectY, cellSize.x, cellSize.y);
                             
                             // Generate sprite name using pattern
                             string spriteName = GenerateSpriteName(biome.biomeName, row, col);
                             
-                            SpriteRect spriteRect = new SpriteRect
+                            SpriteRect spriteRect = new()
                             {
                                 name = spriteName,
                                 rect = cellRect,

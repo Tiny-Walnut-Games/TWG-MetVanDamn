@@ -95,7 +95,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             Gizmos.color = new Color(0.2f, 0.9f, 0.4f, 0.3f);
             Vector3 center = transform.position;
-            Vector3 size = new Vector3(worldSize.x, 0.1f, worldSize.y);
+            Vector3 size = new(worldSize.x, 0.1f, worldSize.y);
             Gizmos.DrawWireCube(center, size);
             
             Gizmos.color = new Color(0.2f, 0.9f, 0.4f, 0.1f);

@@ -80,7 +80,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }, _settings.districtColor, _settings.districtOutline);
 
             // Label
-            GUIStyle style = new GUIStyle(EditorStyles.boldLabel)
+            GUIStyle style = new(EditorStyles.boldLabel)
             {
                 normal = { textColor = _settings.labelColor },
                 fontSize = _settings.labelFontSize,

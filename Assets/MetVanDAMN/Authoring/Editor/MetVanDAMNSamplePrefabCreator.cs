@@ -148,32 +148,32 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 case "Hub":
                     wfcTile.sockets = new WfcSocketConfig[]
                     {
-                        new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
+                        new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
                     };
                     break;
                 case "Corridor":
                     wfcTile.sockets = new WfcSocketConfig[]
                     {
-                        new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
+                        new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
                     };
                     break;
                 case "Chamber":
                     wfcTile.sockets = new WfcSocketConfig[]
                     {
-                        new WfcSocketConfig { socketId = 2, direction = 0, requiredPolarity = Polarity.Sun, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
+                        new() { socketId = 2, direction = 0, requiredPolarity = Polarity.Sun, isOpen = true },
+                        new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
                     };
                     break;
                 case "Specialist":
                     wfcTile.sockets = new WfcSocketConfig[]
                     {
-                        new WfcSocketConfig { socketId = 3, direction = 1, requiredPolarity = Polarity.Heat, isOpen = true },
-                        new WfcSocketConfig { socketId = 2, direction = 3, requiredPolarity = Polarity.Heat, isOpen = true }
+                        new() { socketId = 3, direction = 1, requiredPolarity = Polarity.Heat, isOpen = true },
+                        new() { socketId = 2, direction = 3, requiredPolarity = Polarity.Heat, isOpen = true }
                     };
                     break;
             }

@@ -55,7 +55,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             // Calculate bounds based on biome size or default to reasonable area
             Vector3 center = biomeTransform.position;
-            Vector3 size = new Vector3(20f, 20f, 1f); // Default biome size
+            Vector3 size = new(20f, 20f, 1f); // Default biome size
             
             // Try to get more accurate bounds from colliders or renderers
             var collider = biomeTransform.GetComponent<Collider>();
@@ -89,7 +89,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 for (int z = 0; z < gridHeight; z++)
                 {
-                    Vector3 worldPos = new Vector3(
+                    Vector3 worldPos = new(
                         bounds.min.x + (x * resolution) + (resolution * 0.5f),
                         bounds.center.y,
                         bounds.min.z + (z * resolution) + (resolution * 0.5f)
@@ -159,7 +159,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 for (int z = 0; z < height; z++)
                 {
-                    Vector3 cellCenter = new Vector3(
+                    Vector3 cellCenter = new(
                         bounds.min.x + (x * cellWidth) + (cellWidth * 0.5f),
                         bounds.center.y,
                         bounds.min.z + (z * cellHeight) + (cellHeight * 0.5f)
@@ -171,7 +171,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     
                     // Draw heat map cell
                     Gizmos.color = heatColor;
-                    Vector3 cellSize = new Vector3(cellWidth, 0.1f, cellHeight);
+                    Vector3 cellSize = new(cellWidth, 0.1f, cellHeight);
                     Gizmos.DrawCube(cellCenter, cellSize);
                     
                     // Draw numeric label using Handles.Label instead of sphere markers
@@ -211,9 +211,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static Color GetBlueToRedGradient(float intensity)
         {
             // Classic heat map: Blue (low) -> Yellow -> Red (high)
-            Color lowColor = new Color(0f, 0f, 1f, 0.3f);  // Blue, semi-transparent
-            Color midColor = new Color(1f, 1f, 0f, 0.5f);  // Yellow
-            Color highColor = new Color(1f, 0f, 0f, 0.7f); // Red
+            Color lowColor = new(0f, 0f, 1f, 0.3f);  // Blue, semi-transparent
+            Color midColor = new(1f, 1f, 0f, 0.5f);  // Yellow
+            Color highColor = new(1f, 0f, 0f, 0.7f); // Red
             
             if (intensity < 0.5f)
             {
@@ -242,17 +242,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static Color GetGreenGradient(float intensity)
         {
             // Dark green to bright green
-            Color lowColor = new Color(0f, 0.2f, 0f, 0.3f);
-            Color highColor = new Color(0f, 1f, 0f, 0.8f);
+            Color lowColor = new(0f, 0.2f, 0f, 0.3f);
+            Color highColor = new(0f, 1f, 0f, 0.8f);
             return Color.Lerp(lowColor, highColor, intensity);
         }
 
         private static Color GetCustomGradient(float intensity)
         {
             // Customizable gradient - could be exposed to user preferences
-            Color lowColor = new Color(0.2f, 0f, 0.8f, 0.3f);  // Purple
-            Color midColor = new Color(1f, 0.5f, 0f, 0.5f);    // Orange
-            Color highColor = new Color(1f, 1f, 1f, 0.8f);     // White
+            Color lowColor = new(0.2f, 0f, 0.8f, 0.3f);  // Purple
+            Color midColor = new(1f, 0.5f, 0f, 0.5f);    // Orange
+            Color highColor = new(1f, 1f, 1f, 0.8f);     // White
             
             if (intensity < 0.5f)
             {
@@ -302,7 +302,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 Color legendColor = GetHeatMapColor(t);
                 
                 Vector3 stepPosition = legendPosition + new Vector3(0f, 0f, t * legendHeight);
-                Vector3 stepSize = new Vector3(legendWidth, 0.1f, legendHeight / legendSteps * 1.1f);
+                Vector3 stepSize = new(legendWidth, 0.1f, legendHeight / legendSteps * 1.1f);
                 
                 Gizmos.color = legendColor;
                 Gizmos.DrawCube(stepPosition, stepSize);
@@ -311,7 +311,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Draw legend outline
             Gizmos.color = Color.white;
             Vector3 outlineCenter = legendPosition + new Vector3(0f, 0f, legendHeight * 0.5f);
-            Vector3 outlineSize = new Vector3(legendWidth * 1.2f, 0.12f, legendHeight * 1.1f);
+            Vector3 outlineSize = new(legendWidth * 1.2f, 0.12f, legendHeight * 1.1f);
             Gizmos.DrawWireCube(outlineCenter, outlineSize);
             
             // Draw density value labels (using GL for text rendering in scene view)
@@ -348,7 +348,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 };
                 
                 // Draw outline (shadow effect)
-                Vector3 offset = new Vector3(0.02f, 0f, 0.02f);
+                Vector3 offset = new(0.02f, 0f, 0.02f);
                 Handles.Label(labelPos + offset, labelText, outlineStyle);
                 Handles.Label(labelPos - offset, labelText, outlineStyle);
                 Handles.Label(labelPos + new Vector3(0.02f, 0f, -0.02f), labelText, outlineStyle);

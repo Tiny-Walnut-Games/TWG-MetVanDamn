@@ -234,7 +234,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 // Draw world bounds in scene view
                 Handles.color = new Color(0.2f, 0.9f, 0.4f, 0.5f);
                 Vector3 center = bootstrap.transform.position;
-                Vector3 size = new Vector3(bootstrap.worldSize.x, 0, bootstrap.worldSize.y);
+                Vector3 size = new(bootstrap.worldSize.x, 0, bootstrap.worldSize.y);
                 
                 Handles.DrawWireCube(center, size);
                 
