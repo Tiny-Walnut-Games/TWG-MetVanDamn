@@ -26,6 +26,17 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.2d.sprite",
+            "expression": "1.0.0",
+            "define": "HAS_SPRITE_EDITOR"
+        },
+        {
+            "name": "com.tinywalnutgames.metvd.samples",
+            "expression": "1.0.0", 
+            "define": "HAS_SAMPLES"
+        }
+    ],
     "noEngineReferences": false
 }

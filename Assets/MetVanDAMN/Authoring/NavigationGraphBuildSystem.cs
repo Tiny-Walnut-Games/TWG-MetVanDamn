@@ -69,7 +69,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             if (_districtQuery.IsEmpty)
                 return;
 
-            var navGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
+            var navigationGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
             var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
 
             // Build navigation nodes from districts
