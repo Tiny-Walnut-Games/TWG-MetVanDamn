@@ -59,7 +59,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
         public static void OpenWindow() => GetWindow<BatchSpriteSlicer>("Batch Sprite Slicer");
 
         /// <summary>
-        /// Renders the UI for all batch operations (slicing, layout copy/paste, pivot adjustment).
+        /// Renders the UI for all batch operations (slicing, layout copy/paste, pivot adjustment). 
         /// </summary>
         private void OnGUI()
         {
