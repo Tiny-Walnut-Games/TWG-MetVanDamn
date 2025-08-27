@@ -8,6 +8,9 @@ using TinyWalnutGames.MetVD.Shared;
 using CoreBootstrap = TinyWalnutGames.MetVD.Core.WorldBootstrapConfiguration;
 using CoreInProgress = TinyWalnutGames.MetVD.Core.WorldBootstrapInProgressTag;
 using CoreComplete = TinyWalnutGames.MetVD.Core.WorldBootstrapCompleteTag;
+using CoreBiomeSettings = TinyWalnutGames.MetVD.Core.BiomeGenerationSettings;
+using CoreDistrictSettings = TinyWalnutGames.MetVD.Core.DistrictGenerationSettings;
+using CoreSectorSettings = TinyWalnutGames.MetVD.Core.SectorGenerationSettings;
 
 namespace TinyWalnutGames.MetVD.Authoring.Tests
 {
@@ -35,16 +38,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void WorldBootstrapConfiguration_CanBeCreated()
         {
-            var biomeSettings = new BiomeGenerationSettings(
+            var biomeSettings = new CoreBiomeSettings(
                 biomeCountRange: new int2(3, 6),
                 biomeWeight: 1.0f
             );
-            var districtSettings = new DistrictGenerationSettings(
+            var districtSettings = new CoreDistrictSettings(
                 districtCountRange: new int2(4, 12),
                 districtMinDistance: 15f,
                 districtWeight: 1.0f
             );
-            var sectorSettings = new SectorGenerationSettings(
+            var sectorSettings = new CoreSectorSettings(
                 sectorsPerDistrictRange: new int2(2, 8),
                 sectorGridSize: new int2(6, 6),
                 roomsPerSectorRange: new int2(3, 12),
@@ -121,16 +124,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             var entity = entityManager.CreateEntity();
 
             // Test in-progress tag
-            entityManager.AddComponentData(entity, new WorldBootstrapInProgressTag());
-            Assert.IsTrue(entityManager.HasComponent<WorldBootstrapInProgressTag>(entity));
+            entityManager.AddComponentData(entity, new CoreInProgress());
+            Assert.IsTrue(entityManager.HasComponent<CoreInProgress>(entity));
 
             // Test complete tag
-            entityManager.RemoveComponent<WorldBootstrapInProgressTag>(entity);
-            var completeTag = new WorldBootstrapCompleteTag(biomes: 4, districts: 8, sectors: 24, rooms: 120);
+            entityManager.RemoveComponent<CoreInProgress>(entity);
+            var completeTag = new CoreComplete(biomes: 4, districts: 8, sectors: 24, rooms: 120);
             entityManager.AddComponentData(entity, completeTag);
 
-            Assert.IsTrue(entityManager.HasComponent<WorldBootstrapCompleteTag>(entity));
-            var retrievedComplete = entityManager.GetComponentData<WorldBootstrapCompleteTag>(entity);
+            Assert.IsTrue(entityManager.HasComponent<CoreComplete>(entity));
+            var retrievedComplete = entityManager.GetComponentData<CoreComplete>(entity);
             Assert.AreEqual(4, retrievedComplete.BiomesGenerated);
             Assert.AreEqual(8, retrievedComplete.DistrictsGenerated);
             Assert.AreEqual(24, retrievedComplete.SectorsGenerated);
@@ -223,18 +226,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 seed: worldSettings.Seed,
                 worldSize: worldSettings.WorldSize,
                 randomizationMode: worldSettings.RandomizationMode,
-                biomeSettings: new BiomeGenerationSettings
+                biomeSettings: new CoreBiomeSettings
                 {
                     BiomeCountRange = biomeSettings.BiomeCountRange,
                     BiomeWeight = biomeSettings.BiomeWeight
                 },
-                districtSettings: new DistrictGenerationSettings
+                districtSettings: new CoreDistrictSettings
                 {
                     DistrictCountRange = districtSettings.DistrictCountRange,
                     DistrictMinDistance = districtSettings.DistrictMinDistance,
                     DistrictWeight = districtSettings.DistrictWeight
                 },
-                sectorSettings: new SectorGenerationSettings
+                sectorSettings: new CoreSectorSettings
                 {
                     SectorsPerDistrictRange = districtSettings.SectorsPerDistrictRange,
                     SectorGridSize = districtSettings.SectorGridSize

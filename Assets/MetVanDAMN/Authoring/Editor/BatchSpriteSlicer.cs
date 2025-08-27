@@ -86,6 +86,7 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
 
             EditorGUILayout.Space();
             GUILayout.Label("Slice Layout Operations", EditorStyles.boldLabel);
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
             if (GUILayout.Button(new GUIContent("Copy Rect Layout", "Copy slice rectangles (and outlines) from first selected texture.")))
                 CopySlicesFromSelected();
             using (new EditorGUI.DisabledScope(copiedRects == null))
@@ -100,9 +101,13 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
                     PasteSlicesToSelected();
                 }
             }
+#else
+            GUILayout.Label("Sprite editor package not available. Install com.unity.2d.sprite for slice layout operations.", EditorStyles.helpBox);
+#endif
 
             EditorGUILayout.Space();
             GUILayout.Label("Pivot Adjustment", EditorStyles.boldLabel);
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
             if (GUILayout.Button(new GUIContent("Adjust Pivot Of Selected Slices", "Overwrite pivots for all slices on selected textures.")))
             {
                 if (Selection.objects.Length == 0)
@@ -114,9 +119,13 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
                     AdjustPivotOfSelectedSlices();
                 }
             }
+#else
+            GUILayout.Label("Sprite editor package not available. Install com.unity.2d.sprite for pivot adjustment.", EditorStyles.helpBox);
+#endif
 
             EditorGUILayout.Space();
             GUILayout.Label("Batch Slicing", EditorStyles.boldLabel);
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
             if (GUILayout.Button(new GUIContent("Slice Selected Sprites (Grid)", "Slice selected textures using current grid settings.")))
             {
                 if (Selection.objects.Length == 0)
@@ -128,6 +137,9 @@ namespace TinyWalnutGames.MetVD.Utility.Editor
                     SliceSelectedSprites();
                 }
             }
+#else
+            GUILayout.Label("Sprite editor package not available. Install com.unity.2d.sprite for batch slicing.", EditorStyles.helpBox);
+#endif
         }
 
 #if SPRITE_EDITOR_FEATURES_AVAILABLE

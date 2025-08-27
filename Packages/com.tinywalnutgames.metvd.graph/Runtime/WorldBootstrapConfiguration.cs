@@ -131,6 +131,10 @@ namespace TinyWalnutGames.MetVD.Graph
         public int2 BiomeCountRange;
         public float BiomeWeight;
         
+        // Alias properties for test compatibility
+        public int2 CountRange { get => BiomeCountRange; set => BiomeCountRange = value; }
+        public float Weight { get => BiomeWeight; set => BiomeWeight = value; }
+        
         public BiomeSettings(int2 biomeCountRange, float biomeWeight)
         {
             BiomeCountRange = biomeCountRange;
@@ -147,6 +151,11 @@ namespace TinyWalnutGames.MetVD.Graph
         public int2 SectorGridSize;
         public int2 RoomsPerSectorRange;
         public float TargetLoopDensity;
+        
+        // Alias properties for test compatibility
+        public int2 CountRange { get => DistrictCountRange; set => DistrictCountRange = value; }
+        public float MinDistance { get => DistrictMinDistance; set => DistrictMinDistance = value; }
+        public float Weight { get => DistrictWeight; set => DistrictWeight = value; }
         
         public DistrictSettings(int2 districtCountRange, float districtMinDistance, float districtWeight,
             int2 sectorsPerDistrictRange, int2 sectorGridSize, int2 roomsPerSectorRange, float targetLoopDensity)
@@ -168,12 +177,17 @@ namespace TinyWalnutGames.MetVD.Graph
         public int2 RoomsPerSectorRange;
         public float TargetLoopDensity;
         
+        // Alias property for test compatibility
+        public int2 GridSize { get => SectorGridSize; set => SectorGridSize = value; }
+        
         public SectorSettings(int2 sectorsPerDistrictRange, int2 sectorGridSize, int2 roomsPerSectorRange, float targetLoopDensity)
         {
             SectorsPerDistrictRange = sectorsPerDistrictRange;
             SectorGridSize = sectorGridSize;
             RoomsPerSectorRange = roomsPerSectorRange;
             TargetLoopDensity = targetLoopDensity;
+        }
+    }
         }
     }
 
