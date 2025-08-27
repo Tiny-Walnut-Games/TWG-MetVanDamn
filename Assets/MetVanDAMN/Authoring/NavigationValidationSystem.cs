@@ -108,14 +108,28 @@ namespace TinyWalnutGames.MetVD.Authoring
         [BurstCompile]
         private NativeArray<bool> AnalyzeReachability(ref SystemState state, AgentCapabilities capabilities)
         {
-            // Collect all navigation nodes
+            // Collect all navigation nodes using manual query
+            var navNodeQuery = SystemAPI.QueryBuilder()
+                .WithAll<NavNode>()
+                .Build();
+                
             var nodeIds = new NativeList<uint>(256, Allocator.Temp);
-            foreach (var (navNode, entity) in SystemAPI.Query<RefRO<NavNode>>().WithEntityAccess())
+            
+            if (!navNodeQuery.IsEmpty)
             {
-                if (navNode.ValueRO.IsActive)
+                var entities = navNodeQuery.ToEntityArray(Allocator.Temp);
+                var navNodes = navNodeQuery.ToComponentDataArray<NavNode>(Allocator.Temp);
+                
+                for (int i = 0; i < entities.Length; i++)
                 {
-                    nodeIds.Add(navNode.ValueRO.NodeId);
+                    if (navNodes[i].IsActive)
+                    {
+                        nodeIds.Add(navNodes[i].NodeId);
+                    }
                 }
+                
+                entities.Dispose();
+                navNodes.Dispose();
             }
             
             var reachability = new NativeArray<bool>(nodeIds.Length, Allocator.Temp);
