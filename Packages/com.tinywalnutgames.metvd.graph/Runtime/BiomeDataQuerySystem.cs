@@ -3,59 +3,107 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
-using TinyWalnutGames.MetVD.Biome;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
     /// <summary>
-    /// Component that holds cached biome information for a room
+    /// Component that caches biome data for a room based on parent district/sector
     /// </summary>
     public struct RoomBiomeData : IComponentData
     {
+        /// <summary>
+        /// The resolved biome type for this room
+        /// </summary>
         public BiomeType BiomeType;
-        public Polarity Polarity;
+        
+        /// <summary>
+        /// Primary polarity inherited from parent district
+        /// </summary>
+        public Polarity PrimaryPolarity;
+        
+        /// <summary>
+        /// Secondary polarity for transition zones
+        /// </summary>
+        public Polarity SecondaryPolarity;
+        
+        /// <summary>
+        /// Biome difficulty modifier
+        /// </summary>
         public float DifficultyModifier;
-        public Entity BiomeSource; // Entity that provided this biome data
+        
+        /// <summary>
+        /// Whether this data has been resolved from parent hierarchy
+        /// </summary>
         public bool IsResolved;
         
-        public RoomBiomeData(BiomeType biomeType, Polarity polarity, float difficulty = 0.5f, Entity source = default)
+        /// <summary>
+        /// Entity reference to parent district (for hierarchy queries)
+        /// </summary>
+        public Entity ParentDistrict;
+
+        public RoomBiomeData(BiomeType biomeType, Polarity primaryPolarity, Entity parentDistrict, 
+                           float difficultyModifier = 1f, Polarity secondaryPolarity = Polarity.None)
         {
             BiomeType = biomeType;
-            Polarity = polarity;
-            DifficultyModifier = difficulty;
-            BiomeSource = source;
+            PrimaryPolarity = primaryPolarity;
+            SecondaryPolarity = secondaryPolarity;
+            DifficultyModifier = difficultyModifier;
             IsResolved = true;
+            ParentDistrict = parentDistrict;
+        }
+
+        public static RoomBiomeData CreateUnresolved(Entity parentDistrict)
+        {
+            return new RoomBiomeData
+            {
+                BiomeType = BiomeType.Unknown,
+                PrimaryPolarity = Polarity.None,
+                SecondaryPolarity = Polarity.None,
+                DifficultyModifier = 1f,
+                IsResolved = false,
+                ParentDistrict = parentDistrict
+            };
         }
     }
 
     /// <summary>
-    /// Component that requests biome data resolution for a room
+    /// Component for requesting biome data resolution
     /// </summary>
     public struct BiomeDataRequest : IComponentData
     {
-        public Entity RoomEntity;
-        public NodeId ParentDistrict;
-        public NodeId ParentSector;
-        public bool RequireImmediate;
+        /// <summary>
+        /// Priority of this request (higher = process first)
+        /// </summary>
+        public int Priority;
         
-        public BiomeDataRequest(Entity room, NodeId district, NodeId sector, bool immediate = false)
+        /// <summary>
+        /// Whether to fallback to defaults if parent data unavailable
+        /// </summary>
+        public bool AllowDefaults;
+        
+        /// <summary>
+        /// Maximum distance to search for parent biome data
+        /// </summary>
+        public int MaxSearchDepth;
+
+        public BiomeDataRequest(int priority = 0, bool allowDefaults = true, int maxSearchDepth = 3)
         {
-            RoomEntity = room;
-            ParentDistrict = district;
-            ParentSector = sector;
-            RequireImmediate = immediate;
+            Priority = priority;
+            AllowDefaults = allowDefaults;
+            MaxSearchDepth = math.max(1, maxSearchDepth);
         }
     }
 
     /// <summary>
-    /// System that resolves biome data from parent district/sector hierarchy
+    /// System that resolves biome data for rooms by querying parent district/sector hierarchy
+    /// Replaces hardcoded default values in RoomManagementSystem
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateBefore(typeof(RoomManagementSystem))]
     public partial struct BiomeDataQuerySystem : ISystem
     {
-        private ComponentLookup<BiomeFieldData> _biomeFieldLookup;
+        private ComponentLookup<Biome> _biomeLookup;
         private ComponentLookup<RoomBiomeData> _roomBiomeDataLookup;
         private BufferLookup<ConnectionBufferElement> _connectionLookup;
         private EntityQuery _requestQuery;
@@ -63,7 +111,7 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            _biomeFieldLookup = state.GetComponentLookup<BiomeFieldData>(true);
+            _biomeLookup = state.GetComponentLookup<Biome>(true);
             _roomBiomeDataLookup = state.GetComponentLookup<RoomBiomeData>();
             _connectionLookup = state.GetBufferLookup<ConnectionBufferElement>(true);
             
@@ -76,163 +124,251 @@ namespace TinyWalnutGames.MetVD.Graph
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            _biomeFieldLookup.Update(ref state);
+            if (_requestQuery.IsEmpty) return;
+
+            _biomeLookup.Update(ref state);
             _roomBiomeDataLookup.Update(ref state);
             _connectionLookup.Update(ref state);
 
-            new BiomeDataQueryJob
+            var resolveJob = new BiomeDataResolveJob
             {
-                BiomeFieldLookup = _biomeFieldLookup,
+                BiomeLookup = _biomeLookup,
                 RoomBiomeDataLookup = _roomBiomeDataLookup,
-                ConnectionLookup = _connectionLookup,
-                EntityCommandBuffer = state.GetEntityCommandBuffer()
-            }.Schedule(_requestQuery, state.Dependency).Complete();
+                ConnectionLookup = _connectionLookup
+            };
+
+            state.Dependency = resolveJob.ScheduleParallel(_requestQuery, state.Dependency);
         }
     }
 
     /// <summary>
-    /// Job that processes biome data requests by querying parent hierarchy
+    /// Job that resolves biome data by querying parent hierarchy
     /// </summary>
     [BurstCompile]
-    public partial struct BiomeDataQueryJob : IJobEntity
+    public partial struct BiomeDataResolveJob : IJobEntity
     {
-        [ReadOnly] public ComponentLookup<BiomeFieldData> BiomeFieldLookup;
-        [ReadOnly] public ComponentLookup<RoomBiomeData> RoomBiomeDataLookup;
+        [ReadOnly] public ComponentLookup<Biome> BiomeLookup;
+        public ComponentLookup<RoomBiomeData> RoomBiomeDataLookup;
         [ReadOnly] public BufferLookup<ConnectionBufferElement> ConnectionLookup;
-        public EntityCommandBuffer EntityCommandBuffer;
 
-        public void Execute(Entity entity, in BiomeDataRequest request)
+        public void Execute(Entity entity, in BiomeDataRequest request, in NodeId nodeId)
         {
-            var biomeData = ResolveHierarchicalBiomeData(request);
+            var resolvedData = ResolveFromHierarchy(entity, request, nodeId);
             
-            // Add resolved biome data to the room
-            EntityCommandBuffer.AddComponent(request.RoomEntity, biomeData);
-            
-            // Remove the request component as it's now resolved
-            EntityCommandBuffer.RemoveComponent<BiomeDataRequest>(entity);
+            // Add the resolved biome data component
+            RoomBiomeDataLookup[entity] = resolvedData;
         }
 
-        private RoomBiomeData ResolveHierarchicalBiomeData(in BiomeDataRequest request)
+        private RoomBiomeData ResolveFromHierarchy(Entity roomEntity, BiomeDataRequest request, NodeId nodeId)
         {
-            // Try to get biome data from direct parent district
-            if (TryGetBiomeFromDistrict(request.ParentDistrict, out var districtBiome))
+            // Try to find parent district with biome data
+            var parentDistrict = FindParentDistrict(roomEntity, request.MaxSearchDepth);
+            
+            if (parentDistrict != Entity.Null && BiomeLookup.HasComponent(parentDistrict))
             {
-                return districtBiome;
+                var parentBiome = BiomeLookup[parentDistrict];
+                return new RoomBiomeData(
+                    parentBiome.Type,
+                    parentBiome.PrimaryPolarity,
+                    parentDistrict,
+                    parentBiome.DifficultyModifier,
+                    parentBiome.SecondaryPolarity
+                );
             }
-
-            // Try to get biome data from parent sector
-            if (TryGetBiomeFromSector(request.ParentSector, out var sectorBiome))
+            
+            // Try to infer from sibling rooms
+            var siblingBiome = FindSiblingBiome(roomEntity, nodeId);
+            if (siblingBiome.BiomeType != BiomeType.Unknown)
             {
-                return sectorBiome;
+                return siblingBiome;
             }
-
-            // Fall back to room characteristics-based biome assignment
-            return CreateDefaultBiomeData(request.RoomEntity);
-        }
-
-        private bool TryGetBiomeFromDistrict(NodeId districtId, out RoomBiomeData biomeData)
-        {
-            biomeData = default;
             
-            // Find district entity by NodeId (would typically use a lookup system)
-            var districtEntity = FindEntityByNodeId(districtId);
-            if (districtEntity == Entity.Null)
-                return false;
-
-            if (!BiomeFieldLookup.TryGetComponent(districtEntity, out var biomeField))
-                return false;
-
-            biomeData = new RoomBiomeData(
-                biomeField.PrimaryBiome,
-                Polarity.None, // BiomeFieldData doesn't have polarity, use default
-                CalculateDifficultyFromDistrict(biomeField),
-                districtEntity
-            );
-            return true;
-        }
-
-        private bool TryGetBiomeFromSector(NodeId sectorId, out RoomBiomeData biomeData)
-        {
-            biomeData = default;
-            
-            var sectorEntity = FindEntityByNodeId(sectorId);
-            if (sectorEntity == Entity.Null)
-                return false;
-
-            if (!BiomeFieldLookup.TryGetComponent(sectorEntity, out var biomeField))
-                return false;
-
-            biomeData = new RoomBiomeData(
-                biomeField.PrimaryBiome,
-                Polarity.None, // BiomeFieldData doesn't have polarity, use default
-                CalculateDifficultyFromSector(biomeField),
-                sectorEntity
-            );
-            return true;
-        }
-
-        private RoomBiomeData CreateDefaultBiomeData(Entity roomEntity)
-        {
-            // Create intelligent defaults based on available room characteristics
-            var biomeType = DetermineDefaultBiomeType(roomEntity);
-            var polarity = DetermineDefaultPolarity(roomEntity);
-            var difficulty = 0.5f; // Default medium difficulty
-
-            return new RoomBiomeData(biomeType, polarity, difficulty, Entity.Null);
-        }
-
-        private BiomeType DetermineDefaultBiomeType(Entity roomEntity)
-        {
-            // In a full implementation, this would analyze room connections,
-            // position in world hierarchy, etc.
-            
-            // For now, use room characteristics to make educated guesses
-            if (RoomBiomeDataLookup.HasComponent(roomEntity))
+            // Fallback to intelligent defaults based on node position or characteristics
+            if (request.AllowDefaults)
             {
-                // Use existing biome data if available
-                var existing = RoomBiomeDataLookup[roomEntity];
-                if (existing.IsResolved)
-                    return existing.BiomeType;
+                return CreateIntelligentDefault(nodeId, parentDistrict);
             }
-
-            // Default fallback based on room type
-            return BiomeType.HubArea; // Safe default for most rooms
-        }
-
-        private Polarity DetermineDefaultPolarity(Entity roomEntity)
-        {
-            // Analyze room characteristics to determine appropriate polarity
-            // This could be based on room type, connections, position, etc.
             
-            return Polarity.None; // Neutral polarity as safe default
+            // Return unresolved marker
+            return RoomBiomeData.CreateUnresolved(parentDistrict);
         }
 
-        private float CalculateDifficultyFromDistrict(in BiomeFieldData biomeField)
+        private Entity FindParentDistrict(Entity roomEntity, int maxDepth)
         {
-            // Calculate difficulty based on district biome properties
-            return biomeField.PrimaryBiome switch
+            // Walk up the hierarchy looking for a district entity with biome data
+            Entity currentEntity = roomEntity;
+            
+            for (int depth = 0; depth < maxDepth; depth++)
             {
-                BiomeType.ShadowRealms => 0.8f,      // High difficulty
-                BiomeType.PlasmaFields => 0.9f,      // Very high difficulty
-                BiomeType.SkyGardens => 0.3f,        // Low difficulty
-                BiomeType.HubArea => 0.2f,           // Very low difficulty
-                _ => 0.5f                            // Medium difficulty default
+                // Check if current entity has biome data
+                if (SystemAPI.HasComponent<Biome>(currentEntity))
+                {
+                    return currentEntity;
+                }
+                
+                // Try to find parent entity through NodeId hierarchy
+                if (SystemAPI.HasComponent<NodeId>(currentEntity))
+                {
+                    var nodeId = SystemAPI.GetComponent<NodeId>(currentEntity);
+                    
+                    // If this entity has a parent reference, continue traversal
+                    if (nodeId.Parent != 0 && nodeId.Level > 0)
+                    {
+                        // Find entity with parent NodeId
+                        var parentEntity = FindEntityByNodeId(nodeId.Parent);
+                        if (parentEntity != Entity.Null)
+                        {
+                            currentEntity = parentEntity;
+                            continue;
+                        }
+                    }
+                }
+                
+                // No more parents found
+                break;
+            }
+            
+            return Entity.Null;
+        }
+
+        private Entity FindEntityByNodeId(uint parentId)
+        {
+            // This would typically use a lookup table or entity query
+            // For now, return Entity.Null - in practice this would be optimized
+            // with a cached lookup from NodeId.Value to Entity
+            return Entity.Null;
+        }
+
+        private RoomBiomeData FindSiblingBiome(Entity roomEntity, NodeId nodeId)
+        {
+            // Look at connected/nearby rooms to infer biome type
+            // This would use the connection system in a full implementation
+            
+            if (ConnectionLookup.HasBuffer(roomEntity))
+            {
+                var connections = ConnectionLookup[roomEntity];
+                foreach (var connection in connections)
+                {
+                    // Check connected nodes for biome data
+                    // In practice, would resolve connection.ToNodeId to entity and check biome
+                }
+            }
+            
+            return RoomBiomeData.CreateUnresolved(Entity.Null);
+        }
+
+        private RoomBiomeData CreateIntelligentDefault(NodeId nodeId, Entity parentDistrict)
+        {
+            // Create intelligent defaults based on node characteristics
+            var biomeType = InferBiomeFromNodeId(nodeId);
+            var polarity = InferPolarityFromBiome(biomeType);
+            
+            return new RoomBiomeData(biomeType, polarity, parentDistrict, 1f);
+        }
+
+        private BiomeType InferBiomeFromNodeId(NodeId nodeId)
+        {
+            // Use node ID to deterministically assign biome types
+            var hash = nodeId.Value;
+            var biomeIndex = hash % 8; // Distribute across common biome types
+            
+            return biomeIndex switch
+            {
+                0 => BiomeType.HubArea,
+                1 => BiomeType.SkyGardens,
+                2 => BiomeType.ShadowRealms,
+                3 => BiomeType.CrystalCaverns,
+                4 => BiomeType.PowerPlant,
+                5 => BiomeType.FrozenWastes,
+                6 => BiomeType.Forest,
+                7 => BiomeType.VolcanicCore,
+                _ => BiomeType.HubArea // Fallback
             };
         }
 
-        private float CalculateDifficultyFromSector(in BiomeFieldData biomeField)
+        private Polarity InferPolarityFromBiome(BiomeType biomeType)
         {
-            // Sector-based difficulty is typically lower than district-based
-            var baseDifficulty = CalculateDifficultyFromDistrict(biomeField);
-            return math.max(0.1f, baseDifficulty - 0.2f); // Reduce by 0.2, minimum 0.1
+            return biomeType switch
+            {
+                BiomeType.SkyGardens => Polarity.Sun | Polarity.Wind,
+                BiomeType.ShadowRealms => Polarity.Moon,
+                BiomeType.CrystalCaverns => Polarity.Cold | Polarity.Earth,
+                BiomeType.PowerPlant => Polarity.Tech | Polarity.Heat,
+                BiomeType.FrozenWastes => Polarity.Cold | Polarity.Wind,
+                BiomeType.Forest => Polarity.Life | Polarity.Earth,
+                BiomeType.VolcanicCore => Polarity.Heat | Polarity.Earth,
+                BiomeType.HubArea => Polarity.None,
+                _ => Polarity.None
+            };
+        }
+    }
+
+    /// <summary>
+    /// Helper system that automatically adds BiomeDataRequest to rooms that need biome resolution
+    /// </summary>
+    [BurstCompile]
+    [UpdateInGroup(typeof(InitializationSystemGroup))]
+    [UpdateBefore(typeof(BiomeDataQuerySystem))]
+    public partial struct BiomeDataRequestSystem : ISystem
+    {
+        private EntityQuery _roomsNeedingBiomeData;
+
+        [BurstCompile]
+        public void OnCreate(ref SystemState state)
+        {
+            _roomsNeedingBiomeData = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RoomHierarchyData, NodeId>()
+                .WithNone<RoomBiomeData, BiomeDataRequest>()
+                .Build(ref state);
         }
 
-        private Entity FindEntityByNodeId(NodeId nodeId)
+        [BurstCompile]
+        public void OnUpdate(ref SystemState state)
         {
-            // In a full implementation, this would use a proper NodeId lookup system
-            // For now, return Entity.Null to indicate not found
-            // This would typically query a NodeIdLookup component lookup or similar
-            return Entity.Null;
+            if (_roomsNeedingBiomeData.IsEmpty) return;
+
+            var ecb = new EntityCommandBuffer(Allocator.TempJob);
+            
+            var addRequestJob = new AddBiomeDataRequestJob
+            {
+                ECB = ecb.AsParallelWriter()
+            };
+
+            state.Dependency = addRequestJob.ScheduleParallel(_roomsNeedingBiomeData, state.Dependency);
+            state.Dependency = ecb.Playback(state.EntityManager, state.Dependency);
+            ecb.Dispose(state.Dependency);
+        }
+    }
+
+    /// <summary>
+    /// Job that adds BiomeDataRequest components to rooms that need biome resolution
+    /// </summary>
+    [BurstCompile]
+    public partial struct AddBiomeDataRequestJob : IJobEntity
+    {
+        public EntityCommandBuffer.ParallelWriter ECB;
+
+        public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, in RoomHierarchyData roomData)
+        {
+            // Add request with priority based on room type
+            var priority = GetRequestPriority(roomData.Type);
+            var request = new BiomeDataRequest(priority, allowDefaults: true, maxSearchDepth: 3);
+            
+            ECB.AddComponent(chunkIndex, entity, request);
+        }
+
+        private int GetRequestPriority(RoomType roomType)
+        {
+            return roomType switch
+            {
+                RoomType.Boss => 10,      // High priority
+                RoomType.Special => 8,    // High priority
+                RoomType.Secret => 6,     // Medium priority
+                RoomType.Save => 5,       // Medium priority
+                RoomType.Standard => 3,   // Normal priority
+                RoomType.Corridor => 1,   // Low priority
+                _ => 0                    // Default priority
+            };
         }
     }
 }

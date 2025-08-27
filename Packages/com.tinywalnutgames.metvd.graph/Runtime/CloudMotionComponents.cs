@@ -13,6 +13,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public float3 Velocity;
         public float Speed;
         public float TimeAccumulator;
+        public float Phase;
         public RectInt MovementBounds;
         public bool IsActive;
         
@@ -22,6 +23,7 @@ namespace TinyWalnutGames.MetVD.Graph
             Velocity = velocity;
             Speed = speed;
             TimeAccumulator = 0f;
+            Phase = 0f;
             MovementBounds = bounds;
             IsActive = true;
         }
@@ -67,6 +69,13 @@ namespace TinyWalnutGames.MetVD.Graph
     /// Tag component to mark clouds for motion system processing
     /// </summary>
     public struct CloudMotionTag : IComponentData
+    {
+    }
+
+    /// <summary>
+    /// Tag component to mark cloud platforms that can interact with player/entities
+    /// </summary>
+    public struct CloudPlatformTag : IComponentData
     {
     }
 }

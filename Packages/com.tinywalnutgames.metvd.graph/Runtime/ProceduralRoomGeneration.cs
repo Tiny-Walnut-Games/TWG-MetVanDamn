@@ -339,8 +339,7 @@ namespace TinyWalnutGames.MetVD.Graph
         Switch = 9,
         Enemy = 10,
         Door = 11,
-        Collectible = 12,
-        MotionComponent = 13   // Special marker for motion system components
+        Collectible = 12
     }
     
     /// <summary>

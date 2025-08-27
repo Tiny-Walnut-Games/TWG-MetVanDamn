@@ -178,7 +178,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 PopulateRoomFeatures(featuresBuffer, in roomData, ref random);
 
                 // Initialize room generation request for new procedural pipeline
-                InitializeRoomGenerationRequest(state.EntityManager, entity, roomData, nodeId, ref random, ref state);
+                InitializeRoomGenerationRequest(state.EntityManager, entity, roomData, nodeId, ref random);
             }
         }
 
@@ -187,30 +187,37 @@ namespace TinyWalnutGames.MetVD.Graph
         /// </summary>
         private static void InitializeRoomGenerationRequest(EntityManager entityManager, Entity roomEntity, 
                                                            RoomHierarchyData roomData, NodeId nodeId, 
-                                                           ref Unity.Mathematics.Random random, ref SystemState state)
+                                                           ref Unity.Mathematics.Random random)
         {
             // Determine generator type based on room type and characteristics
             var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
             
-            // Get biome information from parent hierarchy
+            // Get biome information from resolved biome data
             var targetBiome = BiomeType.HubArea;
             var targetPolarity = Polarity.None;
             
-            // Request biome data resolution from parent district/sector hierarchy
-            var biomeRequest = new BiomeDataRequest(roomEntity, new NodeId(nodeId.ParentId, 0), new NodeId(nodeId.ParentId, 1), false);
-            entityManager.AddComponentData(roomEntity, biomeRequest);
-            
-            // If immediate biome data is needed, try to resolve synchronously
-            if (TryGetImmediateBiomeData(nodeId, out var immediateData))
+            // Query for resolved biome data from parent district/sector hierarchy
+            if (entityManager.HasComponent<RoomBiomeData>(roomEntity))
             {
-                targetBiome = immediateData.BiomeType;
-                targetPolarity = immediateData.Polarity;
-                entityManager.AddComponentData(roomEntity, immediateData);
+                var biomeData = entityManager.GetComponentData<RoomBiomeData>(roomEntity);
+                if (biomeData.IsResolved)
+                {
+                    targetBiome = biomeData.BiomeType;
+                    targetPolarity = biomeData.PrimaryPolarity;
+                }
+            }
+            else
+            {
+                // If no biome data is available yet, add a request for it
+                if (!entityManager.HasComponent<BiomeDataRequest>(roomEntity))
+                {
+                    entityManager.AddComponentData(roomEntity, new BiomeDataRequest(priority: 5, allowDefaults: true));
+                    return; // Wait for biome data to be resolved
+                }
             }
             
-            // Get available skills from player state system  
-            var playerEntity = FindPlayerEntity(ref state);
-            var availableSkills = GetPlayerAvailableSkills(ref state, playerEntity);
+            // Determine available skills from player state system
+            var availableSkills = GetPlayerAvailableSkills(entityManager);
             
             var generationRequest = new RoomGenerationRequest(
                 generatorType, 
@@ -425,45 +432,11 @@ namespace TinyWalnutGames.MetVD.Graph
         }
 
         /// <summary>
-        /// Find the player entity in the world
+        /// Get currently available player skills from the player state system
         /// </summary>
-        private static Entity FindPlayerEntity(ref SystemState state)
+        private static Ability GetPlayerAvailableSkills(EntityManager entityManager)
         {
-            // In a full implementation, this would use a player tag or singleton
-            // For now, try to find entity with PlayerSkillState component
-            var playerQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<PlayerSkillState>()
-                .Build(ref state);
-                
-            if (playerQuery.IsEmpty)
-                return Entity.Null;
-                
-            return playerQuery.GetSingletonEntity();
-        }
-
-        /// <summary>
-        /// Try to get immediate biome data from cached sources
-        /// </summary>
-        private static bool TryGetImmediateBiomeData(NodeId nodeId, out RoomBiomeData biomeData)
-        {
-            biomeData = default;
-            // In a full implementation, this would check caches or immediate parent lookups
-            // For now, return false to use async resolution
-            return false;
-        }
-
-        /// <summary>
-        /// Get available skills from player state system
-        /// </summary>
-        private static Ability GetPlayerAvailableSkills(ref SystemState state, Entity playerEntity)
-        {
-            if (playerEntity != Entity.Null)
-            {
-                return PlayerStateUtility.GetAvailableAbilities(ref state, playerEntity);
-            }
-            
-            // Default starting abilities if no player found
-            return Ability.Jump | Ability.DoubleJump;
+            return PlayerStateUtility.GetCurrentPlayerAbilities(entityManager);
         }
     }
 }
