@@ -6,6 +6,8 @@ using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Shared;
 using CoreBootstrap = TinyWalnutGames.MetVD.Core.WorldBootstrapConfiguration;
+using CoreInProgress = TinyWalnutGames.MetVD.Core.WorldBootstrapInProgressTag;
+using CoreComplete = TinyWalnutGames.MetVD.Core.WorldBootstrapCompleteTag;
 
 namespace TinyWalnutGames.MetVD.Authoring.Tests
 {
@@ -175,8 +177,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
             // Verify the bootstrap entity has the required configuration
             Assert.IsTrue(entityManager.HasComponent<CoreBootstrap>(bootstrapEntity));
-            Assert.IsFalse(entityManager.HasComponent<WorldBootstrapInProgressTag>(bootstrapEntity));
-            Assert.IsFalse(entityManager.HasComponent<WorldBootstrapCompleteTag>(bootstrapEntity));
+            Assert.IsFalse(entityManager.HasComponent<CoreInProgress>(bootstrapEntity));
+            Assert.IsFalse(entityManager.HasComponent<CoreComplete>(bootstrapEntity));
 
             var storedConfig = entityManager.GetComponentData<CoreBootstrap>(bootstrapEntity);
             Assert.AreEqual(999, storedConfig.Seed);
@@ -189,25 +191,62 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Test that WorldBootstrapConfiguration can coexist with WorldConfiguration
             var entity = entityManager.CreateEntity();
 
-            var bootstrapSettings = new WorldBootstrapSettings
+            var worldSettings = new WorldSettings
             {
                 Seed = 777,
                 WorldSize = new int2(80, 80),
-                RandomizationMode = RandomizationMode.Partial,
+                RandomizationMode = RandomizationMode.Partial
+            };
+            
+            var biomeSettings = new BiomeSettings
+            {
                 BiomeCountRange = new int2(3, 7),
-                BiomeWeight = 1.5f,
+                BiomeWeight = 1.5f
+            };
+            
+            var districtSettings = new DistrictSettings
+            {
                 DistrictCountRange = new int2(5, 15),
                 DistrictMinDistance = 25f,
                 DistrictWeight = 0.9f,
                 SectorsPerDistrictRange = new int2(3, 10),
-                SectorGridSize = new int2(10, 10),
-                RoomsPerSectorRange = new int2(4, 15),
-                TargetLoopDensity = 0.7f,
+                SectorGridSize = new int2(10, 10)
+            };
+            
+            var debugSettings = new DebugSettings
+            {
                 EnableDebugVisualization = false,
                 LogGenerationSteps = true
             };
 
-            var bootstrapConfig = new CoreBootstrap(bootstrapSettings);
+            var bootstrapConfig = new CoreBootstrap(
+                seed: worldSettings.Seed,
+                worldSize: worldSettings.WorldSize,
+                randomizationMode: worldSettings.RandomizationMode,
+                biomeSettings: new BiomeGenerationSettings
+                {
+                    BiomeCountRange = biomeSettings.BiomeCountRange,
+                    BiomeWeight = biomeSettings.BiomeWeight
+                },
+                districtSettings: new DistrictGenerationSettings
+                {
+                    DistrictCountRange = districtSettings.DistrictCountRange,
+                    DistrictMinDistance = districtSettings.DistrictMinDistance,
+                    DistrictWeight = districtSettings.DistrictWeight
+                },
+                sectorSettings: new SectorGenerationSettings
+                {
+                    SectorsPerDistrictRange = districtSettings.SectorsPerDistrictRange,
+                    SectorGridSize = districtSettings.SectorGridSize
+                },
+                roomSettings: new RoomGenerationSettings
+                {
+                    RoomsPerSectorRange = new int2(4, 15),
+                    TargetLoopDensity = 0.7f
+                },
+                enableDebugVisualization: debugSettings.EnableDebugVisualization,
+                logGenerationSteps: debugSettings.LogGenerationSteps
+            );
             var worldConfig = new WorldConfiguration
             {
                 Seed = 777,
