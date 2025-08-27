@@ -95,7 +95,6 @@ namespace TinyWalnutGames.MetVD.Authoring
         private EntityQuery _navigationRequestQuery;
         private EntityQuery _navNodeQuery;
 
-        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             // Query for entities requesting pathfinding
@@ -113,7 +112,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             state.RequireForUpdate<NavigationGraph>();
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var navGraph = SystemAPI.GetSingleton<NavigationGraph>();

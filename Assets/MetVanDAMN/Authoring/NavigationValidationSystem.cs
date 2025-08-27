@@ -17,7 +17,6 @@ namespace TinyWalnutGames.MetVD.Authoring
         private EntityQuery _navNodeQuery;
         private EntityQuery _navigationGraphQuery;
 
-        [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             _navNodeQuery = SystemAPI.QueryBuilder()
@@ -32,7 +31,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             state.RequireForUpdate(_navigationGraphQuery);
         }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
