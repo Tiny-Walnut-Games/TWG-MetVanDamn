@@ -541,6 +541,12 @@ namespace TinyWalnutGames.MetVD.Graph
         private EntityQuery _conveyorCloudQuery;
         private EntityQuery _affectedEntitiesQuery;
         
+        private ComponentLookup<LocalTransform> _transformLookup;
+        private ComponentLookup<VelocityComponent> _velocityLookup;
+        private ComponentLookup<FrictionComponent> _frictionLookup;
+        private ComponentLookup<PolarityComponent> _polarityLookup;
+        private ComponentLookup<EnergyComponent> _energyLookup;
+        
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -553,6 +559,12 @@ namespace TinyWalnutGames.MetVD.Graph
                 .WithAny<PlayerTag, PhysicsBodyTag>() // Tags for entities that can be affected
                 .Build(ref state);
                 
+            _transformLookup = state.GetComponentLookup<LocalTransform>(false);
+            _velocityLookup = state.GetComponentLookup<VelocityComponent>(false);
+            _frictionLookup = state.GetComponentLookup<FrictionComponent>(true);
+            _polarityLookup = state.GetComponentLookup<PolarityComponent>(true);
+            _energyLookup = state.GetComponentLookup<EnergyComponent>(false);
+                
             state.RequireForUpdate(_conveyorCloudQuery);
         }
 
@@ -560,6 +572,13 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
         {
             var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
+            
+            // Update component lookups
+            _transformLookup.Update(ref state);
+            _velocityLookup.Update(ref state);
+            _frictionLookup.Update(ref state);
+            _polarityLookup.Update(ref state);
+            _energyLookup.Update(ref state);
             
             if (_conveyorCloudQuery.IsEmpty)
                 return;
@@ -592,10 +611,10 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int i = 0; i < affectedEntities.Length; i++)
             {
                 var entity = affectedEntities[i];
-                if (!SystemAPI.HasComponent<LocalTransform>(entity))
+                if (!_transformLookup.HasComponent(entity))
                     continue;
 
-                var entityTransform = SystemAPI.GetComponent<LocalTransform>(entity);
+                var entityTransform = _transformLookup[entity];
                 var distanceFromCenter = math.distance(entityTransform.Position, position);
 
                 // 3. Apply edge fall-off smoothing and stickiness logic
@@ -618,16 +637,11 @@ namespace TinyWalnutGames.MetVD.Graph
             // Spatial query for entities within conveyor influence area
             var affectedEntities = new NativeList<Entity>(64, Allocator.Temp);
 
-            // Create query for potentially affected entities
-            var detectionQuery = SystemAPI.QueryBuilder()
-                .WithAll<LocalTransform>()
-                .WithAny<PlayerTag, PhysicsBodyTag>()
-                .Build();
-
-            if (!detectionQuery.IsEmpty)
+            // Use pre-created query instead of SystemAPI.QueryBuilder
+            if (!_affectedEntitiesQuery.IsEmpty)
             {
-                var entities = detectionQuery.ToEntityArray(Allocator.Temp);
-                var transforms = detectionQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+                var entities = _affectedEntitiesQuery.ToEntityArray(Allocator.Temp);
+                var transforms = _affectedEntitiesQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
 
                 for (int i = 0; i < entities.Length; i++)
                 {
@@ -685,11 +699,11 @@ namespace TinyWalnutGames.MetVD.Graph
         
         private void ApplyConveyorVelocity(ref SystemState state, Entity entity, float3 direction, float speed, float edgeFalloff, float stickinessModifier, float deltaTime)
         {
-            var currentTransform = SystemAPI.GetComponent<LocalTransform>(entity);
+            var currentTransform = _transformLookup[entity];
             var currentVelocity = float3.zero;
-            if (SystemAPI.HasComponent<VelocityComponent>(entity))
+            if (_velocityLookup.HasComponent(entity))
             {
-                currentVelocity = SystemAPI.GetComponent<VelocityComponent>(entity).Value;
+                currentVelocity = _velocityLookup[entity].Value;
             }
             
             var conveyorVelocity = edgeFalloff * speed * stickinessModifier * math.normalize(direction);
@@ -710,9 +724,9 @@ namespace TinyWalnutGames.MetVD.Graph
             var positionBasedModifier = CalculatePositionBasedModifier(entityPosition, direction);
             blendedVelocity *= positionBasedModifier;
             
-            if (SystemAPI.HasComponent<VelocityComponent>(entity))
+            if (_velocityLookup.HasComponent(entity))
             {
-                SystemAPI.SetComponent(entity, new VelocityComponent { Value = blendedVelocity });
+                _velocityLookup[entity] = new VelocityComponent { Value = blendedVelocity };
             }
             ApplyConveyorScriptedEffects(ref state, entity, conveyorVelocity, deltaTime);
         }
@@ -725,9 +739,9 @@ namespace TinyWalnutGames.MetVD.Graph
         }
         private float GetEntityFriction(ref SystemState state, Entity entity)
         {
-            if (SystemAPI.HasComponent<FrictionComponent>(entity))
+            if (_frictionLookup.HasComponent(entity))
             {
-                return SystemAPI.GetComponent<FrictionComponent>(entity).Value;
+                return _frictionLookup[entity].Value;
             }
             return 0.8f;
         }
@@ -737,9 +751,9 @@ namespace TinyWalnutGames.MetVD.Graph
             var effectStrength = math.length(velocity) * deltaTime;
             
             // Apply polarity-based charge transfer and energy effects
-            if (SystemAPI.HasComponent<PolarityComponent>(entity))
+            if (_polarityLookup.HasComponent(entity))
             {
-                var polarity = SystemAPI.GetComponent<PolarityComponent>(entity);
+                var polarity = _polarityLookup[entity];
                 // Polarity affects charge transfer efficiency during conveyor movement
                 var chargeTransferRate = (polarity.ChargeLevel > 0) ? 1.2f : 0.8f;
                 
@@ -756,12 +770,12 @@ namespace TinyWalnutGames.MetVD.Graph
                 effectStrength *= chargeTransferRate;
             }
             
-            if (SystemAPI.HasComponent<EnergyComponent>(entity))
+            if (_energyLookup.HasComponent(entity))
             {
-                var energy = SystemAPI.GetComponent<EnergyComponent>(entity);
+                var energy = _energyLookup[entity];
                 // Conveyor movement generates kinetic energy that can be stored
                 energy.Value += effectStrength * 0.1f;
-                SystemAPI.SetComponent(entity, energy);
+                _energyLookup[entity] = energy;
             }
         }
         
