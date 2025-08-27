@@ -55,6 +55,88 @@ While compiling job:
 ##VS Logs##
 
 Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\BiomeDataQuerySystem__System_14780973700.g.cs	53		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\BiomeDataQuerySystem__System_14780973700.g.cs	53		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\BiomeDataQuerySystem__System_14780973701.g.cs	54		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\BiomeDataQuerySystem__System_14780973701.g.cs	54		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842010.g.cs	89		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842010.g.cs	89		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842011.g.cs	53		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842011.g.cs	53		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	45		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	45		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\CloudMotionSystem__System_470842012.g.cs	45		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\AINavigationSystem__System_10720213750.g.cs	383		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\AINavigationSystem__System_10720213750.g.cs	383		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\AINavigationSystem__System_10720213750.g.cs	491		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\NavigationGraphBuildSystem__System_11528759930.g.cs	293		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\NavigationGraphBuildSystem__System_11528759930.g.cs	293		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\NavigationGraphBuildSystem__System_11528759930.g.cs	396		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\NavigationGraphBuildSystem__System_11528759930.g.cs	494		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\NavigationValidationSystem__System_309206640.g.cs	206		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Authoring.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\NavigationValidationSystem__System_309206640.g.cs	304		
+		
+-------------------------------------------------------------------------------------------------------------
+
+##Build Log##
+
+##UnityConsole##
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapConfiguration.cs(192,5): error CS1022: Type or namespace definition, or end-of-file expected
+
+Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapConfiguration.cs(227,1): error CS1022: Type or namespace definition, or end-of-file expected
+
+Failed to find entry-points:
+Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'TinyWalnutGames.MetVD.Samples, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null' ---> System.Exception: Failed to resolve assembly 'TinyWalnutGames.MetVD.Samples, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null' in directories: C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\MonoBleedingEdge\lib\mono\unityjit-win32
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\MonoBleedingEdge\lib\mono\unityjit-win32\Facades
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.collab-proxy@8a82222c5449\Lib\Editor
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\EditorAssetResources
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.ide.rider@4d374c7eb6db\Rider\Editor
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Managed
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.LowLevel.ILSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities.CodeGen
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\DotNetZip
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\WebGLSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.burst@f7a407abf4d5
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.burst@f7a407abf4d5\Unity.Burst.CodeGen
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\LinuxStandaloneSupport
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\MetroSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\YamlDotNet
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.ai.toolkit@97783faabe3b\Modules\Sdk\Editor
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\AOT
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\iOSSupport
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\PlaybackEngines\AndroidPlayer
+C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Managed\UnityEngine
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies ---> Mono.Cecil.AssemblyResolutionException: Failed to resolve assembly: 'TinyWalnutGames.MetVD.Samples, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null'
+  at Mono.Cecil.BaseAssemblyResolver.Resolve (Mono.Cecil.AssemblyNameReference name, Mono.Cecil.ReaderParameters parameters) [0x00105] in <853812ae52c341daaef3c62ecdb86b32>:0 
+  at zzzUnity.Burst.CodeGen.AssemblyResolver.Resolve (Mono.Cecil.AssemblyNameReference name) [0x00007] in <e6b852d46e1e4bfb963d02704699e755>:0 
+   --- End of inner exception stack trace ---
+  at zzzUnity.Burst.CodeGen.AssemblyResolver.Resolve (Mono.Cecil.AssemblyNameReference name) [0x00054] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.AssemblyLoader.Resolve (Mono.Cecil.AssemblyNameReference name) [0x0007e] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.EntryPointMethodFinder.FindEntryPoints (System.String[] rootAssemblyNames, Burst.Compiler.IL.Hashing.CacheRuntime.HashCacheAssemblyStore assemblyStore, Burst.Compiler.IL.AssemblyLoader assemblyLoader, Burst.Compiler.IL.NativeCompilerOptions options, Burst.Compiler.IL.Server.ProfileDelegate profileCallback, System.Boolean includeRootAssemblyReferences, System.Boolean splitTargets) [0x00055] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer+<>c__DisplayClass18_1.<FindMethods>b__0 (Burst.Compiler.IL.Server.Caching.CacheManager cacheManager) [0x0005e] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer+<>c__DisplayClass26_0`1[TResult].<RunTask>b__0 () [0x00145] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer.RunTask[TResult] (Burst.Compiler.IL.Server.TargetKey target, System.String taskName, System.String[] assemblyFolders, System.Threading.CancellationToken cancellationToken, System.Func`2[T,TResult] function) [0x00131] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer.FindMethods (Burst.Compiler.IL.Server.CompilerServerOptions options, Burst.Compiler.IL.Aot.AotCompilerOptions aotOptions, Burst.Compiler.IL.AssemblyDefinesDict assemblyDefines, Burst.Compiler.IL.Server.TargetKey target, Burst.Compiler.IL.Server.Caching.CacheManager cacheManager, Burst.Compiler.IL.CompilerStatistics stats, System.Threading.CancellationToken cancellationToken) [0x00299] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer+<>c__DisplayClass26_0`1[TResult].<RunTask>b__0 () [0x00145] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer.RunTask[TResult] (Burst.Compiler.IL.Server.TargetKey target, System.String taskName, System.String[] assemblyFolders, System.Threading.CancellationToken cancellationToken, System.Func`2[T,TResult] function) [0x00131] in <e6b852d46e1e4bfb963d02704699e755>:0 
+  at Burst.Compiler.IL.Server.CompilerServer.Compile (Burst.Compiler.IL.Server.CompilerServerOptions options, Burst.Compiler.IL.Server.CompilationMessageStreamer streamer, System.Threading.CancellationToken cancellationToken) [0x001ca] in <e6b852d46e1e4bfb963d02704699e755>:0 
+
+While compiling job:
+
+-------------------------------------------------------------------------------------------------------------
+
+##VS Logs##
+
+Severity	Code	Description	Project	File	Line	Suppression State	Details
 Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\BiomeDataQuerySystem__System_14780973701.g.cs	54		
 Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\BiomeDataQuerySystem__System_14780973700.g.cs	53		
 Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\BiomeDataQuerySystem__System_14780973700.g.cs	53		
