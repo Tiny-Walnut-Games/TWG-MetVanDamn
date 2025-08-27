@@ -120,17 +120,25 @@ namespace TinyWalnutGames.MetVD.Authoring
             if (!navGraph.IsReady)
                 return;
 
-            // Process navigation requests
-            foreach (var (navState, capabilities, pathBuffer, entity) in 
-                     SystemAPI.Query<RefRW<AINavigationState>, RefRO<AgentCapabilities>, DynamicBuffer<PathNodeBufferElement>>()
-                     .WithEntityAccess())
+            // Process navigation requests using manual EntityQuery
+            if (_navigationRequestQuery.IsEmpty)
+                return;
+                
+            var entities = _navigationRequestQuery.ToEntityArray(Allocator.Temp);
+            var navStates = _navigationRequestQuery.ToComponentDataArray<AINavigationState>(Allocator.Temp);
+            var capabilities = _navigationRequestQuery.ToComponentDataArray<AgentCapabilities>(Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
             {
-                var nav = navState.ValueRW;
+                var entity = entities[i];
+                var nav = navStates[i];
+                var caps = capabilities[i];
                 
                 // Skip if no target or already at target
                 if (nav.TargetNodeId == 0 || nav.CurrentNodeId == nav.TargetNodeId)
                 {
                     nav.Status = PathfindingStatus.Idle;
+                    SystemAPI.SetComponent(entity, nav);
                     continue;
                 }
                 
@@ -142,7 +150,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 nav.Status = PathfindingStatus.Searching;
                 nav.LastPathfindTime = SystemAPI.Time.ElapsedTime;
                 
-                var pathfindingResult = FindPath(ref state, nav.CurrentNodeId, nav.TargetNodeId, capabilities.ValueRO);
+                var pathfindingResult = FindPath(ref state, nav.CurrentNodeId, nav.TargetNodeId, caps);
                 
                 // Update navigation state based on result
                 if (pathfindingResult.Success)
@@ -152,16 +160,20 @@ namespace TinyWalnutGames.MetVD.Authoring
                     nav.PathCost = pathfindingResult.TotalCost;
                     nav.CurrentPathStep = 0;
                     
-                    // Clear existing path and add new one
-                    pathBuffer.Clear();
-                    for (int i = 0; i < pathfindingResult.PathLength; i++)
+                    // Update path buffer if it exists
+                    if (SystemAPI.HasBuffer<PathNodeBufferElement>(entity))
                     {
-                        pathBuffer.Add(new PathNodeBufferElement 
-                        { 
-                            NodeId = pathfindingResult.Path[i],
-                            TraversalCost = i < pathfindingResult.PathLength - 1 ? 
-                                           pathfindingResult.PathCosts[i] : 0.0f
-                        });
+                        var pathBuffer = SystemAPI.GetBuffer<PathNodeBufferElement>(entity);
+                        pathBuffer.Clear();
+                        for (int j = 0; j < pathfindingResult.PathLength; j++)
+                        {
+                            pathBuffer.Add(new PathNodeBufferElement 
+                            { 
+                                NodeId = pathfindingResult.Path[j],
+                                TraversalCost = j < pathfindingResult.PathLength - 1 ? 
+                                               pathfindingResult.PathCosts[j] : 0.0f
+                            });
+                        }
                     }
                 }
                 else
@@ -171,8 +183,16 @@ namespace TinyWalnutGames.MetVD.Authoring
                                  PathfindingStatus.NoPathFound;
                     nav.PathLength = 0;
                     nav.PathCost = float.MaxValue;
-                    pathBuffer.Clear();
+                    
+                    if (SystemAPI.HasBuffer<PathNodeBufferElement>(entity))
+                    {
+                        var pathBuffer = SystemAPI.GetBuffer<PathNodeBufferElement>(entity);
+                        pathBuffer.Clear();
+                    }
                 }
+                
+                // Update the component
+                SystemAPI.SetComponent(entity, nav);
 
                 // Dispose temporary path arrays
                 if (pathfindingResult.Path.IsCreated)
@@ -180,6 +200,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                 if (pathfindingResult.PathCosts.IsCreated)
                     pathfindingResult.PathCosts.Dispose();
             }
+            
+            entities.Dispose();
+            navStates.Dispose();
+            capabilities.Dispose();
         }
 
         [BurstCompile]

@@ -17,10 +17,20 @@ namespace TinyWalnutGames.MetVD.Graph
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct CloudMotionSystem : ISystem
     {
+        private EntityQuery _cloudMotionQuery;
+        private ComponentTypeHandle<LocalTransform> _transformHandle;
+        private ComponentTypeHandle<CloudMotionComponent> _motionHandle;
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<CloudMotionComponent>();
+            _cloudMotionQuery = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<CloudMotionComponent, LocalTransform>()
+                .Build(ref state);
+            state.RequireForUpdate(_cloudMotionQuery);
+            
+            _transformHandle = state.GetComponentTypeHandle<LocalTransform>();
+            _motionHandle = state.GetComponentTypeHandle<CloudMotionComponent>();
         }
 
         [BurstCompile]
@@ -29,47 +39,83 @@ namespace TinyWalnutGames.MetVD.Graph
             var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
             var time = (float)state.WorldUnmanaged.Time.ElapsedTime;
             
-            // Process cloud motion using SystemAPI.Query instead of IJobEntity
-            foreach (var (transform, motion) in SystemAPI.Query<RefRW<LocalTransform>, RefRW<CloudMotionComponent>>())
+            // Update type handles
+            _transformHandle.Update(ref state);
+            _motionHandle.Update(ref state);
+            
+            // Use EntityQuery instead of SystemAPI.Query for compatibility
+            var cloudJob = new CloudMotionJob
             {
-                motion.ValueRW.TimeAccumulator += deltaTime;
+                DeltaTime = deltaTime,
+                Time = time,
+                TransformHandle = _transformHandle,
+                MotionHandle = _motionHandle
+            };
+            cloudJob.ScheduleParallel(_cloudMotionQuery, state.Dependency).Complete();
+        }
+    }
+
+    /// <summary>
+    /// Job for processing cloud motion in parallel
+    /// </summary>
+    [BurstCompile]
+    public struct CloudMotionJob : IJobChunk
+    {
+        public float DeltaTime;
+        public float Time;
+        
+        public ComponentTypeHandle<LocalTransform> TransformHandle;
+        public ComponentTypeHandle<CloudMotionComponent> MotionHandle;
+
+        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+        {
+            var transforms = chunk.GetNativeArray(ref TransformHandle);
+            var motions = chunk.GetNativeArray(ref MotionHandle);
+            
+            for (int i = 0; i < chunk.Count; i++)
+            {
+                var transform = transforms[i];
+                var motion = motions[i];
+                
+                motion.TimeAccumulator += DeltaTime;
                 
                 // Update velocity based on motion type
-                switch (motion.ValueRO.MotionType)
+                switch (motion.MotionType)
                 {
                     case CloudMotionType.Gentle:
-                        UpdateGentleMotion(ref motion.ValueRW, time);
+                        CloudMotionSystem.UpdateGentleMotion(ref motion, Time);
                         break;
                         
                     case CloudMotionType.Gusty:
-                        UpdateGustyMotion(ref motion.ValueRW, time);
+                        CloudMotionSystem.UpdateGustyMotion(ref motion, Time);
                         break;
                         
                     case CloudMotionType.Conveyor:
-                        UpdateConveyorMotion(ref motion.ValueRW, time);
+                        CloudMotionSystem.UpdateConveyorMotion(ref motion, Time);
                         break;
                         
                     case CloudMotionType.Electric:
-                        UpdateElectricMotion(ref motion.ValueRW, time);
+                        CloudMotionSystem.UpdateElectricMotion(ref motion, Time);
                         break;
                 }
                 
                 // Apply velocity to position
-                var newPosition = transform.ValueRO.Position;
-                // (Historical diff note retained) Replace this line:
-                // newPosition.xy += deltaTime * motion.ValueRO.Speed * motion.ValueRO.Velocity;
-                // With this line:
-                newPosition.xy += deltaTime * motion.ValueRO.Speed * motion.ValueRO.Velocity.xy;
+                var newPosition = transform.Position;
+                newPosition.xy += DeltaTime * motion.Speed * motion.Velocity.xy;
                 
                 // Apply bounds constraints
-                newPosition.x = math.clamp(newPosition.x, motion.ValueRO.MovementBounds.x, motion.ValueRO.MovementBounds.x + motion.ValueRO.MovementBounds.width);
-                newPosition.y = math.clamp(newPosition.y, motion.ValueRO.MovementBounds.y, motion.ValueRO.MovementBounds.y + motion.ValueRO.MovementBounds.height);
+                newPosition.x = math.clamp(newPosition.x, motion.MovementBounds.x, motion.MovementBounds.x + motion.MovementBounds.width);
+                newPosition.y = math.clamp(newPosition.y, motion.MovementBounds.y, motion.MovementBounds.y + motion.MovementBounds.height);
                 
-                transform.ValueRW.Position = newPosition;
+                transform.Position = newPosition;
+                
+                transforms[i] = transform;
+                motions[i] = motion;
             }
         }
+    }
 
-        private static void UpdateGentleMotion(ref CloudMotionComponent motion, float time)
+        public static void UpdateGentleMotion(ref CloudMotionComponent motion, float time)
         {
             // Slow, predictable sinusoidal motion
             var phaseOffset = motion.Phase;
@@ -104,7 +150,7 @@ namespace TinyWalnutGames.MetVD.Graph
             motion.Velocity = direction * 0.8f; // Constant speed
         }
 
-        private static void UpdateElectricMotion(ref CloudMotionComponent motion, float time)
+        public static void UpdateElectricMotion(ref CloudMotionComponent motion, float time)
         {
             // Rapid, energetic movement with electrical jolts
             var basePhase = motion.Phase;

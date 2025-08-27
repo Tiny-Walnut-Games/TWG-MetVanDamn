@@ -131,14 +131,22 @@ namespace TinyWalnutGames.MetVD.Graph
             _roomBiomeDataLookup.Update(ref state);
             _connectionLookup.Update(ref state);
 
-            // Process biome data requests using SystemAPI.Query
-            foreach (var (entity, request, nodeId) in SystemAPI.Query<RefRO<BiomeDataRequest>, RefRO<NodeId>>().WithEntityAccess())
+            // Process biome data requests using manual EntityQuery iteration
+            var entities = _requestQuery.ToEntityArray(Allocator.Temp);
+            var requests = _requestQuery.ToComponentDataArray<BiomeDataRequest>(Allocator.Temp);
+            var nodeIds = _requestQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
             {
-                var resolvedData = ResolveFromHierarchy(entity, request.ValueRO, nodeId.ValueRO);
+                var resolvedData = ResolveFromHierarchy(entities[i], requests[i], nodeIds[i]);
                 
                 // Add the resolved biome data component
-                _roomBiomeDataLookup[entity] = resolvedData;
+                _roomBiomeDataLookup[entities[i]] = resolvedData;
             }
+            
+            entities.Dispose();
+            requests.Dispose();
+            nodeIds.Dispose();
         }
 
         private RoomBiomeData ResolveFromHierarchy(Entity roomEntity, BiomeDataRequest request, NodeId nodeId)

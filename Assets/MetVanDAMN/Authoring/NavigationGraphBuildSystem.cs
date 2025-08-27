@@ -88,14 +88,19 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             var nodeCount = 0;
 
-            // Convert districts to navigation nodes
-            foreach (var (transform, nodeId, entity) in 
-                     SystemAPI.Query<RefRO<LocalTransform>, RefRO<NodeId>>()
-                     .WithEntityAccess()
-                     .WithNone<NavNode>())
+            // Convert districts to navigation nodes using manual query
+            if (_districtQuery.IsEmpty)
+                return nodeCount;
+                
+            var entities = _districtQuery.ToEntityArray(Allocator.Temp);
+            var transforms = _districtQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
+            var nodeIds = _districtQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
             {
-                var worldPosition = transform.ValueRO.Position;
-                var districtNodeId = nodeId.ValueRO.Value;
+                var entity = entities[i];
+                var worldPosition = transforms[i].Position;
+                var districtNodeId = nodeIds[i].Value;
 
                 // Determine biome type and polarity from existing components
                 var biomeType = BiomeType.Unknown;
@@ -120,6 +125,10 @@ namespace TinyWalnutGames.MetVD.Authoring
 
                 nodeCount++;
             }
+            
+            entities.Dispose();
+            transforms.Dispose();
+            nodeIds.Dispose();
 
             return nodeCount;
         }
@@ -129,12 +138,17 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             var linkCount = 0;
 
-            // Process all connections to create navigation links
-            foreach (var (connection, entity) in 
-                     SystemAPI.Query<RefRO<Connection>>()
-                     .WithEntityAccess())
+            // Process all connections to create navigation links using manual query
+            if (_connectionQuery.IsEmpty)
+                return linkCount;
+                
+            var entities = _connectionQuery.ToEntityArray(Allocator.Temp);
+            var connections = _connectionQuery.ToComponentDataArray<Connection>(Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
             {
-                var conn = connection.ValueRO;
+                var entity = entities[i];
+                var conn = connections[i];
                 
                 // Find source and destination entities
                 var sourceEntity = FindEntityByNodeId(ref state, conn.FromNodeId);
@@ -172,6 +186,9 @@ namespace TinyWalnutGames.MetVD.Authoring
                     }
                 }
             }
+            
+            entities.Dispose();
+            connections.Dispose();
 
             return linkCount;
         }
@@ -179,11 +196,27 @@ namespace TinyWalnutGames.MetVD.Authoring
         [BurstCompile]
         private Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
         {
-            foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
+            // Create a temporary query for finding the entity by NodeId
+            var nodeQuery = SystemAPI.QueryBuilder()
+                .WithAll<NodeId>()
+                .Build();
+                
+            var entities = nodeQuery.ToEntityArray(Allocator.Temp);
+            var nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            
+            for (int i = 0; i < entities.Length; i++)
             {
-                if (id.ValueRO.Value == nodeId)
-                    return entity;
+                if (nodeIds[i].Value == nodeId)
+                {
+                    var result = entities[i];
+                    entities.Dispose();
+                    nodeIds.Dispose();
+                    return result;
+                }
             }
+            
+            entities.Dispose();
+            nodeIds.Dispose();
             return Entity.Null;
         }
 
