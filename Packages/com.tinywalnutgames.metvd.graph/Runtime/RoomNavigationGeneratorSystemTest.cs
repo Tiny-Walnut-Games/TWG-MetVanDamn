@@ -21,7 +21,7 @@ namespace TinyWalnutGames.MetVD.Graph
             var simGroup = World.GetExistingSystemManaged<SimulationSystemGroup>();
             if (simGroup != null)
             {
-                simGroup.Update(World.Unmanaged);
+                simGroup.Update();
             }
         }
     }
