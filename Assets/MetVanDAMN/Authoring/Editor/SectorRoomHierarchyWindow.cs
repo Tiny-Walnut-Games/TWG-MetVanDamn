@@ -589,8 +589,32 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private string DetermineConnectionType(ConnectionAuthoring connection)
         {
-            // Analyze connection to determine type
-            return "Standard"; // Simplified for now
+            // Analyze connection to determine type based on properties and polarity requirements
+            var baseType = connection.type switch
+            {
+                ConnectionType.Bidirectional => "Bidirectional",
+                ConnectionType.Unidirectional => "Unidirectional", 
+                ConnectionType.Blocked => "Blocked",
+                _ => "Unknown"
+            };
+            
+            // Add polarity requirements if present
+            if (connection.requiredPolarity != Polarity.None)
+            {
+                baseType += $" ({connection.requiredPolarity})";
+            }
+            
+            // Add cost indicator for expensive traversals
+            if (connection.traversalCost > 2.0f)
+            {
+                baseType += " [High Cost]";
+            }
+            else if (connection.traversalCost < 0.5f)
+            {
+                baseType += " [Low Cost]";
+            }
+            
+            return baseType;
         }
 
         private float CalculateConnectivity(uint nodeId)
