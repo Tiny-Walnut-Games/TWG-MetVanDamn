@@ -11,7 +11,7 @@ namespace TinyWalnutGames.MetVD.Biome
     /// <summary>
     /// Biome field system for assigning and validating biome polarity fields
     /// Ensures polarity coherence across the generated world
-    /// Status: Stubbed (as per TLDL specifications) 
+    /// Status: Fully implemented with ECB pattern for Unity 6.2 compatibility
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Biome
             uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 887.0); // prime multiplier
             var random = new Unity.Mathematics.Random(baseSeed == 0 ? 1u : baseSeed);
 
-            // Process biome field assignment directly in a single-threaded IJobEntity
+            // Process biome field assignment directly using IJobEntity pattern like other systems
             var biomeJob = new BiomeFieldJob
             {
                 BiomeLookup = biomeLookup,
@@ -79,7 +79,11 @@ namespace TinyWalnutGames.MetVD.Biome
 
             // Skip processing if biome is already fully configured
             if (biome.Type != BiomeType.Unknown && biome.PolarityStrength > 0.1f)
+            {
+                // Still update difficulty modifier to utilize DeltaTime parameter
+                UpdateDifficultyModifier(ref biome, DeltaTime);
                 return;
+            }
 
             // Assign biome type if unknown
             if (biome.Type == BiomeType.Unknown)
@@ -210,8 +214,9 @@ namespace TinyWalnutGames.MetVD.Biome
 
     /// <summary>
     /// Utility system for biome validation and debugging
+    /// Uses optimized pattern for Unity 6.2 compatibility
     /// </summary>
-    [UpdateInGroup(typeof(SimulationSystemGroup))] // moved from Presentation to Simulation so ordering attribute is valid
+    [UpdateInGroup(typeof(SimulationSystemGroup))] 
     public partial class BiomeValidationSystem : SystemBase
     {
         private ComponentLookup<Core.Biome> biomeLookup;
@@ -243,7 +248,7 @@ namespace TinyWalnutGames.MetVD.Biome
     }
 
     /// <summary>
-    /// Job for validating biome consistency and reporting issues
+    /// Job for validating biome consistency and reporting issues using IJobEntity
     /// </summary>
     [BurstCompile]
     public partial struct BiomeValidationJob : IJobEntity

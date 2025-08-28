@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         protected override void OnUpdate()
         {
-            var navGraph = GetSingleton<NavigationGraph>();
+            var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
             if (!navGraph.IsReady)
                 return;
 
@@ -42,7 +42,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             
             // Update navigation graph with validation results
             navGraph.UnreachableAreaCount = unreachableCount;
-            SetSingleton(navGraph);
+            SystemAPI.SetSingleton(navGraph);
 
             // Log validation results for debugging
             if (unreachableCount > 0)
@@ -151,10 +151,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var currentNodeId = queue.Dequeue();
                 var currentEntity = FindEntityByNodeId(currentNodeId);
                 
-                if (currentEntity == Entity.Null || !HasBuffer<NavLinkBufferElement>(currentEntity))
+                if (currentEntity == Entity.Null || !SystemAPI.HasBuffer<NavLinkBufferElement>(currentEntity))
                     continue;
                     
-                var linkBuffer = GetBuffer<NavLinkBufferElement>(currentEntity);
+                var linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(currentEntity);
                 
                 for (int i = 0; i < linkBuffer.Length; i++)
                 {

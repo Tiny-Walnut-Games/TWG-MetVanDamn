@@ -60,8 +60,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             if (_districtQuery.IsEmpty)
                 return;
 
-            var navGraphEntity = GetSingletonEntity<NavigationGraph>();
-            var navGraph = GetSingleton<NavigationGraph>();
+            var navGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
+            var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
 
             // Build navigation nodes from districts
             var nodeCount = BuildNavigationNodes();
@@ -73,9 +73,9 @@ namespace TinyWalnutGames.MetVD.Authoring
             navGraph.NodeCount = nodeCount;
             navGraph.LinkCount = linkCount;
             navGraph.IsReady = true;
-            navGraph.LastRebuildTime = Time.ElapsedTime;
+            navGraph.LastRebuildTime = SystemAPI.Time.ElapsedTime;
             
-            SetSingleton(navGraph);
+            SystemAPI.SetSingleton(navGraph);
         }
 
         private int BuildNavigationNodes()
@@ -94,9 +94,9 @@ namespace TinyWalnutGames.MetVD.Authoring
                     var biomeType = BiomeType.Unknown;
                     var primaryPolarity = Polarity.None;
                     
-                    if (HasComponent<TinyWalnutGames.MetVD.Core.Biome>(entity))
+                    if (SystemAPI.HasComponent<TinyWalnutGames.MetVD.Core.Biome>(entity))
                     {
-                        var biome = GetComponent<TinyWalnutGames.MetVD.Core.Biome>(entity);
+                        var biome = SystemAPI.GetComponent<TinyWalnutGames.MetVD.Core.Biome>(entity);
                         biomeType = biome.Type;
                         primaryPolarity = biome.PrimaryPolarity;
                     }
@@ -106,7 +106,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                     EntityManager.AddComponentData(entity, navNode);
 
                     // Add navigation link buffer for outgoing connections
-                    if (!HasBuffer<NavLinkBufferElement>(entity))
+                    if (!SystemAPI.HasBuffer<NavLinkBufferElement>(entity))
                     {
                         EntityManager.AddBuffer<NavLinkBufferElement>(entity);
                     }
@@ -143,9 +143,9 @@ namespace TinyWalnutGames.MetVD.Authoring
                     var navLink = CreateNavLinkFromConnection(conn, gateConditions);
                     
                     // Add link to source entity's buffer
-                    if (HasBuffer<NavLinkBufferElement>(sourceEntity))
+                    if (SystemAPI.HasBuffer<NavLinkBufferElement>(sourceEntity))
                     {
-                        var linkBuffer = GetBuffer<NavLinkBufferElement>(sourceEntity);
+                        var linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(sourceEntity);
                         linkBuffer.Add(navLink);
                         linkCount++;
                     }
@@ -157,9 +157,9 @@ namespace TinyWalnutGames.MetVD.Authoring
                         reverseLink.FromNodeId = conn.ToNodeId;
                         reverseLink.ToNodeId = conn.FromNodeId;
                         
-                        if (HasBuffer<NavLinkBufferElement>(destEntity))
+                        if (SystemAPI.HasBuffer<NavLinkBufferElement>(destEntity))
                         {
-                            var reverseLinkBuffer = GetBuffer<NavLinkBufferElement>(destEntity);
+                            var reverseLinkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(destEntity);
                             reverseLinkBuffer.Add(reverseLink);
                             linkCount++;
                         }
@@ -189,9 +189,9 @@ namespace TinyWalnutGames.MetVD.Authoring
             var gateConditions = new GateConditionCollection();
             
             // Collect gate conditions from source entity
-            if (HasBuffer<GateConditionBufferElement>(sourceEntity))
+            if (SystemAPI.HasBuffer<GateConditionBufferElement>(sourceEntity))
             {
-                var sourceGates = GetBuffer<GateConditionBufferElement>(sourceEntity);
+                var sourceGates = SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
                 for (int i = 0; i < sourceGates.Length && i < 4; i++) // Limit to 4 conditions
                 {
                     gateConditions.Add(sourceGates[i].Value);
@@ -199,9 +199,9 @@ namespace TinyWalnutGames.MetVD.Authoring
             }
             
             // Collect gate conditions from destination entity
-            if (HasBuffer<GateConditionBufferElement>(destEntity))
+            if (SystemAPI.HasBuffer<GateConditionBufferElement>(destEntity))
             {
-                var destGates = GetBuffer<GateConditionBufferElement>(destEntity);
+                var destGates = SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
                 for (int i = 0; i < destGates.Length && i < (4 - gateConditions.Count); i++)
                 {
                     gateConditions.Add(destGates[i].Value);

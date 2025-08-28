@@ -26,8 +26,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static bool _showRooms = true;
 
         // Cached ECS data for sector/room drawing (play mode only)
-        private static System.Collections.Generic.List<int2> _sectorCoords = new();
-        private static System.Collections.Generic.List<int2> _roomCoords = new();
+        private static readonly System.Collections.Generic.List<int2> _sectorCoords = new();
+        private static readonly System.Collections.Generic.List<int2> _roomCoords = new();
         private static double _lastEcsSampleTime;
         private const double EcsSampleInterval = 0.25; // seconds
 

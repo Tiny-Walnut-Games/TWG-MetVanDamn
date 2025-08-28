@@ -22,8 +22,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private float refreshInterval = 1f;
         private double lastRefreshTime;
         
-        private List<BiomeInfo> biomeInfos = new List<BiomeInfo>();
-        private Dictionary<BiomeType, Color> biomeColors = new Dictionary<BiomeType, Color>();
+        private readonly List<BiomeInfo> biomeInfos = new List<BiomeInfo>();
+        private readonly Dictionary<BiomeType, Color> biomeColors = new Dictionary<BiomeType, Color>();
 
         [System.Serializable]
         private class BiomeInfo

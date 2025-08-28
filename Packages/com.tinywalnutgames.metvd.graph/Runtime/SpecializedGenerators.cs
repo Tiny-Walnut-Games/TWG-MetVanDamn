@@ -43,61 +43,46 @@ namespace TinyWalnutGames.MetVD.Graph
 
             var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
 
-            var patternJob = new PatternDrivenGenerationJob
+            // Use foreach instead of ScheduleParallel to avoid nullable reference issues
+            foreach (var (request, roomData, nodeId, entity) in SystemAPI.Query<RefRW<RoomGenerationRequest>, RefRO<RoomHierarchyData>, RefRO<NodeId>>().WithEntityAccess())
             {
-                SkillTagLookup = _skillTagLookup,
-                PatternBufferLookup = _patternBufferLookup,
-                ModuleBufferLookup = _moduleBufferLookup,
-                Random = random
-            };
+                if (request.ValueRO.GeneratorType != RoomGeneratorType.PatternDrivenModular || request.ValueRO.IsComplete) continue;
 
-            state.Dependency = patternJob.ScheduleParallel(state.Dependency);
-        }
-    }
+                if (!_patternBufferLookup.HasBuffer(entity)) continue;
 
-    [BurstCompile]
-    public partial struct PatternDrivenGenerationJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<SkillTag> SkillTagLookup;
-        public BufferLookup<RoomPatternElement> PatternBufferLookup;
-        [ReadOnly] public BufferLookup<RoomModuleElement> ModuleBufferLookup;
-        public Unity.Mathematics.Random Random;
+                var patterns = _patternBufferLookup[entity];
+                var bounds = roomData.ValueRO.Bounds;
 
-        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
-        {
-            if (request.GeneratorType != RoomGeneratorType.PatternDrivenModular || request.IsComplete) return;
+                // Clear existing patterns
+                patterns.Clear();
 
-            if (!PatternBufferLookup.HasBuffer(entity)) return;
+                var entityRandom = new Unity.Mathematics.Random(random.state + (uint)entity.Index);
 
-            var patterns = PatternBufferLookup[entity];
-            var bounds = roomData.Bounds;
+                // Generate skill-specific patterns based on available abilities
+                if ((request.ValueRO.AvailableSkills & Ability.Dash) != 0)
+                {
+                    GenerateDashGaps(patterns, bounds, request.ValueRO.GenerationSeed, ref entityRandom);
+                }
 
-            // Clear existing patterns
-            patterns.Clear();
+                if ((request.ValueRO.AvailableSkills & Ability.WallJump) != 0)
+                {
+                    GenerateWallClimbShafts(patterns, bounds, request.ValueRO.GenerationSeed, ref entityRandom);
+                }
 
-            // Generate skill-specific patterns based on available abilities
-            if ((request.AvailableSkills & Ability.Dash) != 0)
-            {
-                GenerateDashGaps(patterns, bounds, request.GenerationSeed);
+                if ((request.ValueRO.AvailableSkills & Ability.Grapple) != 0)
+                {
+                    GenerateGrapplePoints(patterns, bounds, request.ValueRO.GenerationSeed, ref entityRandom);
+                }
+
+                // Add skill gates that require unlocked abilities
+                GenerateSkillGates(patterns, bounds, request.ValueRO.AvailableSkills, request.ValueRO.GenerationSeed, ref entityRandom);
+
+                request.ValueRW.IsComplete = true;
             }
-
-            if ((request.AvailableSkills & Ability.WallJump) != 0)
-            {
-                GenerateWallClimbShafts(patterns, bounds, request.GenerationSeed);
-            }
-
-            if ((request.AvailableSkills & Ability.Grapple) != 0)
-            {
-                GenerateGrapplePoints(patterns, bounds, request.GenerationSeed);
-            }
-
-            // Add skill gates that require unlocked abilities
-            GenerateSkillGates(patterns, bounds, request.AvailableSkills, request.GenerationSeed);
         }
 
-        private void GenerateDashGaps(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
+        private static void GenerateDashGaps(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed, ref Unity.Mathematics.Random random)
         {
-            var random = new Unity.Mathematics.Random(seed + 1);
             var gapCount = math.max(1, bounds.width / 8);
 
             for (int i = 0; i < gapCount; i++)
@@ -116,9 +101,8 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void GenerateWallClimbShafts(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
+        private static void GenerateWallClimbShafts(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed, ref Unity.Mathematics.Random random)
         {
-            var random = new Unity.Mathematics.Random(seed + 2);
             var shaftCount = math.max(1, bounds.height / 8);
 
             for (int i = 0; i < shaftCount; i++)
@@ -135,9 +119,8 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void GenerateGrapplePoints(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed)
+        private static void GenerateGrapplePoints(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed, ref Unity.Mathematics.Random random)
         {
-            var random = new Unity.Mathematics.Random(seed + 3);
             var pointCount = math.max(1, (bounds.width * bounds.height) / 32);
 
             for (int i = 0; i < pointCount; i++)
@@ -158,10 +141,8 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void GenerateSkillGates(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, Ability availableSkills, uint seed)
+        private static void GenerateSkillGates(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, Ability availableSkills, uint seed, ref Unity.Mathematics.Random random)
         {
-            var random = new Unity.Mathematics.Random(seed + 4);
-            
             // Create gates that test multiple skills in combination
             if ((availableSkills & (Ability.Dash | Ability.WallJump)) == (Ability.Dash | Ability.WallJump))
             {
@@ -205,116 +186,101 @@ namespace TinyWalnutGames.MetVD.Graph
             _validationLookup.Update(ref state);
             _jumpConnectionLookup.Update(ref state);
 
-            var parametricJob = new ParametricChallengeJob
+            // Use foreach instead of ScheduleParallel to avoid nullable reference issues
+            foreach (var (request, roomData, nodeId, entity) in SystemAPI.Query<RefRW<RoomGenerationRequest>, RefRO<RoomHierarchyData>, RefRO<NodeId>>().WithEntityAccess())
             {
-                JumpPhysicsLookup = _jumpPhysicsLookup,
-                ValidationLookup = _validationLookup,
-                JumpConnectionLookup = _jumpConnectionLookup
-            };
+                if (request.ValueRO.GeneratorType != RoomGeneratorType.ParametricChallenge || request.ValueRO.IsComplete) continue;
 
-            state.Dependency = parametricJob.ScheduleParallel(state.Dependency);
-        }
-    }
+                if (!_jumpPhysicsLookup.HasComponent(entity)) continue;
 
-    [BurstCompile]
-    public partial struct ParametricChallengeJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<JumpPhysicsData> JumpPhysicsLookup;
-        public ComponentLookup<JumpArcValidation> ValidationLookup;
-        public BufferLookup<JumpConnectionElement> JumpConnectionLookup;
+                var jumpPhysics = _jumpPhysicsLookup[entity];
+                var bounds = roomData.ValueRO.Bounds;
 
-        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
-        {
-            if (request.GeneratorType != RoomGeneratorType.ParametricChallenge || request.IsComplete) return;
-
-            if (!JumpPhysicsLookup.HasComponent(entity)) return;
-
-            var jumpPhysics = JumpPhysicsLookup[entity];
-            var bounds = roomData.Bounds;
-
-            // Calculate optimal platform spacing based on jump physics
-            var minSpacing = JumpArcSolver.CalculateMinimumPlatformSpacing(new JumpArcPhysics
-            {
-                JumpHeight = jumpPhysics.JumpHeight,
-                JumpDistance = jumpPhysics.JumpDistance,
-                GravityScale = jumpPhysics.GravityScale,
-                DashDistance = 6.0f // Default dash distance
-            });
-            
-            // Generate platforms with physics-based constraints
-            var platformPositions = new NativeList<float2>(Allocator.Temp);
-            
-            // Start platform
-            platformPositions.Add(new float2(bounds.x + 1, bounds.y + 1));
-            
-            // Intermediate platforms based on jump constraints
-            var currentX = bounds.x + 1 + minSpacing.x;
-            while (currentX < bounds.x + bounds.width - 1)
-            {
-                var targetY = bounds.y + 1 + (platformPositions.Length % 2) * minSpacing.y;
-                var platformPos = new float2(currentX, targetY);
-                
-                // Validate this platform is reachable from the previous one
-                if (platformPositions.Length > 0)
+                // Calculate optimal platform spacing based on jump physics
+                var minSpacing = JumpArcSolver.CalculateMinimumPlatformSpacing(new JumpArcPhysics
                 {
-                    var lastPlatform = platformPositions[platformPositions.Length - 1];
-                    var physics = new JumpArcPhysics
+                    JumpHeight = jumpPhysics.JumpHeight,
+                    JumpDistance = jumpPhysics.JumpDistance,
+                    GravityScale = jumpPhysics.GravityScale,
+                    DashDistance = 6.0f // Default dash distance
+                });
+                
+                // Generate platforms with physics-based constraints
+                var platformPositions = new NativeList<float2>(Allocator.Temp);
+                
+                // Start platform
+                platformPositions.Add(new float2(bounds.x + 1, bounds.y + 1));
+                
+                // Intermediate platforms based on jump constraints
+                var currentX = bounds.x + 1 + minSpacing.x;
+                while (currentX < bounds.x + bounds.width - 1)
+                {
+                    var targetY = bounds.y + 1 + (platformPositions.Length % 2) * minSpacing.y;
+                    var platformPos = new float2(currentX, targetY);
+                    
+                    // Validate this platform is reachable from the previous one
+                    if (platformPositions.Length > 0)
                     {
-                        JumpHeight = jumpPhysics.JumpHeight,
-                        JumpDistance = jumpPhysics.JumpDistance,
-                        GravityScale = jumpPhysics.GravityScale,
-                        DashDistance = 6.0f // Default dash distance
-                    };
-                    if (JumpArcSolver.IsReachable((int2)lastPlatform, (int2)platformPos, Ability.Jump, physics))
+                        var lastPlatform = platformPositions[platformPositions.Length - 1];
+                        var physics = new JumpArcPhysics
+                        {
+                            JumpHeight = jumpPhysics.JumpHeight,
+                            JumpDistance = jumpPhysics.JumpDistance,
+                            GravityScale = jumpPhysics.GravityScale,
+                            DashDistance = 6.0f // Default dash distance
+                        };
+                        if (JumpArcSolver.IsReachable((int2)lastPlatform, (int2)platformPos, Ability.Jump, physics))
+                        {
+                            platformPositions.Add(platformPos);
+                        }
+                    }
+                    
+                    currentX += minSpacing.x;
+                }
+                
+                // End platform
+                platformPositions.Add(new float2(bounds.x + bounds.width - 1, bounds.y + 1));
+
+                // Calculate and store jump connections
+                if (_jumpConnectionLookup.HasBuffer(entity))
+                {
+                    var connections = _jumpConnectionLookup[entity];
+                    connections.Clear();
+                    
+                    for (int i = 0; i < platformPositions.Length - 1; i++)
                     {
-                        platformPositions.Add(platformPos);
+                        var from = platformPositions[i];
+                        var to = platformPositions[i + 1];
+                        
+                        var physics = new JumpArcPhysics
+                        {
+                            JumpHeight = jumpPhysics.JumpHeight,
+                            JumpDistance = jumpPhysics.JumpDistance,
+                            GravityScale = jumpPhysics.GravityScale,
+                            DashDistance = 6.0f // Default dash distance
+                        };
+                        var arcData = JumpArcSolver.CalculateJumpArc((int2)from, (int2)to, physics);
+                        float angle = math.atan2(arcData.InitialVelocity.y, arcData.InitialVelocity.x);
+                        float velocity = math.length(arcData.InitialVelocity);
+                        
+                        connections.Add(new JumpConnectionElement((int2)from, (int2)to, angle, velocity));
                     }
                 }
-                
-                currentX += minSpacing.x;
-            }
-            
-            // End platform
-            platformPositions.Add(new float2(bounds.x + bounds.width - 1, bounds.y + 1));
 
-            // Calculate and store jump connections
-            if (JumpConnectionLookup.HasBuffer(entity))
-            {
-                var connections = JumpConnectionLookup[entity];
-                connections.Clear();
-                
-                for (int i = 0; i < platformPositions.Length - 1; i++)
+                // Store validation results
+                if (_validationLookup.HasComponent(entity))
                 {
-                    var from = platformPositions[i];
-                    var to = platformPositions[i + 1];
-                    
-                    var physics = new JumpArcPhysics
-                    {
-                        JumpHeight = jumpPhysics.JumpHeight,
-                        JumpDistance = jumpPhysics.JumpDistance,
-                        GravityScale = jumpPhysics.GravityScale,
-                        DashDistance = 6.0f // Default dash distance
-                    };
-                    var arcData = JumpArcSolver.CalculateJumpArc((int2)from, (int2)to, physics);
-                    float angle = math.atan2(arcData.InitialVelocity.y, arcData.InitialVelocity.x);
-                    float velocity = math.length(arcData.InitialVelocity);
-                    
-                    connections.Add(new JumpConnectionElement((int2)from, (int2)to, angle, velocity));
+                    var validation = new JumpArcValidation(
+                        platformPositions.Length > 2,
+                        jumpPhysics.JumpDistance,
+                        jumpPhysics.JumpHeight
+                    );
+                    _validationLookup[entity] = validation;
                 }
-            }
 
-            // Store validation results
-            if (ValidationLookup.HasComponent(entity))
-            {
-                var validation = new JumpArcValidation(
-                    platformPositions.Length > 2,
-                    jumpPhysics.JumpDistance,
-                    jumpPhysics.JumpHeight
-                );
-                ValidationLookup[entity] = validation;
+                platformPositions.Dispose();
+                request.ValueRW.IsComplete = true;
             }
-
-            platformPositions.Dispose();
         }
     }
 
@@ -349,65 +315,49 @@ namespace TinyWalnutGames.MetVD.Graph
 
             var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
 
-            var weightedJob = new WeightedTilePrefabJob
+            // Use foreach instead of ScheduleParallel to avoid nullable reference issues
+            foreach (var (request, roomData, nodeId, features, waypoints, entity) in SystemAPI.Query<RefRW<RoomGenerationRequest>, RefRO<RoomHierarchyData>, RefRO<NodeId>, DynamicBuffer<RoomFeatureElement>, DynamicBuffer<NavigationWaypoint>>().WithEntityAccess())
             {
-                SecretConfigLookup = _secretConfigLookup,
-                BiomeAffinityLookup = _biomeAffinityLookup,
-                ModuleBufferLookup = _moduleBufferLookup,
-                Random = random
-            };
+                if (request.ValueRO.GeneratorType != RoomGeneratorType.WeightedTilePrefab || request.ValueRO.IsComplete) continue;
 
-            state.Dependency = weightedJob.ScheduleParallel(state.Dependency);
-        }
-    }
+                var bounds = roomData.ValueRO.Bounds;
+                var area = bounds.width * bounds.height;
 
-    [BurstCompile]
-    public partial struct WeightedTilePrefabJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<SecretAreaConfig> SecretConfigLookup;
-        [ReadOnly] public ComponentLookup<BiomeAffinityComponent> BiomeAffinityLookup;
-        [ReadOnly] public BufferLookup<RoomModuleElement> ModuleBufferLookup;
-        public Unity.Mathematics.Random Random;
+                var entityRandom = new Unity.Mathematics.Random(random.state + (uint)entity.Index);
 
-        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, 
-                          in NodeId nodeId, DynamicBuffer<RoomFeatureElement> features, 
-                          DynamicBuffer<NavigationWaypoint> waypoints)
-        {
-            if (request.GeneratorType != RoomGeneratorType.WeightedTilePrefab || request.IsComplete) return;
-
-            var bounds = roomData.Bounds;
-            var area = bounds.width * bounds.height;
-
-            // Generate main flow layout (60% of area)
-            var mainFeatureCount = (int)(area * 0.6f / 12);
-            for (int i = 0; i < mainFeatureCount; i++)
-            {
-                var weight = Random.NextFloat();
-                var featureType = SelectWeightedFeatureType(weight, request.TargetBiome);
-                
-                var pos = new int2(
-                    Random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
-                    Random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
-                );
-                
-                // Add feature to buffer
-                features.Add(new RoomFeatureElement
+                // Generate main flow layout (60% of area)
+                var mainFeatureCount = (int)(area * 0.6f / 12);
+                for (int i = 0; i < mainFeatureCount; i++)
                 {
-                    Type = featureType,
-                    Position = pos,
-                    FeatureId = (uint)(request.GenerationSeed + i)
-                });
-            }
+                    var weight = entityRandom.NextFloat();
+                    var featureType = SelectWeightedFeatureType(weight, request.ValueRO.TargetBiome);
+                    
+                    var pos = new int2(
+                        entityRandom.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
+                        entityRandom.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
+                    );
+                    
+                    // Add feature to buffer
+                    features.Add(new RoomFeatureElement
+                    {
+                        Type = featureType,
+                        Position = pos,
+                        FeatureId = (uint)(request.ValueRO.GenerationSeed + i)
+                    });
+                }
 
-            // Add secret areas if configured
-            if (SecretConfigLookup.HasComponent(entity))
-            {
-                var secretConfig = SecretConfigLookup[entity];
-                GenerateSecretAreas(bounds, secretConfig, request, waypoints);
+                // Add secret areas if configured
+                if (_secretConfigLookup.HasComponent(entity))
+                {
+                    var secretConfig = _secretConfigLookup[entity];
+                    GenerateSecretAreas(bounds, secretConfig, request.ValueRO, waypoints, ref entityRandom);
+                }
+
+                request.ValueRW.IsComplete = true;
             }
         }
 
-        private RoomFeatureType SelectWeightedFeatureType(float weight, BiomeType biome)
+        private static RoomFeatureType SelectWeightedFeatureType(float weight, BiomeType biome)
         {
             // Biome-specific weighting
             return biome switch
@@ -419,7 +369,7 @@ namespace TinyWalnutGames.MetVD.Graph
             };
         }
 
-        private void GenerateSecretAreas(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, DynamicBuffer<NavigationWaypoint> waypoints)
+        private static void GenerateSecretAreas(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, DynamicBuffer<NavigationWaypoint> waypoints, ref Unity.Mathematics.Random random)
         {
             var secretCount = (int)(bounds.width * bounds.height * config.SecretAreaPercentage / 
                                   (config.MinSecretSize.x * config.MinSecretSize.y));
@@ -427,31 +377,31 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int i = 0; i < secretCount; i++)
             {
                 // Generate hidden alcoves
-                if (config.UseAlternateRoutes && Random.NextFloat() < 0.6f)
+                if (config.UseAlternateRoutes && random.NextFloat() < 0.6f)
                 {
-                    GenerateAlternateRoute(bounds, config, request, i, waypoints);
+                    GenerateAlternateRoute(bounds, config, request, i, waypoints, ref random);
                 }
                 
                 // Generate destructible walls
-                if (config.UseDestructibleWalls && Random.NextFloat() < 0.4f)
+                if (config.UseDestructibleWalls && random.NextFloat() < 0.4f)
                 {
-                    GenerateDestructibleWall(bounds, config, request, i);
+                    GenerateDestructibleWall(bounds, config, request, i, ref random);
                 }
             }
         }
 
-        private void GenerateAlternateRoute(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, int index, DynamicBuffer<NavigationWaypoint> waypoints)
+        private static void GenerateAlternateRoute(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, int index, DynamicBuffer<NavigationWaypoint> waypoints, ref Unity.Mathematics.Random random)
         {
             // Create alternate path around main route
             var routeStart = new int2(
-                Random.NextInt(bounds.x, bounds.x + bounds.width / 3),
-                Random.NextInt(bounds.y, bounds.y + bounds.height - config.MinSecretSize.y)
+                random.NextInt(bounds.x, bounds.x + bounds.width / 3),
+                random.NextInt(bounds.y, bounds.y + bounds.height - config.MinSecretSize.y)
             );
             
             // Create actual alternate geometry - alternate path routing around obstacles
             var routeEnd = new int2(
-                Random.NextInt(bounds.x + (bounds.width * 2 / 3), bounds.x + bounds.width),
-                Random.NextInt(bounds.y, bounds.y + bounds.height - config.MinSecretSize.y)
+                random.NextInt(bounds.x + (bounds.width * 2 / 3), bounds.x + bounds.width),
+                random.NextInt(bounds.y, bounds.y + bounds.height - config.MinSecretSize.y)
             );
             
             // Generate the actual alternate route through the room
@@ -461,12 +411,12 @@ namespace TinyWalnutGames.MetVD.Graph
             AddRouteMarkers(routeStart, routeEnd, index, request, waypoints);
         }
 
-        private void GenerateDestructibleWall(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, int index)
+        private static void GenerateDestructibleWall(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, int index, ref Unity.Mathematics.Random random)
         {
             // Create wall that can be destroyed to reveal secret
             var wallPos = new int2(
-                Random.NextInt(bounds.x + 2, bounds.x + bounds.width - 2),
-                Random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
+                random.NextInt(bounds.x + 2, bounds.x + bounds.width - 2),
+                random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
             );
             
             // Create actual destructible wall geometry with proper collision and destruction logic
@@ -505,29 +455,8 @@ namespace TinyWalnutGames.MetVD.Graph
             AddDestructionEffectMarkers(effectMarker, request);
         }
 
-        /// <summary>
-        /// Convert RoomFeatureType to RoomFeatureObjectType - OBSOLETE: Use RoomFeatureType directly
-        /// </summary>
-        // Commented out obsolete conversion function
-        /*
-        private static RoomFeatureObjectType ConvertToObjectType(RoomFeatureType featureType)
-        {
-            return featureType switch
-            {
-                RoomFeatureType.Platform => RoomFeatureObjectType.Platform,
-                RoomFeatureType.Obstacle => RoomFeatureObjectType.Obstacle,
-                RoomFeatureType.Secret => RoomFeatureObjectType.Secret,
-                RoomFeatureType.PowerUp => RoomFeatureObjectType.PowerUp,
-                RoomFeatureType.HealthPickup => RoomFeatureObjectType.HealthPickup,
-                RoomFeatureType.SaveStation => RoomFeatureObjectType.SaveStation,
-                RoomFeatureType.Switch => RoomFeatureObjectType.Switch,
-                _ => RoomFeatureObjectType.Platform // Default fallback
-            };
-        }
-        */
-
         // Helper methods for fully implemented secret generation
-        private void GeneratePathBetweenPoints(int2 start, int2 end, RectInt bounds, RoomGenerationRequest request)
+        private static void GeneratePathBetweenPoints(int2 start, int2 end, RectInt bounds, RoomGenerationRequest request)
         {
             // Generate a navigable path between two points using simple line algorithm
             var direction = end - start;
@@ -548,7 +477,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddRouteMarkers(int2 start, int2 end, int index, RoomGenerationRequest request, DynamicBuffer<NavigationWaypoint> waypoints)
+        private static void AddRouteMarkers(int2 start, int2 end, int index, RoomGenerationRequest request, DynamicBuffer<NavigationWaypoint> waypoints)
         {
             // Add navigation waypoint markers for AI pathfinding as actual buffer elements
             waypoints.Add(new NavigationWaypoint 
@@ -566,7 +495,7 @@ namespace TinyWalnutGames.MetVD.Graph
             });
         }
 
-        private void CreateWallCollisionGeometry(CollisionGeometry collisionData, RoomGenerationRequest request)
+        private static void CreateWallCollisionGeometry(CollisionGeometry collisionData, RoomGenerationRequest request)
         {
             // Store collision geometry data for processing by CollisionSystem
             // In ECS, this would be added to a collision buffer component on the room entity
@@ -576,7 +505,7 @@ namespace TinyWalnutGames.MetVD.Graph
             // that creates actual physics collision components for Unity Physics
         }
 
-        private void AddDestructibleProperties(DestructibleWallProperties properties, RoomGenerationRequest request)
+        private static void AddDestructibleProperties(DestructibleWallProperties properties, RoomGenerationRequest request)
         {
             // Store destructible properties for processing by DestructibleSystem
             // In ECS, this would add destructible components with health, damage thresholds,
@@ -589,7 +518,7 @@ namespace TinyWalnutGames.MetVD.Graph
             // - Links to particle effect systems
         }
 
-        private void AddDestructionEffectMarkers(EffectSpawnMarker effectMarker, RoomGenerationRequest request)
+        private static void AddDestructionEffectMarkers(EffectSpawnMarker effectMarker, RoomGenerationRequest request)
         {
             // Store effect spawn data for processing by EffectSystem
             // In ECS, this would create effect spawn entities that trigger
@@ -602,7 +531,7 @@ namespace TinyWalnutGames.MetVD.Graph
             // - Links to audio and visual effect systems
         }
 
-        private void AddPathMarker(int2 point, RoomGenerationRequest request)
+        private static void AddPathMarker(int2 point, RoomGenerationRequest request)
         {
             // Store path marker data for processing by NavigationMeshSystem
             // In ECS, this would contribute to navigation mesh generation by creating

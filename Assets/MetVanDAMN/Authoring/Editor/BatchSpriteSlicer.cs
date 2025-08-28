@@ -28,54 +28,52 @@ namespace TinyWalnutGames.Tools.Editor
     /// </summary>
     public class BatchSpriteSlicer : EditorWindow
     {
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
         /// <summary>
         /// Whether to use cell size for slicing or fixed columns/rows.
         /// * If true, cellSize will be used to determine the size of each sprite slice.
         /// * If false, columns and rows will be used instead.
         /// </summary>
-        private bool useCellSize = false;
+        [SerializeField] private bool useCellSize = false;
 
         /// <summary>
         /// Size of each cell for slicing when useCellSize is true.
         /// </summary>
-        private Vector2 cellSize = new(64, 64);
+        [SerializeField] private Vector2 cellSize = new(64, 64);
 
         /// <summary>
-        /// Number of columns and rows for slicing when useCellSize is false.
+        /// Number of columns for slicing when useCellSize is false.
         /// </summary>
-        private int columns = 12;
+        [SerializeField] private int columns = 12;
 
         /// <summary>
         /// Number of rows for slicing when useCellSize is false.
         /// </summary>
-        private int rows = 8;
+        [SerializeField] private int rows = 8;
 
         /// <summary>
         /// Alignment for the pivot of the sliced sprites.
         /// </summary>
-        private SpriteAlignment pivotAlignment = SpriteAlignment.BottomCenter;
+        [SerializeField] private SpriteAlignment pivotAlignment = SpriteAlignment.BottomCenter;
 
         /// <summary>
         /// Whether to ignore empty rectangles when slicing.
         /// </summary>
-        private bool ignoreEmptyRects = true;
+        [SerializeField] private bool ignoreEmptyRects = true;
 
         /// <summary>
         /// List of copied sprite rectangles from the last copy operation.
         /// We're now including custom physics shapes (outlines) as well
         /// </summary>
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
         private static List<SpriteRect> copiedRects = null;
         private static readonly Dictionary<string, List<Vector2[]>> copiedOutlines = new();
-#else
-        private static bool spriteEditorNotAvailable = true;
-#endif
 
         /// <summary>
         /// Width and height of the texture from which the last copy operation was performed.
         /// </summary>
         private static int copiedTexWidth = 0;
         private static int copiedTexHeight = 0;
+#endif
 
         /// <summary>
         /// Opens the Batch Sprite Slicer window in the Unity Editor.
@@ -102,8 +100,7 @@ namespace TinyWalnutGames.Tools.Editor
             {
                 UnityEditor.PackageManager.UI.Window.Open("com.unity.2d.sprite");
             }
-            return;
-#endif
+#else
             
             GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
@@ -152,11 +149,7 @@ namespace TinyWalnutGames.Tools.Editor
                 "Copy the slice layout from the first selected texture. " +
                 "Useful for applying the same slicing to multiple textures.", MessageType.None);
 
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
             using (new EditorGUI.DisabledScope(copiedRects == null))
-#else
-            using (new EditorGUI.DisabledScope(true))
-#endif
             {
                 if (GUILayout.Button(new GUIContent(
                     "Paste Rect Layout",
@@ -216,6 +209,36 @@ namespace TinyWalnutGames.Tools.Editor
                 "Slice all selected textures into a grid based on the current settings. " +
                 "If 'Ignore Empty Rects' is enabled, fully transparent cells will be skipped.",
                 MessageType.None);
+
+            // Debug information section - utilizing all fields for transparency
+            EditorGUILayout.Space();
+            GUILayout.Label("Debug Information", EditorStyles.boldLabel);
+            
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.LabelField("Current Settings:", EditorStyles.miniLabel);
+                EditorGUILayout.LabelField($"  Mode: {(useCellSize ? "Cell Size" : "Grid")}", EditorStyles.miniLabel);
+                if (useCellSize)
+                {
+                    EditorGUILayout.LabelField($"  Cell Size: {cellSize.x}x{cellSize.y}", EditorStyles.miniLabel);
+                }
+                else
+                {
+                    EditorGUILayout.LabelField($"  Grid: {columns}x{rows}", EditorStyles.miniLabel);
+                }
+                EditorGUILayout.LabelField($"  Pivot: {pivotAlignment}", EditorStyles.miniLabel);
+                EditorGUILayout.LabelField($"  Ignore Empty: {ignoreEmptyRects}", EditorStyles.miniLabel);
+                
+                if (copiedRects != null)
+                {
+                    EditorGUILayout.LabelField($"  Copied Slices: {copiedRects.Count} from {copiedTexWidth}x{copiedTexHeight}", EditorStyles.miniLabel);
+                }
+                else
+                {
+                    EditorGUILayout.LabelField("  No slices copied", EditorStyles.miniLabel);
+                }
+            }
+#endif
         }
 
         /// <summary>
@@ -510,7 +533,7 @@ namespace TinyWalnutGames.Tools.Editor
                 var factory = new SpriteDataProviderFactories(); // Create a new instance of SpriteDataProviderFactories to access sprite data providers
                 factory.Init(); // Initialize the factory to ensure it can provide data providers
                 var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); // Get the sprite editor data provider for the texture importer
-                dataProvider.InitSpriteEditorDataProvider(); // Initialize the sprite editor data provider to access sprite data
+                dataProvider.InitSpriteEditorDataProvider(); // Initialize the sprite editor dataProvider to access sprite data
 
                 List<SpriteRect> spriteRects = new(); // Create a list to hold the sprite rectangles
 
@@ -637,5 +660,5 @@ namespace TinyWalnutGames.Tools.Editor
             };
         }
     }
-#endif
 }
+#endif
