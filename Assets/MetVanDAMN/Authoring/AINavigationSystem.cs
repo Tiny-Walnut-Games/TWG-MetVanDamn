@@ -398,7 +398,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             
             Entities.ForEach((Entity entity, in NodeId id) =>
             {
-                if (id.Value == nodeId)
+                if (id._value == nodeId)
                     foundEntity = entity;
             }).WithoutBurst().Run();
             

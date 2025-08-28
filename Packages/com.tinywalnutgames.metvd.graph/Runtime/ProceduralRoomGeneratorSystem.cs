@@ -107,7 +107,7 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             var hash = new Unity.Mathematics.Random((uint)(worldSeed == 0 ? 1 : worldSeed));
             hash.NextUInt();
-            return hash.NextUInt() ^ nodeId.Value ^ ((uint)nodeId.Coordinates.x << 16) ^ ((uint)nodeId.Coordinates.y << 8);
+            return hash.NextUInt() ^ nodeId._value ^ ((uint)nodeId.Coordinates.x << 16) ^ ((uint)nodeId.Coordinates.y << 8);
         }
         private static BiomeAffinity DetermineBiomeAffinity(NodeId nodeId, ref Unity.Mathematics.Random random)
         {
@@ -145,9 +145,26 @@ namespace TinyWalnutGames.MetVD.Graph
         }
         private static RoomTemplate CreateRoomTemplate(RoomGeneratorType generatorType, RoomHierarchyData hierarchy, BiomeAffinity biome, ref Unity.Mathematics.Random random)
         {
+            var biomeSizeModifier = biome switch
+            {
+                BiomeAffinity.Desert => 0.95f, // Harsh but navigable, less forgiving than it looks
+                BiomeAffinity.Forest => 1.15f, // Dense, resource-rich, full of traversal options
+                BiomeAffinity.Mountain => 1.05f, // Vertical challenge, but stable terrain.
+                BiomeAffinity.Ocean => 0.6f, // Movement constrained, requires special traversal.
+                BiomeAffinity.Sky => 1.25f, // High mobility, rare access, peak affinity.
+                BiomeAffinity.TechZone => 0.7f, // Controlled chaos. High risk, low natural flow.
+                BiomeAffinity.Underground => 0.85f, // Tight corridors, limited visibility, but stable.
+                BiomeAffinity.Volcanic => 0.5f, // Hostile, unstable, traversal punished.
+                BiomeAffinity.Any => 0f, // 	Null glyph. Should never be used directly.
+                _ => throw new System.NotImplementedException() // When adding biomes, update: DetermineLayoutOrientation, SelectRoomGenerator, and ConvertBiomeTypeToAffinity in ProceduralRoomGeneration.cs
+            };                                                  // Also check TerrainAndSkyGenerators.cs for BiomeType switches if adding new terrain types.
             var bounds = hierarchy.Bounds;
-            var minSize = new int2(math.max(2, bounds.width / 2), math.max(2, bounds.height / 2));
-            var maxSize = new int2(bounds.width, bounds.height);
+            int2 baseMinSize = new(math.max(2, bounds.width / 2), math.max(2, bounds.height / 2));
+            int2 baseMaxSize = new(bounds.width, bounds.height);
+
+            // Apply biome size modifier while respecting minimums
+            int2 minSize = (int2)math.max((float2)baseMinSize, (float2)baseMinSize * biomeSizeModifier);
+            int2 maxSize = (int2)math.max((float2)minSize, (float2)baseMaxSize * biomeSizeModifier);
             var movementTags = GenerateMovementCapabilities(generatorType, hierarchy.Type, ref random);
             float secretPercent = hierarchy.Type switch
             {

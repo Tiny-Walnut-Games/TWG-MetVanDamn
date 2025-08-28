@@ -182,7 +182,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             
             Entities.WithAll<NodeId>().ForEach((Entity entity, in NodeId id) =>
             {
-                if (id.Value == nodeId)
+                if (id._value == nodeId)
                     foundEntity = entity;
             }).WithoutBurst().Run();
             
@@ -423,7 +423,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             foreach (var entity in entities)
             {
                 var id = entityManager.GetComponentData<NodeId>(entity);
-                if (id.Value == nodeId)
+                if (id._value == nodeId)
                 {
                     entities.Dispose();
                     return entity;

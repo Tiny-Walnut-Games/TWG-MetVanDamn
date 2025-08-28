@@ -28,6 +28,12 @@ namespace TinyWalnutGames.Tools.Editor
     /// </summary>
     public class BatchSpriteSlicer : EditorWindow
     {
+        // 🔥 LIBERATION: Move assembly caching fields OUTSIDE conditional compilation blocks
+        // These need to be available in BOTH compilation scenarios
+        private static string[] _cachedAssemblyNames = null;
+        private static bool _has2DSpriteAssembly = false;
+        private static bool _assemblyInfoCached = false;
+
 #if SPRITE_EDITOR_FEATURES_AVAILABLE
         /// <summary>
         /// Whether to use cell size for slicing or fixed columns/rows.
@@ -107,19 +113,51 @@ namespace TinyWalnutGames.Tools.Editor
             EditorGUILayout.LabelField("2D Package Required: com.unity.2d.sprite");
             EditorGUILayout.LabelField("Current Assembly References:");
             
-            var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
-            bool found2DSprite = false;
-            foreach (var assembly in assemblies)
+            // 🔥 PERFORMANCE FIX: Cache assembly information on first access
+            CacheAssemblyInformationIfNeeded();
+            
+            // 🔥 NOW WORKING: Display each assembly name without using system reflection
+            if (_cachedAssemblyNames != null && _cachedAssemblyNames.Length > 0)
             {
-                if (assembly.FullName.Contains("UnityEditor.U2D.Sprites"))
+                // Display relevant assemblies first
+                if (_has2DSpriteAssembly)
                 {
-                    EditorGUILayout.LabelField("  ✓ " + assembly.GetName().Name);
-                    found2DSprite = true;
+                    EditorGUILayout.LabelField("  ✓ UnityEditor.U2D.Sprites", EditorStyles.miniLabel);
+                }
+                
+                // Display other 2D/Sprite related assemblies
+                foreach (string assemblyName in _cachedAssemblyNames)
+                {
+                    if (Is2DOrSpriteRelatedAssembly(assemblyName))
+                    {
+                        string status = assemblyName.Contains("U2D.Sprites") ? "✓" : "•";
+                        EditorGUILayout.LabelField($"  {status} {assemblyName}", EditorStyles.miniLabel);
+                    }
+                }
+                
+                // Show total assembly count
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField($"Total assemblies loaded: {_cachedAssemblyNames.Length}", EditorStyles.miniLabel);
+                
+                // Optional: Show all assemblies in a collapsible section
+                if (EditorGUILayout.Foldout(false, "Show All Assemblies (Click to expand)"))
+                {
+                    EditorGUI.indentLevel++;
+                    foreach (string assemblyName in _cachedAssemblyNames)
+                    {
+                        EditorGUILayout.LabelField($"• {assemblyName}", EditorStyles.miniLabel);
+                    }
+                    EditorGUI.indentLevel--;
                 }
             }
-            
-            if (!found2DSprite)
+            else
             {
+                EditorGUILayout.LabelField("  Assembly information not available", EditorStyles.helpBox);
+            }
+
+            if (!_has2DSpriteAssembly)
+            {
+                EditorGUILayout.Space();
                 EditorGUILayout.LabelField("  ✗ UnityEditor.U2D.Sprites assembly not found", EditorStyles.helpBox);
             }
 #else
@@ -261,6 +299,72 @@ namespace TinyWalnutGames.Tools.Editor
                 }
             }
 #endif
+        }
+
+        // 🔥 UNIVERSAL METHODS: Available in both compilation scenarios
+        
+        /// <summary>
+        /// 🔥 PERFORMANCE OPTIMIZATION: Cache assembly information once to avoid reflection in GUI loops
+        /// This method is called only when needed and caches results for subsequent GUI redraws
+        /// </summary>
+        private static void CacheAssemblyInformationIfNeeded()
+        {
+            if (_assemblyInfoCached)
+                return; // Already cached, no need to check again
+
+            var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+            var assemblyNames = new List<string>();
+            bool found2DSprite = false;
+
+            // Perform reflection ONCE, not in every GUI redraw
+            for (int i = 0; i < assemblies.Length; i++)
+            {
+                var assembly = assemblies[i];
+                var assemblyName = assembly.GetName().Name; // This is the reflection call we're caching
+                
+                assemblyNames.Add(assemblyName);
+                
+                if (assembly.FullName.Contains("UnityEditor.U2D.Sprites"))
+                {
+                    found2DSprite = true;
+                }
+            }
+
+            // Cache the results
+            _cachedAssemblyNames = assemblyNames.ToArray();
+            _has2DSpriteAssembly = found2DSprite;
+            _assemblyInfoCached = true;
+        }
+
+        /// <summary>
+        /// 🔥 HELPER METHOD: Check if assembly name is related to 2D/Sprite functionality
+        /// No reflection - just string analysis of cached assembly names
+        /// </summary>
+        private static bool Is2DOrSpriteRelatedAssembly(string assemblyName)
+        {
+            if (string.IsNullOrEmpty(assemblyName))
+                return false;
+
+            // Check for 2D/Sprite related assembly patterns
+            return assemblyName.Contains("2D") ||
+                   assemblyName.Contains("Sprite") ||
+                   assemblyName.Contains("U2D") ||
+                   assemblyName.Contains("TextMeshPro") ||
+                   assemblyName.Contains("Tilemap") ||
+                   assemblyName.Contains("SpriteShape") ||
+                   assemblyName.Contains("Animation") ||
+                   assemblyName.Contains("UnityEngine.UI");
+        }
+
+        /// <summary>
+        /// 🔥 RESET CACHE: Call this if assemblies might have changed (e.g., after package installation)
+        /// This forces a refresh of the cached assembly information
+        /// </summary>
+        public static void RefreshAssemblyCache()
+        {
+            _assemblyInfoCached = false;
+            _cachedAssemblyNames = null;
+            _has2DSpriteAssembly = false;
         }
 
         /// <summary>

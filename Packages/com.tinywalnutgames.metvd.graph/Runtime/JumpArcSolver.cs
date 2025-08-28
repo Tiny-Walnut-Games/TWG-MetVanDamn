@@ -18,7 +18,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Calculate minimum platform spacing based on jump physics
         /// </summary>
         [BurstCompile]
-        public static int2 CalculateMinimumPlatformSpacing(JumpArcPhysics physics)
+        public static int2 CalculateMinimumPlatformSpacing(in JumpArcPhysics physics)
         {
             // Calculate horizontal distance based on jump capabilities
             var horizontalSpacing = (int)math.ceil(physics.JumpDistance * 0.8f); // 80% of max distance for safety
@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Check if a destination is reachable from a starting position
         /// </summary>
         [BurstCompile]
-        public static bool IsReachable(int2 from, int2 to, Ability availableAbilities, JumpArcPhysics physics)
+        public static bool IsReachable(in int2 from, in int2 to, Ability availableAbilities, in JumpArcPhysics physics)
         {
             var distance = math.distance((float2)from, (float2)to);
             var heightDiff = to.y - from.y;
@@ -82,7 +82,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Calculate jump arc trajectory data
         /// </summary>
         [BurstCompile]
-        public static JumpArcData CalculateJumpArc(int2 from, int2 to, JumpArcPhysics physics)
+        public static JumpArcData CalculateJumpArc(in int2 from, in int2 to, in JumpArcPhysics physics)
         {
             var delta = (float2)(to - from);
             var distance = math.length(delta);
@@ -117,8 +117,8 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Validate that a room's key areas are reachable using given movement abilities
         /// </summary>
         [BurstCompile]
-        public static bool ValidateRoomReachability(int2 entrance, NativeArray<int2> criticalAreas, 
-                                                   Ability availableAbilities, JumpArcPhysics physics, 
+        public static bool ValidateRoomReachability(in int2 entrance, NativeArray<int2> criticalAreas, 
+                                                   Ability availableAbilities, in JumpArcPhysics physics, 
                                                    RectInt roomBounds, Allocator allocator)
         {
             // implement an array to use with allocator
@@ -149,7 +149,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 }
                 
                 // Check direct reachability
-                if (!IsReachable(entrance, criticalArea, availableAbilities, physics))
+                if (!IsReachable(in entrance, in criticalArea, availableAbilities, in physics))
                 {
                     // Try pathfinding through other critical areas
                     // how do we utilise allocator here? We could use it for temporary arrays if needed
@@ -160,8 +160,8 @@ namespace TinyWalnutGames.MetVD.Graph
                         if (i == j) continue;
                         
                         var intermediate = criticalAreas[j];
-                        if (IsReachable(entrance, intermediate, availableAbilities, physics) &&
-                            IsReachable(intermediate, criticalArea, availableAbilities, physics))
+                        if (IsReachable(in entrance, in intermediate, availableAbilities, in physics) &&
+                            IsReachable(in intermediate, in criticalArea, availableAbilities, in physics))
                         {
                             foundPath = true;
                             break;
@@ -182,14 +182,14 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Validate reachability using a single critical area (convenience overload)
         /// </summary>
         [BurstCompile]
-        public static bool ValidateRoomReachability(int2 entrance, int2 criticalArea, 
-                                                   Ability availableAbilities, JumpArcPhysics physics, 
+        public static bool ValidateRoomReachability(in int2 entrance, in int2 criticalArea, 
+                                                   Ability availableAbilities, in JumpArcPhysics physics, 
                                                    RectInt roomBounds, Allocator allocator)
         {
             var tempArray = new NativeArray<int2>(1, allocator);
             tempArray[0] = criticalArea;
             
-            bool result = ValidateRoomReachability(entrance, tempArray, availableAbilities, physics, roomBounds, allocator);
+            bool result = ValidateRoomReachability(in entrance, tempArray, availableAbilities, in physics, roomBounds, allocator);
             
             tempArray.Dispose();
             return result;
@@ -199,9 +199,9 @@ namespace TinyWalnutGames.MetVD.Graph
         /// Check if a position is reachable from another position (convenience alias for IsReachable)
         /// </summary>
         [BurstCompile]
-        public static bool IsPositionReachable(int2 from, int2 to, Ability availableAbilities, JumpArcPhysics physics)
+        public static bool IsPositionReachable(in int2 from, in int2 to, Ability availableAbilities, in JumpArcPhysics physics)
         {
-            return IsReachable(from, to, availableAbilities, physics);
+            return IsReachable(in from, in to, availableAbilities, in physics);
         }
     }
     

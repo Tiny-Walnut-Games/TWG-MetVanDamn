@@ -71,7 +71,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 {
                     districtEntities[districtIndex] = entities[i];
                     districtPositions[districtIndex] = nodeIds[i].Coordinates;
-                    districtNodeIds[districtIndex] = nodeIds[i].Value;
+                    districtNodeIds[districtIndex] = nodeIds[i]._value;
                     districtIndex++;
                 }
             }

@@ -277,7 +277,7 @@ namespace TinyWalnutGames.MetVD.Samples
             {
                 if (nodeId.Level == 0) // Districts only
                 {
-                    Debug.Log($"   District {nodeId.Value}: ({nodeId.Coordinates.x}, {nodeId.Coordinates.y})");
+                    Debug.Log($"   District {nodeId._value}: ({nodeId.Coordinates.x}, {nodeId.Coordinates.y})");
                 }
             }
             
@@ -299,7 +299,7 @@ namespace TinyWalnutGames.MetVD.Samples
                 
                 if (nodeId.Level == 0 && connectionBuffer.Length > 0) // Districts only
                 {
-                    Debug.Log($"   District {nodeId.Value} -> {connectionBuffer.Length} connections");
+                    Debug.Log($"   District {nodeId._value} -> {connectionBuffer.Length} connections");
                     totalConnections += connectionBuffer.Length;
                 }
             }

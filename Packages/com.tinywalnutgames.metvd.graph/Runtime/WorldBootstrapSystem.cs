@@ -258,7 +258,7 @@ namespace TinyWalnutGames.MetVD.Graph
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (config.LogGenerationSteps)
             {
-                UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} (Strength: {strength:F2}, Gradient: {gradient:F2}, Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:F2})");
+                UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} (Strength: {strength:G}, Gradient: {gradient:G}, Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:G})");
             }
 #endif
         }

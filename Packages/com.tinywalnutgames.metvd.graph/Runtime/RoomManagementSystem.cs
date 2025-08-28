@@ -123,7 +123,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static uint CalculateSpatialHash(NodeId nodeId)
         {
-            return nodeId.Value ^ ((uint)nodeId.Coordinates.x << 16) ^ ((uint)nodeId.Coordinates.y << 8) ^ nodeId.ParentId;
+            return nodeId._value ^ ((uint)nodeId.Coordinates.x << 16) ^ ((uint)nodeId.Coordinates.y << 8) ^ nodeId.ParentId;
         }
     }
 
@@ -175,7 +175,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 var progression = new ProgressionAnalysis(nodeId);
 
                 // Add room management components using optimized data
-                var random = new Unity.Mathematics.Random((uint)(nodeId.Value + 12345));
+                var random = new Unity.Mathematics.Random((uint)(nodeId._value + 12345));
 
                 // Add room state data with progression-based secret count
                 var totalSecrets = DetermineSecretCount(roomData.Type, progression, ref random);
@@ -260,7 +260,7 @@ namespace TinyWalnutGames.MetVD.Graph
             var distanceFromOrigin = math.sqrt(coords.x * coords.x + coords.y * coords.y);
             
             // Create a hash from nodeId properties for deterministic selection
-            var biomeHash = (uint)(nodeId.Value ^ (coords.x << 16) ^ (coords.y << 8) ^ nodeId.ParentId);
+            var biomeHash = (uint)(nodeId._value ^ (coords.x << 16) ^ (coords.y << 8) ^ nodeId.ParentId);
             
             // Apply spatial influence to create biome regions
             // Closer to origin = more hub-like biomes, further = more exotic/dangerous
@@ -324,7 +324,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
 
             // Use nodeId hash to determine polarity in a deterministic way
-            var hash = (uint)(nodeId.Value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8));
+            var hash = (uint)(nodeId._value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8));
 
             // Select base polarity using spatial hash
             var polarityIndex = (int)(hash % (uint)validPolarities.Count);
@@ -378,7 +378,7 @@ namespace TinyWalnutGames.MetVD.Graph
             // Add polarity access based on distance and nodeId hash
             if (distanceFromOrigin > 15)
             {
-                var polarityHash = nodeId.Value & 0xFF;
+                var polarityHash = nodeId._value & 0xFF;
                 if ((polarityHash & 0x01) != 0) skills |= Ability.SunAccess;
                 if ((polarityHash & 0x02) != 0) skills |= Ability.MoonAccess;
                 if ((polarityHash & 0x04) != 0) skills |= Ability.HeatAccess;
@@ -395,7 +395,7 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             // Create a hash that combines nodeId properties with the random seed
             // This ensures rooms at the same nodeId generate consistently, but with variation
-            return (uint)(nodeId.Value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8) ^ nodeId.ParentId ^ randomSeed);
+            return (uint)(nodeId._value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8) ^ nodeId.ParentId ^ randomSeed);
         }
 
         ///// <summary>

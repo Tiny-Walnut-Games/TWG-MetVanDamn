@@ -68,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
             // Deterministic micro-variation derived from generation seed & node for subtle per-room uniqueness.
             // This provides a meaningful semantic use of genStatus beyond flag setting/timing.
-            var seedMix = genStatus.GenerationSeed ^ (nodeId.Value * 0x9E3779B9u);
+            var seedMix = genStatus.GenerationSeed ^ (nodeId._value * 0x9E3779B9u);
             var rand = new Unity.Mathematics.Random(seedMix == 0 ? 1u : seedMix);
             // Apply small stable variations (kept subtle to avoid test flakiness).
             cameraPreset.FieldOfView += rand.NextFloat(-1.5f, 1.5f); // +/-1.5 degrees wobble
@@ -80,7 +80,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
             var zoneData = new CinemachineZoneData
             {
-                RoomNodeId = nodeId.Value,
+                RoomNodeId = nodeId._value,
                 CameraPosition = cameraPosition,
                 ConfinerBounds = confinerBounds,
                 CameraPreset = cameraPreset,
@@ -216,7 +216,7 @@ namespace TinyWalnutGames.MetVD.Graph
             var gameObjectData = new CinemachineGameObjectReference
             {
                 RoomEntity = roomEntity,
-                CameraName = $"VCam_Room_{nodeId.Value}",
+                CameraName = $"VCam_Room_{nodeId._value}",
                 ShouldCreateGameObject = true,
                 GameObjectInstanceId = 0,
                 FieldOfView = zoneData.CameraPreset.FieldOfView,

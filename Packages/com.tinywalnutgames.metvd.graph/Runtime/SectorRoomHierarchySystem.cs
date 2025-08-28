@@ -51,7 +51,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 float jitterX = random.NextFloat(-0.3f, 0.3f); float jitterY = random.NextFloat(-0.3f, 0.3f);
                 int2 sectorLocalCoords = new((int)(gridX + jitterX),(int)(gridY + jitterY));
                 var sectorEntity = entityManager.CreateEntity();
-                var sectorNodeId = new NodeId((uint)(districtNodeId.Value * HierarchyConstants.SectorIdMultiplier + sectorIndex),1,districtNodeId.Value,sectorLocalCoords);
+                var sectorNodeId = new NodeId((uint)(districtNodeId._value * HierarchyConstants.SectorIdMultiplier + sectorIndex),1,districtNodeId._value,sectorLocalCoords);
                 entityManager.AddComponentData(sectorEntity, sectorNodeId);
                 CreateRoomsInSector(entityManager, sectorNodeId, ref random);
             }
@@ -90,7 +90,7 @@ namespace TinyWalnutGames.MetVD.Graph
         private static void CreateLeafRoom(EntityManager entityManager, NodeId sectorNodeId, RectInt bounds, int roomIndex, ref Unity.Mathematics.Random random)
         {
             var roomEntity = entityManager.CreateEntity();
-            var roomNodeId = new NodeId((uint)(sectorNodeId.Value * HierarchyConstants.RoomsPerSectorMultiplier + roomIndex),2, sectorNodeId.Value,new int2(bounds.x + bounds.width/2, bounds.y + bounds.height/2));
+            var roomNodeId = new NodeId((uint)(sectorNodeId._value * HierarchyConstants.RoomsPerSectorMultiplier + roomIndex),2, sectorNodeId._value,new int2(bounds.x + bounds.width/2, bounds.y + bounds.height/2));
             RoomType roomType = RoomType.Normal;
             if (roomIndex == 0)
                 roomType = random.NextFloat() > 0.7f ? RoomType.Entrance : RoomType.Normal;

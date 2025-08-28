@@ -44,7 +44,7 @@ namespace TinyWalnutGames.MetVD.Core
                 if (!em.HasBuffer<ConnectionBufferElement>(edge.From))
                     em.AddBuffer<ConnectionBufferElement>(edge.From);
                 var fromBuf = em.GetBuffer<ConnectionBufferElement>(edge.From);
-                var forward = new Connection(fromNode.Value, toNode.Value, edge.Type, edge.RequiredPolarity, edge.TraversalCost);
+                var forward = new Connection(fromNode._value, toNode._value, edge.Type, edge.RequiredPolarity, edge.TraversalCost);
                 if (!Contains(fromBuf, forward))
                     fromBuf.Add(forward);
 
@@ -53,7 +53,7 @@ namespace TinyWalnutGames.MetVD.Core
                     if (!em.HasBuffer<ConnectionBufferElement>(edge.To))
                         em.AddBuffer<ConnectionBufferElement>(edge.To);
                     var toBuf = em.GetBuffer<ConnectionBufferElement>(edge.To);
-                    var reverse = new Connection(toNode.Value, fromNode.Value, edge.Type, edge.RequiredPolarity, edge.TraversalCost);
+                    var reverse = new Connection(toNode._value, fromNode._value, edge.Type, edge.RequiredPolarity, edge.TraversalCost);
                     if (!Contains(toBuf, reverse))
                         toBuf.Add(reverse);
                 }

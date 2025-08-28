@@ -277,45 +277,46 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private static float AnalyzeNeighborhoodConnectivity(int2 coordinates)
         {
-            // Advanced neighborhood connectivity using graph analysis and real biome adjacency checks
+            // Advanced neighborhood connectivity using simplified analysis
+            // Simplified version to avoid managed types in Burst jobs
             float connectivity = 1f;
             
-            // Calculate biome adjacency matrix for sophisticated neighbor analysis  
-            var adjacencyMap = BuildBiomeAdjacencyMap(coordinates, 3); // 3x3 radius
+            // Simple grid-based connectivity analysis without managed Dictionary
+            float totalConnections = 0f;
+            int connectionCount = 0;
             
-            // Analyze connection patterns using graph theory metrics
-            float clusteringCoefficient = CalculateClusteringCoefficient(adjacencyMap);
-            float pathConnectivity = CalculatePathConnectivity(adjacencyMap);
-            float centralityScore = CalculateBetweennessCentrality(coordinates, adjacencyMap);
+            // Analyze local neighborhood pattern (3x3 grid)
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if (dx == 0 && dy == 0) continue; // Skip center
+                    
+                    int2 position = coordinates + new int2(dx, dy);
+                    float connectionStrength = DetermineBiomeConnectionStrength(position, coordinates);
+                    totalConnections += connectionStrength;
+                    connectionCount++;
+                }
+            }
+            
+            // Calculate average connectivity
+            float averageConnectivity = connectionCount > 0 ? totalConnections / connectionCount : 0.5f;
+            
+            // Analyze connection patterns using simplified metrics
+            float pathConnectivity = CalculatePathConnectivity(coordinates);
+            float centralityScore = CalculateBetweennessCentrality(coordinates);
             
             // Weight different connectivity aspects
-            connectivity *= clusteringCoefficient * 0.4f + pathConnectivity * 0.4f + centralityScore * 0.2f;
+            connectivity *= averageConnectivity * 0.4f + pathConnectivity * 0.4f + centralityScore * 0.2f;
             
             // Bonus for grid alignment and symmetrical patterns
-            float symmetryBonus = CalculateSymmetryBonus(adjacencyMap);
+            float symmetryBonus = CalculateSymmetryBonus(coordinates);
             connectivity *= (1f + symmetryBonus * 0.15f);
             
             return math.clamp(connectivity, 0.2f, 1.5f); // Allow some boost for excellent connectivity
         }
 
-        private static Dictionary<int2, BiomeConnectionType> BuildBiomeAdjacencyMap(int2 center, int radius)
-        {
-            var adjacencyMap = new Dictionary<int2, BiomeConnectionType>();
-            
-            for (int dx = -radius; dx <= radius; dx++)
-            {
-                for (int dy = -radius; dy <= radius; dy++)
-                {
-                    int2 position = center + new int2(dx, dy);
-                    BiomeConnectionType connectionType = DetermineBiomeConnectionType(position, center);
-                    adjacencyMap[position] = connectionType;
-                }
-            }
-            
-            return adjacencyMap;
-        }
-
-        private static BiomeConnectionType DetermineBiomeConnectionType(int2 position, int2 center)
+        private static float DetermineBiomeConnectionStrength(int2 position, int2 center)
         {
             // Multi-layer biome analysis for connection type determination
             float biomeCoherence = math.unlerp(-1f, 1f, math.sin(position.x * 0.7f + position.y * 0.9f));
@@ -325,215 +326,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Combine factors to determine connection strength
             float combinedScore = (biomeCoherence * 0.4f + terrainCompatibility * 0.3f + accessibilityScore * 0.3f);
             
-            if (combinedScore > 0.8f) return BiomeConnectionType.Strong;
-            else if (combinedScore > 0.6f) return BiomeConnectionType.Moderate;
-            else if (combinedScore > 0.3f) return BiomeConnectionType.Weak;
-            else return BiomeConnectionType.None;
-        }
-
-        private static float CalculatePositionAccessibility(int2 position, int2 center)
-        {
-            float distance = math.length(position - center);
-            if (distance == 0) return 1f;
-            
-            // Manhattan distance for grid-based accessibility
-            int manhattanDistance = math.abs(position.x - center.x) + math.abs(position.y - center.y);
-            float euclideanDistance = distance;
-            
-            // Prefer accessible positions (shorter paths)
-            float accessibilityScore = 1f / (1f + euclideanDistance * 0.3f);
-            
-            // Bonus for cardinal directions (easier movement)
-            bool isCardinal = (position.x == center.x) || (position.y == center.y);
-            if (isCardinal) accessibilityScore *= 1.2f;
-            
-            return accessibilityScore;
-        }
-
-        private static float CalculateClusteringCoefficient(Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Calculate how well-connected the neighborhood is (graph theory clustering coefficient)
-            float totalConnections = 0f;
-            float possibleConnections = 0f;
-            
-            var positions = adjacencyMap.Keys.ToArray();
-            
-            for (int i = 0; i < positions.Length; i++)
-            {
-                for (int j = i + 1; j < positions.Length; j++)
-                {
-                    possibleConnections++;
-                    
-                    var connectionStrength = GetConnectionStrength(adjacencyMap[positions[i]], adjacencyMap[positions[j]]);
-                    totalConnections += connectionStrength;
-                }
-            }
-            
-            return possibleConnections > 0 ? totalConnections / possibleConnections : 0f;
-        }
-
-        private static float CalculatePathConnectivity(Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Measure how well positions can reach each other through the adjacency network
-            var strongPositions = adjacencyMap.Where(kvp => kvp.Value >= BiomeConnectionType.Moderate).Select(kvp => kvp.Key).ToArray();
-            
-            if (strongPositions.Length < 2) return 0.3f; // Isolated or nearly isolated
-            
-            // Calculate average path efficiency between strong connection points
-            float totalPathEfficiency = 0f;
-            int pathCount = 0;
-            
-            for (int i = 0; i < strongPositions.Length; i++)
-            {
-                for (int j = i + 1; j < strongPositions.Length; j++)
-                {
-                    float pathEfficiency = CalculatePathEfficiency(strongPositions[i], strongPositions[j], adjacencyMap);
-                    totalPathEfficiency += pathEfficiency;
-                    pathCount++;
-                }
-            }
-            
-            return pathCount > 0 ? totalPathEfficiency / pathCount : 0.5f;
-        }
-
-        private static float CalculatePathEfficiency(int2 start, int2 end, Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Simple path efficiency: direct distance vs. actual connectivity requirement
-            float directDistance = math.length(end - start);
-            
-            // Estimate connection quality along the path
-            int2 direction = end - start;
-            float steps = math.max(math.abs(direction.x), math.abs(direction.y));
-            
-            if (steps == 0) return 1f;
-            
-            float pathQuality = 1f;
-            for (int step = 1; step <= steps; step++)
-            {
-                int2 checkPos = start + new int2(
-                    (int)(direction.x * step / steps),
-                    (int)(direction.y * step / steps)
-                );
-                
-                if (adjacencyMap.TryGetValue(checkPos, out var connectionType))
-                {
-                    pathQuality *= GetConnectionStrength(connectionType) * 0.9f + 0.1f; // Always maintain some path quality
-                }
-            }
-            
-            return pathQuality;
-        }
-
-        private static float CalculateBetweennessCentrality(int2 center, Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Simplified betweenness centrality: how many paths go through this position
-            var otherPositions = adjacencyMap.Keys.Where(pos => !pos.Equals(center)).ToArray();
-            
-            float centralityScore = 0f;
-            int totalPaths = 0;
-            
-            for (int i = 0; i < otherPositions.Length; i++)
-            {
-                for (int j = i + 1; j < otherPositions.Length; j++)
-                {
-                    totalPaths++;
-                    
-                    // Check if the shortest path between i and j passes through center
-                    if (IsOnShortestPath(otherPositions[i], otherPositions[j], center))
-                    {
-                        centralityScore += 1f;
-                    }
-                }
-            }
-            
-            return totalPaths > 0 ? centralityScore / totalPaths : 0.5f; // Default centrality
-        }
-
-        private static bool IsOnShortestPath(int2 start, int2 end, int2 candidate)
-        {
-            // Simplified check: is the candidate position roughly between start and end?
-            float distanceStartToEnd = math.length(end - start);
-            float distanceStartToCandidate = math.length(candidate - start);
-            float distanceCandidateToEnd = math.length(end - candidate);
-            
-            // If going through candidate is approximately the same as direct path, it's on the shortest path
-            float pathThroughCandidate = distanceStartToCandidate + distanceCandidateToEnd;
-            float tolerance = distanceStartToEnd * 0.1f; // 10% tolerance
-            
-            return pathThroughCandidate <= distanceStartToEnd + tolerance;
-        }
-
-        private static float CalculateSymmetryBonus(Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Reward symmetrical patterns in biome layout
-            var center = adjacencyMap.Keys.OrderBy(pos => math.lengthsq(pos)).First(); // Find center-most position
-            float symmetryScore = 0f;
-            int comparisons = 0;
-            
-            foreach (var kvp in adjacencyMap)
-            {
-                int2 position = kvp.Key;
-                BiomeConnectionType connectionType = kvp.Value;
-                
-                // Check reflection across center for various axes
-                int2[] reflections = {
-                    new int2(center.x * 2 - position.x, position.y), // Horizontal reflection
-                    new int2(position.x, center.y * 2 - position.y), // Vertical reflection
-                    new int2(center.x * 2 - position.x, center.y * 2 - position.y) // Point reflection
-                };
-                
-                foreach (var reflection in reflections)
-                {
-                    if (adjacencyMap.TryGetValue(reflection, out var reflectedType))
-                    {
-                        float similarity = GetConnectionSimilarity(connectionType, reflectedType);
-                        symmetryScore += similarity;
-                        comparisons++;
-                    }
-                }
-            }
-            
-            return comparisons > 0 ? symmetryScore / comparisons : 0f;
-        }
-
-        private static float GetConnectionStrength(BiomeConnectionType connectionType)
-        {
-            return connectionType switch
-            {
-                BiomeConnectionType.Strong => 1f,
-                BiomeConnectionType.Moderate => 0.7f,
-                BiomeConnectionType.Weak => 0.4f,
-                BiomeConnectionType.None => 0.1f,
-                _ => 0.1f
-            };
-        }
-
-        private static float GetConnectionStrength(BiomeConnectionType type1, BiomeConnectionType type2)
-        {
-            // Connection strength between two connection types
-            float strength1 = GetConnectionStrength(type1);
-            float strength2 = GetConnectionStrength(type2);
-            return math.sqrt(strength1 * strength2); // Geometric mean for balanced consideration
-        }
-
-        private static float GetConnectionSimilarity(BiomeConnectionType type1, BiomeConnectionType type2)
-        {
-            if (type1 == type2) return 1f;
-            
-            // Calculate similarity based on connection strength difference
-            float strength1 = GetConnectionStrength(type1);
-            float strength2 = GetConnectionStrength(type2);
-            float difference = math.abs(strength1 - strength2);
-            
-            return 1f - difference; // Higher similarity for smaller differences
-        }
-
-        private enum BiomeConnectionType
-        {
-            None = 0,
-            Weak = 1,
-            Moderate = 2,
-            Strong = 3
+            return math.clamp(combinedScore, 0f, 1f);
         }
 
         private static float AnalyzeSpatialClustering(int2 coordinates)
@@ -552,15 +345,130 @@ namespace TinyWalnutGames.MetVD.Authoring
                         (int)(math.cos(angleRad) * radius),
                         (int)(math.sin(angleRad) * radius)
                     );
-                    
-                    // Simulate biome clustering using multi-octave noise
+
+                    // Simulate biome clustering using multi-octave noise and the clusterScore variable
+
                     float clusterNoise = (math.sin(checkPos.x * 0.3f) + math.cos(checkPos.y * 0.3f)) * 0.5f;
                     if (clusterNoise > 0.2f) clusterNeighbors++;
+                    if (clusterScore > 0.5f) clusterNeighbors++; // Higher weight for strong clustering
                 }
             }
             
             clusterScore = math.saturate(clusterNeighbors / 24f); // 24 = 8 angles * 3 radii
             return clusterScore;
+        }
+
+        private static float CalculateClusteringCoefficient(NativeArray<float> connectivityData)
+        {
+            // Simplified clustering coefficient calculation using native arrays
+            if (connectivityData.Length == 0) return 0.5f;
+            
+            float totalConnections = 0f;
+            for (int i = 0; i < connectivityData.Length; i++)
+            {
+                totalConnections += connectivityData[i];
+            }
+            
+            return connectivityData.Length > 0 ? totalConnections / connectivityData.Length : 0f;
+        }
+
+        private static float CalculatePathConnectivity(int2 coordinates)
+        {
+            // Simplified path connectivity using direct distance calculations
+            float pathScore = 0f;
+            int pathCount = 0;
+            
+            // Check connectivity in 8 directions
+            for (int angle = 0; angle < 8; angle++)
+            {
+                float angleRad = angle * math.PI / 4f;
+                int2 direction = new(
+                    (int)(math.cos(angleRad) * 2),
+                    (int)(math.sin(angleRad) * 2)
+                );
+                
+                int2 targetPos = coordinates + direction;
+                float connectionStrength = DetermineBiomeConnectionStrength(targetPos, coordinates);
+                pathScore += connectionStrength;
+                pathCount++;
+            }
+            
+            return pathCount > 0 ? pathScore / pathCount : 0.5f;
+        }
+
+        private static float CalculateBetweennessCentrality(int2 center)
+        {
+            // Simplified centrality calculation based on position characteristics
+            float centralityScore = 0.5f; // Default centrality
+            
+            // Distance from origin affects centrality
+            float distanceFromOrigin = math.length(center);
+            float normalizedDistance = math.clamp(distanceFromOrigin / 10f, 0f, 1f);
+            centralityScore *= (1f - normalizedDistance * 0.3f);
+            
+            // Grid alignment affects centrality
+            bool isWellPositioned = (center.x % 3 == 0) && (center.y % 3 == 0);
+            if (isWellPositioned) centralityScore *= 1.2f;
+            
+            return math.clamp(centralityScore, 0.2f, 1f);
+        }
+
+        private static float CalculateSymmetryBonus(int2 coordinates)
+        {
+            // Simplified symmetry calculation without managed collections
+            float symmetryScore = 0f;
+            int comparisons = 0;
+            
+            // Check symmetry in 4 directions around the coordinate
+            int2[] offsets = {
+                new(1, 0), new(-1, 0),   // Horizontal
+                new(0, 1), new(0, -1),   // Vertical
+            };
+            
+            for (int i = 0; i < offsets.Length; i++)
+            {
+                int2 pos1 = coordinates + offsets[i];
+                int2 pos2 = coordinates - offsets[i];
+                
+                float strength1 = DetermineBiomeConnectionStrength(pos1, coordinates);
+                float strength2 = DetermineBiomeConnectionStrength(pos2, coordinates);
+                float similarity = 1f - math.abs(strength1 - strength2);
+                
+                symmetryScore += similarity;
+                comparisons++;
+            }
+            
+            return comparisons > 0 ? symmetryScore / comparisons : 0f;
+        }
+
+        private static float CalculatePositionAccessibility(int2 position, int2 center)
+        {
+            // Calculate both distance types for different accessibility aspects
+            float euclideanDistance = math.length(position - center);
+            int manhattanDistance = math.abs(position.x - center.x) + math.abs(position.y - center.y);
+            
+            // Grid-based accessibility (for tile-by-tile movement)
+            float gridAccessibility = 1f / (1f + manhattanDistance * 0.2f);
+            
+            // Direct line accessibility (for flying/teleporting entities)  
+            float directAccessibility = 1f / (1f + euclideanDistance * 0.3f);
+            
+            // Combine based on movement types expected in this biome
+            float combinedAccessibility = (gridAccessibility * 0.6f + directAccessibility * 0.4f);
+            
+            // Manhattan distance penalty for diagonal-heavy paths
+            float diagonalPenalty = manhattanDistance > euclideanDistance * 1.5f ? 0.9f : 1f;
+            combinedAccessibility *= diagonalPenalty;
+            
+            // Cardinal direction bonus (Manhattan distance equals Euclidean for cardinal moves)
+            bool isCardinal = (position.x == center.x) || (position.y == center.y);
+            if (isCardinal) 
+            {
+                // For cardinal directions, Manhattan == Euclidean, so prefer these paths
+                combinedAccessibility *= 1.2f;
+            }
+            
+            return math.clamp(combinedAccessibility, 0f, 1f);
         }
     }
 
@@ -791,7 +699,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Use provided grid; fallback if null
             if (grid == null)
             {
-                grid = GameObject.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
+                grid = UnityEngine.Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
                     .OrderByDescending(g => g.GetInstanceID())
                     .FirstOrDefault();
             }
@@ -1436,7 +1344,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             for (int angle = 0; angle < 8; angle++)
             {
                 float angleRad = angle * Mathf.PI / 4f;
-                Vector3 direction = new Vector3(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad));
+                Vector3 direction = new(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad));
                 
                 float corridorScore = 0f;
                 for (float distance = 1f; distance <= 5f; distance += 1f)
@@ -1548,6 +1456,8 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         // Complete biome type system implementation with comprehensive environmental categories
+        // this list is incomplete, there are other lists that are MORE complete.
+        // TODO: integrate with our full biome system
         private enum BiomeType
         {
             Ocean,

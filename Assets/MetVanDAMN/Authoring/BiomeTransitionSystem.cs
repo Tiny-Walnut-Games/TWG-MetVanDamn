@@ -51,13 +51,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         protected override void OnUpdate()
         {
-            // Build a lookup from NodeId.Value -> Entity for neighbor resolution (one per frame)
+            // Build a lookup from NodeId._value -> Entity for neighbor resolution (one per frame)
             var nodeEntities = _biomeNodeQuery.ToEntityArray(Allocator.Temp);
             var nodeIds = _biomeNodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
             var nodeMap = new NativeHashMap<uint, Entity>(nodeEntities.Length, Allocator.Temp);
             for (int i = 0; i < nodeEntities.Length; i++)
             {
-                nodeMap.TryAdd(nodeIds[i].Value, nodeEntities[i]);
+                nodeMap.TryAdd(nodeIds[i]._value, nodeEntities[i]);
             }
 
             // Process transitions
@@ -77,7 +77,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                     for (int i = 0; i < connections.Length; i++)
                     {
                         var connection = connections[i].Value;
-                        uint neighborNodeId = connection.GetDestination(nodeId.Value);
+                        uint neighborNodeId = connection.GetDestination(nodeId._value);
                         if (neighborNodeId == 0) continue;
                         if (nodeMap.TryGetValue(neighborNodeId, out var neighborEntity))
                         {

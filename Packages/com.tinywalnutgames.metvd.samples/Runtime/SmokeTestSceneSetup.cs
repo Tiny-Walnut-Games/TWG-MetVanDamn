@@ -114,7 +114,7 @@ namespace TinyWalnutGames.MetVD.Samples
             { 
                 Coordinates = int2.zero,
                 Level = 0,
-                Value = 0,
+                _value = 0,
                 ParentId = 0
             });
             
@@ -139,7 +139,7 @@ namespace TinyWalnutGames.MetVD.Samples
                     { 
                         Coordinates = new int2(x * 10, y * 10),
                         Level = (byte)(math.abs(x) + math.abs(y)),
-                        Value = (uint)districtId++,
+                        _value = (uint)districtId++,
                         ParentId = 0
                     });
                     

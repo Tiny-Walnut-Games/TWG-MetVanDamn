@@ -278,7 +278,7 @@ namespace TinyWalnutGames.MetVD.Biome
             {
                 buffer.Add(new BiomeValidationRecord
                 {
-                    NodeId = (int)nodeId.Value,
+                    NodeId = (int)nodeId._value,
                     BufferIndex = index,
                     Distance = math.length(nodeId.Coordinates),
                     BiomeType = biome.Type,
@@ -303,7 +303,7 @@ namespace TinyWalnutGames.MetVD.Biome
             {
                 buffer.Add(new BiomeValidationRecord
                 {
-                    NodeId = (int)nodeId.Value,
+                    NodeId = (int)nodeId._value,
                     BufferIndex = index,
                     Distance = math.length(nodeId.Coordinates),
                     BiomeType = biome.Type,
@@ -320,7 +320,7 @@ namespace TinyWalnutGames.MetVD.Biome
             {
                 buffer.Add(new BiomeValidationRecord
                 {
-                    NodeId = (int)nodeId.Value,
+                    NodeId = (int)nodeId._value,
                     BufferIndex = index,
                     Distance = math.length(nodeId.Coordinates),
                     BiomeType = biome.Type,

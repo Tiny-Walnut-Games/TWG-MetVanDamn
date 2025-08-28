@@ -226,7 +226,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 if (showNodeLabels)
                 {
                     var lp = wp + new float3(0, labelOffset, 0);
-                    Handles.Label(lp, $"N{nodeId.Value}\n{navNode.BiomeType}\n{navNode.PrimaryPolarity}", GetLabelStyle(reachable));
+                    Handles.Label(lp, $"N{nodeId._value}\n{navNode.BiomeType}\n{navNode.PrimaryPolarity}", GetLabelStyle(reachable));
                 }
             }
         }
@@ -390,7 +390,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             for (int i = 0; i < ids.Length; i++)
             {
-                if (ids[i].Value == nodeId)
+                if (ids[i]._value == nodeId)
                     return entities[i];
             }
             

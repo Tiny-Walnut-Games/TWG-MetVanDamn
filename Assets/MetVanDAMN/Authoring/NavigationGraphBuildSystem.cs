@@ -107,7 +107,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 .ForEach((Entity entity, in LocalTransform transform, in NodeId nodeId) =>
                 {
                     var worldPosition = transform.Position;
-                    var districtNodeId = nodeId.Value;
+                    var districtNodeId = nodeId._value;
 
                     // Determine biome type and polarity from existing components
                     var biomeType = BiomeType.Unknown;
@@ -199,7 +199,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
             Entities.ForEach((Entity entity, in NodeId id) =>
             {
-                if (id.Value == nodeId)
+                if (id._value == nodeId)
                     foundEntity = entity;
             }).WithoutBurst().Run();
 

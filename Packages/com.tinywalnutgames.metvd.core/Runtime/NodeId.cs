@@ -12,7 +12,7 @@ namespace TinyWalnutGames.MetVD.Core
         /// <summary>
         /// Unique identifier for this node
         /// </summary>
-        public uint Value;
+        public uint _value;
         
         /// <summary>
         /// Hierarchical level (0=district, 1=sector, 2=room)
@@ -30,11 +30,11 @@ namespace TinyWalnutGames.MetVD.Core
         public int2 Coordinates;
 
         // Backward-compatible alias used by older tests (nodeId.value)
-        public uint value { readonly get => Value; set => Value = value; }
+        public uint Value { readonly get => _value; set => _value = value; }
 
         public NodeId(uint value, byte level = 0, uint parentId = 0, int2 coordinates = default)
         {
-            Value = value;
+            _value = value;
             Level = level;
             ParentId = parentId;
             Coordinates = coordinates;
@@ -42,10 +42,10 @@ namespace TinyWalnutGames.MetVD.Core
 
         public override readonly string ToString()
         {
-            return $"NodeId({Value}, L{Level}, Parent:{ParentId}, Pos:{Coordinates})";
+            return $"NodeId({_value}, L{Level}, Parent:{ParentId}, Pos:{Coordinates})";
         }
         
-        public static implicit operator uint(NodeId nodeId) => nodeId.Value;
+        public static implicit operator uint(NodeId nodeId) => nodeId._value;
         public static implicit operator NodeId(uint value) => new(value);
     }
 }

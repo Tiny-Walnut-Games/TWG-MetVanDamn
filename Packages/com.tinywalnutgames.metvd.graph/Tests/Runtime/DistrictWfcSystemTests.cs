@@ -32,7 +32,7 @@ namespace TinyWalnutGames.MetVD.Tests
             var em = _world.EntityManager;
             var e = em.CreateEntity();
             em.AddComponentData(e, new WfcState(initial) { Iteration = iteration });
-            em.AddComponentData(e, new NodeId { Value = 0, Coordinates = int2.zero, Level = 0, ParentId = 0 });
+            em.AddComponentData(e, new NodeId { _value = 0, Coordinates = int2.zero, Level = 0, ParentId = 0 });
             if (withBuffer) em.AddBuffer<WfcCandidateBufferElement>(e);
             return e;
         }

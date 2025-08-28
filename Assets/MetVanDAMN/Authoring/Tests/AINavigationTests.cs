@@ -380,12 +380,12 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange: Create navigation nodes
             var node1Entity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(node1Entity, new NavNode(1, new float3(0, 0, 0), BiomeType.SolarPlains, Polarity.Sun));
-            _entityManager.AddComponentData(node1Entity, new NodeId { Value = 1 });
+            _entityManager.AddComponentData(node1Entity, new NodeId { _value = 1 });
             _entityManager.AddBuffer<Core.NavLinkBufferElement>(node1Entity);
 
             var node2Entity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(node2Entity, new NavNode(2, new float3(10, 0, 0), BiomeType.ShadowRealms, Polarity.Moon));
-            _entityManager.AddComponentData(node2Entity, new NodeId { Value = 2 });
+            _entityManager.AddComponentData(node2Entity, new NodeId { _value = 2 });
             _entityManager.AddBuffer<NavLinkBufferElement>(node2Entity);
 
             // Create navigation link
@@ -669,16 +669,14 @@ namespace TinyWalnutGames.MetVD.Tests
         {
             // This tests the enhanced heuristic calculation indirectly
             // by verifying it produces different costs for horizontal vs vertical movement
-            
-            // Arrange
             var system = _testWorld.GetOrCreateSystem<AINavigationSystem>();
-            
-            // Simulate horizontal and vertical movements
-            var horizontalMove = new float3(5, 0, 0);
-            var verticalMove = new float3(0, 5, 0);
-            var arcMove = new float3(3, 4, 0);
 
-            // The actual calculation happens inside the private method,
+            // Simulate horizontal and vertical movements 👇🏼
+            //var horizontalMove = new float3(5, 0, 0);👇🏼
+            //var verticalMove = new float3(0, 5, 0);👇🏼
+            //var arcMove = new float3(3, 4, 0);👇🏼
+
+            // 👉🏼The actual calculation happens inside the private method,👈🏼
             // but we can verify the system exists and doesn't throw
             Assert.IsNotNull(system);
         }
