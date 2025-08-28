@@ -17,11 +17,11 @@ namespace TinyWalnutGames.MetVD.Graph
         
         protected override void OnUpdate()
         {
-            // Get the managed system and update it via simulation group
-            var simGroup = World.GetExistingSystemManaged<SimulationSystemGroup>();
-            if (simGroup != null)
+            // Get the managed RoomNavigationGeneratorSystem and update it
+            var system = World.GetExistingSystemManaged<RoomNavigationGeneratorSystem>();
+            if (system != null)
             {
-                simGroup.Update();
+                system.Update();
             }
         }
     }
