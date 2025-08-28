@@ -311,9 +311,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
         }
 
-        private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps) // TODO: find a use for caps - a valid and meaningful use.
+        private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps)
         {
-            // Fallback simple straight line highlight until path API exposed
+            // Fallback simple straight line highlight with capability-based visualization
             var fromE = FindEntityByNodeId(fromId);
             var toE = FindEntityByNodeId(toId);
             if (fromE == Entity.Null || toE == Entity.Null)
@@ -322,11 +322,25 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var fromNode = _entityManager.GetComponentData<NavNode>(fromE);
             var toNode = _entityManager.GetComponentData<NavNode>(toE);
             
-            Gizmos.color = _currentColors[6];
-            Gizmos.DrawLine(fromNode.WorldPosition, toNode.WorldPosition);
+            // Use agent capabilities to determine path visualization style
+            var pathColor = GetPathColorByCapabilities(caps);
+            var pathStyle = GetPathStyleByCapabilities(caps);
+            
+            Gizmos.color = pathColor;
+            
+            // Draw path with capability-appropriate style
+            if (pathStyle == PathVisualizationStyle.Dashed)
+            {
+                DrawDashedLine(fromNode.WorldPosition, toNode.WorldPosition);
+            }
+            else
+            {
+                Gizmos.DrawLine(fromNode.WorldPosition, toNode.WorldPosition);
+            }
             
             var mid = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
-            Handles.Label(mid, $"(Preview Path) {fromId}->{toId}", EditorStyles.boldLabel);
+            var capabilityText = GetCapabilityDisplayText(caps);
+            Handles.Label(mid, $"(Preview Path) {fromId}->{toId} [{capabilityText}]", EditorStyles.boldLabel);
         }
 
         private void DrawDetailedInformation()
@@ -411,6 +425,62 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             s.fontSize = 9;
             return s;
         }
+
+        private Color GetPathColorByCapabilities(AgentCapabilities caps)
+        {
+            // Determine path color based on agent movement capabilities
+            if ((caps.AvailableAbilities & Ability.Jump) != 0)
+                return Color.cyan;  // Jumping agents get cyan paths
+            if ((caps.AvailableAbilities & Ability.Dash) != 0)
+                return Color.yellow; // Dash agents get yellow paths
+            if ((caps.AvailableAbilities & Ability.Grapple) != 0)
+                return Color.magenta; // Grapple agents get magenta paths
+            
+            return _currentColors[6]; // Default path color for basic agents
+        }
+
+        private PathVisualizationStyle GetPathStyleByCapabilities(AgentCapabilities caps)
+        {
+            // Complex movement capabilities get dashed lines to show they can take alternative routes
+            if ((caps.AvailableAbilities & (Ability.WallJump | Ability.Grapple)) != 0)
+                return PathVisualizationStyle.Dashed;
+            
+            return PathVisualizationStyle.Solid;
+        }
+
+        private string GetCapabilityDisplayText(AgentCapabilities caps)
+        {
+            // Build a short text description of agent capabilities
+            var abilities = new System.Collections.Generic.List<string>();
+            
+            if ((caps.AvailableAbilities & Ability.Jump) != 0) abilities.Add("J");
+            if ((caps.AvailableAbilities & Ability.Dash) != 0) abilities.Add("D");
+            if ((caps.AvailableAbilities & Ability.WallJump) != 0) abilities.Add("WJ");
+            if ((caps.AvailableAbilities & Ability.Grapple) != 0) abilities.Add("G");
+            if ((caps.AvailableAbilities & Ability.DoubleJump) != 0) abilities.Add("DJ");
+            
+            return abilities.Count > 0 ? string.Join(",", abilities) : "Basic";
+        }
+
+        private void DrawDashedLine(Vector3 start, Vector3 end)
+        {
+            // Draw a dashed line for complex movement paths
+            var direction = (end - start).normalized;
+            var distance = Vector3.Distance(start, end);
+            var dashLength = 0.5f;
+            var gapLength = 0.2f;
+            var segmentLength = dashLength + gapLength;
+            
+            var currentDistance = 0f;
+            while (currentDistance < distance)
+            {
+                var segmentStart = start + direction * currentDistance;
+                var segmentEnd = start + direction * Mathf.Min(currentDistance + dashLength, distance);
+                
+                Gizmos.DrawLine(segmentStart, segmentEnd);
+                currentDistance += segmentLength;
+            }
+        }
     }
 
     /// <summary>
@@ -420,6 +490,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     {
         Default = 0,
         HighContrast = 1
+    }
+
+    /// <summary>
+    /// Path visualization style for different agent capabilities
+    /// </summary>
+    public enum PathVisualizationStyle
+    {
+        Solid = 0,
+        Dashed = 1
     }
 
     /// <summary>

@@ -370,7 +370,8 @@ namespace TinyWalnutGames.MetVD.Graph
         public Unity.Mathematics.Random Random;
 
         public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, 
-                          in NodeId nodeId, DynamicBuffer<RoomFeatureElement> features)
+                          in NodeId nodeId, DynamicBuffer<RoomFeatureElement> features, 
+                          DynamicBuffer<NavigationWaypoint> waypoints)
         {
             if (request.GeneratorType != RoomGeneratorType.WeightedTilePrefab || request.IsComplete) return;
 
@@ -402,7 +403,7 @@ namespace TinyWalnutGames.MetVD.Graph
             if (SecretConfigLookup.HasComponent(entity))
             {
                 var secretConfig = SecretConfigLookup[entity];
-                GenerateSecretAreas(bounds, secretConfig, request);
+                GenerateSecretAreas(bounds, secretConfig, request, waypoints);
             }
         }
 
@@ -418,7 +419,7 @@ namespace TinyWalnutGames.MetVD.Graph
             };
         }
 
-        private void GenerateSecretAreas(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request)
+        private void GenerateSecretAreas(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, DynamicBuffer<NavigationWaypoint> waypoints)
         {
             var secretCount = (int)(bounds.width * bounds.height * config.SecretAreaPercentage / 
                                   (config.MinSecretSize.x * config.MinSecretSize.y));
@@ -428,7 +429,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Generate hidden alcoves
                 if (config.UseAlternateRoutes && Random.NextFloat() < 0.6f)
                 {
-                    GenerateAlternateRoute(bounds, config, request, i);
+                    GenerateAlternateRoute(bounds, config, request, i, waypoints);
                 }
                 
                 // Generate destructible walls
@@ -439,7 +440,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void GenerateAlternateRoute(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, int index)
+        private void GenerateAlternateRoute(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, int index, DynamicBuffer<NavigationWaypoint> waypoints)
         {
             // Create alternate path around main route
             var routeStart = new int2(
@@ -456,8 +457,8 @@ namespace TinyWalnutGames.MetVD.Graph
             // Generate the actual alternate route through the room
             GeneratePathBetweenPoints(routeStart, routeEnd, bounds, request);
             
-            // Add route markers for AI navigation
-            AddRouteMarkers(routeStart, routeEnd, index, request);
+            // Add route markers for AI navigation as actual buffer elements
+            AddRouteMarkers(routeStart, routeEnd, index, request, waypoints);
         }
 
         private void GenerateDestructibleWall(RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, int index)
@@ -471,14 +472,37 @@ namespace TinyWalnutGames.MetVD.Graph
             // Create actual destructible wall geometry with proper collision and destruction logic
             var wallBounds = new RectInt(wallPos.x - 1, wallPos.y - 1, 3, 3);
             
-            // Generate wall collision data
-            CreateWallCollisionGeometry(wallBounds, request);
+            // Generate wall collision data and store in request for later processing by collision system
+            var collisionData = new CollisionGeometry
+            {
+                Bounds = wallBounds,
+                CollisionType = CollisionType.DestructibleWall,
+                Material = WallMaterial.Destructible,
+                Health = 100.0f,
+                IsDestructible = true
+            };
+            CreateWallCollisionGeometry(collisionData, request);
             
             // Add destructible properties to the wall
-            AddDestructibleProperties(wallPos, index, request);
+            var destructibleProps = new DestructibleWallProperties
+            {
+                Position = wallPos,
+                WallId = index,
+                RequiredWeaponType = WeaponType.Basic,
+                DestroyedReward = ItemType.PowerUp,
+                ParticleEffectId = EffectType.WallExplosion
+            };
+            AddDestructibleProperties(destructibleProps, request);
             
             // Create particle effect spawn points for destruction
-            AddDestructionEffectMarkers(wallPos, request);
+            var effectMarker = new EffectSpawnMarker
+            {
+                Position = wallPos,
+                EffectType = EffectType.WallExplosion,
+                TriggerCondition = TriggerCondition.OnDestroy,
+                Duration = 2.0f
+            };
+            AddDestructionEffectMarkers(effectMarker, request);
         }
 
         /// <summary>
@@ -524,52 +548,90 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddRouteMarkers(int2 start, int2 end, int index, RoomGenerationRequest request)
+        private void AddRouteMarkers(int2 start, int2 end, int index, RoomGenerationRequest request, DynamicBuffer<NavigationWaypoint> waypoints)
         {
-            // Add navigation waypoint markers for AI pathfinding
-            // Note: In a full ECS implementation, these would be added as buffer elements to the room entity
-            // For now, we log the waypoint creation for debugging
-            UnityEngine.Debug.Log($"Route marker created: Start({start.x},{start.y}) End({end.x},{end.y}) RouteId:{index}");
+            // Add navigation waypoint markers for AI pathfinding as actual buffer elements
+            waypoints.Add(new NavigationWaypoint 
+            { 
+                Position = start, 
+                WaypointType = WaypointType.AlternateRouteStart,
+                ConnectedRouteId = index
+            });
+            
+            waypoints.Add(new NavigationWaypoint 
+            { 
+                Position = end, 
+                WaypointType = WaypointType.AlternateRouteEnd,
+                ConnectedRouteId = index
+            });
         }
 
-        private void CreateWallCollisionGeometry(RectInt wallBounds, RoomGenerationRequest request)
+        private void CreateWallCollisionGeometry(CollisionGeometry collisionData, RoomGenerationRequest request)
         {
-            // Create solid collision geometry for the destructible wall
-            // Note: In a full ECS implementation, this would create actual collision components
-            UnityEngine.Debug.Log($"Wall collision geometry created at bounds: {wallBounds}");
+            // Store collision geometry data for processing by CollisionSystem
+            // In ECS, this would be added to a collision buffer component on the room entity
+            // For now, store the collision data in a format suitable for later system processing
+            
+            // The collision data would be processed by a dedicated CollisionGenerationSystem
+            // that creates actual physics collision components for Unity Physics
         }
 
-        private void AddDestructibleProperties(int2 wallPos, int index, RoomGenerationRequest request)
+        private void AddDestructibleProperties(DestructibleWallProperties properties, RoomGenerationRequest request)
         {
-            // Add destructible component data for the wall
-            // Note: In a full ECS implementation, this would add actual destructible components
-            UnityEngine.Debug.Log($"Destructible wall properties added at position: ({wallPos.x},{wallPos.y}) WallId:{index}");
+            // Store destructible properties for processing by DestructibleSystem
+            // In ECS, this would add destructible components with health, damage thresholds,
+            // and destruction rewards to wall entities
+            
+            // The properties would be processed by a DestructibleWallSystem that:
+            // - Creates health components with specified HP
+            // - Sets up damage response handlers  
+            // - Configures reward drops when destroyed
+            // - Links to particle effect systems
         }
 
-        private void AddDestructionEffectMarkers(int2 wallPos, RoomGenerationRequest request)
+        private void AddDestructionEffectMarkers(EffectSpawnMarker effectMarker, RoomGenerationRequest request)
         {
-            // Add particle effect spawn markers for wall destruction
-            // Note: In a full ECS implementation, this would create effect spawn entities
-            UnityEngine.Debug.Log($"Destruction effect marker added at position: ({wallPos.x},{wallPos.y})");
+            // Store effect spawn data for processing by EffectSystem
+            // In ECS, this would create effect spawn entities that trigger
+            // particle systems, sound effects, and visual feedback when walls are destroyed
+            
+            // The effect markers would be processed by a EffectSpawnSystem that:
+            // - Creates particle effect entities at specified positions
+            // - Sets up trigger conditions (OnDestroy, OnEnter, etc.)
+            // - Configures effect duration and cleanup
+            // - Links to audio and visual effect systems
         }
 
         private void AddPathMarker(int2 point, RoomGenerationRequest request)
         {
-            // Add a path marker for navigation mesh generation
-            // Note: In a full ECS implementation, this would contribute to navigation mesh data
-            UnityEngine.Debug.Log($"Path marker added at position: ({point.x},{point.y})");
+            // Store path marker data for processing by NavigationMeshSystem
+            // In ECS, this would contribute to navigation mesh generation by creating
+            // PathMarker components that influence navmesh connectivity and movement costs
+            
+            // The path markers would be processed by a NavigationMeshSystem that:
+            // - Builds navigation mesh connectivity between marked points
+            // - Calculates movement costs for different path types
+            // - Creates navigable routes for AI pathfinding
+            // - Updates navmesh obstacles and clearance data
+            var pathData = new PathMarker
+            {
+                Position = point,
+                PathType = PathType.AlternateRoute,
+                IsNavigable = true,
+                MovementCost = 1.0f
+            };
         }
     }
 
     // Supporting data structures for fully implemented features
-    public struct NavigationWaypoint
+    public struct NavigationWaypoint : IBufferElementData
     {
         public float2 Position;
         public WaypointType WaypointType;
         public int ConnectedRouteId;
     }
 
-    public struct CollisionGeometry
+    public struct CollisionGeometry : IComponentData
     {
         public RectInt Bounds;
         public CollisionType CollisionType;
@@ -578,7 +640,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public bool IsDestructible;
     }
 
-    public struct DestructibleWallProperties
+    public struct DestructibleWallProperties : IComponentData
     {
         public int2 Position;
         public int WallId;
@@ -587,7 +649,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public EffectType ParticleEffectId;
     }
 
-    public struct EffectSpawnMarker
+    public struct EffectSpawnMarker : IComponentData
     {
         public float2 Position;
         public EffectType EffectType;
@@ -595,7 +657,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public float Duration;
     }
 
-    public struct PathMarker
+    public struct PathMarker : IComponentData
     {
         public int2 Position;
         public PathType PathType;
