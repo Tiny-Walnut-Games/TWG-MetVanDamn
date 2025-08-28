@@ -7,6 +7,7 @@
         "Unity.Entities",
         "Unity.Entities.Hybrid",
         "Unity.Mathematics",
+        "Unity.Transforms",
         "TinyWalnutGames.MetVD.Core",
         "TinyWalnutGames.MetVD.Shared",
         "TinyWalnutGames.MetVD.Graph",
