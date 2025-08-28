@@ -152,7 +152,11 @@ namespace TinyWalnutGames.Tools.Editor
                 "Copy the slice layout from the first selected texture. " +
                 "Useful for applying the same slicing to multiple textures.", MessageType.None);
 
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
             using (new EditorGUI.DisabledScope(copiedRects == null))
+#else
+            using (new EditorGUI.DisabledScope(true))
+#endif
             {
                 if (GUILayout.Button(new GUIContent(
                     "Paste Rect Layout",

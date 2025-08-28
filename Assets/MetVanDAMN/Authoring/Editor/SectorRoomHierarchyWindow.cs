@@ -593,8 +593,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var baseType = connection.type switch
             {
                 ConnectionType.Bidirectional => "Bidirectional",
-                ConnectionType.Unidirectional => "Unidirectional", 
-                ConnectionType.Blocked => "Blocked",
+                ConnectionType.OneWay => "One-Way", 
+                ConnectionType.Drop => "Drop",
+                ConnectionType.Vent => "Vent",
+                ConnectionType.CrumbleFloor => "Crumble Floor",
+                ConnectionType.Teleporter => "Teleporter",
+                ConnectionType.ConditionalGate => "Conditional Gate",
                 _ => "Unknown"
             };
             

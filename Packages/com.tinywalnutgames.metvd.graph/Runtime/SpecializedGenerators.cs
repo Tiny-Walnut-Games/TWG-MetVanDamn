@@ -536,7 +536,7 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int i = 0; i <= steps; i++)
             {
                 var t = steps > 0 ? (float)i / steps : 0f;
-                var point = start + (int2)math.round(direction * t);
+                var point = start + (int2)math.round((float2)direction * t);
                 
                 // Ensure point is within bounds
                 if (point.x >= bounds.x && point.x < bounds.x + bounds.width &&
@@ -737,5 +737,4 @@ namespace TinyWalnutGames.MetVD.Graph
     // 
     // The current implementation provides full feature logic while maintaining
     // ECS compatibility by logging actions instead of storing incompatible collections.
-}
 }

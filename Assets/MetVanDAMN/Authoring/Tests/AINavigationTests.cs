@@ -239,7 +239,7 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateSystemManaged<NavigationGraphBuildSystem>();
+                var system = _testWorld.GetOrCreateSystem<NavigationGraphBuildSystem>();
                 Assert.IsNotNull(system);
             });
         }
@@ -250,7 +250,7 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateSystemManaged<AINavigationSystem>();
+                var system = _testWorld.GetOrCreateSystem<AINavigationSystem>();
                 Assert.IsNotNull(system);
             });
         }
@@ -261,7 +261,7 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateSystemManaged<NavigationValidationSystem>();
+                var system = _testWorld.GetOrCreateSystem<NavigationValidationSystem>();
                 Assert.IsNotNull(system);
             });
         }
@@ -669,7 +669,7 @@ namespace TinyWalnutGames.MetVD.Tests
             // by verifying it produces different costs for horizontal vs vertical movement
             
             // Arrange
-            var system = _testWorld.GetOrCreateSystemManaged<AINavigationSystem>();
+            var system = _testWorld.GetOrCreateSystem<AINavigationSystem>();
             
             // Simulate horizontal and vertical movements
             var horizontalMove = new float3(5, 0, 0);
