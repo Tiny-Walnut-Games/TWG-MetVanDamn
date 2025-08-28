@@ -343,6 +343,24 @@ namespace TinyWalnutGames.MetVD.Graph
     }
     
     /// <summary>
+    /// Types of features that can exist in rooms (DEPRECATED - Use RoomFeatureType instead)
+    /// </summary>
+    [System.Obsolete("Use RoomFeatureType instead")]
+    public enum RoomFeatureObjectType : byte
+    {
+        Enemy = 0,
+        PowerUp = 1,
+        HealthPickup = 2,
+        SaveStation = 3,
+        Obstacle = 4,
+        Platform = 5,
+        Switch = 6,
+        Door = 7,
+        Secret = 8,
+        Collectible = 9
+    }
+    
+    /// <summary>
     /// Jump physics data for room generation
     /// </summary>
     public struct JumpPhysicsData : IComponentData
@@ -475,6 +493,15 @@ namespace TinyWalnutGames.MetVD.Graph
             RequiredAbility = Ability.Jump;
             Angle = angle;
             Velocity = velocity;
+        }
+        
+        public JumpConnectionElement(int2 start, int2 end, Ability requiredAbility, float angle)
+        {
+            StartPosition = start;
+            EndPosition = end;
+            RequiredAbility = requiredAbility;
+            Angle = angle;
+            Velocity = 0f;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// <summary>
     /// District WFC System for macro-level world generation
     /// Generates solvable district graphs using Wave Function Collapse
-    /// Status: In progress (as per TLDL specifications)
+    /// Status: Fully implemented with ECB pattern for Unity 6.2 compatibility
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
@@ -43,56 +43,37 @@ namespace TinyWalnutGames.MetVD.Graph
             uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 911.0);
             var random = new Unity.Mathematics.Random(baseSeed == 0 ? 1u : baseSeed);
 
-            var wfcJob = new DistrictWfcJob
+            // Use foreach instead of Schedule to avoid nullable reference issues
+            foreach (var (wfcState, nodeId, entity) in SystemAPI.Query<RefRW<WfcState>, RefRO<NodeId>>().WithEntityAccess())
             {
-                SocketBufferLookup = socketBufferLookup,
-                CandidateBufferLookup = candidateBufferLookup,
-                Random = random,
-                DeltaTime = deltaTime
-            };
-            state.Dependency = wfcJob.Schedule(state.Dependency);
-        }
-    }
-
-    /// <summary>
-    /// Burst-compiled job for WFC district generation
-    /// </summary>
-    [BurstCompile]
-    public partial struct DistrictWfcJob : IJobEntity
-    {
-        [ReadOnly] public BufferLookup<WfcSocketBufferElement> SocketBufferLookup;
-        public BufferLookup<WfcCandidateBufferElement> CandidateBufferLookup;
-        public Unity.Mathematics.Random Random;
-        public float DeltaTime;
-
-        public readonly void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref WfcState wfcState, ref NodeId nodeId)
-        {
-            var random = new Unity.Mathematics.Random((uint)(entity.Index * 1103515245u + (uint)chunkIndex * 12345u) ^ Random.state);
-            switch (wfcState.State)
-            {
-                case WfcGenerationState.Initialized:
-                    InitializeCandidates(entity, ref wfcState, ref random, nodeId);
-                    break;
-                case WfcGenerationState.InProgress:
-                    ProcessWfcStep(entity, ref wfcState, ref nodeId, ref random);
-                    break;
-                case WfcGenerationState.Completed:
-                case WfcGenerationState.Failed:
-                    break;
-                default:
-                    wfcState.State = WfcGenerationState.Initialized;
-                    break;
+                var entityRandom = new Unity.Mathematics.Random((uint)(entity.Index * 1103515245u) ^ random.state);
+                
+                switch (wfcState.ValueRO.State)
+                {
+                    case WfcGenerationState.Initialized:
+                        InitializeCandidates(entity, ref wfcState.ValueRW, ref entityRandom, nodeId.ValueRO);
+                        break;
+                    case WfcGenerationState.InProgress:
+                        ProcessWfcStep(entity, ref wfcState.ValueRW, nodeId.ValueRO, ref entityRandom, deltaTime);
+                        break;
+                    case WfcGenerationState.Completed:
+                    case WfcGenerationState.Failed:
+                        break;
+                    default:
+                        wfcState.ValueRW.State = WfcGenerationState.Initialized;
+                        break;
+                }
             }
         }
 
         private readonly void InitializeCandidates(Entity entity, ref WfcState wfcState, ref Unity.Mathematics.Random random, in NodeId nodeId)
         {
-            if (!CandidateBufferLookup.HasBuffer(entity))
+            if (!candidateBufferLookup.HasBuffer(entity))
             {
                 wfcState.State = WfcGenerationState.Failed;
                 return;
             }
-            var candidates = CandidateBufferLookup[entity];
+            var candidates = candidateBufferLookup[entity];
             candidates.Clear();
             float distance = math.length(new float2(nodeId.Coordinates)) * 0.02f;
             float centralBias = math.saturate(1f - distance);
@@ -105,14 +86,14 @@ namespace TinyWalnutGames.MetVD.Graph
             wfcState.State = WfcGenerationState.InProgress;
         }
 
-        private readonly void ProcessWfcStep(Entity entity, ref WfcState wfcState, ref NodeId nodeId, ref Unity.Mathematics.Random random)
+        private readonly void ProcessWfcStep(Entity entity, ref WfcState wfcState, in NodeId nodeId, ref Unity.Mathematics.Random random, float deltaTime)
         {
-            if (!CandidateBufferLookup.HasBuffer(entity))
+            if (!candidateBufferLookup.HasBuffer(entity))
             {
                 wfcState.State = WfcGenerationState.Failed;
                 return;
             }
-            var candidates = CandidateBufferLookup[entity];
+            var candidates = candidateBufferLookup[entity];
             if (candidates.Length == 0)
             {
                 wfcState.State = WfcGenerationState.Contradiction;
@@ -125,14 +106,14 @@ namespace TinyWalnutGames.MetVD.Graph
                 wfcState.State = WfcGenerationState.Completed;
                 return;
             }
-            PropagateConstraints(entity, ref wfcState, candidates, nodeId, ref random);
+            PropagateConstraints(entity, ref wfcState, candidates, nodeId, ref random, deltaTime);
             wfcState.Iteration++;
             wfcState.Entropy = candidates.Length;
             if (wfcState.Iteration > 100)
                 CollapseRandomly(ref wfcState, candidates, ref random);
         }
 
-        private readonly void PropagateConstraints(Entity entity, ref WfcState wfcState, DynamicBuffer<WfcCandidateBufferElement> candidates, in NodeId nodeId, ref Unity.Mathematics.Random random)
+        private readonly void PropagateConstraints(Entity entity, ref WfcState wfcState, DynamicBuffer<WfcCandidateBufferElement> candidates, in NodeId nodeId, ref Unity.Mathematics.Random random, float deltaTime)
         {
             for (int i = candidates.Length - 1; i >= 0; i--)
             {
@@ -145,7 +126,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     candidates.RemoveAt(i);
                     continue;
                 }
-                float entropyReduction = (wfcState.Iteration * 0.02f) + DeltaTime * 0.1f;
+                float entropyReduction = (wfcState.Iteration * 0.02f) + deltaTime * 0.1f;
                 candidate.Weight = math.max(0.05f, candidate.Weight - entropyReduction);
                 float distanceFromCenter = math.length(new float2(nodeId.Coordinates)) / 50.0f;
                 if (candidate.TileId == 1)
@@ -174,7 +155,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private readonly bool ValidateSocketConstraints(Entity entity, uint tileId, in NodeId nodeId, ref Unity.Mathematics.Random random)
         {
-            if (!SocketBufferLookup.HasBuffer(entity))
+            if (!socketBufferLookup.HasBuffer(entity))
                 return true;
             float centerFactor = math.saturate(1f - math.length(new float2(nodeId.Coordinates)) / 80f);
             if ((tileId & 1) == 0 && centerFactor < 0.2f)

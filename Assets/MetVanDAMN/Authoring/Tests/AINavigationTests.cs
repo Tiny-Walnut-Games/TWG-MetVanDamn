@@ -5,6 +5,8 @@ using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Authoring;
 using UnityEngine;
+using NavigationGraph = TinyWalnutGames.MetVD.Core.NavigationGraph;
+using NavLinkBufferElement = TinyWalnutGames.MetVD.Core.NavLinkBufferElement;
 
 namespace TinyWalnutGames.MetVD.Tests
 {
@@ -379,7 +381,7 @@ namespace TinyWalnutGames.MetVD.Tests
             var node1Entity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(node1Entity, new NavNode(1, new float3(0, 0, 0), BiomeType.SolarPlains, Polarity.Sun));
             _entityManager.AddComponentData(node1Entity, new NodeId { Value = 1 });
-            _entityManager.AddBuffer<NavLinkBufferElement>(node1Entity);
+            _entityManager.AddBuffer<Core.NavLinkBufferElement>(node1Entity);
 
             var node2Entity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(node2Entity, new NavNode(2, new float3(10, 0, 0), BiomeType.ShadowRealms, Polarity.Moon));

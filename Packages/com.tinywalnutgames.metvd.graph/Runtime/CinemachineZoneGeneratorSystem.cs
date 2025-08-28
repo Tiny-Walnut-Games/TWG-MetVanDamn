@@ -16,7 +16,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// - Captures lightweight profiling (time spent) into ProceduralRoomGenerated.GenerationTime
     /// Converted to SystemBase so tests/harness can drive Update() directly.
     /// </summary>
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(RoomNavigationGeneratorSystem))]
     public partial class CinemachineZoneGeneratorSystem : SystemBase
     {

@@ -202,7 +202,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
                 while (!validPosition && attempts < maxAttempts)
                 {
-                    float2 candidate = new float2(
+                    float2 candidate = new(
                         random.NextFloat(-worldSize.x * 0.4f, worldSize.x * 0.4f),
                         random.NextFloat(-worldSize.y * 0.4f, worldSize.y * 0.4f)
                     );
@@ -240,7 +240,7 @@ namespace TinyWalnutGames.MetVD.Graph
             var entity = state.EntityManager.CreateEntity();
             
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            state.EntityManager.SetName(entity, $"BiomeField_{biomeType}_{position.x:F0}_{position.y:F0}");
+            state.EntityManager.SetName(entity, $"BiomeField_{biomeType}_{position.x:g}_{position.y:g}");
 #endif
             var strength = math.lerp(0.7f, 1.0f, config.BiomeSettings.BiomeWeight);
             var gradient = random.NextFloat(0.3f, 0.8f);

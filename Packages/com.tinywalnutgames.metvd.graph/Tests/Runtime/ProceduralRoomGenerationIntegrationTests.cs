@@ -230,23 +230,42 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         [Test]
         public void JumpArcSolver_ValidatesRoomConnectivity()
         {
+            // validate room bounds
+            RectInt roomBounds = new(0, 0, 16, 16);
+            Allocator allocator = Allocator.Temp;
+
             // Arrange - Create platforms for connectivity test
-            var platforms = new NativeArray<float2>(4, Allocator.Temp);
-            platforms[0] = new float2(0, 0);
-            platforms[1] = new float2(4, 2);
-            platforms[2] = new float2(8, 1);
-            platforms[3] = new float2(12, 3);
+            var platformsFloat = new NativeArray<float2>(4, Allocator.Temp);
+            platformsFloat[0] = new float2(0, 0);
+            platformsFloat[1] = new float2(4, 2);
+            platformsFloat[2] = new float2(8, 1);
+            platformsFloat[3] = new float2(12, 3);
+
+            // Convert float2 platforms to int2 as required by the API
+            var platforms = new NativeArray<int2>(platformsFloat.Length, Allocator.Temp);
+            for (int i = 0; i < platformsFloat.Length; i++)
+            {
+                platforms[i] = new int2((int)platformsFloat[i].x, (int)platformsFloat[i].y);
+            }
 
             var obstacles = new NativeArray<int2>(0, Allocator.Temp); // No obstacles
-            var physics = new JumpPhysicsData(4.0f, 6.0f, 9.81f, 5.0f, false, false, false);
+
+            // Convert JumpPhysicsData to JumpArcPhysics as required by the API
+            var physics = new JumpArcPhysics
+            {
+                JumpHeight = 4.0f,
+                JumpDistance = 6.0f,
+                GravityScale = 9.81f
+            };
 
             // Act
-            bool isReachable = JumpArcSolver.ValidateRoomReachability(platforms, obstacles, physics);
+            bool isReachable = JumpArcSolver.ValidateRoomReachability(int2.zero, platforms, Ability.Jump, physics, roomBounds, allocator);
 
             // Assert
             Assert.IsTrue(isReachable, "All platforms should be reachable with given jump physics");
 
             // Cleanup
+            platformsFloat.Dispose();
             platforms.Dispose();
             obstacles.Dispose();
         }

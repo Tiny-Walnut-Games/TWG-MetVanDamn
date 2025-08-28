@@ -117,7 +117,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var roomEntity = CreateTestRoomWithTemplate();
             
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var presGroup = _world.GetOrCreateSystemManaged<PresentationSystemGroup>();
+            var simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
             
             var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
             var navGenSystem = _world.GetOrCreateSystemManaged<RoomNavigationGeneratorSystem>();
@@ -125,11 +125,11 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             
             initGroup.AddSystemToUpdateList(roomGenSystem);
             initGroup.AddSystemToUpdateList(navGenSystem);
-            presGroup.AddSystemToUpdateList(cameraGenSystem);
+            simGroup.AddSystemToUpdateList(cameraGenSystem);
             initGroup.SortSystems();
-            presGroup.SortSystems();
+            simGroup.SortSystems();
             initGroup.Update();
-            presGroup.Update();
+            simGroup.Update();
 
             Assert.IsTrue(_entityManager.HasComponent<CinemachineZoneData>(roomEntity));
             Assert.IsTrue(_entityManager.HasComponent<CinemachineGameObjectReference>(roomEntity));
@@ -198,18 +198,18 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             CreateWorldConfiguration();
 
             var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var presGroup = _world.GetOrCreateSystemManaged<PresentationSystemGroup>();
+            var simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
             var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
             var navGenSystem = _world.GetOrCreateSystemManaged<RoomNavigationGeneratorSystem>();
             var cameraGenSystem = _world.GetOrCreateSystemManaged<CinemachineZoneGeneratorSystem>();
 
             initGroup.AddSystemToUpdateList(roomGenSystem);
             initGroup.AddSystemToUpdateList(navGenSystem);
-            presGroup.AddSystemToUpdateList(cameraGenSystem);
+            simGroup.AddSystemToUpdateList(cameraGenSystem);
             initGroup.SortSystems();
-            presGroup.SortSystems();
+            simGroup.SortSystems();
             initGroup.Update();
-            presGroup.Update();
+            simGroup.Update();
 
             var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             Assert.IsTrue(genStatus.ContentGenerated || _entityManager.HasComponent<RoomTemplate>(roomEntity));

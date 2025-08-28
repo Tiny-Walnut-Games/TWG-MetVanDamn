@@ -1,8 +1,8 @@
 //  This script is intended to be used in the Unity Editor only, stored in an Editor folder to ensure it is not included in builds.
 #if UNITY_EDITOR
 
-// Check if sprite editor assemblies are available
-#if HAS_SPRITE_EDITOR || UNITY_2D_SPRITE_EDITOR_AVAILABLE
+// Check if sprite editor assemblies are available with more robust detection
+#if UNITY_2021_2_OR_NEWER && UNITY_2D && (SPRITE_EDITOR_AVAILABLE || UNITY_2D_SPRITE_EDITOR)
 #define SPRITE_EDITOR_FEATURES_AVAILABLE
 #endif
 
@@ -99,6 +99,28 @@ namespace TinyWalnutGames.Tools.Editor
             if (GUILayout.Button("Open Package Manager"))
             {
                 UnityEditor.PackageManager.UI.Window.Open("com.unity.2d.sprite");
+            }
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Debug Information:", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Unity Version: " + Application.unityVersion);
+            EditorGUILayout.LabelField("2D Package Required: com.unity.2d.sprite");
+            EditorGUILayout.LabelField("Current Assembly References:");
+            
+            var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+            bool found2DSprite = false;
+            foreach (var assembly in assemblies)
+            {
+                if (assembly.FullName.Contains("UnityEditor.U2D.Sprites"))
+                {
+                    EditorGUILayout.LabelField("  ✓ " + assembly.GetName().Name);
+                    found2DSprite = true;
+                }
+            }
+            
+            if (!found2DSprite)
+            {
+                EditorGUILayout.LabelField("  ✗ UnityEditor.U2D.Sprites assembly not found", EditorStyles.helpBox);
             }
 #else
             

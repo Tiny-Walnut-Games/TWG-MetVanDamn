@@ -14,7 +14,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
-    [UpdateAfter(typeof(WeightedTilePrefabGenerator))]
+    [UpdateAfter(typeof(RoomGenerationPipelineSystem))]
     public partial struct StackedSegmentGenerator : ISystem
     {
         private ComponentLookup<JumpPhysicsData> _jumpPhysicsLookup;

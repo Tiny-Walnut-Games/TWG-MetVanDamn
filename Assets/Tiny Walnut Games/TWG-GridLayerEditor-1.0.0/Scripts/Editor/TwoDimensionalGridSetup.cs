@@ -1,4 +1,4 @@
-﻿// Assets/Editor/TwoDimensionalGridSettup.cs
+// Assets/Editor/TwoDimensionalGridSettup.cs
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -63,6 +63,8 @@ namespace TinyWalnutGames.GridLayerEditor
         [MenuItem("GameObject/Tiny Walnut Games/Create Side-Scrolling Grid", false, 10)]
         private static void ContextCreateSideScrollingGrid(MenuCommand menuCommand)
         {
+            if (menuCommand == null)
+                throw new ArgumentNullException(nameof(menuCommand)); // Defensive check for null - and a use for menuCommand
             CreateSideScrollingGrid();
         }
 
@@ -128,6 +130,8 @@ namespace TinyWalnutGames.GridLayerEditor
         [MenuItem("GameObject/Tiny Walnut Games/Create Default Top-Down Grid", false, 10)]
         private static void ContextCreateDefaultTopDownGrid(MenuCommand menuCommand)
         {
+            if (menuCommand == null)
+                throw new ArgumentNullException(nameof(menuCommand)); // Defensive check for null - and a use for menuCommand
             CreateDefaultTopDownGrid();
         }
 
@@ -187,6 +191,8 @@ namespace TinyWalnutGames.GridLayerEditor
         [MenuItem("GameObject/Tiny Walnut Games/Create Isometric Top-Down Grid", false, 10)]
         private static void ContextCreateIsometricTopDownGrid(MenuCommand menuCommand)
         {
+            if (menuCommand == null)
+                throw new ArgumentNullException(nameof(menuCommand)); // Defensive check for null - and a use for menuCommand
             CreateIsometricTopDownGrid();
         }
 
@@ -215,6 +221,8 @@ namespace TinyWalnutGames.GridLayerEditor
         [MenuItem("GameObject/Tiny Walnut Games/Create Hexagonal Top-Down Grid", false, 10)]
         private static void ContextCreateHexTopDownGrid(MenuCommand menuCommand)
         {
+            if (menuCommand == null)
+                throw new ArgumentNullException(nameof(menuCommand)); // Defensive check for null - and a use for menuCommand
             CreateHexTopDownGrid();
         }
 

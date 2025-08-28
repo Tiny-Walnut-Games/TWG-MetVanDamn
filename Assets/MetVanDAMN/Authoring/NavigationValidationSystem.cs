@@ -39,9 +39,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 
             // Perform reachability analysis with different agent capability sets
             var unreachableCount = PerformReachabilityAnalysis();
-            
-            // Update navigation graph with validation results
-            navGraph.UnreachableAreaCount = unreachableCount;
+
+            // Update navigation graph state
             SystemAPI.SetSingleton(navGraph);
 
             // Log validation results for debugging
@@ -279,6 +278,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             var em = world.EntityManager;
             var navGraphQuery = em.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
             
+
             if (navGraphQuery.IsEmpty)
             {
                 return new NavigationValidationReport(0, 0);
@@ -465,8 +465,82 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// </summary>
         public static bool IsPathPossible(World world, uint fromNodeId, uint toNodeId, AgentCapabilities capabilities)
         {
-            // Path API not exposed yet; return false to avoid compile errors
-            return false;
+            if (world == null)
+                return false;
+
+            var entityManager = world.EntityManager;
+            if (entityManager == null)
+                return false;
+
+            // Quick check: if source and destination are the same, path is always possible
+            if (fromNodeId == toNodeId)
+                return true;
+
+            // Find source entity
+            var sourceEntity = FindEntityByNodeId(world, fromNodeId);
+            if (sourceEntity == Entity.Null)
+                return false;
+
+            // Find destination entity  
+            var destinationEntity = FindEntityByNodeId(world, toNodeId);
+            if (destinationEntity == Entity.Null)
+                return false;
+
+            // Perform flood fill pathfinding from source to destination
+            var reachableNodes = new NativeHashSet<uint>(1000, Allocator.Temp);
+            var queue = new NativeQueue<uint>(Allocator.Temp);
+            
+            try
+            {
+                // Start flood fill from source node
+                queue.Enqueue(fromNodeId);
+                reachableNodes.Add(fromNodeId);
+                
+                while (queue.Count > 0)
+                {
+                    var currentNodeId = queue.Dequeue();
+                    
+                    // Check if we've reached the destination
+                    if (currentNodeId == toNodeId)
+                    {
+                        return true; // Path found!
+                    }
+                    
+                    // Find current entity and explore its neighbors
+                    var currentEntity = FindEntityByNodeId(world, currentNodeId);
+                    if (currentEntity == Entity.Null || !entityManager.HasBuffer<NavLinkBufferElement>(currentEntity))
+                        continue;
+                        
+                    var linkBuffer = entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
+                    
+                    for (int i = 0; i < linkBuffer.Length; i++)
+                    {
+                        var link = linkBuffer[i].Value;
+                        var neighborId = link.GetDestination(currentNodeId);
+                        
+                        if (neighborId == 0 || reachableNodes.Contains(neighborId))
+                            continue;
+                            
+                        // 🔥 CRITICAL: Check if agent can traverse this link with their capabilities
+                        if (link.CanTraverseWith(capabilities, currentNodeId))
+                        {
+                            reachableNodes.Add(neighborId);
+                            queue.Enqueue(neighborId);
+                        }
+                    }
+                }
+                
+                // If we exit the loop without finding the destination, no path exists
+                return false;
+            }
+            finally
+            {
+                // Always clean up native collections
+                if (reachableNodes.IsCreated)
+                    reachableNodes.Dispose();
+                if (queue.IsCreated)
+                    queue.Dispose();
+            }
         }
 
         /// <summary>

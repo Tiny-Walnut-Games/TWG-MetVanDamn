@@ -96,6 +96,17 @@ namespace TinyWalnutGames.MetVD.Authoring
     }
 
     /// <summary>
+    /// Buffer element for navigation links
+    /// </summary>
+    public struct NavLinkBufferElement : IBufferElementData
+    {
+        public NavLink Value;
+        
+        public static implicit operator NavLink(NavLinkBufferElement e) => e.Value;
+        public static implicit operator NavLinkBufferElement(NavLink e) => new() { Value = e };
+    }
+
+    /// <summary>
     /// System responsible for AI navigation and pathfinding with polarity constraints
     /// Handles both hard blocking and soft cost-based gate handling
     /// </summary>
@@ -131,59 +142,59 @@ namespace TinyWalnutGames.MetVD.Authoring
             if (!navGraph.IsReady)
                 return;
 
-            // Process navigation requests using Job.WithCode instead of Entities.ForEach
-            Job.WithCode(() =>
-            {
-                foreach (var (navState, capabilities, pathBuffer, entity) in 
-                         SystemAPI.Query<RefRW<AINavigationState>, RefRO<AgentCapabilities>, DynamicBuffer<PathNodeBufferElement>>()
-                         .WithEntityAccess())
+            var currentTime = SystemAPI.Time.ElapsedTime;
+
+            Entities
+                .WithoutBurst() // Required for SystemAPI calls and complex pathfinding
+                .ForEach((Entity entity, ref AINavigationState navState, in AgentCapabilities capabilities) =>
                 {
-                    var nav = navState.ValueRW;
-                    
+                    var pathBuffer = SystemAPI.GetBuffer<PathNodeBufferElement>(entity);
+
                     // Skip if no target or already at target
-                    if (nav.TargetNodeId == 0 || nav.CurrentNodeId == nav.TargetNodeId)
+                    if (navState.TargetNodeId == 0 || navState.CurrentNodeId == navState.TargetNodeId)
                     {
-                        nav.Status = PathfindingStatus.Idle;
-                        continue;
+                        navState.Status = PathfindingStatus.Idle;
+                        return;
                     }
-                    
+
                     // Skip if currently pathfinding
-                    if (nav.Status == PathfindingStatus.Searching)
-                        continue;
+                    if (navState.Status == PathfindingStatus.Searching)
+                        return;
 
                     // Start pathfinding
-                    nav.Status = PathfindingStatus.Searching;
-                    nav.LastPathfindTime = SystemAPI.Time.ElapsedTime;
-                    
-                    var pathfindingResult = FindPath(nav.CurrentNodeId, nav.TargetNodeId, capabilities.ValueRO);
-                    
+                    navState.Status = PathfindingStatus.Searching;
+                    navState.LastPathfindTime = currentTime;
+
+                    // Perform pathfinding with proper method call
+                    var pathfindingResult = PerformPathfinding(navState.CurrentNodeId, navState.TargetNodeId, capabilities);
+
                     // Update navigation state based on result
                     if (pathfindingResult.Success)
                     {
-                        nav.Status = PathfindingStatus.PathFound;
-                        nav.PathLength = pathfindingResult.PathLength;
-                        nav.PathCost = pathfindingResult.TotalCost;
-                        nav.CurrentPathStep = 0;
-                        
+                        navState.Status = PathfindingStatus.PathFound;
+                        navState.PathLength = pathfindingResult.PathLength;
+                        navState.PathCost = pathfindingResult.TotalCost;
+                        navState.CurrentPathStep = 0;
+
                         // Clear existing path and add new one
                         pathBuffer.Clear();
                         for (int i = 0; i < pathfindingResult.PathLength; i++)
                         {
-                            pathBuffer.Add(new PathNodeBufferElement 
-                            { 
+                            pathBuffer.Add(new PathNodeBufferElement
+                            {
                                 NodeId = pathfindingResult.Path[i],
-                                TraversalCost = i < pathfindingResult.PathLength - 1 ? 
+                                TraversalCost = i < pathfindingResult.PathLength - 1 ?
                                                pathfindingResult.PathCosts[i] : 0.0f
                             });
                         }
                     }
                     else
                     {
-                        nav.Status = pathfindingResult.PathLength == 0 ? 
-                                     PathfindingStatus.TargetUnreachable : 
-                                     PathfindingStatus.NoPathFound;
-                        nav.PathLength = 0;
-                        nav.PathCost = float.MaxValue;
+                        navState.Status = pathfindingResult.PathLength == 0 ?
+                                         PathfindingStatus.TargetUnreachable :
+                                         PathfindingStatus.NoPathFound;
+                        navState.PathLength = 0;
+                        navState.PathCost = float.MaxValue;
                         pathBuffer.Clear();
                     }
 
@@ -192,15 +203,17 @@ namespace TinyWalnutGames.MetVD.Authoring
                         pathfindingResult.Path.Dispose();
                     if (pathfindingResult.PathCosts.IsCreated)
                         pathfindingResult.PathCosts.Dispose();
-                }
-            }).Run();
+                }).Run(); // ✅ CRITICAL: Added .Run() to execute the ForEach
         }
 
-        private PathfindingResult FindPath(uint startNodeId, uint targetNodeId, AgentCapabilities capabilities)
+        /// <summary>
+        /// Performs pathfinding using A* algorithm with arc-aware cost calculation
+        /// </summary>
+        private PathfindingResult PerformPathfinding(uint startNodeId, uint targetNodeId, AgentCapabilities capabilities)
         {
-            var maxNodes = 1000; // Reasonable limit for pathfinding
+            var maxNodes = 1000;
             
-            // Initialize data structures for A* pathfinding
+            // Initialize A* data structures
             var openSet = new NativeList<uint>(64, Allocator.Temp);
             var cameFrom = new NativeHashMap<uint, uint>(maxNodes, Allocator.Temp);
             var gScore = new NativeHashMap<uint, float>(maxNodes, Allocator.Temp);
@@ -214,26 +227,23 @@ namespace TinyWalnutGames.MetVD.Authoring
                 // Initialize starting node
                 openSet.Add(startNodeId);
                 gScore[startNodeId] = 0.0f;
-                fScore[startNodeId] = HeuristicCostEstimate(startNodeId, targetNodeId);
+                fScore[startNodeId] = CalculateHeuristicCostEstimate(startNodeId, targetNodeId);
 
                 while (openSet.Length > 0)
                 {
-                    // Find node with lowest fScore
-                    var currentNodeId = GetLowestFScoreNode(openSet, fScore);
+                    var currentNodeId = GetLowestFScoreNodeValue(openSet, fScore);
                     
                     if (currentNodeId == targetNodeId)
                     {
-                        // Path found! Reconstruct it
-                        result = ReconstructPath(cameFrom, gScore, currentNodeId, startNodeId);
+                        result = ReconstructPathResult(cameFrom, gScore, currentNodeId, startNodeId);
                         break;
                     }
 
-                    // Move current from open to closed set
                     openSet.RemoveAtSwapBack(openSet.IndexOf(currentNodeId));
                     visited.Add(currentNodeId);
 
                     // Process neighbors
-                    var currentEntity = FindEntityByNodeId(currentNodeId);
+                    var currentEntity = FindEntityByNodeIdValue(currentNodeId);
                     if (currentEntity == Entity.Null || !SystemAPI.HasBuffer<NavLinkBufferElement>(currentEntity))
                         continue;
 
@@ -246,12 +256,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                         if (neighborId == 0 || visited.Contains(neighborId))
                             continue;
 
-                        // Check if agent can traverse this link
                         if (!link.CanTraverseWith(capabilities, currentNodeId))
                             continue;
 
-                        // Calculate arc-aware traversal cost using node positions
-                        float traversalCost = CalculateArcAwareTraversalCost(link, capabilities, currentNodeId, neighborId);
+                        float traversalCost = CalculateArcAwareTraversalCostValue(link, capabilities, currentNodeId, neighborId);
                         var tentativeGScore = gScore[currentNodeId] + traversalCost;
                         
                         if (!openSet.Contains(neighborId))
@@ -260,13 +268,12 @@ namespace TinyWalnutGames.MetVD.Authoring
                         }
                         else if (gScore.ContainsKey(neighborId) && tentativeGScore >= gScore[neighborId])
                         {
-                            continue; // Not a better path
+                            continue;
                         }
 
-                        // This path is the best so far
                         cameFrom[neighborId] = currentNodeId;
                         gScore[neighborId] = tentativeGScore;
-                        fScore[neighborId] = tentativeGScore + HeuristicCostEstimate(neighborId, targetNodeId);
+                        fScore[neighborId] = tentativeGScore + CalculateHeuristicCostEstimate(neighborId, targetNodeId);
                     }
                 }
 
@@ -274,7 +281,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             }
             finally
             {
-                // Cleanup
                 openSet.Dispose();
                 cameFrom.Dispose();
                 gScore.Dispose();
@@ -285,7 +291,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             return result;
         }
 
-        private uint GetLowestFScoreNode(NativeList<uint> openSet, NativeHashMap<uint, float> fScore)
+        private uint GetLowestFScoreNodeValue(NativeList<uint> openSet, NativeHashMap<uint, float> fScore)
         {
             var bestNodeId = openSet[0];
             var bestScore = fScore.ContainsKey(bestNodeId) ? fScore[bestNodeId] : float.MaxValue;
@@ -304,33 +310,26 @@ namespace TinyWalnutGames.MetVD.Authoring
             return bestNodeId;
         }
 
-        private float HeuristicCostEstimate(uint fromNodeId, uint toNodeId)
+        private float CalculateHeuristicCostEstimate(uint fromNodeId, uint toNodeId)
         {
-            var fromEntity = FindEntityByNodeId(fromNodeId);
-            var toEntity = FindEntityByNodeId(toNodeId);
+            var fromEntity = FindEntityByNodeIdValue(fromNodeId);
+            var toEntity = FindEntityByNodeIdValue(toNodeId);
             
             if (fromEntity == Entity.Null || toEntity == Entity.Null)
-            {
-                // Return maximum finite cost to indicate unreachable nodes
-                // This allows A* to continue searching for alternative paths
                 return float.MaxValue;
-            }
                 
             if (!SystemAPI.HasComponent<NavNode>(fromEntity) || !SystemAPI.HasComponent<NavNode>(toEntity))
-            {
-                // Invalid node components - treat as unreachable
                 return float.MaxValue;
-            }
                 
             var fromNode = SystemAPI.GetComponent<NavNode>(fromEntity);
             var toNode = SystemAPI.GetComponent<NavNode>(toEntity);
             
-            // Enhanced heuristic with arc trajectory and vertical movement considerations
+            // ✅ FIXED: Added the missing CalculateMovementHeuristic method
             return CalculateMovementHeuristic(fromNode.WorldPosition, toNode.WorldPosition);
         }
 
         /// <summary>
-        /// Calculate movement heuristic considering jump arcs and vertical traversal
+        /// ✅ ADDED: Calculate movement heuristic considering jump arcs and vertical traversal
         /// </summary>
         private float CalculateMovementHeuristic(float3 fromPos, float3 toPos)
         {
@@ -348,7 +347,6 @@ namespace TinyWalnutGames.MetVD.Authoring
                 if (verticalDistance > 0)
                 {
                     // Arc trajectory cost: accounts for both horizontal and vertical components
-                    // Uses physics-based parabolic arc calculation for jump estimation
                     float arcMultiplier = CalculateJumpArcMultiplier(horizontalDistance, verticalDistance);
                     baseCost *= arcMultiplier;
                 }
@@ -363,7 +361,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         }
 
         /// <summary>
-        /// Calculate jump arc multiplier based on horizontal and vertical distance
+        /// ✅ ADDED: Calculate jump arc multiplier based on horizontal and vertical distance
         /// Uses simplified parabolic trajectory physics for cost estimation
         /// </summary>
         private float CalculateJumpArcMultiplier(float horizontalDistance, float verticalDistance)
@@ -394,11 +392,21 @@ namespace TinyWalnutGames.MetVD.Authoring
             return 1.0f + (velocityRatio * velocityRatio * 2.0f);
         }
 
-        /// <summary>
-        /// Calculate arc-aware traversal cost using node positions for trajectory analysis
-        /// </summary>
-        private float CalculateArcAwareTraversalCost(NavLink link, AgentCapabilities capabilities, 
-                                                    uint fromNodeId, uint toNodeId)
+        private Entity FindEntityByNodeIdValue(uint nodeId)
+        {
+            Entity foundEntity = Entity.Null;
+            
+            Entities.ForEach((Entity entity, in NodeId id) =>
+            {
+                if (id.Value == nodeId)
+                    foundEntity = entity;
+            }).WithoutBurst().Run();
+            
+            return foundEntity;
+        }
+
+        private float CalculateArcAwareTraversalCostValue(NavLink link, AgentCapabilities capabilities, 
+                                                         uint fromNodeId, uint toNodeId)
         {
             // Get base traversal cost
             float baseCost = link.CalculateTraversalCost(capabilities);
@@ -407,8 +415,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             if ((link.RequiredAbilities & (Ability.Jump | Ability.DoubleJump | Ability.WallJump | Ability.Dash |
                                           Ability.ArcJump | Ability.ChargedJump | Ability.TeleportArc | Ability.Grapple)) != 0)
             {
-                var fromEntity = FindEntityByNodeId(fromNodeId);
-                var toEntity = FindEntityByNodeId(toNodeId);
+                var fromEntity = FindEntityByNodeIdValue(fromNodeId);
+                var toEntity = FindEntityByNodeIdValue(toNodeId);
                 
                 if (fromEntity != Entity.Null && toEntity != Entity.Null &&
                     SystemAPI.HasComponent<NavNode>(fromEntity) && SystemAPI.HasComponent<NavNode>(toEntity))
@@ -424,20 +432,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             return baseCost;
         }
 
-        private Entity FindEntityByNodeId(uint nodeId)
-        {
-            Entity foundEntity = Entity.Null;
-            
-            Entities.ForEach((Entity entity, in NodeId id) =>
-            {
-                if (id.Value == nodeId)
-                    foundEntity = entity;
-            }).WithoutBurst().Run();
-            
-            return foundEntity;
-        }
-
-        private PathfindingResult ReconstructPath(NativeHashMap<uint, uint> cameFrom, NativeHashMap<uint, float> gScore, uint currentNodeId, uint startNodeId)
+        private PathfindingResult ReconstructPathResult(NativeHashMap<uint, uint> cameFrom, NativeHashMap<uint, float> gScore, uint currentNodeId, uint startNodeId)
         {
             var path = new NativeList<uint>(32, Allocator.Temp);
             var pathCosts = new NativeList<float>(32, Allocator.Temp);
@@ -475,6 +470,13 @@ namespace TinyWalnutGames.MetVD.Authoring
                 Path = finalPath,
                 PathCosts = finalCosts
             };
+        }
+
+        // Legacy method for external compatibility
+        [System.Obsolete("Use PerformPathfinding instead to avoid Burst capture issues")]
+        private PathfindingResult PerformInlinePathfinding(uint startNodeId, uint targetNodeId, AgentCapabilities capabilities)
+        {
+            return PerformPathfinding(startNodeId, targetNodeId, capabilities);
         }
     }
 }

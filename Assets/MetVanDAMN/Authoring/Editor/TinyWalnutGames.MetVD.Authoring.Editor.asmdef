@@ -9,6 +9,7 @@
         "Unity.Entities.Hybrid",
         "Unity.Mathematics",
         "Unity.Scenes",
+        "Unity.2D.Sprite.Editor",
         "TinyWalnutGames.MetVD.Authoring",
         "TinyWalnutGames.MetVD.Biome",
         "TinyWalnutGames.MetVD.Core",

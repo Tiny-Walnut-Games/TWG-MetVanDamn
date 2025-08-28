@@ -47,85 +47,60 @@ namespace TinyWalnutGames.MetVD.Graph
             uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000.0);
             var random = new Unity.Mathematics.Random(baseSeed == 0 ? 1u : baseSeed);
 
-            var pipelineJob = new RoomGenerationPipelineJob
+            // Use foreach instead of ScheduleParallel to avoid nullable reference issues
+            foreach (var (request, roomData, nodeId, entity) in SystemAPI.Query<RefRW<RoomGenerationRequest>, RefRW<RoomHierarchyData>, RefRO<NodeId>>().WithEntityAccess())
             {
-                BiomeLookup = _biomeLookup,
-                JumpPhysicsLookup = _jumpPhysicsLookup,
-                SecretConfigLookup = _secretConfigLookup,
-                RoomFeatureBufferLookup = _roomFeatureBufferLookup,
-                RoomModuleBufferLookup = _roomModuleBufferLookup,
-                Random = random,
-                DeltaTime = deltaTime
-            };
+                if (request.ValueRO.IsComplete) continue;
 
-            state.Dependency = pipelineJob.ScheduleParallel(state.Dependency);
-        }
-    }
+                var entityRandom = new Unity.Mathematics.Random(random.state + (uint)entity.Index);
 
-    /// <summary>
-    /// Job to process room generation pipeline steps
-    /// </summary>
-    [BurstCompile]
-    public partial struct RoomGenerationPipelineJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<Core.Biome> BiomeLookup;
-        [ReadOnly] public ComponentLookup<JumpPhysicsData> JumpPhysicsLookup;
-        [ReadOnly] public ComponentLookup<SecretAreaConfig> SecretConfigLookup;
-        public BufferLookup<RoomFeatureElement> RoomFeatureBufferLookup;
-        [ReadOnly] public BufferLookup<RoomModuleElement> RoomModuleBufferLookup;
-        public Unity.Mathematics.Random Random;
-        public float DeltaTime;
+                switch (request.ValueRO.CurrentStep)
+                {
+                    case 1: // Biome Selection
+                        ProcessBiomeSelection(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO);
+                        break;
+                    case 2: // Layout Type Decision
+                        ProcessLayoutTypeDecision(ref request.ValueRW, roomData.ValueRO);
+                        break;
+                    case 3: // Room Generator Choice
+                        ProcessRoomGeneratorChoice(ref request.ValueRW, roomData.ValueRO);
+                        break;
+                    case 4: // Content Pass
+                        ProcessContentPass(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
+                        break;
+                    case 5: // Biome-Specific Overrides
+                        ProcessBiomeOverrides(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
+                        break;
+                    case 6: // Nav Generation
+                        ProcessNavGeneration(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
+                        break;
+                    default:
+                        request.ValueRW.IsComplete = true;
+                        continue;
+                }
 
-        public void Execute(Entity entity, ref RoomGenerationRequest request, ref RoomHierarchyData roomData, in NodeId nodeId)
-        {
-            if (request.IsComplete) return;
-
-            switch (request.CurrentStep)
-            {
-                case 1: // Biome Selection
-                    ProcessBiomeSelection(entity, ref request, roomData, nodeId);
-                    break;
-                case 2: // Layout Type Decision
-                    ProcessLayoutTypeDecision(ref request, roomData);
-                    break;
-                case 3: // Room Generator Choice
-                    ProcessRoomGeneratorChoice(ref request, roomData);
-                    break;
-                case 4: // Content Pass
-                    ProcessContentPass(entity, ref request, roomData, nodeId);
-                    break;
-                case 5: // Biome-Specific Overrides
-                    ProcessBiomeOverrides(entity, ref request, roomData, nodeId);
-                    break;
-                case 6: // Nav Generation
-                    ProcessNavGeneration(entity, ref request, roomData, nodeId);
-                    break;
-                default:
-                    request.IsComplete = true;
-                    return;
-            }
-
-            request.CurrentStep++;
-            if (request.CurrentStep > 6)
-            {
-                request.IsComplete = true;
+                request.ValueRW.CurrentStep++;
+                if (request.ValueRW.CurrentStep > 6)
+                {
+                    request.ValueRW.IsComplete = true;
+                }
             }
         }
 
-        private void ProcessBiomeSelection(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
+        private readonly void ProcessBiomeSelection(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
         {
             // Step 1: Choose biome & sub-biome based on world gen rules
             // Apply biome-specific prop/hazard sets
             
             // If we don't have biome data, use fallback
-            if (!BiomeLookup.HasComponent(entity))
+            if (!_biomeLookup.HasComponent(entity))
             {
                 request.TargetBiome = BiomeType.HubArea;
                 request.TargetPolarity = Polarity.None;
                 return;
             }
 
-            var biome = BiomeLookup[entity];
+            var biome = _biomeLookup[entity];
             request.TargetBiome = biome.Type;
             request.TargetPolarity = biome.PrimaryPolarity;
 
@@ -142,7 +117,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessLayoutTypeDecision(ref RoomGenerationRequest request, RoomHierarchyData roomData)
+        private static void ProcessLayoutTypeDecision(ref RoomGenerationRequest request, RoomHierarchyData roomData)
         {
             // Step 2: Decide vertical vs. horizontal orientation
             // Factor in biome constraints (e.g., sky biome favors verticality)
@@ -172,7 +147,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessRoomGeneratorChoice(ref RoomGenerationRequest request, RoomHierarchyData roomData)
+        private static void ProcessRoomGeneratorChoice(ref RoomGenerationRequest request, RoomHierarchyData roomData)
         {
             // Step 3: Pick generator type and filter modules by biome and required skills
             
@@ -214,13 +189,13 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessContentPass(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
+        private readonly void ProcessContentPass(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId, ref Unity.Mathematics.Random random)
         {
             // Step 4: Place hazards, props, secrets + Run Jump Arc Solver
             
-            if (!RoomFeatureBufferLookup.HasBuffer(entity)) return;
+            if (!_roomFeatureBufferLookup.HasBuffer(entity)) return;
             
-            var features = RoomFeatureBufferLookup[entity];
+            var features = _roomFeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             var area = bounds.width * bounds.height;
             
@@ -231,44 +206,44 @@ namespace TinyWalnutGames.MetVD.Graph
             switch (request.GeneratorType)
             {
                 case RoomGeneratorType.PatternDrivenModular:
-                    AddPatternDrivenContent(features, bounds, request);
+                    AddPatternDrivenContent(features, bounds, request, ref random);
                     break;
                 case RoomGeneratorType.ParametricChallenge:
-                    AddParametricChallengeContent(features, bounds, request);
+                    AddParametricChallengeContent(features, bounds, request, ref random);
                     break;
                 case RoomGeneratorType.WeightedTilePrefab:
-                    AddWeightedContent(features, bounds, request);
+                    AddWeightedContent(features, bounds, request, ref random);
                     break;
                 case RoomGeneratorType.StackedSegment:
-                    AddStackedSegmentContent(features, bounds, request);
+                    AddStackedSegmentContent(features, bounds, request, ref random);
                     break;
                 case RoomGeneratorType.LinearBranchingCorridor:
-                    AddLinearCorridorContent(features, bounds, request);
+                    AddLinearCorridorContent(features, bounds, request, ref random);
                     break;
                 case RoomGeneratorType.LayeredPlatformCloud:
-                    AddLayeredPlatformContent(features, bounds, request);
+                    AddLayeredPlatformContent(features, bounds, request, ref random);
                     break;
                 case RoomGeneratorType.BiomeWeightedHeightmap:
-                    AddHeightmapContent(features, bounds, request);
+                    AddHeightmapContent(features, bounds, request, ref random);
                     break;
             }
             
             // Add secret areas if configured
-            if (SecretConfigLookup.HasComponent(entity))
+            if (_secretConfigLookup.HasComponent(entity))
             {
-                var secretConfig = SecretConfigLookup[entity];
-                AddSecretAreas(features, bounds, secretConfig, request);
+                var secretConfig = _secretConfigLookup[entity];
+                AddSecretAreas(features, bounds, secretConfig, request, ref random);
             }
         }
 
-        private void ProcessBiomeOverrides(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
+        private readonly void ProcessBiomeOverrides(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId, ref Unity.Mathematics.Random random)
         {
             // Step 5: Apply visual and mechanical overrides
             // (e.g., moving clouds in sky biome, tech zone hazards)
             
-            if (!RoomFeatureBufferLookup.HasBuffer(entity)) return;
+            if (!_roomFeatureBufferLookup.HasBuffer(entity)) return;
             
-            var features = RoomFeatureBufferLookup[entity];
+            var features = _roomFeatureBufferLookup[entity];
             
             // Apply biome-specific modifications
             for (int i = 0; i < features.Length; i++)
@@ -286,7 +261,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Tech biome - add hazards and automated systems
                 if (request.TargetBiome == BiomeType.PowerPlant || request.TargetBiome == BiomeType.CryogenicLabs)
                 {
-                    if (feature.Type == RoomFeatureType.Obstacle && Random.NextFloat() < 0.3f)
+                    if (feature.Type == RoomFeatureType.Obstacle && random.NextFloat() < 0.3f)
                     {
                         // Convert some obstacles to hazards in tech zones
                         feature.Type = RoomFeatureType.Obstacle; // Could be extended with specific hazard types
@@ -296,14 +271,14 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void ProcessNavGeneration(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
+        private readonly void ProcessNavGeneration(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId, ref Unity.Mathematics.Random random)
         {
             // Step 6: Mark empty tiles above traversable tiles as navigable
             // Calculate jump vectors and add movement-type-aware nav edges
             
-            if (!RoomFeatureBufferLookup.HasBuffer(entity)) return;
+            if (!_roomFeatureBufferLookup.HasBuffer(entity)) return;
             
-            var features = RoomFeatureBufferLookup[entity];
+            var features = _roomFeatureBufferLookup[entity];
             var bounds = roomData.Bounds;
             
             // Collect platform positions for jump arc validation
@@ -324,9 +299,9 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             
             // Run Jump Arc Solver validation if we have jump physics data
-            if (JumpPhysicsLookup.HasComponent(entity) && platformPositions.Length > 1)
+            if (_jumpPhysicsLookup.HasComponent(entity) && platformPositions.Length > 1)
             {
-                var jumpPhysics = JumpPhysicsLookup[entity];
+                var jumpPhysics = _jumpPhysicsLookup[entity];
                 // Build int2 array of critical positions (platforms considered critical)
                 var critical = new NativeArray<int2>(platformPositions.Length, Allocator.Temp);
                 for (int i = 0; i < platformPositions.Length; i++)
@@ -336,12 +311,23 @@ namespace TinyWalnutGames.MetVD.Graph
                 }
                 // Entrance assumed first platform
                 var entrance = critical[0];
-                bool allReachable = JumpArcSolver.ValidateRoomReachability(entrance, critical, Ability.Jump | Ability.DoubleJump, new JumpArcPhysics(), new RectInt(0,0,bounds.width,bounds.height), Allocator.Temp);
+                
+                // Convert JumpPhysicsData to JumpArcPhysics for the solver
+                var arcPhysics = new JumpArcPhysics(
+                    jumpPhysics.JumpHeight,
+                    jumpPhysics.JumpDistance,
+                    jumpPhysics.HasDoubleJump ? 1.5f : 1.0f,
+                    jumpPhysics.GravityScale,
+                    jumpPhysics.HasWallJump ? jumpPhysics.JumpHeight * 0.8f : 0.0f,
+                    jumpPhysics.HasGlide ? 6.0f : 4.0f
+                );
+                
+                bool allReachable = JumpArcSolver.ValidateRoomReachability(entrance, critical, Ability.Jump | Ability.DoubleJump, arcPhysics, new RectInt(0,0,bounds.width,bounds.height), Allocator.Temp);
                 if (!allReachable && features.Length > 2)
                 {
                     for (int i = features.Length - 1; i >= 0; i--)
                     {
-                        if (features[i].Type == RoomFeatureType.Obstacle && Random.NextFloat() < 0.3f)
+                        if (features[i].Type == RoomFeatureType.Obstacle && random.NextFloat() < 0.3f)
                         {
                             features.RemoveAt(i);
                         }
@@ -355,7 +341,7 @@ namespace TinyWalnutGames.MetVD.Graph
         }
 
         // Helper methods for content generation
-        private void AddPatternDrivenContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request)
+        private static void AddPatternDrivenContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request, ref Unity.Mathematics.Random random)
         {
             // Pattern-driven generation for movement skill puzzles
             var area = bounds.width * bounds.height;
@@ -364,8 +350,8 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int i = 0; i < featureCount; i++)
             {
                 var pos = new int2(
-                    Random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
-                    Random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
+                    random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
+                    random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
                 
                 // Add skill-specific challenges based on available abilities
@@ -379,7 +365,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddParametricChallengeContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request)
+        private static void AddParametricChallengeContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request, ref Unity.Mathematics.Random random)
         {
             // Parametric generation tuned for testing specific skills
             var platformCount = math.max(2, bounds.width / 3);
@@ -388,7 +374,7 @@ namespace TinyWalnutGames.MetVD.Graph
             {
                 var pos = new int2(
                     bounds.x + (i * bounds.width / platformCount),
-                    bounds.y + Random.NextInt(1, bounds.height - 1)
+                    bounds.y + random.NextInt(1, bounds.height - 1)
                 );
                 
                 features.Add(new RoomFeatureElement
@@ -400,7 +386,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddWeightedContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request)
+        private static void AddWeightedContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request, ref Unity.Mathematics.Random random)
         {
             // Standard weighted generation with optional secrets
             var area = bounds.width * bounds.height;
@@ -409,11 +395,11 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int i = 0; i < featureCount; i++)
             {
                 var pos = new int2(
-                    Random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
-                    Random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
+                    random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
+                    random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
                 
-                var featureType = Random.NextFloat() > 0.7f ? RoomFeatureType.Platform : RoomFeatureType.Obstacle;
+                var featureType = random.NextFloat() > 0.7f ? RoomFeatureType.Platform : RoomFeatureType.Obstacle;
                 features.Add(new RoomFeatureElement
                 {
                     Type = featureType,
@@ -423,7 +409,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddStackedSegmentContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request)
+        private static void AddStackedSegmentContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request, ref Unity.Mathematics.Random random)
         {
             // Vertical stacked segments for climb/jump routes
             var segmentCount = math.max(2, bounds.height / 4);
@@ -431,13 +417,13 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int segment = 0; segment < segmentCount; segment++)
             {
                 var y = bounds.y + (segment * bounds.height / segmentCount);
-                var platformsInSegment = Random.NextInt(1, 4);
+                var platformsInSegment = random.NextInt(1, 4);
                 
                 for (int p = 0; p < platformsInSegment; p++)
                 {
                     var pos = new int2(
-                        Random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
-                        y + Random.NextInt(0, bounds.height / segmentCount)
+                        random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
+                        y + random.NextInt(0, bounds.height / segmentCount)
                     );
                     
                     features.Add(new RoomFeatureElement
@@ -450,7 +436,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddLinearCorridorContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request)
+        private static void AddLinearCorridorContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request, ref Unity.Mathematics.Random random)
         {
             // Horizontal corridor with rhythm pacing
             var segmentCount = math.max(2, bounds.width / 6);
@@ -462,8 +448,8 @@ namespace TinyWalnutGames.MetVD.Graph
                 // Alternate between challenge and rest beats
                 if (segment % 2 == 0) // Challenge beat
                 {
-                    var pos = new int2(x + Random.NextInt(0, bounds.width / segmentCount), 
-                                      bounds.y + Random.NextInt(1, bounds.height - 1));
+                    var pos = new int2(x + random.NextInt(0, bounds.width / segmentCount), 
+                                      bounds.y + random.NextInt(1, bounds.height - 1));
                     features.Add(new RoomFeatureElement
                     {
                         Type = RoomFeatureType.Obstacle,
@@ -473,8 +459,8 @@ namespace TinyWalnutGames.MetVD.Graph
                 }
                 else // Rest beat
                 {
-                    var pos = new int2(x + Random.NextInt(0, bounds.width / segmentCount),
-                                      bounds.y + Random.NextInt(1, bounds.height - 1));
+                    var pos = new int2(x + random.NextInt(0, bounds.width / segmentCount),
+                                      bounds.y + random.NextInt(1, bounds.height - 1));
                     features.Add(new RoomFeatureElement
                     {
                         Type = RoomFeatureType.Platform,
@@ -485,7 +471,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddLayeredPlatformContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request)
+        private static void AddLayeredPlatformContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request, ref Unity.Mathematics.Random random)
         {
             // Layered platforms for sky biomes with motion patterns
             var layerCount = math.max(2, bounds.height / 3);
@@ -493,13 +479,13 @@ namespace TinyWalnutGames.MetVD.Graph
             for (int layer = 0; layer < layerCount; layer++)
             {
                 var y = bounds.y + (layer * bounds.height / layerCount);
-                var platformsInLayer = Random.NextInt(2, 5);
+                var platformsInLayer = random.NextInt(2, 5);
                 
                 for (int p = 0; p < platformsInLayer; p++)
                 {
                     var pos = new int2(
-                        Random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
-                        y + Random.NextInt(0, bounds.height / layerCount)
+                        random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
+                        y + random.NextInt(0, bounds.height / layerCount)
                     );
                     
                     features.Add(new RoomFeatureElement
@@ -512,7 +498,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddHeightmapContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request)
+        private static void AddHeightmapContent(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, RoomGenerationRequest request, ref Unity.Mathematics.Random random)
         {
             // Heightmap-based terrain generation for overworld biomes
             for (int x = bounds.x; x < bounds.x + bounds.width; x += 2)
@@ -530,15 +516,15 @@ namespace TinyWalnutGames.MetVD.Graph
             }
         }
 
-        private void AddSecretAreas(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request)
+        private static void AddSecretAreas(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, SecretAreaConfig config, RoomGenerationRequest request, ref Unity.Mathematics.Random random)
         {
             var secretCount = (int)(bounds.width * bounds.height * config.SecretAreaPercentage / (config.MinSecretSize.x * config.MinSecretSize.y));
             
             for (int i = 0; i < secretCount; i++)
             {
                 var pos = new int2(
-                    Random.NextInt(bounds.x, bounds.x + bounds.width - config.MinSecretSize.x),
-                    Random.NextInt(bounds.y, bounds.y + bounds.height - config.MinSecretSize.y)
+                    random.NextInt(bounds.x, bounds.x + bounds.width - config.MinSecretSize.x),
+                    random.NextInt(bounds.y, bounds.y + bounds.height - config.MinSecretSize.y)
                 );
                 
                 features.Add(new RoomFeatureElement
@@ -580,7 +566,7 @@ namespace TinyWalnutGames.MetVD.Graph
                    biome == BiomeType.CrystalCaverns;
         }
 
-        private RoomFeatureType SelectSkillSpecificFeature(Ability availableSkills)
+        private static RoomFeatureType SelectSkillSpecificFeature(Ability availableSkills)
         {
             if ((availableSkills & Ability.Dash) != 0) return RoomFeatureType.Obstacle;
             if ((availableSkills & Ability.WallJump) != 0) return RoomFeatureType.Platform;
