@@ -343,7 +343,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             biomeInfos.Clear();
             biomeColors.Clear();
             
-            var biomeAuthorings = FindObjectsOfType<BiomeFieldAuthoring>();
+            var biomeAuthorings = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
             var biomesByType = new Dictionary<BiomeType, List<BiomeFieldAuthoring>>();
             
             // Group biomes by type
@@ -473,7 +473,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void SyncWithTileMapRenderers(Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
         {
-            var tilemapRenderers = FindObjectsOfType<UnityEngine.Tilemaps.TilemapRenderer>();
+            var tilemapRenderers = FindObjectsByType<UnityEngine.Tilemaps.TilemapRenderer>(FindObjectsSortMode.None);
             
             foreach (var renderer in tilemapRenderers)
             {
@@ -593,7 +593,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void FocusBiome(BiomeInfo biomeInfo)
         {
-            var instances = FindObjectsOfType<BiomeFieldAuthoring>()
+            var instances = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None)
                 .Where(b => b.biomeType.Equals(biomeInfo.type))
                 .ToArray();
             
@@ -621,7 +621,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void FocusAllBiomes()
         {
-            var allBiomes = FindObjectsOfType<BiomeFieldAuthoring>();
+            var allBiomes = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
             
             if (allBiomes.Length > 0)
             {
@@ -639,7 +639,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void UpdateBiomeVisibility(BiomeInfo biomeInfo)
         {
-            var instances = FindObjectsOfType<BiomeFieldAuthoring>()
+            var instances = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None)
                 .Where(b => b.biomeType.Equals(biomeInfo.type))
                 .ToArray();
             

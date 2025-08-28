@@ -79,7 +79,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [MenuItem("Tools/MetVanDAMN/Toggle Navigation Graph Visualization")]
         public static void ToggleNavigationGraphVisualization()
         {
-            var gizmos = FindObjectsOfType<NavigationGraphGizmo>();
+            var gizmos = FindObjectsByType<NavigationGraphGizmo>(FindObjectsSortMode.None);
             bool newState = gizmos.Length == 0 || !gizmos[0].showNavigationGraph;
             
             foreach (var gizmo in gizmos)

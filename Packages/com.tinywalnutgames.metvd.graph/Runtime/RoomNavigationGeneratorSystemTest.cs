@@ -17,12 +17,11 @@ namespace TinyWalnutGames.MetVD.Graph
         
         protected override void OnUpdate()
         {
-            // Get the managed RoomNavigationGeneratorSystem and update it
-            var system = World.GetExistingSystemManaged<RoomNavigationGeneratorSystem>();
-            if (system != null)
-            {
-                system.Update();
-            }
+            // Get SystemState and call OnUpdate directly on the unmanaged system
+            ref var systemState = ref this.CheckedStateRef;
+            ref var unmanagedSystem = ref World.Unmanaged.GetUnsafeSystemRef<RoomNavigationGeneratorSystem>(
+                World.Unmanaged.GetExistingUnmanagedSystem<RoomNavigationGeneratorSystem>());
+            unmanagedSystem.OnUpdate(ref systemState);
         }
     }
 }

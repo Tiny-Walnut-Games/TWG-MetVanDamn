@@ -98,7 +98,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var connectionsParent = new GameObject("Connections");
             
             // Find all district authoring components
-            var districts = UnityEngine.Object.FindObjectsOfType<DistrictAuthoring>();
+            var districts = UnityEngine.Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
             
             // Create connections between adjacent districts
             foreach (var district1 in districts)

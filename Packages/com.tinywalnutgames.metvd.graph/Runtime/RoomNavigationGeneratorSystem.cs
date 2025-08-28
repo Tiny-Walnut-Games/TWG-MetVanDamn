@@ -391,9 +391,8 @@ namespace TinyWalnutGames.MetVD.Graph
             };
         }
 
-        public void Update(ref SystemState state, ref RoomNavigationGeneratorSystem system)
+        public void OnDestroy(ref SystemState state)
         {
-            OnUpdate(ref state);
         }
     }
 
