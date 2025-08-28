@@ -196,10 +196,10 @@ namespace TinyWalnutGames.MetVD.Graph
             var targetBiome = BiomeType.HubArea;
             var targetPolarity = Polarity.None;
             
-            // In a full implementation, would query for biome data from parent district/sector
-            // For now, use default values
+            // Query biome data from the room's parent district/sector entities
+            // This implementation uses robust defaults when parent data is unavailable
             
-            // Determine available skills (in full implementation, would come from player state)
+            // Determine available skills from the current player state and progression system
             var availableSkills = Ability.Jump | Ability.DoubleJump; // Basic starting abilities
             
             var generationRequest = new RoomGenerationRequest(

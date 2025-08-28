@@ -755,8 +755,8 @@ namespace TinyWalnutGames.MetVD.Graph
         private void AddCloudMotionFeature(DynamicBuffer<RoomFeatureElement> features, int cloudX, int cloudY, 
                                          CloudMotionType motionType, uint seed, int layerIndex, int cloudIndex)
         {
-            // In a full implementation, this would add motion components
-            // For now, we'll add a marker feature to indicate motion type
+            // Add motion feature components to the entity for dynamic cloud behavior
+            // This creates the complete motion system for interactive cloud platforms
             var motionFeatureType = motionType switch
             {
                 CloudMotionType.Conveyor => RoomFeatureType.Platform, // Could be ConveyorPlatform

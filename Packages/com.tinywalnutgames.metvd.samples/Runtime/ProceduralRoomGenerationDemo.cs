@@ -70,8 +70,8 @@ namespace TinyWalnutGames.MetVD.Samples
             // Add the procedural room generation systems
             var systemGroup = _demoWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
             
-            // Note: In a real Unity project, these systems would be automatically discovered
-            // Here we manually add them for demonstration
+            // Systems are manually added for this demonstration world
+            // This provides complete control over the generation pipeline
             if (logGenerationSteps)
             {
                 Debug.Log("Demo World initialized with procedural room generation systems");

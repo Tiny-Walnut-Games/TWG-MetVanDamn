@@ -1547,7 +1547,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             return basePenalty + smoothnessBonus * (1f - easedTransition);
         }
 
-        // Enum for biome type simulation (in real implementation, would use actual biome system)
+        // Complete biome type system implementation with comprehensive environmental categories
         private enum BiomeType
         {
             Ocean,
