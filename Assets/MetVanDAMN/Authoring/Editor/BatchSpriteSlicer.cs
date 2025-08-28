@@ -219,6 +219,7 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private void CopySlicesFromSelected()
         {
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
             Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
             if (selectedTextures.Length == 0)
             {
@@ -269,6 +270,9 @@ namespace TinyWalnutGames.Tools.Editor
             copiedTexWidth = texture.width;
             copiedTexHeight = texture.height;
             Debug.Log($"Copied {rects.Count} sprite rects (and outlines) from '{texture.name}' ({copiedTexWidth}x{copiedTexHeight}).");
+#else
+            Debug.LogWarning("Sprite Editor features not available. Cannot copy slices.");
+#endif
         }
 
         /// <summary>
@@ -276,6 +280,7 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private void PasteSlicesToSelected()
         {
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
             if (copiedRects == null || copiedRects.Count == 0)
             {
                 Debug.LogWarning("No copied slices to paste.");
@@ -384,6 +389,9 @@ namespace TinyWalnutGames.Tools.Editor
 
                 Debug.Log($"Pasted {newRects.Count} slices (and outlines) to '{texture.name}' ({texWidth}x{texHeight}).");
             }
+#else
+            Debug.LogWarning("Sprite Editor features not available. Cannot paste slices.");
+#endif
         }
 
         /// <summary>
@@ -391,6 +399,7 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private void AdjustPivotOfSelectedSlices()
         {
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
             Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
 
             // Check if any textures are selected to adjust the pivot
@@ -437,6 +446,9 @@ namespace TinyWalnutGames.Tools.Editor
                 // Log the number of slices adjusted and the texture details
                 Debug.Log($"Adjusted pivot for {rects.Count} slices on '{obj.name}'.");
             }
+#else
+            Debug.LogWarning("Sprite Editor features not available. Cannot adjust pivot.");
+#endif
         }
 
         /// <summary>
@@ -444,6 +456,7 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private void SliceSelectedSprites()
         {
+#if SPRITE_EDITOR_FEATURES_AVAILABLE
             Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
 
             // Check if any textures are selected to slice
@@ -590,6 +603,9 @@ namespace TinyWalnutGames.Tools.Editor
 
             // Log the completion of the batch slicing operation
             Debug.Log("Batch slicing completed using ISpriteEditorDataProvider!");
+#else
+            Debug.LogWarning("Sprite Editor features not available. Cannot slice sprites.");
+#endif
         }
 
         /// <summary>
