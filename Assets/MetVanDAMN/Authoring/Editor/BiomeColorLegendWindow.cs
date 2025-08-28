@@ -399,7 +399,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (Application.isPlaying && World.DefaultGameObjectInjectionWorld != null)
             {
                 var world = World.DefaultGameObjectInjectionWorld;
-                var biomeSystem = world.GetExistingSystemManaged<BiomeFieldSystem>();
+                var biomeSystem = world.GetExistingSystem<BiomeFieldSystem>();
                 
                 // Access runtime biome data through ECS query
                 SyncWithECSBiomeData(world, biomesByType);
