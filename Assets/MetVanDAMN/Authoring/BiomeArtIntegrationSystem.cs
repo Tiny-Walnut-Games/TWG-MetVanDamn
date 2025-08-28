@@ -1530,7 +1530,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             if (biomeNoise < 0.2f) return BiomeType.Ocean;
             else if (biomeNoise < 0.4f) return BiomeType.Forest;
             else if (biomeNoise < 0.6f) return BiomeType.Desert;
-            else if (biomeNoise < 0.8f) return BiomeType.Mountain;
+            else if (biomeNoise < 0.8f) return BiomeType.Mountains;
             else return BiomeType.Tundra;
         }
 

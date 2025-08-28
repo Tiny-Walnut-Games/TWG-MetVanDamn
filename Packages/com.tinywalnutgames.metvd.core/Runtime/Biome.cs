@@ -81,9 +81,14 @@ namespace TinyWalnutGames.MetVD.Core
         Volcanic = 23,
         Hell = 24, // Changed from Magma to Hell for clarity
 
+        // Weather/Environmental biomes
+        Storm = 25,          // Storm and wind-based biome
+        MetalRich = 26,      // Metal-rich mining biome
+        Insulating = 27,     // Energy-insulating/dampening biome
+
         // Neutral/Mixed biomes
-        HubArea = 25,
-        TransitionZone = 26
+        HubArea = 28,
+        TransitionZone = 29
     }
 
     /// <summary>

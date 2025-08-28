@@ -337,20 +337,45 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var style = new PathVisualizationStyle
             {
                 LineColor = _currentColors[6],
-                LineWidth = caps.Size > 1.0f ? 3.0f : 2.0f, // Larger agents get thicker lines
-                ShowTraversalCost = caps.HasJumpAbility, // Flying agents see cost differently
-                HighlightConstraints = caps.MaxJumpHeight > 0 // Show height restrictions
+                LineWidth = HasAdvancedMovement(caps) ? 3.0f : 2.0f, // Advanced movement agents get thicker lines
+                ShowTraversalCost = HasJumpAbility(caps), // Jump-capable agents see cost differently
+                HighlightConstraints = GetMaxJumpHeight(caps) > 0 // Show height restrictions for jumping agents
             };
             
             // Color-code by agent movement type
-            if (caps.HasJumpAbility)
+            if (HasJumpAbility(caps))
                 style.LineColor = Color.cyan; // Flying/jumping agents
-            else if (caps.MaxSlope > 0.5f)
+            else if (HasClimbingAbility(caps))
                 style.LineColor = Color.yellow; // Climbing agents
             else
                 style.LineColor = Color.green; // Ground-based agents
                 
             return style;
+        }
+        
+        private bool HasJumpAbility(AgentCapabilities caps)
+        {
+            return (caps.AvailableAbilities & (Ability.Jump | Ability.DoubleJump | Ability.WallJump | Ability.ArcJump | Ability.ChargedJump)) != 0;
+        }
+        
+        private bool HasClimbingAbility(AgentCapabilities caps)
+        {
+            return (caps.AvailableAbilities & (Ability.Climb | Ability.WallJump)) != 0;
+        }
+        
+        private bool HasAdvancedMovement(AgentCapabilities caps)
+        {
+            return (caps.AvailableAbilities & (Ability.TeleportArc | Ability.Grapple | Ability.Flight)) != 0;
+        }
+        
+        private float GetMaxJumpHeight(AgentCapabilities caps)
+        {
+            if ((caps.AvailableAbilities & Ability.TeleportArc) != 0) return 10.0f;
+            if ((caps.AvailableAbilities & Ability.ChargedJump) != 0) return 8.0f;
+            if ((caps.AvailableAbilities & Ability.ArcJump) != 0) return 6.0f;
+            if ((caps.AvailableAbilities & Ability.DoubleJump) != 0) return 4.0f;
+            if ((caps.AvailableAbilities & Ability.Jump) != 0) return 2.0f;
+            return 0.0f;
         }
         
         private PathfindingResult CalculatePathPreview(uint fromId, uint toId, AgentCapabilities caps)
@@ -370,7 +395,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 {
                     IsValid = distance < 1000, // Reasonable distance threshold
                     PathLength = (int)(distance / 10), // Estimated path length
-                    TotalCost = distance * (caps.HasJumpAbility ? 0.8f : 1.2f) // Capability-based cost
+                    TotalCost = distance * (HasJumpAbility(caps) ? 0.8f : 1.2f) // Capability-based cost
                 };
             }
             
