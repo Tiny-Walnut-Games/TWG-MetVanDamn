@@ -410,7 +410,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             
             // Test invalid connection referencing non-existent districts
             var invalidConnection = CreateTestConnection("InvalidConnection", 
-                new NodeId { value = 888 }, new NodeId { value = 777 }); // Neither exist
+                new NodeId { Value = 888 }, new NodeId { Value = 777 }); // Neither exist
             
             BakeGameObjects(world, invalidConnection.gameObject);
             
@@ -418,8 +418,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             var connections = connectionQuery.ToComponentDataArray<ConnectionData>(Allocator.Temp);
             
             Assert.AreEqual(1, connections.Length, "Invalid connection should still be baked");
-            Assert.AreEqual(888u, connections[0].sourceNode.value);
-            Assert.AreEqual(777u, connections[0].targetNode.value);
+            Assert.AreEqual(888u, connections[0].sourceNode.Value);
+            Assert.AreEqual(777u, connections[0].targetNode.Value);
             
             districts.Dispose();
             connections.Dispose();
@@ -437,18 +437,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             World.DefaultGameObjectInjectionWorld = world;
             
             // Create valid district and connection
-            var district = CreateTestDistrict("TestDistrict", new NodeId { value = 100 });
-            var connection = CreateTestConnection("TestConnection", new NodeId { value = 100 }, new NodeId { value = 200 });
+            var district = CreateTestDistrict("TestDistrict", new NodeId { Value = 100 });
+            var connection = CreateTestConnection("TestConnection", new NodeId { Value = 100 }, new NodeId { Value = 200 });
             
             // Create gate with invalid connection reference
             var gateGO = new GameObject("InvalidGate");
             var gate = gateGO.AddComponent<GateConditionAuthoring>();
-            gate.connectionId = new NodeId { value = 500 }; // References non-existent connection
+            gate.connectionId = new NodeId { Value = 500 }; // References non-existent connection
             gate.gateConditions = new GateCondition[]
             {
-                new GateCondition 
-                { 
-                    requiredConnectionId = new NodeId { value = 999 }, // Also invalid
+                new() { 
+                    requiredConnectionId = new NodeId { Value = 999 }, // Also invalid
                     isDefault = false 
                 }
             };
@@ -465,7 +464,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.AreEqual(1, gateQuery.CalculateEntityCount());
             
             var gateData = gateQuery.ToComponentDataArray<GateData>(Allocator.Temp);
-            Assert.AreEqual(500u, gateData[0].connectionId.value, "Gate should reference invalid connection ID");
+            Assert.AreEqual(500u, gateData[0].connectionId.Value, "Gate should reference invalid connection ID");
             
             gateData.Dispose();
             districtQuery.Dispose();
@@ -484,13 +483,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             
             var biomeGO = new GameObject("InvalidBiome");
             var biome = biomeGO.AddComponent<BiomeFieldAuthoring>();
-            biome.nodeId = new NodeId { value = 300 };
+            biome.nodeId = new NodeId { Value = 300 };
             biome.artProfile = null; // Invalid - null profile
             
             // Create another biome with profile but invalid settings
             var invalidProfileBiomeGO = new GameObject("InvalidProfileBiome");
             var invalidProfileBiome = invalidProfileBiomeGO.AddComponent<BiomeFieldAuthoring>();
-            invalidProfileBiome.nodeId = new NodeId { value = 301 };
+            invalidProfileBiome.nodeId = new NodeId { Value = 301 };
             
             var invalidProfile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             // Intentionally leave tiles / prop arrays empty (not assignable via convenience properties)
@@ -519,27 +518,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             World.DefaultGameObjectInjectionWorld = world;
             
             // Create network: District A ↔ District B, with gates and biomes
-            var districtA = CreateTestDistrict("DistrictA", new NodeId { value = 401 });
-            var districtB = CreateTestDistrict("DistrictB", new NodeId { value = 402 });
+            var districtA = CreateTestDistrict("DistrictA", new NodeId { Value = 401 });
+            var districtB = CreateTestDistrict("DistrictB", new NodeId { Value = 402 });
             
             var connectionAB = CreateTestConnection("ConnectionAB", 
-                new NodeId { value = 401 }, new NodeId { value = 402 });
+                new NodeId { Value = 401 }, new NodeId { Value = 402 });
             var connectionBA = CreateTestConnection("ConnectionBA", 
-                new NodeId { value = 402 }, new NodeId { value = 401 });
+                new NodeId { Value = 402 }, new NodeId { Value = 401 });
             
             // Create biomes for both districts
-            var biomeA = CreateTestBiome("BiomeA", new NodeId { value = 401 }, BiomeType.Forest);
-            var biomeB = CreateTestBiome("BiomeB", new NodeId { value = 402 }, BiomeType.Desert);
+            var biomeA = CreateTestBiome("BiomeA", new NodeId { Value = 401 }, BiomeType.Forest);
+            var biomeB = CreateTestBiome("BiomeB", new NodeId { Value = 402 }, BiomeType.Desert);
             
             // Create gate with circular reference (testing edge case)
             var circularGateGO = new GameObject("CircularGate");
             var circularGate = circularGateGO.AddComponent<GateConditionAuthoring>();
-            circularGate.connectionId = new NodeId { value = 401 };
+            circularGate.connectionId = new NodeId { Value = 401 };
             circularGate.gateConditions = new GateCondition[]
             {
-                new GateCondition 
-                { 
-                    requiredConnectionId = new NodeId { value = 401 }, // Self-reference!
+                new() { 
+                    requiredConnectionId = new NodeId { Value = 401 }, // Self-reference!
                     isDefault = false 
                 }
             };
@@ -569,13 +567,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             bool foundAB = false, foundBA = false;
             foreach (var conn in connections)
             {
-                if (conn.sourceNode.value == 401 && conn.targetNode.value == 402) foundAB = true;
-                if (conn.sourceNode.value == 402 && conn.targetNode.value == 401) foundBA = true;
+                if (conn.sourceNode.Value == 401 && conn.targetNode.Value == 402) foundAB = true;
+                if (conn.sourceNode.Value == 402 && conn.targetNode.Value == 401) foundBA = true;
             }
             Assert.IsTrue(foundAB && foundBA, "Bidirectional connections should exist");
             
             // Check circular gate reference
-            Assert.AreEqual(401u, gates[0].connectionId.value, "Gate should have correct connection ID");
+            Assert.AreEqual(401u, gates[0].connectionId.Value, "Gate should have correct connection ID");
             
             connections.Dispose();
             gates.Dispose();

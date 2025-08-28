@@ -1,4 +1,3 @@
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -12,39 +11,38 @@ namespace TinyWalnutGames.MetVD.Authoring
     /// </summary>
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateAfter(typeof(NavigationGraphBuildSystem))]
-    public partial struct NavigationValidationSystem : ISystem
+    public partial class NavigationValidationSystem : SystemBase
     {
         private EntityQuery _navNodeQuery;
         private EntityQuery _navigationGraphQuery;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
+        protected override void OnCreate()
         {
-            _navNodeQuery = SystemAPI.QueryBuilder()
-                .WithAll<NavNode, NavLinkBufferElement>()
-                .Build();
+            _navNodeQuery = GetEntityQuery(
+                ComponentType.ReadOnly<NavNode>(),
+                ComponentType.ReadOnly<NavLinkBufferElement>()
+            );
 
-            _navigationGraphQuery = SystemAPI.QueryBuilder()
-                .WithAll<NavigationGraph>()
-                .Build();
+            _navigationGraphQuery = GetEntityQuery(
+                ComponentType.ReadOnly<NavigationGraph>()
+            );
 
-            state.RequireForUpdate(_navNodeQuery);
-            state.RequireForUpdate(_navigationGraphQuery);
+            RequireForUpdate(_navNodeQuery);
+            RequireForUpdate(_navigationGraphQuery);
         }
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnUpdate()
         {
-            var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
+            var navGraph = GetSingleton<NavigationGraph>();
             if (!navGraph.IsReady)
                 return;
 
             // Perform reachability analysis with different agent capability sets
-            var unreachableCount = PerformReachabilityAnalysis(ref state);
+            var unreachableCount = PerformReachabilityAnalysis();
             
             // Update navigation graph with validation results
             navGraph.UnreachableAreaCount = unreachableCount;
-            SystemAPI.SetSingleton(navGraph);
+            SetSingleton(navGraph);
 
             // Log validation results for debugging
             if (unreachableCount > 0)
@@ -53,8 +51,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             }
         }
 
-        [BurstCompile]
-        private int PerformReachabilityAnalysis(ref SystemState state)
+        private int PerformReachabilityAnalysis()
         {
             var unreachableCount = 0;
             
@@ -64,7 +61,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             for (int profileIndex = 0; profileIndex < testCapabilities.Length; profileIndex++)
             {
                 var capabilities = testCapabilities[profileIndex];
-                var reachabilityResults = AnalyzeReachability(ref state, capabilities);
+                var reachabilityResults = AnalyzeReachability(capabilities);
                 
                 // Count unreachable nodes for this capability profile
                 for (int i = 0; i < reachabilityResults.Length; i++)
@@ -82,7 +79,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             return unreachableCount;
         }
 
-        [BurstCompile]
         private NativeArray<AgentCapabilities> GetTestCapabilityProfiles()
         {
             var profiles = new NativeArray<AgentCapabilities>(5, Allocator.Temp);
@@ -105,18 +101,18 @@ namespace TinyWalnutGames.MetVD.Authoring
             return profiles;
         }
 
-        [BurstCompile]
-        private NativeArray<bool> AnalyzeReachability(ref SystemState state, AgentCapabilities capabilities)
+        private NativeArray<bool> AnalyzeReachability(AgentCapabilities capabilities)
         {
             // Collect all navigation nodes
             var nodeIds = new NativeList<uint>(256, Allocator.Temp);
-            foreach (var (navNode, entity) in SystemAPI.Query<RefRO<NavNode>>().WithEntityAccess())
+            
+            Entities.WithAll<NavNode>().ForEach((in NavNode navNode) =>
             {
-                if (navNode.ValueRO.IsActive)
+                if (navNode.IsActive)
                 {
-                    nodeIds.Add(navNode.ValueRO.NodeId);
+                    nodeIds.Add(navNode.NodeId);
                 }
-            }
+            }).WithoutBurst().Run();
             
             var reachability = new NativeArray<bool>(nodeIds.Length, Allocator.Temp);
             
@@ -128,7 +124,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             
             // Start from first node and see what we can reach
             var startNodeId = nodeIds[0];
-            var reachableNodes = FloodFillReachability(ref state, startNodeId, capabilities);
+            var reachableNodes = FloodFillReachability(startNodeId, capabilities);
             
             // Mark reachable nodes
             for (int i = 0; i < nodeIds.Length; i++)
@@ -142,8 +138,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             return reachability;
         }
 
-        [BurstCompile]
-        private NativeHashSet<uint> FloodFillReachability(ref SystemState state, uint startNodeId, AgentCapabilities capabilities)
+        private NativeHashSet<uint> FloodFillReachability(uint startNodeId, AgentCapabilities capabilities)
         {
             var reachableNodes = new NativeHashSet<uint>(1000, Allocator.Temp);
             var queue = new NativeQueue<uint>(Allocator.Temp);
@@ -154,12 +149,12 @@ namespace TinyWalnutGames.MetVD.Authoring
             while (queue.Count > 0)
             {
                 var currentNodeId = queue.Dequeue();
-                var currentEntity = FindEntityByNodeId(ref state, currentNodeId);
+                var currentEntity = FindEntityByNodeId(currentNodeId);
                 
-                if (currentEntity == Entity.Null || !SystemAPI.HasBuffer<NavLinkBufferElement>(currentEntity))
+                if (currentEntity == Entity.Null || !HasBuffer<NavLinkBufferElement>(currentEntity))
                     continue;
                     
-                var linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(currentEntity);
+                var linkBuffer = GetBuffer<NavLinkBufferElement>(currentEntity);
                 
                 for (int i = 0; i < linkBuffer.Length; i++)
                 {
@@ -182,15 +177,17 @@ namespace TinyWalnutGames.MetVD.Authoring
             return reachableNodes;
         }
 
-        [BurstCompile]
-        private Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
+        private Entity FindEntityByNodeId(uint nodeId)
         {
-            foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
+            Entity foundEntity = Entity.Null;
+            
+            Entities.WithAll<NodeId>().ForEach((Entity entity, in NodeId id) =>
             {
-                if (id.ValueRO.Value == nodeId)
-                    return entity;
-            }
-            return Entity.Null;
+                if (id.Value == nodeId)
+                    foundEntity = entity;
+            }).WithoutBurst().Run();
+            
+            return foundEntity;
         }
     }
 
