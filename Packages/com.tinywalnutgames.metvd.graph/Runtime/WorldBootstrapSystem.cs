@@ -3,9 +3,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-#if UNITY_TRANSFORMS_LOCALTRANSFORM
 using Unity.Transforms;
-#endif
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Biome;
@@ -69,10 +67,10 @@ namespace TinyWalnutGames.MetVD.Graph
             // Mark bootstrap as complete
             state.EntityManager.RemoveComponent<WorldBootstrapInProgressTag>(bootstrapEntity);
             var completeTag = new WorldBootstrapCompleteTag(
-                biomes: CalculateGeneratedBiomes(config),
-                districts: CalculateGeneratedDistricts(config),
-                sectors: CalculateGeneratedSectors(config),
-                rooms: CalculateGeneratedRooms(config)
+                CalculateGeneratedBiomes(config),
+                CalculateGeneratedDistricts(config),
+                CalculateGeneratedSectors(config),
+                CalculateGeneratedRooms(config)
             );
             state.EntityManager.AddComponentData(bootstrapEntity, completeTag);
 

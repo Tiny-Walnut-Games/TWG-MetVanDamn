@@ -462,8 +462,10 @@ namespace TinyWalnutGames.MetVD.Graph
         }
 
         /// <summary>
-        /// Convert RoomFeatureType to RoomFeatureObjectType
+        /// Convert RoomFeatureType to RoomFeatureObjectType - OBSOLETE: Use RoomFeatureType directly
         /// </summary>
+        // Commented out obsolete conversion function
+        /*
         private static RoomFeatureObjectType ConvertToObjectType(RoomFeatureType featureType)
         {
             return featureType switch
@@ -478,5 +480,6 @@ namespace TinyWalnutGames.MetVD.Graph
                 _ => RoomFeatureObjectType.Platform // Default fallback
             };
         }
+        */
     }
 }

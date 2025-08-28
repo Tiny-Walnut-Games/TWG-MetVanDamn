@@ -7,7 +7,7 @@ namespace TinyWalnutGames.MetVD.Graph
     /// Since CinemachineZoneGeneratorSystem is already a SystemBase, tests can use it directly.
     /// This provides name compatibility for any tests expecting CinemachineZoneGeneratorSystemTest.
     /// </summary>
-    public class CinemachineZoneGeneratorSystemTest : CinemachineZoneGeneratorSystem
+    public partial class CinemachineZoneGeneratorSystemTest : CinemachineZoneGeneratorSystem
     {
         // Inherits all functionality from CinemachineZoneGeneratorSystem
     }

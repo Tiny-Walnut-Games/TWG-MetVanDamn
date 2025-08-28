@@ -31,23 +31,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.Tools.Edito
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Shared", "TinyWalnutGames.MetVD.Shared.csproj", "{6BEF65E0-E1A3-6D7E-9453-DA8D0FDF65FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Utility", "TinyWalnutGames.MetVD.Utility.Player.csproj", "{42CE9A5A-151F-11C2-CF3F-733E043831F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Utility.Player", "TinyWalnutGames.MetVD.Utility.Player.csproj", "{42CE9A5A-151F-11C2-CF3F-733E043831F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Graph", "TinyWalnutGames.MetVD.Graph.Player.csproj", "{49C4E017-0693-4452-4C85-D76D7D58CC49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Graph.Player", "TinyWalnutGames.MetVD.Graph.Player.csproj", "{49C4E017-0693-4452-4C85-D76D7D58CC49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Core", "TinyWalnutGames.MetVD.Core.Player.csproj", "{9891ACE8-EE1A-59D1-CC4D-251A5A062472}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Core.Player", "TinyWalnutGames.MetVD.Core.Player.csproj", "{9891ACE8-EE1A-59D1-CC4D-251A5A062472}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Graph.Tests", "TinyWalnutGames.MetVD.Graph.Tests.Player.csproj", "{5D271A50-07E2-9D14-5FD2-CF5E33EE1208}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Graph.Tests.Player", "TinyWalnutGames.MetVD.Graph.Tests.Player.csproj", "{5D271A50-07E2-9D14-5FD2-CF5E33EE1208}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Authoring", "TinyWalnutGames.MetVD.Authoring.Player.csproj", "{5F36E609-03BE-4B55-CCA4-0E09CE7A9564}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Authoring.Player", "TinyWalnutGames.MetVD.Authoring.Player.csproj", "{5F36E609-03BE-4B55-CCA4-0E09CE7A9564}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Samples", "TinyWalnutGames.MetVD.Samples.Player.csproj", "{701B0DBC-F133-B5FA-E95C-23198A9B59EC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Samples.Player", "TinyWalnutGames.MetVD.Samples.Player.csproj", "{701B0DBC-F133-B5FA-E95C-23198A9B59EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Biome", "TinyWalnutGames.MetVD.Biome.Player.csproj", "{02ECEB9D-B468-569B-067D-2C067962C3A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Biome.Player", "TinyWalnutGames.MetVD.Biome.Player.csproj", "{02ECEB9D-B468-569B-067D-2C067962C3A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Core.Tests", "TinyWalnutGames.MetVD.Core.Tests.Player.csproj", "{0BD2BD2A-DF01-A8EA-A742-3EAB59C8168E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Core.Tests.Player", "TinyWalnutGames.MetVD.Core.Tests.Player.csproj", "{0BD2BD2A-DF01-A8EA-A742-3EAB59C8168E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Shared", "TinyWalnutGames.MetVD.Shared.Player.csproj", "{48CCF777-0B65-3DF8-17E2-3AECF5BDA8CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Shared.Player", "TinyWalnutGames.MetVD.Shared.Player.csproj", "{48CCF777-0B65-3DF8-17E2-3AECF5BDA8CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

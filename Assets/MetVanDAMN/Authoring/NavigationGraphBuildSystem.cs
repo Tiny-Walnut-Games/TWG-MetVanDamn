@@ -2,9 +2,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-#if UNITY_TRANSFORMS_LOCALTRANSFORM
 using Unity.Transforms;
-#endif
 using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Authoring
@@ -27,9 +25,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             // Query for districts that can become navigation nodes
             _districtQuery = SystemAPI.QueryBuilder()
-#if UNITY_TRANSFORMS_LOCALTRANSFORM
                 .WithAll<LocalTransform>()
-#endif
                 .WithAll<NodeId>()
                 .WithNone<NavNode>() // Only process districts that haven't been converted yet
                 .Build();
@@ -59,8 +55,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Create navigation graph singleton if it doesn't exist
             if (_navigationGraphQuery.IsEmpty)
             {
-                var navGraphEntity = state.EntityManager.CreateEntity();
-                state.EntityManager.AddComponentData(navGraphEntity, new NavigationGraph());
+                var newNavGraphEntity = state.EntityManager.CreateEntity();
+                state.EntityManager.AddComponentData(newNavGraphEntity, new NavigationGraph());
             }
 
             // Skip if no districts to process
