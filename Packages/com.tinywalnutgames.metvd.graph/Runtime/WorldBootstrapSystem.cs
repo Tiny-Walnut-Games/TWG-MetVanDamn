@@ -77,8 +77,9 @@ namespace TinyWalnutGames.MetVD.Graph
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (config.LogGenerationSteps)
             {
-                UnityEngine.Debug.Log($"🚀 WorldBootstrap: Generated {completeTag.DistrictsGenerated} districts, " +
-                                    $"{completeTag.SectorsGenerated} sectors, {completeTag.RoomsGenerated} rooms");
+                // UnityEngine.Debug.Log($"🚀 WorldBootstrap: Generated {completeTag.DistrictsGenerated} districts, " +
+                //                     $"{completeTag.SectorsGenerated} sectors, {completeTag.RoomsGenerated} rooms"); // REMOVED: Debug.Log not allowed in Burst jobs
+                // Bootstrap metrics: completeTag.DistrictsGenerated, SectorsGenerated, RoomsGenerated available for inspection
             }
 #endif
         }
@@ -92,7 +93,8 @@ namespace TinyWalnutGames.MetVD.Graph
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (config.LogGenerationSteps)
             {
-                UnityEngine.Debug.Log($"🌍 WorldBootstrap: Starting generation with seed {actualSeed}");
+                // UnityEngine.Debug.Log($"🌍 WorldBootstrap: Starting generation with seed {actualSeed}"); // REMOVED: Debug.Log not allowed in Burst jobs
+                // Generation seed: actualSeed available for inspection
             }
 #endif
 
@@ -130,7 +132,8 @@ namespace TinyWalnutGames.MetVD.Graph
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 if (config.LogGenerationSteps)
                 {
-                    UnityEngine.Debug.Log($"🌿 WorldBootstrap: Generated {biomeCount} biome fields");
+                    // UnityEngine.Debug.Log($"🌿 WorldBootstrap: Generated {biomeCount} biome fields"); // REMOVED: Debug.Log not allowed in Burst jobs
+                    // Biome field count: biomeCount available for inspection
                 }
 #endif
             }
@@ -154,7 +157,8 @@ namespace TinyWalnutGames.MetVD.Graph
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (config.LogGenerationSteps)
             {
-                UnityEngine.Debug.Log($"🏰 WorldBootstrap: Generated {districtCount} districts for procedural placement");
+                // UnityEngine.Debug.Log($"🏰 WorldBootstrap: Generated {districtCount} districts for procedural placement"); // REMOVED: Debug.Log not allowed in Burst jobs
+                // District count: districtCount available for inspection
             }
 #endif
         }
@@ -258,7 +262,8 @@ namespace TinyWalnutGames.MetVD.Graph
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (config.LogGenerationSteps)
             {
-                UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} (Strength: {strength:G}, Gradient: {gradient:G}, Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:G})");
+                // UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} (Strength: {strength:G}, Gradient: {gradient:G}, Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:G})"); // REMOVED: Debug.Log not allowed in Burst jobs
+                // Biome field creation: biomeType, position, strength, gradient, secondaryBiome, difficultyModifier available for inspection
             }
 #endif
         }

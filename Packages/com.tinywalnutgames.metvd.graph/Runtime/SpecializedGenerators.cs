@@ -92,10 +92,8 @@ namespace TinyWalnutGames.MetVD.Graph
             }
 
             // Log pattern generation metrics for balancing and debugging
-            if (processedPatternCount > 0)
-            {
-                UnityEngine.Debug.Log($"[PatternDrivenModular] Generated {processedPatternCount} skill patterns, {skillGateGenerationCount} skill gates");
-            }
+            // UnityEngine.Debug.Log($"[PatternDrivenModular] Generated {processedPatternCount} skill patterns, {skillGateGenerationCount} skill gates"); // REMOVED: Debug.Log not allowed in Burst jobs
+            // Pattern metrics: processedPatternCount, skillGateGenerationCount available for inspection
         }
 
         private static void GenerateDashGaps(DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
@@ -365,10 +363,8 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             
             // Log performance metrics for challenge generation
-            if (processedRoomCount > 0)
-            {
-                UnityEngine.Debug.Log($"[ParametricChallenge] Processed {processedRoomCount} challenge rooms with base seed {_baseSeed:X8}");
-            }
+            // UnityEngine.Debug.Log($"[ParametricChallenge] Processed {processedRoomCount} challenge rooms with base seed {_baseSeed:X8}"); // REMOVED: Debug.Log not allowed in Burst jobs
+            // Challenge metrics: processedRoomCount, _baseSeed available for inspection
         }
 
         private static float CalculateChallengeComplexity(NodeId nodeId, RoomHierarchyData roomData)
@@ -474,10 +470,8 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             
             // Log weighted generation metrics
-            if (processedRoomCount > 0)
-            {
-                UnityEngine.Debug.Log($"[WeightedTilePrefab] Generated {processedRoomCount} weighted rooms");
-            }
+            // UnityEngine.Debug.Log($"[WeightedTilePrefab] Generated {processedRoomCount} weighted rooms"); // REMOVED: Debug.Log not allowed in Burst jobs
+            // Weighted generation metrics: processedRoomCount available for inspection
         }
 
         private static float CalculateSpatialVariation(NodeId nodeId, RoomHierarchyData roomData)

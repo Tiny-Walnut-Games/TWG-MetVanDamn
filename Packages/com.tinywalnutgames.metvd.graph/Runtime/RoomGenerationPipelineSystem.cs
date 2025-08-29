@@ -109,10 +109,8 @@ namespace TinyWalnutGames.MetVD.Graph
             }
 
             // Log pipeline performance metrics for monitoring (uses the previously unused random)
-            if (processedRoomCount > 0)
-            {
-                UnityEngine.Debug.Log($"[RoomGenerationPipeline] Processed {processedRoomCount} rooms with base seed {baseSeed:X8}, master random state: {_masterRandom.state}");
-            }
+            // UnityEngine.Debug.Log($"[RoomGenerationPipeline] Processed {processedRoomCount} rooms with base seed {baseSeed:X8}, master random state: {_masterRandom.state}"); // REMOVED: Debug.Log not allowed in Burst jobs
+            // Pipeline metrics: processedRoomCount, baseSeed, _masterRandom.state available for inspection
         }
 
         private readonly void ProcessBiomeSelection(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId)
@@ -722,7 +720,8 @@ namespace TinyWalnutGames.MetVD.Graph
             // part 1 of @jmeyer1980's attempt to make use of the previously unused `request`
             if (request.IsComplete)
             {
-                UnityEngine.Debug.LogWarning($"[RoomGenerationPipeline] Attempted Nav Generation on already completed room entity {entity.Index}. Skipping.");
+                // UnityEngine.Debug.LogWarning($"[RoomGenerationPipeline] Attempted Nav Generation on already completed room entity {entity.Index}. Skipping."); // REMOVED: Debug.LogWarning not allowed in Burst jobs
+                // Navigation generation skip: entity.Index available for inspection when request.IsComplete
                 return;
             }
             // end of part one of @jmeyer1980's attempt to make use of the previously unused `request`

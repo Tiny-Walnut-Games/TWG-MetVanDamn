@@ -113,6 +113,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
     /// <summary>
     /// Job for analyzing biome complexity and determining optimization parameters
+    /// NOTE: Burst compilation disabled due to Unity managed object access (ProfileRef.Value)
     /// </summary>
     public partial struct BiomeOptimizationAnalysisJob : IJobEntity
     {
@@ -120,7 +121,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         [ReadOnly] public ComponentLookup<BiomeArtProfileReference> artProfileLookup;
         [ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
 
-        [BurstCompile]
+        // [BurstCompile] - REMOVED: Job accesses Unity managed objects via ProfileRef.Value
         public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
         {
             if (!artProfileLookup.TryGetComponent(entity, out var artProfileRef) || !artProfileRef.ProfileRef.IsValid())
@@ -217,6 +218,7 @@ namespace TinyWalnutGames.MetVD.Authoring
     /// <summary>
     /// Job for optimizing spatial coherence between neighboring biomes
     /// </summary>
+    [BurstCompile]
     public partial struct SpatialCoherenceOptimizationJob : IJobEntity
     {
         [ReadOnly] public ComponentLookup<CoreBiome> biomeLookup;

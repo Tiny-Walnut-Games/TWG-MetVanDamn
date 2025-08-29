@@ -50,7 +50,8 @@ namespace TinyWalnutGames.MetVD.Utility
             _results.AddRange(components);
             components.Dispose();
             AggregatorDiagnostics<T>.LastCount = _results.Length;
-            UnityEngine.Debug.Log($"[Aggregator<{typeof(T).Name}>] Collected {_results.Length} entries.");
+            // UnityEngine.Debug.Log($"[Aggregator<{typeof(T).Name}>] Collected {_results.Length} entries."); // REMOVED: Debug.Log not allowed in Burst jobs
+            // Metrics available via AggregatorDiagnostics<T>.LastCount for debug inspection
         }
 
         /// <summary>

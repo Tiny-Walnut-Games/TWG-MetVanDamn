@@ -49,7 +49,8 @@ namespace TinyWalnutGames.MetVD.Graph
                 if (!_loggedFallback && SystemAPI.Time.ElapsedTime > 0)
                 {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    UnityEngine.Debug.LogWarning("DistrictLayoutSystem: WorldConfiguration missing. Using fallback defaults (64x64, all sectors).");
+                    // UnityEngine.Debug.LogWarning("DistrictLayoutSystem: WorldConfiguration missing. Using fallback defaults (64x64, all sectors)."); // REMOVED: Debug.LogWarning not allowed in Burst jobs
+                    // Fallback configuration: 64x64, all sectors (check _loggedFallback flag to see if fallback was used)
 #endif
                     _loggedFallback = true;
                 }
