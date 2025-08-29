@@ -1,14 +1,10 @@
-using Codice.Client.BaseCommands.Import;
-using NUnit.Framework;
-using System.Collections.Generic; // Needed for List<>
+using System.Collections.Generic;
 using System.Linq;
-using TinyWalnutGames.MetVD.Biome;
-using TinyWalnutGames.MetVD.Core; // For NodeId, Biome component
+using TinyWalnutGames.MetVD.Core;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem;
@@ -293,7 +289,6 @@ namespace TinyWalnutGames.MetVD.Authoring
                 for (int dy = -1; dy <= 1; dy++)
                 {
                     if (dx == 0 && dy == 0) continue; // Skip center
-                    
                     int2 position = coordinates + new int2(dx, dy);
                     float connectionStrength = DetermineBiomeConnectionStrength(position, coordinates);
                     totalConnections += connectionStrength;
@@ -402,7 +397,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             // Simplified centrality calculation based on position characteristics
             float centralityScore = 0.5f; // Default centrality
-            
+                        
             // Distance from origin affects centrality
             float distanceFromOrigin = math.length(center);
             float normalizedDistance = math.clamp(distanceFromOrigin / 10f, 0f, 1f);
@@ -923,7 +918,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                     float terrainSuitability = CalculateTerrainSuitability(sample, layerName);
                     float spawnChance = settings.baseDensity * terrainSuitability * settings.densityMultiplier;
 
-                    if (rng.NextDouble() < spawnChance && IsPositionValid(sample.position, layerName))
+                    if (rng.NextDouble() < spawnChance && IsPositionValid(sample.position, layerObject.name))
                     {
                         PlacePropAtPosition(sample.position, layerObject);
                         if (placedPropPositions.Count >= settings.maxPropsPerBiome!)
@@ -1333,7 +1328,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             // Advanced accessibility calculation using multi-factor path analysis
             // Considers elevation gradients, terrain obstacles, and connectivity networks
-            
+                        
             float distanceFromCenter = Vector2.Distance(
                 new Vector2(position.x, position.z),
                 new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y)

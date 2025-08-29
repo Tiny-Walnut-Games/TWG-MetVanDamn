@@ -339,7 +339,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 }
                 
                 // Tech biome - add hazards and automated systems
-                if (request.TargetBiome == BiomeType.PowerPlant || request.TargetBiome == BiomeType.CryogenicLabs)
+                if (IsTechBiome(request.TargetBiome))
                 {
                     if (feature.Type == RoomFeatureType.Obstacle && random.NextFloat() < 0.3f * environmentalFactor)
                     {
@@ -354,6 +354,14 @@ namespace TinyWalnutGames.MetVD.Graph
                 features[i] = feature;
             }
         }
+
+        private static bool IsTechBiome(BiomeType biomeType) => biomeType switch
+        {
+            BiomeType.PowerPlant => true,
+            BiomeType.CryogenicLabs => true,
+            BiomeType.PlasmaFields => true,
+            _ => false
+        };
 
         private static float CalculateEnvironmentalFactor(NodeId nodeId, RoomHierarchyData roomData)
         {
@@ -639,13 +647,47 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static bool IsSkyBiome(BiomeType biome)
         {
-            return biome == BiomeType.SkyGardens || biome == BiomeType.PlasmaFields;
+            // 🔥 FIXED: Complete sky biome detection including all aerial/floating biomes
+            return biome switch
+            {
+                BiomeType.SkyGardens => true,    // Primary sky biome
+                BiomeType.PlasmaFields => true,  // Floating energy fields
+                BiomeType.VoidChambers => true,  // Floating in void space
+                BiomeType.Cosmic => true,        // Space/cosmic floating areas
+                _ => false
+            };
         }
 
         private static bool IsTerrainBiome(BiomeType biome)
         {
-            return biome == BiomeType.SolarPlains || biome == BiomeType.FrozenWastes || 
-                   biome == BiomeType.CrystalCaverns;
+            // 🔥 FIXED: Complete terrain biome detection for heightmap generation
+            return biome switch
+            {
+                // Earth/Nature biomes - primary terrain types
+                BiomeType.SolarPlains => true,
+                BiomeType.Forest => true,
+                BiomeType.Mountains => true,
+                BiomeType.Desert => true,
+                BiomeType.Tundra => true,
+                
+                // Ice biomes with terrain features
+                BiomeType.FrozenWastes => true,
+                BiomeType.IcyCanyon => true,
+                
+                // Crystal biomes with terrain
+                BiomeType.CrystalCaverns => true,
+                BiomeType.Crystal => true,
+                
+                // Ruins with terrain features
+                BiomeType.Ruins => true,
+                BiomeType.AncientRuins => true,
+                
+                // Volcanic terrain
+                BiomeType.Volcanic => true,
+                BiomeType.VolcanicCore => true,
+                
+                _ => false
+            };
         }
 
         private static RoomFeatureType SelectSkillSpecificFeature(Ability availableSkills, ref Unity.Mathematics.Random _patternRandom)

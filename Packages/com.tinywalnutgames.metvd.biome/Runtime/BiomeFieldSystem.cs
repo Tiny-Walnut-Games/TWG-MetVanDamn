@@ -151,21 +151,56 @@ namespace TinyWalnutGames.MetVD.Biome
 
         private readonly float GetBasePolarityStrength(BiomeType biomeType) => biomeType switch
         {
+            // Neutral/Mixed biomes - lowest strength
             BiomeType.HubArea => 0.2f,
             BiomeType.TransitionZone => 0.4f,
+            BiomeType.Unknown => 0.1f,
+
+            // Light-aligned biomes
             BiomeType.SolarPlains => 0.8f,
             BiomeType.CrystalCaverns => 0.9f,
             BiomeType.SkyGardens => 0.7f,
+
+            // Dark-aligned biomes  
             BiomeType.ShadowRealms => 0.9f,
             BiomeType.DeepUnderwater => 0.8f,
             BiomeType.VoidChambers => 1.0f,
+
+            // Hazard/Energy biomes - high strength
             BiomeType.VolcanicCore => 1.0f,
             BiomeType.PowerPlant => 0.8f,
             BiomeType.PlasmaFields => 0.9f,
+
+            // Ice/Crystal biomes
             BiomeType.FrozenWastes => 0.9f,
             BiomeType.IceCatacombs => 0.8f,
             BiomeType.CryogenicLabs => 0.7f,
+            BiomeType.IcyCanyon => 0.8f,
+            BiomeType.Tundra => 0.6f,
+
+            // Earth/Nature biomes - moderate strength
+            BiomeType.Forest => 0.6f,
+            BiomeType.Mountains => 0.7f,
+            BiomeType.Desert => 0.7f,
+
+            // Water biomes
+            BiomeType.Ocean => 0.8f,
+
+            // Space biomes - very high strength
+            BiomeType.Cosmic => 0.9f,
+
+            // Crystal biomes
+            BiomeType.Crystal => 0.8f,
+
+            // Ruins/Ancient biomes - moderate to low
+            BiomeType.Ruins => 0.5f,
             BiomeType.AncientRuins => 0.6f,
+
+            // Volcanic/Fire biomes - highest strength
+            BiomeType.Volcanic => 0.9f,
+            BiomeType.Hell => 1.0f,
+
+            // Default fallback
             _ => 0.5f
         };
 
