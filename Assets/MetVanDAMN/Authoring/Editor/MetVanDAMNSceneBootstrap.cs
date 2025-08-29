@@ -376,7 +376,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 light.intensity = 1.2f;
                 light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
             }
-            if (Camera.main == null)
+            if (UnityEngine.Object.FindFirstObjectByType<Camera>() == null)
             {
                 GameObject camGO = new("Main Camera") { tag = "MainCamera" };
                 Camera cam = camGO.AddComponent<Camera>();

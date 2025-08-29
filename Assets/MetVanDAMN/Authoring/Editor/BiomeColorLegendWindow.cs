@@ -735,8 +735,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         /// </summary>
         public static Dictionary<BiomeType, Color> GetBiomeColorMapping()
         {
-            var window = Resources.FindObjectsOfTypeAll<BiomeColorLegendWindow>().FirstOrDefault();
-            return window != null ? window.biomeColors : null ?? new Dictionary<BiomeType, Color>();
+            // Use modern EditorWindow finding approach for Unity 6000.2.2f1
+            var window = HasOpenInstances<BiomeColorLegendWindow>() ? GetWindow<BiomeColorLegendWindow>() : null;
+            return window != null ? window.biomeColors : new Dictionary<BiomeType, Color>();
         }
     }
 }
