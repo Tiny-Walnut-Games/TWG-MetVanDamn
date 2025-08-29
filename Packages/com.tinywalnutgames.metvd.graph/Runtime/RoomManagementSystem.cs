@@ -140,6 +140,62 @@ namespace TinyWalnutGames.MetVD.Graph
         private EntityQuery _roomsQuery;
         private EntityQuery _sectorsQuery;
 
+        // Burst-compatible static arrays for enum values
+        private static readonly BiomeType[] ValidBiomes = new BiomeType[]
+        {
+            BiomeType.SolarPlains,
+            BiomeType.CrystalCaverns,
+            BiomeType.SkyGardens,
+            BiomeType.ShadowRealms,
+            BiomeType.DeepUnderwater,
+            BiomeType.VoidChambers,
+            BiomeType.VolcanicCore,
+            BiomeType.PowerPlant,
+            BiomeType.PlasmaFields,
+            BiomeType.FrozenWastes,
+            BiomeType.IceCatacombs,
+            BiomeType.CryogenicLabs,
+            BiomeType.IcyCanyon,
+            BiomeType.Tundra,
+            BiomeType.Forest,
+            BiomeType.Mountains,
+            BiomeType.Desert,
+            BiomeType.Ocean,
+            BiomeType.Cosmic,
+            BiomeType.Crystal,
+            BiomeType.Ruins,
+            BiomeType.AncientRuins,
+            BiomeType.Volcanic,
+            BiomeType.Hell,
+            BiomeType.HubArea,
+            BiomeType.TransitionZone
+        };
+
+        private static readonly Polarity[] ValidPolarities = new Polarity[]
+        {
+            Polarity.Sun,
+            Polarity.Moon,
+            Polarity.Heat,
+            Polarity.Cold,
+            Polarity.Earth,
+            Polarity.Wind,
+            Polarity.Life,
+            Polarity.Tech
+        };
+
+        private static readonly BiomeType[] SafeBiomes = new BiomeType[]
+        {
+            BiomeType.SolarPlains,
+            BiomeType.CrystalCaverns,
+            BiomeType.SkyGardens,
+            BiomeType.Forest,
+            BiomeType.Mountains,
+            BiomeType.Desert,
+            BiomeType.Ocean,
+            BiomeType.HubArea,
+            BiomeType.TransitionZone
+        };
+
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
@@ -238,23 +294,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
         /// <summary>
         /// Determine biome based on nodeId spatial coordinates and parent relationships
-        /// Uses existing BiomeType enum with spatial coherence logic
+        /// Uses Burst-compatible static arrays with spatial coherence logic
         /// </summary>
         private static BiomeType DetermineBiomeFromNodeId(NodeId nodeId)
         {
-            // Get all BiomeType enum values dynamically
-            var biomeValues = Enum.GetValues(typeof(BiomeType));
-            var validBiomes = new BiomeType[biomeValues.Length - 1]; // Exclude Unknown
-            int validIndex = 0;
-
-            foreach (BiomeType biome in biomeValues)
-            {
-                if (biome != BiomeType.Unknown)
-                {
-                    validBiomes[validIndex++] = biome;
-                }
-            }
-
             // Use nodeId coordinates to create deterministic but varied biome regions
             var coords = nodeId.Coordinates;
             var distanceFromOrigin = math.sqrt(coords.x * coords.x + coords.y * coords.y);
@@ -278,30 +321,16 @@ namespace TinyWalnutGames.MetVD.Graph
             // Combine hash with spatial bias for regional coherence
             var finalHash = biomeHash + (quadrantBias << 24) + (uint)(distanceInfluence * 1000);
             
-            // Select biome index from valid biomes
-            var biomeIndex = (int)(finalHash % (uint)validBiomes.Length);
-
-            // discard biome selections that are too dangerous for close distances
+            // Filter out dangerous biomes for close distances
             if (distanceFromOrigin < 5.0f)
             {
-                // Filter out high-danger biomes for close distances
-                var safeBiomes = new System.Collections.Generic.List<BiomeType>();
-                foreach (var biome in validBiomes)
-                {
-                    if (biome != BiomeType.VoidChambers && biome != BiomeType.Hell &&
-                        biome != BiomeType.PlasmaFields && biome != BiomeType.Cosmic)
-                    {
-                        safeBiomes.Add(biome);
-                    }
-                }
-                if (safeBiomes.Count > 0)
-                {
-                    biomeIndex = (int)(finalHash % (uint)safeBiomes.Count);
-                    return safeBiomes[biomeIndex];
-                }
+                var safeIndex = (int)(finalHash % (uint)SafeBiomes.Length);
+                return SafeBiomes[safeIndex];
             }
 
-            return validBiomes[biomeIndex];
+            // Select biome index from all valid biomes
+            var biomeIndex = (int)(finalHash % (uint)ValidBiomes.Length);
+            return ValidBiomes[biomeIndex];
         }
 
         /// <summary>
@@ -310,34 +339,21 @@ namespace TinyWalnutGames.MetVD.Graph
         /// </summary>
         private static Polarity DeterminePolarityFromNodeId(NodeId nodeId)
         {
-            // Get all Polarity enum values dynamically
-            var polarityValues = Enum.GetValues(typeof(Polarity));
-            var validPolarities = new System.Collections.Generic.List<Polarity>();
-
-            foreach (Polarity polarity in polarityValues)
-            {
-                // Exclude None and composite values for base selection
-                if (polarity != Polarity.None && !IsCompositePolarity(polarity))
-                {
-                    validPolarities.Add(polarity);
-                }
-            }
-
             // Use nodeId hash to determine polarity in a deterministic way
             var hash = (uint)(nodeId._value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8));
 
             // Select base polarity using spatial hash
-            var polarityIndex = (int)(hash % (uint)validPolarities.Count);
-            var selectedPolarity = validPolarities[polarityIndex];
+            var polarityIndex = (int)(hash % (uint)ValidPolarities.Length);
+            var selectedPolarity = ValidPolarities[polarityIndex];
 
             // For areas far from origin, add dual polarity combinations
             var distanceFromOrigin = math.length((float2)nodeId.Coordinates);
             if (distanceFromOrigin > 10.0f)
             {
-                var secondaryIndex = (int)((nodeId.ParentId >> 8) % (uint)validPolarities.Count);
+                var secondaryIndex = (int)((nodeId.ParentId >> 8) % (uint)ValidPolarities.Length);
                 if (secondaryIndex != polarityIndex)
                 {
-                    selectedPolarity |= validPolarities[secondaryIndex];
+                    selectedPolarity |= ValidPolarities[secondaryIndex];
                 }
             }
 
@@ -396,212 +412,6 @@ namespace TinyWalnutGames.MetVD.Graph
             // Create a hash that combines nodeId properties with the random seed
             // This ensures rooms at the same nodeId generate consistently, but with variation
             return (uint)(nodeId._value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8) ^ nodeId.ParentId ^ randomSeed);
-        }
-
-        ///// <summary>
-        ///// Initialize room generation request using existing enums and dynamic discovery
-        ///// </summary>
-        //private static void InitializeRoomGenerationRequest(EntityManager entityManager, Entity roomEntity,
-        //                                                   RoomHierarchyData roomData, NodeId nodeId,
-        //                                                   ProgressionAnalysis progression,
-        //                                                   ref Unity.Mathematics.Random random)
-        //{
-        //    // Determine generator type based on room type and characteristics
-        //    var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
-
-        //    // Use dynamic biome selection from existing BiomeType enum
-        //    var targetBiome = DetermineBiomeFromProgression(progression);
-
-        //    // Use dynamic polarity selection from existing Polarity enum
-        //    var targetPolarity = DeterminePolarityFromProgression(progression);
-
-        //    // Use dynamic skill determination from existing Ability enum
-        //    var availableSkills = DetermineSkillsFromProgression(progression, targetBiome);
-
-        //    var generationRequest = new RoomGenerationRequest(
-        //        generatorType,
-        //        targetBiome,
-        //        targetPolarity,
-        //        availableSkills,
-        //        progression.SpatialHash ^ random.NextUInt()
-        //    )
-        //    {
-        //        RoomEntity = roomEntity,
-        //        RoomBounds = new int2(roomData.Bounds.width, roomData.Bounds.height)
-        //    };
-
-        //    entityManager.AddComponentData(roomEntity, generationRequest);
-
-        //    // Add specialized components based on generator type
-        //    AddSpecializedComponents(entityManager, roomEntity, generatorType, roomData, progression);
-        //}
-
-        /// <summary>
-        /// Dynamically determine biome using existing BiomeType enum values
-        /// Uses reflection to discover all available biome types at runtime
-        /// </summary>
-        private static BiomeType DetermineBiomeFromProgression(ProgressionAnalysis progression)
-        {
-            // Get all BiomeType enum values dynamically
-            var biomeValues = Enum.GetValues(typeof(BiomeType));
-            var validBiomes = new BiomeType[biomeValues.Length - 1]; // Exclude Unknown
-            int validIndex = 0;
-
-            foreach (BiomeType biome in biomeValues)
-            {
-                if (biome != BiomeType.Unknown)
-                {
-                    validBiomes[validIndex++] = biome;
-                }
-            }
-
-            // Apply distance-based biome filtering for appropriate progression
-            var filteredBiomes = FilterBiomesByProgression(validBiomes, progression.ProgressionTier);
-
-            // Select biome using spatial hash
-            var biomeIndex = (int)(progression.SpatialHash % (uint)filteredBiomes.Length);
-            return filteredBiomes[biomeIndex];
-        }
-
-        /// <summary>
-        /// Filter biomes based on progression tier for appropriate difficulty
-        /// </summary>
-        private static BiomeType[] FilterBiomesByProgression(BiomeType[] allBiomes, int progressionTier)
-        {
-            // Early game: filter out dangerous biomes
-            if (progressionTier < 2)
-            {
-                var safeBiomes = new System.Collections.Generic.List<BiomeType>();
-                foreach (var biome in allBiomes)
-                {
-                    // Exclude high-danger biomes for early progression
-                    if (biome != BiomeType.VoidChambers && biome != BiomeType.Hell &&
-                        biome != BiomeType.PlasmaFields && biome != BiomeType.Cosmic)
-                    {
-                        safeBiomes.Add(biome);
-                    }
-                }
-                return safeBiomes.ToArray();
-            }
-
-            // Late game: all biomes are available
-            return allBiomes;
-        }
-
-        /// <summary>
-        /// Dynamically determine polarity using existing Polarity enum values
-        /// </summary>
-        private static Polarity DeterminePolarityFromProgression(ProgressionAnalysis progression)
-        {
-            // Get all Polarity enum values dynamically
-            var polarityValues = Enum.GetValues(typeof(Polarity));
-            var validPolarities = new System.Collections.Generic.List<Polarity>();
-
-            foreach (Polarity polarity in polarityValues)
-            {
-                // Exclude None and composite values for base selection
-                if (polarity != Polarity.None && !IsCompositePolarity(polarity))
-                {
-                    validPolarities.Add(polarity);
-                }
-            }
-
-            // Select base polarity
-            var polarityIndex = (int)((progression.SpatialHash >> 8) % (uint)validPolarities.Count);
-            var selectedPolarity = validPolarities[polarityIndex];
-
-            // For advanced areas, add dual polarity combinations
-            if (progression.ProgressionTier > 4)
-            {
-                var secondaryIndex = (int)((progression.SpatialHash >> 16) % (uint)validPolarities.Count);
-                if (secondaryIndex != polarityIndex)
-                {
-                    selectedPolarity |= validPolarities[secondaryIndex];
-                }
-            }
-
-            return selectedPolarity;
-        }
-
-        /// <summary>
-        /// Check if polarity is a composite (combination) value
-        /// </summary>
-        private static bool IsCompositePolarity(Polarity polarity)
-        {
-            // Check if polarity has multiple bits set (composite)
-            return (polarity & (polarity - 1)) != 0;
-        }
-
-        /// <summary>
-        /// Dynamically determine skills using existing Ability enum based on progression
-        /// </summary>
-        private static Ability DetermineSkillsFromProgression(ProgressionAnalysis progression, BiomeType biome)
-        {
-            var skills = Ability.Jump; // Always start with basic jump
-
-            // Progressive ability unlocking based on distance and tier
-            // Use the actual Ability enum values instead of hardcoded progression
-
-            // Movement progression
-            if (progression.ProgressionTier >= 1) skills |= Ability.DoubleJump;
-            if (progression.ProgressionTier >= 2) skills |= Ability.WallJump;
-            if (progression.ProgressionTier >= 3) skills |= Ability.Dash;
-            if (progression.ProgressionTier >= 4) skills |= Ability.ArcJump;
-            if (progression.ProgressionTier >= 5) skills |= Ability.Grapple;
-            if (progression.ProgressionTier >= 6) skills |= Ability.ChargedJump;
-            if (progression.ProgressionTier >= 7) skills |= Ability.TeleportArc;
-
-            // Add biome-specific environmental abilities
-            skills |= GetBiomeSpecificAbilities(biome);
-
-            // Add tools based on progression
-            if (progression.ProgressionTier >= 3) skills |= Ability.Scan;
-            if (progression.ProgressionTier >= 4) skills |= Ability.Bomb;
-            if (progression.ProgressionTier >= 5) skills |= Ability.Drill;
-            if (progression.ProgressionTier >= 6) skills |= Ability.Hack;
-
-            // Add polarity access abilities for advanced areas
-            if (progression.ProgressionTier >= 4)
-            {
-                // Use spatial hash to determine which polarity abilities to grant
-                var polarityMask = progression.SpatialHash & 0xFF;
-                if ((polarityMask & 0x01) != 0) skills |= Ability.SunAccess;
-                if ((polarityMask & 0x02) != 0) skills |= Ability.MoonAccess;
-                if ((polarityMask & 0x04) != 0) skills |= Ability.HeatAccess;
-                if ((polarityMask & 0x08) != 0) skills |= Ability.ColdAccess;
-            }
-
-            return skills;
-        }
-
-        /// <summary>
-        /// Get biome-specific environmental abilities using actual BiomeType enum
-        /// </summary>
-        private static Ability GetBiomeSpecificAbilities(BiomeType biome)
-        {
-            return biome switch
-            {
-                // Water biomes require swimming
-                BiomeType.Ocean or BiomeType.DeepUnderwater => Ability.Swim,
-
-                // Cold biomes require cold resistance
-                BiomeType.FrozenWastes or BiomeType.IceCatacombs or
-                BiomeType.CryogenicLabs or BiomeType.IcyCanyon or BiomeType.Tundra => Ability.ColdResistance,
-
-                // Hot biomes require heat resistance
-                BiomeType.VolcanicCore or BiomeType.Hell or BiomeType.Volcanic => Ability.HeatResistance,
-
-                // Mountain/cave biomes benefit from climbing
-                BiomeType.Mountains or BiomeType.CrystalCaverns => Ability.Climb,
-
-                // Tech biomes require hacking
-                BiomeType.PowerPlant or BiomeType.CryogenicLabs => Ability.Hack,
-
-                // High-pressure environments
-                BiomeType.VoidChambers or BiomeType.Cosmic => Ability.PressureResistance,
-
-                _ => Ability.None
-            };
         }
 
         /// <summary>
