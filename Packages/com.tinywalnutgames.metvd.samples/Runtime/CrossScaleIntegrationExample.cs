@@ -15,7 +15,7 @@ namespace TinyWalnutGames.MetVD.Samples
         /// </summary>
         public static void CreateDungeonRoom(EntityManager entityManager)
         {
-            var roomEntity = entityManager.CreateEntity();
+            Entity roomEntity = entityManager.CreateEntity();
             
             // Room identification
             entityManager.AddComponentData(roomEntity, new NodeId(
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Samples
         /// </summary>
         public static void CreateSolarSystem(EntityManager entityManager)
         {
-            var systemEntity = entityManager.CreateEntity();
+            Entity systemEntity = entityManager.CreateEntity();
             
             // System identification (same NodeId structure)
             entityManager.AddComponentData(systemEntity, new NodeId(

@@ -75,19 +75,27 @@ namespace TinyWalnutGames.MetVD.Core
         /// </summary>
         public readonly bool CanTraverseFrom(uint nodeId, Polarity availablePolarity)
         {
-            if (!IsActive) return false;
-            
+            if (!IsActive)
+            {
+                return false;
+            }
+
             // Check if starting from the correct node
             bool validDirection = (Type == ConnectionType.Bidirectional) 
                 ? (nodeId == FromNodeId || nodeId == ToNodeId)
                 : (nodeId == FromNodeId);
                 
-            if (!validDirection) return false;
-            
+            if (!validDirection)
+            {
+                return false;
+            }
+
             // Check polarity requirements
             if (RequiredPolarity == Polarity.None || RequiredPolarity == Polarity.Any)
+            {
                 return true;
-                
+            }
+
             return (availablePolarity & RequiredPolarity) != 0;
         }
 

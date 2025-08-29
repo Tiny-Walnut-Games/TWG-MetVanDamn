@@ -41,8 +41,8 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange
             uint nodeId = 1;
             var position = new float3(10, 0, 20);
-            var biomeType = BiomeType.SolarPlains;
-            var polarity = Polarity.Sun;
+            BiomeType biomeType = BiomeType.SolarPlains;
+            Polarity polarity = Polarity.Sun;
 
             // Act
             var navNode = new NavNode(nodeId, position, biomeType, polarity);
@@ -62,8 +62,8 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange
             uint fromNode = 1;
             uint toNode = 2;
-            var polarity = Polarity.Moon;
-            var abilities = Ability.Jump;
+            Polarity polarity = Polarity.Moon;
+            Ability abilities = Ability.Jump;
 
             // Act
             var navLink = new NavLink(fromNode, toNode, ConnectionType.Bidirectional, polarity, abilities);
@@ -241,7 +241,7 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateSystem<NavigationGraphBuildSystem>();
+                SystemHandle system = _testWorld.GetOrCreateSystem<NavigationGraphBuildSystem>();
                 Assert.IsNotNull(system);
             });
         }
@@ -252,7 +252,7 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateSystem<AINavigationSystem>();
+                SystemHandle system = _testWorld.GetOrCreateSystem<AINavigationSystem>();
                 Assert.IsNotNull(system);
             });
         }
@@ -263,7 +263,7 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var system = _testWorld.GetOrCreateSystem<NavigationValidationSystem>();
+                SystemHandle system = _testWorld.GetOrCreateSystem<NavigationValidationSystem>();
                 Assert.IsNotNull(system);
             });
         }
@@ -294,9 +294,9 @@ namespace TinyWalnutGames.MetVD.Tests
         public void NavigationIssue_Creation_IsValid()
         {
             // Arrange
-            var issueType = NavigationIssueType.UnreachableNode;
+            NavigationIssueType issueType = NavigationIssueType.UnreachableNode;
             uint nodeId = 5;
-            var description = "Test node is unreachable";
+            string description = "Test node is unreachable";
 
             // Act
             var issue = new NavigationIssue(issueType, nodeId, description);
@@ -330,7 +330,7 @@ namespace TinyWalnutGames.MetVD.Tests
             // Arrange & Act & Assert
             Assert.DoesNotThrow(() =>
             {
-                var report = NavigationValidationUtility.GenerateValidationReport(_testWorld);
+                NavigationValidationReport report = NavigationValidationUtility.GenerateValidationReport(_testWorld);
                 report.Dispose();
             });
         }
@@ -361,7 +361,7 @@ namespace TinyWalnutGames.MetVD.Tests
                 // Act & Assert
                 Assert.DoesNotThrow(() =>
                 {
-                    var fixes = NavigationValidationUtility.GenerateQuickFixSuggestions(report);
+                    NativeList<NavigationQuickFix> fixes = NavigationValidationUtility.GenerateQuickFixSuggestions(report);
                     fixes.Dispose();
                 });
             }
@@ -378,33 +378,33 @@ namespace TinyWalnutGames.MetVD.Tests
         public void NavigationIntegrationTest_FullScenario_WorksCorrectly()
         {
             // Arrange: Create navigation nodes
-            var node1Entity = _entityManager.CreateEntity();
+            Entity node1Entity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(node1Entity, new NavNode(1, new float3(0, 0, 0), BiomeType.SolarPlains, Polarity.Sun));
             _entityManager.AddComponentData(node1Entity, new NodeId { _value = 1 });
             _entityManager.AddBuffer<Core.NavLinkBufferElement>(node1Entity);
 
-            var node2Entity = _entityManager.CreateEntity();
+            Entity node2Entity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(node2Entity, new NavNode(2, new float3(10, 0, 0), BiomeType.ShadowRealms, Polarity.Moon));
             _entityManager.AddComponentData(node2Entity, new NodeId { _value = 2 });
             _entityManager.AddBuffer<NavLinkBufferElement>(node2Entity);
 
             // Create navigation link
-            var linkBuffer = _entityManager.GetBuffer<NavLinkBufferElement>(node1Entity);
+            DynamicBuffer<NavLinkBufferElement> linkBuffer = _entityManager.GetBuffer<NavLinkBufferElement>(node1Entity);
             var navLink = new NavLink(1, 2, ConnectionType.Bidirectional, Polarity.Sun, Ability.None);
             linkBuffer.Add(navLink);
 
             // Create agent entity
-            var agentEntity = _entityManager.CreateEntity();
+            Entity agentEntity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(agentEntity, new AINavigationState(1, 2));
             _entityManager.AddComponentData(agentEntity, new AgentCapabilities(Polarity.Sun, Ability.Jump, 0.8f));
             _entityManager.AddBuffer<PathNodeBufferElement>(agentEntity);
 
             // Create navigation graph singleton
-            var navGraphEntity = _entityManager.CreateEntity();
+            Entity navGraphEntity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(navGraphEntity, new NavigationGraph(2, 1) { IsReady = true });
 
             // Act: Test agent can navigate
-            var agent = _entityManager.GetComponentData<AgentCapabilities>(agentEntity);
+            AgentCapabilities agent = _entityManager.GetComponentData<AgentCapabilities>(agentEntity);
             bool canTraverse = navLink.CanTraverseWith(agent, 1);
             float cost = navLink.CalculateTraversalCost(agent);
 
@@ -463,10 +463,10 @@ namespace TinyWalnutGames.MetVD.Tests
         public void ArcJump_Ability_IsCorrectlyDefined()
         {
             // Arrange & Act
-            var arcJumpAbility = Ability.ArcJump;
-            var chargedJumpAbility = Ability.ChargedJump;
-            var teleportArcAbility = Ability.TeleportArc;
-            var allArcMovement = Ability.AllArcMovement;
+            Ability arcJumpAbility = Ability.ArcJump;
+            Ability chargedJumpAbility = Ability.ChargedJump;
+            Ability teleportArcAbility = Ability.TeleportArc;
+            Ability allArcMovement = Ability.AllArcMovement;
 
             // Assert
             Assert.AreNotEqual(Ability.None, arcJumpAbility);
@@ -669,7 +669,7 @@ namespace TinyWalnutGames.MetVD.Tests
         {
             // This tests the enhanced heuristic calculation indirectly
             // by verifying it produces different costs for horizontal vs vertical movement
-            var system = _testWorld.GetOrCreateSystem<AINavigationSystem>();
+            SystemHandle system = _testWorld.GetOrCreateSystem<AINavigationSystem>();
 
             // Simulate horizontal and vertical movements 👇🏼
             //var horizontalMove = new float3(5, 0, 0);👇🏼

@@ -34,7 +34,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         {
             // Test that the StackedSegmentGenerator system can be created
             // For ISystem (unmanaged) types, we test by getting the simulation group
-            var simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
             Assert.IsNotNull(simGroup);
             
             // The system should be automatically registered in the group via [UpdateInGroup]
@@ -46,7 +46,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void LinearBranchingCorridorGenerator_CanBeCreated()
         {
             // Test that the LinearBranchingCorridorGenerator system can be created
-            var simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
             Assert.IsNotNull(simGroup);
         }
 
@@ -54,7 +54,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void BiomeWeightedHeightmapGenerator_CanBeCreated()
         {
             // Test that the BiomeWeightedHeightmapGenerator system can be created
-            var simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
             Assert.IsNotNull(simGroup);
         }
 
@@ -62,7 +62,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void LayeredPlatformCloudGenerator_CanBeCreated()
         {
             // Test that the LayeredPlatformCloudGenerator system can be created
-            var simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
             Assert.IsNotNull(simGroup);
         }
 
@@ -70,9 +70,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void BeatType_Enum_CanBeUsed()
         {
             // Test that BeatType enum can be used
-            var challengeBeat = BeatType.Challenge;
-            var restBeat = BeatType.Rest;
-            var secretBeat = BeatType.Secret;
+            BeatType challengeBeat = BeatType.Challenge;
+            BeatType restBeat = BeatType.Rest;
+            BeatType secretBeat = BeatType.Secret;
             
             Assert.AreEqual(0, (byte)challengeBeat);
             Assert.AreEqual(1, (byte)restBeat);
@@ -83,10 +83,10 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void CloudMotionType_Enum_CanBeUsed()
         {
             // Test that CloudMotionType enum can be used
-            var gentle = CloudMotionType.Gentle;
-            var gusty = CloudMotionType.Gusty;
-            var conveyor = CloudMotionType.Conveyor;
-            var electric = CloudMotionType.Electric;
+            CloudMotionType gentle = CloudMotionType.Gentle;
+            CloudMotionType gusty = CloudMotionType.Gusty;
+            CloudMotionType conveyor = CloudMotionType.Conveyor;
+            CloudMotionType electric = CloudMotionType.Electric;
             
             Assert.AreEqual(0, (byte)gentle);
             Assert.AreEqual(1, (byte)gusty);
@@ -98,12 +98,12 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void TypeConversionUtility_CanConvertTypes()
         {
             // Test that TypeConversionUtility can convert between types
-            var platformType = RoomFeatureType.Platform;
-            var obstacleType = RoomFeatureType.Obstacle;
+            RoomFeatureType platformType = RoomFeatureType.Platform;
+            RoomFeatureType obstacleType = RoomFeatureType.Obstacle;
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            var convertedPlatform = TypeConversionUtility.ConvertToObjectType(platformType);
-            var convertedObstacle = TypeConversionUtility.ConvertToObjectType(obstacleType);
+            RoomFeatureObjectType convertedPlatform = TypeConversionUtility.ConvertToObjectType(platformType);
+            RoomFeatureObjectType convertedObstacle = TypeConversionUtility.ConvertToObjectType(obstacleType);
 #pragma warning restore CS0618 // Type or member is obsolete
 
             Assert.AreEqual(RoomFeatureType.Platform, convertedPlatform);
@@ -128,8 +128,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var physics = new JumpArcPhysics(3.0f, 4.0f, 1.5f, 1.0f, 2.0f, 6.0f);
             var from = new int2(0, 0);
             var to = new int2(2, 1);
-            
-            var isReachable = JumpArcSolver.IsReachable(from, to, Ability.Jump, physics);
+
+            bool isReachable = JumpArcSolver.IsReachable(from, to, Ability.Jump, physics);
             Assert.IsTrue(isReachable);
         }
 
@@ -141,7 +141,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var from = new int2(0, 0);
             var to = new int2(2, 1);
 
-            JumpArcSolver.CalculateJumpArc(from, to, physics, out var arcData);
+            JumpArcSolver.CalculateJumpArc(from, to, physics, out JumpArcData arcData);
 
             Assert.AreEqual(from, arcData.StartPosition);
             Assert.AreEqual(to, arcData.EndPosition);

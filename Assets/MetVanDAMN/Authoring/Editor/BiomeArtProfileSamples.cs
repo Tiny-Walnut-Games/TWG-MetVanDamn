@@ -37,7 +37,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         /// </summary>
         public static BiomeArtProfile CreateForestBiomeSample()
         {
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             profile.biomeName = "Dense Forest";
             profile.debugColor = new Color(0.2f, 0.6f, 0.2f, 1f);
 
@@ -97,7 +97,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         /// </summary>
         public static BiomeArtProfile CreateDesertBiomeSample()
         {
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             profile.biomeName = "Arid Desert";
             profile.debugColor = new Color(0.8f, 0.7f, 0.3f, 1f);
 
@@ -155,7 +155,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         /// </summary>
         public static BiomeArtProfile CreateMountainBiomeSample()
         {
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             profile.biomeName = "Rocky Mountains";
             profile.debugColor = new Color(0.5f, 0.4f, 0.3f, 1f);
 
@@ -213,7 +213,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         /// </summary>
         public static BiomeArtProfile CreateCoastalBiomeSample()
         {
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             profile.biomeName = "Coastal Shores";
             profile.debugColor = new Color(0.4f, 0.6f, 0.8f, 1f);
 
@@ -270,7 +270,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         /// </summary>
         public static BiomeArtProfile CreateUrbanBiomeSample()
         {
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             profile.biomeName = "Urban District";
             profile.debugColor = new Color(0.6f, 0.6f, 0.6f, 1f);
 

@@ -21,9 +21,13 @@ namespace TinyWalnutGames.GridLayerEditor
             // Get the path of the selected object in the Project window
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (string.IsNullOrEmpty(path))
+            {
                 path = "Assets";
+            }
             else if (!Directory.Exists(path))
+            {
                 path = Path.GetDirectoryName(path);
+            }
 
             // 🔥 DUPLICATE PREVENTION MAGIC: Check for existing GridLayerConfig in target directory
             if (HasExistingGridLayerConfigInDirectory(path))
@@ -54,7 +58,7 @@ namespace TinyWalnutGames.GridLayerEditor
             }
 
             // Create and save the new GridLayerConfig asset
-            var asset = ScriptableObject.CreateInstance<GridLayerConfig>();
+            GridLayerConfig asset = ScriptableObject.CreateInstance<GridLayerConfig>();
             AssetDatabase.CreateAsset(asset, assetPathAndName);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -72,12 +76,14 @@ namespace TinyWalnutGames.GridLayerEditor
         private static bool HasExistingGridLayerConfigInDirectory(string directoryPath)
         {
             if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
+            {
                 return false;
+            }
 
             // Search for any .asset files in the directory that are GridLayerConfig assets
-            var assetFiles = Directory.GetFiles(directoryPath, "*.asset", SearchOption.TopDirectoryOnly);
+            string[] assetFiles = Directory.GetFiles(directoryPath, "*.asset", SearchOption.TopDirectoryOnly);
             
-            foreach (var assetFile in assetFiles)
+            foreach (string assetFile in assetFiles)
             {
                 // Convert to Unity asset path format
                 string unityAssetPath = assetFile.Replace('\\', '/');
@@ -87,7 +93,7 @@ namespace TinyWalnutGames.GridLayerEditor
                 }
 
                 // Check if this asset is a GridLayerConfig
-                var asset = AssetDatabase.LoadAssetAtPath<GridLayerConfig>(unityAssetPath);
+                GridLayerConfig asset = AssetDatabase.LoadAssetAtPath<GridLayerConfig>(unityAssetPath);
                 if (asset != null)
                 {
                     Debug.Log($"Found existing GridLayerConfig: {unityAssetPath}");

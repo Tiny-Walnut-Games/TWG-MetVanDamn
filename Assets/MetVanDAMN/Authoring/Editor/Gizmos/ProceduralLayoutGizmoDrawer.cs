@@ -52,7 +52,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (_settings == null)
             {
                 LoadSettings();
-                if (_settings == null) return;
+                if (_settings == null)
+                {
+                    return;
+                }
             }
             DrawDebugControls();
             DrawProceduralLayoutGizmos();
@@ -87,17 +90,21 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void DrawProceduralLayoutGizmos()
         {
-            var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
-            var worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
+            DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            WorldConfigurationAuthoring worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
             if (_showRandomizationMode && worldConfig != null)
             {
                 DrawRandomizationModeInfo(worldConfig);
             }
-            foreach (var district in districts)
+            foreach (DistrictAuthoring district in districts)
             {
                 DrawDistrictGizmos(district);
             }
-            if (_showConnections) DrawConnectionGizmos();
+            if (_showConnections)
+            {
+                DrawConnectionGizmos();
+            }
+
             if (Application.isPlaying)
             {
                 DrawSectorsAndRooms();
@@ -106,10 +113,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void DrawRandomizationModeInfo(WorldConfigurationAuthoring worldConfig)
         {
-            var sceneView = SceneView.currentDrawingSceneView;
-            if (sceneView == null) return;
-            var cam = sceneView.camera;
-            if (cam == null) return;
+            SceneView sceneView = SceneView.currentDrawingSceneView;
+            if (sceneView == null)
+            {
+                return;
+            }
+
+            Camera cam = sceneView.camera;
+            if (cam == null)
+            {
+                return;
+            }
+
             Vector3 anchor = cam.transform.position + cam.transform.forward * 10f;
             Handles.color = Color.yellow;
             Handles.Label(anchor, $"Randomization Mode: {worldConfig.randomizationMode}\nSeed: {worldConfig.seed}\nWorld Size: {worldConfig.worldSize}");
@@ -120,10 +135,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             Vector3 position = GetGizmoPosition(district);
             bool isUnplaced = district.gridCoordinates.x == 0 && district.gridCoordinates.y == 0;
             if (isUnplaced && _showUnplacedDistricts)
+            {
                 DrawUnplacedDistrictGizmo(position, district);
+            }
             else if (!isUnplaced && _showPlacedDistricts)
+            {
                 DrawPlacedDistrictGizmo(position, district);
-            if (_showBiomeRadius) DrawBiomeRadiusGizmo(position, district);
+            }
+
+            if (_showBiomeRadius)
+            {
+                DrawBiomeRadiusGizmo(position, district);
+            }
         }
 
         private static void DrawUnplacedDistrictGizmo(Vector3 position, DistrictAuthoring district)
@@ -170,8 +193,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void DrawConnectionGizmos()
         {
-            var connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
-            foreach (var connection in connections)
+            ConnectionAuthoring[] connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
+            foreach (ConnectionAuthoring connection in connections)
             {
                 if (connection.from != null && connection.to != null)
                 {
@@ -205,13 +228,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void DrawSectorsAndRooms()
         {
-            if (!_showSectors && !_showRooms) return;
+            if (!_showSectors && !_showRooms)
+            {
+                return;
+            }
             // Convert ECS coordinates directly (sectors small quads, rooms small discs)
             Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
             if (_showSectors)
             {
                 Handles.color = new Color(0.95f, 0.75f, 0.2f, 0.35f); // amber
-                foreach (var c in _sectorCoords)
+                foreach (int2 c in _sectorCoords)
                 {
                     Vector3 p = new(c.x, 0f, c.y);
                     float size = (_settings != null ? _settings.gridCellSize : 1f) * 0.6f;
@@ -223,7 +249,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (_showRooms)
             {
                 Handles.color = new Color(0.4f, 0.8f, 1f, 0.5f); // cyan tint
-                foreach (var c in _roomCoords)
+                foreach (int2 c in _roomCoords)
                 {
                     Vector3 p = new(c.x, 0f, c.y);
                     float radius = (_settings != null ? _settings.gridCellSize : 1f) * 0.25f;
@@ -234,23 +260,41 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void SampleHierarchyEcsData()
         {
-            if (!Application.isPlaying) return;
-            if (EditorApplication.timeSinceStartup - _lastEcsSampleTime < EcsSampleInterval) return;
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
+            if (EditorApplication.timeSinceStartup - _lastEcsSampleTime < EcsSampleInterval)
+            {
+                return;
+            }
+
             _lastEcsSampleTime = EditorApplication.timeSinceStartup;
-            var world = World.DefaultGameObjectInjectionWorld;
-            if (world == null || !world.IsCreated) return;
-            var em = world.EntityManager;
+            World world = World.DefaultGameObjectInjectionWorld;
+            if (world == null || !world.IsCreated)
+            {
+                return;
+            }
+
+            EntityManager em = world.EntityManager;
             try
             {
-                var query = em.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
-                using var nodeIds = query.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+                EntityQuery query = em.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+                using Unity.Collections.NativeArray<NodeId> nodeIds = query.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
                 _sectorCoords.Clear();
                 _roomCoords.Clear();
                 for (int i = 0; i < nodeIds.Length; i++)
                 {
-                    var n = nodeIds[i];
-                    if (n.Level == 1) _sectorCoords.Add(n.Coordinates);
-                    else if (n.Level == 2) _roomCoords.Add(n.Coordinates);
+                    NodeId n = nodeIds[i];
+                    if (n.Level == 1)
+                    {
+                        _sectorCoords.Add(n.Coordinates);
+                    }
+                    else if (n.Level == 2)
+                    {
+                        _roomCoords.Add(n.Coordinates);
+                    }
                 }
             }
             catch { /* swallow sampling errors safely */ }
@@ -332,21 +376,27 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void PreviewProceduralLayout()
         {
-            var worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
+            WorldConfigurationAuthoring worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
             if (worldConfig == null)
             {
                 Debug.LogWarning("Procedural Layout Preview: WorldConfigurationAuthoring not found in scene.");
                 return;
             }
-            var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
             if (districts.Length == 0)
             {
                 Debug.LogWarning("Procedural Layout Preview: No DistrictAuthoring components found.");
                 return;
             }
             var unplaced = new System.Collections.Generic.List<DistrictAuthoring>();
-            foreach (var d in districts)
-                if (d.level == 0 && d.gridCoordinates.x == 0 && d.gridCoordinates.y == 0) unplaced.Add(d);
+            foreach (DistrictAuthoring d in districts)
+            {
+                if (d.level == 0 && d.gridCoordinates.x == 0 && d.gridCoordinates.y == 0)
+                {
+                    unplaced.Add(d);
+                }
+            }
+
             if (unplaced.Count == 0)
             {
                 Debug.Log("Procedural Layout Preview: All districts already placed.");
@@ -354,7 +404,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
             int targetCount = worldConfig.targetSectors > 0 ? math.min(worldConfig.targetSectors, unplaced.Count) : unplaced.Count;
             var random = new Unity.Mathematics.Random((uint)(worldConfig.seed == 0 ? 1 : worldConfig.seed));
-            var strategy = targetCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
+            DistrictPlacementStrategy strategy = targetCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
             var positions = new int2[targetCount];
             GeneratePositionsPreview(positions, worldConfig.worldSize, strategy, ref random);
             for (int i = 0; i < targetCount; i++)
@@ -384,11 +434,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                             float dist = math.length(new float2(candidate - positions[j]));
                             if (dist < minDistance) { valid = false; break; }
                         }
-                        if (valid) positions[i] = candidate;
+                        if (valid)
+                        {
+                            positions[i] = candidate;
+                        }
+
                         attempts++;
                     }
                     if (!valid)
+                    {
                         positions[i] = new(random.NextInt(0, worldSize.x), random.NextInt(0, worldSize.y));
+                    }
                 }
             }
             else
@@ -409,16 +465,27 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void FrameAllDistricts()
         {
-            var sceneView = SceneView.lastActiveSceneView;
-            if (sceneView == null) return;
-            var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
-            if (districts.Length == 0) return;
+            SceneView sceneView = SceneView.lastActiveSceneView;
+            if (sceneView == null)
+            {
+                return;
+            }
+
+            DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            if (districts.Length == 0)
+            {
+                return;
+            }
+
             Bounds bounds = new(); bool init = false;
-            foreach (var d in districts)
+            foreach (DistrictAuthoring d in districts)
             {
                 Vector3 pos = GetGizmoPosition(d);
                 if (!init) { bounds = new Bounds(pos, Vector3.zero); init = true; }
-                else bounds.Encapsulate(pos);
+                else
+                {
+                    bounds.Encapsulate(pos);
+                }
             }
             bounds.Expand(10f);
             sceneView.Frame(bounds, false);

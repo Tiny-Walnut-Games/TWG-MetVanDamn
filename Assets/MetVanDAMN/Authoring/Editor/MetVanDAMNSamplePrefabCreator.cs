@@ -20,10 +20,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             // Ensure directory exists
             if (!AssetDatabase.IsValidFolder("Assets/MetVanDAMN/Prefabs"))
+            {
                 AssetDatabase.CreateFolder("Assets/MetVanDAMN", "Prefabs");
+            }
+
             if (!AssetDatabase.IsValidFolder("Assets/MetVanDAMN/Prefabs/Samples"))
+            {
                 AssetDatabase.CreateFolder("Assets/MetVanDAMN/Prefabs", "Samples");
-            
+            }
+
             CreateDistrictPrefab();
             CreateConnectionAnchorPrefab();
             CreateBiomeFieldPrefab();
@@ -37,9 +42,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void CreateDistrictPrefab()
         {
             var go = new GameObject("District_Sample");
-            
+
             // Add district authoring component
-            var district = go.AddComponent<DistrictAuthoring>();
+            DistrictAuthoring district = go.AddComponent<DistrictAuthoring>();
             district.nodeId = 1;
             district.level = 0;
             district.parentId = 0;
@@ -52,9 +57,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             cube.transform.SetParent(go.transform);
             cube.transform.localPosition = Vector3.zero;
             cube.transform.localScale = Vector3.one * 0.8f;
-            
+
             // Color coding for districts
-            var renderer = cube.GetComponent<Renderer>();
+            Renderer renderer = cube.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             renderer.material.color = new Color(0.2f, 0.8f, 0.2f, 0.8f); // Green
             
@@ -64,9 +69,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void CreateConnectionAnchorPrefab()
         {
             var go = new GameObject("ConnectionAnchor_Sample");
-            
+
             // Add connection authoring component (will be configured in scene)
-            var connection = go.AddComponent<ConnectionAuthoring>();
+            ConnectionAuthoring connection = go.AddComponent<ConnectionAuthoring>();
             connection.type = ConnectionType.Bidirectional;
             connection.requiredPolarity = Polarity.None;
             connection.traversalCost = 1.0f;
@@ -76,9 +81,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             cylinder.transform.SetParent(go.transform);
             cylinder.transform.localPosition = Vector3.zero;
             cylinder.transform.localScale = new Vector3(0.1f, 0.5f, 0.1f);
-            
+
             // Color coding for connections
-            var renderer = cylinder.GetComponent<Renderer>();
+            Renderer renderer = cylinder.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             renderer.material.color = new Color(0.8f, 0.2f, 0.8f, 0.9f); // Magenta
             
@@ -88,9 +93,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void CreateBiomeFieldPrefab()
         {
             var go = new GameObject("BiomeField_Sample");
-            
+
             // Add biome field authoring component
-            var biomeField = go.AddComponent<BiomeFieldAuthoring>();
+            BiomeFieldAuthoring biomeField = go.AddComponent<BiomeFieldAuthoring>();
             biomeField.primaryBiome = BiomeType.SolarPlains;
             biomeField.secondaryBiome = BiomeType.Unknown;
             biomeField.strength = 1.0f;
@@ -101,9 +106,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             sphere.transform.SetParent(go.transform);
             sphere.transform.localPosition = Vector3.zero;
             sphere.transform.localScale = Vector3.one * 2.0f; // Larger to show field area
-            
+
             // Color coding for biome fields
-            var renderer = sphere.GetComponent<Renderer>();
+            Renderer renderer = sphere.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             renderer.material.color = new Color(0.8f, 0.8f, 0.2f, 0.3f); // Yellow, transparent
             
@@ -132,9 +137,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void CreateWfcTilePrototype(string name, uint tileId, float weight, BiomeType biomeType, Polarity polarity, byte minConn, byte maxConn)
         {
             var go = new GameObject($"WfcTilePrototype_{name}");
-            
+
             // Add WFC tile prototype authoring component
-            var wfcTile = go.AddComponent<WfcTilePrototypeAuthoring>();
+            WfcTilePrototypeAuthoring wfcTile = go.AddComponent<WfcTilePrototypeAuthoring>();
             wfcTile.tileId = tileId;
             wfcTile.weight = weight;
             wfcTile.biomeType = biomeType;
@@ -205,9 +210,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 visual.transform.SetParent(go.transform);
                 visual.transform.localPosition = Vector3.zero;
                 visual.transform.localScale = Vector3.one * 0.6f;
-                
+
                 // Apply material
-                var renderer = visual.GetComponent<Renderer>();
+                Renderer renderer = visual.GetComponent<Renderer>();
                 renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
                 renderer.material.color = visual.GetComponent<Renderer>().material.color;
             }

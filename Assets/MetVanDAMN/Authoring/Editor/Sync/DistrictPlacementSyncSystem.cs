@@ -22,18 +22,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         protected override void OnUpdate()
         {
-            var nodeIdHandle = GetComponentTypeHandle<NodeId>(true); // not used directly but keeps pattern
-            var nodeIds = _districtQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
-            var entities = _districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
-            var em = EntityManager;
+            ComponentTypeHandle<NodeId> nodeIdHandle = GetComponentTypeHandle<NodeId>(true); // not used directly but keeps pattern
+            Unity.Collections.NativeArray<NodeId> nodeIds = _districtQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+            Unity.Collections.NativeArray<Entity> entities = _districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            EntityManager em = EntityManager;
             try
             {
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    var node = nodeIds[i];
-                    if (node.Level != 0) continue;
-                    if (!em.HasComponent<DistrictAuthoring>(entities[i])) continue; // safety
-                    var authoring = em.GetComponentObject<DistrictAuthoring>(entities[i]);
+                    NodeId node = nodeIds[i];
+                    if (node.Level != 0)
+                    {
+                        continue;
+                    }
+
+                    if (!em.HasComponent<DistrictAuthoring>(entities[i]))
+                    {
+                        continue; // safety
+                    }
+
+                    DistrictAuthoring authoring = em.GetComponentObject<DistrictAuthoring>(entities[i]);
                     if (authoring.gridCoordinates.x != node.Coordinates.x || authoring.gridCoordinates.y != node.Coordinates.y)
                     {
                         authoring.gridCoordinates = node.Coordinates;
@@ -43,8 +51,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             }
             finally
             {
-                if (nodeIds.IsCreated) nodeIds.Dispose();
-                if (entities.IsCreated) entities.Dispose();
+                if (nodeIds.IsCreated)
+                {
+                    nodeIds.Dispose();
+                }
+
+                if (entities.IsCreated)
+                {
+                    entities.Dispose();
+                }
             }
         }
     }

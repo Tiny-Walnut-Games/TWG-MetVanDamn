@@ -95,7 +95,11 @@ namespace TinyWalnutGames.GridLayerEditor
         /// </summary>
         public void ApplyPlatformerPreset()
         {
-            if (_config == null) return;
+            if (_config == null)
+            {
+                return;
+            }
+
             _config.layerNames = new[] { "WalkableGround", "Ladders", "Hazards" };
         }
 
@@ -106,13 +110,17 @@ namespace TinyWalnutGames.GridLayerEditor
         /// <param name="enabled">Whether the layer should be enabled or disabled.</param>
         public void ToggleLayer(string layerName, bool enabled)
         {
-            if (_config == null) return;
-            var names = _config.layerNames ?? new string[0];
+            if (_config == null)
+            {
+                return;
+            }
+
+            string[] names = _config.layerNames ?? new string[0];
             if (enabled)
             {
                 if (!System.Array.Exists(names, l => l == layerName))
                 {
-                    var newNames = new string[names.Length + 1];
+                    string[] newNames = new string[names.Length + 1];
                     names.CopyTo(newNames, 0);
                     newNames[names.Length] = layerName;
                     _config.layerNames = newNames;
@@ -129,7 +137,11 @@ namespace TinyWalnutGames.GridLayerEditor
         /// </summary>
         public void CreateGridWithLayers()
         {
-            if (_config == null || _config.layerNames == null) return;
+            if (_config == null || _config.layerNames == null)
+            {
+                return;
+            }
+
             TwoDimensionalGridSetup.CreateCustomGrid(_config.layerNames);
         }
 
@@ -172,7 +184,9 @@ namespace TinyWalnutGames.GridLayerEditor
             {
                 string name = LayerMask.LayerToName(i);
                 if (!string.IsNullOrEmpty(name))
+                {
                     layers.Add(name);
+                }
             }
             return layers.ToArray();
         }

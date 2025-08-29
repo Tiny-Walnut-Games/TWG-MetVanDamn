@@ -87,6 +87,112 @@ namespace TinyWalnutGames.MetVD.Authoring
     }
 
     /// <summary>
+    /// Debug visualization settings for checkered material override system
+    /// Enables coordinate-aware procedural material generation for biome debugging
+    /// </summary>
+    [System.Serializable]
+    public class CheckeredMaterialSettings
+    {
+        [Header("Checkered Material Override")]
+        [Tooltip("Enable procedural checkered material generation for debug visualization")]
+        public bool enableCheckerOverride = false;
+        
+        [Header("Coordinate Intelligence")]
+        [Range(0f, 2f), Tooltip("How strongly world coordinates influence pattern complexity")]
+        public float coordinateInfluenceStrength = 0.7f;
+        
+        [Range(0.5f, 2f), Tooltip("Distance from origin scaling factor for pattern detail")]
+        public float distanceScalingFactor = 1.0f;
+        
+        [Tooltip("Enable coordinate-based pattern warping for organic appearance")]
+        public bool enableCoordinateWarping = true;
+        
+        [Header("Animation & Dynamics")]
+        [Range(0f, 1f), Tooltip("Animation speed for polarity-based material effects")]
+        public float polarityAnimationSpeed = 0.2f;
+        
+        [Range(0.5f, 3f), Tooltip("Multiplier for complexity-based visual enhancements")]
+        public float complexityTierMultiplier = 1.2f;
+        
+        [Header("Pattern Customization")]
+        [Range(2, 32), Tooltip("Base checker size in pixels (coordinate complexity modifies this)")]
+        public int baseCheckerSize = 8;
+        
+        [Tooltip("Use mathematical patterns (Fibonacci, prime numbers) to influence generation")]
+        public bool useMathematicalPatterns = true;
+        
+        [Range(0f, 1f), Tooltip("Strength of mathematical pattern influence on checker generation")]
+        public float mathematicalPatternStrength = 0.5f;
+        
+        [Header("Biome-Specific Overrides")]
+        [Tooltip("Use biome-specific color relationships for secondary checker colors")]
+        public bool useBiomeColorHarmony = true;
+        
+        [Range(0f, 1f), Tooltip("Intensity of biome-specific visual effects")]
+        public float biomeVisualizationIntensity = 0.8f;
+        
+        /// <summary>
+        /// Converts these settings to the runtime complexity settings structure
+        /// Enables seamless integration with the BiomeCheckerMaterialOverride system
+        /// </summary>
+        public BiomeCheckerMaterialOverride.CheckerComplexitySettings ToComplexitySettings()
+        {
+            return new BiomeCheckerMaterialOverride.CheckerComplexitySettings
+            {
+                coordinateInfluenceStrength = this.coordinateInfluenceStrength,
+                distanceScalingFactor = this.distanceScalingFactor,
+                polarityAnimationSpeed = this.polarityAnimationSpeed,
+                enableCoordinateWarping = this.enableCoordinateWarping,
+                complexityTierMultiplier = this.complexityTierMultiplier
+            };
+        }
+        
+        /// <summary>
+        /// Creates default settings optimized for biome debugging and visualization
+        /// Provides balanced coordinate-awareness without overwhelming visual complexity
+        /// </summary>
+        public static CheckeredMaterialSettings CreateDebugOptimized()
+        {
+            return new CheckeredMaterialSettings
+            {
+                enableCheckerOverride = true,
+                coordinateInfluenceStrength = 0.6f,
+                distanceScalingFactor = 1.0f,
+                enableCoordinateWarping = true,
+                polarityAnimationSpeed = 0.15f,
+                complexityTierMultiplier = 1.0f,
+                baseCheckerSize = 8,
+                useMathematicalPatterns = true,
+                mathematicalPatternStrength = 0.3f,
+                useBiomeColorHarmony = true,
+                biomeVisualizationIntensity = 0.9f
+            };
+        }
+        
+        /// <summary>
+        /// Creates settings optimized for performance with minimal coordinate influence
+        /// Suitable for runtime use where visual fidelity is less critical than performance
+        /// </summary>
+        public static CheckeredMaterialSettings CreatePerformanceOptimized()
+        {
+            return new CheckeredMaterialSettings
+            {
+                enableCheckerOverride = true,
+                coordinateInfluenceStrength = 0.3f,
+                distanceScalingFactor = 0.5f,
+                enableCoordinateWarping = false,
+                polarityAnimationSpeed = 0f,
+                complexityTierMultiplier = 0.8f,
+                baseCheckerSize = 16,
+                useMathematicalPatterns = false,
+                mathematicalPatternStrength = 0f,
+                useBiomeColorHarmony = true,
+                biomeVisualizationIntensity = 0.6f
+            };
+        }
+    }
+
+    /// <summary>
     /// Comprehensive prop placement configuration for advanced biome art
     /// </summary>
     [System.Serializable]
@@ -153,6 +259,10 @@ namespace TinyWalnutGames.MetVD.Authoring
         [Tooltip("Advanced prop placement configuration for this biome.")]
         public PropPlacementSettings propSettings;
 
+        [Header("Debug Visualization")]
+        [Tooltip("Checkered material override settings for coordinate-aware debugging")]
+        public CheckeredMaterialSettings checkerSettings = new();
+
         [Header("Advanced")]
         [Tooltip("Optional sorting layer override for biome visuals.")]
         public string sortingLayerOverride;
@@ -164,21 +274,51 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// <summary>
         /// Convenient access to prop prefabs for backward compatibility
         /// </summary>
-        public GameObject[] propPrefabs => propSettings?.propPrefabs ?? new GameObject[0];
+        public GameObject[] PropPrefabs => propSettings?.propPrefabs ?? new GameObject[0];
         
         /// <summary>
         /// Convenient access to all tiles for backward compatibility
         /// </summary>
-        public TileBase[] tiles
+        public TileBase[] Tiles
         {
             get
             {
                 var tileList = new List<TileBase>();
-                if (floorTile != null) tileList.Add(floorTile);
-                if (wallTile != null) tileList.Add(wallTile);
-                if (backgroundTile != null) tileList.Add(backgroundTile);
-                if (transitionTiles != null) tileList.AddRange(transitionTiles);
+                if (floorTile != null)
+                {
+                    tileList.Add(floorTile);
+                }
+
+                if (wallTile != null)
+                {
+                    tileList.Add(wallTile);
+                }
+
+                if (backgroundTile != null)
+                {
+                    tileList.Add(backgroundTile);
+                }
+
+                if (transitionTiles != null)
+                {
+                    tileList.AddRange(transitionTiles);
+                }
+
                 return tileList.ToArray();
+            }
+        }
+        
+        /// <summary>
+        /// Applies checkered material override to the specified tilemap if enabled
+        /// Integrates seamlessly with the BiomeCheckerMaterialOverride system
+        /// </summary>
+        public void ApplyCheckerOverrideIfEnabled(Tilemap tilemap, TinyWalnutGames.MetVD.Core.BiomeType biome, 
+            TinyWalnutGames.MetVD.Core.NodeId nodeId)
+        {
+            if (checkerSettings?.enableCheckerOverride == true && tilemap != null)
+            {
+                BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = checkerSettings.ToComplexitySettings();
+                BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome, nodeId, complexitySettings);
             }
         }
     }

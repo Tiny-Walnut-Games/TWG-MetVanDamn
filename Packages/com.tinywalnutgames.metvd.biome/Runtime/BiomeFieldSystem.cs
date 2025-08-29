@@ -39,7 +39,7 @@ namespace TinyWalnutGames.MetVD.Biome
             nodeIdLookup.Update(ref state);
             connectionBufferLookup.Update(ref state);
 
-            var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
+            float deltaTime = state.WorldUnmanaged.Time.DeltaTime;
 
             // Use a simple deterministic seed per frame; avoid JobsUtility to keep compatibility
             uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 887.0); // prime multiplier
@@ -87,15 +87,21 @@ namespace TinyWalnutGames.MetVD.Biome
 
             // Assign biome type if unknown
             if (biome.Type == BiomeType.Unknown)
+            {
                 biome.Type = AssignBiomeType(nodeId, biome.PrimaryPolarity, ref random);
+            }
 
             // Calculate polarity strength based on position and neighbors
             if (biome.PolarityStrength <= 0.1f)
+            {
                 biome.PolarityStrength = CalculatePolarityStrength(entity, nodeId, biome, ref random);
+            }
 
             // Assign secondary polarity for mixed biomes
             if (biome.SecondaryPolarity == Polarity.None && biome.Type == BiomeType.TransitionZone)
+            {
                 biome.SecondaryPolarity = GetComplementaryPolarity(biome.PrimaryPolarity);
+            }
 
             // Update difficulty modifier based on polarity complexity
             UpdateDifficultyModifier(ref biome, DeltaTime);
@@ -226,8 +232,10 @@ namespace TinyWalnutGames.MetVD.Biome
             
             // Dual polarity biomes are more challenging
             if (biome.SecondaryPolarity != Polarity.None)
+            {
                 baseModifier += 0.3f;
-            
+            }
+
             // Some biomes are inherently more difficult
             float biomeModifier = biome.Type switch
             {
@@ -295,7 +303,9 @@ namespace TinyWalnutGames.MetVD.Biome
         {
             // Ensure buffer exists (IJobEntity injection will add via Execute signature if declared) but guard anyway
             if (!validationBuffer.IsCreated)
+            {
                 return;
+            }
 
             ValidatePolarityCoherence(validationBuffer, biome, nodeId, entity.Index);
             ValidateBiomeTypeAssignment(validationBuffer, biome, nodeId, entity.Index);
@@ -306,9 +316,15 @@ namespace TinyWalnutGames.MetVD.Biome
         {
             bool isValid = true;
             if (biome.PrimaryPolarity == Polarity.None && biome.SecondaryPolarity != Polarity.None)
+            {
                 isValid = false;
+            }
+
             if (biome.PolarityStrength > 1.0f || biome.PolarityStrength < 0.0f)
+            {
                 isValid = false;
+            }
+
             if (!isValid)
             {
                 buffer.Add(new BiomeValidationRecord
@@ -389,9 +405,11 @@ namespace TinyWalnutGames.MetVD.Biome
         protected override void OnUpdate()
         {
             if (_missingBufferQuery.IsEmptyIgnoreFilter)
+            {
                 return;
+            }
 
-            var entities = _missingBufferQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            NativeArray<Entity> entities = _missingBufferQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
             var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
             for (int i = 0; i < entities.Length; i++)
             {

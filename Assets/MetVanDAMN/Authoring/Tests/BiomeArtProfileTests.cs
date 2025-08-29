@@ -31,7 +31,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void BiomeArtProfile_CanBeCreated()
         {
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             // Initialize nested settings (was previously flat fields like propSpawnChance)
             profile.propSettings = new PropPlacementSettings();
 
@@ -45,8 +45,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void BiomeArtProfileReference_CanBeAddedToEntity()
         {
-            var entity = entityManager.CreateEntity();
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            Entity entity = entityManager.CreateEntity();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             profile.propSettings = new PropPlacementSettings();
 
             var artProfileRef = new BiomeArtProfileReference
@@ -60,7 +60,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
             Assert.IsTrue(entityManager.HasComponent<BiomeArtProfileReference>(entity));
 
-            var retrievedRef = entityManager.GetComponentData<BiomeArtProfileReference>(entity);
+            BiomeArtProfileReference retrievedRef = entityManager.GetComponentData<BiomeArtProfileReference>(entity);
             Assert.AreEqual(ProjectionType.TopDown, retrievedRef.ProjectionType);
             Assert.IsFalse(retrievedRef.IsApplied);
         }
@@ -68,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void BiomeTransition_ComponentDataWorks()
         {
-            var entity = entityManager.CreateEntity();
+            Entity entity = entityManager.CreateEntity();
 
             var transition = new BiomeTransition
             {
@@ -83,7 +83,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
             Assert.IsTrue(entityManager.HasComponent<BiomeTransition>(entity));
 
-            var retrievedTransition = entityManager.GetComponentData<BiomeTransition>(entity);
+            BiomeTransition retrievedTransition = entityManager.GetComponentData<BiomeTransition>(entity);
             Assert.AreEqual(BiomeType.SolarPlains, retrievedTransition.FromBiome);
             Assert.AreEqual(BiomeType.CrystalCaverns, retrievedTransition.ToBiome);
             Assert.AreEqual(0.5f, retrievedTransition.TransitionStrength, 0.001f);
@@ -101,7 +101,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void BiomeArtProfile_DefaultLayersConfiguration()
         {
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             profile.propSettings = new PropPlacementSettings();
 
             Assert.IsNotNull(profile.propSettings.allowedPropLayers);
@@ -112,7 +112,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void BiomeArtProfile_AllowedPropLayersCanBeModified()
         {
-            var profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
+            BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
             profile.propSettings = new PropPlacementSettings();
 
             profile.propSettings.allowedPropLayers.Add("FloorProps");

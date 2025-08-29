@@ -18,7 +18,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 string[] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
                 if (guids.Length > 0)
+                {
                     _settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
+                }
             }
         }
 
@@ -44,7 +46,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             bool enter = true;
             while (prop.NextVisible(enter))
             {
-                if (prop.name == "m_Script") continue;
+                if (prop.name == "m_Script")
+                {
+                    continue;
+                }
+
                 EditorGUILayout.PropertyField(prop, true);
                 enter = false;
             }
@@ -59,8 +65,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 if (districts.Length > 0)
                 {
                     Bounds b = new(districts[0].transform.position, Vector3.one);
-                    foreach (var d in districts)
+                    foreach (DistrictAuthoring d in districts)
+                    {
                         b.Encapsulate(d.transform.position);
+                    }
+
                     SceneView.lastActiveSceneView.Frame(b, false);
                 }
             }

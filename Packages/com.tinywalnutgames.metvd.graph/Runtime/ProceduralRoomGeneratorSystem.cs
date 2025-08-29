@@ -30,30 +30,38 @@ namespace TinyWalnutGames.MetVD.Graph
 
         protected override void OnUpdate()
         {
-            if (_roomsToGenerateQuery.IsEmptyIgnoreFilter) return;
+            if (_roomsToGenerateQuery.IsEmptyIgnoreFilter)
+            {
+                return;
+            }
+
             WorldConfiguration worldConfig = default;
             if (!_worldConfigQuery.IsEmptyIgnoreFilter)
+            {
                 worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
+            }
 
-            using var roomEntities = _roomsToGenerateQuery.ToEntityArray(Allocator.Temp);
-            using var nodeIds = _roomsToGenerateQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-            using var roomData = _roomsToGenerateQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+            using NativeArray<Entity> roomEntities = _roomsToGenerateQuery.ToEntityArray(Allocator.Temp);
+            using NativeArray<NodeId> nodeIds = _roomsToGenerateQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            using NativeArray<RoomHierarchyData> roomData = _roomsToGenerateQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
 
             for (int i = 0; i < roomEntities.Length; i++)
             {
-                var roomEntity = roomEntities[i];
-                var nodeId = nodeIds[i];
-                var hierarchy = roomData[i];
+                Entity roomEntity = roomEntities[i];
+                NodeId nodeId = nodeIds[i];
+                RoomHierarchyData hierarchy = roomData[i];
                 uint roomSeed = GenerateRoomSeed(worldConfig.Seed, nodeId);
                 var random = new Unity.Mathematics.Random(roomSeed == 0 ? 1u : roomSeed);
-                var biomeAffinity = DetermineBiomeAffinity(nodeId, ref random);
+                BiomeAffinity biomeAffinity = DetermineBiomeAffinity(nodeId, ref random);
                 bool layoutOrientation = DetermineLayoutOrientation(hierarchy, biomeAffinity, ref random);
-                var generatorType = SelectRoomGenerator(hierarchy.Type, biomeAffinity, layoutOrientation, ref random);
-                var roomTemplate = CreateRoomTemplate(generatorType, hierarchy, biomeAffinity, ref random);
+                RoomGeneratorType generatorType = SelectRoomGenerator(hierarchy.Type, biomeAffinity, layoutOrientation, ref random);
+                RoomTemplate roomTemplate = CreateRoomTemplate(generatorType, hierarchy, biomeAffinity, ref random);
                 EntityManager.AddComponentData(roomEntity, roomTemplate);
                 EntityManager.AddComponentData(roomEntity, new ProceduralRoomGenerated(roomSeed));
                 if (!EntityManager.HasBuffer<RoomNavigationElement>(roomEntity))
+                {
                     EntityManager.AddBuffer<RoomNavigationElement>(roomEntity);
+                }
             }
         }
 #else
@@ -111,16 +119,32 @@ namespace TinyWalnutGames.MetVD.Graph
         }
         private static BiomeAffinity DetermineBiomeAffinity(NodeId nodeId, ref Unity.Mathematics.Random random)
         {
-            var coords = nodeId.Coordinates;
-            if (coords.y > 50) return BiomeAffinity.Sky;
-            if (coords.y < -20) return BiomeAffinity.Underground;
-            if (math.abs(coords.x) > 40) return BiomeAffinity.Desert;
-            if (coords.y > 20) return BiomeAffinity.Mountain;
+            int2 coords = nodeId.Coordinates;
+            if (coords.y > 50)
+            {
+                return BiomeAffinity.Sky;
+            }
+
+            if (coords.y < -20)
+            {
+                return BiomeAffinity.Underground;
+            }
+
+            if (math.abs(coords.x) > 40)
+            {
+                return BiomeAffinity.Desert;
+            }
+
+            if (coords.y > 20)
+            {
+                return BiomeAffinity.Mountain;
+            }
+
             return random.NextFloat() > 0.7f ? (BiomeAffinity)(random.NextInt(1, 5)) : BiomeAffinity.Forest;
         }
         private static bool DetermineLayoutOrientation(RoomHierarchyData hierarchy, BiomeAffinity biome, ref Unity.Mathematics.Random random)
         {
-            var bounds = hierarchy.Bounds; bool isVertical = bounds.height > bounds.width;
+            RectInt bounds = hierarchy.Bounds; bool isVertical = bounds.height > bounds.width;
             return biome switch
             {
                 BiomeAffinity.Sky => true,
@@ -137,15 +161,22 @@ namespace TinyWalnutGames.MetVD.Graph
                 case RoomType.Treasure: return random.NextFloat() > 0.6f ? RoomGeneratorType.ParametricChallenge : RoomGeneratorType.PatternDrivenModular;
                 case RoomType.Hub: return RoomGeneratorType.WeightedTilePrefab;
                 default:
-                    if (biome == BiomeAffinity.Sky) return RoomGeneratorType.SkyBiomePlatform;
+                    if (biome == BiomeAffinity.Sky)
+                    {
+                        return RoomGeneratorType.SkyBiomePlatform;
+                    }
+
                     if (isVertical)
+                    {
                         return random.NextFloat() > 0.4f ? RoomGeneratorType.VerticalSegment : RoomGeneratorType.WeightedTilePrefab;
+                    }
+
                     return random.NextFloat() > 0.4f ? RoomGeneratorType.HorizontalCorridor : RoomGeneratorType.WeightedTilePrefab;
             }
         }
         private static RoomTemplate CreateRoomTemplate(RoomGeneratorType generatorType, RoomHierarchyData hierarchy, BiomeAffinity biome, ref Unity.Mathematics.Random random)
         {
-            var biomeSizeModifier = biome switch
+            float biomeSizeModifier = biome switch
             {
                 BiomeAffinity.Desert => 0.95f, // Harsh but navigable, less forgiving than it looks
                 BiomeAffinity.Forest => 1.15f, // Dense, resource-rich, full of traversal options
@@ -158,14 +189,14 @@ namespace TinyWalnutGames.MetVD.Graph
                 BiomeAffinity.Any => 0f, // 	Null glyph. Should never be used directly.
                 _ => throw new System.NotImplementedException() // When adding biomes, update: DetermineLayoutOrientation, SelectRoomGenerator, and ConvertBiomeTypeToAffinity in ProceduralRoomGeneration.cs
             };                                                  // Also check TerrainAndSkyGenerators.cs for BiomeType switches if adding new terrain types.
-            var bounds = hierarchy.Bounds;
+            RectInt bounds = hierarchy.Bounds;
             int2 baseMinSize = new(math.max(2, bounds.width / 2), math.max(2, bounds.height / 2));
             int2 baseMaxSize = new(bounds.width, bounds.height);
 
             // Apply biome size modifier while respecting minimums
             int2 minSize = (int2)math.max((float2)baseMinSize, (float2)baseMinSize * biomeSizeModifier);
             int2 maxSize = (int2)math.max((float2)minSize, (float2)baseMaxSize * biomeSizeModifier);
-            var movementTags = GenerateMovementCapabilities(generatorType, hierarchy.Type, ref random);
+            MovementCapabilityTags movementTags = GenerateMovementCapabilities(generatorType, hierarchy.Type, ref random);
             float secretPercent = hierarchy.Type switch
             {
                 RoomType.Treasure => 0.3f,
@@ -182,7 +213,7 @@ namespace TinyWalnutGames.MetVD.Graph
             switch (generatorType)
             {
                 case RoomGeneratorType.PatternDrivenModular:
-                    var skillChoices = new[] { Ability.Dash, Ability.WallJump, Ability.Grapple, Ability.DoubleJump };
+                    Ability[] skillChoices = new[] { Ability.Dash, Ability.WallJump, Ability.Grapple, Ability.DoubleJump };
                     required = skillChoices[random.NextInt(0, skillChoices.Length)];
                     optional = skillChoices[random.NextInt(0, skillChoices.Length)];
                     difficulty = random.NextFloat(0.6f, 0.9f);
@@ -199,7 +230,10 @@ namespace TinyWalnutGames.MetVD.Graph
             if (roomType == RoomType.Boss)
             {
                 difficulty = math.max(difficulty, 0.7f);
-                if (optional == Ability.None) optional = Ability.Dash;
+                if (optional == Ability.None)
+                {
+                    optional = Ability.Dash;
+                }
             }
             return new MovementCapabilityTags(required, optional, BiomeAffinity.Any, difficulty);
         }

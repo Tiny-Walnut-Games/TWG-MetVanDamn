@@ -161,8 +161,10 @@ namespace TinyWalnutGames.MetVD.Core
         /// </summary>
         public readonly bool CanPass(Polarity availablePolarity, Ability availableAbilities, float playerSkillLevel = 0.0f)
         {
-            if (!IsActive || IsUnlocked) 
+            if (!IsActive || IsUnlocked)
+            {
                 return true;
+            }
 
             // Polarity rule: Hard gates require ALL required bits; softer gates require ANY bit.
             bool polarityMatch = RequiredPolarity == Polarity.None || RequiredPolarity == Polarity.Any ||
@@ -175,7 +177,9 @@ namespace TinyWalnutGames.MetVD.Core
 
             // If hard requirements are met, gate can be passed
             if (polarityMatch && abilityMatch)
+            {
                 return true;
+            }
 
             // Check for skill-based bypass
             if (Softness != GateSoftness.Hard && playerSkillLevel >= MinimumSkillLevel)
@@ -201,13 +205,19 @@ namespace TinyWalnutGames.MetVD.Core
             {
                 // Reflect the same ALL vs ANY rule for Hard vs soft when reporting missing bits.
                 if (Softness == GateSoftness.Hard)
+                {
                     missingPolarity = (RequiredPolarity & ~availablePolarity);
+                }
                 else if ((availablePolarity & RequiredPolarity) == 0)
+                {
                     missingPolarity = RequiredPolarity; // none of the acceptable bits present
+                }
             }
 
             if (RequiredAbilities != Ability.None)
+            {
                 missingAbilities = RequiredAbilities & ~availableAbilities;
+            }
 
             return (missingPolarity, missingAbilities);
         }

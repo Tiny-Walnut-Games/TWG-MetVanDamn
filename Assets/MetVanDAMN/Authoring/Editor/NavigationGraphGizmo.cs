@@ -79,10 +79,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [MenuItem("Tools/MetVanDAMN/Toggle Navigation Graph Visualization")]
         public static void ToggleNavigationGraphVisualization()
         {
-            var gizmos = FindObjectsByType<NavigationGraphGizmo>(FindObjectsSortMode.None);
+            NavigationGraphGizmo[] gizmos = FindObjectsByType<NavigationGraphGizmo>(FindObjectsSortMode.None);
             bool newState = gizmos.Length == 0 || !gizmos[0].showNavigationGraph;
             
-            foreach (var gizmo in gizmos)
+            foreach (NavigationGraphGizmo gizmo in gizmos)
             {
                 gizmo.showNavigationGraph = newState;
             }
@@ -96,19 +96,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [MenuItem("Tools/MetVanDAMN/Validate Navigation Connectivity")]
         public static void ValidateNavigationConnectivity()
         {
-            var world = World.DefaultGameObjectInjectionWorld;
+            World world = World.DefaultGameObjectInjectionWorld;
             if (world == null || !world.IsCreated)
             {
                 Debug.LogWarning("No world available for navigation validation.");
                 return;
             }
 
-            var report = NavigationValidationUtility.GenerateValidationReport(world);
+            NavigationValidationReport report = NavigationValidationUtility.GenerateValidationReport(world);
             
             try
             {
-                var title = "Navigation Connectivity Report";
-                var message = $"Navigation Graph Status:\n" +
+                string title = "Navigation Connectivity Report";
+                string message = $"Navigation Graph Status:\n" +
                              $"• Total Nodes: {report.TotalNodes}\n" +
                              $"• Total Links: {report.TotalLinks}\n" +
                              $"• Unreachable Areas: {(report.HasUnreachableAreas ? "Yes" : "None")}\n" +
@@ -123,7 +123,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     Debug.Log("=== Navigation Connectivity Issues ===");
                     for (int i = 0; i < report.Issues.Length; i++)
                     {
-                        var issue = report.Issues[i];
+                        NavigationIssue issue = report.Issues[i];
                         Debug.LogWarning($"{issue.Type}: {issue.Description} (Node: {issue.NodeId})");
                     }
                 }
@@ -153,7 +153,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void OnDrawGizmos()
         {
             if (!showNavigationGraph || _world == null || !_world.IsCreated)
+            {
                 return;
+            }
 
             DrawNavigationGraph();
         }
@@ -161,7 +163,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void OnDrawGizmosSelected()
         {
             if (!showNavigationGraph || _world == null || !_world.IsCreated)
+            {
                 return;
+            }
 
             DrawNavigationGraph();
             DrawDetailedInformation();
@@ -169,16 +173,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void DrawNavigationGraph()
         {
-            var navGraphQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
+            EntityQuery navGraphQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
             if (navGraphQuery.IsEmpty)
+            {
                 return;
+            }
 
-            var navGraph = navGraphQuery.GetSingleton<NavigationGraph>();
+            NavigationGraph navGraph = navGraphQuery.GetSingleton<NavigationGraph>();
             if (!navGraph.IsReady)
+            {
                 return;
+            }
 
             // Get test agent capabilities
-            var testCapabilities = GetTestAgentCapabilities();
+            AgentCapabilities testCapabilities = GetTestAgentCapabilities();
 
             // Draw navigation nodes
             DrawNavigationNodes(testCapabilities);
@@ -195,19 +203,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void DrawNavigationNodes(AgentCapabilities caps)
         {
-            var q = _entityManager.CreateEntityQuery(
+            EntityQuery q = _entityManager.CreateEntityQuery(
                 ComponentType.ReadOnly<NavNode>(),
                 ComponentType.ReadOnly<NodeId>());
 
-            using var entities = q.ToEntityArray(Allocator.Temp);
+            using NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
             
             for (int i = 0; i < entities.Length; i++)
             {
-                var e = entities[i];
-                var navNode = _entityManager.GetComponentData<NavNode>(e);
-                var nodeId = _entityManager.GetComponentData<NodeId>(e);
+                Entity e = entities[i];
+                NavNode navNode = _entityManager.GetComponentData<NavNode>(e);
+                NodeId nodeId = _entityManager.GetComponentData<NodeId>(e);
 
-                var wp = navNode.WorldPosition;
+                float3 wp = navNode.WorldPosition;
                 bool reachable = navNode.IsCompatibleWith(caps);
 
                 // Choose color based on reachability
@@ -225,7 +233,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 // Draw node labels
                 if (showNodeLabels)
                 {
-                    var lp = wp + new float3(0, labelOffset, 0);
+                    float3 lp = wp + new float3(0, labelOffset, 0);
                     Handles.Label(lp, $"N{nodeId._value}\n{navNode.BiomeType}\n{navNode.PrimaryPolarity}", GetLabelStyle(reachable));
                 }
             }
@@ -233,21 +241,21 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void DrawNavigationLinks(AgentCapabilities caps)
         {
-            var linkQ = _entityManager.CreateEntityQuery(
+            EntityQuery linkQ = _entityManager.CreateEntityQuery(
                 ComponentType.ReadOnly<NavNode>(),
                 ComponentType.ReadOnly<NavLinkBufferElement>());
 
-            using var entities = linkQ.ToEntityArray(Allocator.Temp);
+            using NativeArray<Entity> entities = linkQ.ToEntityArray(Allocator.Temp);
 
             for (int i = 0; i < entities.Length; i++)
             {
-                var e = entities[i];
-                var navNode = _entityManager.GetComponentData<NavNode>(e);
-                var buffer = _entityManager.GetBuffer<NavLinkBufferElement>(e);
+                Entity e = entities[i];
+                NavNode navNode = _entityManager.GetComponentData<NavNode>(e);
+                DynamicBuffer<NavLinkBufferElement> buffer = _entityManager.GetBuffer<NavLinkBufferElement>(e);
 
                 for (int j = 0; j < buffer.Length; j++)
                 {
-                    var link = buffer[j].Value;
+                    NavLink link = buffer[j].Value;
                     DrawNavigationLink(navNode, link, caps);
                 }
             }
@@ -255,11 +263,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void DrawNavigationLink(NavNode source, NavLink link, AgentCapabilities caps)
         {
-            var targetEntity = FindEntityByNodeId(link.ToNodeId);
+            Entity targetEntity = FindEntityByNodeId(link.ToNodeId);
             if (targetEntity == Entity.Null || !_entityManager.HasComponent<NavNode>(targetEntity))
+            {
                 return;
+            }
 
-            var target = _entityManager.GetComponentData<NavNode>(targetEntity);
+            NavNode target = _entityManager.GetComponentData<NavNode>(targetEntity);
             bool canTraverse = link.CanTraverseWith(caps, source.NodeId);
             float cost = link.CalculateTraversalCost(caps);
 
@@ -281,8 +291,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
             // Draw link line
             Gizmos.color = linkColor;
-            var a = source.WorldPosition;
-            var b = target.WorldPosition;
+            float3 a = source.WorldPosition;
+            float3 b = target.WorldPosition;
             
             // Draw arrow for directional links
             if (link.ConnectionType != ConnectionType.Bidirectional)
@@ -297,14 +307,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Draw link cost labels
             if (showLinkCosts)
             {
-                var mid = (a + b) * 0.5f;
-                var txt = $"Cost: {cost:F1}";
+                float3 mid = (a + b) * 0.5f;
+                string txt = $"Cost: {cost:F1}";
                 
                 if (showGateRequirements && (link.RequiredPolarity != Polarity.None || link.RequiredAbilities != Ability.None))
                 {
                     txt += $"\n{link.RequiredPolarity}";
                     if (link.RequiredAbilities != Ability.None)
+                    {
                         txt += $"\n{link.RequiredAbilities}";
+                    }
                 }
 
                 Handles.Label(mid, txt, GetLinkLabelStyle(canTraverse));
@@ -314,17 +326,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps)
         {
             // Fallback simple straight line highlight with capability-based visualization
-            var fromE = FindEntityByNodeId(fromId);
-            var toE = FindEntityByNodeId(toId);
+            Entity fromE = FindEntityByNodeId(fromId);
+            Entity toE = FindEntityByNodeId(toId);
             if (fromE == Entity.Null || toE == Entity.Null)
+            {
                 return;
+            }
 
-            var fromNode = _entityManager.GetComponentData<NavNode>(fromE);
-            var toNode = _entityManager.GetComponentData<NavNode>(toE);
-            
+            NavNode fromNode = _entityManager.GetComponentData<NavNode>(fromE);
+            NavNode toNode = _entityManager.GetComponentData<NavNode>(toE);
+
             // Use agent capabilities to determine path visualization style
-            var pathColor = GetPathColorByCapabilities(caps);
-            var pathStyle = GetPathStyleByCapabilities(caps);
+            Color pathColor = GetPathColorByCapabilities(caps);
+            PathVisualizationStyle pathStyle = GetPathStyleByCapabilities(caps);
             
             Gizmos.color = pathColor;
             
@@ -337,27 +351,29 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 Gizmos.DrawLine(fromNode.WorldPosition, toNode.WorldPosition);
             }
-            
-            var mid = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
-            var capabilityText = GetCapabilityDisplayText(caps);
+
+            float3 mid = (fromNode.WorldPosition + toNode.WorldPosition) * 0.5f;
+            string capabilityText = GetCapabilityDisplayText(caps);
             Handles.Label(mid, $"(Preview Path) {fromId}->{toId} [{capabilityText}]", EditorStyles.boldLabel);
         }
 
         private void DrawDetailedInformation()
         {
-            var navGraphQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
+            EntityQuery navGraphQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
             if (navGraphQuery.IsEmpty)
+            {
                 return;
+            }
 
-            var navGraph = navGraphQuery.GetSingleton<NavigationGraph>();
+            NavigationGraph navGraph = navGraphQuery.GetSingleton<NavigationGraph>();
             
             // Draw information panel in scene view
             Handles.BeginGUI();
             
             var rect = new Rect(10, 10, 300, 150);
             GUI.Box(rect, "Navigation Graph Info");
-            
-            var info = $"Nodes: {navGraph.NodeCount}\n" +
+
+            string info = $"Nodes: {navGraph.NodeCount}\n" +
                        $"Links: {navGraph.LinkCount}\n" +
                        $"Ready: {navGraph.IsReady}\n" +
                        $"Unreachable Areas: {navGraph.UnreachableAreaCount}\n" +
@@ -372,11 +388,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void DrawArrowLine(float3 s, float3 e, float size)
         {
             Gizmos.DrawLine(s, e);
-            
-            var dir = math.normalize(e - s);
-            var right = math.cross(dir, new float3(0, 1, 0));
-            var h1 = e - dir * size + 0.5f * size * right;
-            var h2 = e - dir * size - 0.5f * size * right;
+
+            float3 dir = math.normalize(e - s);
+            float3 right = math.cross(dir, new float3(0, 1, 0));
+            float3 h1 = e - dir * size + 0.5f * size * right;
+            float3 h2 = e - dir * size - 0.5f * size * right;
             
             Gizmos.DrawLine(e, h1);
             Gizmos.DrawLine(e, h2);
@@ -384,14 +400,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private Entity FindEntityByNodeId(uint nodeId)
         {
-            var q = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
-            using var entities = q.ToEntityArray(Allocator.Temp);
-            using var ids = q.ToComponentDataArray<NodeId>(Allocator.Temp);
+            EntityQuery q = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+            using NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
+            using NativeArray<NodeId> ids = q.ToComponentDataArray<NodeId>(Allocator.Temp);
             
             for (int i = 0; i < ids.Length; i++)
             {
                 if (ids[i]._value == nodeId)
+                {
                     return entities[i];
+                }
             }
             
             return Entity.Null;
@@ -430,12 +448,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             // Determine path color based on agent movement capabilities
             if ((caps.AvailableAbilities & Ability.Jump) != 0)
+            {
                 return Color.cyan;  // Jumping agents get cyan paths
+            }
+
             if ((caps.AvailableAbilities & Ability.Dash) != 0)
+            {
                 return Color.yellow; // Dash agents get yellow paths
+            }
+
             if ((caps.AvailableAbilities & Ability.Grapple) != 0)
+            {
                 return Color.magenta; // Grapple agents get magenta paths
-            
+            }
+
             return _currentColors[6]; // Default path color for basic agents
         }
 
@@ -443,8 +469,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             // Complex movement capabilities get dashed lines to show they can take alternative routes
             if ((caps.AvailableAbilities & (Ability.WallJump | Ability.Grapple)) != 0)
+            {
                 return PathVisualizationStyle.Dashed;
-            
+            }
+
             return PathVisualizationStyle.Solid;
         }
 
@@ -453,29 +481,48 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Build a short text description of agent capabilities
             var abilities = new System.Collections.Generic.List<string>();
             
-            if ((caps.AvailableAbilities & Ability.Jump) != 0) abilities.Add("J");
-            if ((caps.AvailableAbilities & Ability.Dash) != 0) abilities.Add("D");
-            if ((caps.AvailableAbilities & Ability.WallJump) != 0) abilities.Add("WJ");
-            if ((caps.AvailableAbilities & Ability.Grapple) != 0) abilities.Add("G");
-            if ((caps.AvailableAbilities & Ability.DoubleJump) != 0) abilities.Add("DJ");
-            
+            if ((caps.AvailableAbilities & Ability.Jump) != 0)
+            {
+                abilities.Add("J");
+            }
+
+            if ((caps.AvailableAbilities & Ability.Dash) != 0)
+            {
+                abilities.Add("D");
+            }
+
+            if ((caps.AvailableAbilities & Ability.WallJump) != 0)
+            {
+                abilities.Add("WJ");
+            }
+
+            if ((caps.AvailableAbilities & Ability.Grapple) != 0)
+            {
+                abilities.Add("G");
+            }
+
+            if ((caps.AvailableAbilities & Ability.DoubleJump) != 0)
+            {
+                abilities.Add("DJ");
+            }
+
             return abilities.Count > 0 ? string.Join(",", abilities) : "Basic";
         }
 
         private void DrawDashedLine(Vector3 start, Vector3 end)
         {
             // Draw a dashed line for complex movement paths
-            var direction = (end - start).normalized;
-            var distance = Vector3.Distance(start, end);
-            var dashLength = 0.5f;
-            var gapLength = 0.2f;
-            var segmentLength = dashLength + gapLength;
-            
-            var currentDistance = 0f;
+            Vector3 direction = (end - start).normalized;
+            float distance = Vector3.Distance(start, end);
+            float dashLength = 0.5f;
+            float gapLength = 0.2f;
+            float segmentLength = dashLength + gapLength;
+
+            float currentDistance = 0f;
             while (currentDistance < distance)
             {
-                var segmentStart = start + direction * currentDistance;
-                var segmentEnd = start + direction * Mathf.Min(currentDistance + dashLength, distance);
+                Vector3 segmentStart = start + direction * currentDistance;
+                Vector3 segmentEnd = start + direction * Mathf.Min(currentDistance + dashLength, distance);
                 
                 Gizmos.DrawLine(segmentStart, segmentEnd);
                 currentDistance += segmentLength;

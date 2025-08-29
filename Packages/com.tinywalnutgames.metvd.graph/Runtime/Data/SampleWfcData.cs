@@ -134,19 +134,19 @@ namespace TinyWalnutGames.MetVD.Graph.Data
         /// </summary>
         public static int InitializeSampleTileSet(EntityManager entityManager)
         {
-            var prototypes = CreateBasicTilePrototypes(Allocator.Temp);
+            NativeArray<WfcTilePrototype> prototypes = CreateBasicTilePrototypes(Allocator.Temp);
             int tilesCreated = 0;
             
-            foreach (var prototype in prototypes)
+            foreach (WfcTilePrototype prototype in prototypes)
             {
-                var tileEntity = entityManager.CreateEntity();
+                Entity tileEntity = entityManager.CreateEntity();
                 entityManager.AddComponentData(tileEntity, prototype);
-                
+
                 // Add socket buffer
-                var socketBuffer = entityManager.AddBuffer<WfcSocketBufferElement>(tileEntity);
-                var sockets = GetSocketsForTile(prototype.TileId, Allocator.Temp);
+                DynamicBuffer<WfcSocketBufferElement> socketBuffer = entityManager.AddBuffer<WfcSocketBufferElement>(tileEntity);
+                NativeArray<WfcSocket> sockets = GetSocketsForTile(prototype.TileId, Allocator.Temp);
                 
-                foreach (var socket in sockets)
+                foreach (WfcSocket socket in sockets)
                 {
                     socketBuffer.Add(socket);
                 }

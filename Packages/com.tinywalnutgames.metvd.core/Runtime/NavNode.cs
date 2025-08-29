@@ -62,8 +62,11 @@ namespace TinyWalnutGames.MetVD.Core
         /// </summary>
         public readonly bool IsCompatibleWith(AgentCapabilities capabilities)
         {
-            if (!IsActive) return false;
-            
+            if (!IsActive)
+            {
+                return false;
+            }
+
             // Check if agent can handle this node's polarity environment
             if (PrimaryPolarity != Polarity.None && PrimaryPolarity != Polarity.Any)
             {
@@ -163,15 +166,21 @@ namespace TinyWalnutGames.MetVD.Core
         /// </summary>
         public readonly bool CanTraverseWith(AgentCapabilities capabilities, uint fromNodeId)
         {
-            if (!IsActive) return false;
-            
+            if (!IsActive)
+            {
+                return false;
+            }
+
             // Check if traversing from the correct node
             bool validDirection = (ConnectionType == ConnectionType.Bidirectional) 
                 ? (fromNodeId == FromNodeId || fromNodeId == ToNodeId)
                 : (fromNodeId == FromNodeId);
                 
-            if (!validDirection) return false;
-            
+            if (!validDirection)
+            {
+                return false;
+            }
+
             // For hard gates, strict requirement checking
             if (GateSoftness == GateSoftness.Hard)
             {
@@ -179,14 +188,18 @@ namespace TinyWalnutGames.MetVD.Core
                 if (RequiredPolarity != Polarity.None && RequiredPolarity != Polarity.Any)
                 {
                     if ((capabilities.AvailablePolarity & RequiredPolarity) == 0)
+                    {
                         return false;
+                    }
                 }
                 
                 // Check ability requirements  
                 if (RequiredAbilities != Ability.None)
                 {
                     if ((capabilities.AvailableAbilities & RequiredAbilities) != RequiredAbilities)
+                    {
                         return false;
+                    }
                 }
             }
             
@@ -199,8 +212,11 @@ namespace TinyWalnutGames.MetVD.Core
         /// </summary>
         public readonly float CalculateTraversalCost(AgentCapabilities capabilities)
         {
-            if (!IsActive) return float.MaxValue;
-            
+            if (!IsActive)
+            {
+                return float.MaxValue;
+            }
+
             float effectiveCost = BaseCost;
             
             // Apply polarity mismatch penalty for soft gates
@@ -247,8 +263,11 @@ namespace TinyWalnutGames.MetVD.Core
         public readonly float CalculateTraversalCost(AgentCapabilities capabilities, float3 fromPosition, float3 toPosition)
         {
             float baseCost = CalculateTraversalCost(capabilities);
-            if (baseCost >= float.MaxValue) return baseCost;
-            
+            if (baseCost >= float.MaxValue)
+            {
+                return baseCost;
+            }
+
             // Add arc trajectory cost for jump-based movements
             if (HasJumpMovementRequirement())
             {

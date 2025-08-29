@@ -38,7 +38,10 @@ namespace TinyWalnutGames.MetVD.Utility
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
-            if (_results.IsCreated) _results.Dispose();
+            if (_results.IsCreated)
+            {
+                _results.Dispose();
+            }
         }
 
         [BurstCompile]
@@ -46,7 +49,7 @@ namespace TinyWalnutGames.MetVD.Utility
         {
             _results.Clear();
             // Extract components in a temp array then append (no safety handle issues)
-            var components = _query.ToComponentDataArray<T>(Allocator.Temp);
+            NativeArray<T> components = _query.ToComponentDataArray<T>(Allocator.Temp);
             _results.AddRange(components);
             components.Dispose();
             AggregatorDiagnostics<T>.LastCount = _results.Length;

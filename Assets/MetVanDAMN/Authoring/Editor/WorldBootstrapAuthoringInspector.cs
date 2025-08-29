@@ -89,7 +89,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             EditorGUILayout.LabelField("World Configuration", EditorStyles.boldLabel);
             
             bootstrap.seed = EditorGUILayout.IntField(new GUIContent("Seed", "Seed for deterministic generation (0 = random)"), bootstrap.seed);
-            var worldSizeVector = EditorGUILayout.Vector2IntField(new GUIContent("World Size", "World bounds size (X,Z)"), 
+            Vector2Int worldSizeVector = EditorGUILayout.Vector2IntField(new GUIContent("World Size", "World bounds size (X,Z)"), 
                 new Vector2Int(bootstrap.worldSize.x, bootstrap.worldSize.y));
             bootstrap.worldSize = new Unity.Mathematics.int2(worldSizeVector.x, worldSizeVector.y);
             bootstrap.randomizationMode = (TinyWalnutGames.MetVD.Shared.RandomizationMode)EditorGUILayout.EnumPopup(
@@ -239,7 +239,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 
                 // Draw corner labels
                 Handles.color = Color.white;
-                var halfSize = size * 0.5f;
+                Vector3 halfSize = size * 0.5f;
                 Handles.Label(center + new Vector3(halfSize.x, 1, halfSize.z), "NE");
                 Handles.Label(center + new Vector3(-halfSize.x, 1, halfSize.z), "NW");
                 Handles.Label(center + new Vector3(halfSize.x, 1, -halfSize.z), "SE");

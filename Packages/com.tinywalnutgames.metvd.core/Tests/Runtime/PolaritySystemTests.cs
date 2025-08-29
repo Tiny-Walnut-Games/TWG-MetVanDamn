@@ -32,7 +32,7 @@ namespace TinyWalnutGames.MetVD.Tests
         public void PolarityAny_ShouldOrAllPoles()
         {
             // Test that Any equals OR of all poles (addresses blocker #2) 
-            var expected = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold |
+            Polarity expected = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold |
                           Polarity.Earth | Polarity.Wind | Polarity.Life | Polarity.Tech;
             
             Assert.AreEqual(expected, Polarity.Any, "Any should be OR of all individual poles");

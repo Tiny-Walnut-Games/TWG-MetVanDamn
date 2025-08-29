@@ -82,7 +82,7 @@ namespace TinyWalnutGames.MetVD.Samples
         
         void CreateWorldConfiguration()
         {
-            var configEntity = entityManager.CreateEntity();
+            Entity configEntity = entityManager.CreateEntity();
             entityManager.SetName(configEntity, "WorldConfiguration");
             
             entityManager.AddComponentData(configEntity, new WorldSeed { Value = worldSeed });
@@ -106,8 +106,8 @@ namespace TinyWalnutGames.MetVD.Samples
             // Use targetSectorCount to determine how many districts to create
             int actualDistrictCount = math.min(targetSectorCount, 24); // Reasonable upper limit
             int gridSize = (int)math.ceil(math.sqrt(actualDistrictCount));
-            
-            var hubEntity = entityManager.CreateEntity();
+
+            Entity hubEntity = entityManager.CreateEntity();
             entityManager.SetName(hubEntity, "HubDistrict");
             
             entityManager.AddComponentData(hubEntity, new NodeId 
@@ -130,9 +130,12 @@ namespace TinyWalnutGames.MetVD.Samples
             {
                 for (int y = -halfGrid; y <= halfGrid && districtsCreated < actualDistrictCount; y++)
                 {
-                    if (x == 0 && y == 0) continue; // Skip hub position
-                    
-                    var districtEntity = entityManager.CreateEntity();
+                    if (x == 0 && y == 0)
+                    {
+                        continue; // Skip hub position
+                    }
+
+                    Entity districtEntity = entityManager.CreateEntity();
                     entityManager.SetName(districtEntity, $"District_{x}_{y}");
                     
                     entityManager.AddComponentData(districtEntity, new NodeId 
@@ -169,7 +172,7 @@ namespace TinyWalnutGames.MetVD.Samples
         
         void CreatePolarityField(Polarity polarity, float2 center, string name)
         {
-            var fieldEntity = entityManager.CreateEntity();
+            Entity fieldEntity = entityManager.CreateEntity();
             entityManager.SetName(fieldEntity, name);
             
             entityManager.AddComponentData(fieldEntity, new PolarityFieldData
@@ -227,5 +230,6 @@ namespace TinyWalnutGames.MetVD.Samples
         public int TargetSectorCount;
         public int MaxDistrictCount;
         public float BiomeTransitionRadius;
+        public uint WorldSeed;
     }
 }

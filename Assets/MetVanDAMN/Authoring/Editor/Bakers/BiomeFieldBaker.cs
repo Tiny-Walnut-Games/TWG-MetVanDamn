@@ -9,7 +9,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     {
         public override void Bake(BiomeFieldAuthoring authoring)
         {
-            var entity = GetEntity(TransformUsageFlags.Dynamic);
+            Entity entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent(entity, new BiomeFieldData
             {
                 PrimaryBiome = authoring.primaryBiome,

@@ -33,13 +33,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected | GizmoType.Pickable)]
         static void DrawPropDensityHeatmap(BiomeArtProfileAuthoring biomeAuthoring, GizmoType gizmoType)
         {
-            if (!s_showHeatmap || biomeAuthoring.artProfile == null) return;
+            if (!s_showHeatmap || biomeAuthoring.artProfile == null)
+            {
+                return;
+            }
 
-            var profile = biomeAuthoring.artProfile;
-            var bounds = CalculateBiomeBounds(biomeAuthoring.transform);
-            
+            BiomeArtProfile profile = biomeAuthoring.artProfile;
+            Bounds bounds = CalculateBiomeBounds(biomeAuthoring.transform);
+
             // Sample density across the biome area
-            var densityData = SampleDensityGrid(bounds, profile, s_heatmapResolution);
+            float[,] densityData = SampleDensityGrid(bounds, profile, s_heatmapResolution);
             
             // Draw heatmap visualization
             DrawHeatmapGrid(densityData, bounds);
@@ -56,16 +59,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Calculate bounds based on biome size or default to reasonable area
             Vector3 center = biomeTransform.position;
             Vector3 size = new Vector3(20f, 20f, 1f); // Default biome size
-            
+
             // Try to get more accurate bounds from colliders or renderers
-            var collider = biomeTransform.GetComponent<Collider>();
+            Collider collider = biomeTransform.GetComponent<Collider>();
             if (collider != null)
             {
                 size = collider.bounds.size;
             }
             else
             {
-                var renderer = biomeTransform.GetComponent<Renderer>();
+                Renderer renderer = biomeTransform.GetComponent<Renderer>();
                 if (renderer != null)
                 {
                     size = renderer.bounds.size;
@@ -82,8 +85,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             gridWidth = Mathf.Min(gridWidth, s_maxSamples);
             gridHeight = Mathf.Min(gridHeight, s_maxSamples);
-            
-            var densityGrid = new float[gridWidth, gridHeight];
+
+            float[,] densityGrid = new float[gridWidth, gridHeight];
             
             for (int x = 0; x < gridWidth; x++)
             {
@@ -152,8 +155,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 }
             }
             
-            if (maxDensity <= 0f) return;
-            
+            if (maxDensity <= 0f)
+            {
+                return;
+            }
+
             // Draw heat map cells with enhanced numeric labels
             for (int x = 0; x < width; x++)
             {
@@ -178,7 +184,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     if (actualDensity > 0.1f) // Only show labels for significant density values
                     {
                         string densityLabel = actualDensity.ToString("F1");
-                        var labelPosition = cellCenter + Vector3.up * 0.5f;
+                        Vector3 labelPosition = cellCenter + Vector3.up * 0.5f;
                         
                         // Use contrasting color for label based on background intensity
                         var labelStyle = new GUIStyle();
@@ -289,8 +295,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 }
             }
             
-            if (maxDensity <= minDensity) return;
-            
+            if (maxDensity <= minDensity)
+            {
+                return;
+            }
+
             // Draw legend gradient bar
             int legendSteps = 10;
             float legendHeight = 5f;

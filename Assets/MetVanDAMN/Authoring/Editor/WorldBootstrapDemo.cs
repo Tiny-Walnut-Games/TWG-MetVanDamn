@@ -47,8 +47,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private void OnValidate()
         {
-            if (Application.isPlaying) return;
-            
+            if (Application.isPlaying)
+            {
+                return;
+            }
+
             if (targetBootstrap != null && demoType != DemoType.Custom)
             {
                 ApplyConfiguration();
@@ -58,7 +61,10 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private void ApplyConfiguration()
         {
-            if (targetBootstrap == null) return;
+            if (targetBootstrap == null)
+            {
+                return;
+            }
 
             switch (demoType)
             {

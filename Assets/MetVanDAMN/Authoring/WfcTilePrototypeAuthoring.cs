@@ -44,12 +44,16 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             // Ensure tile ID is not zero
             if (tileId == 0)
+            {
                 tileId = 1;
-            
+            }
+
             // Ensure weight is positive
             if (weight <= 0)
+            {
                 weight = 0.01f;
-            
+            }
+
             // Ensure connection constraints are valid
             minConnections = (byte)Mathf.Clamp(minConnections, 0, 4);
             maxConnections = (byte)Mathf.Clamp(maxConnections, minConnections, 4);
@@ -105,7 +109,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// <summary>
         /// Convert to runtime WfcSocket
         /// </summary>
-        public WfcSocket ToWfcSocket()
+        public readonly WfcSocket ToWfcSocket()
         {
             return new WfcSocket(socketId, direction, requiredPolarity, isOpen);
         }

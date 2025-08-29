@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     {
         public override void Bake(DistrictAuthoring authoring)
         {
-            var entity = GetEntity(TransformUsageFlags.Dynamic);
+            Entity entity = GetEntity(TransformUsageFlags.Dynamic);
             AddComponent(entity, new NodeId(authoring.nodeId, authoring.level, authoring.parentId, authoring.gridCoordinates));
             AddComponent(entity, new WfcState(authoring.initialWfcState));
             AddComponent(entity, new SectorRefinementData(authoring.targetLoopDensity));

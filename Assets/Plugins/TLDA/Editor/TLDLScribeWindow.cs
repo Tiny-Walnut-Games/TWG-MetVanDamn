@@ -169,7 +169,7 @@ namespace LivingDevAgent.Editor
 
         static void OpenWindow(string title)
         {
-            var wnd = GetWindow<TLDLScribeWindow>(true, title, true);
+            TLDLScribeWindow wnd = GetWindow<TLDLScribeWindow>(true, title, true);
             wnd.minSize = new Vector2(900, 600);
             wnd.Show();
         }
@@ -201,13 +201,18 @@ namespace LivingDevAgent.Editor
             _rootPath = EditorPrefs.GetString(EditorPrefsRootKey, string.Empty);
             if (string.IsNullOrEmpty(_rootPath))
             {
-                var defaultFolder = Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
+                string defaultFolder = Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
                 if (Directory.Exists(defaultFolder))
+                {
                     _rootPath = defaultFolder;
+                }
             }
             if (!string.IsNullOrEmpty(_rootPath) && Directory.Exists(_rootPath))
             {
-                if (string.IsNullOrEmpty(_activeDirPath)) _activeDirPath = _rootPath;
+                if (string.IsNullOrEmpty(_activeDirPath))
+                {
+                    _activeDirPath = _rootPath;
+                }
             }
         }
 
@@ -222,7 +227,7 @@ namespace LivingDevAgent.Editor
 
                 using (new EditorGUILayout.VerticalScope())
                 {
-                    var tabs = new[] { "Form", "Editor", "Preview" };
+                    string[] tabs = new[] { "Form", "Editor", "Preview" };
                     _tab = GUILayout.Toolbar(_tab, tabs);
                     EditorGUILayout.Space(6);
 
@@ -245,20 +250,42 @@ namespace LivingDevAgent.Editor
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 // Root selection
-                if (GUILayout.Button("Choose Root…", EditorStyles.toolbarButton, GUILayout.Width(110))) ChooseRootFolder();
+                if (GUILayout.Button("Choose Root…", EditorStyles.toolbarButton, GUILayout.Width(110)))
+                {
+                    ChooseRootFolder();
+                }
+
                 using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_rootPath)))
                 {
-                    if (GUILayout.Button("Open Root", EditorStyles.toolbarButton, GUILayout.Width(90))) OpenInFileBrowser(_rootPath);
-                    if (GUILayout.Button("Refresh", EditorStyles.toolbarButton, GUILayout.Width(70))) RefreshNavigator();
+                    if (GUILayout.Button("Open Root", EditorStyles.toolbarButton, GUILayout.Width(90)))
+                    {
+                        OpenInFileBrowser(_rootPath);
+                    }
+
+                    if (GUILayout.Button("Refresh", EditorStyles.toolbarButton, GUILayout.Width(70)))
+                    {
+                        RefreshNavigator();
+                    }
                 }
                 GUILayout.Space(8);
 
                 // File ops
-                if (GUILayout.Button("Load File…", EditorStyles.toolbarButton, GUILayout.Width(90))) LoadFileDialog();
+                if (GUILayout.Button("Load File…", EditorStyles.toolbarButton, GUILayout.Width(90)))
+                {
+                    LoadFileDialog();
+                }
+
                 using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_rawContent)))
                 {
-                    if (GUILayout.Button("Save Raw", EditorStyles.toolbarButton, GUILayout.Width(80))) SaveRaw();
-                    if (GUILayout.Button("Save Raw As…", EditorStyles.toolbarButton, GUILayout.Width(100))) SaveRawAs();
+                    if (GUILayout.Button("Save Raw", EditorStyles.toolbarButton, GUILayout.Width(80)))
+                    {
+                        SaveRaw();
+                    }
+
+                    if (GUILayout.Button("Save Raw As…", EditorStyles.toolbarButton, GUILayout.Width(100)))
+                    {
+                        SaveRawAs();
+                    }
                 }
 
                 GUILayout.FlexibleSpace();
@@ -268,7 +295,7 @@ namespace LivingDevAgent.Editor
                 {
                     if (WarnOverwriteRawIfDirty())
                     {
-                        var md = BuildMarkdown(GetCreatedTs());
+                        string md = BuildMarkdown(GetCreatedTs());
                         _rawContent = md;
                         _rawGeneratedSnapshot = md;
                         _rawDirty = false;
@@ -276,7 +303,10 @@ namespace LivingDevAgent.Editor
                         _statusLine = "Generated content from form into Editor";
                     }
                 }
-                if (GUILayout.Button("Create TLDL File", EditorStyles.toolbarButton)) TryCreate();
+                if (GUILayout.Button("Create TLDL File", EditorStyles.toolbarButton))
+                {
+                    TryCreate();
+                }
             }
         }
 
@@ -316,8 +346,15 @@ namespace LivingDevAgent.Editor
                 {
                     using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_activeDirPath)))
                     {
-                        if (GUILayout.Button("Open Folder")) OpenInFileBrowser(_activeDirPath);
-                        if (GUILayout.Button("New Folder…")) CreateChildFolder();
+                        if (GUILayout.Button("Open Folder"))
+                        {
+                            OpenInFileBrowser(_activeDirPath);
+                        }
+
+                        if (GUILayout.Button("New Folder…"))
+                        {
+                            CreateChildFolder();
+                        }
                     }
                 }
             }
@@ -332,20 +369,28 @@ namespace LivingDevAgent.Editor
         // KeeperNote: Guards regeneration so the user does not accidentally lose bespoke raw edits when toggling form actions.
         bool WarnOverwriteRawIfDirty()
         {
-            if (!_rawDirty) return true;
+            if (!_rawDirty)
+            {
+                return true;
+            }
+
             return EditorUtility.DisplayDialog("Overwrite Raw Editor?", "You have unsaved manual edits in the raw editor. Overwrite with regenerated content?", "Overwrite", "Cancel");
         }
         // KeeperNote: Central image cache with LRU eviction prevents unbounded Texture2D accumulation during long authoring sessions.
         void AddTextureToCache(string key, Texture2D tex)
         {
-            if (tex == null) return;
+            if (tex == null)
+            {
+                return;
+            }
+
             _imageCache[key] = tex;
             _imageCacheOrder.Add(key);
             if (_imageCacheOrder.Count > ImageCacheMax)
             {
-                var oldest = _imageCacheOrder[0];
+                string oldest = _imageCacheOrder[0];
                 _imageCacheOrder.RemoveAt(0);
-                if (_imageCache.TryGetValue(oldest, out var oldTex) && oldTex != null)
+                if (_imageCache.TryGetValue(oldest, out Texture2D oldTex) && oldTex != null)
                 {
                     DestroyImmediate(oldTex);
                 }
@@ -355,23 +400,45 @@ namespace LivingDevAgent.Editor
         // KeeperNote: Lightweight header parser so reopening an existing markdown rehydrates core form inputs (author/context/summary/tags) for iterative refinement.
         void ParseBasicMetadata(string md)
         {
-            if (string.IsNullOrEmpty(md)) return;
+            if (string.IsNullOrEmpty(md))
+            {
+                return;
+            }
+
             try
             {
                 using var reader = new StringReader(md);
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (line.StartsWith("**Author:")) { var v = line["**Author:**".Length..].Trim(); if (!string.IsNullOrEmpty(v)) _author = v; }
-                    else if (line.StartsWith("**Summary:")) { var v = line["**Summary:**".Length..].Trim(); if (!string.IsNullOrEmpty(v)) _summary = v; }
-                    else if (line.StartsWith("**Context:")) { var v = line["**Context:**".Length..].Trim(); if (!string.IsNullOrEmpty(v)) _context = v; }
+                    if (line.StartsWith("**Author:")) {
+                        string v = line["**Author:**".Length..].Trim(); if (!string.IsNullOrEmpty(v))
+                        {
+                            _author = v;
+                        }
+                    }
+                    else if (line.StartsWith("**Summary:")) {
+                        string v = line["**Summary:**".Length..].Trim(); if (!string.IsNullOrEmpty(v))
+                        {
+                            _summary = v;
+                        }
+                    }
+                    else if (line.StartsWith("**Context:")) {
+                        string v = line["**Context:**".Length..].Trim(); if (!string.IsNullOrEmpty(v))
+                        {
+                            _context = v;
+                        }
+                    }
                     else if (line.StartsWith("**Tags"))
                     {
-                        var idx = line.IndexOf(':');
+                        int idx = line.IndexOf(':');
                         if (idx >= 0)
                         {
-                            var v = line[(idx + 1)..].Trim();
-                            if (!string.IsNullOrEmpty(v)) _tagsCsv = v.Replace('#', ' ').Replace("  ", " ").Trim().Replace(' ', ',');
+                            string v = line[(idx + 1)..].Trim();
+                            if (!string.IsNullOrEmpty(v))
+                            {
+                                _tagsCsv = v.Replace('#', ' ').Replace("  ", " ").Trim().Replace(' ', ',');
+                            }
                         }
                     }
                 }
@@ -410,13 +477,22 @@ namespace LivingDevAgent.Editor
         {
             // KeeperNote: Non-destructive upgrade — adds thumbnails, duplication, reveal-in-finder & stable sorting while preserving legacy traversal semantics.
             if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
+            {
                 return;
+            }
 
             string folderName = Path.GetFileName(path);
-            if (string.IsNullOrEmpty(folderName)) folderName = path;
-            if (!_folderExpanded.ContainsKey(path)) _folderExpanded[path] = depth <= 1; // expand root/top-level by default
+            if (string.IsNullOrEmpty(folderName))
+            {
+                folderName = path;
+            }
 
-            var labelPrefix = indent ?? string.Empty;
+            if (!_folderExpanded.ContainsKey(path))
+            {
+                _folderExpanded[path] = depth <= 1; // expand root/top-level by default
+            }
+
+            string labelPrefix = indent ?? string.Empty;
             using (new EditorGUILayout.HorizontalScope())
             {
                 _folderExpanded[path] = EditorGUILayout.Foldout(_folderExpanded[path], labelPrefix + folderName, true);
@@ -427,14 +503,17 @@ namespace LivingDevAgent.Editor
                 }
             }
 
-            if (!_folderExpanded[path]) return;
+            if (!_folderExpanded[path])
+            {
+                return;
+            }
 
             try
             {
                 // Sort subdirectories for stable nav
-                var subDirs = Directory.GetDirectories(path);
+                string[] subDirs = Directory.GetDirectories(path);
                 Array.Sort(subDirs, StringComparer.OrdinalIgnoreCase);
-                foreach (var d in subDirs)
+                foreach (string d in subDirs)
                 {
                     EditorGUI.indentLevel++;
                     DrawDirectoryNode(d, depth + 1, GetIndent(depth + 1));
@@ -442,28 +521,31 @@ namespace LivingDevAgent.Editor
                 }
 
                 // Sort files for stable nav
-                var files = Directory.GetFiles(path);
+                string[] files = Directory.GetFiles(path);
                 Array.Sort(files, StringComparer.OrdinalIgnoreCase);
-                foreach (var f in files)
+                foreach (string f in files)
                 {
-                    var ext = Path.GetExtension(f);
-                    if (!s_AllowedExts.Contains(ext)) continue;
+                    string ext = Path.GetExtension(f);
+                    if (!s_AllowedExts.Contains(ext))
+                    {
+                        continue;
+                    }
 
                     using (new EditorGUILayout.HorizontalScope())
                     {
                         EditorGUI.indentLevel++;
-                        var fileName = Path.GetFileName(f);
-                        var fileLabel = (indent ?? string.Empty) + "  " + fileName;
+                        string fileName = Path.GetFileName(f);
+                        string fileLabel = (indent ?? string.Empty) + "  " + fileName;
                         bool isImage = s_ImageExts.Contains(ext);
 
                         // Optional thumbnail for images
                         if (isImage)
                         {
-                            if (!_imageCache.TryGetValue(f, out var tex) || tex == null)
+                            if (!_imageCache.TryGetValue(f, out Texture2D tex) || tex == null)
                             {
                                 try
                                 {
-                                    var bytes = File.ReadAllBytes(f);
+                                    byte[] bytes = File.ReadAllBytes(f);
                                     if (bytes != null)
                                     {
                                         tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
@@ -480,12 +562,12 @@ namespace LivingDevAgent.Editor
                                 }
                                 catch { /* ignore IO/format errors */ }
                             }
-                            if (_imageCache.TryGetValue(f, out var thumb) && thumb != null)
+                            if (_imageCache.TryGetValue(f, out Texture2D thumb) && thumb != null)
                             {
                                 const float maxThumb = 36f;
-                                var aspect = (float)thumb.width / Mathf.Max(1, thumb.height);
-                                var w = Mathf.Min(maxThumb * aspect, maxThumb);
-                                var h = Mathf.Min(maxThumb, maxThumb / Mathf.Max(0.01f, aspect));
+                                float aspect = (float)thumb.width / Mathf.Max(1, thumb.height);
+                                float w = Mathf.Min(maxThumb * aspect, maxThumb);
+                                float h = Mathf.Min(maxThumb, maxThumb / Mathf.Max(0.01f, aspect));
                                 GUILayout.Label(thumb, GUILayout.Width(w), GUILayout.Height(h));
                             }
                             else
@@ -499,9 +581,13 @@ namespace LivingDevAgent.Editor
                             if (isImage)
                             {
                                 // Copy markdown image link instead of inserting directly
-                                var baseDir = string.IsNullOrEmpty(_currentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_currentFilePath);
-                                if (string.IsNullOrEmpty(baseDir)) baseDir = ResolveActiveFolder();
-                                var rel = GetRelativePath(baseDir, f).Replace('\\', '/');
+                                string baseDir = string.IsNullOrEmpty(_currentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_currentFilePath);
+                                if (string.IsNullOrEmpty(baseDir))
+                                {
+                                    baseDir = ResolveActiveFolder();
+                                }
+
+                                string rel = GetRelativePath(baseDir, f).Replace('\\', '/');
                                 CopyImageMarkdownLink(f, rel);
                             }
                             else
@@ -524,9 +610,13 @@ namespace LivingDevAgent.Editor
                         {
                             if (GUILayout.Button("Insert", GUILayout.Width(60)))
                             {
-                                var baseDir = string.IsNullOrEmpty(_currentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_currentFilePath);
-                                if (string.IsNullOrEmpty(baseDir)) baseDir = ResolveActiveFolder();
-                                var rel = GetRelativePath(baseDir, f).Replace('\\', '/');
+                                string baseDir = string.IsNullOrEmpty(_currentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_currentFilePath);
+                                if (string.IsNullOrEmpty(baseDir))
+                                {
+                                    baseDir = ResolveActiveFolder();
+                                }
+
+                                string rel = GetRelativePath(baseDir, f).Replace('\\', '/');
                                 InsertImageMarkdownAtCursor(rel);
                             }
                         }
@@ -534,7 +624,7 @@ namespace LivingDevAgent.Editor
                         {
                             try
                             {
-                                var copy = DuplicateFile(f);
+                                string copy = DuplicateFile(f);
                                 _statusLine = $"Duplicated: {MakeProjectRelative(copy)}";
                                 RefreshNavigator();
                             }
@@ -557,8 +647,12 @@ namespace LivingDevAgent.Editor
         // 3) Replace PostWriteImport with a correct, minimal implementation
         void PostWriteImport(string absPath)
         {
-            if (string.IsNullOrEmpty(absPath)) return;
-            var unityPath = MakeUnityPath(absPath);
+            if (string.IsNullOrEmpty(absPath))
+            {
+                return;
+            }
+
+            string unityPath = MakeUnityPath(absPath);
             if (!string.IsNullOrEmpty(unityPath))
             {
                 AssetDatabase.ImportAsset(unityPath, ImportAssetOptions.ForceSynchronousImport);
@@ -568,8 +662,8 @@ namespace LivingDevAgent.Editor
         // 4) Add helpers
         string MakeUnityPath(string absPath)
         {
-            var norm = absPath.Replace('\\', '/');
-            var dataPath = Application.dataPath.Replace('\\', '/');
+            string norm = absPath.Replace('\\', '/');
+            string dataPath = Application.dataPath.Replace('\\', '/');
             if (norm.StartsWith(dataPath, StringComparison.OrdinalIgnoreCase))
             {
                 // Convert absolute path under Assets to "Assets/..." path
@@ -582,9 +676,11 @@ namespace LivingDevAgent.Editor
         {
             // KeeperNote: Safe copy pattern: never overwrite originals, enabling exploratory edits on documentation snapshots.
             if (string.IsNullOrEmpty(srcPath) || !File.Exists(srcPath))
+            {
                 throw new FileNotFoundException("Source file not found", srcPath);
+            }
 
-            var target = GenerateUniqueCopyPath(srcPath);
+            string target = GenerateUniqueCopyPath(srcPath);
             File.Copy(srcPath, target, overwrite: false);
             PostWriteImport(target);
             return target;
@@ -593,12 +689,12 @@ namespace LivingDevAgent.Editor
         string GenerateUniqueCopyPath(string srcPath)
         {
             // KeeperNote: Incremental naming strategy ("Name Copy", "Name Copy 2", ...) mirrors common OS UX for predictability.
-            var dir = Path.GetDirectoryName(srcPath) ?? "";
-            var name = Path.GetFileNameWithoutExtension(srcPath);
-            var ext = Path.GetExtension(srcPath);
+            string dir = Path.GetDirectoryName(srcPath) ?? "";
+            string name = Path.GetFileNameWithoutExtension(srcPath);
+            string ext = Path.GetExtension(srcPath);
 
             // Try "Name Copy.ext", then "Name Copy 2.ext", etc.
-            var candidate = Path.Combine(dir, $"{name} Copy{ext}");
+            string candidate = Path.Combine(dir, $"{name} Copy{ext}");
             int i = 2;
             while (File.Exists(candidate))
             {
@@ -610,13 +706,17 @@ namespace LivingDevAgent.Editor
 
         void OpenContainingFolderOfFile(string absPath)
         {
-            if (string.IsNullOrEmpty(absPath)) return;
+            if (string.IsNullOrEmpty(absPath))
+            {
+                return;
+            }
+
             EditorUtility.RevealInFinder(absPath);
         }
 
         void DrawForm()
         {
-            var viewportHeight = Mathf.Max(140f, position.height - 220f);
+            float viewportHeight = Mathf.Max(140f, position.height - 220f);
             _scroll = EditorGUILayout.BeginScrollView(_scroll, GUILayout.Height(viewportHeight), GUILayout.ExpandHeight(true));
 
             // Header
@@ -634,38 +734,71 @@ namespace LivingDevAgent.Editor
             EditorGUILayout.Space(8);
             GUILayout.Label("Sections", EditorStyles.boldLabel);
             _includeDiscoveries = EditorGUILayout.ToggleLeft("Include Discoveries", _includeDiscoveries);
-            if (_includeDiscoveries) DrawDiscoveries();
+            if (_includeDiscoveries)
+            {
+                DrawDiscoveries();
+            }
 
             _includeActions = EditorGUILayout.ToggleLeft("Include Actions Taken", _includeActions);
-            if (_includeActions) DrawActions();
+            if (_includeActions)
+            {
+                DrawActions();
+            }
 
             _includeTechnicalDetails = EditorGUILayout.ToggleLeft("Include Technical Details (Code/Config)", _includeTechnicalDetails);
-            if (_includeTechnicalDetails) DrawTechnicalDetails();
+            if (_includeTechnicalDetails)
+            {
+                DrawTechnicalDetails();
+            }
 
             _includeTerminalProof = EditorGUILayout.ToggleLeft("Include Terminal Proof", _includeTerminalProof);
-            if (_includeTerminalProof) DrawTerminalProof();
+            if (_includeTerminalProof)
+            {
+                DrawTerminalProof();
+            }
 
             _includeDependencies = EditorGUILayout.ToggleLeft("Include Dependencies", _includeDependencies);
-            if (_includeDependencies) DrawDependencies();
+            if (_includeDependencies)
+            {
+                DrawDependencies();
+            }
 
             _includeLessons = EditorGUILayout.ToggleLeft("Include Lessons Learned", _includeLessons);
-            if (_includeLessons) DrawLessons();
+            if (_includeLessons)
+            {
+                DrawLessons();
+            }
 
             _includeNextSteps = EditorGUILayout.ToggleLeft("Include Next Steps", _includeNextSteps);
-            if (_includeNextSteps) DrawNextSteps();
+            if (_includeNextSteps)
+            {
+                DrawNextSteps();
+            }
 
             _includeReferences = EditorGUILayout.ToggleLeft("Include References", _includeReferences);
-            if (_includeReferences) DrawReferences();
+            if (_includeReferences)
+            {
+                DrawReferences();
+            }
 
             _includeDevTimeTravel = EditorGUILayout.ToggleLeft("Include DevTimeTravel Context", _includeDevTimeTravel);
-            if (_includeDevTimeTravel) DrawDevTimeTravel();
+            if (_includeDevTimeTravel)
+            {
+                DrawDevTimeTravel();
+            }
 
             _includeMetadata = EditorGUILayout.ToggleLeft("Include Metadata", _includeMetadata);
-            if (_includeMetadata) DrawMetadata();
+            if (_includeMetadata)
+            {
+                DrawMetadata();
+            }
 
             // Images
             _includeImages = EditorGUILayout.ToggleLeft("Include Images", _includeImages);
-            if (_includeImages) DrawImagesSection();
+            if (_includeImages)
+            {
+                DrawImagesSection();
+            }
 
             EditorGUILayout.Space(12);
             DrawIssueCreator();
@@ -710,7 +843,7 @@ namespace LivingDevAgent.Editor
             if (_autoSyncEditor)
             {
                 // KeeperNote: Auto-sync eliminates drift while respecting manual raw edits (skips when dirty) — acts like a guarded one-way binding.
-                var snap = BuildFormSnapshot();
+                string snap = BuildFormSnapshot();
                 if (snap != _lastFormSnapshot)
                 {
                     if (_rawDirty)
@@ -755,11 +888,18 @@ namespace LivingDevAgent.Editor
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Add Image…", GUILayout.Width(120))) AddImageFile();
+                if (GUILayout.Button("Add Image…", GUILayout.Width(120)))
+                {
+                    AddImageFile();
+                }
+
                 if (GUILayout.Button("Open Images Folder", GUILayout.Width(160)))
                 {
-                    var imagesDir = EnsureImagesDirectory();
-                    if (!string.IsNullOrEmpty(imagesDir)) OpenInFileBrowser(imagesDir);
+                    string imagesDir = EnsureImagesDirectory();
+                    if (!string.IsNullOrEmpty(imagesDir))
+                    {
+                        OpenInFileBrowser(imagesDir);
+                    }
                 }
             }
 
@@ -776,7 +916,7 @@ namespace LivingDevAgent.Editor
                 return;
             }
 
-            var items = new string[_templates.Count];
+            string[] items = new string[_templates.Count];
             for (int i = 0; i < _templates.Count; i++)
             {
                 items[i] = string.IsNullOrEmpty(_templates[i].Title) ? _templates[i].Key : _templates[i].Title;
@@ -787,7 +927,7 @@ namespace LivingDevAgent.Editor
             {
                 if (GUILayout.Button("Load Template → Editor"))
                 {
-                    var md = LoadTemplateMarkdown(_templates[_selectedTemplateIndex]);
+                    string md = LoadTemplateMarkdown(_templates[_selectedTemplateIndex]);
                     _rawContent = md ?? string.Empty;
                     _tab = 1;
                     _statusLine = "Loaded template into Editor";
@@ -812,7 +952,7 @@ namespace LivingDevAgent.Editor
 
             for (int i = 0; i < _discoveries.Count; i++)
             {
-                var d = _discoveries[i];
+                Discovery d = _discoveries[i];
                 EditorGUILayout.BeginVertical("frameBox");
                 d.Foldout = EditorGUILayout.Foldout(d.Foldout, string.IsNullOrEmpty(d.Category) ? $"Discovery {i + 1}" : d.Category, true);
                 if (d.Foldout)
@@ -838,7 +978,11 @@ namespace LivingDevAgent.Editor
                 EditorGUILayout.EndVertical();
             }
 
-            if (GUILayout.Button("+ Add Discovery")) _discoveries.Add(new Discovery { Category = $"Discovery {_discoveries.Count + 1}" });
+            if (GUILayout.Button("+ Add Discovery"))
+            {
+                _discoveries.Add(new Discovery { Category = $"Discovery {_discoveries.Count + 1}" });
+            }
+
             EditorGUILayout.EndVertical();
         }
 
@@ -850,7 +994,7 @@ namespace LivingDevAgent.Editor
 
             for (int i = 0; i < _actions.Count; i++)
             {
-                var a = _actions[i];
+                ActionItem a = _actions[i];
                 EditorGUILayout.BeginVertical("frameBox");
                 a.Foldout = EditorGUILayout.Foldout(a.Foldout, string.IsNullOrEmpty(a.Name) ? $"Action {i + 1}" : a.Name, true);
                 if (a.Foldout)
@@ -872,7 +1016,11 @@ namespace LivingDevAgent.Editor
                 EditorGUILayout.EndVertical();
             }
 
-            if (GUILayout.Button("+ Add Action")) _actions.Add(new ActionItem { Name = $"Action {_actions.Count + 1}" });
+            if (GUILayout.Button("+ Add Action"))
+            {
+                _actions.Add(new ActionItem { Name = $"Action {_actions.Count + 1}" });
+            }
+
             EditorGUILayout.EndVertical();
         }
 
@@ -935,21 +1083,28 @@ namespace LivingDevAgent.Editor
             GUILayout.Label("References", EditorStyles.boldLabel);
 
             // Drag-and-drop box
-            var dropRect = GUILayoutUtility.GetRect(0, 60, GUILayout.ExpandWidth(true));
+            Rect dropRect = GUILayoutUtility.GetRect(0, 60, GUILayout.ExpandWidth(true));
             GUI.Box(dropRect, "Drag & Drop assets/files here", EditorStyles.helpBox);
             HandleReferenceDragAndDrop(dropRect);
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Add Selected Assets")) AddSelectedAssetsAsReferences();
-                if (GUILayout.Button("Add Files…")) AddFilesAsReferences();
+                if (GUILayout.Button("Add Selected Assets"))
+                {
+                    AddSelectedAssetsAsReferences();
+                }
+
+                if (GUILayout.Button("Add Files…"))
+                {
+                    AddFilesAsReferences();
+                }
             }
 
             // List current references with remove buttons
             if (_referencePaths.Count > 0)
             {
                 GUILayout.Label("Linked Files", EditorStyles.miniBoldLabel);
-                for (var i = 0; i < _referencePaths.Count; i++)
+                for (int i = 0; i < _referencePaths.Count; i++)
                 {
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField(_referencePaths[i], GUILayout.ExpandWidth(true));
@@ -971,15 +1126,18 @@ namespace LivingDevAgent.Editor
             _rawWrap = EditorGUILayout.ToggleLeft("Wrap lines", _rawWrap);
 
             var rawStyle = new GUIStyle(_textAreaMonospace) { wordWrap = _rawWrap };
-            var viewportHeight = Mathf.Max(140f, position.height - 240f);
+            float viewportHeight = Mathf.Max(140f, position.height - 240f);
             _rawScroll = EditorGUILayout.BeginScrollView(_rawScroll, GUILayout.Height(viewportHeight), GUILayout.ExpandHeight(true));
             GUI.SetNextControlName(_rawEditorControlName);
             // Use current buffer directly; do not pre-calc height which caused clipping / invisible appended lines
-            var edited = EditorGUILayout.TextArea(_rawContent ?? string.Empty, rawStyle, GUILayout.ExpandHeight(true));
+            string edited = EditorGUILayout.TextArea(_rawContent ?? string.Empty, rawStyle, GUILayout.ExpandHeight(true));
             if (edited != _rawContent)
             {
                 if (_rawGeneratedSnapshot != null && edited != _rawGeneratedSnapshot)
+                {
                     _rawDirty = true; // user diverged from generated content
+                }
+
                 _rawContent = edited;
             }
 
@@ -997,7 +1155,12 @@ namespace LivingDevAgent.Editor
                         if (!string.IsNullOrEmpty(_rawContent) && _rawCursorIndex > 0)
                         {
                             for (int i = 0; i < Math.Min(_rawCursorIndex, _rawContent.Length); i++)
-                                if (_rawContent[i] == '\n') line++;
+                            {
+                                if (_rawContent[i] == '\n')
+                                {
+                                    line++;
+                                }
+                            }
                         }
                         _rawScroll.y = line * 18f; // approx line height
                         _pendingScrollToCursor = false;
@@ -1008,20 +1171,37 @@ namespace LivingDevAgent.Editor
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("Load File…", GUILayout.Width(110))) LoadFileDialog();
+                if (GUILayout.Button("Load File…", GUILayout.Width(110)))
+                {
+                    LoadFileDialog();
+                }
+
                 using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_rawContent)))
                 {
-                    if (GUILayout.Button("Save Raw")) SaveRaw();
-                    if (GUILayout.Button("Save Raw As…")) SaveRawAs();
+                    if (GUILayout.Button("Save Raw"))
+                    {
+                        SaveRaw();
+                    }
+
+                    if (GUILayout.Button("Save Raw As…"))
+                    {
+                        SaveRawAs();
+                    }
                 }
-                if (GUILayout.Button("Insert Image…", GUILayout.Width(120))) AddImageAndInsertAtCursor();
+                if (GUILayout.Button("Insert Image…", GUILayout.Width(120)))
+                {
+                    AddImageAndInsertAtCursor();
+                }
             }
         }
 
         void HandleReferenceDragAndDrop(Rect area)
         {
-            var evt = Event.current;
-            if (!area.Contains(evt.mousePosition)) return;
+            Event evt = Event.current;
+            if (!area.Contains(evt.mousePosition))
+            {
+                return;
+            }
 
             if (evt.type == EventType.DragUpdated || evt.type == EventType.DragPerform)
             {
@@ -1029,16 +1209,22 @@ namespace LivingDevAgent.Editor
                 if (evt.type == EventType.DragPerform)
                 {
                     DragAndDrop.AcceptDrag();
-                    foreach (var obj in DragAndDrop.objectReferences)
+                    foreach (UnityEngine.Object obj in DragAndDrop.objectReferences)
                     {
-                        var path = AssetDatabase.GetAssetPath(obj);
-                        if (!string.IsNullOrEmpty(path)) TryAddReferencePath(path);
+                        string path = AssetDatabase.GetAssetPath(obj);
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            TryAddReferencePath(path);
+                        }
                     }
                     if (DragAndDrop.paths != null)
                     {
-                        foreach (var raw in DragAndDrop.paths)
+                        foreach (string raw in DragAndDrop.paths)
                         {
-                            if (!string.IsNullOrEmpty(raw)) TryAddReferencePath(raw);
+                            if (!string.IsNullOrEmpty(raw))
+                            {
+                                TryAddReferencePath(raw);
+                            }
                         }
                     }
                 }
@@ -1048,32 +1234,38 @@ namespace LivingDevAgent.Editor
 
         void AddSelectedAssetsAsReferences()
         {
-            var objs = Selection.objects;
-            foreach (var obj in objs)
+            UnityEngine.Object[] objs = Selection.objects;
+            foreach (UnityEngine.Object obj in objs)
             {
-                var path = AssetDatabase.GetAssetPath(obj);
-                if (!string.IsNullOrEmpty(path)) TryAddReferencePath(path);
+                string path = AssetDatabase.GetAssetPath(obj);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    TryAddReferencePath(path);
+                }
             }
         }
 
         void AddFilesAsReferences()
         {
-            var projectRoot = Directory.GetParent(Application.dataPath)!.FullName;
-            var dir = Application.dataPath;
+            string projectRoot = Directory.GetParent(Application.dataPath)!.FullName;
+            string dir = Application.dataPath;
             // Allow common docs
-            var filters = new[] { "All", "*.*", "Markdown", "md,markdown", "Text", "txt,log", "YAML", "yaml,yml", "JSON", "json", "XML", "xml" };
-            var picked = EditorUtility.OpenFilePanelWithFilters("Add Reference File", dir, filters);
+            string[] filters = new[] { "All", "*.*", "Markdown", "md,markdown", "Text", "txt,log", "YAML", "yaml,yml", "JSON", "json", "XML", "xml" };
+            string picked = EditorUtility.OpenFilePanelWithFilters("Add Reference File", dir, filters);
             if (!string.IsNullOrEmpty(picked))
             {
-                var rel = ToProjectRelativePath(picked, projectRoot) ?? picked;
+                string rel = ToProjectRelativePath(picked, projectRoot) ?? picked;
                 TryAddReferencePath(rel);
             }
         }
 
         void TryAddReferencePath(string path)
         {
-            var norm = path.Replace('\\', '/');
-            if (!_referencePaths.Contains(norm)) _referencePaths.Add(norm);
+            string norm = path.Replace('\\', '/');
+            if (!_referencePaths.Contains(norm))
+            {
+                _referencePaths.Add(norm);
+            }
         }
 
         static string ToProjectRelativePath(string absPath, string projectRoot)
@@ -1082,7 +1274,7 @@ namespace LivingDevAgent.Editor
             projectRoot = projectRoot.Replace('\\', '/');
             if (absPath.StartsWith(projectRoot))
             {
-                var rel = absPath[projectRoot.Length..].TrimStart('/');
+                string rel = absPath[projectRoot.Length..].TrimStart('/');
                 return rel;
             }
             return null;
@@ -1090,8 +1282,8 @@ namespace LivingDevAgent.Editor
 
         string MakeProjectRelative(string absPath)
         {
-            var projectRoot = Directory.GetParent(Application.dataPath)!.FullName.Replace('\\', '/');
-            var norm = absPath.Replace('\\', '/');
+            string projectRoot = Directory.GetParent(Application.dataPath)!.FullName.Replace('\\', '/');
+            string norm = absPath.Replace('\\', '/');
             if (norm.StartsWith(projectRoot))
             {
                 return norm[(projectRoot.Length + 1)..];
@@ -1112,8 +1304,8 @@ namespace LivingDevAgent.Editor
         string BuildMarkdown(string createdTs, string dateOverride = null, string safeTitleOverride = null)
         {
             // KeeperNote: Deterministic section builder; toggles act as feature flags so raw regen remains idempotent given same form snapshot.
-            var date = string.IsNullOrEmpty(dateOverride) ? DateTime.UtcNow.ToString("yyyy-MM-dd") : dateOverride;
-            var safeTitle = string.IsNullOrEmpty(safeTitleOverride) ? ScribeUtils.SanitizeTitle(_title) : safeTitleOverride;
+            string date = string.IsNullOrEmpty(dateOverride) ? DateTime.UtcNow.ToString("yyyy-MM-dd") : dateOverride;
+            string safeTitle = string.IsNullOrEmpty(safeTitleOverride) ? ScribeUtils.SanitizeTitle(_title) : safeTitleOverride;
 
             var sb = new StringBuilder();
             sb.AppendLine("# TLDL Entry Template");
@@ -1133,15 +1325,35 @@ namespace LivingDevAgent.Editor
             {
                 sb.AppendLine("## Discoveries");
                 sb.AppendLine();
-                foreach (var d in _discoveries)
+                foreach (Discovery d in _discoveries)
                 {
-                    var heading = string.IsNullOrWhiteSpace(d.Category) ? "[Discovery]" : $"[{d.Category}]";
+                    string heading = string.IsNullOrWhiteSpace(d.Category) ? "[Discovery]" : $"[{d.Category}]";
                     sb.AppendLine($"### {heading}");
-                    if (!string.IsNullOrWhiteSpace(d.KeyFinding)) sb.AppendLine($"- **Key Finding**: {d.KeyFinding}");
-                    if (!string.IsNullOrWhiteSpace(d.Impact)) sb.AppendLine($"- **Impact**: {d.Impact}");
-                    if (!string.IsNullOrWhiteSpace(d.Evidence)) sb.AppendLine($"- **Evidence**: {d.Evidence}");
-                    if (!string.IsNullOrWhiteSpace(d.RootCause)) sb.AppendLine($"- **Root Cause**: {d.RootCause}");
-                    if (!string.IsNullOrWhiteSpace(d.PatternRecognition)) sb.AppendLine($"- **Pattern Recognition**: {d.PatternRecognition}");
+                    if (!string.IsNullOrWhiteSpace(d.KeyFinding))
+                    {
+                        sb.AppendLine($"- **Key Finding**: {d.KeyFinding}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(d.Impact))
+                    {
+                        sb.AppendLine($"- **Impact**: {d.Impact}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(d.Evidence))
+                    {
+                        sb.AppendLine($"- **Evidence**: {d.Evidence}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(d.RootCause))
+                    {
+                        sb.AppendLine($"- **Root Cause**: {d.RootCause}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(d.PatternRecognition))
+                    {
+                        sb.AppendLine($"- **Pattern Recognition**: {d.PatternRecognition}");
+                    }
+
                     sb.AppendLine();
                 }
             }
@@ -1152,15 +1364,39 @@ namespace LivingDevAgent.Editor
                 sb.AppendLine();
                 for (int i = 0; i < _actions.Count; i++)
                 {
-                    var a = _actions[i];
-                    var idx = i + 1;
+                    ActionItem a = _actions[i];
+                    int idx = i + 1;
                     sb.AppendLine($"{idx}. **[{(string.IsNullOrWhiteSpace(a.Name) ? $"Action {idx}" : a.Name)}]**");
-                    if (!string.IsNullOrWhiteSpace(a.What)) sb.AppendLine($"   - **What**: {a.What}");
-                    if (!string.IsNullOrWhiteSpace(a.Why)) sb.AppendLine($"   - **Why**: {a.Why}");
-                    if (!string.IsNullOrWhiteSpace(a.How)) sb.AppendLine($"   - **How**: {a.How}");
-                    if (!string.IsNullOrWhiteSpace(a.Result)) sb.AppendLine($"   - **Result**: {a.Result}");
-                    if (!string.IsNullOrWhiteSpace(a.FilesChanged)) sb.AppendLine($"   - **Files Changed**: {a.FilesChanged}");
-                    if (!string.IsNullOrWhiteSpace(a.Validation)) sb.AppendLine($"   - **Validation**: {a.Validation}");
+                    if (!string.IsNullOrWhiteSpace(a.What))
+                    {
+                        sb.AppendLine($"   - **What**: {a.What}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(a.Why))
+                    {
+                        sb.AppendLine($"   - **Why**: {a.Why}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(a.How))
+                    {
+                        sb.AppendLine($"   - **How**: {a.How}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(a.Result))
+                    {
+                        sb.AppendLine($"   - **Result**: {a.Result}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(a.FilesChanged))
+                    {
+                        sb.AppendLine($"   - **Files Changed**: {a.FilesChanged}");
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(a.Validation))
+                    {
+                        sb.AppendLine($"   - **Validation**: {a.Validation}");
+                    }
+
                     sb.AppendLine();
                 }
             }
@@ -1199,9 +1435,21 @@ namespace LivingDevAgent.Editor
             if (_includeDependencies)
             {
                 sb.AppendLine("### Dependencies");
-                if (!string.IsNullOrWhiteSpace(_depsAdded)) sb.AppendLine($"- **Added**:\n{ScribeUtils.Bulletize(_depsAdded)}");
-                if (!string.IsNullOrWhiteSpace(_depsRemoved)) sb.AppendLine($"- **Removed**:\n{ScribeUtils.Bulletize(_depsRemoved)}");
-                if (!string.IsNullOrWhiteSpace(_depsUpdated)) sb.AppendLine($"- **Updated**:\n{ScribeUtils.Bulletize(_depsUpdated)}");
+                if (!string.IsNullOrWhiteSpace(_depsAdded))
+                {
+                    sb.AppendLine($"- **Added**:\n{ScribeUtils.Bulletize(_depsAdded)}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_depsRemoved))
+                {
+                    sb.AppendLine($"- **Removed**:\n{ScribeUtils.Bulletize(_depsRemoved)}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_depsUpdated))
+                {
+                    sb.AppendLine($"- **Updated**:\n{ScribeUtils.Bulletize(_depsUpdated)}");
+                }
+
                 sb.AppendLine();
             }
 
@@ -1210,10 +1458,14 @@ namespace LivingDevAgent.Editor
             {
                 sb.AppendLine("## Images");
                 sb.AppendLine();
-                foreach (var img in _imagePaths)
+                foreach (string img in _imagePaths)
                 {
-                    if (string.IsNullOrWhiteSpace(img)) continue;
-                    var alt = Path.GetFileNameWithoutExtension(img);
+                    if (string.IsNullOrWhiteSpace(img))
+                    {
+                        continue;
+                    }
+
+                    string alt = Path.GetFileNameWithoutExtension(img);
                     sb.AppendLine($"![{alt}]({img})");
                 }
                 sb.AppendLine();
@@ -1222,18 +1474,42 @@ namespace LivingDevAgent.Editor
             if (_includeLessons)
             {
                 sb.AppendLine("## Lessons Learned");
-                if (!string.IsNullOrWhiteSpace(_lessonsWorked)) sb.AppendLine($"\n### What Worked Well\n{ScribeUtils.Bulletize(_lessonsWorked)}");
-                if (!string.IsNullOrWhiteSpace(_lessonsImprove)) sb.AppendLine($"\n### What Could Be Improved\n{ScribeUtils.Bulletize(_lessonsImprove)}");
-                if (!string.IsNullOrWhiteSpace(_lessonsGaps)) sb.AppendLine($"\n### Knowledge Gaps Identified\n{ScribeUtils.Bulletize(_lessonsGaps)}");
+                if (!string.IsNullOrWhiteSpace(_lessonsWorked))
+                {
+                    sb.AppendLine($"\n### What Worked Well\n{ScribeUtils.Bulletize(_lessonsWorked)}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_lessonsImprove))
+                {
+                    sb.AppendLine($"\n### What Could Be Improved\n{ScribeUtils.Bulletize(_lessonsImprove)}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_lessonsGaps))
+                {
+                    sb.AppendLine($"\n### Knowledge Gaps Identified\n{ScribeUtils.Bulletize(_lessonsGaps)}");
+                }
+
                 sb.AppendLine();
             }
 
             if (_includeNextSteps)
             {
                 sb.AppendLine("## Next Steps");
-                if (!string.IsNullOrWhiteSpace(_nextImmediate)) sb.AppendLine($"\n### Immediate Actions (High Priority)\n{ScribeUtils.Checklist(_nextImmediate)}");
-                if (!string.IsNullOrWhiteSpace(_nextMedium)) sb.AppendLine($"\n### Medium-term Actions (Medium Priority)\n{ScribeUtils.Checklist(_nextMedium)}");
-                if (!string.IsNullOrWhiteSpace(_nextLong)) sb.AppendLine($"\n### Long-term Considerations (Low Priority)\n{ScribeUtils.Checklist(_nextLong)}");
+                if (!string.IsNullOrWhiteSpace(_nextImmediate))
+                {
+                    sb.AppendLine($"\n### Immediate Actions (High Priority)\n{ScribeUtils.Checklist(_nextImmediate)}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_nextMedium))
+                {
+                    sb.AppendLine($"\n### Medium-term Actions (Medium Priority)\n{ScribeUtils.Checklist(_nextMedium)}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_nextLong))
+                {
+                    sb.AppendLine($"\n### Long-term Considerations (Low Priority)\n{ScribeUtils.Checklist(_nextLong)}");
+                }
+
                 sb.AppendLine();
             }
 
@@ -1245,10 +1521,10 @@ namespace LivingDevAgent.Editor
                 if (_referencePaths.Count > 0)
                 {
                     sb.AppendLine("### Internal Links");
-                    foreach (var p in _referencePaths)
+                    foreach (string p in _referencePaths)
                     {
-                        var fileName = Path.GetFileName(p);
-                        var linkPath = p.Replace('\\', '/');
+                        string fileName = Path.GetFileName(p);
+                        string linkPath = p.Replace('\\', '/');
                         sb.AppendLine($"- [{fileName}]({linkPath})");
                     }
                     sb.AppendLine();
@@ -1274,10 +1550,26 @@ namespace LivingDevAgent.Editor
                 sb.AppendLine("## DevTimeTravel Context");
                 sb.AppendLine();
                 sb.AppendLine("### Snapshot Information");
-                if (!string.IsNullOrWhiteSpace(_snapshotId)) sb.AppendLine($"- **Snapshot ID**: {_snapshotId}");
-                if (!string.IsNullOrWhiteSpace(_branch)) sb.AppendLine($"- **Branch**: {_branch}");
-                if (!string.IsNullOrWhiteSpace(_commitHash)) sb.AppendLine($"- **Commit Hash**: {_commitHash}");
-                if (!string.IsNullOrWhiteSpace(_environment)) sb.AppendLine($"- **Environment**: {_environment}");
+                if (!string.IsNullOrWhiteSpace(_snapshotId))
+                {
+                    sb.AppendLine($"- **Snapshot ID**: {_snapshotId}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_branch))
+                {
+                    sb.AppendLine($"- **Branch**: {_branch}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_commitHash))
+                {
+                    sb.AppendLine($"- **Commit Hash**: {_commitHash}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_environment))
+                {
+                    sb.AppendLine($"- **Environment**: {_environment}");
+                }
+
                 sb.AppendLine();
             }
 
@@ -1287,12 +1579,24 @@ namespace LivingDevAgent.Editor
             if (_includeMetadata)
             {
                 sb.AppendLine("## TLDL Metadata");
-                var tagsLine = ScribeUtils.FormatTags(_tagsCsv);
-                if (!string.IsNullOrWhiteSpace(tagsLine)) sb.AppendLine($"\n**Tags**: {tagsLine}");
+                string tagsLine = ScribeUtils.FormatTags(_tagsCsv);
+                if (!string.IsNullOrWhiteSpace(tagsLine))
+                {
+                    sb.AppendLine($"\n**Tags**: {tagsLine}");
+                }
+
                 sb.AppendLine($"**Complexity**: {_complexity}");
                 sb.AppendLine($"**Impact**: {_impact}");
-                if (!string.IsNullOrWhiteSpace(_teamMembers)) sb.AppendLine($"**Team Members**: {_teamMembers}");
-                if (!string.IsNullOrWhiteSpace(_duration)) sb.AppendLine($"**Duration**: {_duration}");
+                if (!string.IsNullOrWhiteSpace(_teamMembers))
+                {
+                    sb.AppendLine($"**Team Members**: {_teamMembers}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_duration))
+                {
+                    sb.AppendLine($"**Duration**: {_duration}");
+                }
+
                 sb.AppendLine($"**Created**: {createdTs}");
                 sb.AppendLine($"**Last Updated**: {createdTs}");
                 sb.AppendLine($"**Status**: {FormatStatus(_status)}");
@@ -1320,7 +1624,7 @@ namespace LivingDevAgent.Editor
         static T Clone<T>(T src) where T : new()
         {
             var t = new T();
-            foreach (var f in typeof(T).GetFields())
+            foreach (System.Reflection.FieldInfo f in typeof(T).GetFields())
             {
                 f.SetValue(t, f.GetValue(src));
             }
@@ -1342,10 +1646,10 @@ namespace LivingDevAgent.Editor
         void DrawPreview()
         {
             // Always render from raw if available, otherwise from form
-            var md = !string.IsNullOrEmpty(_rawContent) ? _rawContent : BuildMarkdown(GetCreatedTs());
+            string md = !string.IsNullOrEmpty(_rawContent) ? _rawContent : BuildMarkdown(GetCreatedTs());
 
             // Remove mode switch; preview is always rendered view
-            var viewportHeight = Mathf.Max(120f, position.height - 220f);
+            float viewportHeight = Mathf.Max(120f, position.height - 220f);
             _previewScroll = EditorGUILayout.BeginScrollView(_previewScroll, GUILayout.Height(viewportHeight), GUILayout.ExpandHeight(true));
             GUILayout.Label("Markdown Preview (rendered)", EditorStyles.boldLabel);
             RenderMarkdown(md);
@@ -1354,13 +1658,17 @@ namespace LivingDevAgent.Editor
 
         void RenderMarkdown(string md)
         {
-            if (string.IsNullOrEmpty(md)) return;
-            var lines = md.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-            var inCode = false;
-            var codeBuffer = new StringBuilder();
-            foreach (var raw in lines)
+            if (string.IsNullOrEmpty(md))
             {
-                var line = raw;
+                return;
+            }
+
+            string[] lines = md.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            bool inCode = false;
+            var codeBuffer = new StringBuilder();
+            foreach (string raw in lines)
+            {
+                string line = raw;
                 if (line.StartsWith("```"))
                 {
                     if (!inCode)
@@ -1382,11 +1690,11 @@ namespace LivingDevAgent.Editor
                 }
 
                 // Markdown image: ![alt](path)
-                var imgMatch = Regex.Match(line, @"^\s*!\[([^\]]*)\]\(([^)]+)\)\s*$");
+                Match imgMatch = Regex.Match(line, @"^\s*!\[([^\]]*)\]\(([^)]+)\)\s*$");
                 if (imgMatch.Success)
                 {
-                    var alt = imgMatch.Groups[1].Value;
-                    var path = imgMatch.Groups[2].Value;
+                    string alt = imgMatch.Groups[1].Value;
+                    string path = imgMatch.Groups[2].Value;
                     RenderImage(path, alt);
                     continue;
                 }
@@ -1394,8 +1702,8 @@ namespace LivingDevAgent.Editor
                 // Checkbox list items: - [ ] and - [x]
                 if (Regex.IsMatch(line, @"^\s*[-*]\s\[( |x|X)\]\s"))
                 {
-                    var isChecked = line.IndexOf("[x]", StringComparison.OrdinalIgnoreCase) >= 0;
-                    var text = Regex.Replace(line, @"^\s*[-*]\s\[( |x|X)\]\s", "");
+                    bool isChecked = line.IndexOf("[x]", StringComparison.OrdinalIgnoreCase) >= 0;
+                    string text = Regex.Replace(line, @"^\s*[-*]\s\[( |x|X)\]\s", "");
                     EditorGUI.BeginDisabledGroup(true);
                     EditorGUILayout.ToggleLeft(ApplyInlineFormatting(text), isChecked);
                     EditorGUI.EndDisabledGroup();
@@ -1431,20 +1739,26 @@ namespace LivingDevAgent.Editor
 
         void RenderImage(string refPath, string alt)
         {
-            var resolved = ResolveImageAbsolutePath(refPath);
+            string resolved = ResolveImageAbsolutePath(refPath);
             if (string.IsNullOrEmpty(resolved))
             {
                 EditorGUILayout.HelpBox($"Image not found: {refPath}", MessageType.None);
                 return;
             }
-            if (!_imageCache.TryGetValue(resolved, out var tex) || tex == null)
+            if (!_imageCache.TryGetValue(resolved, out Texture2D tex) || tex == null)
             {
-                var bytes = File.Exists(resolved) ? File.ReadAllBytes(resolved) : null;
+                byte[] bytes = File.Exists(resolved) ? File.ReadAllBytes(resolved) : null;
                 if (bytes != null)
                 {
                     tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                    if (!tex.LoadImage(bytes)) tex = null;
-                    else _imageCache[resolved] = tex;
+                    if (!tex.LoadImage(bytes))
+                    {
+                        tex = null;
+                    }
+                    else
+                    {
+                        _imageCache[resolved] = tex;
+                    }
                 }
             }
             if (tex == null)
@@ -1452,12 +1766,15 @@ namespace LivingDevAgent.Editor
                 EditorGUILayout.HelpBox($"(missing image) {alt} - {refPath}", MessageType.Warning);
                 return;
             }
-            var maxWidth = Mathf.Max(100f, position.width - 360f);
-            var aspect = (float)tex.width / Mathf.Max(1, tex.height);
-            var width = Mathf.Min(maxWidth, tex.width);
-            var height = width / Mathf.Max(0.01f, aspect);
+            float maxWidth = Mathf.Max(100f, position.width - 360f);
+            float aspect = (float)tex.width / Mathf.Max(1, tex.height);
+            float width = Mathf.Min(maxWidth, tex.width);
+            float height = width / Mathf.Max(0.01f, aspect);
             GUILayout.Label(new GUIContent(tex, alt), GUILayout.Width(width), GUILayout.Height(height));
-            if (!string.IsNullOrEmpty(alt)) EditorGUILayout.LabelField(alt, EditorStyles.miniLabel);
+            if (!string.IsNullOrEmpty(alt))
+            {
+                EditorGUILayout.LabelField(alt, EditorStyles.miniLabel);
+            }
         }
 
         private string GetProjectRoot()
@@ -1467,43 +1784,73 @@ namespace LivingDevAgent.Editor
 
         string ResolveImageAbsolutePath(string refPath)
         {
-            if (string.IsNullOrEmpty(refPath)) return null;
-            var norm = refPath.Replace('\\', '/');
-            if (Path.IsPathRooted(refPath)) return refPath;
+            if (string.IsNullOrEmpty(refPath))
+            {
+                return null;
+            }
+
+            string norm = refPath.Replace('\\', '/');
+            if (Path.IsPathRooted(refPath))
+            {
+                return refPath;
+            }
 
             // If current file exists, resolve relative to its directory
-            var baseDir = string.IsNullOrEmpty(_currentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_currentFilePath);
-            if (string.IsNullOrEmpty(baseDir)) baseDir = ResolveActiveFolder();
-            var abs = Path.GetFullPath(Path.Combine(baseDir, norm));
-            if (File.Exists(abs)) return abs;
+            string baseDir = string.IsNullOrEmpty(_currentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_currentFilePath);
+            if (string.IsNullOrEmpty(baseDir))
+            {
+                baseDir = ResolveActiveFolder();
+            }
+
+            string abs = Path.GetFullPath(Path.Combine(baseDir, norm));
+            if (File.Exists(abs))
+            {
+                return abs;
+            }
 
             // Try images subfolder under active folder
-            var imgDir = EnsureImagesDirectory();
-            var tryAbs = Path.Combine(imgDir ?? baseDir, Path.GetFileName(norm));
-            if (File.Exists(tryAbs)) return tryAbs;
+            string imgDir = EnsureImagesDirectory();
+            string tryAbs = Path.Combine(imgDir ?? baseDir, Path.GetFileName(norm));
+            if (File.Exists(tryAbs))
+            {
+                return tryAbs;
+            }
+
             return abs;
         }
 
         string EnsureImagesDirectory()
         {
-            var baseDir = string.IsNullOrEmpty(_currentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_currentFilePath);
-            if (string.IsNullOrEmpty(baseDir)) baseDir = ResolveActiveFolder();
-            var imagesDir = Path.Combine(baseDir, "images");
-            if (!Directory.Exists(imagesDir)) Directory.CreateDirectory(imagesDir);
+            string baseDir = string.IsNullOrEmpty(_currentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_currentFilePath);
+            if (string.IsNullOrEmpty(baseDir))
+            {
+                baseDir = ResolveActiveFolder();
+            }
+
+            string imagesDir = Path.Combine(baseDir, "images");
+            if (!Directory.Exists(imagesDir))
+            {
+                Directory.CreateDirectory(imagesDir);
+            }
+
             return imagesDir;
         }
 
         void AddImageFile()
         {
-            var startDir = EnsureImagesDirectory();
-            var picked = EditorUtility.OpenFilePanelWithFilters("Add Image", startDir, new[] { "Images", "png,jpg,jpeg,gif", "All", "*.*" });
-            if (string.IsNullOrEmpty(picked)) return;
+            string startDir = EnsureImagesDirectory();
+            string picked = EditorUtility.OpenFilePanelWithFilters("Add Image", startDir, new[] { "Images", "png,jpg,jpeg,gif", "All", "*.*" });
+            if (string.IsNullOrEmpty(picked))
+            {
+                return;
+            }
+
             try
             {
-                var imagesDir = EnsureImagesDirectory();
-                var fileName = Path.GetFileName(picked);
-                var dest = Path.Combine(imagesDir, fileName);
-                var uniqueDest = dest;
+                string imagesDir = EnsureImagesDirectory();
+                string fileName = Path.GetFileName(picked);
+                string dest = Path.Combine(imagesDir, fileName);
+                string uniqueDest = dest;
                 int i = 1;
                 while (File.Exists(uniqueDest))
                 {
@@ -1514,9 +1861,13 @@ namespace LivingDevAgent.Editor
                 PostWriteImport(uniqueDest);
 
                 // Add relative path entry
-                var rel = Path.GetFileName(uniqueDest);
-                var mdRef = $"images/{rel}".Replace('\\', '/');
-                if (!_imagePaths.Contains(mdRef)) _imagePaths.Add(mdRef);
+                string rel = Path.GetFileName(uniqueDest);
+                string mdRef = $"images/{rel}".Replace('\\', '/');
+                if (!_imagePaths.Contains(mdRef))
+                {
+                    _imagePaths.Add(mdRef);
+                }
+
                 _statusLine = $"Image added: {mdRef}";
             }
             catch (Exception ex)
@@ -1528,7 +1879,11 @@ namespace LivingDevAgent.Editor
         void AddImageAndInsertAtCursor()
         {
             AddImageFile();
-            if (_imagePaths.Count == 0) return;
+            if (_imagePaths.Count == 0)
+            {
+                return;
+            }
+
             string last = _imagePaths[^1];
             InsertImageMarkdownAtCursor(last);
         }
@@ -1536,7 +1891,7 @@ namespace LivingDevAgent.Editor
         void InsertImageMarkdownAtCursor(string relPath)
         {
             // KeeperNote: Cursor-aware insertion preserves writing flow; fallback appends to end for resilience if focus state is lost.
-            var insert = $"![image]({relPath})";
+            string insert = $"![image]({relPath})";
             if (!string.IsNullOrEmpty(relPath) && !_imagePaths.Contains(relPath))
             {
                 _imagePaths.Add(relPath);
@@ -1547,13 +1902,21 @@ namespace LivingDevAgent.Editor
                 _rawContent ??= string.Empty;
                 bool needLeadingNewline = _rawCursorIndex > 0 && _rawContent[_rawCursorIndex - 1] != '\n';
                 bool needTrailingNewline = _rawCursorIndex < _rawContent.Length && _rawContent[_rawCursorIndex] != '\n';
-                var prefix = _rawContent[.._rawCursorIndex];
-                var suffix = _rawContent[_rawCursorIndex..];
+                string prefix = _rawContent[.._rawCursorIndex];
+                string suffix = _rawContent[_rawCursorIndex..];
                 var builder = new StringBuilder(prefix.Length + insert.Length + suffix.Length + 4);
                 builder.Append(prefix);
-                if (needLeadingNewline) builder.Append('\n');
+                if (needLeadingNewline)
+                {
+                    builder.Append('\n');
+                }
+
                 builder.Append(insert);
-                if (needTrailingNewline) builder.Append('\n');
+                if (needTrailingNewline)
+                {
+                    builder.Append('\n');
+                }
+
                 builder.Append(suffix);
                 _rawContent = builder.ToString();
                 _rawCursorIndex = prefix.Length + (needLeadingNewline ? 1 : 0) + insert.Length + (needTrailingNewline ? 1 : 0);
@@ -1561,8 +1924,12 @@ namespace LivingDevAgent.Editor
             }
             else
             {
-                var md = _rawContent ?? string.Empty;
-                if (!md.EndsWith("\n") && md.Length > 0) md += "\n";
+                string md = _rawContent ?? string.Empty;
+                if (!md.EndsWith("\n") && md.Length > 0)
+                {
+                    md += "\n";
+                }
+
                 _rawCursorIndex = md.Length; // set cursor to end prior to append
                 _rawContent = md + insert + "\n";
                 _statusLine = $"Inserted image at end: {relPath}";
@@ -1576,9 +1943,13 @@ namespace LivingDevAgent.Editor
 
         void CopyImageMarkdownLink(string absPath, string relPath)
         {
-            if (string.IsNullOrEmpty(relPath)) return;
-            var alt = Path.GetFileNameWithoutExtension(absPath);
-            var md = $"![{alt}]({relPath})";
+            if (string.IsNullOrEmpty(relPath))
+            {
+                return;
+            }
+
+            string alt = Path.GetFileNameWithoutExtension(absPath);
+            string md = $"![{alt}]({relPath})";
             EditorGUIUtility.systemCopyBuffer = md;
             _statusLine = $"Link copied: {relPath}";
             ShowNotification(new GUIContent("Link Copied"));
@@ -1587,8 +1958,8 @@ namespace LivingDevAgent.Editor
         // Restored helpers and sections that other features depend on
         void ChooseRootFolder()
         {
-            var start = string.IsNullOrEmpty(_rootPath) ? Application.dataPath : _rootPath;
-            var picked = EditorUtility.OpenFolderPanel("Choose Sudo-GitBook Root", start, "");
+            string start = string.IsNullOrEmpty(_rootPath) ? Application.dataPath : _rootPath;
+            string picked = EditorUtility.OpenFolderPanel("Choose Sudo-GitBook Root", start, "");
             if (!string.IsNullOrEmpty(picked))
             {
                 _rootPath = picked;
@@ -1601,7 +1972,11 @@ namespace LivingDevAgent.Editor
 
         void OpenInFileBrowser(string path)
         {
-            if (string.IsNullOrEmpty(path)) return;
+            if (string.IsNullOrEmpty(path))
+            {
+                return;
+            }
+
             EditorUtility.RevealInFinder(path);
         }
 
@@ -1612,17 +1987,29 @@ namespace LivingDevAgent.Editor
 
         void CreateChildFolder()
         {
-            var parent = _activeDirPath;
-            if (string.IsNullOrEmpty(parent)) parent = ResolveActiveFolder();
-            var name = EditorUtility.SaveFilePanel("New Folder Name", parent, "NewFolder", "");
+            string parent = _activeDirPath;
+            if (string.IsNullOrEmpty(parent))
+            {
+                parent = ResolveActiveFolder();
+            }
+
+            string name = EditorUtility.SaveFilePanel("New Folder Name", parent, "NewFolder", "");
             if (!string.IsNullOrEmpty(name))
             {
                 try
                 {
                     // SaveFilePanel returns a file path; we want folder path. Create directory if not exists.
-                    var dir = name;
-                    if (Path.HasExtension(dir)) dir = Path.GetDirectoryName(dir);
-                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                    string dir = name;
+                    if (Path.HasExtension(dir))
+                    {
+                        dir = Path.GetDirectoryName(dir);
+                    }
+
+                    if (!Directory.Exists(dir))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+
                     _activeDirPath = dir;
                     _statusLine = $"Folder ready: {dir}";
                     RefreshNavigator();
@@ -1636,16 +2023,24 @@ namespace LivingDevAgent.Editor
 
         string ResolveActiveFolder()
         {
-            if (!string.IsNullOrEmpty(_activeDirPath)) return _activeDirPath;
-            if (!string.IsNullOrEmpty(_rootPath)) return _rootPath;
-            var fallback = Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
+            if (!string.IsNullOrEmpty(_activeDirPath))
+            {
+                return _activeDirPath;
+            }
+
+            if (!string.IsNullOrEmpty(_rootPath))
+            {
+                return _rootPath;
+            }
+
+            string fallback = Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
             return fallback;
         }
 
         void LoadFileDialog()
         {
-            var dir = ResolveActiveFolder();
-            var picked = EditorUtility.OpenFilePanelWithFilters(
+            string dir = ResolveActiveFolder();
+            string picked = EditorUtility.OpenFilePanelWithFilters(
                 "Open Document",
                 dir,
                 new[] { "All", "*.*", "Markdown", "md,markdown", "Text", "txt,log", "XML", "xml" }
@@ -1660,7 +2055,7 @@ namespace LivingDevAgent.Editor
         {
             try
             {
-                var text = File.ReadAllText(absPath);
+                string text = File.ReadAllText(absPath);
                 _currentFilePath = absPath;
                 _rawContent = text;
                 _rawGeneratedSnapshot = text;
@@ -1699,9 +2094,9 @@ namespace LivingDevAgent.Editor
 
         void SaveRawAs()
         {
-            var dir = ResolveActiveFolder();
-            var suggested = $"TLDL-{DateTime.UtcNow:yyyy-MM-dd}-Entry.md";
-            var picked = EditorUtility.SaveFilePanel("Save Document As", dir, suggested, "md");
+            string dir = ResolveActiveFolder();
+            string suggested = $"TLDL-{DateTime.UtcNow:yyyy-MM-dd}-Entry.md";
+            string picked = EditorUtility.SaveFilePanel("Save Document As", dir, suggested, "md");
             if (!string.IsNullOrEmpty(picked))
             {
                 try
@@ -1721,24 +2116,34 @@ namespace LivingDevAgent.Editor
 
         void EnsureTemplatesLoaded()
         {
-            if (_templates != null) return;
+            if (_templates != null)
+            {
+                return;
+            }
+
             try
             {
                 _templates = new List<TemplateInfo>();
-                var root = GetProjectRoot();
-                var registry = Path.Combine(root, "templates", "comments", "registry.yaml");
-                if (!File.Exists(registry)) return;
+                string root = GetProjectRoot();
+                string registry = Path.Combine(root, "templates", "comments", "registry.yaml");
+                if (!File.Exists(registry))
+                {
+                    return;
+                }
 
-                var lines = File.ReadAllLines(registry);
+                string[] lines = File.ReadAllLines(registry);
                 bool inTemplates = false;
                 string currentKey = null, currentFile = null, currentTitle = null;
-                foreach (var raw in lines)
+                foreach (string raw in lines)
                 {
-                    var line = raw.TrimEnd();
+                    string line = raw.TrimEnd();
                     if (line.Trim() == "templates:") { inTemplates = true; continue; }
-                    if (!inTemplates) continue;
+                    if (!inTemplates)
+                    {
+                        continue;
+                    }
 
-                    var keyMatch = Regex.Match(line, @"^\s{2}([A-Za-z0-9_-]+):\s*$");
+                    Match keyMatch = Regex.Match(line, @"^\s{2}([A-Za-z0-9_-]+):\s*$");
                     if (keyMatch.Success)
                     {
                         if (!string.IsNullOrEmpty(currentKey) && !string.IsNullOrEmpty(currentFile))
@@ -1750,14 +2155,14 @@ namespace LivingDevAgent.Editor
                         continue;
                     }
 
-                    var fileMatch = Regex.Match(line, @"^\s{4}file:\s*(.+)$");
+                    Match fileMatch = Regex.Match(line, @"^\s{4}file:\s*(.+)$");
                     if (fileMatch.Success)
                     {
                         currentFile = fileMatch.Groups[1].Value.Trim();
                         continue;
                     }
 
-                    var titleMatch = Regex.Match(line, @"^\s{4}title:\s*""?(.*?)""?$");
+                    Match titleMatch = Regex.Match(line, @"^\s{4}title:\s*""?(.*?)""?$");
                     if (titleMatch.Success)
                     {
                         currentTitle = titleMatch.Groups[1].Value.Trim();
@@ -1780,22 +2185,34 @@ namespace LivingDevAgent.Editor
             // KeeperNote: Issue creation uses a template registry so extending new archetypes is declarative (edit YAML, no code change).
             try
             {
-                var issuesDir = GetIssuesDirectory();
-                if (!Directory.Exists(issuesDir)) Directory.CreateDirectory(issuesDir);
+                string issuesDir = GetIssuesDirectory();
+                if (!Directory.Exists(issuesDir))
+                {
+                    Directory.CreateDirectory(issuesDir);
+                }
+
                 EnsureIssuesReadme(issuesDir);
 
-                var safeTitle = string.IsNullOrWhiteSpace(_title) ? "Issue" : ScribeUtils.SanitizeTitle(_title);
-                var fileName = $"Issue-{DateTime.UtcNow:yyyy-MM-dd}-{safeTitle}.md";
-                var absPath = Path.Combine(issuesDir, fileName);
+                string safeTitle = string.IsNullOrWhiteSpace(_title) ? "Issue" : ScribeUtils.SanitizeTitle(_title);
+                string fileName = $"Issue-{DateTime.UtcNow:yyyy-MM-dd}-{safeTitle}.md";
+                string absPath = Path.Combine(issuesDir, fileName);
 
                 var header = new StringBuilder();
                 header.AppendLine($"# Issue: {(_title ?? "Untitled")} ");
                 header.AppendLine($"**Created:** {GetCreatedTs()}");
-                if (!string.IsNullOrWhiteSpace(_context)) header.AppendLine($"**Context:** {_context}");
-                if (!string.IsNullOrWhiteSpace(_summary)) header.AppendLine($"**Summary:** {_summary}");
+                if (!string.IsNullOrWhiteSpace(_context))
+                {
+                    header.AppendLine($"**Context:** {_context}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(_summary))
+                {
+                    header.AppendLine($"**Summary:** {_summary}");
+                }
+
                 header.AppendLine();
 
-                var body = LoadTemplateMarkdown(info) ?? string.Empty;
+                string body = LoadTemplateMarkdown(info) ?? string.Empty;
                 File.WriteAllText(absPath, header + body, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
                 _currentFilePath = absPath;
@@ -1818,14 +2235,22 @@ namespace LivingDevAgent.Editor
             // KeeperNote: Core TLDL artifact writer — uses sanitized title for filename safety and reproducible IDs.
             try
             {
-                var date = DateTime.UtcNow.ToString("yyyy-MM-dd");
-                var safeTitle = ScribeUtils.SanitizeTitle(_title);
-                if (string.IsNullOrEmpty(safeTitle)) safeTitle = "Entry";
-                var fileName = $"TLDL-{date}-{safeTitle}.md";
-                var targetFolder = ResolveActiveFolder();
-                if (!Directory.Exists(targetFolder)) Directory.CreateDirectory(targetFolder);
-                var absPath = Path.Combine(targetFolder, fileName);
-                var md = BuildMarkdown(GetCreatedTs(), date, safeTitle);
+                string date = DateTime.UtcNow.ToString("yyyy-MM-dd");
+                string safeTitle = ScribeUtils.SanitizeTitle(_title);
+                if (string.IsNullOrEmpty(safeTitle))
+                {
+                    safeTitle = "Entry";
+                }
+
+                string fileName = $"TLDL-{date}-{safeTitle}.md";
+                string targetFolder = ResolveActiveFolder();
+                if (!Directory.Exists(targetFolder))
+                {
+                    Directory.CreateDirectory(targetFolder);
+                }
+
+                string absPath = Path.Combine(targetFolder, fileName);
+                string md = BuildMarkdown(GetCreatedTs(), date, safeTitle);
                 File.WriteAllText(absPath, md, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
                 PostWriteImport(absPath);
                 _currentFilePath = absPath;
@@ -1869,21 +2294,33 @@ namespace LivingDevAgent.Editor
         // --- Restored helper methods (previously removed during refactor) ---
         static string GetRelativePath(string baseDir, string fullPath)
         {
-            if (string.IsNullOrEmpty(baseDir) || string.IsNullOrEmpty(fullPath)) return fullPath ?? string.Empty;
+            if (string.IsNullOrEmpty(baseDir) || string.IsNullOrEmpty(fullPath))
+            {
+                return fullPath ?? string.Empty;
+            }
+
             try
             {
                 var baseUri = new Uri(AppendDirectorySeparatorChar(baseDir));
                 var pathUri = new Uri(fullPath);
-                var rel = Uri.UnescapeDataString(baseUri.MakeRelativeUri(pathUri).ToString());
+                string rel = Uri.UnescapeDataString(baseUri.MakeRelativeUri(pathUri).ToString());
                 return rel.Replace('/', Path.DirectorySeparatorChar);
             }
             catch { return fullPath; }
         }
         static string AppendDirectorySeparatorChar(string path)
         {
-            if (string.IsNullOrEmpty(path)) return path;
+            if (string.IsNullOrEmpty(path))
+            {
+                return path;
+            }
+
             char last = path[^1];
-            if (last == Path.DirectorySeparatorChar || last == Path.AltDirectorySeparatorChar) return path;
+            if (last == Path.DirectorySeparatorChar || last == Path.AltDirectorySeparatorChar)
+            {
+                return path;
+            }
+
             return path + Path.DirectorySeparatorChar;
         }
         string BuildFormSnapshot()
@@ -1893,12 +2330,12 @@ namespace LivingDevAgent.Editor
             sb.Append('|').Append(_includeDiscoveries).Append(_includeActions).Append(_includeTechnicalDetails).Append(_includeDependencies)
               .Append(_includeLessons).Append(_includeNextSteps).Append(_includeReferences).Append(_includeDevTimeTravel).Append(_includeMetadata)
               .Append(_includeTerminalProof).Append(_includeImages);
-            foreach (var d in _discoveries)
+            foreach (Discovery d in _discoveries)
             {
                 sb.Append("|D:").Append(d.Category).Append('|').Append(d.KeyFinding).Append('|').Append(d.Impact).Append('|').Append(d.Evidence)
                   .Append('|').Append(d.RootCause).Append('|').Append(d.PatternRecognition);
             }
-            foreach (var a in _actions)
+            foreach (ActionItem a in _actions)
             {
                 sb.Append("|A:").Append(a.Name).Append('|').Append(a.What).Append('|').Append(a.Why).Append('|').Append(a.How)
                   .Append('|').Append(a.Result).Append('|').Append(a.FilesChanged).Append('|').Append(a.Validation);
@@ -1929,8 +2366,12 @@ namespace LivingDevAgent.Editor
         }
         string ApplyInlineFormatting(string input)
         {
-            if (string.IsNullOrEmpty(input)) return string.Empty;
-            var s = input;
+            if (string.IsNullOrEmpty(input))
+            {
+                return string.Empty;
+            }
+
+            string s = input;
             s = s.Replace("<", "&lt;").Replace(">", "&gt;");
             s = Regex.Replace(s, "`([^`]+)`", m => $"<color=#c8e1ff><b>{m.Groups[1].Value}</b></color>");
             s = Regex.Replace(s, @"\*\*([^*]+)\*\*", m => $"<b>{m.Groups[1].Value}</b>");
@@ -1944,11 +2385,15 @@ namespace LivingDevAgent.Editor
             // KeeperNote: Reads YAML-embedded template blocks (| literal) and extracts markdown payload without relying on full YAML parser.
             try
             {
-                if (info == null || string.IsNullOrEmpty(info.AbsPath) || !File.Exists(info.AbsPath)) return null;
-                var yaml = File.ReadAllLines(info.AbsPath);
+                if (info == null || string.IsNullOrEmpty(info.AbsPath) || !File.Exists(info.AbsPath))
+                {
+                    return null;
+                }
+
+                string[] yaml = File.ReadAllLines(info.AbsPath);
                 var md = new StringBuilder();
                 bool inBlock = false;
-                foreach (var raw in yaml)
+                foreach (string raw in yaml)
                 {
                     if (!inBlock)
                     {
@@ -1959,9 +2404,17 @@ namespace LivingDevAgent.Editor
                     }
                     else
                     {
-                        if (raw.Length > 0 && !char.IsWhiteSpace(raw[0])) break; // out of block
-                        var line = raw;
-                        if (line.StartsWith("  ")) line = line[2..];
+                        if (raw.Length > 0 && !char.IsWhiteSpace(raw[0]))
+                        {
+                            break; // out of block
+                        }
+
+                        string line = raw;
+                        if (line.StartsWith("  "))
+                        {
+                            line = line[2..];
+                        }
+
                         md.AppendLine(line);
                     }
                 }
@@ -1983,8 +2436,12 @@ namespace LivingDevAgent.Editor
             // KeeperNote: Bootstraps contextual README to explain automation contract for new collaborators.
             try
             {
-                var readme = Path.Combine(issuesDir, "Readme.md");
-                if (File.Exists(readme)) return;
+                string readme = Path.Combine(issuesDir, "Readme.md");
+                if (File.Exists(readme))
+                {
+                    return;
+                }
+
                 var sb = new StringBuilder();
                 sb.AppendLine("This directory `Root\\TLDL\\issues` (`Root/` is the current root of the project that contains the Assets and Packages directories) is used for all issues created using the Scribe window.");
                 sb.AppendLine("Do not rename arbitrarily — automation / CI flows may rely on this canonical path.");

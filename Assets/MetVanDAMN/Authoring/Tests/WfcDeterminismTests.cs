@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Unity.Entities;
 using Unity.Collections;
 using Unity.Mathematics;
@@ -24,9 +24,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             _testWorld = new World("WfcDeterminismTestWorld");
             _entityManager = _testWorld.EntityManager;
             _simGroup = _testWorld.GetOrCreateSystemManaged<SimulationSystemGroup>();
-            
+
             // Add the WFC system to the simulation group
-            var systemHandle = _testWorld.GetOrCreateSystem(typeof(DistrictWfcSystem));
+            SystemHandle systemHandle = _testWorld.GetOrCreateSystem(typeof(DistrictWfcSystem));
             _simGroup.AddSystemToUpdateList(systemHandle);
             _simGroup.SortSystems();
         }
@@ -35,7 +35,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         public void TearDown()
         {
             if (_testWorld.IsCreated)
+            {
                 _testWorld.Dispose();
+            }
         }
 
         [Test]
@@ -43,9 +45,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         {
             // Test that WFC generation is deterministic with the same seed
             const uint testSeed = 42;
-            
-            var results1 = RunWfcGenerationWithSeed(testSeed);
-            var results2 = RunWfcGenerationWithSeed(testSeed);
+
+            WfcGenerationResults results1 = RunWfcGenerationWithSeed(testSeed);
+            WfcGenerationResults results2 = RunWfcGenerationWithSeed(testSeed);
             
             Assert.AreEqual(results1.entityCount, results2.entityCount, "Should generate same number of entities");
             Assert.AreEqual(results1.completedCount, results2.completedCount, "Should complete same number of entities");
@@ -67,9 +69,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Test that different seeds produce different but valid results
             const uint seed1 = 123;
             const uint seed2 = 456;
-            
-            var results1 = RunWfcGenerationWithSeed(seed1);
-            var results2 = RunWfcGenerationWithSeed(seed2);
+
+            WfcGenerationResults results1 = RunWfcGenerationWithSeed(seed1);
+            WfcGenerationResults results2 = RunWfcGenerationWithSeed(seed2);
             
             Assert.AreEqual(results1.entityCount, results2.entityCount, "Should generate same number of entities");
             
@@ -96,12 +98,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Test full world generation reproducibility
             const uint worldSeed = 789;
             const int targetSectors = 5;
-            
-            var config1 = CreateTestWorldConfig(worldSeed, targetSectors);
-            var config2 = CreateTestWorldConfig(worldSeed, targetSectors);
-            
-            var hash1 = GenerateWorldAndComputeHash(config1);
-            var hash2 = GenerateWorldAndComputeHash(config2);
+
+            WorldGenerationConfig config1 = CreateTestWorldConfig(worldSeed, targetSectors);
+            WorldGenerationConfig config2 = CreateTestWorldConfig(worldSeed, targetSectors);
+
+            uint hash1 = GenerateWorldAndComputeHash(config1);
+            uint hash2 = GenerateWorldAndComputeHash(config2);
             
             Assert.AreEqual(hash1, hash2, "Same world configuration should produce identical results");
         }
@@ -110,12 +112,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         public void WfcConstraintValidation_IsConsistent()
         {
             // Test that constraint validation produces consistent results
-            var testEntity = CreateTestEntityWithWfcState();
+            Entity testEntity = CreateTestEntityWithWfcState();
             var nodeId = new NodeId(1, 0, 0, new int2(5, 5));
             _entityManager.SetComponentData(testEntity, nodeId);
-            
+
             // Run multiple validation passes
-            var validationResults = new bool[10];
+            bool[] validationResults = new bool[10];
             for (int i = 0; i < validationResults.Length; i++)
             {
                 // Simulate validation logic from DistrictWfcJob
@@ -128,7 +130,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             int trueCount = 0;
             for (int i = 0; i < validationResults.Length; i++)
             {
-                if (validationResults[i]) trueCount++;
+                if (validationResults[i])
+                {
+                    trueCount++;
+                }
             }
             
             // Should have consistent bias toward true/false, not completely random
@@ -150,10 +155,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             {
                 _simGroup.Update();
             }
-            
+
             // Collect results
-            var query = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<WfcState>());
-            var states = query.ToComponentDataArray<WfcState>(Allocator.Temp);
+            EntityQuery query = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<WfcState>());
+            NativeArray<WfcState> states = query.ToComponentDataArray<WfcState>(Allocator.Temp);
             
             var results = new WfcGenerationResults
             {
@@ -180,7 +185,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         private void CreateTestWorld(uint seed)
         {
             // Create world configuration
-            var configEntity = _entityManager.CreateEntity();
+            Entity configEntity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(configEntity, new WorldSeed { Value = seed });
             _entityManager.AddComponentData(configEntity, new WorldBounds 
             { 
@@ -191,7 +196,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Create test districts
             for (int i = 0; i < 5; i++)
             {
-                var districtEntity = _entityManager.CreateEntity();
+                Entity districtEntity = _entityManager.CreateEntity();
                 _entityManager.AddComponentData(districtEntity, new NodeId((uint)i, 0, 0, new int2(i - 2, 0)));
                 _entityManager.AddComponentData(districtEntity, new WfcState(WfcGenerationState.Initialized));
                 _entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);
@@ -202,6 +207,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         {
             return new WorldGenerationConfig
             {
+                WorldSeed = seed,
                 TargetSectorCount = targetSectors,
                 MaxDistrictCount = targetSectors * 4,
                 BiomeTransitionRadius = 10.0f
@@ -212,15 +218,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         {
             // Clear existing entities
             _entityManager.DestroyEntity(_entityManager.UniversalQuery);
-            
+
             // Create world based on config
-            var configEntity = _entityManager.CreateEntity();
+            Entity configEntity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(configEntity, config);
             
             // Generate districts based on target sector count
             for (int i = 0; i < config.TargetSectorCount; i++)
             {
-                var districtEntity = _entityManager.CreateEntity();
+                Entity districtEntity = _entityManager.CreateEntity();
                 _entityManager.AddComponentData(districtEntity, new NodeId((uint)i, 0, 0, new int2(i % 3, i / 3)));
                 _entityManager.AddComponentData(districtEntity, new WfcState(WfcGenerationState.Initialized));
                 _entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);
@@ -231,10 +237,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             {
                 _simGroup.Update();
             }
-            
+
             // Compute hash of final state
-            var query = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<WfcState>());
-            var states = query.ToComponentDataArray<WfcState>(Allocator.Temp);
+            EntityQuery query = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<WfcState>());
+            NativeArray<WfcState> states = query.ToComponentDataArray<WfcState>(Allocator.Temp);
             
             uint hash = 0;
             for (int i = 0; i < states.Length; i++)
@@ -252,7 +258,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
         private Entity CreateTestEntityWithWfcState()
         {
-            var entity = _entityManager.CreateEntity();
+            Entity entity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(entity, new WfcState(WfcGenerationState.InProgress));
             _entityManager.AddBuffer<WfcCandidateBufferElement>(entity);
             return entity;
@@ -260,13 +266,32 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
         private bool ValidateTestConstraints(Entity entity, NodeId nodeId, ref Unity.Mathematics.Random random)
         {
-            // Simplified version of constraint validation from DistrictWfcJob
+            // We first need to assign a temporary entity to simulate the job context?
+            if (!_entityManager.HasComponent<WfcState>(entity))
+            {
+                return false;
+            }
+            WfcState wfcState = _entityManager.GetComponentData<WfcState>(entity);
+            if (wfcState.State != WfcGenerationState.InProgress)
+            {
+                return false;
+            }
+
+            // ⚠Intended use!⚠ Simplified version of constraint validation from DistrictWfcJob for testing purposes
+            // Example constraints based on position - not actual game logic
+            // if your specific project has different constraints, adjust accordingly
             float d = math.length(new float2(nodeId.Coordinates));
-            if (d > 30f) return random.NextFloat() < 0.2f;
-            
+            if (d > 30f)
+            {
+                return random.NextFloat() < 0.2f;
+            }
+
             int parity = (nodeId.Coordinates.x ^ nodeId.Coordinates.y) & 1;
-            if (parity == 1) return random.NextFloat() > 0.3f;
-            
+            if (parity == 1)
+            {
+                return random.NextFloat() > 0.3f;
+            }
+
             return true;
         }
 
@@ -279,7 +304,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             public void Dispose()
             {
                 if (tileAssignments.IsCreated)
+                {
                     tileAssignments.Dispose();
+                }
             }
         }
     }

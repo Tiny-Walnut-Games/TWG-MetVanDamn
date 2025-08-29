@@ -35,7 +35,7 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void Start()
         {
-            var world = World.DefaultGameObjectInjectionWorld;
+            World world = World.DefaultGameObjectInjectionWorld;
             if (world == null)
             {
                 Debug.LogError("ProceduralLayoutDemo: Default World not available!");
@@ -52,7 +52,10 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void Update()
         {
-            if (!enableAutoDemo || !_demoStarted) return;
+            if (!enableAutoDemo || !_demoStarted)
+            {
+                return;
+            }
 
             if (Time.time - _lastUpdateTime > demoUpdateInterval)
             {
@@ -85,7 +88,10 @@ namespace TinyWalnutGames.MetVD.Samples
         [ContextMenu("Check Current Demo Status")]
         public void CheckDemoProgress()
         {
-            if (_entityManager == null) return;
+            if (_entityManager == null)
+            {
+                return;
+            }
 
             switch (_currentStage)
             {
@@ -106,21 +112,26 @@ namespace TinyWalnutGames.MetVD.Samples
                     break;
                 default:
                     if (logLayoutProgress)
+                    {
                         Debug.Log("🎉 Procedural Layout Demo Complete!");
+                    }
+
                     break;
             }
         }
 
         private void CheckDistrictLayoutStage()
         {
-            using var layoutDoneQuery = _entityManager.CreateEntityQuery(typeof(DistrictLayoutDoneTag));
+            using EntityQuery layoutDoneQuery = _entityManager.CreateEntityQuery(typeof(DistrictLayoutDoneTag));
             
             if (layoutDoneQuery.CalculateEntityCount() > 0)
             {
-                var layoutDone = layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
+                DistrictLayoutDoneTag layoutDone = layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
                 if (logLayoutProgress)
+                {
                     Debug.Log($"✅ Stage 1 Complete: District Layout ({layoutDone.DistrictCount} districts placed)");
-                
+                }
+
                 // Check actual district positions
                 LogDistrictPositions();
                 _currentStage = 1;
@@ -133,16 +144,18 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void CheckConnectionBuildingStage()
         {
-            using var layoutDoneQuery = _entityManager.CreateEntityQuery(typeof(DistrictLayoutDoneTag));
+            using EntityQuery layoutDoneQuery = _entityManager.CreateEntityQuery(typeof(DistrictLayoutDoneTag));
             
             if (layoutDoneQuery.CalculateEntityCount() > 0)
             {
-                var layoutDone = layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
+                DistrictLayoutDoneTag layoutDone = layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
                 if (layoutDone.ConnectionCount > 0)
                 {
                     if (logLayoutProgress)
+                    {
                         Debug.Log($"✅ Stage 2 Complete: Connection Building ({layoutDone.ConnectionCount} connections created)");
-                    
+                    }
+
                     LogConnectionGraph();
                     _currentStage = 2;
                 }
@@ -155,13 +168,13 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void CheckRuleRandomizationStage()
         {
-            using var rulesDoneQuery = _entityManager.CreateEntityQuery(typeof(RuleRandomizationDoneTag));
-            using var ruleSetQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
+            using EntityQuery rulesDoneQuery = _entityManager.CreateEntityQuery(typeof(RuleRandomizationDoneTag));
+            using EntityQuery ruleSetQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
             
             if (rulesDoneQuery.CalculateEntityCount() > 0 && ruleSetQuery.CalculateEntityCount() > 0)
             {
-                var rulesDone = rulesDoneQuery.GetSingleton<RuleRandomizationDoneTag>();
-                var ruleSet = ruleSetQuery.GetSingleton<WorldRuleSet>();
+                RuleRandomizationDoneTag rulesDone = rulesDoneQuery.GetSingleton<RuleRandomizationDoneTag>();
+                WorldRuleSet ruleSet = ruleSetQuery.GetSingleton<WorldRuleSet>();
                 
                 if (logRuleGeneration)
                 {
@@ -181,8 +194,8 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void CheckHierarchyStage()
         {
-            using var sectorQuery = _entityManager.CreateEntityQuery(typeof(SectorHierarchyData));
-            using var roomQuery = _entityManager.CreateEntityQuery(typeof(RoomHierarchyData));
+            using EntityQuery sectorQuery = _entityManager.CreateEntityQuery(typeof(SectorHierarchyData));
+            using EntityQuery roomQuery = _entityManager.CreateEntityQuery(typeof(RoomHierarchyData));
             
             int sectorCount = sectorQuery.CalculateEntityCount();
             int roomCount = roomQuery.CalculateEntityCount();
@@ -190,7 +203,10 @@ namespace TinyWalnutGames.MetVD.Samples
             if (sectorCount > 0 || roomCount > 0)
             {
                 if (logHierarchyCreation)
+                {
                     Debug.Log($"✅ Stage 4 Complete: Hierarchy Creation ({sectorCount} sectors, {roomCount} rooms)");
+                }
+
                 _currentStage = 4;
             }
             else if (logHierarchyCreation)
@@ -201,18 +217,24 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void CheckWfcIntegrationStage()
         {
-            using var wfcQuery = _entityManager.CreateEntityQuery(typeof(WfcState));
-            
-            var wfcEntities = wfcQuery.ToComponentDataArray<WfcState>(Unity.Collections.Allocator.Temp);
+            using EntityQuery wfcQuery = _entityManager.CreateEntityQuery(typeof(WfcState));
+
+            Unity.Collections.NativeArray<WfcState> wfcEntities = wfcQuery.ToComponentDataArray<WfcState>(Unity.Collections.Allocator.Temp);
             
             int inProgressCount = 0;
             int completedCount = 0;
             
             for (int i = 0; i < wfcEntities.Length; i++)
             {
-                var wfcState = wfcEntities[i];
-                if (wfcState.State == WfcGenerationState.InProgress) inProgressCount++;
-                else if (wfcState.State == WfcGenerationState.Completed) completedCount++;
+                WfcState wfcState = wfcEntities[i];
+                if (wfcState.State == WfcGenerationState.InProgress)
+                {
+                    inProgressCount++;
+                }
+                else if (wfcState.State == WfcGenerationState.Completed)
+                {
+                    completedCount++;
+                }
             }
             
             wfcEntities.Dispose();
@@ -220,7 +242,10 @@ namespace TinyWalnutGames.MetVD.Samples
             if (completedCount > 0 || inProgressCount > 0)
             {
                 if (logLayoutProgress)
+                {
                     Debug.Log($"✅ Stage 5: WFC Integration Active ({inProgressCount} in progress, {completedCount} completed)");
+                }
+
                 _currentStage = 5;
             }
             else if (logLayoutProgress)
@@ -231,7 +256,7 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void CreateWorldConfiguration()
         {
-            var worldConfigEntity = _entityManager.CreateEntity();
+            Entity worldConfigEntity = _entityManager.CreateEntity();
             _entityManager.AddComponentData(worldConfigEntity, new WorldConfiguration
             {
                 Seed = UnityEngine.Random.Range(1, 999999),
@@ -245,14 +270,14 @@ namespace TinyWalnutGames.MetVD.Samples
         {
             for (int i = 0; i < districtCount; i++)
             {
-                var districtEntity = _entityManager.CreateEntity();
+                Entity districtEntity = _entityManager.CreateEntity();
                 
                 // Create unplaced district (coordinates 0,0, level 0)
                 _entityManager.AddComponentData(districtEntity, new NodeId((uint)(i + 1), 0, 0, new int2(0, 0)));
                 _entityManager.AddComponentData(districtEntity, new WfcState(WfcGenerationState.Initialized));
-                
+
                 // Add sector hierarchy data
-                var sectorSeed = (uint)(i * 12345 + 6789);
+                uint sectorSeed = (uint)(i * 12345 + 6789);
                 _entityManager.AddComponentData(districtEntity, new SectorHierarchyData(
                     new int2(6, 6), // 6x6 local grid
                     UnityEngine.Random.Range(2, 5), // 2-4 sectors per district
@@ -269,11 +294,11 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void LogDistrictPositions()
         {
-            using var nodeQuery = _entityManager.CreateEntityQuery(typeof(NodeId));
-            var nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+            using EntityQuery nodeQuery = _entityManager.CreateEntityQuery(typeof(NodeId));
+            Unity.Collections.NativeArray<NodeId> nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
             
             Debug.Log("📍 District Positions:");
-            foreach (var nodeId in nodeIds)
+            foreach (NodeId nodeId in nodeIds)
             {
                 if (nodeId.Level == 0) // Districts only
                 {
@@ -286,16 +311,16 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void LogConnectionGraph()
         {
-            using var connectionQuery = _entityManager.CreateEntityQuery(typeof(ConnectionBufferElement));
-            var entities = connectionQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            using EntityQuery connectionQuery = _entityManager.CreateEntityQuery(typeof(ConnectionBufferElement));
+            Unity.Collections.NativeArray<Entity> entities = connectionQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
             
             Debug.Log("🔗 Connection Graph:");
             int totalConnections = 0;
             
-            foreach (var entity in entities)
+            foreach (Entity entity in entities)
             {
-                var connectionBuffer = _entityManager.GetBuffer<ConnectionBufferElement>(entity);
-                var nodeId = _entityManager.GetComponentData<NodeId>(entity);
+                DynamicBuffer<ConnectionBufferElement> connectionBuffer = _entityManager.GetBuffer<ConnectionBufferElement>(entity);
+                NodeId nodeId = _entityManager.GetComponentData<NodeId>(entity);
                 
                 if (nodeId.Level == 0 && connectionBuffer.Length > 0) // Districts only
                 {
@@ -311,10 +336,10 @@ namespace TinyWalnutGames.MetVD.Samples
         private void ClearDemoEntities()
         {
             // Clear existing demo entities to start fresh
-            using var allEntitiesQuery = _entityManager.CreateEntityQuery(typeof(Entity));
-            var allEntities = allEntitiesQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            using EntityQuery allEntitiesQuery = _entityManager.CreateEntityQuery(typeof(Entity));
+            Unity.Collections.NativeArray<Entity> allEntities = allEntitiesQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
             
-            foreach (var entity in allEntities)
+            foreach (Entity entity in allEntities)
             {
                 // Only clear entities with our components (avoid clearing system entities)
                 if (_entityManager.HasComponent<NodeId>(entity) ||
@@ -331,7 +356,10 @@ namespace TinyWalnutGames.MetVD.Samples
 
         private void OnGUI()
         {
-            if (!enableAutoDemo) return;
+            if (!enableAutoDemo)
+            {
+                return;
+            }
 
             GUILayout.BeginArea(new Rect(10, Screen.height - 150, 400, 140));
             GUILayout.BeginVertical("box");

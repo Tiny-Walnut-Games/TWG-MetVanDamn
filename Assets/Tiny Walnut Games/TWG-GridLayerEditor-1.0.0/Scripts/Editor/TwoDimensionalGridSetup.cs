@@ -64,7 +64,10 @@ namespace TinyWalnutGames.GridLayerEditor
         private static void ContextCreateSideScrollingGrid(MenuCommand menuCommand)
         {
             if (menuCommand == null)
+            {
                 throw new ArgumentNullException(nameof(menuCommand)); // Defensive check for null - and a use for menuCommand
+            }
+
             CreateSideScrollingGrid();
         }
 
@@ -91,17 +94,21 @@ namespace TinyWalnutGames.GridLayerEditor
         /// </summary>
         private static string[] GetCustomOrDefaultLayers(string[] topDownDefaultLayers)
         {
-            var config = AssetDatabase.LoadAssetAtPath<GridLayerConfig>("Assets/GridLayerConfig.asset");
+            GridLayerConfig config = AssetDatabase.LoadAssetAtPath<GridLayerConfig>("Assets/GridLayerConfig.asset");
             // Platformer default layers
             string[] platformerDefaultLayers = Enum.GetNames(typeof(SideScrollingLayers));
             if (config != null && config.layerNames != null && config.layerNames.Length > 0)
             {
                 // If custom layers are equal to platformer default, use top-down default
                 if (config.layerNames.SequenceEqual(platformerDefaultLayers))
+                {
                     return topDownDefaultLayers;
+                }
                 // If custom layers are different from top-down default, use custom
                 if (!config.layerNames.SequenceEqual(topDownDefaultLayers))
+                {
                     return config.layerNames;
+                }
             }
             return topDownDefaultLayers;
         }
@@ -114,7 +121,7 @@ namespace TinyWalnutGames.GridLayerEditor
         {
             var gridGO = new GameObject("Top-Down Grid", typeof(Grid));
             gridGO.transform.position = Vector3.zero;
-            var layers = GetCustomOrDefaultLayers(Enum.GetNames(typeof(TopDownLayers)));
+            string[] layers = GetCustomOrDefaultLayers(Enum.GetNames(typeof(TopDownLayers)));
             int layerCount = layers.Length;
             for (int i = 0; i < layerCount; i++)
             {
@@ -131,7 +138,10 @@ namespace TinyWalnutGames.GridLayerEditor
         private static void ContextCreateDefaultTopDownGrid(MenuCommand menuCommand)
         {
             if (menuCommand == null)
+            {
                 throw new ArgumentNullException(nameof(menuCommand)); // Defensive check for null - and a use for menuCommand
+            }
+
             CreateDefaultTopDownGrid();
         }
 
@@ -174,9 +184,9 @@ namespace TinyWalnutGames.GridLayerEditor
         {
             var gridGO = new GameObject("Isometric Top-Down Grid", typeof(Grid));
             gridGO.transform.position = Vector3.zero;
-            var grid = gridGO.GetComponent<Grid>();
+            Grid grid = gridGO.GetComponent<Grid>();
             grid.cellLayout = GridLayout.CellLayout.Isometric;
-            var layers = GetCustomOrDefaultLayers(IsometricTopDownLayers);
+            string[] layers = GetCustomOrDefaultLayers(IsometricTopDownLayers);
             int layerCount = layers.Length;
             for (int i = 0; i < layerCount; i++)
             {
@@ -192,7 +202,10 @@ namespace TinyWalnutGames.GridLayerEditor
         private static void ContextCreateIsometricTopDownGrid(MenuCommand menuCommand)
         {
             if (menuCommand == null)
+            {
                 throw new ArgumentNullException(nameof(menuCommand)); // Defensive check for null - and a use for menuCommand
+            }
+
             CreateIsometricTopDownGrid();
         }
 
@@ -204,9 +217,9 @@ namespace TinyWalnutGames.GridLayerEditor
         {
             var gridGO = new GameObject("Hexagonal Top-Down Grid", typeof(Grid));
             gridGO.transform.position = Vector3.zero;
-            var grid = gridGO.GetComponent<Grid>();
+            Grid grid = gridGO.GetComponent<Grid>();
             grid.cellLayout = GridLayout.CellLayout.Hexagon;
-            var layers = GetCustomOrDefaultLayers(HexTopDownLayers);
+            string[] layers = GetCustomOrDefaultLayers(HexTopDownLayers);
             int layerCount = layers.Length;
             for (int i = 0; i < layerCount; i++)
             {
@@ -222,7 +235,10 @@ namespace TinyWalnutGames.GridLayerEditor
         private static void ContextCreateHexTopDownGrid(MenuCommand menuCommand)
         {
             if (menuCommand == null)
+            {
                 throw new ArgumentNullException(nameof(menuCommand)); // Defensive check for null - and a use for menuCommand
+            }
+
             CreateHexTopDownGrid();
         }
 
@@ -264,15 +280,22 @@ namespace TinyWalnutGames.GridLayerEditor
             // Try to set Unity layer by name; warn if not found
             int unityLayer = LayerMask.NameToLayer(layerName);
             if (unityLayer != -1)
+            {
                 tmGO.layer = unityLayer;
+            }
             else
+            {
                 Debug.LogWarning($"Layer '{layerName}' not found. GameObject will use default layer.");
+            }
 
             // Try to set sorting layer by name; warn if not found
-            var renderer = tmGO.GetComponent<TilemapRenderer>();
+            TilemapRenderer renderer = tmGO.GetComponent<TilemapRenderer>();
             renderer.sortingLayerName = layerName;
             if (renderer.sortingLayerName != layerName)
+            {
                 Debug.LogWarning($"Sorting Layer '{layerName}' not found. Renderer will use default sorting layer.");
+            }
+
             renderer.sortingOrder = 0;
         }
 

@@ -25,7 +25,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void OnSceneGUI(SceneView sv)
         {
-            if (_settings == null) return;
+            if (_settings == null)
+            {
+                return;
+            }
+
             if (_settings.enableTransformSnapUtility && GUILayout.Button("MetVD Snap Districts To Grid", GUILayout.Width(220)))
             {
                 SnapAllDistrictsToGrid();
@@ -34,11 +38,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void SnapAllDistrictsToGrid()
         {
-            var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
             Undo.RecordObjects(districts, "Snap Districts To Grid");
-            foreach (var d in districts)
+            foreach (DistrictAuthoring d in districts)
             {
-                if (!_settings.useGridCoordinatesForGizmos) continue; // only meaningful when grid-based
+                if (!_settings.useGridCoordinatesForGizmos)
+                {
+                    continue; // only meaningful when grid-based
+                }
+
                 Vector3 target = GridPositionFromAuthoring(d);
                 d.transform.position = target;
                 if (_settings.adaptDistrictSizeToCell)
@@ -53,16 +61,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static Vector3 GridPositionFromAuthoring(DistrictAuthoring district)
         {
             if (_settings == null || !_settings.useGridCoordinatesForGizmos)
+            {
                 return district.transform.position;
-            var coord = district.gridCoordinates; // int2 authoring field
+            }
+
+            Unity.Mathematics.int2 coord = district.gridCoordinates; // int2 authoring field
             return new Vector3(coord.x * _settings.gridCellSize, district.transform.position.y, coord.y * _settings.gridCellSize) + _settings.gridOriginOffset;
         }
 
         [DrawGizmo(GizmoType.NonSelected | GizmoType.Selected | GizmoType.Pickable)]
         private static void DrawDistrictGizmo(DistrictAuthoring district, GizmoType type)
         {
-            if (_settings == null) return;
-            if (!ShouldDraw()) return;
+            if (_settings == null)
+            {
+                return;
+            }
+
+            if (!ShouldDraw())
+            {
+                return;
+            }
 
             Vector3 pos = GridPositionFromAuthoring(district);
             Vector2 size = _settings.useGridCoordinatesForGizmos && _settings.adaptDistrictSizeToCell
@@ -94,10 +112,25 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [DrawGizmo(GizmoType.NonSelected | GizmoType.Selected)]
         private static void DrawConnectionGizmo(ConnectionAuthoring connection, GizmoType type)
         {
-            if (_settings == null) return;
-            if (!ShouldDraw()) return;
-            if (connection.from == null || connection.to == null) return;
-            if (connection.from == connection.to) return;
+            if (_settings == null)
+            {
+                return;
+            }
+
+            if (!ShouldDraw())
+            {
+                return;
+            }
+
+            if (connection.from == null || connection.to == null)
+            {
+                return;
+            }
+
+            if (connection.from == connection.to)
+            {
+                return;
+            }
 
             Vector3 a = GridPositionFromAuthoring(connection.from);
             Vector3 b = GridPositionFromAuthoring(connection.to);
@@ -108,14 +141,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Arrow (direction a->b or both)
             DrawArrow(a, b, lineColor);
             if (connection.type == Core.ConnectionType.Bidirectional)
+            {
                 DrawArrow(b, a, lineColor);
+            }
         }
 
         [DrawGizmo(GizmoType.NonSelected | GizmoType.Selected)]
         private static void DrawBiomeFieldGizmo(BiomeFieldAuthoring field, GizmoType type)
         {
-            if (_settings == null) return;
-            if (!ShouldDraw()) return;
+            if (_settings == null)
+            {
+                return;
+            }
+
+            if (!ShouldDraw())
+            {
+                return;
+            }
 
             Handles.color = _settings.biomePrimary;
             Handles.DrawSolidDisc(field.transform.position, Vector3.up, _settings.biomeRadius * field.strength);
@@ -130,7 +172,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             Vector3 dir = (to - from);
             float len = dir.magnitude;
-            if (len < 0.01f) return;
+            if (len < 0.01f)
+            {
+                return;
+            }
+
             dir /= len;
             Vector3 basePos = Vector3.Lerp(from, to, 0.5f);
             Vector3 right = Vector3.Cross(Vector3.up, dir).normalized;

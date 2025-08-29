@@ -52,8 +52,8 @@ namespace TinyWalnutGames.MetVD.Authoring
         protected override void OnUpdate()
         {
             // Build a lookup from NodeId._value -> Entity for neighbor resolution (one per frame)
-            var nodeEntities = _biomeNodeQuery.ToEntityArray(Allocator.Temp);
-            var nodeIds = _biomeNodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            NativeArray<Entity> nodeEntities = _biomeNodeQuery.ToEntityArray(Allocator.Temp);
+            NativeArray<NodeId> nodeIds = _biomeNodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
             var nodeMap = new NativeHashMap<uint, Entity>(nodeEntities.Length, Allocator.Temp);
             for (int i = 0; i < nodeEntities.Length; i++)
             {
@@ -76,14 +76,18 @@ namespace TinyWalnutGames.MetVD.Authoring
 
                     for (int i = 0; i < connections.Length; i++)
                     {
-                        var connection = connections[i].Value;
+                        Connection connection = connections[i].Value;
                         uint neighborNodeId = connection.GetDestination(nodeId._value);
-                        if (neighborNodeId == 0) continue;
-                        if (nodeMap.TryGetValue(neighborNodeId, out var neighborEntity))
+                        if (neighborNodeId == 0)
+                        {
+                            continue;
+                        }
+
+                        if (nodeMap.TryGetValue(neighborNodeId, out Entity neighborEntity))
                         {
                             if (EntityManager.HasComponent<CoreBiome>(neighborEntity))
                             {
-                                var neighborBiomeData = EntityManager.GetComponentData<CoreBiome>(neighborEntity);
+                                CoreBiome neighborBiomeData = EntityManager.GetComponentData<CoreBiome>(neighborEntity);
                                 if (neighborBiomeData.Type != biome.Type && neighborBiomeData.Type != BiomeType.Unknown)
                                 {
                                     hasTransition = true;
@@ -107,9 +111,13 @@ namespace TinyWalnutGames.MetVD.Authoring
                         };
 
                         if (EntityManager.HasComponent<BiomeTransition>(entity))
+                        {
                             EntityManager.SetComponentData(entity, transition);
+                        }
                         else
+                        {
                             EntityManager.AddComponentData(entity, transition);
+                        }
                     }
                     else
                     {
@@ -147,14 +155,21 @@ namespace TinyWalnutGames.MetVD.Authoring
                          in BiomeArtProfileReference artProfileRef) =>
                 {
                     if (transition.TransitionTilesApplied)
+                    {
                         return;
+                    }
 
-                    var isValid = artProfileRef.ProfileRef.IsValid();
-                    if (!isValid) return;
+                    bool isValid = artProfileRef.ProfileRef.IsValid();
+                    if (!isValid)
+                    {
+                        return;
+                    }
 
-                    var artProfile = artProfileRef.ProfileRef.Value;
+                    BiomeArtProfile artProfile = artProfileRef.ProfileRef.Value;
                     if (artProfile == null || artProfile.transitionTiles == null || artProfile.transitionTiles.Length == 0)
+                    {
                         return;
+                    }
 
                     ApplyTransitionTiles(artProfile, transition, nodeId);
                     transition.TransitionTilesApplied = true;
@@ -163,15 +178,18 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private void ApplyTransitionTiles(BiomeArtProfile artProfile, BiomeTransition transition, NodeId nodeId)
         {
-            var grid = GameObject.FindFirstObjectByType<Grid>();
-            if (grid == null) return;
+            Grid grid = GameObject.FindFirstObjectByType<Grid>();
+            if (grid == null)
+            {
+                return;
+            }
 
             Transform blendingLayer = grid.transform.Find("Blending");
             if (blendingLayer == null)
             {
                 for (int i = 0; i < grid.transform.childCount; i++)
                 {
-                    var child = grid.transform.GetChild(i);
+                    Transform child = grid.transform.GetChild(i);
                     if (child.GetComponent<Tilemap>() != null)
                     {
                         blendingLayer = child;
@@ -179,14 +197,23 @@ namespace TinyWalnutGames.MetVD.Authoring
                     }
                 }
             }
-            if (blendingLayer == null) return;
+            if (blendingLayer == null)
+            {
+                return;
+            }
 
-            if (!blendingLayer.TryGetComponent<Tilemap>(out var tilemap)) return;
+            if (!blendingLayer.TryGetComponent<Tilemap>(out Tilemap tilemap))
+            {
+                return;
+            }
 
             int tileIndex = Mathf.FloorToInt(transition.TransitionStrength * artProfile.transitionTiles.Length);
             tileIndex = Mathf.Clamp(tileIndex, 0, artProfile.transitionTiles.Length - 1);
-            var transitionTile = artProfile.transitionTiles[tileIndex];
-            if (transitionTile == null) return;
+            TileBase transitionTile = artProfile.transitionTiles[tileIndex];
+            if (transitionTile == null)
+            {
+                return;
+            }
 
             Vector3Int position = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
             tilemap.SetTile(position, transitionTile);

@@ -91,24 +91,30 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
         {
             // Skip if rules already generated
-            if (!_rulesDoneQuery.IsEmptyIgnoreFilter) return;
+            if (!_rulesDoneQuery.IsEmptyIgnoreFilter)
+            {
+                return;
+            }
 
             // Wait for district layout to complete
-            if (_layoutDoneQuery.IsEmptyIgnoreFilter) return;
+            if (_layoutDoneQuery.IsEmptyIgnoreFilter)
+            {
+                return;
+            }
 
-            var worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
-            var layoutDone = _layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
+            WorldConfiguration worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
+            DistrictLayoutDoneTag layoutDone = _layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
 
             // Generate rules based on randomization mode
             var random = new Unity.Mathematics.Random((uint)(worldConfig.Seed + 42));
-            var ruleSet = GenerateWorldRules(worldConfig.RandomizationMode, layoutDone.DistrictCount, ref random);
+            WorldRuleSet ruleSet = GenerateWorldRules(worldConfig.RandomizationMode, layoutDone.DistrictCount, ref random);
 
             // Create singleton rule set entity
-            var ruleEntity = state.EntityManager.CreateEntity();
+            Entity ruleEntity = state.EntityManager.CreateEntity();
             state.EntityManager.AddComponentData(ruleEntity, ruleSet);
 
             // Mark rules as done
-            var doneEntity = state.EntityManager.CreateEntity();
+            Entity doneEntity = state.EntityManager.CreateEntity();
             state.EntityManager.AddComponentData(doneEntity, new RuleRandomizationDoneTag(worldConfig.RandomizationMode, 1));
         }
 
@@ -132,10 +138,10 @@ namespace TinyWalnutGames.MetVD.Graph
         private static WorldRuleSet ApplyCuratedRules(ref Unity.Mathematics.Random random)
         {
             // Use balanced curated polarity distribution
-            var curatedPolarity = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold;
-            
+            Polarity curatedPolarity = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold;
+
             // Standard upgrade set ensuring reachability
-            var curatedUpgrades = 0u;
+            uint curatedUpgrades = 0u;
             curatedUpgrades |= 1u << 0; // Jump upgrade
             curatedUpgrades |= 1u << 1; // Double jump
             curatedUpgrades |= 1u << 2; // Dash
@@ -166,7 +172,7 @@ namespace TinyWalnutGames.MetVD.Graph
         private static WorldRuleSet ApplyPartialRandomization(ref Unity.Mathematics.Random random)
         {
             // Randomize biome polarities but ensure at least 2 are present
-            var randomizedPolarity = Polarity.None;
+            Polarity randomizedPolarity = Polarity.None;
             int polarityCount = math.max(2, random.NextInt(2, math.min(6, 8))); // 8 possible
             
             // Shuffle and select polarities
@@ -177,7 +183,7 @@ namespace TinyWalnutGames.MetVD.Graph
             }
 
             // Keep curated upgrades for reachability
-            var curatedUpgrades = 0u;
+            uint curatedUpgrades = 0u;
             curatedUpgrades |= 1u << 0; // Jump upgrade
             curatedUpgrades |= 1u << 1; // Double jump  
             curatedUpgrades |= 1u << 2; // Dash
@@ -192,7 +198,7 @@ namespace TinyWalnutGames.MetVD.Graph
         private static WorldRuleSet ApplyFullRandomization(int districtCount, ref Unity.Mathematics.Random random)
         {
             // Randomize biome polarities
-            var randomizedPolarity = Polarity.None;
+            Polarity randomizedPolarity = Polarity.None;
             int polarityCount = math.max(2, random.NextInt(2, 8));
             
             for (int i = 0; i < polarityCount; i++)
@@ -202,14 +208,14 @@ namespace TinyWalnutGames.MetVD.Graph
             }
 
             // Randomize upgrades but ensure minimum set for reachability
-            var randomizedUpgrades = 0u;
+            uint randomizedUpgrades = 0u;
             
             // Always include basic movement (reachability guard)
             randomizedUpgrades |= 1u << 0; // Jump upgrade (essential)
-            
+
             // Randomly add other upgrades based on district count
-            var maxUpgrades = math.min(8, math.max(3, districtCount / 2));
-            var upgradeCount = random.NextInt(2, maxUpgrades); // At least 2, including guaranteed jump
+            int maxUpgrades = math.min(8, math.max(3, districtCount / 2));
+            int upgradeCount = random.NextInt(2, maxUpgrades); // At least 2, including guaranteed jump
             
             for (int i = 1; i < upgradeCount && i < 8; i++)
             {

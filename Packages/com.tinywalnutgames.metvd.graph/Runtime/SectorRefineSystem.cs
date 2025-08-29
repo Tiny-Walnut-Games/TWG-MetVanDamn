@@ -65,7 +65,7 @@ namespace TinyWalnutGames.MetVD.Graph
             connectionBufferLookup.Update(ref state);
             gateBufferLookup.Update(ref state);
 
-            var deltaTime = state.WorldUnmanaged.Time.DeltaTime;
+            float deltaTime = state.WorldUnmanaged.Time.DeltaTime;
             uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 997.0); // prime multiplier for better distribution
             var random = new Unity.Mathematics.Random(baseSeed == 0 ? 1u : baseSeed);
 
@@ -122,9 +122,11 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             if (WfcStateLookup.HasComponent(entity))
             {
-                var wfcState = WfcStateLookup[entity];
+                WfcState wfcState = WfcStateLookup[entity];
                 if (wfcState.State != WfcGenerationState.Completed)
+                {
                     return;
+                }
             }
             // Deterministic path complexity in test‑expected range [6,14]
             // (matches assumption in tests: NextInt(6,15) upper-exclusive 15)
@@ -140,18 +142,22 @@ namespace TinyWalnutGames.MetVD.Graph
                 refinementData.Phase = SectorRefinementPhase.LockPlacement;
                 return;
             }
-            var connections = ConnectionBufferLookup[entity];
+            DynamicBuffer<ConnectionBufferElement> connections = ConnectionBufferLookup[entity];
             int loopsToCreate = (int)(refinementData.CriticalPathLength * refinementData.TargetLoopDensity) - refinementData.LoopCount;
             for (int i = 0; i < math.min(loopsToCreate, 3); i++)
             {
                 // Slightly modulate loop probability by frame delta to use DeltaTime meaningfully
                 float loopProbability = (0.7f - (i * 0.1f)) * math.saturate(1f - (DeltaTime * 0.05f));
                 if (random.NextFloat() < loopProbability)
+                {
                     CreateLoop(connections, ref refinementData, ref random, i);
+                }
             }
             int targetLoops = (int)(refinementData.CriticalPathLength * refinementData.TargetLoopDensity);
             if (refinementData.LoopCount >= targetLoops)
+            {
                 refinementData.Phase = SectorRefinementPhase.LockPlacement;
+            }
         }
 
         private readonly void CreateLoop(DynamicBuffer<ConnectionBufferElement> connections, ref SectorRefinementData refinementData, ref Unity.Mathematics.Random random, int loopIndex)
@@ -187,7 +193,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 refinementData.Phase = SectorRefinementPhase.PathValidation;
                 return;
             }
-            var gates = GateBufferLookup[entity];
+            DynamicBuffer<GateConditionBufferElement> gates = GateBufferLookup[entity];
             if (refinementData.HardLockCount == 0)
             {
                 int lockPosition = random.NextInt(6, 11);
@@ -225,9 +231,15 @@ namespace TinyWalnutGames.MetVD.Graph
             int lockThreshold = 10 + (entity.Index & 1);
             bool pathsValid = true;
             if (refinementData.LoopCount == 0 && refinementData.CriticalPathLength > loopThreshold)
+            {
                 pathsValid = false;
+            }
+
             if (refinementData.HardLockCount == 0 && refinementData.CriticalPathLength > lockThreshold)
+            {
                 pathsValid = false;
+            }
+
             refinementData.Phase = pathsValid ? SectorRefinementPhase.Completed : SectorRefinementPhase.Failed;
         }
 

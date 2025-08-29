@@ -34,7 +34,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void DistrictLayoutSystem_RespectsTargetSectors()
         {
             // Create world configuration with specific TargetSectors
-            var configEntity = _entityManager.CreateEntity();
+            Entity configEntity = _entityManager.CreateEntity();
             var worldConfig = new WorldConfiguration
             {
                 Seed = 12345,
@@ -55,7 +55,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
             // Simulate DistrictLayoutSystem logic
             var random = new Unity.Mathematics.Random((uint)worldConfig.Seed);
-            var targetDistrictCount = worldConfig.TargetSectors > 0 ? 
+            int targetDistrictCount = worldConfig.TargetSectors > 0 ? 
                 math.min(worldConfig.TargetSectors, districts.Length) : districts.Length;
 
             // Verify target count calculation
@@ -102,7 +102,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void RoomManagement_CreatesProperFeatures()
         {
             // Create a room entity with hierarchy data
-            var roomEntity = _entityManager.CreateEntity();
+            Entity roomEntity = _entityManager.CreateEntity();
             var roomBounds = new RectInt(0, 0, 10, 8);
             var roomData = new RoomHierarchyData(roomBounds, RoomType.Boss, true);
             var nodeId = new NodeId(12345, 2, 1000, new int2(5, 4));

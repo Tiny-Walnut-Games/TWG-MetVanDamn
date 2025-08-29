@@ -17,6 +17,74 @@ indent_size = 4
 [*.cs]
 indent_size = 4
 
+# ==================================================
+# 🧙‍♂️ TACTICAL SYMBOL ENFORCEMENT PROTOCOL
+# "Force AI assistants to see real problems, protect meaningful symbols"
+# "Perfect is the enemy of good - aim for >95% symbol preservation"
+# ==================================================
+
+# UNRESOLVED SYMBOLS - These are REAL ERRORS that AI must fix (your forcing function!)
+dotnet_diagnostic.CS0103.severity = error  # Name does not exist in current context - MUST FIX
+dotnet_diagnostic.CS0246.severity = error  # Type or namespace not found - MUST FIX  
+dotnet_diagnostic.CS0234.severity = error  # Type/namespace does not exist in namespace - MUST FIX
+dotnet_diagnostic.CS0117.severity = error  # Does not contain definition - MUST FIX
+dotnet_diagnostic.CS0104.severity = error  # Ambiguous reference - MUST FIX
+dotnet_diagnostic.CS0119.severity = error  # Expression denotes a type but is used as variable - MUST FIX
+
+# DECLARED BUT NEVER USED - These are REAL PROBLEMS that need purpose or fixing
+dotnet_diagnostic.CS0219.severity = error  # Variable assigned but never used - FIND PURPOSE OR FIX
+dotnet_diagnostic.CS0168.severity = error  # Variable declared but never used - FIND PURPOSE OR FIX  
+dotnet_diagnostic.CS0414.severity = error  # Field assigned but never used - FIND PURPOSE OR FIX
+dotnet_diagnostic.CS0169.severity = error  # Field never used - FIND PURPOSE OR FIX
+
+# SACRED SYMBOL PRESERVATION - These are ENHANCEMENT OPPORTUNITIES, not deletions
+dotnet_diagnostic.IDE0059.severity = suggestion # "Unnecessary" assignment - MAKE IT COORDINATE-AWARE
+dotnet_diagnostic.IDE0060.severity = suggestion # "Unused" parameter - ADD SPATIAL INTELLIGENCE  
+dotnet_diagnostic.IDE0051.severity = suggestion # "Private member never used" - FIND CREATIVE PURPOSE
+dotnet_diagnostic.IDE0052.severity = suggestion # "Private member can be removed" - TRANSFORM TO DEBUG AID
+
+# STYLE AND OPTIMIZATION - Suggestions for improvement, not deletion mandates  
+dotnet_diagnostic.CA1822.severity = suggestion  # Member can be static - BUT CONSIDER NODEIDS FIRST
+dotnet_diagnostic.CA1823.severity = suggestion  # Unused private fields - MAKE THEM COORDINATE-AWARE
+dotnet_diagnostic.CA1801.severity = suggestion  # Unused parameters - USE FOR DEBUGGING/LOGGING
+
+# ==================================================
+# 🎯 THE TACTICAL DIFFERENCE:
+# CS#### errors = "This code won't compile or has undefined references" → ERROR (forces AI attention)
+# IDE#### warnings = "This could be optimized or simplified" → SUGGESTION (preserve and enhance)
+# Like GPU mesh generation: >95% success rate across all systems is engineering excellence!
+# ==================================================
+
+# Performance guidelines (not deletion mandates)
+csharp_prefer_braces = true:suggestion
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+
+# Unity/ECS guidelines (enhance, don't delete)
+dotnet_diagnostic.UNT0001.severity = suggestion
+dotnet_diagnostic.UNT0002.severity = suggestion
+dotnet_diagnostic.UNT0014.severity = suggestion
+
+# DOTS/Burst enhancement opportunities
+dotnet_diagnostic.DOTS0001.severity = suggestion
+dotnet_diagnostic.DOTS0002.severity = suggestion
+
+# ==================================================
+# 🧮 SACRED ENHANCEMENT EXAMPLES
+# 
+# WHEN YOU SEE CS0103 (Name does not exist): This is a REAL ERROR - fix the reference!
+# WHEN YOU SEE IDE0059 (Unnecessary assignment): This is an ENHANCEMENT OPPORTUNITY - make it coordinate-aware!
+#
+# The difference: CS errors break compilation, IDE suggestions improve code quality
+# Just like GPU mesh data: we aim for >95% preservation success across all AI systems
+# ==================================================
+
 [*.{yml,yaml}]
 indent_size = 2
 

@@ -77,7 +77,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [MenuItem("Tools/MetVanDAMN/World Debugger/Sector Room Hierarchy")]
         public static void ShowWindow()
         {
-            var window = GetWindow<SectorRoomHierarchyWindow>("Sector Hierarchy");
+            SectorRoomHierarchyWindow window = GetWindow<SectorRoomHierarchyWindow>("Sector Hierarchy");
             window.minSize = new Vector2(400, 300);
             window.RefreshHierarchyData();
         }
@@ -150,8 +150,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             EditorGUILayout.LabelField("Biome:", GUILayout.Width(45));
             string[] biomeOptions = new[] { "All" }.Concat(availableBiomeTypes.OrderBy(t => t)).ToArray();
             int currentBiomeIndex = System.Array.IndexOf(biomeOptions, biomeFilter);
-            if (currentBiomeIndex < 0) currentBiomeIndex = 0;
-            
+            if (currentBiomeIndex < 0)
+            {
+                currentBiomeIndex = 0;
+            }
+
             int newBiomeIndex = EditorGUILayout.Popup(currentBiomeIndex, biomeOptions, GUILayout.Width(100));
             if (newBiomeIndex != currentBiomeIndex && newBiomeIndex >= 0 && newBiomeIndex < biomeOptions.Length)
             {
@@ -199,10 +202,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             if (GUILayout.Button("Expand All", GUILayout.Width(80)))
             {
-                foreach (var hierarchy in districtHierarchies)
+                foreach (DistrictHierarchy hierarchy in districtHierarchies)
                 {
                     hierarchy.isExpanded = true;
-                    foreach (var sector in hierarchy.sectors)
+                    foreach (SectorInfo sector in hierarchy.sectors)
                     {
                         sector.isExpanded = true;
                     }
@@ -211,10 +214,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             if (GUILayout.Button("Collapse All", GUILayout.Width(80)))
             {
-                foreach (var hierarchy in districtHierarchies)
+                foreach (DistrictHierarchy hierarchy in districtHierarchies)
                 {
                     hierarchy.isExpanded = false;
-                    foreach (var sector in hierarchy.sectors)
+                    foreach (SectorInfo sector in hierarchy.sectors)
                     {
                         sector.isExpanded = false;
                     }
@@ -260,9 +263,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void DrawHierarchy()
         {
-            var filteredHierarchies = GetFilteredHierarchies();
+            IEnumerable<DistrictHierarchy> filteredHierarchies = GetFilteredHierarchies();
             
-            foreach (var hierarchy in filteredHierarchies)
+            foreach (DistrictHierarchy hierarchy in filteredHierarchies)
             {
                 DrawDistrictHierarchy(hierarchy);
             }
@@ -309,7 +312,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 if (hierarchy.connections.Count > 0)
                 {
                     EditorGUILayout.LabelField("Connections:", EditorStyles.boldLabel);
-                    foreach (var connection in hierarchy.connections)
+                    foreach (ConnectionInfo connection in hierarchy.connections)
                     {
                         DrawConnectionInfo(connection);
                     }
@@ -318,7 +321,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 
                 // Draw sectors
                 EditorGUILayout.LabelField("Sectors:", EditorStyles.boldLabel);
-                foreach (var sector in hierarchy.sectors)
+                foreach (SectorInfo sector in hierarchy.sectors)
                 {
                     DrawSectorInfo(sector);
                 }
@@ -373,7 +376,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 EditorGUI.indentLevel++;
                 
-                foreach (var room in sector.rooms)
+                foreach (RoomInfo room in sector.rooms)
                 {
                     DrawRoomInfo(room);
                 }
@@ -426,39 +429,53 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             districtHierarchies.Clear();
             connectionMap.Clear();
             availableBiomeTypes.Clear();
-            
-            var districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
-            var connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
-            var gates = Object.FindObjectsByType<GateConditionAuthoring>(FindObjectsSortMode.None);
-            var biomes = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
+
+            DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            ConnectionAuthoring[] connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
+            GateConditionAuthoring[] gates = Object.FindObjectsByType<GateConditionAuthoring>(FindObjectsSortMode.None);
+            BiomeFieldAuthoring[] biomes = Object.FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
             
             // Build biome type collection
-            foreach (var biome in biomes)
+            foreach (BiomeFieldAuthoring biome in biomes)
             {
                 if (biome != null && biome.artProfile != null && !string.IsNullOrEmpty(biome.artProfile.biomeName))
+                {
                     availableBiomeTypes.Add(biome.artProfile.biomeName);
+                }
                 else
+                {
                     availableBiomeTypes.Add("Unknown");
+                }
             }
             
             // Build connection map
-            foreach (var connection in connections)
+            foreach (ConnectionAuthoring connection in connections)
             {
-                if (connection == null) continue;
+                if (connection == null)
+                {
+                    continue;
+                }
+
                 uint sourceId = connection.sourceNode; // assuming now uint
                 uint targetId = connection.targetNode;
                 
                 if (!connectionMap.ContainsKey(sourceId))
+                {
                     connectionMap[sourceId] = new List<uint>();
-                
+                }
+
                 connectionMap[sourceId].Add(targetId);
             }
             
             // Build district hierarchies with biome associations
-            foreach (var district in districts)
+            foreach (DistrictAuthoring district in districts)
             {
-                if (district == null) continue;
-                var hierarchy = BuildDistrictHierarchy(district, connections, gates, biomes);
+                if (district == null)
+                {
+                    continue;
+                }
+
+                DistrictHierarchy hierarchy = BuildDistrictHierarchy(district, connections, gates, biomes);
                 districtHierarchies.Add(hierarchy);
             }
             
@@ -471,9 +488,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var hierarchy = new DistrictHierarchy { district = district };
             
             uint nodeId = district.nodeId;
-            
+
             // Find associated biome
-            var associatedBiome = biomes.FirstOrDefault(b=> b!=null && b.nodeId == nodeId);
+            BiomeFieldAuthoring associatedBiome = biomes.FirstOrDefault(b=> b!=null && b.nodeId == nodeId);
             if (associatedBiome != null)
             {
                 hierarchy.associatedBiome = associatedBiome;
@@ -482,7 +499,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             else
             {
                 // Try to find by proximity if no exact match
-                var closestBiome = biomes
+                BiomeFieldAuthoring closestBiome = biomes
                     .Where(b => b != null)
                     .OrderBy(b => Vector3.Distance(district.transform.position, b.transform.position))
                     .FirstOrDefault();
@@ -492,12 +509,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     hierarchy.associatedBiome = closestBiome;
                     hierarchy.biomeType = $"{closestBiome.artProfile?.biomeName ?? "Unknown"} (nearby)";
                 }
-                else hierarchy.biomeType = "No Biome";
+                else
+                {
+                    hierarchy.biomeType = "No Biome";
+                }
             }
-            
+
             // Build connections
-            var districtConnections = connections.Where(c=> c!=null && c.sourceNode == nodeId);
-            foreach (var connection in districtConnections)
+            IEnumerable<ConnectionAuthoring> districtConnections = connections.Where(c=> c!=null && c.sourceNode == nodeId);
+            foreach (ConnectionAuthoring connection in districtConnections)
             {
                 var info = new ConnectionInfo
                 {
@@ -513,8 +533,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Build sectors (simulated based on target sector count)
             int targetSectorCount = district.targetSectorCount;
             for (int i=0;i<targetSectorCount;i++)
+            {
                 hierarchy.sectors.Add(GenerateSectorInfo(i, district.transform.position, targetSectorCount));
-            
+            }
+
             hierarchy.totalRoomCount = hierarchy.sectors.Sum(s=> s.roomCount);
             hierarchy.averageConnectivity = CalculateConnectivity(nodeId);
             
@@ -550,8 +572,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private Vector3 CalculateSectorPosition(Vector3 districtPosition, int sectorId, int totalSectors)
         {
             if (totalSectors == 1)
+            {
                 return districtPosition;
-            
+            }
+
             float angle = (float)sectorId / totalSectors * 2f * Mathf.PI;
             float radius = 8f; // Approximate sector spacing
             
@@ -590,7 +614,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private string DetermineConnectionType(ConnectionAuthoring connection)
         {
             // Analyze connection to determine type based on properties and polarity requirements
-            var baseType = connection.type switch
+            string baseType = connection.type switch
             {
                 ConnectionType.Bidirectional => "Bidirectional",
                 ConnectionType.OneWay => "One-Way", 
@@ -624,17 +648,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private float CalculateConnectivity(uint nodeId)
         {
             if (!connectionMap.ContainsKey(nodeId))
+            {
                 return 0f;
-            
+            }
+
             // Advanced connectivity analysis using graph theory metrics
-            var connections = connectionMap[nodeId];
+            List<uint> connections = connectionMap[nodeId];
             float baseConnectivity = connections.Count;
             
             // Calculate connectivity quality based on connection types and weights
             float qualityScore = 0f;
             float redundancyBonus = 0f;
             
-            foreach (var connection in connections)
+            foreach (uint connection in connections)
             {
                 // Weight connections based on target node importance
                 float targetConnectivity = connectionMap.ContainsKey(connection) ? 
@@ -665,7 +691,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             var objectsToSelect = new List<UnityEngine.Object>();
             
-            foreach (var hierarchy in GetFilteredHierarchies())
+            foreach (DistrictHierarchy hierarchy in GetFilteredHierarchies())
             {
                 if (hierarchy.district != null)
                 {
@@ -677,7 +703,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     objectsToSelect.Add(hierarchy.associatedBiome.gameObject);
                 }
                 
-                foreach (var connection in hierarchy.connections)
+                foreach (ConnectionInfo connection in hierarchy.connections)
                 {
                     if (connection.connection != null)
                     {
@@ -744,19 +770,31 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 uint nodeId = 0;
                 if (targetObject is Component comp)
                 {
-                    var districtAuth = comp.GetComponent<DistrictAuthoring>();
-                    if (districtAuth != null) nodeId = districtAuth.nodeId;
-                    
-                    var biomeAuth = comp.GetComponent<BiomeFieldAuthoring>();
-                    if (biomeAuth != null) nodeId = biomeAuth.nodeId;
+                    DistrictAuthoring districtAuth = comp.GetComponent<DistrictAuthoring>();
+                    if (districtAuth != null)
+                    {
+                        nodeId = districtAuth.nodeId;
+                    }
+
+                    BiomeFieldAuthoring biomeAuth = comp.GetComponent<BiomeFieldAuthoring>();
+                    if (biomeAuth != null)
+                    {
+                        nodeId = biomeAuth.nodeId;
+                    }
                 }
                 else if (targetObject is GameObject go)
                 {
-                    var districtAuth = go.GetComponent<DistrictAuthoring>();
-                    if (districtAuth != null) nodeId = districtAuth.nodeId;
-                    
-                    var biomeAuth = go.GetComponent<BiomeFieldAuthoring>();
-                    if (biomeAuth != null) nodeId = biomeAuth.nodeId;
+                    DistrictAuthoring districtAuth = go.GetComponent<DistrictAuthoring>();
+                    if (districtAuth != null)
+                    {
+                        nodeId = districtAuth.nodeId;
+                    }
+
+                    BiomeFieldAuthoring biomeAuth = go.GetComponent<BiomeFieldAuthoring>();
+                    if (biomeAuth != null)
+                    {
+                        nodeId = biomeAuth.nodeId;
+                    }
                 }
                 
                 if (enableMultiSelect && (currentEvent.control || currentEvent.command))
@@ -773,12 +811,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                         {
                             selectedNodeIds.Add(nodeId);
                             if (targetObject is GameObject gameObj)
+                            {
                                 highlightedObjects.Add(gameObj);
+                            }
                         }
                     }
-                    
+
                     // Add to Unity selection
-                    var currentSelection = Selection.objects.ToList();
+                    List<Object> currentSelection = Selection.objects.ToList();
                     if (!currentSelection.Contains(targetObject))
                     {
                         currentSelection.Add(targetObject);
@@ -795,7 +835,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     {
                         selectedNodeIds.Add(nodeId);
                         if (targetObject is GameObject gameObj)
+                        {
                             highlightedObjects.Add(gameObj);
+                        }
                     }
                     
                     // Replace Unity selection

@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [MenuItem("Tools/MetVanDAMN/World Debugger/Biome Color Legend")]
         public static void ShowWindow()
         {
-            var window = GetWindow<BiomeColorLegendWindow>("Biome Legend");
+            BiomeColorLegendWindow window = GetWindow<BiomeColorLegendWindow>("Biome Legend");
             window.minSize = new Vector2(300, 200);
             window.RefreshBiomeData();
         }
@@ -87,26 +87,29 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void SynchronizeWithECSBiomeSystems()
         {
             // Runtime ECS biome system synchronization for play mode
-            var world = World.DefaultGameObjectInjectionWorld;
-            if (world == null) return;
+            World world = World.DefaultGameObjectInjectionWorld;
+            if (world == null)
+            {
+                return;
+            }
 
             // Query ECS entities with biome components for runtime color data
-            var entityManager = world.EntityManager;
-            var biomeQuery = entityManager.CreateEntityQuery(typeof(TinyWalnutGames.MetVD.Core.Biome), typeof(NodeId));
+            EntityManager entityManager = world.EntityManager;
+            EntityQuery biomeQuery = entityManager.CreateEntityQuery(typeof(TinyWalnutGames.MetVD.Core.Biome), typeof(NodeId));
             
             if (biomeQuery.CalculateEntityCount() > 0)
             {
-                var entities = biomeQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
-                var biomes = biomeQuery.ToComponentDataArray<TinyWalnutGames.MetVD.Core.Biome>(Unity.Collections.Allocator.Temp);
-                var nodeIds = biomeQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+                NativeArray<Entity> entities = biomeQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+                NativeArray<Core.Biome> biomes = biomeQuery.ToComponentDataArray<TinyWalnutGames.MetVD.Core.Biome>(Unity.Collections.Allocator.Temp);
+                NativeArray<NodeId> nodeIds = biomeQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
                 
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    var nodeId = nodeIds[i];
-                    var biomeType = biomes[i].Type.ToString();
-                    
+                    NodeId nodeId = nodeIds[i];
+                    string biomeType = biomes[i].Type.ToString();
+
                     // Update biome data if runtime color information is available
-                    var existingEntry = biomeInfos.Find(entry => 
+                    BiomeInfo existingEntry = biomeInfos.Find(entry => 
                         entry.nodeId == nodeId || entry.type.ToString() == biomeType);
                     
                     if (existingEntry != null)
@@ -127,19 +130,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void SynchronizeWithTilemapRenderers()
         {
             // TilemapRenderer color detection and updates
-            var tilemapRenderers = Object.FindObjectsByType<TilemapRenderer>(FindObjectsSortMode.None);
+            TilemapRenderer[] tilemapRenderers = Object.FindObjectsByType<TilemapRenderer>(FindObjectsSortMode.None);
             
-            foreach (var renderer in tilemapRenderers)
+            foreach (TilemapRenderer renderer in tilemapRenderers)
             {
                 if (renderer.material != null && renderer.material.HasProperty("_Color"))
                 {
                     Color rendererColor = renderer.material.color;
-                    
+
                     // Try to match tilemap renderer to biome by checking parent hierarchy
-                    var biomeAuthoring = renderer.GetComponentInParent<BiomeFieldAuthoring>();
+                    BiomeFieldAuthoring biomeAuthoring = renderer.GetComponentInParent<BiomeFieldAuthoring>();
                     if (biomeAuthoring != null)
                     {
-                        var existingEntry = biomeInfos.Find(entry => entry.nodeId == biomeAuthoring.nodeId);
+                        BiomeInfo existingEntry = biomeInfos.Find(entry => entry.nodeId == biomeAuthoring.nodeId);
                         if (existingEntry != null && existingEntry.currentColor != rendererColor)
                         {
                             existingEntry.currentColor = rendererColor;
@@ -151,7 +154,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     {
                         // Try to match by name patterns
                         string rendererName = renderer.gameObject.name.ToLowerInvariant();
-                        var matchingEntry = biomeInfos.Find(entry => 
+                        BiomeInfo matchingEntry = biomeInfos.Find(entry => 
                             rendererName.Contains(entry.type.ToString().ToLowerInvariant()) ||
                             rendererName.Contains(entry.nodeId.ToString()));
                             
@@ -259,7 +262,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             EditorGUILayout.LabelField("Biome Color Legend", EditorStyles.boldLabel);
             EditorGUILayout.Space(5);
             
-            foreach (var biomeInfo in biomeInfos.OrderBy(b => b.type.ToString()))
+            foreach (BiomeInfo biomeInfo in biomeInfos.OrderBy(b => b.type.ToString()))
             {
                 DrawBiomeEntry(biomeInfo);
             }
@@ -342,15 +345,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             biomeInfos.Clear();
             biomeColors.Clear();
-            
-            var biomeAuthorings = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
+
+            BiomeFieldAuthoring[] biomeAuthorings = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
             var biomesByType = new Dictionary<BiomeType, List<BiomeFieldAuthoring>>();
             
             // Group biomes by type
-            foreach (var biomeAuthoring in biomeAuthorings)
+            foreach (BiomeFieldAuthoring biomeAuthoring in biomeAuthorings)
             {
-                if (biomeAuthoring == null) continue;
-                
+                if (biomeAuthoring == null)
+                {
+                    continue;
+                }
+
                 BiomeType biomeType = biomeAuthoring.biomeType;
                 
                 if (!biomesByType.ContainsKey(biomeType))
@@ -365,7 +371,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             SyncWithRuntimeBiomeData(biomesByType);
             
             // Create biome info entries
-            foreach (var kvp in biomesByType)
+            foreach (KeyValuePair<BiomeType, List<BiomeFieldAuthoring>> kvp in biomesByType)
             {
                 BiomeType type = kvp.Key;
                 List<BiomeFieldAuthoring> instances = kvp.Value;
@@ -398,15 +404,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Sync with runtime biome field system if available during play mode
             if (Application.isPlaying && World.DefaultGameObjectInjectionWorld != null)
             {
-                var world = World.DefaultGameObjectInjectionWorld;
-                var biomeSystem = world.GetExistingSystem<BiomeFieldSystem>();
+                World world = World.DefaultGameObjectInjectionWorld;
+                SystemHandle biomeSystem = world.GetExistingSystem<BiomeFieldSystem>();
 
-                if (biomeSystem == null) return;
-                foreach ( var biome in biomesByType.
+                if (biomeSystem == null)
+                {
+                    return;
+                }
+
+                foreach (BiomeFieldAuthoring biome in biomesByType.
                     SelectMany(kvp => kvp.Value) )
                 {
-                    if (biome == null) continue;
-                    var biomeType = biome.biomeType;
+                    if (biome == null)
+                    {
+                        continue;
+                    }
+
+                    BiomeType biomeType = biome.biomeType;
                     if (!biomeColors.ContainsKey(biomeType))
                     {
                         biomeColors[biomeType] = GetBiomeColor(biomeType, biomesByType[biomeType]);
@@ -425,31 +439,31 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             try
             {
-                var entityManager = world.EntityManager;
+                EntityManager entityManager = world.EntityManager;
                 var biomesByTypeList = biomesByType.Keys.ToList();
 
                 // Query all biome entities with art profile references
-                using var query = entityManager.CreateEntityQuery(
+                using EntityQuery query = entityManager.CreateEntityQuery(
                     ComponentType.ReadOnly<Core.Biome>(),
                     ComponentType.ReadOnly<BiomeArtProfileReference>()
                 );
                 
-                using var entities = query.ToEntityArray(Allocator.Temp);
-                using var biomeComponents = query.ToComponentDataArray<Core.Biome>(Allocator.Temp);
-                using var artProfileRefs = query.ToComponentDataArray<BiomeArtProfileReference>(Allocator.Temp);
+                using NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+                using NativeArray<Core.Biome> biomeComponents = query.ToComponentDataArray<Core.Biome>(Allocator.Temp);
+                using NativeArray<BiomeArtProfileReference> artProfileRefs = query.ToComponentDataArray<BiomeArtProfileReference>(Allocator.Temp);
 
                 // for each biome type in biomesByTypeList, find matching ECS entities
                 for (int j = 0; j < biomesByTypeList.Count; j++)
                 {
                     for (int i = 0; i < entities.Length; i++)
                     {
-                        var biomeComponent = biomeComponents[i];
+                        Core.Biome biomeComponent = biomeComponents[i];
                         if (biomeComponent.Type == biomeComponents[i].Type)
                         {
-                            var artProfileRef = artProfileRefs[i];
+                            BiomeArtProfileReference artProfileRef = artProfileRefs[i];
                             if (artProfileRef.ProfileRef.IsValid())
                             {
-                                var profile = artProfileRef.ProfileRef.Value;
+                                BiomeArtProfile profile = artProfileRef.ProfileRef.Value;
                                 if (profile.debugColor.a > 0f)
                                 {
                                     // Runtime debug color takes precedence
@@ -458,21 +472,21 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                             }
                         }
                     }
-                    var biomeType = biomesByTypeList[j];
+                    BiomeType biomeType = biomesByTypeList[j];
                 }
 
                 // Additionally, update biome info entries with art profile data
                 for (int i = 0; i < entities.Length; i++)
                 {
-                    var biomeComponent = biomeComponents[i];
-                    var artProfileRef = artProfileRefs[i];
+                    Core.Biome biomeComponent = biomeComponents[i];
+                    BiomeArtProfileReference artProfileRef = artProfileRefs[i];
 
                     if (artProfileRef.ProfileRef.Value != null)
                         {
-                        var profile = artProfileRef.ProfileRef.Value;
-                        
+                        BiomeArtProfile profile = artProfileRef.ProfileRef.Value;
+
                         // Update biome info entry if it exists
-                        var existingEntry = biomeInfos.Find(entry => entry.type == biomeComponent.Type);
+                        BiomeInfo existingEntry = biomeInfos.Find(entry => entry.type == biomeComponent.Type);
                         if (existingEntry != null)
                         {
                             existingEntry.isRuntimeActive = true;
@@ -499,14 +513,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void SyncWithTileMapRenderers(Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
         {
-            var tilemapRenderers = FindObjectsByType<TilemapRenderer>(FindObjectsSortMode.None);
+            TilemapRenderer[] tilemapRenderers = FindObjectsByType<TilemapRenderer>(FindObjectsSortMode.None);
 
-            foreach (var renderer in tilemapRenderers)
+            foreach (TilemapRenderer renderer in tilemapRenderers)
             {
                 if (renderer.material != null && renderer.material.HasProperty("_Color"))
                 {
                     // Check if this tilemap is associated with any biome
-                    var associatedBiome = FindBiomeForTilemap(renderer, biomesByType);
+                    BiomeFieldAuthoring associatedBiome = FindBiomeForTilemap(renderer, biomesByType);
                     if (associatedBiome != null)
                     {
                         // Update color from runtime material
@@ -523,12 +537,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private BiomeFieldAuthoring FindBiomeForTilemap(TilemapRenderer renderer, Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
         {
             // Find biome by proximity to tilemap or by name matching
-            foreach (var kvp in biomesByType)
+            foreach (KeyValuePair<BiomeType, List<BiomeFieldAuthoring>> kvp in biomesByType)
             {
-                foreach (var biome in kvp.Value)
+                foreach (BiomeFieldAuthoring biome in kvp.Value)
                 {
-                    if (biome == null) continue;
-                    if (renderer == null) continue;
+                    if (biome == null)
+                    {
+                        continue;
+                    }
+
+                    if (renderer == null)
+                    {
+                        continue;
+                    }
+
                     renderer.name.ToLowerInvariant();
                     // Try to match by name patterns first
                     if (renderer.name.ToLowerInvariant().Contains(biome.biomeType.ToString().ToLowerInvariant()) ||
@@ -557,7 +579,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private Color GetBiomeColor(BiomeType type, List<BiomeFieldAuthoring> instances)
         {
             // Try to get color from art profile first
-            var profileWithColor = instances.FirstOrDefault(i => i.artProfile != null);
+            BiomeFieldAuthoring profileWithColor = instances.FirstOrDefault(i => i.artProfile != null);
             if (profileWithColor != null ? profileWithColor.artProfile : null != null)
             {
                 return profileWithColor.artProfile.debugColor;
@@ -640,10 +662,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private Vector3 CalculateAveragePosition(List<BiomeFieldAuthoring> instances)
         {
-            if (instances.Count == 0) return Vector3.zero;
-            
+            if (instances.Count == 0)
+            {
+                return Vector3.zero;
+            }
+
             Vector3 sum = Vector3.zero;
-            foreach (var instance in instances)
+            foreach (BiomeFieldAuthoring instance in instances)
             {
                 sum += instance.transform.position;
             }
@@ -672,7 +697,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void FocusBiome(BiomeInfo biomeInfo)
         {
-            var instances = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None)
+            BiomeFieldAuthoring[] instances = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None)
                 .Where(b => b.biomeType.Equals(biomeInfo.type))
                 .ToArray();
             
@@ -688,7 +713,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 {
                     // Frame all instances
                     var bounds = new Bounds(instances[0].transform.position, Vector3.zero);
-                    foreach (var instance in instances)
+                    foreach (BiomeFieldAuthoring instance in instances)
                     {
                         bounds.Encapsulate(instance.transform.position);
                     }
@@ -700,14 +725,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void FocusAllBiomes()
         {
-            var allBiomes = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
+            BiomeFieldAuthoring[] allBiomes = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None);
             
             if (allBiomes.Length > 0)
             {
                 Selection.objects = allBiomes.Cast<Object>().ToArray();
                 
                 var bounds = new Bounds(allBiomes[0].transform.position, Vector3.zero);
-                foreach (var biome in allBiomes)
+                foreach (BiomeFieldAuthoring biome in allBiomes)
                 {
                     bounds.Encapsulate(biome.transform.position);
                 }
@@ -718,11 +743,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private void UpdateBiomeVisibility(BiomeInfo biomeInfo)
         {
-            var instances = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None)
+            BiomeFieldAuthoring[] instances = FindObjectsByType<BiomeFieldAuthoring>(FindObjectsSortMode.None)
                 .Where(b => b.biomeType.Equals(biomeInfo.type))
                 .ToArray();
             
-            foreach (var instance in instances)
+            foreach (BiomeFieldAuthoring instance in instances)
             {
                 instance.gameObject.SetActive(biomeInfo.isVisible);
             }
@@ -736,7 +761,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         public static Dictionary<BiomeType, Color> GetBiomeColorMapping()
         {
             // Use modern EditorWindow finding approach for Unity 6000.2.2f1
-            var window = HasOpenInstances<BiomeColorLegendWindow>() ? GetWindow<BiomeColorLegendWindow>() : null;
+            BiomeColorLegendWindow window = HasOpenInstances<BiomeColorLegendWindow>() ? GetWindow<BiomeColorLegendWindow>() : null;
             return window != null ? window.biomeColors : new Dictionary<BiomeType, Color>();
         }
     }

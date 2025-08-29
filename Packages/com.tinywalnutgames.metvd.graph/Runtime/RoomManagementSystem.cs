@@ -213,19 +213,21 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
         {
             // Get all rooms that need management data
-            using var roomEntities = _roomsQuery.ToEntityArray(Allocator.Temp);
-            using var roomHierarchyData = _roomsQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
-            using var roomNodeIds = _roomsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            using NativeArray<Entity> roomEntities = _roomsQuery.ToEntityArray(Allocator.Temp);
+            using NativeArray<RoomHierarchyData> roomHierarchyData = _roomsQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+            using NativeArray<NodeId> roomNodeIds = _roomsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
 
             for (int i = 0; i < roomEntities.Length; i++)
             {
-                var entity = roomEntities[i];
-                var roomData = roomHierarchyData[i];
-                var nodeId = roomNodeIds[i];
+                Entity entity = roomEntities[i];
+                RoomHierarchyData roomData = roomHierarchyData[i];
+                NodeId nodeId = roomNodeIds[i];
 
                 // Skip rooms that already have management data
                 if (state.EntityManager.HasComponent<RoomStateData>(entity))
+                {
                     continue;
+                }
 
                 // Analyze progression using actual nodeId data
                 var progression = new ProgressionAnalysis(nodeId);
@@ -234,17 +236,17 @@ namespace TinyWalnutGames.MetVD.Graph
                 var random = new Unity.Mathematics.Random((uint)(nodeId._value + 12345));
 
                 // Add room state data with progression-based secret count
-                var totalSecrets = DetermineSecretCount(roomData.Type, progression, ref random);
+                int totalSecrets = DetermineSecretCount(roomData.Type, progression, ref random);
                 state.EntityManager.AddComponentData(entity, new RoomStateData(totalSecrets));
 
                 // Add navigation data
-                var isCriticalPath = roomData.Type == RoomType.Entrance || roomData.Type == RoomType.Exit || roomData.Type == RoomType.Boss;
-                var traversalTime = CalculateTraversalTime(in roomData.Bounds, roomData.Type);
+                bool isCriticalPath = roomData.Type == RoomType.Entrance || roomData.Type == RoomType.Exit || roomData.Type == RoomType.Boss;
+                float traversalTime = CalculateTraversalTime(in roomData.Bounds, roomData.Type);
                 CalculatePrimaryEntrance(in roomData.Bounds, out int2 primaryEntrance);
                 state.EntityManager.AddComponentData(entity, new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime));
 
                 // Add room features buffer
-                var featuresBuffer = state.EntityManager.AddBuffer<RoomFeatureElement>(entity);
+                DynamicBuffer<RoomFeatureElement> featuresBuffer = state.EntityManager.AddBuffer<RoomFeatureElement>(entity);
                 PopulateRoomFeatures(featuresBuffer, in roomData, progression, ref random);
 
                 // Initialize room generation request for new procedural pipeline
@@ -262,16 +264,16 @@ namespace TinyWalnutGames.MetVD.Graph
                                                            ref Unity.Mathematics.Random random)
         {
             // Determine generator type based on room type and characteristics
-            var generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
+            RoomGeneratorType generatorType = DetermineGeneratorType(roomData.Type, roomData.Bounds);
 
             // Use nodeId to determine biome based on spatial location and hierarchy
-            var targetBiome = DetermineBiomeFromNodeId(nodeId);
+            BiomeType targetBiome = DetermineBiomeFromNodeId(nodeId);
 
             // Use nodeId to determine polarity based on coordinates and parent relationships
-            var targetPolarity = DeterminePolarityFromNodeId(nodeId);
+            Polarity targetPolarity = DeterminePolarityFromNodeId(nodeId);
 
             // Use nodeId coordinates and hierarchy to simulate progression-based skills
-            var availableSkills = DetermineAvailableSkillsFromNodeId(nodeId);
+            Ability availableSkills = DetermineAvailableSkillsFromNodeId(nodeId);
 
             // Create generation request with nodeId-enhanced seed
             var generationRequest = new RoomGenerationRequest(
@@ -299,15 +301,15 @@ namespace TinyWalnutGames.MetVD.Graph
         private static BiomeType DetermineBiomeFromNodeId(NodeId nodeId)
         {
             // Use nodeId coordinates to create deterministic but varied biome regions
-            var coords = nodeId.Coordinates;
-            var distanceFromOrigin = math.sqrt(coords.x * coords.x + coords.y * coords.y);
-            
+            int2 coords = nodeId.Coordinates;
+            float distanceFromOrigin = math.sqrt(coords.x * coords.x + coords.y * coords.y);
+
             // Create a hash from nodeId properties for deterministic selection
-            var biomeHash = (uint)(nodeId._value ^ (coords.x << 16) ^ (coords.y << 8) ^ nodeId.ParentId);
-            
+            uint biomeHash = (uint)(nodeId._value ^ (coords.x << 16) ^ (coords.y << 8) ^ nodeId.ParentId);
+
             // Apply spatial influence to create biome regions
             // Closer to origin = more hub-like biomes, further = more exotic/dangerous
-            var distanceInfluence = math.clamp(distanceFromOrigin / 20.0f, 0.0f, 1.0f);
+            float distanceInfluence = math.clamp(distanceFromOrigin / 20.0f, 0.0f, 1.0f);
             
             // Use quadrant-based regional bias for spatial coherence
             int quadrantBias = (coords.x >= 0, coords.y >= 0) switch
@@ -319,17 +321,17 @@ namespace TinyWalnutGames.MetVD.Graph
             };
 
             // Combine hash with spatial bias for regional coherence
-            var finalHash = biomeHash + (quadrantBias << 24) + (uint)(distanceInfluence * 1000);
+            long finalHash = biomeHash + (quadrantBias << 24) + (uint)(distanceInfluence * 1000);
             
             // Filter out dangerous biomes for close distances
             if (distanceFromOrigin < 5.0f)
             {
-                var safeIndex = (int)(finalHash % (uint)SafeBiomes.Length);
+                int safeIndex = (int)(finalHash % (uint)SafeBiomes.Length);
                 return SafeBiomes[safeIndex];
             }
 
             // Select biome index from all valid biomes
-            var biomeIndex = (int)(finalHash % (uint)ValidBiomes.Length);
+            int biomeIndex = (int)(finalHash % (uint)ValidBiomes.Length);
             return ValidBiomes[biomeIndex];
         }
 
@@ -340,17 +342,17 @@ namespace TinyWalnutGames.MetVD.Graph
         private static Polarity DeterminePolarityFromNodeId(NodeId nodeId)
         {
             // Use nodeId hash to determine polarity in a deterministic way
-            var hash = (uint)(nodeId._value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8));
+            uint hash = (uint)(nodeId._value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8));
 
             // Select base polarity using spatial hash
-            var polarityIndex = (int)(hash % (uint)ValidPolarities.Length);
-            var selectedPolarity = ValidPolarities[polarityIndex];
+            int polarityIndex = (int)(hash % (uint)ValidPolarities.Length);
+            Polarity selectedPolarity = ValidPolarities[polarityIndex];
 
             // For areas far from origin, add dual polarity combinations
-            var distanceFromOrigin = math.length((float2)nodeId.Coordinates);
+            float distanceFromOrigin = math.length((float2)nodeId.Coordinates);
             if (distanceFromOrigin > 10.0f)
             {
-                var secondaryIndex = (int)((nodeId.ParentId >> 8) % (uint)ValidPolarities.Length);
+                int secondaryIndex = (int)((nodeId.ParentId >> 8) % (uint)ValidPolarities.Length);
                 if (secondaryIndex != polarityIndex)
                 {
                     selectedPolarity |= ValidPolarities[secondaryIndex];
@@ -366,39 +368,99 @@ namespace TinyWalnutGames.MetVD.Graph
         /// </summary>
         private static Ability DetermineAvailableSkillsFromNodeId(NodeId nodeId)
         {
-            var distanceFromOrigin = math.sqrt(nodeId.Coordinates.x * nodeId.Coordinates.x + nodeId.Coordinates.y * nodeId.Coordinates.y);
-            
+            float distanceFromOrigin = math.sqrt(nodeId.Coordinates.x * nodeId.Coordinates.x + nodeId.Coordinates.y * nodeId.Coordinates.y);
+
             // Basic abilities always available
-            var skills = Ability.Jump;
+            Ability skills = Ability.Jump;
             
             // Progressive ability unlocking based on distance and nodeId hierarchy
-            if (distanceFromOrigin > 2) skills |= Ability.DoubleJump;
-            if (distanceFromOrigin > 5) skills |= Ability.WallJump;
-            if (distanceFromOrigin > 8) skills |= Ability.Dash;
-            if (distanceFromOrigin > 12) skills |= Ability.Grapple;
-            
+            if (distanceFromOrigin > 2)
+            {
+                skills |= Ability.DoubleJump;
+            }
+
+            if (distanceFromOrigin > 5)
+            {
+                skills |= Ability.WallJump;
+            }
+
+            if (distanceFromOrigin > 8)
+            {
+                skills |= Ability.Dash;
+            }
+
+            if (distanceFromOrigin > 12)
+            {
+                skills |= Ability.Grapple;
+            }
+
             // Add environmental abilities based on nodeId coordinates
-            var coords = nodeId.Coordinates;
-            if (coords.y < -5) skills |= Ability.Swim; // Deep areas need swimming
-            if (math.abs(coords.x) > 10) skills |= Ability.Climb; // Far areas need climbing
-            if (coords.x > 15) skills |= Ability.HeatResistance; // Eastern areas are hot
-            if (coords.x < -15) skills |= Ability.ColdResistance; // Western areas are cold
-            
+            int2 coords = nodeId.Coordinates;
+            if (coords.y < -5)
+            {
+                skills |= Ability.Swim; // Deep areas need swimming
+            }
+
+            if (math.abs(coords.x) > 10)
+            {
+                skills |= Ability.Climb; // Far areas need climbing
+            }
+
+            if (coords.x > 15)
+            {
+                skills |= Ability.HeatResistance; // Eastern areas are hot
+            }
+
+            if (coords.x < -15)
+            {
+                skills |= Ability.ColdResistance; // Western areas are cold
+            }
+
             // Add tool abilities based on parent ID patterns
-            var parentPattern = nodeId.ParentId % 8;
-            if (parentPattern == 0 && distanceFromOrigin > 5) skills |= Ability.Scan;
-            if (parentPattern == 1 && distanceFromOrigin > 8) skills |= Ability.Bomb;
-            if (parentPattern == 2 && distanceFromOrigin > 10) skills |= Ability.Drill;
-            if (parentPattern == 3 && distanceFromOrigin > 12) skills |= Ability.Hack;
-            
+            uint parentPattern = nodeId.ParentId % 8;
+            if (parentPattern == 0 && distanceFromOrigin > 5)
+            {
+                skills |= Ability.Scan;
+            }
+
+            if (parentPattern == 1 && distanceFromOrigin > 8)
+            {
+                skills |= Ability.Bomb;
+            }
+
+            if (parentPattern == 2 && distanceFromOrigin > 10)
+            {
+                skills |= Ability.Drill;
+            }
+
+            if (parentPattern == 3 && distanceFromOrigin > 12)
+            {
+                skills |= Ability.Hack;
+            }
+
             // Add polarity access based on distance and nodeId hash
             if (distanceFromOrigin > 15)
             {
-                var polarityHash = nodeId._value & 0xFF;
-                if ((polarityHash & 0x01) != 0) skills |= Ability.SunAccess;
-                if ((polarityHash & 0x02) != 0) skills |= Ability.MoonAccess;
-                if ((polarityHash & 0x04) != 0) skills |= Ability.HeatAccess;
-                if ((polarityHash & 0x08) != 0) skills |= Ability.ColdAccess;
+                uint polarityHash = nodeId._value & 0xFF;
+                if ((polarityHash & 0x01) != 0)
+                {
+                    skills |= Ability.SunAccess;
+                }
+
+                if ((polarityHash & 0x02) != 0)
+                {
+                    skills |= Ability.MoonAccess;
+                }
+
+                if ((polarityHash & 0x04) != 0)
+                {
+                    skills |= Ability.HeatAccess;
+                }
+
+                if ((polarityHash & 0x08) != 0)
+                {
+                    skills |= Ability.ColdAccess;
+                }
             }
             
             return skills;
@@ -419,7 +481,7 @@ namespace TinyWalnutGames.MetVD.Graph
         /// </summary>
         private static int DetermineSecretCount(RoomType roomType, ProgressionAnalysis progression, ref Unity.Mathematics.Random random)
         {
-            var baseCount = roomType switch
+            int baseCount = roomType switch
             {
                 RoomType.Treasure => random.NextInt(2, 5),
                 RoomType.Boss => random.NextInt(1, 3),
@@ -429,7 +491,7 @@ namespace TinyWalnutGames.MetVD.Graph
             };
 
             // Add progression-based bonus secrets (more secrets in advanced areas)
-            var progressionBonus = progression.ProgressionTier / 3;
+            int progressionBonus = progression.ProgressionTier / 3;
             return baseCount + progressionBonus;
         }
 
@@ -441,8 +503,8 @@ namespace TinyWalnutGames.MetVD.Graph
                                                 ProgressionAnalysis progression,
                                                 ref Unity.Mathematics.Random random)
         {
-            var bounds = roomData.Bounds;
-            var area = bounds.width * bounds.height;
+            RectInt bounds = roomData.Bounds;
+            int area = bounds.width * bounds.height;
 
             switch (roomData.Type)
             {
@@ -489,7 +551,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 roomData.Type == RoomType.Treasure || roomData.Type == RoomType.Normal)
             {
                 // Dynamic secret intensity based on progression
-                var secretIntensity = math.clamp(0.1f + (progression.ProgressionTier * 0.05f), 0.05f, 0.5f);
+                float secretIntensity = math.clamp(0.1f + (progression.ProgressionTier * 0.05f), 0.05f, 0.5f);
                 var secretConfig = new SecretAreaConfig(secretIntensity, new int2(2, 2), new int2(4, 4),
                                                       Ability.None, true, true);
                 entityManager.AddComponentData(roomEntity, secretConfig);
@@ -509,7 +571,7 @@ namespace TinyWalnutGames.MetVD.Graph
             features.Add(new RoomFeatureElement(RoomFeatureType.Enemy, bossPos, random.NextUInt()));
 
             // Progressive platform complexity
-            var platformCount = 2 + progression.ProgressionTier;
+            int platformCount = 2 + progression.ProgressionTier;
             for (int i = 0; i < platformCount; i++)
             {
                 var platformPos = new int2(
@@ -525,14 +587,14 @@ namespace TinyWalnutGames.MetVD.Graph
                                                              ref Unity.Mathematics.Random random)
         {
             // More treasures in advanced areas
-            var treasureCount = 1 + (progression.ProgressionTier / 2);
+            int treasureCount = 1 + (progression.ProgressionTier / 2);
             for (int i = 0; i < treasureCount; i++)
             {
                 var treasurePos = new int2(
                     random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
                     random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
-                var featureType = random.NextFloat() > 0.5f ? RoomFeatureType.PowerUp : RoomFeatureType.Collectible;
+                RoomFeatureType featureType = random.NextFloat() > 0.5f ? RoomFeatureType.PowerUp : RoomFeatureType.Collectible;
                 features.Add(new RoomFeatureElement(featureType, treasurePos, random.NextUInt()));
             }
         }
@@ -543,9 +605,9 @@ namespace TinyWalnutGames.MetVD.Graph
                                                            ref Unity.Mathematics.Random random)
         {
             // Progressive enemy and feature scaling
-            var baseEnemyCount = area / 8;
-            var progressiveEnemyCount = baseEnemyCount + (progression.ProgressionTier / 3);
-            var enemyCount = math.min(progressiveEnemyCount, random.NextInt(0, 5));
+            int baseEnemyCount = area / 8;
+            int progressiveEnemyCount = baseEnemyCount + (progression.ProgressionTier / 3);
+            int enemyCount = math.min(progressiveEnemyCount, random.NextInt(0, 5));
 
             for (int i = 0; i < enemyCount; i++)
             {
@@ -557,19 +619,19 @@ namespace TinyWalnutGames.MetVD.Graph
             }
 
             // Progressive feature complexity
-            var featureCount = (area / 12) + progression.ProgressionTier;
+            int featureCount = (area / 12) + progression.ProgressionTier;
             for (int i = 0; i < featureCount; i++)
             {
                 var featurePos = new int2(
                     random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1),
                     random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
                 );
-                var featureType = random.NextFloat() > 0.6f ? RoomFeatureType.Platform : RoomFeatureType.Obstacle;
+                RoomFeatureType featureType = random.NextFloat() > 0.6f ? RoomFeatureType.Platform : RoomFeatureType.Obstacle;
                 features.Add(new RoomFeatureElement(featureType, featurePos, random.NextUInt()));
             }
 
             // Progressive health pickup scaling (harder areas = less health)
-            var healthChance = 0.8f - (progression.ProgressionTier * 0.05f);
+            float healthChance = 0.8f - (progression.ProgressionTier * 0.05f);
             if (random.NextFloat() > healthChance)
             {
                 var healthPos = new int2(
@@ -586,7 +648,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static RoomGeneratorType DetermineGeneratorType(RoomType roomType, RectInt bounds)
         {
-            var aspectRatio = (float)bounds.width / bounds.height;
+            float aspectRatio = (float)bounds.width / bounds.height;
 
             return roomType switch
             {
@@ -601,8 +663,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static float CalculateTraversalTime(in RectInt bounds, RoomType roomType)
         {
-            var area = bounds.width * bounds.height;
-            var baseTime = math.sqrt(area) * 0.5f;
+            int area = bounds.width * bounds.height;
+            float baseTime = math.sqrt(area) * 0.5f;
 
             return roomType switch
             {
@@ -626,7 +688,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static void AddShopRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
         {
-            var itemCount = random.NextInt(2, 5);
+            int itemCount = random.NextInt(2, 5);
             for (int i = 0; i < itemCount; i++)
             {
                 var itemPos = new int2(

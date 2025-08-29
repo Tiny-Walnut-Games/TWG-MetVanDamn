@@ -8,13 +8,16 @@ namespace TinyWalnutGames.MetVD.Tests
         [Test]
         public void Polarity_AllSinglePairs_FormExpectedDualMask()
         {
-            var singles = new[] { Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold, Polarity.Earth, Polarity.Wind, Polarity.Life, Polarity.Tech };
+            Polarity[] singles = new[] { Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold, Polarity.Earth, Polarity.Wind, Polarity.Life, Polarity.Tech };
             for (int i = 0; i < singles.Length; i++)
+            {
                 for (int j = i + 1; j < singles.Length; j++)
                 {
-                    var combo = singles[i] | singles[j];
+                    Polarity combo = singles[i] | singles[j];
                     Assert.IsTrue((combo & singles[i]) != 0 && (combo & singles[j]) != 0);
                 }
+            }
+
             Assert.AreEqual(Polarity.SunMoon, Polarity.Sun | Polarity.Moon);
             Assert.AreEqual(Polarity.HeatCold, Polarity.Heat | Polarity.Cold);
             Assert.AreEqual(Polarity.EarthWind, Polarity.Earth | Polarity.Wind);
@@ -64,7 +67,7 @@ namespace TinyWalnutGames.MetVD.Tests
         public void GetMissingRequirements_ReturnsExpectedMasks()
         {
             var gate = new GateCondition(Polarity.HeatCold, Ability.Jump | Ability.Dash, GateSoftness.Hard, 0f, "Req Mask");
-            var (missPol, missAb) = gate.GetMissingRequirements(Polarity.Heat, Ability.Jump);
+            (Polarity missPol, Ability missAb) = gate.GetMissingRequirements(Polarity.Heat, Ability.Jump);
             Assert.AreEqual(Polarity.Cold, missPol);
             Assert.AreEqual(Ability.Dash, missAb);
             (missPol, missAb) = gate.GetMissingRequirements(Polarity.HeatCold, Ability.Jump | Ability.Dash);

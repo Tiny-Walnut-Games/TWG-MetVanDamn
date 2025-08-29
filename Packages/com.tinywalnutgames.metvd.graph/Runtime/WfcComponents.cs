@@ -45,8 +45,11 @@ namespace TinyWalnutGames.MetVD.Graph
         /// </summary>
         public readonly bool IsCompatibleWith(WfcSocket other)
         {
-            if (!IsOpen || !other.IsOpen) return false;
-            
+            if (!IsOpen || !other.IsOpen)
+            {
+                return false;
+            }
+
             // Sockets must have matching IDs and opposite directions
             bool directionMatch = (Direction + 2) % 4 == other.Direction;
             bool idMatch = SocketId == other.SocketId;

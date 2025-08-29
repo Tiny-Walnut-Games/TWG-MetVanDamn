@@ -48,15 +48,19 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             // Skip if bootstrap is already complete
             if (!_completeQuery.IsEmptyIgnoreFilter)
+            {
                 return;
+            }
 
             // Skip if bootstrap is already in progress
             if (!_inProgressQuery.IsEmptyIgnoreFilter)
+            {
                 return;
+            }
 
             // Get the bootstrap configuration
-            var bootstrapEntity = _bootstrapQuery.GetSingletonEntity();
-            var config = _bootstrapQuery.GetSingleton<WorldBootstrapConfiguration>();
+            Entity bootstrapEntity = _bootstrapQuery.GetSingletonEntity();
+            WorldBootstrapConfiguration config = _bootstrapQuery.GetSingleton<WorldBootstrapConfiguration>();
 
             // Mark bootstrap as in progress
             state.EntityManager.AddComponentData(bootstrapEntity, new WorldBootstrapInProgressTag());
@@ -74,14 +78,14 @@ namespace TinyWalnutGames.MetVD.Graph
             );
             state.EntityManager.AddComponentData(bootstrapEntity, completeTag);
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (config.LogGenerationSteps)
-            {
-                // UnityEngine.Debug.Log($"🚀 WorldBootstrap: Generated {completeTag.DistrictsGenerated} districts, " +
-                //                     $"{completeTag.SectorsGenerated} sectors, {completeTag.RoomsGenerated} rooms"); // REMOVED: Debug.Log not allowed in Burst jobs
-                // Bootstrap metrics: completeTag.DistrictsGenerated, SectorsGenerated, RoomsGenerated available for inspection
-            }
-#endif
+//#if UNITY_EDITOR || DEVELOPMENT_BUILD
+//            if (config.LogGenerationSteps)
+//            {
+//                // UnityEngine.Debug.Log($"🚀 WorldBootstrap: Generated {completeTag.DistrictsGenerated} districts, " +
+//                //                     $"{completeTag.SectorsGenerated} sectors, {completeTag.RoomsGenerated} rooms"); // REMOVED: Debug.Log not allowed in Burst jobs
+//                // Bootstrap metrics: districts, sectors, rooms available for inspection
+//            }
+//#endif
         }
 
         private static void GenerateWorldHierarchy(ref SystemState state, WorldBootstrapConfiguration config)
@@ -139,8 +143,15 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             finally
             {
-                if (biomeTypes.IsCreated) biomeTypes.Dispose();
-                if (biomePositions.IsCreated) biomePositions.Dispose();
+                if (biomeTypes.IsCreated)
+                {
+                    biomeTypes.Dispose();
+                }
+
+                if (biomePositions.IsCreated)
+                {
+                    biomePositions.Dispose();
+                }
             }
         }
 
@@ -190,7 +201,10 @@ namespace TinyWalnutGames.MetVD.Graph
             }
             finally
             {
-                if (availableTypes.IsCreated) availableTypes.Dispose();
+                if (availableTypes.IsCreated)
+                {
+                    availableTypes.Dispose();
+                }
             }
         }
 
@@ -222,7 +236,9 @@ namespace TinyWalnutGames.MetVD.Graph
                     }
 
                     if (validPosition)
+                    {
                         positions[i] = candidate;
+                    }
 
                     attempts++;
                 }
@@ -241,22 +257,22 @@ namespace TinyWalnutGames.MetVD.Graph
         private static void CreateBiomeFieldEntity(ref SystemState state, BiomeType biomeType, float2 position, 
                                                  WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
         {
-            var entity = state.EntityManager.CreateEntity();
+            Entity entity = state.EntityManager.CreateEntity();
             
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             state.EntityManager.SetName(entity, $"BiomeField_{biomeType}_{position.x:g}_{position.y:g}");
 #endif
-            var strength = math.lerp(0.7f, 1.0f, config.BiomeSettings.BiomeWeight);
-            var gradient = random.NextFloat(0.3f, 0.8f);
-            var secondaryBiome = DetermineSecondaryBiome(biomeType, ref random);
+            float strength = math.lerp(0.7f, 1.0f, config.BiomeSettings.BiomeWeight);
+            float gradient = random.NextFloat(0.3f, 0.8f);
+            BiomeType secondaryBiome = DetermineSecondaryBiome(biomeType, ref random);
             state.EntityManager.AddComponentData(entity, new BiomeFieldData { PrimaryBiome = biomeType, SecondaryBiome = secondaryBiome, Strength = strength, Gradient = gradient });
-            var (primaryPolarity, secondaryPolarity) = GetBiomePolarities(biomeType, secondaryBiome);
-            var difficultyModifier = CalculateBiomeDifficulty(biomeType, ref random);
+            (Polarity primaryPolarity, Polarity secondaryPolarity) = GetBiomePolarities(biomeType, secondaryBiome);
+            float difficultyModifier = CalculateBiomeDifficulty(biomeType, ref random);
             state.EntityManager.AddComponentData(entity, new TinyWalnutGames.MetVD.Core.Biome(biomeType, primaryPolarity, strength, secondaryPolarity, difficultyModifier));
 #if UNITY_TRANSFORMS_LOCALTRANSFORM
             state.EntityManager.AddComponentData(entity, new LocalTransform { Position = new float3(position.x, 0, position.y), Rotation = quaternion.identity, Scale = CalculateBiomeInfluenceRadius(biomeType, config.WorldSize) });
 #endif
-            var influenceBuffer = state.EntityManager.AddBuffer<BiomeInfluence>(entity);
+            DynamicBuffer<BiomeInfluence> influenceBuffer = state.EntityManager.AddBuffer<BiomeInfluence>(entity);
             PopulateBiomeInfluences(influenceBuffer, biomeType, secondaryBiome, strength, gradient);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -272,7 +288,9 @@ namespace TinyWalnutGames.MetVD.Graph
         {
             // 30% chance of having a secondary biome for transition zones
             if (random.NextFloat() > 0.3f)
+            {
                 return BiomeType.Unknown;
+            }
 
             // Select compatible secondary biome based on primary
             return primaryBiome switch
@@ -289,7 +307,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static (Polarity primary, Polarity secondary) GetBiomePolarities(BiomeType primaryBiome, BiomeType secondaryBiome)
         {
-            var primary = primaryBiome switch
+            Polarity primary = primaryBiome switch
             {
                 BiomeType.SolarPlains or BiomeType.SkyGardens => Polarity.Sun,
                 BiomeType.ShadowRealms or BiomeType.DeepUnderwater or BiomeType.VoidChambers => Polarity.Moon,
@@ -300,14 +318,14 @@ namespace TinyWalnutGames.MetVD.Graph
                 _ => Polarity.None
             };
 
-            var secondary = secondaryBiome == BiomeType.Unknown ? Polarity.None : GetBiomePolarities(secondaryBiome, BiomeType.Unknown).primary;
+            Polarity secondary = secondaryBiome == BiomeType.Unknown ? Polarity.None : GetBiomePolarities(secondaryBiome, BiomeType.Unknown).primary;
             
             return (primary, secondary);
         }
 
         private static float CalculateBiomeDifficulty(BiomeType biomeType, ref Unity.Mathematics.Random random)
         {
-            var baseDifficulty = biomeType switch
+            float baseDifficulty = biomeType switch
             {
                 BiomeType.HubArea => 0.5f,
                 BiomeType.SolarPlains or BiomeType.SkyGardens => 0.7f,
@@ -327,10 +345,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static float CalculateBiomeInfluenceRadius(BiomeType biomeType, int2 worldSize)
         {
-            var baseRadius = math.min(worldSize.x, worldSize.y) * 0.4f;
-            
+            float baseRadius = math.min(worldSize.x, worldSize.y) * 0.4f;
+
             // Adjust radius based on biome type
-            var multiplier = biomeType switch
+            float multiplier = biomeType switch
             {
                 BiomeType.HubArea => 1.5f,      // Hub areas have larger influence
                 BiomeType.TransitionZone => 1.2f, // Transition zones blend widely
@@ -369,7 +387,7 @@ namespace TinyWalnutGames.MetVD.Graph
         private static void CreateDistrictEntity(ref SystemState state, uint nodeId, 
                                                WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
         {
-            var entity = state.EntityManager.CreateEntity();
+            Entity entity = state.EntityManager.CreateEntity();
             
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             state.EntityManager.SetName(entity, $"District_{nodeId}");

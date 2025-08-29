@@ -30,27 +30,33 @@ namespace TinyWalnutGames.MetVD.Graph
         }
         public void OnUpdate(ref SystemState state)
         {
-            if (_layoutDoneQuery.IsEmptyIgnoreFilter) return;
-            using var entities = _districtsQuery.ToEntityArray(Allocator.Temp);
-            using var nodeIds = _districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-            using var sectorData = _districtsQuery.ToComponentDataArray<SectorHierarchyData>(Allocator.Temp);
+            if (_layoutDoneQuery.IsEmptyIgnoreFilter)
+            {
+                return;
+            }
+
+            using NativeArray<Entity> entities = _districtsQuery.ToEntityArray(Allocator.Temp);
+            using NativeArray<NodeId> nodeIds = _districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            using NativeArray<SectorHierarchyData> sectorData = _districtsQuery.ToComponentDataArray<SectorHierarchyData>(Allocator.Temp);
             for (int i = 0; i < entities.Length; i++)
             {
-                var nodeId = nodeIds[i]; var sectorHierarchy = sectorData[i];
+                NodeId nodeId = nodeIds[i]; SectorHierarchyData sectorHierarchy = sectorData[i];
                 if (nodeId.Level == 0 && !sectorHierarchy.IsSubdivided)
+                {
                     SubdivideDistrictIntoSectors(state.EntityManager, entities[i], nodeId, sectorHierarchy);
+                }
             }
         }
         private static void SubdivideDistrictIntoSectors(EntityManager entityManager, Entity districtEntity, NodeId districtNodeId, SectorHierarchyData sectorHierarchy)
         {
             var random = new Unity.Mathematics.Random(sectorHierarchy.SectorSeed);
-            var gridSize = sectorHierarchy.LocalGridSize; int totalCells = gridSize.x * gridSize.y; int actualSectorCount = math.min(sectorHierarchy.SectorCount, totalCells);
+            int2 gridSize = sectorHierarchy.LocalGridSize; int totalCells = gridSize.x * gridSize.y; int actualSectorCount = math.min(sectorHierarchy.SectorCount, totalCells);
             for (int sectorIndex = 0; sectorIndex < actualSectorCount; sectorIndex++)
             {
                 int gridX = sectorIndex % gridSize.x; int gridY = sectorIndex / gridSize.x;
                 float jitterX = random.NextFloat(-0.3f, 0.3f); float jitterY = random.NextFloat(-0.3f, 0.3f);
                 int2 sectorLocalCoords = new((int)(gridX + jitterX),(int)(gridY + jitterY));
-                var sectorEntity = entityManager.CreateEntity();
+                Entity sectorEntity = entityManager.CreateEntity();
                 var sectorNodeId = new NodeId((uint)(districtNodeId._value * HierarchyConstants.SectorIdMultiplier + sectorIndex),1,districtNodeId._value,sectorLocalCoords);
                 entityManager.AddComponentData(sectorEntity, sectorNodeId);
                 CreateRoomsInSector(entityManager, sectorNodeId, ref random);
@@ -64,7 +70,7 @@ namespace TinyWalnutGames.MetVD.Graph
             int roomCounter = 0; int maxRooms = 6; int minRoomSize = 2;
             while (roomQueue.Length > 0 && roomCounter < maxRooms)
             {
-                var currentBounds = roomQueue[0]; roomQueue.RemoveAt(0);
+                RectInt currentBounds = roomQueue[0]; roomQueue.RemoveAt(0);
                 if (currentBounds.width <= minRoomSize || currentBounds.height <= minRoomSize)
                 { CreateLeafRoom(entityManager, sectorNodeId, currentBounds, roomCounter, ref random); roomCounter++; continue; }
                 bool splitHorizontally = currentBounds.width > currentBounds.height ? random.NextFloat() > 0.3f : random.NextFloat() > 0.7f;
@@ -89,15 +95,32 @@ namespace TinyWalnutGames.MetVD.Graph
         }
         private static void CreateLeafRoom(EntityManager entityManager, NodeId sectorNodeId, RectInt bounds, int roomIndex, ref Unity.Mathematics.Random random)
         {
-            var roomEntity = entityManager.CreateEntity();
+            Entity roomEntity = entityManager.CreateEntity();
             var roomNodeId = new NodeId((uint)(sectorNodeId._value * HierarchyConstants.RoomsPerSectorMultiplier + roomIndex),2, sectorNodeId._value,new int2(bounds.x + bounds.width/2, bounds.y + bounds.height/2));
             RoomType roomType = RoomType.Normal;
             if (roomIndex == 0)
+            {
                 roomType = random.NextFloat() > 0.7f ? RoomType.Entrance : RoomType.Normal;
+            }
             else if (bounds.width * bounds.height > 6)
             {
                 float typeRoll = random.NextFloat();
-                if (typeRoll > 0.9f) roomType = RoomType.Boss; else if (typeRoll > 0.8f) roomType = RoomType.Treasure; else if (typeRoll > 0.7f) roomType = RoomType.Save; else roomType = RoomType.Normal;
+                if (typeRoll > 0.9f)
+                {
+                    roomType = RoomType.Boss;
+                }
+                else if (typeRoll > 0.8f)
+                {
+                    roomType = RoomType.Treasure;
+                }
+                else if (typeRoll > 0.7f)
+                {
+                    roomType = RoomType.Save;
+                }
+                else
+                {
+                    roomType = RoomType.Normal;
+                }
             }
             entityManager.AddComponentData(roomEntity, roomNodeId);
             entityManager.AddComponentData(roomEntity, new RoomHierarchyData(bounds, roomType, true));

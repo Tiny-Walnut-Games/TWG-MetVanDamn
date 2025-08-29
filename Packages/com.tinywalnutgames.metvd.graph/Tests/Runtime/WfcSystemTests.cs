@@ -29,7 +29,9 @@ namespace TinyWalnutGames.MetVD.Tests
         public void TearDown()
         {
             if (testWorld != null && testWorld.IsCreated)
+            {
                 testWorld.Dispose();
+            }
         }
 
         [Test]
@@ -37,9 +39,9 @@ namespace TinyWalnutGames.MetVD.Tests
         {
             // This test verifies that WFC system uses NativeArray<Random> for thread safety
             // (addresses blocker #3 - Random in parallel jobs)
-            
+
             // Create a test entity with WFC component
-            var entity = testWorld.EntityManager.CreateEntity();
+            Entity entity = testWorld.EntityManager.CreateEntity();
             testWorld.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
 
             // Group update should not throw even if WFC is not present in this world
@@ -90,7 +92,7 @@ namespace TinyWalnutGames.MetVD.Tests
                 // Create test entities for WFC processing
                 for (int i = 0; i < 5; i++)
                 {
-                    var entity = testWorld.EntityManager.CreateEntity();
+                    Entity entity = testWorld.EntityManager.CreateEntity();
                     testWorld.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
                     testWorld.EntityManager.AddBuffer<WfcCandidateBufferElement>(entity);
                 }

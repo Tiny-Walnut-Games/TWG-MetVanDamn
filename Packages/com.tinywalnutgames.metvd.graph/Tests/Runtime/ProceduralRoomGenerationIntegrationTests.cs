@@ -37,7 +37,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void BossRoom_SkillChallenge_GeneratesCorrectly()
         {
             // Arrange - Create a boss room with advanced skills
-            var roomEntity = CreateTestRoom(
+            Entity roomEntity = CreateTestRoom(
                 RoomType.Boss, 
                 new RectInt(0, 0, 20, 16), 
                 BiomeType.VolcanicCore,
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             );
 
             // Act - Process room generation
-            var request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
             
             // Assert - Boss rooms should use pattern-driven modular generation
             Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, request.GeneratorType);
@@ -60,7 +60,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void TreasureRoom_JumpTesting_ValidatesPhysics()
         {
             // Arrange - Create a treasure room for jump testing
-            var roomEntity = CreateTestRoom(
+            Entity roomEntity = CreateTestRoom(
                 RoomType.Treasure,
                 new RectInt(0, 0, 12, 8),
                 BiomeType.CrystalCaverns,
@@ -68,8 +68,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             );
 
             // Act
-            var request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-            var jumpPhysics = _entityManager.GetComponentData<JumpPhysicsData>(roomEntity);
+            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+            JumpPhysicsData jumpPhysics = _entityManager.GetComponentData<JumpPhysicsData>(roomEntity);
 
             // Assert - Treasure rooms should use parametric challenge generation
             Assert.AreEqual(RoomGeneratorType.ParametricChallenge, request.GeneratorType);
@@ -82,7 +82,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void SkyBiome_CloudPlatforms_GeneratesMotion()
         {
             // Arrange - Create a room in sky biome
-            var roomEntity = CreateTestRoom(
+            Entity roomEntity = CreateTestRoom(
                 RoomType.Normal,
                 new RectInt(0, 0, 16, 20), // Tall room
                 BiomeType.SkyGardens,
@@ -90,8 +90,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             );
 
             // Act
-            var request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-            var biome = _entityManager.GetComponentData<Core.Biome>(roomEntity);
+            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+            Biome biome = _entityManager.GetComponentData<Core.Biome>(roomEntity);
 
             // Assert - Sky biomes should use layered platform generation
             Assert.AreEqual(RoomGeneratorType.LayeredPlatformCloud, request.GeneratorType);
@@ -103,7 +103,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void HorizontalRoom_CorridorFlow_GeneratesRhythm()
         {
             // Arrange - Create a wide horizontal room
-            var roomEntity = CreateTestRoom(
+            Entity roomEntity = CreateTestRoom(
                 RoomType.Normal,
                 new RectInt(0, 0, 24, 8), // Wide room (aspect ratio 3:1)
                 BiomeType.HubArea,
@@ -111,7 +111,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             );
 
             // Act
-            var request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
             // Assert - Wide rooms should use linear corridor generation
             Assert.AreEqual(RoomGeneratorType.LinearBranchingCorridor, request.GeneratorType);
@@ -122,7 +122,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void VerticalRoom_StackedSegments_EnsuresConnectivity()
         {
             // Arrange - Create a tall vertical room
-            var roomEntity = CreateTestRoom(
+            Entity roomEntity = CreateTestRoom(
                 RoomType.Normal,
                 new RectInt(0, 0, 8, 24), // Tall room (aspect ratio 1:3)
                 BiomeType.CrystalCaverns,
@@ -130,7 +130,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             );
 
             // Act
-            var request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
             // Assert - Tall rooms should use stacked segment generation
             Assert.AreEqual(RoomGeneratorType.StackedSegment, request.GeneratorType);
@@ -141,7 +141,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void SecretAreas_WithBombSkill_GeneratesDestructibleWalls()
         {
             // Arrange - Create a room with bomb skill for secret access
-            var roomEntity = CreateTestRoom(
+            Entity roomEntity = CreateTestRoom(
                 RoomType.Normal,
                 new RectInt(0, 0, 16, 12),
                 BiomeType.AncientRuins,
@@ -149,7 +149,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             );
 
             // Act
-            var secretConfig = _entityManager.GetComponentData<SecretAreaConfig>(roomEntity);
+            SecretAreaConfig secretConfig = _entityManager.GetComponentData<SecretAreaConfig>(roomEntity);
 
             // Assert - Should have secret configuration with destructible walls
             Assert.AreEqual(Ability.Bomb, secretConfig.SecretSkillRequirement);
@@ -161,7 +161,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void SaveRoom_SafeArea_UsesWeightedGeneration()
         {
             // Arrange - Create a save room (should be safe)
-            var roomEntity = CreateTestRoom(
+            Entity roomEntity = CreateTestRoom(
                 RoomType.Save,
                 new RectInt(0, 0, 10, 10),
                 BiomeType.HubArea,
@@ -169,8 +169,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             );
 
             // Act
-            var request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-            var roomState = _entityManager.GetComponentData<RoomStateData>(roomEntity);
+            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+            RoomStateData roomState = _entityManager.GetComponentData<RoomStateData>(roomEntity);
 
             // Assert - Save rooms should use safe weighted generation
             Assert.AreEqual(RoomGeneratorType.WeightedTilePrefab, request.GeneratorType);
@@ -181,15 +181,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void BiomePolarity_MatchesRoomContent()
         {
             // Arrange - Create rooms in different biomes
-            var fireRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.VolcanicCore, Ability.Jump);
-            var iceRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.FrozenWastes, Ability.Jump);
+            Entity fireRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.VolcanicCore, Ability.Jump);
+            Entity iceRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.FrozenWastes, Ability.Jump);
 
             // Act
-            var fireRequest = _entityManager.GetComponentData<RoomGenerationRequest>(fireRoomEntity);
-            var iceRequest = _entityManager.GetComponentData<RoomGenerationRequest>(iceRoomEntity);
+            RoomGenerationRequest fireRequest = _entityManager.GetComponentData<RoomGenerationRequest>(fireRoomEntity);
+            RoomGenerationRequest iceRequest = _entityManager.GetComponentData<RoomGenerationRequest>(iceRoomEntity);
 
-            var fireBiome = _entityManager.GetComponentData<Core.Biome>(fireRoomEntity);
-            var iceBiome = _entityManager.GetComponentData<Core.Biome>(iceRoomEntity);
+            Biome fireBiome = _entityManager.GetComponentData<Core.Biome>(fireRoomEntity);
+            Biome iceBiome = _entityManager.GetComponentData<Core.Biome>(iceRoomEntity);
 
             // Assert - Biome polarities should match room requests
             Assert.AreEqual(Polarity.Heat, fireRequest.TargetPolarity);
@@ -202,7 +202,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void Pipeline_SixSteps_CompletesCorrectly()
         {
             // Arrange
-            var roomEntity = CreateTestRoom(
+            Entity roomEntity = CreateTestRoom(
                 RoomType.Normal,
                 new RectInt(0, 0, 12, 12),
                 BiomeType.SolarPlains,
@@ -210,7 +210,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             );
 
             // Act - Simulate pipeline progression
-            var request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
             
             // Step 1: Biome Selection (already done in setup)
             Assert.AreEqual(1, request.CurrentStep);
@@ -220,7 +220,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             request.IsComplete = true;
             _entityManager.SetComponentData(roomEntity, request);
 
-            var finalRequest = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+            RoomGenerationRequest finalRequest = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
             // Assert - Pipeline should complete successfully
             Assert.AreEqual(6, finalRequest.CurrentStep);
@@ -285,14 +285,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void DifferentGenerators_ProduceUniqueContent()
         {
             // Arrange - Create rooms with different generator types
-            var patternRoom = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 16, 16), BiomeType.VolcanicCore, Ability.Dash);
-            var parametricRoom = CreateTestRoom(RoomType.Treasure, new RectInt(0, 0, 16, 16), BiomeType.CrystalCaverns, Ability.Jump);
-            var weightedRoom = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 16, 16), BiomeType.HubArea, Ability.Jump);
+            Entity patternRoom = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 16, 16), BiomeType.VolcanicCore, Ability.Dash);
+            Entity parametricRoom = CreateTestRoom(RoomType.Treasure, new RectInt(0, 0, 16, 16), BiomeType.CrystalCaverns, Ability.Jump);
+            Entity weightedRoom = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 16, 16), BiomeType.HubArea, Ability.Jump);
 
             // Act
-            var patternRequest = _entityManager.GetComponentData<RoomGenerationRequest>(patternRoom);
-            var parametricRequest = _entityManager.GetComponentData<RoomGenerationRequest>(parametricRoom);
-            var weightedRequest = _entityManager.GetComponentData<RoomGenerationRequest>(weightedRoom);
+            RoomGenerationRequest patternRequest = _entityManager.GetComponentData<RoomGenerationRequest>(patternRoom);
+            RoomGenerationRequest parametricRequest = _entityManager.GetComponentData<RoomGenerationRequest>(parametricRoom);
+            RoomGenerationRequest weightedRequest = _entityManager.GetComponentData<RoomGenerationRequest>(weightedRoom);
 
             // Assert - Each should use different generator type
             Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, patternRequest.GeneratorType);
@@ -310,7 +310,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         /// </summary>
         private Entity CreateTestRoom(RoomType roomType, RectInt bounds, BiomeType biomeType, Ability availableSkills)
         {
-            var roomEntity = _entityManager.CreateEntity();
+            Entity roomEntity = _entityManager.CreateEntity();
 
             // Add core room data
             var roomData = new RoomHierarchyData(bounds, roomType, true);
@@ -319,12 +319,12 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(roomEntity, nodeId);
 
             // Add biome data
-            var polarity = GetPolarityForBiome(biomeType);
+            Polarity polarity = GetPolarityForBiome(biomeType);
             var biome = new Core.Biome(biomeType, polarity, 1.0f, Polarity.None, 1.0f);
             _entityManager.AddComponentData(roomEntity, biome);
 
             // Determine generator type
-            var generatorType = DetermineGeneratorType(roomType, bounds, biomeType);
+            RoomGeneratorType generatorType = DetermineGeneratorType(roomType, bounds, biomeType);
 
             // Create room generation request
             var generationRequest = new RoomGenerationRequest(
@@ -367,7 +367,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
                     break;
 
                 case RoomGeneratorType.WeightedTilePrefab:
-                    var secretSkill = (availableSkills & Ability.Bomb) != 0 ? Ability.Bomb : Ability.None;
+                    Ability secretSkill = (availableSkills & Ability.Bomb) != 0 ? Ability.Bomb : Ability.None;
                     var secretConfig = new SecretAreaConfig(0.15f, new int2(2, 2), new int2(4, 4), 
                         secretSkill, true, true);
                     _entityManager.AddComponentData(entity, secretConfig);
@@ -377,7 +377,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
         private static RoomGeneratorType DetermineGeneratorType(RoomType roomType, RectInt bounds, BiomeType biomeType)
         {
-            var aspectRatio = (float)bounds.width / bounds.height;
+            float aspectRatio = (float)bounds.width / bounds.height;
 
             return roomType switch
             {
@@ -426,8 +426,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         private static RoomNavigationData CreateNavData(RectInt bounds, RoomType roomType)
         {
             var entrance = new int2(bounds.x + 1, bounds.y + 1);
-            var isCritical = roomType == RoomType.Boss || roomType == RoomType.Entrance;
-            var traversalTime = (bounds.width + bounds.height) * 0.5f;
+            bool isCritical = roomType == RoomType.Boss || roomType == RoomType.Entrance;
+            float traversalTime = (bounds.width + bounds.height) * 0.5f;
             return new RoomNavigationData(entrance, isCritical, traversalTime);
         }
     }

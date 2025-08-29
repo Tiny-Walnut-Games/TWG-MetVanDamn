@@ -26,7 +26,10 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private void OnValidate()
         {
-            if (nodeId == 0) nodeId = 1; // avoid zero ID edge case
+            if (nodeId == 0)
+            {
+                nodeId = 1; // avoid zero ID edge case
+            }
         }
     }
 }

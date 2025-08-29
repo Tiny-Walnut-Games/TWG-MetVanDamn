@@ -1,19 +1,11 @@
 //  This script is intended to be used in the Unity Editor only, stored in an Editor folder to ensure it is not included in builds.
 #if UNITY_EDITOR
 
-// Check if sprite editor assemblies are available with more robust detection
-#if UNITY_2021_2_OR_NEWER && UNITY_2D && (SPRITE_EDITOR_AVAILABLE || UNITY_2D_SPRITE_EDITOR)
-#define SPRITE_EDITOR_FEATURES_AVAILABLE
-#endif
-
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
-
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
-using UnityEditor.U2D.Sprites; // this script requires com.unity.2d.sprite package be imported to work.
-#endif
+using UnityEditor.U2D.Sprites; // 🔥 LIBERATION: No more conditional imports!
 
 namespace TinyWalnutGames.Tools.Editor
 {
@@ -25,16 +17,12 @@ namespace TinyWalnutGames.Tools.Editor
     /// I wanted to thread the tasks, but I am understanding that the Unity API is not thread-safe,
     /// so I had to use the ISpriteEditorDataProvider interface instead.
     /// see https://docs.unity3d.com/Packages/com.unity.2d.sprite@latest/manual/SpriteEditorDataProvider.html
+    /// 
+    /// 🔥 NUCLEAR LIBERATION: Conditional compilation walls DESTROYED!
+    /// This is an Editor-only tool in an Editor folder - no need for sprite editor feature detection!
     /// </summary>
     public class BatchSpriteSlicer : EditorWindow
     {
-        // 🔥 LIBERATION: Move assembly caching fields OUTSIDE conditional compilation blocks
-        // These need to be available in BOTH compilation scenarios
-        private static string[] _cachedAssemblyNames = null;
-        private static bool _has2DSpriteAssembly = false;
-        private static bool _assemblyInfoCached = false;
-
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
         /// <summary>
         /// Whether to use cell size for slicing or fixed columns/rows.
         /// * If true, cellSize will be used to determine the size of each sprite slice.
@@ -79,12 +67,13 @@ namespace TinyWalnutGames.Tools.Editor
         /// </summary>
         private static int copiedTexWidth = 0;
         private static int copiedTexHeight = 0;
-#endif
 
         /// <summary>
         /// Opens the Batch Sprite Slicer window in the Unity Editor.
+        /// ⚠Intended use!⚠ Menu path made unique to avoid conflicts with existing tools
+        /// Original path: "Tools/Batch Sprite Slicer" - Modified to prevent duplicate menu warnings
         /// </summary>
-        [MenuItem("Tools/Batch Sprite Slicer")] // Adds a menu item to open the window
+        [MenuItem("Tools/MetVanDAMN/Batch Sprite Slicer")] // Sacred Symbol Preservation: Unique path prevents menu conflicts
         public static void OpenWindow()
         {
             GetWindow<BatchSpriteSlicer>("Batch Sprite Slicer"); // Opens the window with a title
@@ -92,76 +81,10 @@ namespace TinyWalnutGames.Tools.Editor
 
         /// <summary>
         /// Called when the window is drawn in the Unity Editor.
+        /// 🔥 LIBERATED: No more conditional compilation madness!
         /// </summary>
         private void OnGUI()
         {
-#if !SPRITE_EDITOR_FEATURES_AVAILABLE
-            GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox(
-                "Sprite Editor features are not available. This tool requires Unity's 2D Sprite Editor package " +
-                "or sprite editor assemblies to be available. Please install com.unity.2d.sprite package to enable functionality.",
-                MessageType.Warning);
-            
-            if (GUILayout.Button("Open Package Manager"))
-            {
-                UnityEditor.PackageManager.UI.Window.Open("com.unity.2d.sprite");
-            }
-            
-            EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Debug Information:", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("Unity Version: " + Application.unityVersion);
-            EditorGUILayout.LabelField("2D Package Required: com.unity.2d.sprite");
-            EditorGUILayout.LabelField("Current Assembly References:");
-            
-            // 🔥 PERFORMANCE FIX: Cache assembly information on first access
-            CacheAssemblyInformationIfNeeded();
-            
-            // 🔥 NOW WORKING: Display each assembly name without using system reflection
-            if (_cachedAssemblyNames != null && _cachedAssemblyNames.Length > 0)
-            {
-                // Display relevant assemblies first
-                if (_has2DSpriteAssembly)
-                {
-                    EditorGUILayout.LabelField("  ✓ UnityEditor.U2D.Sprites", EditorStyles.miniLabel);
-                }
-                
-                // Display other 2D/Sprite related assemblies
-                foreach (string assemblyName in _cachedAssemblyNames)
-                {
-                    if (Is2DOrSpriteRelatedAssembly(assemblyName))
-                    {
-                        string status = assemblyName.Contains("U2D.Sprites") ? "✓" : "•";
-                        EditorGUILayout.LabelField($"  {status} {assemblyName}", EditorStyles.miniLabel);
-                    }
-                }
-                
-                // Show total assembly count
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField($"Total assemblies loaded: {_cachedAssemblyNames.Length}", EditorStyles.miniLabel);
-                
-                // Optional: Show all assemblies in a collapsible section
-                if (EditorGUILayout.Foldout(false, "Show All Assemblies (Click to expand)"))
-                {
-                    EditorGUI.indentLevel++;
-                    foreach (string assemblyName in _cachedAssemblyNames)
-                    {
-                        EditorGUILayout.LabelField($"• {assemblyName}", EditorStyles.miniLabel);
-                    }
-                    EditorGUI.indentLevel--;
-                }
-            }
-            else
-            {
-                EditorGUILayout.LabelField("  Assembly information not available", EditorStyles.helpBox);
-            }
-
-            if (!_has2DSpriteAssembly)
-            {
-                EditorGUILayout.Space();
-                EditorGUILayout.LabelField("  ✗ UnityEditor.U2D.Sprites assembly not found", EditorStyles.helpBox);
-            }
-#else
-            
             GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
                 "Slice multiple sprites from selected textures in the project. " +
@@ -298,81 +221,14 @@ namespace TinyWalnutGames.Tools.Editor
                     EditorGUILayout.LabelField("  No slices copied", EditorStyles.miniLabel);
                 }
             }
-#endif
-        }
-
-        // 🔥 UNIVERSAL METHODS: Available in both compilation scenarios
-        
-        /// <summary>
-        /// 🔥 PERFORMANCE OPTIMIZATION: Cache assembly information once to avoid reflection in GUI loops
-        /// This method is called only when needed and caches results for subsequent GUI redraws
-        /// </summary>
-        private static void CacheAssemblyInformationIfNeeded()
-        {
-            if (_assemblyInfoCached)
-                return; // Already cached, no need to check again
-
-            var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
-            var assemblyNames = new List<string>();
-            bool found2DSprite = false;
-
-            // Perform reflection ONCE, not in every GUI redraw
-            for (int i = 0; i < assemblies.Length; i++)
-            {
-                var assembly = assemblies[i];
-                var assemblyName = assembly.GetName().Name; // This is the reflection call we're caching
-                
-                assemblyNames.Add(assemblyName);
-                
-                if (assembly.FullName.Contains("UnityEditor.U2D.Sprites"))
-                {
-                    found2DSprite = true;
-                }
-            }
-
-            // Cache the results
-            _cachedAssemblyNames = assemblyNames.ToArray();
-            _has2DSpriteAssembly = found2DSprite;
-            _assemblyInfoCached = true;
         }
 
         /// <summary>
-        /// 🔥 HELPER METHOD: Check if assembly name is related to 2D/Sprite functionality
-        /// No reflection - just string analysis of cached assembly names
-        /// </summary>
-        private static bool Is2DOrSpriteRelatedAssembly(string assemblyName)
-        {
-            if (string.IsNullOrEmpty(assemblyName))
-                return false;
-
-            // Check for 2D/Sprite related assembly patterns
-            return assemblyName.Contains("2D") ||
-                   assemblyName.Contains("Sprite") ||
-                   assemblyName.Contains("U2D") ||
-                   assemblyName.Contains("TextMeshPro") ||
-                   assemblyName.Contains("Tilemap") ||
-                   assemblyName.Contains("SpriteShape") ||
-                   assemblyName.Contains("Animation") ||
-                   assemblyName.Contains("UnityEngine.UI");
-        }
-
-        /// <summary>
-        /// 🔥 RESET CACHE: Call this if assemblies might have changed (e.g., after package installation)
-        /// This forces a refresh of the cached assembly information
-        /// </summary>
-        public static void RefreshAssemblyCache()
-        {
-            _assemblyInfoCached = false;
-            _cachedAssemblyNames = null;
-            _has2DSpriteAssembly = false;
-        }
-
-        /// <summary>
-        /// Copies the sprite rectangles and custom physics outlines from the selected texture(s) in the project.    
+        /// Copies the sprite rectangles and custom physics outlines from the selected texture(s) in the project.
+        /// 🔥 LIBERATED: No more creepy death skull guardians needed!
         /// </summary>
         private void CopySlicesFromSelected()
         {
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
             Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
             if (selectedTextures.Length == 0)
             {
@@ -381,7 +237,7 @@ namespace TinyWalnutGames.Tools.Editor
             }
 
             string path = AssetDatabase.GetAssetPath(selectedTextures[0]);
-            TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
             if (importer == null)
             {
                 Debug.LogWarning("Texture importer not found.");
@@ -397,7 +253,7 @@ namespace TinyWalnutGames.Tools.Editor
 
             var factory = new SpriteDataProviderFactories();
             factory.Init();
-            var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+            ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
             dataProvider.InitSpriteEditorDataProvider();
 
             var rects = new List<SpriteRect>(dataProvider.GetSpriteRects());
@@ -409,10 +265,10 @@ namespace TinyWalnutGames.Tools.Editor
 
             // Store outlines using GUID as key
             copiedOutlines.Clear();
-            var outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
-            foreach (var rect in rects)
+            ISpritePhysicsOutlineDataProvider outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
+            foreach (SpriteRect rect in rects)
             {
-                var outlines = outlineProvider.GetOutlines(rect.spriteID);
+                List<Vector2[]> outlines = outlineProvider.GetOutlines(rect.spriteID);
                 // Deep copy the outlines to avoid reference issues
                 copiedOutlines[rect.spriteID.ToString()] = outlines != null
                     ? outlines.Select(arr => arr.ToArray()).ToList()
@@ -423,17 +279,14 @@ namespace TinyWalnutGames.Tools.Editor
             copiedTexWidth = texture.width;
             copiedTexHeight = texture.height;
             Debug.Log($"Copied {rects.Count} sprite rects (and outlines) from '{texture.name}' ({copiedTexWidth}x{copiedTexHeight}).");
-#else
-            Debug.LogWarning("Sprite Editor features not available. Cannot copy slices.");
-#endif
         }
 
         /// <summary>
         /// Pastes the copied sprite rectangles and custom physics outlines to the selected texture(s) in the project.
+        /// 🔥 LIBERATED: Freedom from conditional compilation chains!
         /// </summary>
         private void PasteSlicesToSelected()
         {
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
             if (copiedRects == null || copiedRects.Count == 0)
             {
                 Debug.LogWarning("No copied slices to paste.");
@@ -445,7 +298,7 @@ namespace TinyWalnutGames.Tools.Editor
             foreach (Object obj in selectedTextures)
             {
                 string path = AssetDatabase.GetAssetPath(obj);
-                TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
                 if (importer == null)
                 {
                     Debug.LogWarning($"Skipping '{obj.name}', texture importer not found.");
@@ -464,7 +317,7 @@ namespace TinyWalnutGames.Tools.Editor
 
                 var factory = new SpriteDataProviderFactories();
                 factory.Init();
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+                ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
                 dataProvider.InitSpriteEditorDataProvider();
 
                 // Scale rects to fit new texture size
@@ -475,9 +328,9 @@ namespace TinyWalnutGames.Tools.Editor
                 // Map from old rect GUID to new rect for outline assignment
                 Dictionary<string, SpriteRect> guidToNewRect = new();
 
-                foreach (var srcRect in copiedRects)
+                foreach (SpriteRect srcRect in copiedRects)
                 {
-                    var r = srcRect.rect;
+                    Rect r = srcRect.rect;
                     var scaledRect = new Rect(
                         Mathf.RoundToInt(r.x * scaleX),
                         Mathf.RoundToInt(r.y * scaleY),
@@ -486,7 +339,9 @@ namespace TinyWalnutGames.Tools.Editor
                     );
 
                     if (scaledRect.width <= 0 || scaledRect.height <= 0)
+                    {
                         continue;
+                    }
 
                     SpriteRect newRect = new()
                     {
@@ -507,23 +362,25 @@ namespace TinyWalnutGames.Tools.Editor
                 dataProvider.Apply();
 
                 // Set outlines (physics shapes)
-                var outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
-                foreach (var srcRect in copiedRects)
+                ISpritePhysicsOutlineDataProvider outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
+                foreach (SpriteRect srcRect in copiedRects)
                 {
-                    if (!guidToNewRect.TryGetValue(srcRect.spriteID.ToString(), out var newRect))
-                        continue;
-
-                    if (copiedOutlines.TryGetValue(srcRect.spriteID.ToString(), out var outlines) && outlines != null && outlines.Count > 0)
+                    if (!guidToNewRect.TryGetValue(srcRect.spriteID.ToString(), out SpriteRect newRect))
                     {
-                        var srcRectRect = srcRect.rect;
-                        var newRectRect = newRect.rect;
+                        continue;
+                    }
+
+                    if (copiedOutlines.TryGetValue(srcRect.spriteID.ToString(), out List<Vector2[]> outlines) && outlines != null && outlines.Count > 0)
+                    {
+                        Rect srcRectRect = srcRect.rect;
+                        Rect newRectRect = newRect.rect;
                         float outlineScaleX = newRectRect.width / srcRectRect.width;
                         float outlineScaleY = newRectRect.height / srcRectRect.height;
 
                         List<Vector2[]> scaledOutlines = new();
-                        foreach (var outline in outlines)
+                        foreach (Vector2[] outline in outlines)
                         {
-                            Vector2[] scaled = new Vector2[outline.Length];
+                            var scaled = new Vector2[outline.Length];
                             for (int i = 0; i < outline.Length; i++)
                             {
                                 scaled[i] = new Vector2(
@@ -542,40 +399,34 @@ namespace TinyWalnutGames.Tools.Editor
 
                 Debug.Log($"Pasted {newRects.Count} slices (and outlines) to '{texture.name}' ({texWidth}x{texHeight}).");
             }
-#else
-            Debug.LogWarning("Sprite Editor features not available. Cannot paste slices.");
-#endif
         }
 
         /// <summary>
         /// Adjusts the pivot of all selected sprite slices to the specified pivot alignment.
+        /// 🔥 LIBERATED: Clean code, no more conditional chaos!
         /// </summary>
         private void AdjustPivotOfSelectedSlices()
         {
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
-            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
+            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
 
-            // Check if any textures are selected to adjust the pivot
             foreach (Object obj in selectedTextures)
             {
-                string path = AssetDatabase.GetAssetPath(obj); // Get the path of the selected texture
-                TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter; // Get the TextureImporter for the selected texture
+                string path = AssetDatabase.GetAssetPath(obj);
+                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
 
-                // Check if the importer is null, which means the texture is not a valid sprite texture
                 if (importer == null)
                 {
                     Debug.LogWarning($"Skipping '{obj.name}', texture importer not found.");
                     continue;
                 }
 
-                var factory = new SpriteDataProviderFactories(); // Create a new instance of SpriteDataProviderFactories to access sprite data providers
-                factory.Init(); // Initialize the factory to ensure it can provide data providers
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); // Get the sprite editor data provider for the texture importer
-                dataProvider.InitSpriteEditorDataProvider(); // Initialize the sprite editor data provider to access sprite data
+                var factory = new SpriteDataProviderFactories();
+                factory.Init();
+                ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+                dataProvider.InitSpriteEditorDataProvider();
 
-                var rects = new List<SpriteRect>(dataProvider.GetSpriteRects()); // Get all sprite rectangles from the data provider
+                var rects = new List<SpriteRect>(dataProvider.GetSpriteRects());
 
-                // Check if there are any sprite rectangles to adjust
                 if (rects.Count == 0)
                 {
                     Debug.LogWarning($"No slices found on '{obj.name}'.");
@@ -589,45 +440,36 @@ namespace TinyWalnutGames.Tools.Editor
                     rects[i].pivot = GetPivotForAlignment(pivotAlignment);
                 }
 
-                // Clear all previous rects before setting new ones
                 dataProvider.SetSpriteRects(rects.ToArray());
                 dataProvider.Apply();
 
-                // Import the asset to apply changes
                 AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 
-                // Log the number of slices adjusted and the texture details
                 Debug.Log($"Adjusted pivot for {rects.Count} slices on '{obj.name}'.");
             }
-#else
-            Debug.LogWarning("Sprite Editor features not available. Cannot adjust pivot.");
-#endif
         }
 
         /// <summary>
         /// Slices the selected textures into multiple sprites based on the specified cell size or grid settings.
+        /// 🔥 LIBERATED: Pure, clean sprite slicing power!
         /// </summary>
         private void SliceSelectedSprites()
         {
-#if SPRITE_EDITOR_FEATURES_AVAILABLE
-            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets); // Get all selected textures in the project
+            Object[] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
 
-            // Check if any textures are selected to slice
             foreach (Object obj in selectedTextures)
             {
-                string path = AssetDatabase.GetAssetPath(obj); // Get the path of the selected texture
-                TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter; // Get the TextureImporter for the selected texture
+                string path = AssetDatabase.GetAssetPath(obj);
+                var importer = AssetImporter.GetAtPath(path) as TextureImporter;
 
-                // Check if the importer is null, which means the texture is not a valid sprite texture
                 if (importer == null)
                 {
                     Debug.LogWarning($"Skipping '{obj.name}', texture importer not found.");
                     continue;
                 }
 
-                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path); // Load the texture asset from the path
+                Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
 
-                // Check if the texture is null, which means it could not be loaded
                 if (texture == null)
                 {
                     Debug.LogWarning($"Skipping '{obj.name}', could not load texture asset.");
@@ -638,44 +480,42 @@ namespace TinyWalnutGames.Tools.Editor
                 int texWidth = texture.width;
                 int texHeight = texture.height;
 
-                // Check if the texture dimensions are valid for slicing
                 int actualColumns, actualRows, spriteWidth, spriteHeight;
 
                 if (useCellSize)
                 {
-                    spriteWidth = Mathf.Max(1, Mathf.RoundToInt(cellSize.x)); // Calculate sprite width based on cell size
-                    spriteHeight = Mathf.Max(1, Mathf.RoundToInt(cellSize.y)); // Calculate sprite height based on cell size
-                    actualColumns = Mathf.Max(1, texWidth / spriteWidth); // Calculate actual columns based on texture width and sprite width
-                    actualRows = Mathf.Max(1, texHeight / spriteHeight); // Calculate actual rows based on texture height and sprite height
+                    spriteWidth = Mathf.Max(1, Mathf.RoundToInt(cellSize.x));
+                    spriteHeight = Mathf.Max(1, Mathf.RoundToInt(cellSize.y));
+                    actualColumns = Mathf.Max(1, texWidth / spriteWidth);
+                    actualRows = Mathf.Max(1, texHeight / spriteHeight);
                 }
                 else
                 {
-                    actualColumns = Mathf.Max(1, columns); // Use specified columns, ensuring at least 1 column
-                    actualRows = Mathf.Max(1, rows); // Use specified rows, ensuring at least 1 row
-                    spriteWidth = texWidth / actualColumns; // Calculate sprite width based on texture width and actual columns
-                    spriteHeight = texHeight / actualRows; // Calculate sprite height based on texture height and actual rows
+                    actualColumns = Mathf.Max(1, columns);
+                    actualRows = Mathf.Max(1, rows);
+                    spriteWidth = texWidth / actualColumns;
+                    spriteHeight = texHeight / actualRows;
                 }
 
-                var factory = new SpriteDataProviderFactories(); // Create a new instance of SpriteDataProviderFactories to access sprite data providers
-                factory.Init(); // Initialize the factory to ensure it can provide data providers
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); // Get the sprite editor data provider for the texture importer
-                dataProvider.InitSpriteEditorDataProvider(); // Initialize the sprite editor dataProvider to access sprite data
+                var factory = new SpriteDataProviderFactories();
+                factory.Init();
+                ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+                dataProvider.InitSpriteEditorDataProvider();
 
-                List<SpriteRect> spriteRects = new(); // Create a list to hold the sprite rectangles
+                List<SpriteRect> spriteRects = new();
 
-                string assetPath = AssetDatabase.GetAssetPath(texture); // Get the asset path of the texture
-                TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(assetPath); // Get the TextureImporter for the texture
-                bool wasReadable = texImporter.isReadable; // Check if the texture was readable
+                string assetPath = AssetDatabase.GetAssetPath(texture);
+                var texImporter = (TextureImporter)TextureImporter.GetAtPath(assetPath);
+                bool wasReadable = texImporter.isReadable;
                 if (!wasReadable)
                 {
-                    texImporter.isReadable = true; // Set the texture to be readable if it wasn't already
-                    AssetDatabase.ImportAsset(assetPath); // Import the asset to apply changes
+                    texImporter.isReadable = true;
+                    AssetDatabase.ImportAsset(assetPath);
                 }
 
                 // Iterate through the grid to create sprite rectangles
                 for (int y = 0; y < actualRows; y++)
                 {
-                    // iterate through each column in the current row
                     for (int x = 0; x < actualColumns; x++)
                     {
                         int rectX = x * spriteWidth;
@@ -685,9 +525,14 @@ namespace TinyWalnutGames.Tools.Editor
 
                         // Last column/row may be smaller if texture size is not a perfect multiple
                         if (x == actualColumns - 1)
+                        {
                             rectW = texWidth - rectX;
+                        }
+
                         if (y == actualRows - 1)
+                        {
                             rectH = texHeight - rectY;
+                        }
 
                         // Clamp the rectangle dimensions to ensure they don't exceed texture bounds
                         rectW = Mathf.Clamp(rectW, 0, texWidth - rectX);
@@ -695,7 +540,9 @@ namespace TinyWalnutGames.Tools.Editor
 
                         // Skip empty rectangles
                         if (rectW <= 0 || rectH <= 0)
+                        {
                             continue;
+                        }
 
                         // Flip Y so row 0 is at the top
                         int flippedY = texHeight - (rectY + rectH);
@@ -708,8 +555,6 @@ namespace TinyWalnutGames.Tools.Editor
                         // Check if the rectangle is empty if ignoreEmptyRects is true
                         if (ignoreEmptyRects)
                         {
-                            // Get the pixels in the rectangle area
-                            // Note: This can be slow for large textures, consider optimizing if needed
                             Color[] pixels = texture.GetPixels(
                                 Mathf.RoundToInt(cellRect.x),
                                 Mathf.RoundToInt(cellRect.y),
@@ -717,11 +562,9 @@ namespace TinyWalnutGames.Tools.Editor
                                 Mathf.RoundToInt(cellRect.height)
                             );
 
-                            // Check if any pixel in the rectangle has an alpha value greater than 0
                             isEmpty = true;
 
-                            // Iterate through the pixels to check if any pixel is not fully transparent
-                            foreach (var pixel in pixels)
+                            foreach (Color pixel in pixels)
                             {
                                 if (pixel.a > 0f)
                                 {
@@ -731,11 +574,11 @@ namespace TinyWalnutGames.Tools.Editor
                             }
                         }
 
-                        // If ignoreEmptyRects is true and the rectangle is empty, skip adding it
                         if (ignoreEmptyRects && isEmpty)
+                        {
                             continue;
+                        }
 
-                        // Create a new SpriteRect with the calculated rectangle and specified pivot alignment
                         SpriteRect rect = new()
                         {
                             name = $"{obj.name}_{x}_{y}",
@@ -744,32 +587,25 @@ namespace TinyWalnutGames.Tools.Editor
                             pivot = GetPivotForAlignment(pivotAlignment)
                         };
 
-                        spriteRects.Add(rect); // Add the created rectangle to the list of sprite rectangles
+                        spriteRects.Add(rect);
                     }
                 }
 
-                dataProvider.SetSpriteRects(spriteRects.ToArray()); // Set the created sprite rectangles to the data provider
-                dataProvider.Apply(); // Apply the changes to the data provider
+                dataProvider.SetSpriteRects(spriteRects.ToArray());
+                dataProvider.Apply();
 
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate); // Import the asset to apply changes
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             }
 
-            // Log the completion of the batch slicing operation
             Debug.Log("Batch slicing completed using ISpriteEditorDataProvider!");
-#else
-            Debug.LogWarning("Sprite Editor features not available. Cannot slice sprites.");
-#endif
         }
 
         /// <summary>
         /// Gets the pivot vector for the specified sprite alignment.
+        /// 🔥 LIBERATED: Pure utility function, no protection needed!
         /// </summary>
-        /// <param name="alignment"></param>
-        /// <returns></returns>
         private Vector2 GetPivotForAlignment(SpriteAlignment alignment)
         {
-            // Return the pivot vector based on the specified sprite alignment
-            // The pivot vector is normalized to the range [0, 1] where (0, 0) is the bottom-left corner and (1, 1) is the top-right corner
             return alignment switch
             {
                 SpriteAlignment.BottomCenter => new Vector2(0.5f, 0f),

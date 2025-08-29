@@ -40,7 +40,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void CreateWorldConfiguration()
         {
             var worldConfigGO = new GameObject("WorldConfiguration");
-            var worldConfig = worldConfigGO.AddComponent<WorldConfigurationAuthoring>();
+            WorldConfigurationAuthoring worldConfig = worldConfigGO.AddComponent<WorldConfigurationAuthoring>();
             
             // Configure with sensible defaults for the sample
             // Note: Assuming WorldConfigurationAuthoring has typical world setup fields
@@ -60,8 +60,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     var districtGO = new GameObject($"District_{x + 1}_{z + 1}");
                     districtGO.transform.SetParent(districtsParent.transform);
                     districtGO.transform.position = new Vector3(x * 5f, 0, z * 5f);
-                    
-                    var district = districtGO.AddComponent<DistrictAuthoring>();
+
+                    DistrictAuthoring district = districtGO.AddComponent<DistrictAuthoring>();
                     district.nodeId = (uint)((x + 1) * 3 + (z + 1) + 1); // Unique IDs 1-9
                     district.level = 0;
                     district.parentId = 0;
@@ -84,8 +84,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             visual.transform.SetParent(parent.transform);
             visual.transform.localPosition = Vector3.zero;
             visual.transform.localScale = new Vector3(1.5f, 0.2f, 1.5f);
-            
-            var renderer = visual.GetComponent<Renderer>();
+
+            Renderer renderer = visual.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             
             // Color code by position for easy identification
@@ -96,32 +96,35 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void CreateSampleConnections()
         {
             var connectionsParent = new GameObject("Connections");
-            
+
             // Find all district authoring components
-            var districts = UnityEngine.Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+            DistrictAuthoring[] districts = UnityEngine.Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
             
             // Create connections between adjacent districts
-            foreach (var district1 in districts)
+            foreach (DistrictAuthoring district1 in districts)
             {
-                foreach (var district2 in districts)
+                foreach (DistrictAuthoring district2 in districts)
                 {
-                    if (district1 == district2) continue;
-                    
+                    if (district1 == district2)
+                    {
+                        continue;
+                    }
+
                     // Check if districts are adjacent (distance of 1 in grid coordinates)
-                    var dist = math.abs(district1.gridCoordinates.x - district2.gridCoordinates.x) +
+                    int dist = math.abs(district1.gridCoordinates.x - district2.gridCoordinates.x) +
                               math.abs(district1.gridCoordinates.y - district2.gridCoordinates.y);
                     
                     if (dist == 1 && district1.nodeId < district2.nodeId) // Avoid duplicate connections
                     {
                         var connectionGO = new GameObject($"Connection_{district1.nodeId}_{district2.nodeId}");
                         connectionGO.transform.SetParent(connectionsParent.transform);
-                        
+
                         // Position connection between districts
-                        var pos1 = district1.transform.position;
-                        var pos2 = district2.transform.position;
+                        Vector3 pos1 = district1.transform.position;
+                        Vector3 pos2 = district2.transform.position;
                         connectionGO.transform.position = (pos1 + pos2) * 0.5f + Vector3.up * 0.5f;
-                        
-                        var connection = connectionGO.AddComponent<ConnectionAuthoring>();
+
+                        ConnectionAuthoring connection = connectionGO.AddComponent<ConnectionAuthoring>();
                         connection.from = district1;
                         connection.to = district2;
                         connection.type = ConnectionType.Bidirectional;
@@ -142,17 +145,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var visual = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             visual.name = "Visual";
             visual.transform.SetParent(parent.transform);
-            
+
             // Orient cylinder to connect the two points
-            var direction = (to - from).normalized;
-            var distance = Vector3.Distance(from, to);
+            Vector3 direction = (to - from).normalized;
+            float distance = Vector3.Distance(from, to);
             
             visual.transform.localPosition = Vector3.zero;
             visual.transform.localScale = new Vector3(0.1f, distance * 0.5f, 0.1f);
             visual.transform.LookAt(parent.transform.position + direction);
             visual.transform.Rotate(90, 0, 0);
-            
-            var renderer = visual.GetComponent<Renderer>();
+
+            Renderer renderer = visual.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             renderer.material.color = new Color(0.8f, 0.3f, 0.8f);
         }
@@ -172,12 +175,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             for (int i = 0; i < biomeConfigs.Length; i++)
             {
-                var config = biomeConfigs[i];
+                (Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) config = biomeConfigs[i];
                 var biomeFieldGO = new GameObject($"BiomeField_{i + 1}");
                 biomeFieldGO.transform.SetParent(biomeFieldsParent.transform);
                 biomeFieldGO.transform.position = config.position;
-                
-                var biomeField = biomeFieldGO.AddComponent<BiomeFieldAuthoring>();
+
+                BiomeFieldAuthoring biomeField = biomeFieldGO.AddComponent<BiomeFieldAuthoring>();
                 biomeField.primaryBiome = config.primary;
                 biomeField.secondaryBiome = config.secondary;
                 biomeField.strength = config.strength;
@@ -197,8 +200,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             visual.transform.SetParent(parent.transform);
             visual.transform.localPosition = Vector3.zero;
             visual.transform.localScale = Vector3.one * (2f + strength);
-            
-            var renderer = visual.GetComponent<Renderer>();
+
+            Renderer renderer = visual.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             
             // Color code by biome type
@@ -242,12 +245,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             
             for (int i = 0; i < tileConfigs.Length; i++)
             {
-                var config = tileConfigs[i];
+                (string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) config = tileConfigs[i];
                 var tileGO = new GameObject($"WfcTilePrototype_{config.name}");
                 tileGO.transform.SetParent(wfcLibraryParent.transform);
                 tileGO.transform.position = new Vector3(i * 2f, 0, 0);
-                
-                var wfcTile = tileGO.AddComponent<WfcTilePrototypeAuthoring>();
+
+                WfcTilePrototypeAuthoring wfcTile = tileGO.AddComponent<WfcTilePrototypeAuthoring>();
                 wfcTile.tileId = config.id;
                 wfcTile.weight = config.weight;
                 wfcTile.biomeType = config.biome;
@@ -306,8 +309,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             visual.transform.SetParent(parent.transform);
             visual.transform.localPosition = Vector3.zero;
             visual.transform.localScale = Vector3.one * 0.8f;
-            
-            var renderer = visual.GetComponent<Renderer>();
+
+            Renderer renderer = visual.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             
             // Color by type
@@ -328,8 +331,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var cameraGO = new GameObject("Sample Camera");
             cameraGO.transform.position = new Vector3(0, 8, -8);
             cameraGO.transform.LookAt(Vector3.zero);
-            
-            var camera = cameraGO.AddComponent<Camera>();
+
+            Camera camera = cameraGO.AddComponent<Camera>();
             camera.fieldOfView = 60f;
             camera.nearClipPlane = 0.3f;
             camera.farClipPlane = 1000f;
@@ -345,8 +348,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Create directional light
             var lightGO = new GameObject("Directional Light");
             lightGO.transform.rotation = Quaternion.Euler(30f, 30f, 0f);
-            
-            var light = lightGO.AddComponent<Light>();
+
+            Light light = lightGO.AddComponent<Light>();
             light.type = LightType.Directional;
             light.color = Color.white;
             light.intensity = 1f;

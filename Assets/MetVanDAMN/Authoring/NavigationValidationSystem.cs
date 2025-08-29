@@ -33,12 +33,14 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         protected override void OnUpdate()
         {
-            var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
+            NavigationGraph navGraph = SystemAPI.GetSingleton<NavigationGraph>();
             if (!navGraph.IsReady)
+            {
                 return;
+            }
 
             // Perform reachability analysis with different agent capability sets
-            var unreachableCount = PerformReachabilityAnalysis();
+            int unreachableCount = PerformReachabilityAnalysis();
 
             // Update navigation graph state
             SystemAPI.SetSingleton(navGraph);
@@ -52,15 +54,15 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private int PerformReachabilityAnalysis()
         {
-            var unreachableCount = 0;
-            
+            int unreachableCount = 0;
+
             // Test reachability with different agent capability profiles
-            var testCapabilities = GetTestCapabilityProfiles();
+            NativeArray<AgentCapabilities> testCapabilities = GetTestCapabilityProfiles();
             
             for (int profileIndex = 0; profileIndex < testCapabilities.Length; profileIndex++)
             {
-                var capabilities = testCapabilities[profileIndex];
-                var reachabilityResults = AnalyzeReachability(capabilities);
+                AgentCapabilities capabilities = testCapabilities[profileIndex];
+                NativeArray<bool> reachabilityResults = AnalyzeReachability(capabilities);
                 
                 // Count unreachable nodes for this capability profile
                 for (int i = 0; i < reachabilityResults.Length; i++)
@@ -120,10 +122,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                 nodeIds.Dispose();
                 return reachability;
             }
-            
+
             // Start from first node and see what we can reach
-            var startNodeId = nodeIds[0];
-            var reachableNodes = FloodFillReachability(startNodeId, capabilities);
+            uint startNodeId = nodeIds[0];
+            NativeHashSet<uint> reachableNodes = FloodFillReachability(startNodeId, capabilities);
             
             // Mark reachable nodes
             for (int i = 0; i < nodeIds.Length; i++)
@@ -147,22 +149,26 @@ namespace TinyWalnutGames.MetVD.Authoring
             
             while (queue.Count > 0)
             {
-                var currentNodeId = queue.Dequeue();
-                var currentEntity = FindEntityByNodeId(currentNodeId);
+                uint currentNodeId = queue.Dequeue();
+                Entity currentEntity = FindEntityByNodeId(currentNodeId);
                 
                 if (currentEntity == Entity.Null || !SystemAPI.HasBuffer<NavLinkBufferElement>(currentEntity))
+                {
                     continue;
-                    
-                var linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(currentEntity);
+                }
+
+                DynamicBuffer<NavLinkBufferElement> linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(currentEntity);
                 
                 for (int i = 0; i < linkBuffer.Length; i++)
                 {
-                    var link = linkBuffer[i].Value;
-                    var neighborId = link.GetDestination(currentNodeId);
+                    NavLink link = linkBuffer[i].Value;
+                    uint neighborId = link.GetDestination(currentNodeId);
                     
                     if (neighborId == 0 || reachableNodes.Contains(neighborId))
+                    {
                         continue;
-                        
+                    }
+
                     // Check if this agent can traverse this link
                     if (link.CanTraverseWith(capabilities, currentNodeId))
                     {
@@ -183,7 +189,9 @@ namespace TinyWalnutGames.MetVD.Authoring
             Entities.WithAll<NodeId>().ForEach((Entity entity, in NodeId id) =>
             {
                 if (id._value == nodeId)
+                {
                     foundEntity = entity;
+                }
             }).WithoutBurst().Run();
             
             return foundEntity;
@@ -218,9 +226,14 @@ namespace TinyWalnutGames.MetVD.Authoring
         public void Dispose()
         {
             if (UnreachableNodeIds.IsCreated)
+            {
                 UnreachableNodeIds.Dispose();
+            }
+
             if (Issues.IsCreated)
+            {
                 Issues.Dispose();
+            }
         }
     }
 
@@ -275,8 +288,8 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// </summary>
         public static NavigationValidationReport GenerateValidationReport(World world)
         {
-            var em = world.EntityManager;
-            var navGraphQuery = em.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
+            EntityManager em = world.EntityManager;
+            EntityQuery navGraphQuery = em.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
             
 
             if (navGraphQuery.IsEmpty)
@@ -284,32 +297,32 @@ namespace TinyWalnutGames.MetVD.Authoring
                 return new NavigationValidationReport(0, 0);
             }
 
-            var navGraph = navGraphQuery.GetSingleton<NavigationGraph>();
+            NavigationGraph navGraph = navGraphQuery.GetSingleton<NavigationGraph>();
             var report = new NavigationValidationReport(navGraph.NodeCount, navGraph.LinkCount);
-            
+
             // Perform comprehensive validation using the system's analysis results
-            var nodeQuery = em.CreateEntityQuery(ComponentType.ReadOnly<NavNode>(), ComponentType.ReadOnly<NavLinkBufferElement>());
-            
+            EntityQuery nodeQuery = em.CreateEntityQuery(ComponentType.ReadOnly<NavNode>(), ComponentType.ReadOnly<NavLinkBufferElement>());
+
             // Collect all navigation nodes for analysis
-            var allNodes = nodeQuery.ToEntityArray(Allocator.Temp);
+            NativeArray<Entity> allNodes = nodeQuery.ToEntityArray(Allocator.Temp);
             report.TotalNodes = allNodes.Length;
-            
+
             // Test reachability with multiple agent capability profiles
-            var testCapabilities = GetTestCapabilityProfiles();
+            NativeArray<AgentCapabilities> testCapabilities = GetTestCapabilityProfiles();
             var unreachableNodeIds = new NativeHashSet<uint>(allNodes.Length, Allocator.Temp);
             
             for (int profileIndex = 0; profileIndex < testCapabilities.Length; profileIndex++)
             {
-                var capabilities = testCapabilities[profileIndex];
-                var reachableFromStart = PerformReachabilityAnalysis(world, capabilities, allNodes);
+                AgentCapabilities capabilities = testCapabilities[profileIndex];
+                NativeHashSet<uint> reachableFromStart = PerformReachabilityAnalysis(world, capabilities, allNodes);
                 
                 // Mark unreachable nodes for this capability profile
                 for (int nodeIndex = 0; nodeIndex < allNodes.Length; nodeIndex++)
                 {
-                    var nodeEntity = allNodes[nodeIndex];
+                    Entity nodeEntity = allNodes[nodeIndex];
                     if (em.HasComponent<NavNode>(nodeEntity))
                     {
-                        var navNode = em.GetComponentData<NavNode>(nodeEntity);
+                        NavNode navNode = em.GetComponentData<NavNode>(nodeEntity);
                         if (!reachableFromStart.Contains(navNode.NodeId))
                         {
                             unreachableNodeIds.Add(navNode.NodeId);
@@ -333,7 +346,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             report.UnreachableNodeCount = unreachableNodeIds.Count;
             
             // Copy unreachable node IDs to report
-            foreach (var nodeId in unreachableNodeIds)
+            foreach (uint nodeId in unreachableNodeIds)
             {
                 report.UnreachableNodeIds.Add(nodeId);
             }
@@ -353,11 +366,13 @@ namespace TinyWalnutGames.MetVD.Authoring
         private static NativeHashSet<uint> PerformReachabilityAnalysis(World world, AgentCapabilities capabilities, NativeArray<Entity> allNodes)
         {
             var reachableNodes = new NativeHashSet<uint>(allNodes.Length, Unity.Collections.Allocator.Temp);
-            var entityManager = world.EntityManager;
+            EntityManager entityManager = world.EntityManager;
             
             if (allNodes.Length == 0)
+            {
                 return reachableNodes;
-                
+            }
+
             // Start from the first valid node
             Entity startEntity = Entity.Null;
             uint startNodeId = 0;
@@ -373,8 +388,10 @@ namespace TinyWalnutGames.MetVD.Authoring
             }
             
             if (startEntity == Entity.Null)
+            {
                 return reachableNodes;
-            
+            }
+
             // Flood fill algorithm to find all reachable nodes
             var queue = new NativeQueue<uint>(Unity.Collections.Allocator.Temp);
             queue.Enqueue(startNodeId);
@@ -382,22 +399,26 @@ namespace TinyWalnutGames.MetVD.Authoring
             
             while (queue.Count > 0)
             {
-                var currentNodeId = queue.Dequeue();
-                var currentEntity = FindEntityByNodeId(world, currentNodeId);
+                uint currentNodeId = queue.Dequeue();
+                Entity currentEntity = FindEntityByNodeId(world, currentNodeId);
                 
                 if (currentEntity == Entity.Null || !entityManager.HasBuffer<NavLinkBufferElement>(currentEntity))
+                {
                     continue;
-                    
-                var linkBuffer = entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
+                }
+
+                DynamicBuffer<NavLinkBufferElement> linkBuffer = entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
                 
                 for (int i = 0; i < linkBuffer.Length; i++)
                 {
-                    var link = linkBuffer[i].Value;
-                    var neighborId = link.GetDestination(currentNodeId);
+                    NavLink link = linkBuffer[i].Value;
+                    uint neighborId = link.GetDestination(currentNodeId);
                     
                     if (neighborId == 0 || reachableNodes.Contains(neighborId))
+                    {
                         continue;
-                        
+                    }
+
                     // Check if this agent can traverse this link
                     if (link.CanTraverseWith(capabilities, currentNodeId))
                     {
@@ -416,13 +437,13 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// </summary>
         private static Entity FindEntityByNodeId(World world, uint nodeId)
         {
-            var entityManager = world.EntityManager;
-            var nodeQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
-            var entities = nodeQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            EntityManager entityManager = world.EntityManager;
+            EntityQuery nodeQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+            NativeArray<Entity> entities = nodeQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
             
-            foreach (var entity in entities)
+            foreach (Entity entity in entities)
             {
-                var id = entityManager.GetComponentData<NodeId>(entity);
+                NodeId id = entityManager.GetComponentData<NodeId>(entity);
                 if (id._value == nodeId)
                 {
                     entities.Dispose();
@@ -466,25 +487,35 @@ namespace TinyWalnutGames.MetVD.Authoring
         public static bool IsPathPossible(World world, uint fromNodeId, uint toNodeId, AgentCapabilities capabilities)
         {
             if (world == null)
+            {
                 return false;
+            }
 
-            var entityManager = world.EntityManager;
+            EntityManager entityManager = world.EntityManager;
             if (entityManager == null)
+            {
                 return false;
+            }
 
             // Quick check: if source and destination are the same, path is always possible
             if (fromNodeId == toNodeId)
+            {
                 return true;
+            }
 
             // Find source entity
-            var sourceEntity = FindEntityByNodeId(world, fromNodeId);
+            Entity sourceEntity = FindEntityByNodeId(world, fromNodeId);
             if (sourceEntity == Entity.Null)
+            {
                 return false;
+            }
 
             // Find destination entity  
-            var destinationEntity = FindEntityByNodeId(world, toNodeId);
+            Entity destinationEntity = FindEntityByNodeId(world, toNodeId);
             if (destinationEntity == Entity.Null)
+            {
                 return false;
+            }
 
             // Perform flood fill pathfinding from source to destination
             var reachableNodes = new NativeHashSet<uint>(1000, Allocator.Temp);
@@ -498,29 +529,33 @@ namespace TinyWalnutGames.MetVD.Authoring
                 
                 while (queue.Count > 0)
                 {
-                    var currentNodeId = queue.Dequeue();
+                    uint currentNodeId = queue.Dequeue();
                     
                     // Check if we've reached the destination
                     if (currentNodeId == toNodeId)
                     {
                         return true; // Path found!
                     }
-                    
+
                     // Find current entity and explore its neighbors
-                    var currentEntity = FindEntityByNodeId(world, currentNodeId);
+                    Entity currentEntity = FindEntityByNodeId(world, currentNodeId);
                     if (currentEntity == Entity.Null || !entityManager.HasBuffer<NavLinkBufferElement>(currentEntity))
+                    {
                         continue;
-                        
-                    var linkBuffer = entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
+                    }
+
+                    DynamicBuffer<NavLinkBufferElement> linkBuffer = entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
                     
                     for (int i = 0; i < linkBuffer.Length; i++)
                     {
-                        var link = linkBuffer[i].Value;
-                        var neighborId = link.GetDestination(currentNodeId);
+                        NavLink link = linkBuffer[i].Value;
+                        uint neighborId = link.GetDestination(currentNodeId);
                         
                         if (neighborId == 0 || reachableNodes.Contains(neighborId))
+                        {
                             continue;
-                            
+                        }
+
                         // 🔥 CRITICAL: Check if agent can traverse this link with their capabilities
                         if (link.CanTraverseWith(capabilities, currentNodeId))
                         {
@@ -537,9 +572,14 @@ namespace TinyWalnutGames.MetVD.Authoring
             {
                 // Always clean up native collections
                 if (reachableNodes.IsCreated)
+                {
                     reachableNodes.Dispose();
+                }
+
                 if (queue.IsCreated)
+                {
                     queue.Dispose();
+                }
             }
         }
 
@@ -554,7 +594,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Generate suggestions based on issues found
             for (int i = 0; i < report.Issues.Length; i++)
             {
-                var issue = report.Issues[i];
+                NavigationIssue issue = report.Issues[i];
                 if(issue.Type == NavigationIssueType.UnreachableNode)
                 {
                     fixes.Add(new NavigationQuickFix

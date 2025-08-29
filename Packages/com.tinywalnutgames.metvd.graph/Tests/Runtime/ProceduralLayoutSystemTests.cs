@@ -25,10 +25,10 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _initGroup = _testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
 
             // Create unmanaged systems (District layout -> connections -> rules -> sector/room hierarchy)
-            var layoutHandle = _testWorld.CreateSystem(typeof(DistrictLayoutSystem));
-            var connectionHandle = _testWorld.CreateSystem(typeof(ConnectionBuilderSystem));
-            var rulesHandle = _testWorld.CreateSystem(typeof(RuleRandomizationSystem));
-            var sectorRoomHandle = _testWorld.CreateSystem(typeof(SectorRoomHierarchySystem));
+            SystemHandle layoutHandle = _testWorld.CreateSystem(typeof(DistrictLayoutSystem));
+            SystemHandle connectionHandle = _testWorld.CreateSystem(typeof(ConnectionBuilderSystem));
+            SystemHandle rulesHandle = _testWorld.CreateSystem(typeof(RuleRandomizationSystem));
+            SystemHandle sectorRoomHandle = _testWorld.CreateSystem(typeof(SectorRoomHierarchySystem));
 
             _initGroup.AddSystemToUpdateList(layoutHandle);
             _initGroup.AddSystemToUpdateList(connectionHandle);
@@ -41,14 +41,16 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void TearDown()
         {
             if (_testWorld != null && _testWorld.IsCreated)
+            {
                 _testWorld.Dispose();
+            }
         }
 
         [Test]
         public void DistrictLayoutSystem_WithUnplacedDistricts_ShouldAssignCoordinates()
         {
             // Arrange
-            var worldConfig = _entityManager.CreateEntity();
+            Entity worldConfig = _entityManager.CreateEntity();
             _entityManager.AddComponentData(worldConfig, new WorldConfiguration
             {
                 Seed = 12345,
@@ -58,11 +60,11 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             });
 
             // Create unplaced districts
-            var district1 = _entityManager.CreateEntity();
+            Entity district1 = _entityManager.CreateEntity();
             _entityManager.AddComponentData(district1, new NodeId(1, 0, 0, new int2(0, 0)));
             _entityManager.AddComponentData(district1, new WfcState());
 
-            var district2 = _entityManager.CreateEntity();
+            Entity district2 = _entityManager.CreateEntity();
             _entityManager.AddComponentData(district2, new NodeId(2, 0, 0, new int2(0, 0)));
             _entityManager.AddComponentData(district2, new WfcState());
 
@@ -70,15 +72,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _initGroup.Update();
 
             // Assert
-            var node1 = _entityManager.GetComponentData<NodeId>(district1);
-            var node2 = _entityManager.GetComponentData<NodeId>(district2);
+            NodeId node1 = _entityManager.GetComponentData<NodeId>(district1);
+            NodeId node2 = _entityManager.GetComponentData<NodeId>(district2);
 
             // Should no longer be at (0,0)
             Assert.That(node1.Coordinates.x != 0 || node1.Coordinates.y != 0, "District 1 should be moved from (0,0)");
             Assert.That(node2.Coordinates.x != 0 || node2.Coordinates.y != 0, "District 2 should be moved from (0,0)");
 
             // Check that layout done tag was created
-            using var layoutDoneQuery = _entityManager.CreateEntityQuery(typeof(DistrictLayoutDoneTag));
+            using EntityQuery layoutDoneQuery = _entityManager.CreateEntityQuery(typeof(DistrictLayoutDoneTag));
             Assert.That(layoutDoneQuery.CalculateEntityCount(), Is.EqualTo(1), "Should create DistrictLayoutDoneTag");
         }
 
@@ -86,7 +88,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void SectorRoomHierarchySystem_GeneratesSectorsAndRooms()
         {
             // Arrange world + districts (TargetSectors influences sectors per district)
-            var worldConfig = _entityManager.CreateEntity();
+            Entity worldConfig = _entityManager.CreateEntity();
             _entityManager.AddComponentData(worldConfig, new WorldConfiguration
             {
                 Seed = 2222,
@@ -96,7 +98,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             });
             for (uint i = 0; i < 3; i++)
             {
-                var d = _entityManager.CreateEntity();
+                Entity d = _entityManager.CreateEntity();
                 _entityManager.AddComponentData(d, new NodeId(i + 1, 0, 0, int2.zero));
                 _entityManager.AddComponentData(d, new WfcState());
             }
@@ -104,15 +106,29 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             // Act (single update should: place districts -> add DistrictLayoutDoneTag -> subdivide into sectors + rooms)
             _initGroup.Update();
 
-            using var sectorQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<SectorHierarchyData>());
-            using var roomQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<RoomHierarchyData>());
+            using EntityQuery sectorQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<SectorHierarchyData>());
+            using EntityQuery roomQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<RoomHierarchyData>());
 
             int sectorCount = 0;
             int roomCount = 0;
-            var sectorNodeIds = sectorQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
-            for (int i = 0; i < sectorNodeIds.Length; i++) if (sectorNodeIds[i].Level == 1) sectorCount++;
-            var roomNodeIds = roomQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
-            for (int i = 0; i < roomNodeIds.Length; i++) if (roomNodeIds[i].Level == 2) roomCount++;
+            Unity.Collections.NativeArray<NodeId> sectorNodeIds = sectorQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+            for (int i = 0; i < sectorNodeIds.Length; i++)
+            {
+                if (sectorNodeIds[i].Level == 1)
+                {
+                    sectorCount++;
+                }
+            }
+
+            Unity.Collections.NativeArray<NodeId> roomNodeIds = roomQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+            for (int i = 0; i < roomNodeIds.Length; i++)
+            {
+                if (roomNodeIds[i].Level == 2)
+                {
+                    roomCount++;
+                }
+            }
+
             sectorNodeIds.Dispose(); roomNodeIds.Dispose();
 
             Assert.Greater(sectorCount, 0, "Should generate at least one sector");
@@ -123,7 +139,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void RuleRandomizationSystem_WithPartialMode_ShouldRandomizeBiomes()
         {
             // Arrange
-            var worldConfig = _entityManager.CreateEntity();
+            Entity worldConfig = _entityManager.CreateEntity();
             _entityManager.AddComponentData(worldConfig, new WorldConfiguration
             {
                 Seed = 54321,
@@ -132,15 +148,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
                 RandomizationMode = RandomizationMode.Partial
             });
 
-            var layoutDone = _entityManager.CreateEntity();
+            Entity layoutDone = _entityManager.CreateEntity();
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(3, 0));
 
             // Create test districts to satisfy ConnectionBuilderSystem requirements
-            var district1 = _entityManager.CreateEntity();
+            Entity district1 = _entityManager.CreateEntity();
             _entityManager.AddComponentData(district1, new NodeId(1, 0, 0, new int2(1, 1)));
             _entityManager.AddBuffer<ConnectionBufferElement>(district1);
 
-            var district2 = _entityManager.CreateEntity();
+            Entity district2 = _entityManager.CreateEntity();
             _entityManager.AddComponentData(district2, new NodeId(2, 0, 0, new int2(2, 2)));
             _entityManager.AddBuffer<ConnectionBufferElement>(district2);
 
@@ -148,14 +164,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _initGroup.Update();
 
             // Assert
-            using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
+            using EntityQuery ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
             Assert.That(ruleQuery.CalculateEntityCount(), Is.EqualTo(1), "Should create WorldRuleSet");
 
-            var ruleSet = ruleQuery.GetSingleton<WorldRuleSet>();
+            WorldRuleSet ruleSet = ruleQuery.GetSingleton<WorldRuleSet>();
             Assert.That(ruleSet.BiomePolarityMask, Is.Not.EqualTo(Polarity.None), "Should have assigned biome polarities");
             Assert.That(ruleSet.UpgradesRandomized, Is.False, "Upgrades should not be randomized in Partial mode");
 
-            using var rulesDoneQuery = _entityManager.CreateEntityQuery(typeof(RuleRandomizationDoneTag));
+            using EntityQuery rulesDoneQuery = _entityManager.CreateEntityQuery(typeof(RuleRandomizationDoneTag));
             Assert.That(rulesDoneQuery.CalculateEntityCount(), Is.EqualTo(1), "Should create RuleRandomizationDoneTag");
         }
 
@@ -163,7 +179,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void RuleRandomizationSystem_WithFullMode_ShouldRandomizeEverything()
         {
             // Arrange
-            var worldConfig = _entityManager.CreateEntity();
+            Entity worldConfig = _entityManager.CreateEntity();
             _entityManager.AddComponentData(worldConfig, new WorldConfiguration
             {
                 Seed = 98765,
@@ -172,15 +188,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
                 RandomizationMode = RandomizationMode.Full
             });
 
-            var layoutDone = _entityManager.CreateEntity();
+            Entity layoutDone = _entityManager.CreateEntity();
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(8, 0));
 
             // Create test districts to satisfy ConnectionBuilderSystem requirements
-            var district1 = _entityManager.CreateEntity();
+            Entity district1 = _entityManager.CreateEntity();
             _entityManager.AddComponentData(district1, new NodeId(1, 0, 0, new int2(1, 1)));
             _entityManager.AddBuffer<ConnectionBufferElement>(district1);
 
-            var district2 = _entityManager.CreateEntity();
+            Entity district2 = _entityManager.CreateEntity();
             _entityManager.AddComponentData(district2, new NodeId(2, 0, 0, new int2(2, 2)));
             _entityManager.AddBuffer<ConnectionBufferElement>(district2);
 
@@ -188,8 +204,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _initGroup.Update();
 
             // Assert
-            using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
-            var ruleSet = ruleQuery.GetSingleton<WorldRuleSet>();
+            using EntityQuery ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
+            WorldRuleSet ruleSet = ruleQuery.GetSingleton<WorldRuleSet>();
 
             Assert.That(ruleSet.BiomePolarityMask, Is.Not.EqualTo(Polarity.None), "Should have assigned biome polarities");
             Assert.That(ruleSet.UpgradesRandomized, Is.True, "Upgrades should be randomized in Full mode");
@@ -204,7 +220,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void RuleRandomizationSystem_WithNoneMode_ShouldUseCuratedRules()
         {
             // Arrange
-            var worldConfig = _entityManager.CreateEntity();
+            Entity worldConfig = _entityManager.CreateEntity();
             _entityManager.AddComponentData(worldConfig, new WorldConfiguration
             {
                 Seed = 11111,
@@ -213,15 +229,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
                 RandomizationMode = RandomizationMode.None
             });
 
-            var layoutDone = _entityManager.CreateEntity();
+            Entity layoutDone = _entityManager.CreateEntity();
             _entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(4, 0));
 
             // Create test districts to satisfy ConnectionBuilderSystem requirements
-            var district1 = _entityManager.CreateEntity();
+            Entity district1 = _entityManager.CreateEntity();
             _entityManager.AddComponentData(district1, new NodeId(1, 0, 0, new int2(1, 1)));
             _entityManager.AddBuffer<ConnectionBufferElement>(district1);
 
-            var district2 = _entityManager.CreateEntity();
+            Entity district2 = _entityManager.CreateEntity();
             _entityManager.AddComponentData(district2, new NodeId(2, 0, 0, new int2(2, 2)));
             _entityManager.AddBuffer<ConnectionBufferElement>(district2);
 
@@ -229,13 +245,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _initGroup.Update();
 
             // Assert
-            using var ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
-            var ruleSet = ruleQuery.GetSingleton<WorldRuleSet>();
+            using EntityQuery ruleQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
+            WorldRuleSet ruleSet = ruleQuery.GetSingleton<WorldRuleSet>();
 
             Assert.That(ruleSet.UpgradesRandomized, Is.False, "Upgrades should not be randomized in None mode");
 
             // Should have curated polarity distribution
-            var expectedCuratedPolarities = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold;
+            Polarity expectedCuratedPolarities = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold;
             Assert.That(ruleSet.BiomePolarityMask, Is.EqualTo(expectedCuratedPolarities), "Should use curated polarity distribution");
         }
     }

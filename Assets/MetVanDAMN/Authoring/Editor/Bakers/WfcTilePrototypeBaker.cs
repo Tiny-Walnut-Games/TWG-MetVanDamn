@@ -14,7 +14,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     {
         public override void Bake(WfcTilePrototypeAuthoring authoring)
         {
-            var entity = GetEntity(TransformUsageFlags.None);
+            Entity entity = GetEntity(TransformUsageFlags.None);
             
             // Add the tile prototype component
             AddComponent(entity, new WfcTilePrototype(
@@ -29,9 +29,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             // Add socket buffer if sockets are defined
             if (authoring.sockets != null && authoring.sockets.Length > 0)
             {
-                var socketBuffer = AddBuffer<WfcSocketBufferElement>(entity);
+                DynamicBuffer<WfcSocketBufferElement> socketBuffer = AddBuffer<WfcSocketBufferElement>(entity);
                 
-                foreach (var socketConfig in authoring.sockets)
+                foreach (WfcSocketConfig socketConfig in authoring.sockets)
                 {
                     if (socketConfig.isOpen) // Only add open sockets
                     {

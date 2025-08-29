@@ -46,13 +46,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void ProceduralRoomGenerator_CreatesRoomTemplate_WithCorrectCapabilityTags()
         {
             // Arrange
-            var roomEntity = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 10, 8));
-            var worldConfig = CreateWorldConfiguration();
+            Entity roomEntity = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 10, 8));
+            Entity worldConfig = CreateWorldConfiguration();
             _ = worldConfig; // suppress unused
-            
+
             // Create and update the procedural room generator system
-            var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
+            InitializationSystemGroup initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            ProceduralRoomGeneratorSystem roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
             initGroup.AddSystemToUpdateList(roomGenSystem);
             initGroup.SortSystems();
             initGroup.Update();
@@ -60,9 +60,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             // Assert
             Assert.IsTrue(_entityManager.HasComponent<RoomTemplate>(roomEntity));
             Assert.IsTrue(_entityManager.HasComponent<ProceduralRoomGenerated>(roomEntity));
-            
-            var template = _entityManager.GetComponentData<RoomTemplate>(roomEntity);
-            var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+
+            RoomTemplate template = _entityManager.GetComponentData<RoomTemplate>(roomEntity);
+            ProceduralRoomGenerated genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             
             Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, template.GeneratorType);
             Assert.AreNotEqual(Ability.None, template.CapabilityTags.RequiredSkills);
@@ -76,13 +76,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void NavigationGenerator_CreatesMovementConnections_WithCorrectAbilityTags()
         {
             // Arrange
-            var roomEntity = CreateTestRoomWithTemplate();
-            
-            var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
-            
+            Entity roomEntity = CreateTestRoomWithTemplate();
+
+            InitializationSystemGroup initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            ProceduralRoomGeneratorSystem roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
+
             // Use the main system directly since it's now SystemBase
-            var navGenSystem = _world.GetOrCreateSystemManaged<RoomNavigationGeneratorSystem>();
+            RoomNavigationGeneratorSystem navGenSystem = _world.GetOrCreateSystemManaged<RoomNavigationGeneratorSystem>();
 
             initGroup.AddSystemToUpdateList(roomGenSystem);
             initGroup.AddSystemToUpdateList(navGenSystem);
@@ -91,11 +91,11 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
             // Assert
             Assert.IsTrue(_entityManager.HasBuffer<RoomNavigationElement>(roomEntity));
-            
-            var navBuffer = _entityManager.GetBuffer<RoomNavigationElement>(roomEntity);
+
+            DynamicBuffer<RoomNavigationElement> navBuffer = _entityManager.GetBuffer<RoomNavigationElement>(roomEntity);
             Assert.Greater(navBuffer.Length, 0);
-            
-            var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+
+            ProceduralRoomGenerated genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             Assert.IsTrue(genStatus.NavigationGenerated);
             
             bool hasJumpConnection = false;
@@ -114,14 +114,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         public void CinemachineZoneGenerator_CreatesBiomeSpecificCameraSettings()
         {
             // Arrange
-            var roomEntity = CreateTestRoomWithTemplate();
-            
-            var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
-            
-            var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
-            var navGenSystem = _world.GetOrCreateSystemManaged<RoomNavigationGeneratorSystem>();
-            var cameraGenSystem = _world.GetOrCreateSystemManaged<CinemachineZoneGeneratorSystem>();
+            Entity roomEntity = CreateTestRoomWithTemplate();
+
+            InitializationSystemGroup initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            SimulationSystemGroup simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+
+            ProceduralRoomGeneratorSystem roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
+            RoomNavigationGeneratorSystem navGenSystem = _world.GetOrCreateSystemManaged<RoomNavigationGeneratorSystem>();
+            CinemachineZoneGeneratorSystem cameraGenSystem = _world.GetOrCreateSystemManaged<CinemachineZoneGeneratorSystem>();
             
             initGroup.AddSystemToUpdateList(roomGenSystem);
             initGroup.AddSystemToUpdateList(navGenSystem);
@@ -133,16 +133,16 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
             Assert.IsTrue(_entityManager.HasComponent<CinemachineZoneData>(roomEntity));
             Assert.IsTrue(_entityManager.HasComponent<CinemachineGameObjectReference>(roomEntity));
-            
-            var cameraZone = _entityManager.GetComponentData<CinemachineZoneData>(roomEntity);
-            var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+
+            CinemachineZoneData cameraZone = _entityManager.GetComponentData<CinemachineZoneData>(roomEntity);
+            ProceduralRoomGenerated genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             
             Assert.IsTrue(genStatus.CinemachineGenerated);
             Assert.Greater(cameraZone.Priority, 0);
             Assert.Greater(cameraZone.BlendTime, 0.0f);
-            
-            var roomData = _entityManager.GetComponentData<RoomHierarchyData>(roomEntity);
-            var roomBounds = roomData.Bounds;
+
+            RoomHierarchyData roomData = _entityManager.GetComponentData<RoomHierarchyData>(roomEntity);
+            RectInt roomBounds = roomData.Bounds;
             Assert.IsTrue(cameraZone.CameraPosition.x >= roomBounds.x - 5 && 
                          cameraZone.CameraPosition.x <= roomBounds.x + roomBounds.width + 5);
         }
@@ -153,8 +153,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var physics = new JumpArcPhysics();
             var startPos = new int2(0, 0);
             var targetPos = new int2(3, 2);
-            var basicMovement = Ability.Jump;
-            var advancedMovement = Ability.Jump | Ability.DoubleJump | Ability.Dash;
+            Ability basicMovement = Ability.Jump;
+            Ability advancedMovement = Ability.Jump | Ability.DoubleJump | Ability.Dash;
             bool reachableBasic = JumpArcSolver.IsPositionReachable(startPos, targetPos, basicMovement, physics); // TODO: Find a use for this variable
             bool reachableAdvanced = JumpArcSolver.IsPositionReachable(startPos, targetPos, advancedMovement, physics);
             Assert.IsTrue(reachableAdvanced, "Advanced movement must reach the target.");
@@ -194,14 +194,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         [Test]
         public void CompleteGenerationPipeline_ProcessesRoomCorrectly()
         {
-            var roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
+            Entity roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
             CreateWorldConfiguration();
 
-            var initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            var simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
-            var roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
-            var navGenSystem = _world.GetOrCreateSystemManaged<RoomNavigationGeneratorSystem>();
-            var cameraGenSystem = _world.GetOrCreateSystemManaged<CinemachineZoneGeneratorSystem>();
+            InitializationSystemGroup initGroup = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            SimulationSystemGroup simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            ProceduralRoomGeneratorSystem roomGenSystem = _world.GetOrCreateSystemManaged<ProceduralRoomGeneratorSystem>();
+            RoomNavigationGeneratorSystem navGenSystem = _world.GetOrCreateSystemManaged<RoomNavigationGeneratorSystem>();
+            CinemachineZoneGeneratorSystem cameraGenSystem = _world.GetOrCreateSystemManaged<CinemachineZoneGeneratorSystem>();
 
             initGroup.AddSystemToUpdateList(roomGenSystem);
             initGroup.AddSystemToUpdateList(navGenSystem);
@@ -211,7 +211,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             initGroup.Update();
             simGroup.Update();
 
-            var genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+            ProceduralRoomGenerated genStatus = _entityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
             Assert.IsTrue(genStatus.ContentGenerated || _entityManager.HasComponent<RoomTemplate>(roomEntity));
             Assert.IsTrue(genStatus.NavigationGenerated);
             Assert.IsTrue(genStatus.CinemachineGenerated);
@@ -223,7 +223,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
         private Entity CreateTestRoom(RoomType roomType, RectInt bounds)
         {
-            var roomEntity = _entityManager.CreateEntity();
+            Entity roomEntity = _entityManager.CreateEntity();
             var nodeId = new NodeId(12345u, 2, 1000u, new int2(bounds.x, bounds.y));
             var roomData = new RoomHierarchyData(bounds, roomType, true);
             _entityManager.AddComponentData(roomEntity, nodeId);
@@ -234,7 +234,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
         private Entity CreateTestRoomWithTemplate()
         {
-            var roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
+            Entity roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
             var capabilityTags = new MovementCapabilityTags(Ability.Jump, Ability.DoubleJump, BiomeAffinity.Forest, 0.5f);
             var template = new RoomTemplate(RoomGeneratorType.WeightedTilePrefab, capabilityTags, new int2(4, 3), new int2(8, 6), 0.15f, true, 999u);
             _entityManager.AddComponentData(roomEntity, template);
@@ -244,7 +244,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
         private Entity CreateWorldConfiguration()
         {
-            var configEntity = _entityManager.CreateEntity();
+            Entity configEntity = _entityManager.CreateEntity();
             var worldConfig = new WorldConfiguration { Seed = 12345, WorldSize = new int2(50, 50), TargetSectors = 8, RandomizationMode = RandomizationMode.Partial };
             _entityManager.AddComponentData(configEntity, worldConfig);
             return configEntity;

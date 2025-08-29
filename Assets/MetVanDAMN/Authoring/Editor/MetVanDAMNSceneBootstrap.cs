@@ -57,9 +57,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             if (PrefabStageUtility.GetCurrentPrefabStage() != null)
             {
                 if (!EditorUtility.DisplayDialog("Exit Prefab Stage?", "You are editing a prefab which blocks additive scene creation. Exit and continue?", "Yes", "Cancel"))
+                {
                     return;
+                }
+
                 if (PrefabStageUtility.GetCurrentPrefabStage().scene.isDirty)
+                {
                     PrefabStageUtility.GetCurrentPrefabStage().ClearDirtiness();
+                }
+
                 AssetDatabase.SaveAssets();
                 EditorSceneManager.CloseScene(EditorSceneManager.GetActiveScene(), true);
             }
@@ -82,13 +88,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 // Ensure root scene is loaded additively before each attempt (in case prior fallback replaced it)
                 ReopenRootIfNeeded();
                 var parentGO = GameObject.Find("_SubScenes");
-                if (!parentGO) parentGO = new GameObject("_SubScenes");
+                if (!parentGO)
+                {
+                    parentGO = new GameObject("_SubScenes");
+                }
+
                 TryCreateAndLinkSubScene(subName, parentGO.transform);
             }
 
             // Final ensure root open & saved
             ReopenRootIfNeeded();
-            var finalRoot = SceneManager.GetSceneByPath(rootPath);
+            Scene finalRoot = SceneManager.GetSceneByPath(rootPath);
             if (finalRoot.IsValid())
             {
                 EditorSceneManager.MarkSceneDirty(finalRoot);
@@ -100,14 +110,21 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             string note = _fallbackTriggeredThisRun ? " (one or more sub‑scenes created via fallback)" : string.Empty;
             Debug.Log("✅ MetVanDAMN baseline scene + " + SubSceneNames.Length + " sub‑scenes created at " + rootPath + note);
             if (_fallbackTriggeredThisRun)
+            {
                 Debug.LogWarning("Some sub‑scenes were created using fallback (Single) mode because additive creation was unavailable. Re-run the bootstrap later if you need to refresh links.");
+            }
+
             Debug.Log("   Next: Open the scene and press Play for immediate worldgen smoke validation.");
         }
 
         private static void ReopenRootIfNeeded()
         {
-            if (string.IsNullOrEmpty(_currentRootScenePath)) return;
-            var root = SceneManager.GetSceneByPath(_currentRootScenePath);
+            if (string.IsNullOrEmpty(_currentRootScenePath))
+            {
+                return;
+            }
+
+            Scene root = SceneManager.GetSceneByPath(_currentRootScenePath);
             if (!root.IsValid() || !root.isLoaded)
             {
                 if (File.Exists(_currentRootScenePath))
@@ -116,8 +133,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 }
             }
             // Ensure the root scene remains active (helps SubScene authoring context)
-            var ensuredRoot = SceneManager.GetSceneByPath(_currentRootScenePath);
-            if (ensuredRoot.IsValid()) SceneManager.SetActiveScene(ensuredRoot);
+            Scene ensuredRoot = SceneManager.GetSceneByPath(_currentRootScenePath);
+            if (ensuredRoot.IsValid())
+            {
+                SceneManager.SetActiveScene(ensuredRoot);
+            }
         }
 
 #if METVD_FULL_DOTS
@@ -127,19 +147,38 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             SmokeTestSceneSetup comp = go.AddComponent<SmokeTestSceneSetup>();
             SerializedObject so = new(comp);
             SerializedProperty seedProp = so.FindProperty("worldSeed");
-            if (seedProp != null) seedProp.uintValue = 42u;
+            if (seedProp != null)
+            {
+                seedProp.uintValue = 42u;
+            }
+
             SerializedProperty worldSizeProp = so.FindProperty("worldSize");
             if (worldSizeProp != null)
             {
                 SerializedProperty x = worldSizeProp.FindPropertyRelative("x");
                 SerializedProperty y = worldSizeProp.FindPropertyRelative("y");
-                if (x != null) x.intValue = 50;
-                if (y != null) y.intValue = 50;
+                if (x != null)
+                {
+                    x.intValue = 50;
+                }
+
+                if (y != null)
+                {
+                    y.intValue = 50;
+                }
             }
             SerializedProperty sectorsProp = so.FindProperty("targetSectorCount");
-            if (sectorsProp != null) sectorsProp.intValue = 5;
+            if (sectorsProp != null)
+            {
+                sectorsProp.intValue = 5;
+            }
+
             SerializedProperty radiusProp = so.FindProperty("biomeTransitionRadius");
-            if (radiusProp != null) radiusProp.floatValue = 10f;
+            if (radiusProp != null)
+            {
+                radiusProp.floatValue = 10f;
+            }
+
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 #else
@@ -227,7 +266,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static bool SafeEnsureScene(string scenePath, string sceneName)
         {
             Scene existingLoaded = SceneManager.GetSceneByPath(scenePath);
-            if (existingLoaded.IsValid() && existingLoaded.isLoaded) return true;
+            if (existingLoaded.IsValid() && existingLoaded.isLoaded)
+            {
+                return true;
+            }
 
             if (File.Exists(scenePath))
             {
@@ -237,28 +279,50 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
             try
             {
-                var additive = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+                Scene additive = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
                 additive.name = sceneName;
                 if (!EditorSceneManager.SaveScene(additive, scenePath))
                 {
                     Debug.LogError("❌ Failed to save sub‑scene " + sceneName + " at " + scenePath);
                     return false;
                 }
+                
+                // 🔥 TIMING FIX: Force immediate asset database synchronization!
                 AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh(); // <--- Add this here!
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                
+                // 🧙‍♂️ Sacred Symbol Preservation: Wait for the asset to be actually importable
+                // This prevents the classic "SceneAsset is null even though file exists" timing issue
+                int attempts = 0;
+                while (attempts < 10)
+                {
+                    SceneAsset testAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+                    if (testAsset != null)
+                    {
+                        break; // Asset is ready!
+                    }
+                    System.Threading.Thread.Sleep(50); // Give Unity a moment to process
+                    attempts++;
+                }
+                
                 return true;
             }
             catch (InvalidOperationException ex)
             {
                 _fallbackTriggeredThisRun = true;
                 Debug.LogWarning("Additive scene creation fallback engaged for '" + sceneName + "': " + ex.Message);
-                var temp = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+                Scene temp = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
                 temp.name = sceneName;
                 if (!EditorSceneManager.SaveScene(temp, scenePath))
                 {
                     Debug.LogError("❌ Fallback save failed for sub‑scene " + sceneName + " at " + scenePath);
                     return false;
                 }
+                
+                // 🔥 TIMING FIX: Same synchronization for fallback path!
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                
                 // Re-open root baseline additively if it exists
                 ReopenRootIfNeeded();
                 return true;
@@ -267,7 +331,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void CloseIfLoaded(string scenePath)
         {
-            var sc = SceneManager.GetSceneByPath(scenePath);
+            Scene sc = SceneManager.GetSceneByPath(scenePath);
             if (sc.IsValid() && sc.isLoaded)
             {
                 // Do not close root scene
@@ -282,7 +346,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void TryCreateAndLinkSubScene(string subName, Transform parent)
         {
             string scenePath = Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/");
-            if (!SafeEnsureScene(scenePath, subName)) return;
+            if (!SafeEnsureScene(scenePath, subName))
+            {
+                return;
+            }
+
             if (parent == null || parent.gameObject == null)
             {
                 var parentGO = GameObject.Find("_SubScenes");
@@ -292,24 +360,43 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 }
                 parent = parentGO.transform;
             }
-            GameObject go = GameObject.Find(subName);
+            var go = GameObject.Find(subName);
             if (!go)
             {
                 go = new GameObject(subName);
             }
             go.transform.SetParent(parent, false);
             SubScene subSceneComp = go.GetComponent<SubScene>();
-            if (!subSceneComp) subSceneComp = go.AddComponent<SubScene>();
+            if (!subSceneComp)
+            {
+                subSceneComp = go.AddComponent<SubScene>();
+            }
+
             SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
             if (sceneAsset != null)
             {
                 SerializedObject so = new(subSceneComp);
                 SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
-                if (sceneProp != null) sceneProp.objectReferenceValue = sceneAsset;
+                if (sceneProp != null)
+                {
+                    sceneProp.objectReferenceValue = sceneAsset;
+                }
+
                 SerializedProperty autoLoadProp = so.FindProperty("m_AutoLoadScene");
-                if (autoLoadProp != null) autoLoadProp.boolValue = true;
+                if (autoLoadProp != null)
+                {
+                    autoLoadProp.boolValue = true;
+                }
+
                 so.ApplyModifiedPropertiesWithoutUndo();
+                Debug.Log($"✅ SubScene '{subName}' successfully linked to {scenePath}");
             }
+            else
+            {
+                // 🔥 TIMING DIAGNOSTIC: Better error feedback for timing issues
+                Debug.LogError($"❌ SceneAsset at '{scenePath}' could not be loaded! File exists: {File.Exists(scenePath)}. This suggests an AssetDatabase timing issue.");
+            }
+            
             // Close sub-scene if currently loaded so it becomes a proper SubScene reference only
             CloseIfLoaded(scenePath);
         }
@@ -351,16 +438,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                         so.ApplyModifiedProperties();
                         EditorUtility.SetDirty(existing);
                         AssetDatabase.SaveAssets();
+                        Debug.Log($"✅ SubScene '{subName}' successfully linked to {scenePath} (reflection mode)");
                     }
                     catch (Exception e)
                     {
                         Debug.LogWarning("SubScene serialization assignment failed for " + subName + ": " + e.Message);
                     }
                 }
+                else
+                {
+                    // 🔥 TIMING DIAGNOSTIC: Better error feedback for timing issues
+                    Debug.LogError($"❌ SceneAsset at '{scenePath}' could not be loaded! File exists: {File.Exists(scenePath)}. This suggests an AssetDatabase timing issue.");
+                }
             }
             else if (!go.GetComponent<SubSceneMarker>())
             {
                 go.AddComponent<SubSceneMarker>();
+                Debug.Log($"✅ SubSceneMarker added to '{subName}' (SubScene type not available)");
             }
             CloseIfLoaded(scenePath);
         }
@@ -402,7 +496,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static void EnsureFolder(string path)
         {
-            if (AssetDatabase.IsValidFolder(path)) return;
+            if (AssetDatabase.IsValidFolder(path))
+            {
+                return;
+            }
+
             string[] segments = path.Split('/');
             string current = segments[0];
             for (int i = 1; i < segments.Length; i++)

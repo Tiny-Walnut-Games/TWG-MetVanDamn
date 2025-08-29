@@ -72,7 +72,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void WorldBootstrapConfiguration_CanBeAddedToEntity()
         {
-            var entity = entityManager.CreateEntity();
+            Entity entity = entityManager.CreateEntity();
             var biomeSettings = new TinyWalnutGames.MetVD.Core.BiomeGenerationSettings(
                 biomeCountRange: new int2(2, 4),
                 biomeWeight: 0.8f
@@ -106,7 +106,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
             Assert.IsTrue(entityManager.HasComponent<TinyWalnutGames.MetVD.Core.WorldBootstrapConfiguration>(entity));
 
-            var retrievedConfig = entityManager.GetComponentData<TinyWalnutGames.MetVD.Core.WorldBootstrapConfiguration>(entity);
+            WorldBootstrapConfiguration retrievedConfig = entityManager.GetComponentData<TinyWalnutGames.MetVD.Core.WorldBootstrapConfiguration>(entity);
             Assert.AreEqual(12345, retrievedConfig.Seed);
             Assert.AreEqual(new int2(32, 32), retrievedConfig.WorldSize);
             Assert.AreEqual(RandomizationMode.Full, retrievedConfig.RandomizationMode);
@@ -117,7 +117,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         [Test]
         public void WorldBootstrapTags_CanBeAddedToEntity()
         {
-            var entity = entityManager.CreateEntity();
+            Entity entity = entityManager.CreateEntity();
 
             // Test in-progress tag
             entityManager.AddComponentData(entity, new WorldBootstrapInProgressTag());
@@ -129,7 +129,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             entityManager.AddComponentData(entity, completeTag);
 
             Assert.IsTrue(entityManager.HasComponent<WorldBootstrapCompleteTag>(entity));
-            var retrievedComplete = entityManager.GetComponentData<WorldBootstrapCompleteTag>(entity);
+            WorldBootstrapCompleteTag retrievedComplete = entityManager.GetComponentData<WorldBootstrapCompleteTag>(entity);
             Assert.AreEqual(4, retrievedComplete.BiomesGenerated);
             Assert.AreEqual(8, retrievedComplete.DistrictsGenerated);
             Assert.AreEqual(24, retrievedComplete.SectorsGenerated);
@@ -141,8 +141,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         {
             // This test validates that the system setup would work correctly
             // without running the actual system update (which requires Unity runtime)
-            
-            var bootstrapEntity = entityManager.CreateEntity();
+
+            Entity bootstrapEntity = entityManager.CreateEntity();
             var biomeSettings = new BiomeGenerationSettings(
                 new int2(1, 3), // CountRange 
                 1.0f            // Weight
@@ -179,7 +179,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.IsFalse(entityManager.HasComponent<WorldBootstrapInProgressTag>(bootstrapEntity));
             Assert.IsFalse(entityManager.HasComponent<WorldBootstrapCompleteTag>(bootstrapEntity));
 
-            var storedConfig = entityManager.GetComponentData<WorldBootstrapConfiguration>(bootstrapEntity);
+            WorldBootstrapConfiguration storedConfig = entityManager.GetComponentData<WorldBootstrapConfiguration>(bootstrapEntity);
             Assert.AreEqual(999, storedConfig.Seed);
             Assert.AreEqual(new int2(50, 50), storedConfig.WorldSize);
         }
@@ -188,7 +188,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
         public void WorldConfiguration_IsCompatibleWithBootstrap()
         {
             // Test that WorldBootstrapConfiguration can coexist with WorldConfiguration
-            var entity = entityManager.CreateEntity();
+            Entity entity = entityManager.CreateEntity();
 
             var biomeSettings = new BiomeGenerationSettings(
                 new int2(3, 7), // BiomeCountRange
@@ -233,8 +233,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             Assert.IsTrue(entityManager.HasComponent<WorldBootstrapConfiguration>(entity));
             Assert.IsTrue(entityManager.HasComponent<WorldConfiguration>(entity));
 
-            var retrievedBootstrap = entityManager.GetComponentData<WorldBootstrapConfiguration>(entity);
-            var retrievedWorld = entityManager.GetComponentData<WorldConfiguration>(entity);
+            WorldBootstrapConfiguration retrievedBootstrap = entityManager.GetComponentData<WorldBootstrapConfiguration>(entity);
+            WorldConfiguration retrievedWorld = entityManager.GetComponentData<WorldConfiguration>(entity);
 
             Assert.AreEqual(retrievedBootstrap.Seed, retrievedWorld.Seed);
             Assert.AreEqual(retrievedBootstrap.WorldSize, retrievedWorld.WorldSize);

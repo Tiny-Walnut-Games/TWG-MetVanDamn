@@ -14,11 +14,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         public override void Bake(ConnectionAuthoring authoring)
         {
             if (authoring.from == null || authoring.to == null || authoring.from == authoring.to)
+            {
                 return;
+            }
 
-            var connectionEntity = GetEntity(TransformUsageFlags.None);
-            var fromEntity = GetEntity(authoring.from.gameObject, TransformUsageFlags.None);
-            var toEntity = GetEntity(authoring.to.gameObject, TransformUsageFlags.None);
+            Entity connectionEntity = GetEntity(TransformUsageFlags.None);
+            Entity fromEntity = GetEntity(authoring.from.gameObject, TransformUsageFlags.None);
+            Entity toEntity = GetEntity(authoring.to.gameObject, TransformUsageFlags.None);
 
             AddComponent(connectionEntity, new ConnectionEdge
             {

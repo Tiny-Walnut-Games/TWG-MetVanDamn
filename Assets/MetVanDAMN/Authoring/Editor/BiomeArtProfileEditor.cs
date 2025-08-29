@@ -40,7 +40,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 EditorGUILayout.HelpBox("At least one tile type should be assigned for visual generation.", MessageType.Warning);
             }
 
-            var propSettings = profile.propSettings;
+            PropPlacementSettings propSettings = profile.propSettings;
             if (propSettings != null)
             {
                 bool hasPrefabs = propSettings.propPrefabs != null && propSettings.propPrefabs.Length > 0;
@@ -87,8 +87,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             GameObject floorLayer = new("Floor", typeof(UnityEngine.Tilemaps.Tilemap), typeof(UnityEngine.Tilemaps.TilemapRenderer));
             floorLayer.transform.SetParent(testGrid.transform);
 
-            var tilemap = floorLayer.GetComponent<UnityEngine.Tilemaps.Tilemap>();
-            var renderer = floorLayer.GetComponent<UnityEngine.Tilemaps.TilemapRenderer>();
+            UnityEngine.Tilemaps.Tilemap tilemap = floorLayer.GetComponent<UnityEngine.Tilemaps.Tilemap>();
+            UnityEngine.Tilemaps.TilemapRenderer renderer = floorLayer.GetComponent<UnityEngine.Tilemaps.TilemapRenderer>();
 
             if (profile.floorTile != null)
             {

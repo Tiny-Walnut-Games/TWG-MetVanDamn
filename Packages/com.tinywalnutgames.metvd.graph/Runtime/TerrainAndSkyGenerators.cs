@@ -4,6 +4,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
+using Unity.Jobs;
 
 namespace TinyWalnutGames.MetVD.Graph
 {
@@ -27,7 +28,7 @@ namespace TinyWalnutGames.MetVD.Graph
             _featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
         }
 
-        [BurstCompile]
+        // NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
         public void OnUpdate(ref SystemState state)
         {
             _jumpPhysicsLookup.Update(ref state);
@@ -35,157 +36,217 @@ namespace TinyWalnutGames.MetVD.Graph
 
             var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
 
-            // Use foreach instead of ScheduleParallel to avoid nullable reference issues
-            foreach (var (request, roomData, nodeId, entity) in SystemAPI.Query<RefRW<RoomGenerationRequest>, RefRO<RoomHierarchyData>, RefRO<NodeId>>().WithEntityAccess())
+            // Gather entities for job processing
+            EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+                .Build(ref state);
+
+            NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+            ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
+            ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
+            ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
+
+            var stackedJob = new StackedGenerationJob
             {
-                if (request.ValueRO.GeneratorType != RoomGeneratorType.StackedSegment || request.ValueRO.IsComplete) continue;
+                JumpPhysicsLookup = _jumpPhysicsLookup,
+                FeatureBufferLookup = _featureBufferLookup,
+                Entities = entities,
+                Requests = requests,
+                RoomData = roomData,
+                NodeIds = nodeIds,
+                BaseRandom = random
+            };
 
-                if (!_featureBufferLookup.HasBuffer(entity)) continue;
-
-                var features = _featureBufferLookup[entity];
-                var bounds = roomData.ValueRO.Bounds;
-                features.Clear();
-
-                // Use entity index for seeding
-                var entityRandom = new Unity.Mathematics.Random(random.state + (uint)entity.Index);
-
-                // Determine segment count based on room height
-                var segmentCount = math.max(3, bounds.height / 4);
-                var segmentHeight = bounds.height / segmentCount;
-
-                // Get jump physics for coherent route planning
-                var jumpHeight = 3.0f; // Default
-                if (_jumpPhysicsLookup.HasComponent(entity))
-                {
-                    jumpHeight = _jumpPhysicsLookup[entity].JumpHeight;
-                }
-
-                // Generate each vertical segment
-                for (int segment = 0; segment < segmentCount; segment++)
-                {
-                    var segmentY = bounds.y + (segment * segmentHeight);
-                    GenerateVerticalSegment(features, bounds, segmentY, segmentHeight, segment, jumpHeight, request.ValueRO.GenerationSeed, ref entityRandom);
-                }
-
-                // Ensure vertical connectivity between segments
-                EnsureVerticalConnectivity(features, bounds, segmentCount, segmentHeight, jumpHeight);
-
-                // Mark as complete
-                request.ValueRW.IsComplete = true;
-            }
+            stackedJob.Execute();
+            entities.Dispose();
         }
 
-        private static void GenerateVerticalSegment(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
-                                           int segmentY, int segmentHeight, int segmentIndex, float jumpHeight, uint seed, ref Unity.Mathematics.Random random)
+        [BurstCompile]
+        private struct StackedGenerationJob : IJob
         {
-            // Each segment has 1-3 platforms with vertical progression opportunities
-            var platformCount = random.NextInt(1, 4);
-            
-            for (int p = 0; p < platformCount; p++)
+            [ReadOnly] public ComponentLookup<JumpPhysicsData> JumpPhysicsLookup;
+            public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
+            [ReadOnly] public NativeArray<Entity> Entities;
+            public ComponentLookup<RoomGenerationRequest> Requests;
+            [ReadOnly] public ComponentLookup<RoomHierarchyData> RoomData;
+            [ReadOnly] public ComponentLookup<NodeId> NodeIds;
+            public Unity.Mathematics.Random BaseRandom;
+
+            public void Execute()
             {
-                var platformX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
-                var platformY = segmentY + random.NextInt(0, segmentHeight - 1);
-                
-                // Ensure platforms support upward movement
-                var featureType = RoomFeatureType.Platform;
-                
-                // Add climb assists for tall segments
-                if (segmentHeight > jumpHeight + 1)
+                for (int i = 0; i < Entities.Length; i++)
                 {
-                    if (p == 0) // First platform in segment - add wall for wall-jumping
+                    Entity entity = Entities[i];
+                    RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
+
+                    if (request.ValueRO.GeneratorType != RoomGeneratorType.StackedSegment || request.ValueRO.IsComplete)
                     {
-                        features.Add(new RoomFeatureElement
-                        {
-                            Type = RoomFeatureType.Obstacle,
-                            Position = new int2(platformX + 1, platformY + 1),
-                            FeatureId = (uint)(seed + segmentIndex * 100 + p * 10 + 1)
-                        });
+                        continue;
                     }
+
+                    if (!FeatureBufferLookup.HasBuffer(entity))
+                    {
+                        continue;
+                    }
+
+                    DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup[entity];
+                    RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
+                    RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
+                    RectInt bounds = roomDataRO.ValueRO.Bounds;
+                    features.Clear();
+
+                    var entityRandom = new Unity.Mathematics.Random(BaseRandom.state + (uint)entity.Index);
+
+                    int segmentCount = math.max(3, bounds.height / 4);
+                    int segmentHeight = bounds.height / segmentCount;
+
+                    float jumpHeight = 3.0f;
+                    if (JumpPhysicsLookup.HasComponent(entity))
+                    {
+                        jumpHeight = JumpPhysicsLookup[entity].JumpHeight;
+                    }
+
+                    // Use nodeId coordinates to influence segment placement and connectivity patterns
+                    float coordinateComplexity = CalculateCoordinateBasedComplexity(nodeId.ValueRO);
+
+                    for (int segment = 0; segment < segmentCount; segment++)
+                    {
+                        int segmentY = bounds.y + (segment * segmentHeight);
+                        GenerateVerticalSegment(features, bounds, segmentY, segmentHeight, segment, jumpHeight, request.ValueRO.GenerationSeed, ref entityRandom, coordinateComplexity);
+                    }
+
+                    EnsureVerticalConnectivity(features, bounds, segmentCount, segmentHeight, jumpHeight);
+                    request.ValueRW.IsComplete = true;
                 }
-                
-                features.Add(new RoomFeatureElement
-                {
-                    Type = featureType,
-                    Position = new int2(platformX, platformY),
-                    FeatureId = (uint)(seed + segmentIndex * 100 + p * 10)
-                });
             }
-            
-            // Add segment-specific challenges
-            if (segmentIndex % 3 == 0) // Every third segment has a challenge
-            {
-                AddVerticalChallenge(features, bounds, segmentY, segmentHeight, ref random, seed);
-            }
-        }
 
-        private static void AddVerticalChallenge(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
-                                        int segmentY, int segmentHeight, ref Unity.Mathematics.Random random, uint seed)
-        {
-            var challengeType = random.NextInt(0, 3);
-            
-            switch (challengeType)
+            // Add meaningful coordinate-based complexity calculation
+            private static float CalculateCoordinateBasedComplexity(NodeId nodeId)
             {
-                case 0: // Moving obstacle
-                    {
-                        var obstacleX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
-                        var obstacleY = segmentY + segmentHeight / 2;
-                        features.Add(new RoomFeatureElement
-                        {
-                            Type = RoomFeatureType.Obstacle,
-                            Position = new int2(obstacleX, obstacleY),
-                            FeatureId = (uint)(seed + 10000)
-                        });
-                    }
-                    break;
-                case 1: // Power-up placement requiring skill
-                    {
-                        var powerUpX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
-                        var powerUpY = segmentY + segmentHeight - 1;
-                        features.Add(new RoomFeatureElement
-                        {
-                            Type = RoomFeatureType.PowerUp,
-                            Position = new int2(powerUpX, powerUpY),
-                            FeatureId = (uint)(seed + 20000)
-                        });
-                    }
-                    break;
-                case 2: // Switch/door mechanism
-                    {
-                        var switchX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
-                        var switchY = segmentY + 1;
-                        features.Add(new RoomFeatureElement
-                        {
-                            Type = RoomFeatureType.Switch,
-                            Position = new int2(switchX, switchY),
-                            FeatureId = (uint)(seed + 30000)
-                        });
-                    }
-                    break;
+                int2 coords = nodeId.Coordinates;
+                float distance = math.length(coords);
+                // Distance from origin affects segment complexity (farther = more complex)
+                float distanceComplexity = math.clamp(distance / 20f, 0.7f, 1.8f);
+                // Coordinate parity adds variation
+                float parityVariation = ((coords.x ^ coords.y) & 1) == 0 ? 1.1f : 0.9f;
+                return distanceComplexity * parityVariation;
             }
-        }
 
-        private static void EnsureVerticalConnectivity(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
-                                              int segmentCount, int segmentHeight, float jumpHeight)
-        {
-            // Add connectivity platforms between segments if gaps are too large
-            for (int segment = 0; segment < segmentCount - 1; segment++)
+            private static void GenerateVerticalSegment(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
+                                               int segmentY, int segmentHeight, int segmentIndex, float jumpHeight, uint seed, ref Unity.Mathematics.Random random, float coordinateComplexity)
             {
-                var currentSegmentTop = bounds.y + ((segment + 1) * segmentHeight);
-                var nextSegmentBottom = bounds.y + (segment * segmentHeight);
-                var gap = currentSegmentTop - nextSegmentBottom;
+                // Use coordinate complexity to influence platform count and arrangement
+                int basePlatformCount = random.NextInt(1, 4);
+                int platformCount = (int)(basePlatformCount * coordinateComplexity); // More complex areas get more platforms
+                platformCount = math.max(1, platformCount); // Ensure at least one platform
                 
-                if (gap > jumpHeight)
+                for (int p = 0; p < platformCount; p++)
                 {
-                    // Add intermediate platform
-                    var bridgeX = bounds.x + bounds.width / 2;
-                    var bridgeY = nextSegmentBottom + (int)(gap / 2);
+                    int platformX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
+                    int platformY = segmentY + random.NextInt(0, segmentHeight - 1);
+
+                    // Ensure platforms support upward movement
+                    RoomFeatureType featureType = RoomFeatureType.Platform;
+                    
+                    // Add climb assists for tall segments - influenced by coordinate complexity
+                    if (segmentHeight > jumpHeight + 1)
+                    {
+                        if (p == 0 && coordinateComplexity > 1.2f) // Only add walls in more complex areas
+                        {
+                            features.Add(new RoomFeatureElement
+                            {
+                                Type = RoomFeatureType.Obstacle,
+                                Position = new int2(platformX + 1, platformY + 1),
+                                FeatureId = (uint)(seed + segmentIndex * 100 + p * 10 + 1)
+                            });
+                        }
+                    }
                     
                     features.Add(new RoomFeatureElement
                     {
-                        Type = RoomFeatureType.Platform,
-                        Position = new int2(bridgeX, bridgeY),
-                        FeatureId = (uint)(segment * 1000 + 999) // Special connectivity ID
+                        Type = featureType,
+                        Position = new int2(platformX, platformY),
+                        FeatureId = (uint)(seed + segmentIndex * 100 + p * 10)
                     });
+                }
+
+                // Add segment-specific challenges - frequency influenced by coordinate complexity
+                float challengeThreshold = (segmentIndex % 3 == 0) ? 1.0f : 2.0f; // Every third segment base chance
+                if (coordinateComplexity > challengeThreshold)
+                {
+                    AddVerticalChallenge(features, bounds, segmentY, segmentHeight, ref random, seed);
+                }
+            }
+
+            private static void AddVerticalChallenge(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
+                                        int segmentY, int segmentHeight, ref Unity.Mathematics.Random random, uint seed)
+            {
+                int challengeType = random.NextInt(0, 3);
+                
+                switch (challengeType)
+                {
+                    case 0: // Moving obstacle
+                        {
+                            int obstacleX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
+                            int obstacleY = segmentY + segmentHeight / 2;
+                            features.Add(new RoomFeatureElement
+                            {
+                                Type = RoomFeatureType.Obstacle,
+                                Position = new int2(obstacleX, obstacleY),
+                                FeatureId = (uint)(seed + 10000)
+                            });
+                        }
+                        break;
+                    case 1: // Power-up placement requiring skill
+                        {
+                            int powerUpX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
+                            int powerUpY = segmentY + segmentHeight - 1;
+                            features.Add(new RoomFeatureElement
+                            {
+                                Type = RoomFeatureType.PowerUp,
+                                Position = new int2(powerUpX, powerUpY),
+                                FeatureId = (uint)(seed + 20000)
+                            });
+                        }
+                        break;
+                    case 2: // Switch/door mechanism
+                        {
+                            int switchX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
+                            int switchY = segmentY + 1;
+                            features.Add(new RoomFeatureElement
+                            {
+                                Type = RoomFeatureType.Switch,
+                                Position = new int2(switchX, switchY),
+                                FeatureId = (uint)(seed + 30000)
+                            });
+                        }
+                        break;
+                }
+            }
+
+            private static void EnsureVerticalConnectivity(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
+                                                  int segmentCount, int segmentHeight, float jumpHeight)
+            {
+                // Add connectivity platforms between segments if gaps are too large
+                for (int segment = 0; segment < segmentCount - 1; segment++)
+                {
+                    int currentSegmentTop = bounds.y + ((segment + 1) * segmentHeight);
+                    int nextSegmentBottom = bounds.y + (segment * segmentHeight);
+                    int gap = currentSegmentTop - nextSegmentBottom;
+                    
+                    if (gap > jumpHeight)
+                    {
+                        // Add intermediate platform
+                        int bridgeX = bounds.x + bounds.width / 2;
+                        int bridgeY = nextSegmentBottom + (int)(gap / 2);
+                        
+                        features.Add(new RoomFeatureElement
+                        {
+                            Type = RoomFeatureType.Platform,
+                            Position = new int2(bridgeX, bridgeY),
+                            FeatureId = (uint)(segment * 1000 + 999) // Special connectivity ID
+                        });
+                    }
                 }
             }
         }
@@ -211,7 +272,7 @@ namespace TinyWalnutGames.MetVD.Graph
             _secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
         }
 
-        [BurstCompile]
+        // NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
         public void OnUpdate(ref SystemState state)
         {
             _featureBufferLookup.Update(ref state);
@@ -219,195 +280,453 @@ namespace TinyWalnutGames.MetVD.Graph
 
             var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
 
-            // Use foreach instead of ScheduleParallel to avoid nullable reference issues
-            foreach (var (request, roomData, nodeId, entity) in SystemAPI.Query<RefRW<RoomGenerationRequest>, RefRO<RoomHierarchyData>, RefRO<NodeId>>().WithEntityAccess())
+            // Gather entities for job processing
+            EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+                .Build(ref state);
+
+            NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+            ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
+            ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
+            ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
+
+            var corridorJob = new CorridorGenerationJob
             {
-                if (request.ValueRO.GeneratorType != RoomGeneratorType.LinearBranchingCorridor || request.ValueRO.IsComplete) continue;
-
-                if (!_featureBufferLookup.HasBuffer(entity)) continue;
-
-                var features = _featureBufferLookup[entity];
-                var bounds = roomData.ValueRO.Bounds;
-                features.Clear();
-
-                var entityRandom = new Unity.Mathematics.Random(random.state + (uint)entity.Index);
-
-                // Create rhythm-based horizontal progression
-                var beatCount = math.max(4, bounds.width / 6); // One beat every 6 units
-                var beatWidth = bounds.width / beatCount;
-
-                for (int beat = 0; beat < beatCount; beat++)
-                {
-                    var beatX = bounds.x + (beat * beatWidth);
-                    var beatType = DetermineBeatType(beat, beatCount);
-                    
-                    GenerateBeat(features, bounds, beatX, beatWidth, beatType, beat, request.ValueRO.GenerationSeed, ref entityRandom);
-                }
-
-                // Add branching paths for secrets
-                if (_secretConfigLookup.HasComponent(entity))
-                {
-                    var secretConfig = _secretConfigLookup[entity];
-                    GenerateBranchingPaths(features, bounds, secretConfig, request.ValueRO.GenerationSeed, ref entityRandom);
-                }
-
-                request.ValueRW.IsComplete = true;
-            }
-        }
-
-        private static BeatType DetermineBeatType(int beatIndex, int totalBeats)
-        {
-            // Create rhythm pattern: Challenge, Rest, Secret, Challenge, Rest, etc.
-            return (beatIndex % 3) switch
-            {
-                0 => BeatType.Challenge,
-                1 => BeatType.Rest,
-                2 => BeatType.Secret,
-                _ => BeatType.Rest
+                FeatureBufferLookup = _featureBufferLookup,
+                SecretConfigLookup = _secretConfigLookup,
+                Entities = entities,
+                Requests = requests,
+                RoomData = roomData,
+                NodeIds = nodeIds,
+                BaseRandom = random
             };
+
+            corridorJob.Execute();
+            entities.Dispose();
         }
 
-        private static void GenerateBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
-                                int beatX, int beatWidth, BeatType beatType, int beatIndex, uint seed, ref Unity.Mathematics.Random random)
+        [BurstCompile]
+        private struct CorridorGenerationJob : IJob
         {
-            switch (beatType)
+            public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
+            [ReadOnly] public ComponentLookup<SecretAreaConfig> SecretConfigLookup;
+            [ReadOnly] public NativeArray<Entity> Entities;
+            public ComponentLookup<RoomGenerationRequest> Requests;
+            [ReadOnly] public ComponentLookup<RoomHierarchyData> RoomData;
+            [ReadOnly] public ComponentLookup<NodeId> NodeIds;
+            public Unity.Mathematics.Random BaseRandom;
+
+            public void Execute()
             {
-                case BeatType.Challenge:
-                    GenerateChallengeBeat(features, bounds, beatX, beatWidth, ref random, seed);
-                    break;
-                case BeatType.Rest:
-                    GenerateRestBeat(features, bounds, beatX, beatWidth, ref random, seed);
-                    break;
-                case BeatType.Secret:
-                    GenerateSecretBeat(features, bounds, beatX, beatWidth, ref random, seed);
-                    break;
+                for (int i = 0; i < Entities.Length; i++)
+                {
+                    Entity entity = Entities[i];
+                    RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
+
+                    if (request.ValueRO.GeneratorType != RoomGeneratorType.LinearBranchingCorridor || request.ValueRO.IsComplete)
+                    {
+                        continue;
+                    }
+
+                    if (!FeatureBufferLookup.HasBuffer(entity))
+                    {
+                        continue;
+                    }
+
+                    DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup[entity];
+                    RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
+                    RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
+                    RectInt bounds = roomDataRO.ValueRO.Bounds;
+                    features.Clear();
+
+                    var entityRandom = new Unity.Mathematics.Random(BaseRandom.state + (uint)entity.Index);
+
+                    int beatCount = math.max(4, bounds.width / 6);
+                    int beatWidth = bounds.width / beatCount;
+
+                    // Use nodeId coordinates to influence rhythm and beat complexity patterns
+                    float rhythmComplexity = CalculateRhythmComplexity(nodeId.ValueRO);
+
+                    for (int beat = 0; beat < beatCount; beat++)
+                    {
+                        int beatX = bounds.x + (beat * beatWidth);
+                        BeatType beatType = DetermineBeatType(beat, beatCount, rhythmComplexity);
+                        
+                        GenerateBeat(features, bounds, beatX, beatWidth, beatType, beat, request.ValueRO.GenerationSeed, ref entityRandom);
+                    }
+
+                    if (SecretConfigLookup.HasComponent(entity))
+                    {
+                        SecretAreaConfig secretConfig = SecretConfigLookup[entity];
+                        GenerateBranchingPaths(features, bounds, secretConfig, request.ValueRO.GenerationSeed, ref entityRandom, rhythmComplexity);
+                    }
+
+                    request.ValueRW.IsComplete = true;
+                }
             }
-        }
 
-        private static void GenerateChallengeBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
-                                         int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed)
-        {
-            // Add obstacles and hazards for active challenge
-            var obstacleCount = random.NextInt(1, 3);
-            
-            for (int i = 0; i < obstacleCount; i++)
+            // Add meaningful rhythm complexity calculation based on coordinates
+            private static float CalculateRhythmComplexity(NodeId nodeId)
             {
-                var obstaclePos = new int2(
-                    random.NextInt(beatX, beatX + beatWidth),
-                    random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
+                int2 coords = nodeId.Coordinates;
+                float distance = math.length(coords);
+                // Distance influences rhythm complexity - farther rooms have more complex beats
+                float baseComplexity = math.clamp(distance / 15f, 0.6f, 2.0f);
+                // Coordinate sum creates rhythm variation pattern
+                float rhythmVariation = ((coords.x + coords.y) % 5) * 0.1f + 0.8f; // 0.8 to 1.2 range
+                return baseComplexity * rhythmVariation;
+            }
+
+            private static BeatType DetermineBeatType(int beatIndex, int totalBeats, float rhythmComplexity)
+            {
+                // 🧮 COORDINATE-AWARE - Uses rhythm complexity for spatial beat pattern intelligence
+                // Burst-compatible enum-based corridor classification instead of managed strings
+                BeatType basePattern = (beatIndex % 3) switch
+                {
+                    0 => BeatType.Challenge,
+                    1 => BeatType.Rest,
+                    2 => BeatType.Secret,
+                    _ => BeatType.Rest
+                };
+
+                // 🔧 ENHANCEMENT READY - Transform string-based logic into efficient enum classification
+                // Sacred Symbol Preservation: Preserves corridor length analysis while making Burst-compatible
+                CorridorLength corridorType = totalBeats > 8 ? CorridorLength.Long : 
+                                            totalBeats > 5 ? CorridorLength.Medium : 
+                                            CorridorLength.Short;
+                                            
+                float progressionFactor = (float)beatIndex / totalBeats; // 0.0 to 1.0 progression through corridor
+                
+                // 🧮 COORDINATE-AWARE - Adaptive pacing based on corridor length and spatial progression
+                switch (corridorType)
+                {
+                    case CorridorLength.Long:
+                        // Long corridors: gentle intro, intense middle, easier ending
+                        if (progressionFactor < 0.2f || progressionFactor > 0.8f)
+                        {
+                            // Early and late beats favor rest for pacing
+                            if (basePattern == BeatType.Challenge && rhythmComplexity < 1.2f)
+                            {
+                                return BeatType.Rest;
+                            }
+                        }
+                        else if (progressionFactor >= 0.3f && progressionFactor <= 0.7f)
+                        {
+                            // Middle section gets more challenging
+                            if (basePattern == BeatType.Rest && rhythmComplexity > 1.0f)
+                            {
+                                return BeatType.Challenge;
+                            }
+                        }
+                        break;
+                        
+                    case CorridorLength.Medium:
+                        // Medium corridors: steady escalation with secret opportunities
+                        if (progressionFactor > 0.6f && basePattern == BeatType.Rest)
+                        {
+                            // Later beats in medium corridors favor secrets for exploration
+                            if (rhythmComplexity > 1.3f)
+                            {
+                                return BeatType.Secret;
+                            }
+                        }
+                        break;
+                        
+                    case CorridorLength.Short:
+                        // Short corridors: front-loaded intensity for quick challenges
+                        if (progressionFactor < 0.5f && rhythmComplexity > 1.5f)
+                        {
+                            // Early beats in short corridors get immediate challenge
+                            if (basePattern == BeatType.Rest)
+                            {
+                                return BeatType.Challenge;
+                            }
+                        }
+                        break;
+                }
+
+                // Higher rhythm complexity can shift patterns for more variety (original logic preserved)
+                if (rhythmComplexity > 1.5f)
+                {
+                    // Complex areas get more challenge beats
+                    if (basePattern == BeatType.Rest && (beatIndex % 4) == 0)
+                    {
+                        return BeatType.Challenge;
+                    }
+                }
+                else if (rhythmComplexity < 0.8f)
+                {
+                    // Simple areas get more rest beats
+                    if (basePattern == BeatType.Challenge && (beatIndex % 2) == 1)
+                    {
+                        return BeatType.Rest;
+                    }
+                }
+
+                return basePattern;
+            }
+
+            private static void GenerateBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
+                                int beatX, int beatWidth, BeatType beatType, int beatIndex, uint seed, ref Unity.Mathematics.Random random)
+            {
+                switch (beatType)
+                {
+                    case BeatType.Challenge:
+                        GenerateChallengeBeat(features, bounds, beatX, beatWidth, ref random, seed, beatIndex);
+                        break;
+                    case BeatType.Rest:
+                        GenerateRestBeat(features, bounds, beatX, beatWidth, ref random, seed, beatIndex);
+                        break;
+                    case BeatType.Secret:
+                        GenerateSecretBeat(features, bounds, beatX, beatWidth, ref random, seed, beatIndex);
+                        break;
+                }
+            }
+
+            private static void GenerateChallengeBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+                                             int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed, int beatIndex)
+            {
+                // Use beat index to influence obstacle patterns and difficulty scaling
+                int baseObstacleCount = random.NextInt(1, 3);
+                int obstacleCount = beatIndex > 5 ? baseObstacleCount + 1 : baseObstacleCount; // Later beats get more obstacles
+                
+                for (int i = 0; i < obstacleCount; i++)
+                {
+                    var obstaclePos = new int2(
+                        random.NextInt(beatX, beatX + beatWidth),
+                        random.NextInt(bounds.y + 1, bounds.y + bounds.height - 1)
+                    );
+                    
+                    features.Add(new RoomFeatureElement
+                    {
+                        Type = RoomFeatureType.Obstacle,
+                        Position = obstaclePos,
+                        FeatureId = (uint)(seed + i + beatIndex * 1000) // Include beat index for unique IDs
+                    });
+                }
+
+                // Platform placement influenced by beat position for progression difficulty
+                int platformY = bounds.y + bounds.height / 2;
+                if (beatIndex % 3 == 0) // Every third beat gets elevated platform
+                {
+                    platformY = bounds.y + (bounds.height * 2) / 3;
+                }
+                
+                var platformPos = new int2(
+                    beatX + beatWidth / 2,
+                    platformY
                 );
                 
                 features.Add(new RoomFeatureElement
                 {
-                    Type = RoomFeatureType.Obstacle,
-                    Position = obstaclePos,
-                    FeatureId = (uint)(seed + i)
+                    Type = RoomFeatureType.Platform,
+                    Position = platformPos,
+                    FeatureId = (uint)(seed + 10 + beatIndex * 1000)
                 });
             }
-            
-            // Add platform to navigate challenge
-            var platformPos = new int2(
-                beatX + beatWidth / 2,
-                bounds.y + bounds.height / 2
-            );
-            
-            features.Add(new RoomFeatureElement
-            {
-                Type = RoomFeatureType.Platform,
-                Position = platformPos,
-                FeatureId = (uint)(seed + 10)
-            });
-        }
 
-        private static void GenerateRestBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
-                                    int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed)
-        {
-            // Safe area with minimal obstacles, possibly health pickup
-            if (random.NextFloat() < 0.3f)
+            private static void GenerateRestBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+                                    int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed, int beatIndex)
             {
-                var healthPos = new int2(
-                    beatX + beatWidth / 2,
+                // Use beat index to influence rest quality - later beats get better recovery opportunities
+                float healthChance = beatIndex > 3 ? 0.5f : 0.3f; // Better health chances as player progresses
+                
+                if (random.NextFloat() < healthChance)
+                {
+                    var healthPos = new int2(
+                        beatX + beatWidth / 2,
+                        bounds.y + 1
+                    );
+                    
+                    features.Add(new RoomFeatureElement
+                    {
+                        Type = RoomFeatureType.HealthPickup,
+                        Position = healthPos,
+                        FeatureId = (uint)(seed + 100 + beatIndex * 1000)
+                    });
+                }
+
+                // Platform placement adjusted for rest beat progression
+                int platformX = beatX + random.NextInt(1, beatWidth - 1);
+                if (beatIndex % 4 == 0) // Every fourth beat gets centered safe platform
+                {
+                    platformX = beatX + beatWidth / 2;
+                }
+                
+                var platformPos = new int2(
+                    platformX,
                     bounds.y + 1
                 );
                 
                 features.Add(new RoomFeatureElement
                 {
-                    Type = RoomFeatureType.HealthPickup,
-                    Position = healthPos,
-                    FeatureId = (uint)(seed + 100)
+                    Type = RoomFeatureType.Platform,
+                    Position = platformPos,
+                    FeatureId = (uint)(seed + 110 + beatIndex * 1000)
                 });
             }
-            
-            // Simple platform for traversal
-            var platformPos = new int2(
-                beatX + random.NextInt(1, beatWidth - 1),
-                bounds.y + 1
-            );
-            
-            features.Add(new RoomFeatureElement
-            {
-                Type = RoomFeatureType.Platform,
-                Position = platformPos,
-                FeatureId = (uint)(seed + 110)
-            });
-        }
 
-        private static void GenerateSecretBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
-                                      int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed)
-        {
-            // Hidden elements that require exploration
-            var secretPos = new int2(
-                beatX + random.NextInt(0, beatWidth),
-                random.NextFloat() > 0.5f ? bounds.y + bounds.height - 1 : bounds.y + 1
-            );
-            
-            features.Add(new RoomFeatureElement
+            private static void GenerateSecretBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+                                      int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed, int beatIndex)
             {
-                Type = RoomFeatureType.Secret,
-                Position = secretPos,
-                FeatureId = (uint)(seed + 200)
-            });
-            
-            // Add concealment
-            var wallPos = new int2(secretPos.x, secretPos.y + (secretPos.y == bounds.y + 1 ? 1 : -1));
-            features.Add(new RoomFeatureElement
-            {
-                Type = RoomFeatureType.Obstacle,
-                Position = wallPos,
-                FeatureId = (uint)(seed + 210)
-            });
-        }
-
-        private static void GenerateBranchingPaths(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
-                                          SecretAreaConfig secretConfig, uint seed, ref Unity.Mathematics.Random random)
-        {
-            // Create upper and lower alternate routes
-            if (bounds.height > 6)
-            {
-                // Upper route
-                var upperY = bounds.y + bounds.height - 2;
-                for (int x = bounds.x + 2; x < bounds.x + bounds.width - 2; x += 4)
+                // Use beat index to influence secret complexity and placement strategy
+                bool useAdvancedPlacement = beatIndex > 2; // Later beats get more sophisticated secret hiding
+                
+                int2 secretPos;
+                if (useAdvancedPlacement)
                 {
-                    features.Add(new RoomFeatureElement
-                    {
-                        Type = RoomFeatureType.Platform,
-                        Position = new int2(x, upperY),
-                        FeatureId = (uint)(seed + 1000 + x)
-                    });
+                    // Advanced placement: alternate between high and low based on beat index
+                    bool useHighPlacement = (beatIndex % 2) == 0;
+                    secretPos = new int2(
+                        beatX + random.NextInt(0, beatWidth),
+                        useHighPlacement ? bounds.y + bounds.height - 1 : bounds.y + 1
+                    );
+                }
+                else
+                {
+                    // Simple placement for early beats
+                    secretPos = new int2(
+                        beatX + random.NextInt(0, beatWidth),
+                        random.NextFloat() > 0.5f ? bounds.y + bounds.height - 1 : bounds.y + 1
+                    );
                 }
                 
-                // Lower route (if room is tall enough)
-                if (bounds.height > 8)
+                features.Add(new RoomFeatureElement
                 {
-                    var lowerY = bounds.y + 2;
-                    for (int x = bounds.x + 3; x < bounds.x + bounds.width - 3; x += 5)
+                    Type = RoomFeatureType.Secret,
+                    Position = secretPos,
+                    FeatureId = (uint)(seed + 200 + beatIndex * 1000)
+                });
+
+                // Concealment strategy influenced by beat progression
+                int concealmentComplexity = beatIndex > 4 ? 2 : 1; // Later beats get multiple concealment layers
+                for (int c = 0; c < concealmentComplexity; c++)
+                {
+                    int wallOffset = c == 0 ? (secretPos.y == bounds.y + 1 ? 1 : -1) : (c % 2 == 0 ? 1 : -1);
+                    var wallPos = new int2(secretPos.x + c, secretPos.y + wallOffset);
+                    
+                    // Ensure wall stays within bounds
+                    if (wallPos.x >= bounds.x && wallPos.x < bounds.x + bounds.width &&
+                        wallPos.y >= bounds.y && wallPos.y < bounds.y + bounds.height)
+                    {
+                        features.Add(new RoomFeatureElement
+                        {
+                            Type = RoomFeatureType.Obstacle,
+                            Position = wallPos,
+                            FeatureId = (uint)(seed + 210 + beatIndex * 1000 + c)
+                        });
+                    }
+                }
+            }
+
+            private static void GenerateBranchingPaths(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
+                                          SecretAreaConfig secretConfig, uint seed, ref Unity.Mathematics.Random random, float rhythmComplexity)
+            {
+                // Create upper and lower alternate routes - influenced by rhythm complexity
+                if (bounds.height > 6)
+                {
+                    // Use secret config percentage to influence branching density scaling
+                    float secretAreaInfluence = secretConfig.SecretAreaPercentage; // Now this parameter has meaning!
+                    int baseBranchingDensity = (int)(rhythmComplexity * 3f);
+                    int secretInfluencedDensity = (int)(baseBranchingDensity * (1.0f + secretAreaInfluence)); // Secret areas boost branching complexity
+
+                    // Upper route - spacing influenced by rhythm complexity and secret area density
+                    int upperY = bounds.y + bounds.height - 2;
+                    int baseUpperSpacing = rhythmComplexity > 1.2f ? 3 : 4;
+                    // Use secretInfluencedDensity to determine complexity tier
+                    int complexityTier = secretInfluencedDensity switch
+                    {
+                        <= 1 => 0,  // Simple
+                        <= 2 => 1,  // Moderate  
+                        <= 3 => 2,  // Complex
+                        _    => 3   // Extreme
+                    };
+
+                    int upperSpacing = complexityTier switch
+                    {
+                        0 => baseUpperSpacing,
+                        1 => math.max(2, baseUpperSpacing - 1),
+                        2 => math.max(2, baseUpperSpacing - 2),
+                        3 => 2 // Minimum spacing for extreme complexity
+,
+                        _ => throw new System.NotImplementedException()
+                    };
+
+                    // Use tier for other features too
+                    float bonusSecretChance = complexityTier * 0.1f; // 0%, 10%, 20%, 30% bonus
+                    int additionalPlatformRows = complexityTier >= 2 ? 1 : 0; // Extra vertical layer
+                    
+                    for (int x = bounds.x + 2; x < bounds.x + bounds.width - 2; x += upperSpacing)
                     {
                         features.Add(new RoomFeatureElement
                         {
                             Type = RoomFeatureType.Platform,
-                            Position = new int2(x, lowerY),
-                            FeatureId = (uint)(seed + 2000 + x)
+                            Position = new int2(x, upperY),
+                            FeatureId = (uint)(seed + 1000 + x)
                         });
+                        
+                        // Use bonusSecretChance to actually add bonus secrets based on complexity
+                        if (secretAreaInfluence > 0.3f && random.NextFloat() < (secretAreaInfluence + bonusSecretChance))
+                        {
+                            features.Add(new RoomFeatureElement
+                            {
+                                Type = RoomFeatureType.Secret,
+                                Position = new int2(x, upperY + 1),
+                                FeatureId = (uint)(seed + 1500 + x)
+                            });
+                        }
+                        
+                        // Use bonusSecretChance for rare treasure placement in extreme complexity tiers
+                        if (complexityTier >= 3 && random.NextFloat() < bonusSecretChance * 0.5f)
+                        {
+                            features.Add(new RoomFeatureElement
+                            {
+                                Type = RoomFeatureType.PowerUp, // Rare treasures in extreme areas
+                                Position = new int2(x + 1, upperY + 2),
+                                FeatureId = (uint)(seed + 1800 + x)
+                            });
+                        }
+                    }
+                    
+                    // Use additionalPlatformRows to create extra vertical layers in complex areas
+                    if (additionalPlatformRows > 0)
+                    {
+                        int extraLayerY = upperY + 3; // Above the main upper route
+                        if (extraLayerY < bounds.y + bounds.height - 1)
+                        {
+                            int extraSpacing = upperSpacing + 1; // Slightly wider spacing for challenge
+                            for (int x = bounds.x + 4; x < bounds.x + bounds.width - 4; x += extraSpacing)
+                            {
+                                features.Add(new RoomFeatureElement
+                                {
+                                    Type = RoomFeatureType.Platform,
+                                    Position = new int2(x, extraLayerY),
+                                    FeatureId = (uint)(seed + 3000 + x)
+                                });
+                                
+                                // Extra layers get skill-specific challenges based on bonusSecretChance
+                                if (complexityTier >= 2 && random.NextFloat() < (0.4f + bonusSecretChance))
+                                {
+                                    features.Add(new RoomFeatureElement
+                                    {
+                                        Type = RoomFeatureType.Switch, // Switches for advanced routes
+                                        Position = new int2(x, extraLayerY + 1),
+                                        FeatureId = (uint)(seed + 3500 + x)
+                                    });
+                                }
+                                
+                                // Use bonusSecretChance to create ultra-rare collectibles in extra layers
+                                if (complexityTier >= 3 && random.NextFloat() < bonusSecretChance * 0.3f)
+                                {
+                                    features.Add(new RoomFeatureElement
+                                    {
+                                        Type = RoomFeatureType.Collectible, // Ultra-rare drops in highest layers
+                                        Position = new int2(x - 1, extraLayerY),
+                                        FeatureId = (uint)(seed + 3800 + x)
+                                    });
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -422,6 +741,17 @@ namespace TinyWalnutGames.MetVD.Graph
         Challenge = 0,
         Rest = 1,
         Secret = 2
+    }
+    
+    /// <summary>
+    /// Corridor length classification for Burst-compatible spatial pacing analysis
+    /// Replaces managed string comparisons with efficient enum-based logic
+    /// </summary>
+    public enum CorridorLength : byte
+    {
+        Short = 0,   // Quick intensity corridors (≤5 beats)
+        Medium = 1,  // Balanced pacing corridors (6-8 beats) 
+        Long = 2     // Extended journey corridors (9+ beats)
     }
 
     /// <summary>
@@ -444,126 +774,168 @@ namespace TinyWalnutGames.MetVD.Graph
             _featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
         }
 
-        [BurstCompile]
+        // NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
         public void OnUpdate(ref SystemState state)
         {
             _biomeLookup.Update(ref state);
             _featureBufferLookup.Update(ref state);
 
-            // Use foreach instead of ScheduleParallel to avoid nullable reference issues
-            foreach (var (request, roomData, nodeId, entity) in SystemAPI.Query<RefRW<RoomGenerationRequest>, RefRO<RoomHierarchyData>, RefRO<NodeId>>().WithEntityAccess())
+            // Gather entities for job processing
+            EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+                .Build(ref state);
+
+            NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+            ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
+            ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
+            ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
+
+            var heightmapJob = new HeightmapGenerationJob
             {
-                if (request.ValueRO.GeneratorType != RoomGeneratorType.BiomeWeightedHeightmap || request.ValueRO.IsComplete) continue;
+                BiomeLookup = _biomeLookup,
+                FeatureBufferLookup = _featureBufferLookup,
+                Entities = entities,
+                Requests = requests,
+                RoomData = roomData,
+                NodeIds = nodeIds
+            };
 
-                if (!_featureBufferLookup.HasBuffer(entity)) continue;
-
-                var features = _featureBufferLookup[entity];
-                var bounds = roomData.ValueRO.Bounds;
-                features.Clear();
-
-                // Get biome information for terrain characteristics
-                var biome = _biomeLookup.HasComponent(entity) ? _biomeLookup[entity] : 
-                           new Core.Biome(BiomeType.SolarPlains, Polarity.Sun);
-
-                // Generate heightmap using biome-specific noise
-                GenerateBiomeHeightmap(features, bounds, biome, request.ValueRO.GenerationSeed);
-
-                request.ValueRW.IsComplete = true;
-            }
+            heightmapJob.Execute();
+            entities.Dispose();
         }
 
-        private static void GenerateBiomeHeightmap(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
-                                          Core.Biome biome, uint seed)
+        [BurstCompile]
+        private struct HeightmapGenerationJob : IJob
         {
-            var random = new Unity.Mathematics.Random(seed);
-            var noiseScale = GetBiomeNoiseScale(biome.Type);
-            var heightVariation = GetBiomeHeightVariation(biome.Type);
-            var baseHeight = bounds.y + bounds.height / 3;
+            [ReadOnly] public ComponentLookup<Core.Biome> BiomeLookup;
+            public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
+            [ReadOnly] public NativeArray<Entity> Entities;
+            public ComponentLookup<RoomGenerationRequest> Requests;
+            [ReadOnly] public ComponentLookup<RoomHierarchyData> RoomData;
+            [ReadOnly] public ComponentLookup<NodeId> NodeIds;
 
-            for (int x = bounds.x; x < bounds.x + bounds.width; x++)
+            public void Execute()
             {
-                // Generate noise-based height
-                var noise = math.sin(x * noiseScale + seed * 0.001f) * 0.5f + 0.5f;
-                var height = baseHeight + (int)(noise * heightVariation);
-                
-                // Clamp to room bounds
-                height = math.clamp(height, bounds.y, bounds.y + bounds.height - 1);
-                
-                // Create terrain platform
-                features.Add(new RoomFeatureElement
+                for (int i = 0; i < Entities.Length; i++)
                 {
-                    Type = RoomFeatureType.Platform,
-                    Position = new int2(x, height),
-                    FeatureId = (uint)(seed + x)
-                });
-                
-                // Add biome-specific features
-                if (ShouldAddBiomeFeature(x, biome, seed, ref random))
-                {
-                    var featureType = GetBiomeSpecificFeature(biome.Type);
-                    var featureHeight = height + 1;
-                    
-                    if (featureHeight < bounds.y + bounds.height)
+                    Entity entity = Entities[i];
+                    RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
+
+                    if (request.ValueRO.GeneratorType != RoomGeneratorType.BiomeWeightedHeightmap || request.ValueRO.IsComplete)
                     {
-                        features.Add(new RoomFeatureElement
+                        continue;
+                    }
+
+                    if (!FeatureBufferLookup.HasBuffer(entity))
+                    {
+                        continue;
+                    }
+
+                    DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup[entity];
+                    RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
+                    RectInt bounds = roomDataRO.ValueRO.Bounds;
+                    features.Clear();
+
+                    Core.Biome biome = BiomeLookup.HasComponent(entity) ? BiomeLookup[entity] : 
+                               new Core.Biome(BiomeType.SolarPlains, Polarity.Sun);
+
+                    GenerateBiomeHeightmap(features, bounds, biome, request.ValueRO.GenerationSeed);
+                    request.ValueRW.IsComplete = true;
+                }
+            }
+
+            private static void GenerateBiomeHeightmap(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
+                                              Core.Biome biome, uint seed)
+            {
+                var random = new Unity.Mathematics.Random(seed);
+                float noiseScale = GetBiomeNoiseScale(biome.Type);
+                float heightVariation = GetBiomeHeightVariation(biome.Type);
+                int baseHeight = bounds.y + bounds.height / 3;
+
+                for (int x = bounds.x; x < bounds.x + bounds.width; x++)
+                {
+                    float noise = math.sin(x * noiseScale + seed * 0.001f) * 0.5f + 0.5f;
+                    int height = baseHeight + (int)(noise * heightVariation);
+                    height = math.clamp(height, bounds.y, bounds.y + bounds.height - 1);
+                    
+                    features.Add(new RoomFeatureElement
+                    {
+                        Type = RoomFeatureType.Platform,
+                        Position = new int2(x, height),
+                        FeatureId = (uint)(seed + x)
+                    });
+                    
+                    if (ShouldAddBiomeFeature(x, biome, seed, ref random))
+                    {
+                        RoomFeatureType featureType = GetBiomeSpecificFeature(biome.Type);
+                        int featureHeight = height + 1;
+                        
+                        if (featureHeight < bounds.y + bounds.height)
                         {
-                            Type = featureType,
-                            Position = new int2(x, featureHeight),
-                            FeatureId = (uint)(seed + x + 10000)
-                        });
+                            features.Add(new RoomFeatureElement
+                            {
+                                Type = featureType,
+                                Position = new int2(x, featureHeight),
+                                FeatureId = (uint)(seed + x + 10000)
+                            });
+                        }
                     }
                 }
             }
-        }
 
-        private static float GetBiomeNoiseScale(BiomeType biome)
-        {
-            return biome switch
+            private static float GetBiomeNoiseScale(BiomeType biome)
             {
-                BiomeType.SolarPlains => 0.1f,      // Gentle rolling hills
-                BiomeType.FrozenWastes => 0.05f,    // Smooth ice sheets
-                BiomeType.VolcanicCore => 0.2f,     // Rough volcanic terrain
-                BiomeType.CrystalCaverns => 0.15f,  // Crystalline formations
-                _ => 0.1f
-            };
-        }
+                return biome switch
+                {
+                    BiomeType.SolarPlains => 0.1f,
+                    BiomeType.FrozenWastes => 0.05f,
+                    BiomeType.VolcanicCore => 0.2f,
+                    BiomeType.CrystalCaverns => 0.15f,
+                    _ => 0.1f
+                };
+            }
 
-        private static float GetBiomeHeightVariation(BiomeType biome)
-        {
-            return biome switch
+            private static float GetBiomeHeightVariation(BiomeType biome)
             {
-                BiomeType.SolarPlains => 3.0f,      // Moderate hills
-                BiomeType.FrozenWastes => 1.0f,     // Flat frozen landscape
-                BiomeType.VolcanicCore => 5.0f,     // Dramatic elevation changes
-                BiomeType.CrystalCaverns => 4.0f,   // Tall crystal spires
-                _ => 2.0f
-            };
-        }
+                return biome switch
+                {
+                    BiomeType.SolarPlains => 3.0f,
+                    BiomeType.FrozenWastes => 1.0f,
+                    BiomeType.VolcanicCore => 5.0f,
+                    BiomeType.CrystalCaverns => 4.0f,
+                    _ => 2.0f
+                };
+            }
 
-        private static bool ShouldAddBiomeFeature(int x, Core.Biome biome, uint seed, ref Unity.Mathematics.Random random)
-        {
-            var featureChance = biome.Type switch
+            private static bool ShouldAddBiomeFeature(int x, Core.Biome biome, uint seed, ref Unity.Mathematics.Random random)
             {
-                BiomeType.SolarPlains => 0.1f,      // Occasional trees/rocks
-                BiomeType.FrozenWastes => 0.05f,    // Sparse ice formations
-                BiomeType.VolcanicCore => 0.2f,     // Frequent lava vents
-                BiomeType.CrystalCaverns => 0.15f,  // Crystal formations
-                _ => 0.08f
-            };
-            
-            return random.NextFloat() < featureChance;
-        }
+                float featureChance = biome.Type switch
+                {
+                    BiomeType.SolarPlains => 0.1f,
+                    BiomeType.FrozenWastes => 0.05f,
+                    BiomeType.VolcanicCore => 0.2f,
+                    BiomeType.CrystalCaverns => 0.15f,
+                    _ => 0.08f
+                };
 
-        private static RoomFeatureType GetBiomeSpecificFeature(BiomeType biome)
-        {
-            return biome switch
+                // Use x position and seed to create deterministic spatial variation in feature placement
+                float spatialVariation = math.sin(x * 0.1f + seed * 0.001f) * 0.5f + 0.5f; // 0 to 1 range
+                float adjustedChance = featureChance * (0.5f + spatialVariation); // Varies feature density spatially
+                
+                return random.NextFloat() < adjustedChance;
+            }
+
+            private static RoomFeatureType GetBiomeSpecificFeature(BiomeType biome)
             {
-                BiomeType.SolarPlains => RoomFeatureType.Obstacle,      // Trees/rocks
-                BiomeType.FrozenWastes => RoomFeatureType.Obstacle,     // Ice spikes
-                BiomeType.VolcanicCore => RoomFeatureType.Obstacle,     // Lava vents
-                BiomeType.CrystalCaverns => RoomFeatureType.Collectible, // Crystal pickups
-                _ => RoomFeatureType.Obstacle
-            };
+                return biome switch
+                {
+                    BiomeType.SolarPlains => RoomFeatureType.Obstacle,
+                    BiomeType.FrozenWastes => RoomFeatureType.Obstacle,
+                    BiomeType.VolcanicCore => RoomFeatureType.Obstacle,
+                    BiomeType.CrystalCaverns => RoomFeatureType.Collectible,
+                    _ => RoomFeatureType.Obstacle
+                };
+            }
         }
     }
 
@@ -587,159 +959,242 @@ namespace TinyWalnutGames.MetVD.Graph
             _biomeLookup = state.GetComponentLookup<Core.Biome>(true);
         }
 
-        [BurstCompile]
+        // NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
         public void OnUpdate(ref SystemState state)
         {
             _featureBufferLookup.Update(ref state);
             _biomeLookup.Update(ref state);
 
-            // Use foreach instead of ScheduleParallel to avoid nullable reference issues
-            foreach (var (request, roomData, nodeId, entity) in SystemAPI.Query<RefRW<RoomGenerationRequest>, RefRO<RoomHierarchyData>, RefRO<NodeId>>().WithEntityAccess())
+            // Gather entities for job processing
+            EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+                .Build(ref state);
+
+            NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+            ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
+            ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
+            ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
+
+            var cloudJob = new CloudGenerationJob
             {
-                if (request.ValueRO.GeneratorType != RoomGeneratorType.LayeredPlatformCloud || request.ValueRO.IsComplete) continue;
+                FeatureBufferLookup = _featureBufferLookup,
+                BiomeLookup = _biomeLookup,
+                Entities = entities,
+                Requests = requests,
+                RoomData = roomData,
+                NodeIds = nodeIds
+            };
 
-                if (!_featureBufferLookup.HasBuffer(entity)) continue;
-
-                var features = _featureBufferLookup[entity];
-                var bounds = roomData.ValueRO.Bounds;
-                features.Clear();
-
-                // Get biome for motion pattern determination
-                var biome = _biomeLookup.HasComponent(entity) ? _biomeLookup[entity] : 
-                           new Core.Biome(BiomeType.SkyGardens, Polarity.Wind);
-
-                var random = new Unity.Mathematics.Random(request.ValueRO.GenerationSeed + (uint)entity.Index);
-
-                // Generate layered cloud platforms
-                var layerCount = math.max(3, bounds.height / 4);
-                
-                for (int layer = 0; layer < layerCount; layer++)
-                {
-                    var layerY = bounds.y + (layer * bounds.height / layerCount);
-                    GenerateCloudLayer(features, bounds, layerY, layer, biome, request.ValueRO.GenerationSeed, ref random);
-                }
-
-                // Add floating islands
-                GenerateFloatingIslands(features, bounds, biome, request.ValueRO.GenerationSeed, ref random);
-
-                request.ValueRW.IsComplete = true;
-            }
+            cloudJob.Execute();
+            entities.Dispose();
         }
 
-        private static void GenerateCloudLayer(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
-                                      int layerY, int layerIndex, Core.Biome biome, uint seed, ref Unity.Mathematics.Random random)
+        [BurstCompile]
+        private struct CloudGenerationJob : IJob
         {
-            var cloudCount = random.NextInt(2, 5);
-            
-            for (int cloud = 0; cloud < cloudCount; cloud++)
-            {
-                var cloudX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
-                var cloudY = layerY + random.NextInt(-1, 2); // Slight vertical variation
-                
-                // Create cloud platform
-                features.Add(new RoomFeatureElement
-                {
-                    Type = RoomFeatureType.Platform,
-                    Position = new int2(cloudX, cloudY),
-                    FeatureId = (uint)(seed + layerIndex * 1000 + cloud * 100)
-                });
-                
-                // Add motion pattern based on biome
-                var motionType = GetCloudMotionType(biome.Type, biome.PrimaryPolarity);
-                AddCloudMotionFeature(features, cloudX, cloudY, motionType, seed, layerIndex, cloud);
-            }
-        }
+            public BufferLookup<RoomFeatureElement> FeatureBufferLookup;
+            [ReadOnly] public ComponentLookup<Core.Biome> BiomeLookup;
+            [ReadOnly] public NativeArray<Entity> Entities;
+            public ComponentLookup<RoomGenerationRequest> Requests;
+            [ReadOnly] public ComponentLookup<RoomHierarchyData> RoomData;
+            [ReadOnly] public ComponentLookup<NodeId> NodeIds;
 
-        private static void GenerateFloatingIslands(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
-                                           Core.Biome biome, uint seed, ref Unity.Mathematics.Random random)
-        {
-            var islandCount = random.NextInt(1, 3);
-            
-            for (int island = 0; island < islandCount; island++)
+            public void Execute()
             {
-                var islandCenterX = random.NextInt(bounds.x + 3, bounds.x + bounds.width - 3);
-                var islandCenterY = random.NextInt(bounds.y + 2, bounds.y + bounds.height - 2);
-                
-                // Create island base (3x2 platform cluster)
-                for (int dx = -1; dx <= 1; dx++)
+                for (int i = 0; i < Entities.Length; i++)
                 {
-                    for (int dy = 0; dy <= 1; dy++)
+                    Entity entity = Entities[i];
+                    RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
+
+                    if (request.ValueRO.GeneratorType != RoomGeneratorType.LayeredPlatformCloud || request.ValueRO.IsComplete)
                     {
-                        var pos = new int2(islandCenterX + dx, islandCenterY + dy);
-                        if (pos.x >= bounds.x && pos.x < bounds.x + bounds.width &&
-                            pos.y >= bounds.y && pos.y < bounds.y + bounds.height)
-                        {
-                            features.Add(new RoomFeatureElement
-                            {
-                                Type = RoomFeatureType.Platform,
-                                Position = pos,
-                                FeatureId = (uint)(seed + 5000 + island * 100 + dx * 10 + dy)
-                            });
-                        }
+                        continue;
+                    }
+
+                    if (!FeatureBufferLookup.HasBuffer(entity))
+                    {
+                        continue;
+                    }
+
+                    DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup[entity];
+                    RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
+                    RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
+                    RectInt bounds = roomDataRO.ValueRO.Bounds;
+                    features.Clear();
+
+                    Core.Biome biome = BiomeLookup.HasComponent(entity) ? BiomeLookup[entity] : 
+                               new Core.Biome(BiomeType.SkyGardens, Polarity.Wind);
+
+                    var random = new Unity.Mathematics.Random(request.ValueRO.GenerationSeed + (uint)entity.Index);
+
+                    // Use nodeId coordinates to influence cloud layer patterns and island placement
+                    float skyComplexity = CalculateSkyComplexity(nodeId.ValueRO);
+
+                    int layerCount = math.max(3, bounds.height / 4);
+                    
+                    for (int layer = 0; layer < layerCount; layer++)
+                    {
+                        int layerY = bounds.y + (layer * bounds.height / layerCount);
+                        GenerateCloudLayer(features, bounds, layerY, layer, biome, request.ValueRO.GenerationSeed, ref random, skyComplexity);
+                    }
+
+                    GenerateFloatingIslands(features, bounds, biome, request.ValueRO.GenerationSeed, ref random, skyComplexity);
+                    request.ValueRW.IsComplete = true;
+                }
+            }
+
+            // Add meaningful sky complexity calculation based on coordinates
+            private static float CalculateSkyComplexity(NodeId nodeId)
+            {
+                int2 coords = nodeId.Coordinates;
+                int altitude = coords.y; // Y coordinate represents altitude in sky biomes
+                float distance = math.length(coords);
+
+                // Higher altitude areas are more complex (more challenging sky navigation)
+                float altitudeComplexity = math.clamp(altitude / 10f + 1f, 0.8f, 2.5f);
+                // Distance from origin adds variation
+                float distanceVariation = math.clamp(distance / 25f, 0.7f, 1.6f);
+                
+                return altitudeComplexity * distanceVariation;
+            }
+
+            private static void GenerateCloudLayer(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
+                                          int layerY, int layerIndex, Core.Biome biome, uint seed, ref Unity.Mathematics.Random random, float skyComplexity)
+            {
+                // Use sky complexity to influence cloud density and arrangement patterns
+                int baseCloudCount = random.NextInt(2, 5);
+                int cloudCount = (int)(baseCloudCount * skyComplexity); // More complex skies get more clouds
+                cloudCount = math.clamp(cloudCount, 1, 8); // Reasonable bounds
+                
+                for (int cloud = 0; cloud < cloudCount; cloud++)
+                {
+                    int cloudX = random.NextInt(bounds.x + 1, bounds.x + bounds.width - 1);
+                    int cloudY = layerY + random.NextInt(-1, 2);
+                    
+                    features.Add(new RoomFeatureElement
+                    {
+                        Type = RoomFeatureType.Platform,
+                        Position = new int2(cloudX, cloudY),
+                        FeatureId = (uint)(seed + layerIndex * 1000 + cloud * 100)
+                    });
+
+                    CloudMotionType motionType = GetCloudMotionType(biome.Type, biome.PrimaryPolarity);
+                    
+                    // Complex skies get more motion features
+                    if (skyComplexity > 1.3f)
+                    {
+                        AddCloudMotionFeature(features, cloudX, cloudY, motionType, seed, layerIndex, cloud);
                     }
                 }
-                
-                // Add island-specific features based on biome
-                AddIslandFeatures(features, islandCenterX, islandCenterY, biome, ref random, seed, island);
             }
-        }
 
-        private static CloudMotionType GetCloudMotionType(BiomeType biome, Polarity polarity)
-        {
-            return biome switch
+            private static void GenerateFloatingIslands(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, 
+                                               Core.Biome biome, uint seed, ref Unity.Mathematics.Random random, float skyComplexity)
             {
-                BiomeType.SkyGardens => CloudMotionType.Gentle,      // Slow drifting
-                BiomeType.PlasmaFields => CloudMotionType.Electric, // Rapid movement
-                BiomeType.PowerPlant => CloudMotionType.Conveyor,   // Mechanical motion
-                _ => polarity switch
+                // Use sky complexity to determine island density and size
+                int baseIslandCount = random.NextInt(1, 3);
+                int islandCount = skyComplexity > 1.5f ? baseIslandCount + 1 : baseIslandCount; // Complex skies get extra islands
+                
+                for (int island = 0; island < islandCount; island++)
                 {
-                    Polarity.Wind => CloudMotionType.Gusty,          // Irregular movement
-                    Polarity.Tech => CloudMotionType.Conveyor,      // Predictable patterns
-                    _ => CloudMotionType.Gentle
+                    int islandCenterX = random.NextInt(bounds.x + 3, bounds.x + bounds.width - 3);
+                    int islandCenterY = random.NextInt(bounds.y + 2, bounds.y + bounds.height - 2);
+
+                    // Island size influenced by sky complexity
+                    int islandSize = skyComplexity > 1.2f ? 2 : 1; // Larger islands in complex areas
+                    
+                    for (int dx = -islandSize; dx <= islandSize; dx++)
+                    {
+                        for (int dy = 0; dy <= islandSize; dy++)
+                        {
+                            var pos = new int2(islandCenterX + dx, islandCenterY + dy);
+                            if (pos.x >= bounds.x && pos.x < bounds.x + bounds.width &&
+                                pos.y >= bounds.y && pos.y < bounds.y + bounds.height)
+                            {
+                                features.Add(new RoomFeatureElement
+                                {
+                                    Type = RoomFeatureType.Platform,
+                                    Position = pos,
+                                    FeatureId = (uint)(seed + 5000 + island * 100 + dx * 10 + dy)
+                                });
+                            }
+                        }
+                    }
+                    
+                    AddIslandFeatures(features, islandCenterX, islandCenterY, biome, ref random, seed, island, skyComplexity);
                 }
-            };
-        }
+            }
 
-        private static void AddCloudMotionFeature(DynamicBuffer<RoomFeatureElement> features, int cloudX, int cloudY, 
-                                         CloudMotionType motionType, uint seed, int layerIndex, int cloudIndex)
-        {
-            // Add motion feature components to the entity for dynamic cloud behavior
-            var motionFeatureType = motionType switch
+            private static CloudMotionType GetCloudMotionType(BiomeType biome, Polarity polarity)
             {
-                CloudMotionType.Conveyor => RoomFeatureType.Platform, // Could be ConveyorPlatform
-                CloudMotionType.Electric => RoomFeatureType.Obstacle, // Could be ElectricCloud
-                _ => RoomFeatureType.Platform
-            };
-            
-            // Add motion indicator (in practice this would be a separate motion component)
-            features.Add(new RoomFeatureElement
-            {
-                Type = motionFeatureType,
-                Position = new int2(cloudX, cloudY + 1),
-                FeatureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100 + 50) // Motion feature ID
-            });
-        }
+                return biome switch
+                {
+                    BiomeType.SkyGardens => CloudMotionType.Gentle,
+                    BiomeType.PlasmaFields => CloudMotionType.Electric,
+                    BiomeType.PowerPlant => CloudMotionType.Conveyor,
+                    _ => polarity switch
+                    {
+                        Polarity.Wind => CloudMotionType.Gusty,
+                        Polarity.Tech => CloudMotionType.Conveyor,
+                        _ => CloudMotionType.Gentle
+                    }
+                };
+            }
 
-        private static void AddIslandFeatures(DynamicBuffer<RoomFeatureElement> features, int centerX, int centerY, 
-                                     Core.Biome biome, ref Unity.Mathematics.Random random, uint seed, int islandIndex)
-        {
-            // Add biome-specific island features
-            var featureType = biome.Type switch
+            private static void AddCloudMotionFeature(DynamicBuffer<RoomFeatureElement> features, int cloudX, int cloudY, 
+                                             CloudMotionType motionType, uint seed, int layerIndex, int cloudIndex)
             {
-                BiomeType.SkyGardens => RoomFeatureType.PowerUp,     // Nature power-ups
-                BiomeType.PlasmaFields => RoomFeatureType.Collectible, // Energy crystals
-                BiomeType.PowerPlant => RoomFeatureType.SaveStation, // Tech stations
-                _ => RoomFeatureType.Secret                          // Hidden treasures
-            };
-            
-            if (random.NextFloat() < 0.7f) // 70% chance for island feature
-            {
+                RoomFeatureType motionFeatureType = motionType switch
+                {
+                    CloudMotionType.Conveyor => RoomFeatureType.Platform,
+                    CloudMotionType.Electric => RoomFeatureType.Obstacle,
+                    _ => RoomFeatureType.Platform
+                };
+                
                 features.Add(new RoomFeatureElement
                 {
-                    Type = featureType,
-                    Position = new int2(centerX, centerY + 2),
-                    FeatureId = (uint)(seed + 6000 + islandIndex * 100)
+                    Type = motionFeatureType,
+                    Position = new int2(cloudX, cloudY + 1),
+                    FeatureId = (uint)(seed + layerIndex * 1000 + cloudIndex * 100 + 50)
                 });
+            }
+
+            private static void AddIslandFeatures(DynamicBuffer<RoomFeatureElement> features, int centerX, int centerY, 
+                                         Core.Biome biome, ref Unity.Mathematics.Random random, uint seed, int islandIndex, float skyComplexity)
+            {
+                RoomFeatureType featureType = biome.Type switch
+                {
+                    BiomeType.SkyGardens => RoomFeatureType.PowerUp,
+                    BiomeType.PlasmaFields => RoomFeatureType.Collectible,
+                    BiomeType.PowerPlant => RoomFeatureType.SaveStation,
+                    _ => RoomFeatureType.Secret
+                };
+
+                // Sky complexity influences feature placement probability and variety
+                float baseChance = 0.7f;
+                float complexityBonus = (skyComplexity - 1.0f) * 0.3f; // More complex areas get higher chance
+                float featureChance = math.clamp(baseChance + complexityBonus, 0.3f, 0.95f);
+                
+                if (random.NextFloat() < featureChance)
+                {
+                    features.Add(new RoomFeatureElement
+                    {
+                        Type = featureType,
+                        Position = new int2(centerX, centerY + 2),
+                        FeatureId = (uint)(seed + 6000 + islandIndex * 100)
+                    });
+                    
+                    // Very complex sky areas get additional features
+                    if (skyComplexity > 2.0f && random.NextFloat() < 0.4f)
+                    {
+                        features.Add(new RoomFeatureElement
+                        {
+                            Type = RoomFeatureType.Secret, // Bonus secret in complex areas
+                            Position = new int2(centerX + 1, centerY + 1),
+                            FeatureId = (uint)(seed + 6000 + islandIndex * 100 + 50)
+                        });
+                    }
+                }
             }
         }
     }

@@ -39,7 +39,9 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
         {
             if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
+            {
                 return;
+            }
 
             // Fallback configuration if authoring/baker did not supply one (e.g., tests / legacy bootstrap)
             WorldConfiguration worldConfig;
@@ -60,28 +62,30 @@ namespace TinyWalnutGames.MetVD.Graph
                 worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
             }
 
-            var unplacedEntities = _unplacedQuery.ToEntityArray(Allocator.Temp);
-            var nodeIds = _unplacedQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            NativeArray<Entity> unplacedEntities = _unplacedQuery.ToEntityArray(Allocator.Temp);
+            NativeArray<NodeId> nodeIds = _unplacedQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
             try
             {
                 // Collect all level 0 districts still at (0,0)
                 int unplacedCount = 0;
                 for (int i = 0; i < nodeIds.Length; i++)
                 {
-                    var n = nodeIds[i];
+                    NodeId n = nodeIds[i];
                     if (n.Level == 0 && n.Coordinates.x == 0 && n.Coordinates.y == 0)
+                    {
                         unplacedCount++;
+                    }
                 }
                 if (unplacedCount == 0)
                 {
-                    var layoutDoneEntity = state.EntityManager.CreateEntity();
+                    Entity layoutDoneEntity = state.EntityManager.CreateEntity();
                     state.EntityManager.AddComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(0, 0));
                     return;
                 }
 
                 // ALWAYS place all remaining unplaced districts so we do not leave any at origin.
                 var random = new Unity.Mathematics.Random((uint)(worldConfig.Seed == 0 ? 1 : worldConfig.Seed));
-                var strategy = unplacedCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
+                DistrictPlacementStrategy strategy = unplacedCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
                 var positions = new NativeArray<int2>(unplacedCount, Allocator.Temp);
                 try
                 {
@@ -90,14 +94,17 @@ namespace TinyWalnutGames.MetVD.Graph
                     // Derive sectors per district: distribute TargetSectors across placed districts (>=1)
                     int sectorsPerDistrict = 1;
                     if (worldConfig.TargetSectors > 0)
+                    {
                         sectorsPerDistrict = math.max(1, worldConfig.TargetSectors / math.max(1, unplacedCount));
+                    }
+
                     sectorsPerDistrict = math.clamp(sectorsPerDistrict, 1, 25); // safety cap
 
                     int positionIndex = 0;
                     int placedCount = 0;
                     for (int i = 0; i < nodeIds.Length && positionIndex < unplacedCount; i++)
                     {
-                        var nodeId = nodeIds[i];
+                        NodeId nodeId = nodeIds[i];
                         if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
                         {
                             nodeId.Coordinates = positions[positionIndex++];
@@ -112,15 +119,26 @@ namespace TinyWalnutGames.MetVD.Graph
                         }
                     }
                     // Now mark done AFTER all have coordinates.
-                    var doneEntity = state.EntityManager.CreateEntity();
+                    Entity doneEntity = state.EntityManager.CreateEntity();
                     state.EntityManager.AddComponentData(doneEntity, new DistrictLayoutDoneTag(placedCount, 0));
                 }
-                finally { if (positions.IsCreated) positions.Dispose(); }
+                finally { if (positions.IsCreated)
+                    {
+                        positions.Dispose();
+                    }
+                }
             }
             finally
             {
-                if (unplacedEntities.IsCreated) unplacedEntities.Dispose();
-                if (nodeIds.IsCreated) nodeIds.Dispose();
+                if (unplacedEntities.IsCreated)
+                {
+                    unplacedEntities.Dispose();
+                }
+
+                if (nodeIds.IsCreated)
+                {
+                    nodeIds.Dispose();
+                }
             }
         }
 
@@ -148,11 +166,17 @@ namespace TinyWalnutGames.MetVD.Graph
                         float distance = math.length(new float2(candidate - positions[j]));
                         if (distance < minDistance) { validPosition = false; break; }
                     }
-                    if (validPosition) positions[i] = candidate;
+                    if (validPosition)
+                    {
+                        positions[i] = candidate;
+                    }
+
                     attempts++;
                 }
                 if (!validPosition)
+                {
                     positions[i] = new(random.NextInt(0, worldSize.x), random.NextInt(0, worldSize.y));
+                }
             }
         }
         static void GenerateJitteredGridPositions(NativeArray<int2> positions, int2 worldSize, ref Unity.Mathematics.Random random)
@@ -161,7 +185,11 @@ namespace TinyWalnutGames.MetVD.Graph
             float2 cellSize = new float2(worldSize) / gridDim;
             float jitterAmount = math.min(cellSize.x, cellSize.y) * 0.3f;
             var shuffledIndices = new NativeArray<int>(positions.Length, Allocator.Temp);
-            for (int i = 0; i < shuffledIndices.Length; i++) shuffledIndices[i] = i;
+            for (int i = 0; i < shuffledIndices.Length; i++)
+            {
+                shuffledIndices[i] = i;
+            }
+
             for (int i = shuffledIndices.Length - 1; i > 0; i--)
             { int j = random.NextInt(0, i + 1); (shuffledIndices[i], shuffledIndices[j]) = (shuffledIndices[j], shuffledIndices[i]); }
             for (int i = 0; i < positions.Length; i++)

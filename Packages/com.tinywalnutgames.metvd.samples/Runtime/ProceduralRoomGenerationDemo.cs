@@ -68,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Samples
             _entityManager = _demoWorld.EntityManager;
 
             // Add the procedural room generation systems
-            var systemGroup = _demoWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            InitializationSystemGroup systemGroup = _demoWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
             
             // Systems are manually added for this demonstration world
             // This provides complete control over the generation pipeline
@@ -83,7 +83,10 @@ namespace TinyWalnutGames.MetVD.Samples
         /// </summary>
         public void CreateDemoRoom()
         {
-            if (_entityManager == null) return;
+            if (_entityManager == null)
+            {
+                return;
+            }
 
             // Clean up previous room if it exists
             if (_demoRoomEntity != Entity.Null && _entityManager.Exists(_demoRoomEntity))
@@ -103,14 +106,14 @@ namespace TinyWalnutGames.MetVD.Samples
             _entityManager.AddComponentData(_demoRoomEntity, nodeId);
 
             // Create biome data
-            var biome = CreateBiomeFromType(targetBiome);
+            Core.Biome biome = CreateBiomeFromType(targetBiome);
             _entityManager.AddComponentData(_demoRoomEntity, biome);
 
             // Determine generator type based on Best Fit Matrix
-            var generatorType = DetermineOptimalGenerator(roomType, roomBounds, targetBiome);
-            
+            RoomGeneratorType generatorType = DetermineOptimalGenerator(roomType, roomBounds, targetBiome);
+
             // Build available skills mask
-            var availableSkills = BuildSkillsMask();
+            Ability availableSkills = BuildSkillsMask();
 
             // Create room generation request
             var generationRequest = new RoomGenerationRequest(
@@ -143,7 +146,7 @@ namespace TinyWalnutGames.MetVD.Samples
         /// </summary>
         private RoomGeneratorType DetermineOptimalGenerator(RoomType roomType, RectInt bounds, BiomeType biome)
         {
-            var aspectRatio = (float)bounds.width / bounds.height;
+            float aspectRatio = (float)bounds.width / bounds.height;
 
             // Apply Best Fit Matrix logic
             return roomType switch
@@ -164,14 +167,37 @@ namespace TinyWalnutGames.MetVD.Samples
         /// </summary>
         private Ability BuildSkillsMask()
         {
-            var skills = Ability.None;
+            Ability skills = Ability.None;
             
-            if (hasJump) skills |= Ability.Jump;
-            if (hasDoubleJump) skills |= Ability.DoubleJump;
-            if (hasWallJump) skills |= Ability.WallJump;
-            if (hasDash) skills |= Ability.Dash;
-            if (hasGrapple) skills |= Ability.Grapple;
-            if (hasBomb) skills |= Ability.Bomb;
+            if (hasJump)
+            {
+                skills |= Ability.Jump;
+            }
+
+            if (hasDoubleJump)
+            {
+                skills |= Ability.DoubleJump;
+            }
+
+            if (hasWallJump)
+            {
+                skills |= Ability.WallJump;
+            }
+
+            if (hasDash)
+            {
+                skills |= Ability.Dash;
+            }
+
+            if (hasGrapple)
+            {
+                skills |= Ability.Grapple;
+            }
+
+            if (hasBomb)
+            {
+                skills |= Ability.Bomb;
+            }
 
             return skills;
         }
@@ -181,7 +207,7 @@ namespace TinyWalnutGames.MetVD.Samples
         /// </summary>
         private Core.Biome CreateBiomeFromType(BiomeType biomeType)
         {
-            var polarity = biomeType switch
+            Polarity polarity = biomeType switch
             {
                 BiomeType.SolarPlains => Polarity.Sun,
                 BiomeType.ShadowRealms => Polarity.Moon,
@@ -236,8 +262,8 @@ namespace TinyWalnutGames.MetVD.Samples
         private RoomNavigationData CreateNavigationData(RectInt bounds)
         {
             var primaryEntrance = new int2(bounds.x + 1, bounds.y + 1);
-            var isCriticalPath = roomType == RoomType.Boss || roomType == RoomType.Entrance || roomType == RoomType.Exit;
-            var traversalTime = CalculateTraversalTime(bounds);
+            bool isCriticalPath = roomType == RoomType.Boss || roomType == RoomType.Entrance || roomType == RoomType.Exit;
+            float traversalTime = CalculateTraversalTime(bounds);
 
             return new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime);
         }
@@ -247,7 +273,7 @@ namespace TinyWalnutGames.MetVD.Samples
         /// </summary>
         private float CalculateTraversalTime(RectInt bounds)
         {
-            var baseTime = (bounds.width + bounds.height) * 0.5f;
+            float baseTime = (bounds.width + bounds.height) * 0.5f;
             
             return roomType switch
             {
@@ -263,9 +289,12 @@ namespace TinyWalnutGames.MetVD.Samples
         /// </summary>
         private int CalculateSecretCount()
         {
-            if (!enableSecrets) return 0;
-            
-            var area = roomWidth * roomHeight;
+            if (!enableSecrets)
+            {
+                return 0;
+            }
+
+            int area = roomWidth * roomHeight;
             return roomType switch
             {
                 RoomType.Treasure => math.max(2, area / 20),
@@ -300,15 +329,15 @@ namespace TinyWalnutGames.MetVD.Samples
         [ContextMenu("Demo All Generator Types")]
         public void DemoAllGeneratorTypes()
         {
-            var originalType = roomType;
-            var originalBiome = targetBiome;
+            RoomType originalType = roomType;
+            BiomeType originalBiome = targetBiome;
 
             StartCoroutine(DemoGeneratorSequence(originalType, originalBiome));
         }
 
         private System.Collections.IEnumerator DemoGeneratorSequence(RoomType originalType, BiomeType originalBiome)
         {
-            var generatorTypes = new[]
+            (RoomType, BiomeType, string)[] generatorTypes = new[]
             {
                 (RoomType.Boss, BiomeType.VolcanicCore, "Pattern-Driven Modular - Skill Challenges"),
                 (RoomType.Treasure, BiomeType.CrystalCaverns, "Parametric Challenge - Jump Testing"),
@@ -317,7 +346,7 @@ namespace TinyWalnutGames.MetVD.Samples
                 (RoomType.Normal, BiomeType.SolarPlains, "Biome-Weighted Heightmap - Terrain")
             };
 
-            foreach (var (type, biome, description) in generatorTypes)
+            foreach ((RoomType type, BiomeType biome, string description) in generatorTypes)
             {
                 roomType = type;
                 targetBiome = biome;
@@ -339,15 +368,21 @@ namespace TinyWalnutGames.MetVD.Samples
         void OnDrawGizmos()
         {
             if (!Application.isPlaying || _entityManager == null || !_entityManager.Exists(_demoRoomEntity))
+            {
                 return;
+            }
 
             DrawRoomBounds();
             
             if (showJumpArcs)
+            {
                 DrawJumpArcs();
-                
+            }
+
             if (showSecretAreas)
+            {
                 DrawSecretAreas();
+            }
         }
 
         private void DrawRoomBounds()
@@ -360,12 +395,14 @@ namespace TinyWalnutGames.MetVD.Samples
         private void DrawJumpArcs()
         {
             if (!_entityManager.HasBuffer<JumpConnectionElement>(_demoRoomEntity))
+            {
                 return;
+            }
 
-            var connections = _entityManager.GetBuffer<JumpConnectionElement>(_demoRoomEntity);
+            DynamicBuffer<JumpConnectionElement> connections = _entityManager.GetBuffer<JumpConnectionElement>(_demoRoomEntity);
             Gizmos.color = Color.green;
             
-            foreach (var connection in connections)
+            foreach (JumpConnectionElement connection in connections)
             {
                 var from = new Vector3(connection.FromPosition.x, connection.FromPosition.y, 0);
                 var to = new Vector3(connection.ToPosition.x, connection.ToPosition.y, 0);
@@ -379,11 +416,13 @@ namespace TinyWalnutGames.MetVD.Samples
         private void DrawSecretAreas()
         {
             if (!_entityManager.HasBuffer<RoomFeatureElement>(_demoRoomEntity))
+            {
                 return;
+            }
 
-            var features = _entityManager.GetBuffer<RoomFeatureElement>(_demoRoomEntity);
+            DynamicBuffer<RoomFeatureElement> features = _entityManager.GetBuffer<RoomFeatureElement>(_demoRoomEntity);
             
-            foreach (var feature in features)
+            foreach (RoomFeatureElement feature in features)
             {
                 if (feature.Type == RoomFeatureType.Secret)
                 {

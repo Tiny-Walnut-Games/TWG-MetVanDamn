@@ -16,35 +16,35 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         [MenuItem(MENU_BASE + "Forest Biome (Clustered)", false, 1)]
         public static void CreateForestBiomeSample()
         {
-            var profile = BiomeArtProfileSamples.CreateForestBiomeSample();
+            BiomeArtProfile profile = BiomeArtProfileSamples.CreateForestBiomeSample();
             SaveProfileAsset(profile, "ForestBiome_ClusteredSample");
         }
 
         [MenuItem(MENU_BASE + "Desert Biome (Radial)", false, 2)]
         public static void CreateDesertBiomeSample()
         {
-            var profile = BiomeArtProfileSamples.CreateDesertBiomeSample();
+            BiomeArtProfile profile = BiomeArtProfileSamples.CreateDesertBiomeSample();
             SaveProfileAsset(profile, "DesertBiome_RadialSample");
         }
 
         [MenuItem(MENU_BASE + "Mountain Biome (Terrain-Aware)", false, 3)]
         public static void CreateMountainBiomeSample()
         {
-            var profile = BiomeArtProfileSamples.CreateMountainBiomeSample();
+            BiomeArtProfile profile = BiomeArtProfileSamples.CreateMountainBiomeSample();
             SaveProfileAsset(profile, "MountainBiome_TerrainSample");
         }
 
         [MenuItem(MENU_BASE + "Coastal Biome (Linear)", false, 4)]
         public static void CreateCoastalBiomeSample()
         {
-            var profile = BiomeArtProfileSamples.CreateCoastalBiomeSample();
+            BiomeArtProfile profile = BiomeArtProfileSamples.CreateCoastalBiomeSample();
             SaveProfileAsset(profile, "CoastalBiome_LinearSample");
         }
 
         [MenuItem(MENU_BASE + "Urban Biome (Sparse)", false, 5)]
         public static void CreateUrbanBiomeSample()
         {
-            var profile = BiomeArtProfileSamples.CreateUrbanBiomeSample();
+            BiomeArtProfile profile = BiomeArtProfileSamples.CreateUrbanBiomeSample();
             SaveProfileAsset(profile, "UrbanBiome_SparseSample");
         }
 
@@ -165,8 +165,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void DrawAdvancedSettings()
         {
             EditorGUI.indentLevel++;
-            
-            var settings = profile.propSettings;
+
+            PropPlacementSettings settings = profile.propSettings;
             
             // Strategy information
             EditorGUILayout.LabelField("Strategy Analysis", EditorStyles.boldLabel);
@@ -180,23 +180,35 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             EditorGUILayout.LabelField($"Effective Density: {effectiveDensity:F3}");
             
             if (effectiveDensity < 0.05f)
+            {
                 EditorGUILayout.HelpBox("Very sparse placement - good for landmarks or special items", MessageType.Info);
+            }
             else if (effectiveDensity < 0.15f)
+            {
                 EditorGUILayout.HelpBox("Moderate density - balanced placement", MessageType.Info);
+            }
             else if (effectiveDensity < 0.3f)
+            {
                 EditorGUILayout.HelpBox("High density - lush environments", MessageType.Info);
+            }
             else
+            {
                 EditorGUILayout.HelpBox("Very high density - may cause performance issues", MessageType.Warning);
+            }
 
             // Performance warnings
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Performance Analysis", EditorStyles.boldLabel);
             
             if (settings.maxPropsPerBiome > 200)
+            {
                 EditorGUILayout.HelpBox("High prop count may impact performance on lower-end devices", MessageType.Warning);
-            
+            }
+
             if (!settings.useSpatialOptimization && settings.maxPropsPerBiome > 100)
+            {
                 EditorGUILayout.HelpBox("Consider enabling spatial optimization for better performance", MessageType.Info);
+            }
 
             EditorGUI.indentLevel--;
         }
@@ -204,8 +216,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void DrawPreviewStats()
         {
             EditorGUI.indentLevel++;
-            
-            var settings = profile.propSettings;
+
+            PropPlacementSettings settings = profile.propSettings;
             
             // Estimated prop counts
             EditorGUILayout.LabelField("Estimated Props per Biome", EditorStyles.boldLabel);
@@ -283,23 +295,47 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             int score = 0;
             
             // Strategy sophistication (0-2 points)
-            if (settings.strategy == PropPlacementStrategy.Terrain) score += 2;
-            else if (settings.strategy == PropPlacementStrategy.Clustered || settings.strategy == PropPlacementStrategy.Radial) score += 1;
-            
+            if (settings.strategy == PropPlacementStrategy.Terrain)
+            {
+                score += 2;
+            }
+            else if (settings.strategy == PropPlacementStrategy.Clustered || settings.strategy == PropPlacementStrategy.Radial)
+            {
+                score += 1;
+            }
+
             // Density curve usage (0-1 points)
-            if (settings.densityCurve != null && settings.densityCurve.keys.Length > 2) score += 1;
-            
+            if (settings.densityCurve != null && settings.densityCurve.keys.Length > 2)
+            {
+                score += 1;
+            }
+
             // Avoidance sophistication (0-2 points)
-            if (settings.avoidance.avoidOvercrowding && settings.avoidance.avoidTransitions) score += 2;
-            else if (settings.avoidance.avoidOvercrowding || settings.avoidance.avoidTransitions) score += 1;
-            
+            if (settings.avoidance.avoidOvercrowding && settings.avoidance.avoidTransitions)
+            {
+                score += 2;
+            }
+            else if (settings.avoidance.avoidOvercrowding || settings.avoidance.avoidTransitions)
+            {
+                score += 1;
+            }
+
             // Variation features (0-2 points)
-            if (settings.variation.randomRotation && settings.variation.positionJitter > 0) score += 2;
-            else if (settings.variation.randomRotation || settings.variation.positionJitter > 0) score += 1;
-            
+            if (settings.variation.randomRotation && settings.variation.positionJitter > 0)
+            {
+                score += 2;
+            }
+            else if (settings.variation.randomRotation || settings.variation.positionJitter > 0)
+            {
+                score += 1;
+            }
+
             // Performance considerations (0-1 points)
-            if (settings.useSpatialOptimization && settings.maxPropsPerBiome < 200) score += 1;
-            
+            if (settings.useSpatialOptimization && settings.maxPropsPerBiome < 200)
+            {
+                score += 1;
+            }
+
             return score switch
             {
                 8 => "A+ (Exceptional)",
@@ -319,20 +355,30 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             var issues = new System.Collections.Generic.List<string>();
             
             if (string.IsNullOrEmpty(profile.biomeName))
+            {
                 issues.Add("Biome name is empty");
-                
+            }
+
             if (profile.propSettings == null)
+            {
                 issues.Add("Prop settings are not configured");
+            }
             else
             {
                 if (profile.propSettings.propPrefabs == null || profile.propSettings.propPrefabs.Length == 0)
+                {
                     issues.Add("No prop prefabs assigned");
-                    
+                }
+
                 if (profile.propSettings.allowedPropLayers.Count == 0)
+                {
                     issues.Add("No allowed prop layers specified");
-                    
+                }
+
                 if (profile.propSettings.baseDensity <= 0)
+                {
                     issues.Add("Base density must be greater than 0");
+                }
             }
             
             if (issues.Count == 0)

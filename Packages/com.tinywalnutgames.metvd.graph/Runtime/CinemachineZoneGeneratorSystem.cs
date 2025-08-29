@@ -33,20 +33,23 @@ namespace TinyWalnutGames.MetVD.Graph
 
         protected override void OnUpdate()
         {
-            using var roomEntities = _roomsWithNavigationQuery.ToEntityArray(Allocator.Temp);
-            using var nodeIds = _roomsWithNavigationQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-            using var roomData = _roomsWithNavigationQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
-            using var templates = _roomsWithNavigationQuery.ToComponentDataArray<RoomTemplate>(Allocator.Temp);
+            using NativeArray<Entity> roomEntities = _roomsWithNavigationQuery.ToEntityArray(Allocator.Temp);
+            using NativeArray<NodeId> nodeIds = _roomsWithNavigationQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            using NativeArray<RoomHierarchyData> roomData = _roomsWithNavigationQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+            using NativeArray<RoomTemplate> templates = _roomsWithNavigationQuery.ToComponentDataArray<RoomTemplate>(Allocator.Temp);
 
             for (int i = 0; i < roomEntities.Length; i++)
             {
-                var roomEntity = roomEntities[i];
-                var nodeId = nodeIds[i];
-                var hierarchy = roomData[i];
-                var template = templates[i];
+                Entity roomEntity = roomEntities[i];
+                NodeId nodeId = nodeIds[i];
+                RoomHierarchyData hierarchy = roomData[i];
+                RoomTemplate template = templates[i];
 
-                var genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
-                if (genStatus.CinemachineGenerated) continue;
+                ProceduralRoomGenerated genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+                if (genStatus.CinemachineGenerated)
+                {
+                    continue;
+                }
 
                 var sw = Stopwatch.StartNew();
                 GenerateCinemachineZone(EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
@@ -62,21 +65,21 @@ namespace TinyWalnutGames.MetVD.Graph
                                                    RoomHierarchyData hierarchy, RoomTemplate template,
                                                    NodeId nodeId, ref ProceduralRoomGenerated genStatus)
         {
-            var bounds = hierarchy.Bounds;
-            var biomeAffinity = template.CapabilityTags.BiomeType;
-            var cameraPreset = CreateBiomeSpecificCameraPreset(biomeAffinity, hierarchy.Type, template.GeneratorType);
+            RectInt bounds = hierarchy.Bounds;
+            BiomeAffinity biomeAffinity = template.CapabilityTags.BiomeType;
+            CinemachineCameraPreset cameraPreset = CreateBiomeSpecificCameraPreset(biomeAffinity, hierarchy.Type, template.GeneratorType);
 
             // Deterministic micro-variation derived from generation seed & node for subtle per-room uniqueness.
             // This provides a meaningful semantic use of genStatus beyond flag setting/timing.
-            var seedMix = genStatus.GenerationSeed ^ (nodeId._value * 0x9E3779B9u);
+            uint seedMix = genStatus.GenerationSeed ^ (nodeId._value * 0x9E3779B9u);
             var rand = new Unity.Mathematics.Random(seedMix == 0 ? 1u : seedMix);
             // Apply small stable variations (kept subtle to avoid test flakiness).
             cameraPreset.FieldOfView += rand.NextFloat(-1.5f, 1.5f); // +/-1.5 degrees wobble
             cameraPreset.Offset.x += rand.NextFloat(-0.5f, 0.5f);
             cameraPreset.Offset.y += rand.NextFloat(-0.25f, 0.25f);
 
-            var cameraPosition = CalculateCameraPosition(bounds, cameraPreset);
-            var confinerBounds = CalculateConfinerBounds(bounds, cameraPreset);
+            float3 cameraPosition = CalculateCameraPosition(bounds, cameraPreset);
+            BoundingBox confinerBounds = CalculateConfinerBounds(bounds, cameraPreset);
 
             var zoneData = new CinemachineZoneData
             {
@@ -211,8 +214,8 @@ namespace TinyWalnutGames.MetVD.Graph
                                                            CinemachineZoneData zoneData, NodeId nodeId)
         {
             // Provide enriched metadata so a later hybrid bridge can spawn & configure the actual Cinemachine Virtual Camera.
-            var boundsCenter = zoneData.ConfinerBounds.Center;
-            var boundsSize = zoneData.ConfinerBounds.Size;
+            float3 boundsCenter = zoneData.ConfinerBounds.Center;
+            float3 boundsSize = zoneData.ConfinerBounds.Size;
             var gameObjectData = new CinemachineGameObjectReference
             {
                 RoomEntity = roomEntity,

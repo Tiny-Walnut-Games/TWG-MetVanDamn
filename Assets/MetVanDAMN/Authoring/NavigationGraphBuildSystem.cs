@@ -56,30 +56,32 @@ namespace TinyWalnutGames.MetVD.Authoring
         protected override void OnUpdate()
         {
             // 🔥 CREATE ACTUAL ECB INSTANCE - NOT JUST COMMENTS
-            var ecb = _endInitEcbSystem.CreateCommandBuffer();
+            EntityCommandBuffer ecb = _endInitEcbSystem.CreateCommandBuffer();
 
             // 🔥 USE ECB FOR SINGLETON CREATION - NO MORE DIRECT ENTITYMANAGER
             if (_navigationGraphQuery.IsEmpty)
             {
-                var newNavGraphEntity = ecb.CreateEntity();
+                Entity newNavGraphEntity = ecb.CreateEntity();
                 ecb.AddComponent(newNavGraphEntity, new NavigationGraph());
             }
 
             // Skip if no districts to process
             if (_districtQuery.IsEmpty)
+            {
                 return;
+            }
 
             // Build navigation nodes from districts using ECB
-            var nodeCount = BuildNavigationNodesWithActualECB(ecb);
+            int nodeCount = BuildNavigationNodesWithActualECB(ecb);
 
             // Build navigation links from connections and gates
-            var linkCount = BuildNavigationLinks();
+            int linkCount = BuildNavigationLinks();
 
             // Update navigation graph statistics if it exists
             if (!_navigationGraphQuery.IsEmpty)
             {
-                var navGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
-                var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
+                Entity navGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
+                NavigationGraph navGraph = SystemAPI.GetSingleton<NavigationGraph>();
                 
                 navGraph.NodeCount = nodeCount;
                 navGraph.LinkCount = linkCount;
@@ -99,23 +101,23 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// </summary>
         private int BuildNavigationNodesWithActualECB(EntityCommandBuffer ecb)
         {
-            var nodeCount = 0;
+            int nodeCount = 0;
 
             // Convert districts to navigation nodes
             Entities
                 .WithNone<NavNode>()
                 .ForEach((Entity entity, in LocalTransform transform, in NodeId nodeId) =>
                 {
-                    var worldPosition = transform.Position;
-                    var districtNodeId = nodeId._value;
+                    float3 worldPosition = transform.Position;
+                    uint districtNodeId = nodeId._value;
 
                     // Determine biome type and polarity from existing components
-                    var biomeType = BiomeType.Unknown;
-                    var primaryPolarity = Polarity.None;
+                    BiomeType biomeType = BiomeType.Unknown;
+                    Polarity primaryPolarity = Polarity.None;
 
                     if (SystemAPI.HasComponent<TinyWalnutGames.MetVD.Core.Biome>(entity))
                     {
-                        var biome = SystemAPI.GetComponent<TinyWalnutGames.MetVD.Core.Biome>(entity);
+                        Core.Biome biome = SystemAPI.GetComponent<TinyWalnutGames.MetVD.Core.Biome>(entity);
                         biomeType = biome.Type;
                         primaryPolarity = biome.PrimaryPolarity;
                     }
@@ -143,31 +145,33 @@ namespace TinyWalnutGames.MetVD.Authoring
         /// </summary>
         private int BuildNavigationLinks()
         {
-            var linkCount = 0;
+            int linkCount = 0;
 
             // Process all connections to create navigation links
             Entities
                 .ForEach((Entity entity, in Connection connection) =>
                 {
-                    var conn = connection;
+                    Connection conn = connection;
 
                     // Find source and destination entities
-                    var sourceEntity = FindEntityByNodeId(conn.FromNodeId);
-                    var destEntity = FindEntityByNodeId(conn.ToNodeId);
+                    Entity sourceEntity = FindEntityByNodeId(conn.FromNodeId);
+                    Entity destEntity = FindEntityByNodeId(conn.ToNodeId);
 
                     if (sourceEntity == Entity.Null || destEntity == Entity.Null)
+                    {
                         return;
+                    }
 
                     // Check for gate conditions on source or destination
-                    var gateConditions = CollectGateConditions(sourceEntity, destEntity);
+                    GateConditionCollection gateConditions = CollectGateConditions(sourceEntity, destEntity);
 
                     // Create navigation link with gate conditions
-                    var navLink = CreateNavLinkFromConnection(conn, gateConditions);
+                    NavLink navLink = CreateNavLinkFromConnection(conn, gateConditions);
 
                     // Add link to source entity's buffer
                     if (SystemAPI.HasBuffer<NavLinkBufferElement>(sourceEntity))
                     {
-                        var linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(sourceEntity);
+                        DynamicBuffer<NavLinkBufferElement> linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(sourceEntity);
                         linkBuffer.Add(navLink);
                         linkCount++;
                     }
@@ -175,13 +179,13 @@ namespace TinyWalnutGames.MetVD.Authoring
                     // For bidirectional connections, add reverse link
                     if (conn.Type == ConnectionType.Bidirectional)
                     {
-                        var reverseLink = navLink;
+                        NavLink reverseLink = navLink;
                         reverseLink.FromNodeId = conn.ToNodeId;
                         reverseLink.ToNodeId = conn.FromNodeId;
 
                         if (SystemAPI.HasBuffer<NavLinkBufferElement>(destEntity))
                         {
-                            var reverseLinkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(destEntity);
+                            DynamicBuffer<NavLinkBufferElement> reverseLinkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(destEntity);
                             reverseLinkBuffer.Add(reverseLink);
                             linkCount++;
                         }
@@ -200,7 +204,9 @@ namespace TinyWalnutGames.MetVD.Authoring
             Entities.ForEach((Entity entity, in NodeId id) =>
             {
                 if (id._value == nodeId)
+                {
                     foundEntity = entity;
+                }
             }).WithoutBurst().Run();
 
             return foundEntity;
@@ -213,7 +219,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Collect gate conditions from source entity
             if (SystemAPI.HasBuffer<GateConditionBufferElement>(sourceEntity))
             {
-                var sourceGates = SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
+                DynamicBuffer<GateConditionBufferElement> sourceGates = SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
                 for (int i = 0; i < sourceGates.Length && i < 4; i++) // Limit to 4 conditions
                 {
                     gateConditions.Add(sourceGates[i].Value);
@@ -223,7 +229,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Collect gate conditions from destination entity
             if (SystemAPI.HasBuffer<GateConditionBufferElement>(destEntity))
             {
-                var destGates = SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
+                DynamicBuffer<GateConditionBufferElement> destGates = SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
                 for (int i = 0; i < destGates.Length && i < (4 - gateConditions.Count); i++)
                 {
                     gateConditions.Add(destGates[i].Value);
@@ -236,22 +242,24 @@ namespace TinyWalnutGames.MetVD.Authoring
         private static NavLink CreateNavLinkFromConnection(Connection connection, GateConditionCollection gates)
         {
             // Determine combined requirements from all gate conditions
-            var combinedPolarity = Polarity.None;
-            var combinedAbilities = Ability.None;
-            var strictestSoftness = GateSoftness.Trivial;
-            var maxTraversalCost = connection.TraversalCost;
+            Polarity combinedPolarity = Polarity.None;
+            Ability combinedAbilities = Ability.None;
+            GateSoftness strictestSoftness = GateSoftness.Trivial;
+            float maxTraversalCost = connection.TraversalCost;
 
             for (int i = 0; i < gates.Count; i++)
             {
-                var gate = gates[i];
+                GateCondition gate = gates[i];
                 combinedPolarity |= gate.RequiredPolarity;
                 combinedAbilities |= gate.RequiredAbilities;
 
                 if (gate.Softness < strictestSoftness)
+                {
                     strictestSoftness = gate.Softness;
+                }
 
                 // Increase cost for stricter gates
-                var gateCostMultiplier = (int)gate.Softness switch
+                float gateCostMultiplier = (int)gate.Softness switch
                 {
                     0 => 5.0f,  // Hard
                     1 => 4.0f,  // VeryDifficult
@@ -265,7 +273,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             }
 
             // Override connection polarity with gate requirements if more restrictive
-            var effectivePolarity = combinedPolarity != Polarity.None ? combinedPolarity : connection.RequiredPolarity;
+            Polarity effectivePolarity = combinedPolarity != Polarity.None ? combinedPolarity : connection.RequiredPolarity;
 
             return new NavLink(
                 connection.FromNodeId,
@@ -302,7 +310,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                     case 2: _gate2 = gate; break;
                     case 3: _gate3 = gate; break;
                 }
-                if (_count < 4) _count++;
+                if (_count < 4)
+                {
+                    _count++;
+                }
             }
 
             public readonly GateCondition this[int index]

@@ -32,22 +32,25 @@ namespace TinyWalnutGames.MetVD.Graph
 
         protected override void OnUpdate()
         {
-            using var roomEntities = _roomsWithContentQuery.ToEntityArray(Allocator.Temp);
-            using var nodeIds = _roomsWithContentQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-            using var roomData = _roomsWithContentQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
-            using var templates = _roomsWithContentQuery.ToComponentDataArray<RoomTemplate>(Allocator.Temp);
+            using NativeArray<Entity> roomEntities = _roomsWithContentQuery.ToEntityArray(Allocator.Temp);
+            using NativeArray<NodeId> nodeIds = _roomsWithContentQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+            using NativeArray<RoomHierarchyData> roomData = _roomsWithContentQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+            using NativeArray<RoomTemplate> templates = _roomsWithContentQuery.ToComponentDataArray<RoomTemplate>(Allocator.Temp);
             
             for (int i = 0; i < roomEntities.Length; i++)
             {
-                var roomEntity = roomEntities[i];
-                var nodeId = nodeIds[i];
-                var hierarchy = roomData[i];
-                var template = templates[i];
-                
+                Entity roomEntity = roomEntities[i];
+                NodeId nodeId = nodeIds[i];
+                RoomHierarchyData hierarchy = roomData[i];
+                RoomTemplate template = templates[i];
+
                 // Check if navigation already generated
-                var genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
-                if (genStatus.NavigationGenerated) continue;
-                
+                ProceduralRoomGenerated genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+                if (genStatus.NavigationGenerated)
+                {
+                    continue;
+                }
+
                 // Generate navigation for this room
                 GenerateRoomNavigation(EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
                 
@@ -61,18 +64,18 @@ namespace TinyWalnutGames.MetVD.Graph
                                                   RoomHierarchyData hierarchy, RoomTemplate template, 
                                                   NodeId nodeId, ref ProceduralRoomGenerated genStatus)
         {
-            var navBuffer = entityManager.GetBuffer<RoomNavigationElement>(roomEntity);
+            DynamicBuffer<RoomNavigationElement> navBuffer = entityManager.GetBuffer<RoomNavigationElement>(roomEntity);
             navBuffer.Clear();
-            
-            var bounds = hierarchy.Bounds;
+
+            RectInt bounds = hierarchy.Bounds;
             var random = new Unity.Mathematics.Random(genStatus.GenerationSeed == 0 ? 1u : genStatus.GenerationSeed);
-            
+
             // Generate basic physics parameters for this room type
-            var physics = GeneratePhysicsForRoom(template, ref random);
-            
+            JumpArcPhysics physics = GeneratePhysicsForRoom(template, ref random);
+
             // Generate tilemap data for navigation calculation using procedural algorithms
             // This provides full room layout generation based on the room template
-            var tilemap = SimulateRoomTilemap(bounds, template, ref random);
+            NativeArray<TileType> tilemap = SimulateRoomTilemap(bounds, template, ref random);
             
             // Phase 1: Apply Empty-Above-Traversable Rule
             ApplyEmptyAboveTraversableRule(bounds, tilemap, navBuffer);
@@ -132,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Graph
             var tilemap = new NativeArray<TileType>(tileCount, Allocator.Temp);
 
             // Get configurable parameters for this room type
-            var config = GetTilemapGenerationConfig(template);
+            TilemapConfig config = GetTilemapGenerationConfig(template);
 
             // Fill with basic layout based on config
             for (int y = 0; y < bounds.height; y++)
@@ -144,15 +147,25 @@ namespace TinyWalnutGames.MetVD.Graph
                     // Ground level and walls
                     if ((config.HasGroundLevel && y == 0) ||
                         (config.HasWalls && (x == 0 || x == bounds.width - 1)))
+                    {
                         tilemap[index] = TileType.Solid;
+                    }
                     else if (config.HasGroundLevel && y == 1)
+                    {
                         tilemap[index] = TileType.Platform; // Ground level platforms
+                    }
                     else if (random.NextFloat() < config.PlatformProbability) // Random platforms
+                    {
                         tilemap[index] = TileType.Platform;
+                    }
                     else if (random.NextFloat() < config.ClimbableProbability) // Climbable surfaces
+                    {
                         tilemap[index] = TileType.Climbable;
+                    }
                     else
+                    {
                         tilemap[index] = TileType.Empty;
+                    }
                 }
             }
             return tilemap;
@@ -168,9 +181,9 @@ namespace TinyWalnutGames.MetVD.Graph
                 {
                     int currentIndex = y * bounds.width + x;
                     int belowIndex = (y - 1) * bounds.width + x;
-                    
-                    var currentTile = tilemap[currentIndex];
-                    var belowTile = tilemap[belowIndex];
+
+                    TileType currentTile = tilemap[currentIndex];
+                    TileType belowTile = tilemap[belowIndex];
                     
                     // If current is empty and below is traversable
                     if (currentTile == TileType.Empty && IsTraversable(belowTile))
@@ -198,10 +211,13 @@ namespace TinyWalnutGames.MetVD.Graph
                 for (int x = 0; x < bounds.width; x++)
                 {
                     int index = y * bounds.width + x;
-                    var currentTile = tilemap[index];
+                    TileType currentTile = tilemap[index];
                     
-                    if (!IsTraversable(currentTile)) continue;
-                    
+                    if (!IsTraversable(currentTile))
+                    {
+                        continue;
+                    }
+
                     var fromPos = new Unity.Mathematics.int2(x, y);
                     
                     // Check reachable positions within jump/movement range
@@ -216,8 +232,11 @@ namespace TinyWalnutGames.MetVD.Graph
                                              JumpArcPhysics physics, Ability requiredSkills,
                                              DynamicBuffer<RoomNavigationElement> navBuffer)
         {
-            if ((requiredSkills & Ability.Jump) == 0) return;
-            
+            if ((requiredSkills & Ability.Jump) == 0)
+            {
+                return;
+            }
+
             int jumpRange = (int)physics.JumpDistance;
             int jumpHeight = (int)physics.JumpHeight;
             
@@ -225,14 +244,20 @@ namespace TinyWalnutGames.MetVD.Graph
             {
                 for (int dy = -1; dy <= jumpHeight; dy++) // Can jump up or fall down
                 {
-                    if (dx == 0 && dy == 0) continue;
+                    if (dx == 0 && dy == 0)
+                    {
+                        continue;
+                    }
+
+                    int2 toPos = fromPos + new Unity.Mathematics.int2(dx, dy);
                     
-                    var toPos = fromPos + new Unity.Mathematics.int2(dx, dy);
-                    
-                    if (!IsWithinBounds(toPos, bounds)) continue;
-                    
+                    if (!IsWithinBounds(toPos, bounds))
+                    {
+                        continue;
+                    }
+
                     int toIndex = toPos.y * bounds.width + toPos.x;
-                    var toTile = tilemap[toIndex];
+                    TileType toTile = tilemap[toIndex];
                     
                     // Can land on traversable tiles or move through empty space
                     if (IsTraversable(toTile) || toTile == TileType.Empty)
@@ -258,21 +283,30 @@ namespace TinyWalnutGames.MetVD.Graph
                                              JumpArcPhysics physics, Ability requiredSkills,
                                              DynamicBuffer<RoomNavigationElement> navBuffer)
         {
-            if ((requiredSkills & Ability.Dash) == 0) return;
-            
+            if ((requiredSkills & Ability.Dash) == 0)
+            {
+                return;
+            }
+
             int dashRange = (int)physics.DashDistance;
             
             // Horizontal dashes
             for (int dx = -dashRange; dx <= dashRange; dx++)
             {
-                if (dx == 0) continue;
+                if (dx == 0)
+                {
+                    continue;
+                }
+
+                int2 toPos = fromPos + new Unity.Mathematics.int2(dx, 0);
                 
-                var toPos = fromPos + new Unity.Mathematics.int2(dx, 0);
-                
-                if (!IsWithinBounds(toPos, bounds)) continue;
-                
+                if (!IsWithinBounds(toPos, bounds))
+                {
+                    continue;
+                }
+
                 int toIndex = toPos.y * bounds.width + toPos.x;
-                var toTile = tilemap[toIndex];
+                TileType toTile = tilemap[toIndex];
                 
                 if (IsTraversable(toTile) || toTile == TileType.Empty)
                 {
@@ -285,28 +319,37 @@ namespace TinyWalnutGames.MetVD.Graph
                                                  JumpArcPhysics physics, Ability requiredSkills,
                                                  DynamicBuffer<RoomNavigationElement> navBuffer)
         {
-            if ((requiredSkills & Ability.WallJump) == 0) return;
-            
+            if ((requiredSkills & Ability.WallJump) == 0)
+            {
+                return;
+            }
+
             // Check for walls adjacent to current position
-            var leftWall = fromPos + new Unity.Mathematics.int2(-1, 0);
-            var rightWall = fromPos + new Unity.Mathematics.int2(1, 0);
+            int2 leftWall = fromPos + new Unity.Mathematics.int2(-1, 0);
+            int2 rightWall = fromPos + new Unity.Mathematics.int2(1, 0);
             
             bool hasLeftWall = IsWall(leftWall, bounds, tilemap);
             bool hasRightWall = IsWall(rightWall, bounds, tilemap);
             
-            if (!hasLeftWall && !hasRightWall) return;
-            
+            if (!hasLeftWall && !hasRightWall)
+            {
+                return;
+            }
+
             int wallJumpHeight = (int)physics.WallJumpHeight;
             
             // Wall jump upward
             for (int dy = 1; dy <= wallJumpHeight; dy++)
             {
-                var toPos = fromPos + new Unity.Mathematics.int2(0, dy);
+                int2 toPos = fromPos + new Unity.Mathematics.int2(0, dy);
                 
-                if (!IsWithinBounds(toPos, bounds)) continue;
-                
+                if (!IsWithinBounds(toPos, bounds))
+                {
+                    continue;
+                }
+
                 int toIndex = toPos.y * bounds.width + toPos.x;
-                var toTile = tilemap[toIndex];
+                TileType toTile = tilemap[toIndex];
                 
                 if (IsTraversable(toTile) || toTile == TileType.Empty)
                 {
@@ -328,8 +371,11 @@ namespace TinyWalnutGames.MetVD.Graph
                 var fromPos = new Unity.Mathematics.int2(random.NextInt(0, bounds.width), random.NextInt(0, bounds.height));
                 var toPos = new Unity.Mathematics.int2(random.NextInt(0, bounds.width), random.NextInt(0, bounds.height));
                 
-                if (Unity.Mathematics.math.all(fromPos == toPos)) continue;
-                
+                if (Unity.Mathematics.math.all(fromPos == toPos))
+                {
+                    continue;
+                }
+
                 // Use advanced movement for secret routes
                 Ability secretMovement = optionalSkills != Ability.None ? optionalSkills : Ability.Grapple;
                 float distance = Unity.Mathematics.math.length(new Unity.Mathematics.float2(toPos - fromPos));
@@ -345,8 +391,11 @@ namespace TinyWalnutGames.MetVD.Graph
 
         private static bool IsWall(Unity.Mathematics.int2 position, RectInt bounds, NativeArray<TileType> tilemap)
         {
-            if (!IsWithinBounds(position, bounds)) return true; // Boundary counts as wall
-            
+            if (!IsWithinBounds(position, bounds))
+            {
+                return true; // Boundary counts as wall
+            }
+
             int index = position.y * bounds.width + position.x;
             return tilemap[index] == TileType.Solid;
         }

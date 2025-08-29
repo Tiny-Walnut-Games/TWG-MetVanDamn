@@ -24,45 +24,59 @@ namespace TinyWalnutGames.MetVD.Core
         public void OnUpdate(ref SystemState state)
         {
             if (_edgeQuery.IsEmpty || !_doneQuery.IsEmptyIgnoreFilter)
+            {
                 return; // nothing to do OR already built
+            }
 
-            var edges = _edgeQuery.ToComponentDataArray<ConnectionEdge>(Allocator.Temp); // small one-shot copy
-            var em = state.EntityManager;
+            NativeArray<ConnectionEdge> edges = _edgeQuery.ToComponentDataArray<ConnectionEdge>(Allocator.Temp); // small one-shot copy
+            EntityManager em = state.EntityManager;
 
             for (int i = 0; i < edges.Length; i++)
             {
-                var edge = edges[i];
+                ConnectionEdge edge = edges[i];
 
                 // Resolve NodeId components (optional safety: skip if missing)
                 if (!em.HasComponent<NodeId>(edge.From) || !em.HasComponent<NodeId>(edge.To))
+                {
                     continue; // skip if NodeId missing
+                }
 
-                var fromNode = em.GetComponentData<NodeId>(edge.From);
-                var toNode = em.GetComponentData<NodeId>(edge.To);
+                NodeId fromNode = em.GetComponentData<NodeId>(edge.From);
+                NodeId toNode = em.GetComponentData<NodeId>(edge.To);
 
                 // Ensure buffers exist
                 if (!em.HasBuffer<ConnectionBufferElement>(edge.From))
+                {
                     em.AddBuffer<ConnectionBufferElement>(edge.From);
-                var fromBuf = em.GetBuffer<ConnectionBufferElement>(edge.From);
+                }
+
+                DynamicBuffer<ConnectionBufferElement> fromBuf = em.GetBuffer<ConnectionBufferElement>(edge.From);
                 var forward = new Connection(fromNode._value, toNode._value, edge.Type, edge.RequiredPolarity, edge.TraversalCost);
                 if (!Contains(fromBuf, forward))
+                {
                     fromBuf.Add(forward);
+                }
 
                 if (edge.Type == ConnectionType.Bidirectional)
                 {
                     if (!em.HasBuffer<ConnectionBufferElement>(edge.To))
+                    {
                         em.AddBuffer<ConnectionBufferElement>(edge.To);
-                    var toBuf = em.GetBuffer<ConnectionBufferElement>(edge.To);
+                    }
+
+                    DynamicBuffer<ConnectionBufferElement> toBuf = em.GetBuffer<ConnectionBufferElement>(edge.To);
                     var reverse = new Connection(toNode._value, fromNode._value, edge.Type, edge.RequiredPolarity, edge.TraversalCost);
                     if (!Contains(toBuf, reverse))
+                    {
                         toBuf.Add(reverse);
+                    }
                 }
             }
 
             edges.Dispose();
 
             // Mark completion with a simple tag entity so we do not rebuild.
-            var tagEntity = em.CreateEntity();
+            Entity tagEntity = em.CreateEntity();
             em.AddComponent<ConnectionGraphBuiltTag>(tagEntity);
         }
 
@@ -70,9 +84,11 @@ namespace TinyWalnutGames.MetVD.Core
         {
             for (int i = 0; i < buf.Length; i++)
             {
-                var existing = buf[i].Value;
+                Connection existing = buf[i].Value;
                 if (existing.FromNodeId == c.FromNodeId && existing.ToNodeId == c.ToNodeId && existing.Type == c.Type && existing.RequiredPolarity == c.RequiredPolarity)
+                {
                     return true;
+                }
             }
             return false;
         }
