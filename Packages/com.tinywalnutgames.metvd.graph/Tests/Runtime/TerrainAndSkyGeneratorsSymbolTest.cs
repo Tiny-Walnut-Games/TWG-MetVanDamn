@@ -115,8 +115,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
         {
             // Test that JumpArcSolver can calculate minimum platform spacing
             var physics = new JumpArcPhysics(3.0f, 4.0f, 1.5f, 1.0f, 2.0f, 6.0f);
-            var spacing = JumpArcSolver.CalculateMinimumPlatformSpacing(physics);
-            
+            JumpArcSolver.CalculateMinimumPlatformSpacing(physics, out int2 spacing);
+
             Assert.Greater(spacing.x, 0);
             Assert.Greater(spacing.y, 0);
         }
@@ -140,9 +140,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             var physics = new JumpArcPhysics(3.0f, 4.0f, 1.5f, 1.0f, 2.0f, 6.0f);
             var from = new int2(0, 0);
             var to = new int2(2, 1);
-            
-            var arcData = JumpArcSolver.CalculateJumpArc(from, to, physics);
-            
+
+            JumpArcSolver.CalculateJumpArc(from, to, physics, out var arcData);
+
             Assert.AreEqual(from, arcData.StartPosition);
             Assert.AreEqual(to, arcData.EndPosition);
             Assert.Greater(arcData.FlightTime, 0);

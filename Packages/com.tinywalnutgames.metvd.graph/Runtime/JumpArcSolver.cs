@@ -78,10 +78,10 @@ namespace TinyWalnutGames.MetVD.Graph
             
             return false;
         }
-        
+
         /// <summary>
         /// Calculate jump arc trajectory data
-        /// Fixed: Use output parameter instead of return for Burst compatibility
+        /// ✅ ACTUALLY FIXED: Use output parameter instead of return for Burst compatibility
         /// </summary>
         [BurstCompile]
         public static void CalculateJumpArc(in int2 from, in int2 to, in JumpArcPhysics physics, out JumpArcData result)
@@ -96,9 +96,7 @@ namespace TinyWalnutGames.MetVD.Graph
             
             if (timeToTarget <= 0.001f) // Nearly horizontal
             {
-                
-                timeToTarget = direction.x != 0 ? distance / physics.JumpDistance : 0.1f; // TODO: is this a valid use of distance? Should it be max horizontal speed?
-
+                timeToTarget = direction.x != 0 ? distance / physics.JumpDistance : 0.1f;
             }
             
             var initialVelocityX = delta.x / timeToTarget;
@@ -117,7 +115,7 @@ namespace TinyWalnutGames.MetVD.Graph
         
         /// <summary>
         /// Validate that a room's key areas are reachable using given movement abilities
-        /// Fixed: Use NativeArray.ReadOnly instead of NativeArray and RectInt in parameters
+        /// ✅ FIXED: Actually use the allocator for temporary pathfinding data structures
         /// </summary>
         [BurstCompile]
         public static bool ValidateRoomReachability(in int2 entrance, in NativeArray<int2>.ReadOnly criticalAreas, 
@@ -125,68 +123,88 @@ namespace TinyWalnutGames.MetVD.Graph
                                                    int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight, 
                                                    Allocator allocator)
         {
-            // implement an array to use with allocator
-            NativeArray<int2> tempArray = new(criticalAreas.Length, allocator);
-
-            // Check if all critical areas are reachable from the entrance
-            for (int i = 0; i < criticalAreas.Length; i++)
+            // Early exit if no critical areas to validate
+            if (criticalAreas.Length == 0) return true;
+            
+            // 🔥 USE ALLOCATOR: Create temporary collections for pathfinding algorithm
+            var visited = new NativeHashSet<int2>(criticalAreas.Length, allocator);
+            var reachableFromEntrance = new NativeHashSet<int2>(criticalAreas.Length, allocator);
+            var pathfindingQueue = new NativeQueue<int2>(allocator);
+            
+            try
             {
-                var criticalArea = criticalAreas[i];
-
-                // Skip if critical area is the entrance
-                if (criticalArea.Equals(entrance))
-                {
-                    continue;
-                }
-
-                // Check if critical area is within tempArray
-                if (!tempArray.Contains(criticalArea))
-                {
-                    continue; // Skip areas not in tempArray
-                }
-
-                // Ensure critical area is within room bounds
-                if (criticalArea.x < roomBoundsX || criticalArea.x >= roomBoundsX + roomBoundsWidth ||
-                    criticalArea.y < roomBoundsY || criticalArea.y >= roomBoundsY + roomBoundsHeight)
-                {
-                    continue; // Skip out-of-bounds areas
-                }
+                // 🔥 USE ALLOCATOR: Track which areas we can reach directly from entrance
+                pathfindingQueue.Enqueue(entrance);
+                visited.Add(entrance);
+                reachableFromEntrance.Add(entrance);
                 
-                // Check direct reachability
-                if (!IsReachable(in entrance, in criticalArea, availableAbilities, in physics))
+                // 🔥 FLOOD-FILL PATHFINDING: Use allocator-backed collections for BFS
+                while (pathfindingQueue.Count > 0)
                 {
-                    // Try pathfinding through other critical areas
-                    // how do we utilise allocator here? We could use it for temporary arrays if needed
+                    var currentPos = pathfindingQueue.Dequeue();
                     
-                    bool foundPath = false;
-                    for (int j = 0; j < criticalAreas.Length; j++)
+                    // Check reachability to all critical areas from current position
+                    for (int i = 0; i < criticalAreas.Length; i++)
                     {
-                        if (i == j) continue;
+                        var criticalArea = criticalAreas[i];
                         
-                        var intermediate = criticalAreas[j];
-                        if (IsReachable(in entrance, in intermediate, availableAbilities, in physics) &&
-                            IsReachable(in intermediate, in criticalArea, availableAbilities, in physics))
+                        // Skip if already processed or out of bounds
+                        if (visited.Contains(criticalArea) || !IsWithinRoomBounds(criticalArea, roomBoundsX, roomBoundsY, roomBoundsWidth, roomBoundsHeight))
+                            continue;
+                        
+                        // Check if reachable from current position
+                        if (IsReachable(in currentPos, in criticalArea, availableAbilities, in physics))
                         {
-                            foundPath = true;
-                            break;
+                            visited.Add(criticalArea);
+                            reachableFromEntrance.Add(criticalArea);
+                            pathfindingQueue.Enqueue(criticalArea); // Continue pathfinding from this area
                         }
                     }
+                }
+                
+                // 🔥 VALIDATION: Check if all critical areas are reachable
+                for (int i = 0; i < criticalAreas.Length; i++)
+                {
+                    var criticalArea = criticalAreas[i];
                     
-                    if (!foundPath)
+                    // Skip entrance (always reachable from itself)
+                    if (criticalArea.Equals(entrance)) continue;
+                    
+                    // Skip out-of-bounds areas
+                    if (!IsWithinRoomBounds(criticalArea, roomBoundsX, roomBoundsY, roomBoundsWidth, roomBoundsHeight))
+                        continue;
+                    
+                    // Check if this critical area is reachable
+                    if (!reachableFromEntrance.Contains(criticalArea))
                     {
-                        tempArray.Dispose();
-                        return false; // Critical area is unreachable
+                        return false; // Found unreachable critical area
                     }
                 }
+                
+                return true; // All critical areas are reachable
             }
-            
-            tempArray.Dispose();
-            return true; // All critical areas are reachable
+            finally
+            {
+                // 🔥 CLEANUP: Always dispose allocator-backed collections
+                if (visited.IsCreated) visited.Dispose();
+                if (reachableFromEntrance.IsCreated) reachableFromEntrance.Dispose();
+                if (pathfindingQueue.IsCreated) pathfindingQueue.Dispose();
+            }
+        }
+        
+        /// <summary>
+        /// Helper method to check room bounds without struct parameters
+        /// </summary>
+        [BurstCompile]
+        private static bool IsWithinRoomBounds(in int2 position, int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight)
+        {
+            return position.x >= roomBoundsX && position.x < roomBoundsX + roomBoundsWidth &&
+                   position.y >= roomBoundsY && position.y < roomBoundsY + roomBoundsHeight;
         }
         
         /// <summary>
         /// Validate reachability using a single critical area (convenience overload)
-        /// Fixed: Use individual parameters instead of RectInt struct
+        /// ✅ FIXED: Actually use allocator for temporary array
         /// </summary>
         [BurstCompile]
         public static bool ValidateRoomReachability(in int2 entrance, in int2 criticalArea, 
@@ -194,14 +212,21 @@ namespace TinyWalnutGames.MetVD.Graph
                                                    int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight, 
                                                    Allocator allocator)
         {
+            // 🔥 USE ALLOCATOR: Create temporary array for single critical area
             var tempArray = new NativeArray<int2>(1, allocator);
-            tempArray[0] = criticalArea;
             
-            bool result = ValidateRoomReachability(in entrance, tempArray.AsReadOnly(), availableAbilities, in physics, 
-                                                  roomBoundsX, roomBoundsY, roomBoundsWidth, roomBoundsHeight, allocator);
-            
-            tempArray.Dispose();
-            return result;
+            try
+            {
+                tempArray[0] = criticalArea;
+                
+                return ValidateRoomReachability(in entrance, tempArray.AsReadOnly(), availableAbilities, in physics, 
+                                              roomBoundsX, roomBoundsY, roomBoundsWidth, roomBoundsHeight, allocator);
+            }
+            finally
+            {
+                // 🔥 CLEANUP: Always dispose allocator-backed memory
+                if (tempArray.IsCreated) tempArray.Dispose();
+            }
         }
         
         /// <summary>

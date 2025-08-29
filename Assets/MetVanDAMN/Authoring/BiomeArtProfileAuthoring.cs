@@ -78,21 +78,92 @@ namespace TinyWalnutGames.MetVD.Authoring
                 
             string lowerName = profileName.ToLower();
             
-            if (lowerName.Contains("solar") || lowerName.Contains("sun")) return BiomeType.SolarPlains;
-            if (lowerName.Contains("crystal")) return BiomeType.CrystalCaverns;
-            if (lowerName.Contains("sky") || lowerName.Contains("garden")) return BiomeType.SkyGardens;
-            if (lowerName.Contains("shadow")) return BiomeType.ShadowRealms;
-            if (lowerName.Contains("underwater") || lowerName.Contains("ocean")) return BiomeType.DeepUnderwater;
-            if (lowerName.Contains("void")) return BiomeType.VoidChambers;
-            if (lowerName.Contains("volcanic") || lowerName.Contains("volcano")) return BiomeType.VolcanicCore;
-            if (lowerName.Contains("power") || lowerName.Contains("plant")) return BiomeType.PowerPlant;
-            if (lowerName.Contains("plasma")) return BiomeType.PlasmaFields;
-            if (lowerName.Contains("frozen") || lowerName.Contains("ice")) return BiomeType.FrozenWastes;
-            if (lowerName.Contains("catacomb")) return BiomeType.IceCatacombs;
-            if (lowerName.Contains("cryogenic") || lowerName.Contains("lab")) return BiomeType.CryogenicLabs;
-            if (lowerName.Contains("hub")) return BiomeType.HubArea;
-            if (lowerName.Contains("transition")) return BiomeType.TransitionZone;
-            if (lowerName.Contains("ancient") || lowerName.Contains("ruin")) return BiomeType.AncientRuins;
+            // 🔥 FIXED: Complete mapping for all 27 biome types
+            
+            // Light-aligned biomes
+            if (lowerName.Contains("solar") || lowerName.Contains("sun") || lowerName.Contains("plain")) 
+                return BiomeType.SolarPlains;
+            if (lowerName.Contains("crystal") && lowerName.Contains("cavern")) 
+                return BiomeType.CrystalCaverns;
+            if (lowerName.Contains("sky") || lowerName.Contains("garden") || lowerName.Contains("floating")) 
+                return BiomeType.SkyGardens;
+
+            // Dark-aligned biomes
+            if (lowerName.Contains("shadow") || lowerName.Contains("realm")) 
+                return BiomeType.ShadowRealms;
+            if (lowerName.Contains("underwater") || lowerName.Contains("deep") && lowerName.Contains("water")) 
+                return BiomeType.DeepUnderwater;
+            if (lowerName.Contains("void") || lowerName.Contains("chamber")) 
+                return BiomeType.VoidChambers;
+
+            // Hazard/Energy biomes
+            if (lowerName.Contains("volcanic") && lowerName.Contains("core")) 
+                return BiomeType.VolcanicCore;
+            if (lowerName.Contains("power") || lowerName.Contains("plant") || lowerName.Contains("facility")) 
+                return BiomeType.PowerPlant;
+            if (lowerName.Contains("plasma") || lowerName.Contains("field") || lowerName.Contains("energy")) 
+                return BiomeType.PlasmaFields;
+
+            // Ice/Crystal biomes
+            if (lowerName.Contains("frozen") || lowerName.Contains("waste")) 
+                return BiomeType.FrozenWastes;
+            if (lowerName.Contains("ice") && lowerName.Contains("catacomb")) 
+                return BiomeType.IceCatacombs;
+            if (lowerName.Contains("cryogenic") || lowerName.Contains("lab") || lowerName.Contains("cryo")) 
+                return BiomeType.CryogenicLabs;
+            if (lowerName.Contains("icy") && lowerName.Contains("canyon")) 
+                return BiomeType.IcyCanyon;
+            if (lowerName.Contains("tundra") || lowerName.Contains("arctic")) 
+                return BiomeType.Tundra;
+
+            // Earth/Nature biomes
+            if (lowerName.Contains("forest") || lowerName.Contains("wood") || lowerName.Contains("tree")) 
+                return BiomeType.Forest;
+            if (lowerName.Contains("mountain") || lowerName.Contains("peak") || lowerName.Contains("cliff")) 
+                return BiomeType.Mountains;
+            if (lowerName.Contains("desert") || lowerName.Contains("sand") || lowerName.Contains("dune")) 
+                return BiomeType.Desert;
+
+            // Water biomes
+            if (lowerName.Contains("ocean") || lowerName.Contains("sea") || lowerName.Contains("aquatic")) 
+                return BiomeType.Ocean;
+
+            // Space biomes
+            if (lowerName.Contains("cosmic") || lowerName.Contains("space") || lowerName.Contains("stellar")) 
+                return BiomeType.Cosmic;
+
+            // Crystal biomes (general crystal, not caverns)
+            if (lowerName.Contains("crystal") && !lowerName.Contains("cavern")) 
+                return BiomeType.Crystal;
+
+            // Ruins/Ancient biomes
+            if (lowerName.Contains("ancient") && lowerName.Contains("ruin")) 
+                return BiomeType.AncientRuins;
+            if (lowerName.Contains("ruin") || lowerName.Contains("temple") || lowerName.Contains("artifact")) 
+                return BiomeType.Ruins;
+
+            // Volcanic/Fire biomes
+            if (lowerName.Contains("volcanic") && !lowerName.Contains("core")) 
+                return BiomeType.Volcanic;
+            if (lowerName.Contains("hell") || lowerName.Contains("inferno") || lowerName.Contains("demon")) 
+                return BiomeType.Hell;
+
+            // Neutral/Mixed biomes
+            if (lowerName.Contains("hub") || lowerName.Contains("central") || lowerName.Contains("main")) 
+                return BiomeType.HubArea;
+            if (lowerName.Contains("transition") || lowerName.Contains("blend") || lowerName.Contains("border")) 
+                return BiomeType.TransitionZone;
+
+            // Additional keyword fallbacks for broader matching
+            if (lowerName.Contains("fire") || lowerName.Contains("lava") || lowerName.Contains("magma")) 
+                return BiomeType.VolcanicCore;
+            if (lowerName.Contains("ice") || lowerName.Contains("cold") || lowerName.Contains("freeze")) 
+                return BiomeType.FrozenWastes;
+            if (lowerName.Contains("water") && !lowerName.Contains("deep") && !lowerName.Contains("underwater")) 
+                return BiomeType.Ocean;
+            if (lowerName.Contains("tech") || lowerName.Contains("machine") || lowerName.Contains("robot")) 
+                return BiomeType.PowerPlant;
+
             return BiomeType.Unknown;
         }
     }

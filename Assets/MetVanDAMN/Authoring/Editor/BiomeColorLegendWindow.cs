@@ -539,24 +539,73 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private Color GetDefaultBiomeColor(BiomeType type)
         {
-            // Generate consistent colors based on biome type
-            switch (type.ToString().ToLower())
+            // 🔥 FIXED: Complete color mapping for all 27 biome types
+            return type switch
             {
-                case "forest": return new Color(0.2f, 0.6f, 0.2f, 1f);
-                case "desert": return new Color(0.9f, 0.8f, 0.3f, 1f);
-                case "mountain": return new Color(0.5f, 0.5f, 0.5f, 1f);
-                case "water": return new Color(0.2f, 0.4f, 0.8f, 1f);
-                case "swamp": return new Color(0.3f, 0.4f, 0.2f, 1f);
-                case "tundra": return new Color(0.8f, 0.9f, 1f, 1f);
-                case "volcanic": return new Color(0.8f, 0.2f, 0.1f, 1f);
-                default:
-                    // Generate color based on hash of type name
-                    int hash = type.GetHashCode();
-                    float r = ((hash & 0xFF0000) >> 16) / 255f;
-                    float g = ((hash & 0x00FF00) >> 8) / 255f;
-                    float b = (hash & 0x0000FF) / 255f;
-                    return new Color(r * 0.7f + 0.3f, g * 0.7f + 0.3f, b * 0.7f + 0.3f, 1f);
-            }
+                // Light-aligned biomes
+                BiomeType.SolarPlains => new Color(1f, 0.9f, 0.4f, 1f),       // Bright golden
+                BiomeType.CrystalCaverns => new Color(0.6f, 0.8f, 1f, 1f),    // Crystal blue
+                BiomeType.SkyGardens => new Color(0.4f, 0.7f, 0.9f, 1f),      // Sky blue
+
+                // Dark-aligned biomes  
+                BiomeType.ShadowRealms => new Color(0.2f, 0.1f, 0.3f, 1f),    // Dark purple
+                BiomeType.DeepUnderwater => new Color(0.1f, 0.3f, 0.6f, 1f),  // Deep blue
+                BiomeType.VoidChambers => new Color(0.1f, 0.1f, 0.1f, 1f),    // Near black
+
+                // Hazard/Energy biomes
+                BiomeType.VolcanicCore => new Color(1f, 0.3f, 0.1f, 1f),       // Lava red
+                BiomeType.PowerPlant => new Color(0.2f, 0.8f, 0.3f, 1f),      // Electric green
+                BiomeType.PlasmaFields => new Color(0.9f, 0.2f, 0.9f, 1f),    // Plasma purple
+
+                // Ice/Crystal biomes
+                BiomeType.FrozenWastes => new Color(0.9f, 0.95f, 1f, 1f),     // Ice white
+                BiomeType.IceCatacombs => new Color(0.7f, 0.85f, 0.95f, 1f),  // Ice blue
+                BiomeType.CryogenicLabs => new Color(0.6f, 0.9f, 1f, 1f),     // Cryo blue
+                BiomeType.IcyCanyon => new Color(0.8f, 0.9f, 0.95f, 1f),      // Canyon ice
+                BiomeType.Tundra => new Color(0.8f, 0.9f, 1f, 1f),            // Tundra blue
+
+                // Earth/Nature biomes
+                BiomeType.Forest => new Color(0.2f, 0.6f, 0.2f, 1f),          // Forest green
+                BiomeType.Mountains => new Color(0.5f, 0.5f, 0.5f, 1f),       // Mountain gray
+                BiomeType.Desert => new Color(0.9f, 0.8f, 0.3f, 1f),          // Desert tan
+
+                // Water biomes
+                BiomeType.Ocean => new Color(0.2f, 0.4f, 0.8f, 1f),           // Ocean blue
+
+                // Space biomes
+                BiomeType.Cosmic => new Color(0.3f, 0.1f, 0.6f, 1f),          // Cosmic purple
+
+                // Crystal biomes
+                BiomeType.Crystal => new Color(0.8f, 0.5f, 1f, 1f),           // Crystal violet
+
+                // Ruins/Ancient biomes
+                BiomeType.Ruins => new Color(0.6f, 0.5f, 0.4f, 1f),           // Ancient stone
+                BiomeType.AncientRuins => new Color(0.7f, 0.6f, 0.3f, 1f),    // Weathered gold
+
+                // Volcanic/Fire biomes
+                BiomeType.Volcanic => new Color(0.8f, 0.2f, 0.1f, 1f),        // Volcanic red
+                BiomeType.Hell => new Color(1f, 0.1f, 0f, 1f),                // Hell fire red
+
+                // Neutral/Mixed biomes
+                BiomeType.HubArea => new Color(0.7f, 0.7f, 0.7f, 1f),         // Neutral gray
+                BiomeType.TransitionZone => new Color(0.6f, 0.6f, 0.8f, 1f),  // Transition purple
+
+                // Unknown/fallback
+                BiomeType.Unknown => new Color(0.5f, 0.5f, 0.5f, 1f),         // Unknown gray
+                
+                // Default hash-based fallback for any future additions
+                _ => GenerateHashBasedColor(type)
+            };
+        }
+
+        private static Color GenerateHashBasedColor(BiomeType type)
+        {
+            // Generate color based on hash of type name for future-proofing
+            int hash = type.GetHashCode();
+            float r = ((hash & 0xFF0000) >> 16) / 255f;
+            float g = ((hash & 0x00FF00) >> 8) / 255f;
+            float b = (hash & 0x0000FF) / 255f;
+            return new Color(r * 0.7f + 0.3f, g * 0.7f + 0.3f, b * 0.7f + 0.3f, 1f);
         }
 
         private Vector3 CalculateAveragePosition(List<BiomeFieldAuthoring> instances)

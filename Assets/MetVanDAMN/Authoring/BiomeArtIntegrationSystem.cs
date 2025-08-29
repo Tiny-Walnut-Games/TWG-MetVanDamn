@@ -1,15 +1,17 @@
-using Unity.Entities;
-using Unity.Collections;
+using Codice.Client.BaseCommands.Import;
+using NUnit.Framework;
+using System.Collections.Generic; // Needed for List<>
+using System.Linq;
+using TinyWalnutGames.MetVD.Biome;
+using TinyWalnutGames.MetVD.Core; // For NodeId, Biome component
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using TinyWalnutGames.MetVD.Core; // For NodeId, Biome component
-using TinyWalnutGames.MetVD.Biome;
 using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem;
-using System.Linq;
-using System.Collections.Generic; // Needed for List<>
-
 // Disambiguate Biome component from potential namespace collisions
 using CoreBiome = TinyWalnutGames.MetVD.Core.Biome;
 
@@ -784,7 +786,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                     if (IsPositionValid(position, layerName))
                     {
                         PlacePropAtPosition(position, layerObject);
-                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
+                        if (placedPropPositions.Count >= settings.maxPropsPerBiome!)
+                        {
+                            return;
+                        }
                     }
                 }
             }
@@ -803,7 +808,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                 foreach (var center in clusterCenters)
                 {
                     PlaceClusterAroundCenter(center, layerObject);
-                    if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
+                    if (placedPropPositions.Count >= settings.maxPropsPerBiome!)
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -815,7 +823,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var layerObject = grid.transform.Find(layerName);
                 if (layerObject == null) continue;
 
-                int maxAttempts = Mathf.RoundToInt(settings.maxPropsPerBiome * 0.1f);
+                int maxAttempts = Mathf.RoundToInt(settings.maxPropsPerBiome! * 0.1f);
                 int placedCount = 0;
                 int attempts = 0;
 
@@ -829,7 +837,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                     {
                         PlacePropAtPosition(position, layerObject);
                         placedCount++;
-                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
+                        if (placedPropPositions.Count >= settings.maxPropsPerBiome!)
+                        {
+                            return;
+                        }
                     }
                     attempts++;
                 }
@@ -852,7 +863,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                         if (IsPositionValid(point, layerName))
                         {
                             PlacePropAtPosition(point, layerObject);
-                            if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
+                            if (placedPropPositions.Count >= settings.maxPropsPerBiome!)
+                            {
+                                return;
+                            }
                         }
                     }
                 }
@@ -885,7 +899,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                         if (IsPositionValid(position, layerName))
                         {
                             PlacePropAtPosition(position, layerObject);
-                            if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
+                            if (placedPropPositions.Count >= settings.maxPropsPerBiome!)
+                            {
+                                return;
+                            }
                         }
                     }
                 }
@@ -909,7 +926,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                     if (rng.NextDouble() < spawnChance && IsPositionValid(sample.position, layerName))
                     {
                         PlacePropAtPosition(sample.position, layerObject);
-                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
+                        if (placedPropPositions.Count >= settings.maxPropsPerBiome!)
+                        {
+                            return;
+                        }
                     }
                 }
             }
@@ -1068,7 +1088,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 if (IsPositionValid(propPosition, layerObject.name))
                 {
                     PlacePropAtPosition(propPosition, layerObject);
-                    if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
+                    if (placedPropPositions.Count >= settings.maxPropsPerBiome!) return;
                 }
             }
         }
@@ -1445,11 +1465,40 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Simulate biome assignment using noise-based regions
             float biomeNoise = Mathf.PerlinNoise(position.x * 0.05f, position.z * 0.05f);
             
-            if (biomeNoise < 0.2f) return BiomeType.Ocean;
-            else if (biomeNoise < 0.4f) return BiomeType.Forest;
-            else if (biomeNoise < 0.6f) return BiomeType.Desert;
-            else if (biomeNoise < 0.8f) return BiomeType.Mountain;
-            else return BiomeType.Tundra;
+            // 🔥 FIXED: Use all 27 biome types (0-26)
+            int biomeIndex = Mathf.FloorToInt(biomeNoise * 27f);
+            
+            return biomeIndex switch
+            {
+                0 => BiomeType.Unknown,
+                1 => BiomeType.SolarPlains,
+                2 => BiomeType.CrystalCaverns,
+                3 => BiomeType.SkyGardens,
+                4 => BiomeType.ShadowRealms,
+                5 => BiomeType.DeepUnderwater,
+                6 => BiomeType.VoidChambers,
+                7 => BiomeType.VolcanicCore,
+                8 => BiomeType.PowerPlant,
+                9 => BiomeType.PlasmaFields,
+                10 => BiomeType.FrozenWastes,
+                11 => BiomeType.IceCatacombs,
+                12 => BiomeType.CryogenicLabs,
+                13 => BiomeType.IcyCanyon,
+                14 => BiomeType.Tundra,
+                15 => BiomeType.Forest,
+                16 => BiomeType.Mountains,
+                17 => BiomeType.Desert,
+                18 => BiomeType.Ocean,
+                19 => BiomeType.Cosmic,
+                20 => BiomeType.Crystal,
+                21 => BiomeType.Ruins,
+                22 => BiomeType.AncientRuins,
+                23 => BiomeType.Volcanic,
+                24 => BiomeType.Hell,
+                25 => BiomeType.HubArea,
+                26 => BiomeType.TransitionZone,
+                _ => BiomeType.Unknown // Fallback for any unexpected values
+            };
         }
 
         private float CalculateBoundaryTransitionPenalty(float boundaryFactor, float transitionZone)
@@ -1463,18 +1512,6 @@ namespace TinyWalnutGames.MetVD.Authoring
             float easedTransition = transitionZone * transitionZone * (3f - 2f * transitionZone); // Smoothstep
             
             return basePenalty + smoothnessBonus * (1f - easedTransition);
-        }
-
-        // Complete biome type system implementation with comprehensive environmental categories
-        // this list is incomplete, there are other lists that are MORE complete.
-        // TODO: integrate with our full biome system
-        private enum BiomeType
-        {
-            Ocean,
-            Forest, 
-            Desert,
-            Mountain,
-            Tundra
         }
 
         private float CalculateGeologicalStability(Vector3 position)

@@ -271,25 +271,63 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
         private static Color GetBiomeColor(BiomeType biomeType)
         {
-            switch (biomeType)
+            // 🔥 FIXED: Complete color mapping for all 27 biome types in Gizmo system
+            return biomeType switch
             {
-                case BiomeType.SolarPlains: return Color.yellow;
-                case BiomeType.CrystalCaverns: return Color.cyan;
-                case BiomeType.SkyGardens: return Color.green;
-                case BiomeType.ShadowRealms: return new Color(0.5f, 0f, 0.5f, 1f);
-                case BiomeType.DeepUnderwater: return Color.blue;
-                case BiomeType.VoidChambers: return Color.black;
-                case BiomeType.VolcanicCore: return Color.red;
-                case BiomeType.PowerPlant: return new Color(1f, 0.5f, 0f, 1f);
-                case BiomeType.PlasmaFields: return Color.magenta;
-                case BiomeType.FrozenWastes: return Color.white;
-                case BiomeType.IceCatacombs: return new Color(0.7f, 0.9f, 1f, 1f);
-                case BiomeType.CryogenicLabs: return new Color(0.5f, 0.8f, 1f, 1f);
-                case BiomeType.HubArea: return new Color(0.8f, 0.8f, 0.8f, 1f);
-                case BiomeType.TransitionZone: return new Color(0.6f, 0.6f, 0.6f, 1f);
-                case BiomeType.AncientRuins: return new Color(0.6f, 0.4f, 0.2f, 1f);
-                default: return Color.gray;
-            }
+                // Light-aligned biomes
+                BiomeType.SolarPlains => new Color(1f, 0.9f, 0.4f, 1f),       // Bright golden
+                BiomeType.CrystalCaverns => new Color(0.6f, 0.8f, 1f, 1f),    // Crystal blue
+                BiomeType.SkyGardens => new Color(0.4f, 0.7f, 0.9f, 1f),      // Sky blue
+
+                // Dark-aligned biomes
+                BiomeType.ShadowRealms => new Color(0.2f, 0.1f, 0.3f, 1f),    // Dark purple
+                BiomeType.DeepUnderwater => new Color(0.1f, 0.3f, 0.6f, 1f),  // Deep blue
+                BiomeType.VoidChambers => new Color(0.1f, 0.1f, 0.1f, 1f),    // Near black
+
+                // Hazard/Energy biomes
+                BiomeType.VolcanicCore => new Color(1f, 0.3f, 0.1f, 1f),       // Lava red
+                BiomeType.PowerPlant => new Color(0.2f, 0.8f, 0.3f, 1f),      // Electric green
+                BiomeType.PlasmaFields => new Color(0.9f, 0.2f, 0.9f, 1f),    // Plasma purple
+
+                // Ice/Crystal biomes
+                BiomeType.FrozenWastes => new Color(0.9f, 0.95f, 1f, 1f),     // Ice white
+                BiomeType.IceCatacombs => new Color(0.7f, 0.85f, 0.95f, 1f),  // Ice blue
+                BiomeType.CryogenicLabs => new Color(0.6f, 0.9f, 1f, 1f),     // Cryo blue
+                BiomeType.IcyCanyon => new Color(0.8f, 0.9f, 0.95f, 1f),      // Canyon ice
+                BiomeType.Tundra => new Color(0.8f, 0.9f, 1f, 1f),            // Tundra blue
+
+                // Earth/Nature biomes
+                BiomeType.Forest => new Color(0.2f, 0.6f, 0.2f, 1f),          // Forest green
+                BiomeType.Mountains => new Color(0.5f, 0.5f, 0.5f, 1f),       // Mountain gray
+                BiomeType.Desert => new Color(0.9f, 0.8f, 0.3f, 1f),          // Desert tan
+
+                // Water biomes
+                BiomeType.Ocean => new Color(0.2f, 0.4f, 0.8f, 1f),           // Ocean blue
+
+                // Space biomes
+                BiomeType.Cosmic => new Color(0.3f, 0.1f, 0.6f, 1f),          // Cosmic purple
+
+                // Crystal biomes
+                BiomeType.Crystal => new Color(0.8f, 0.5f, 1f, 1f),           // Crystal violet
+
+                // Ruins/Ancient biomes
+                BiomeType.Ruins => new Color(0.6f, 0.5f, 0.4f, 1f),           // Ancient stone
+                BiomeType.AncientRuins => new Color(0.7f, 0.6f, 0.3f, 1f),    // Weathered gold
+
+                // Volcanic/Fire biomes
+                BiomeType.Volcanic => new Color(0.8f, 0.2f, 0.1f, 1f),        // Volcanic red
+                BiomeType.Hell => new Color(1f, 0.1f, 0f, 1f),                // Hell fire red
+
+                // Neutral/Mixed biomes
+                BiomeType.HubArea => new Color(0.8f, 0.8f, 0.8f, 1f),         // Neutral gray
+                BiomeType.TransitionZone => new Color(0.6f, 0.6f, 0.8f, 1f),  // Transition purple
+
+                // Unknown/fallback
+                BiomeType.Unknown => new Color(0.5f, 0.5f, 0.5f, 1f),         // Unknown gray
+                
+                // Default fallback
+                _ => Color.gray,
+            };
         }
 
         private static void PreviewProceduralLayout()
