@@ -116,13 +116,13 @@ namespace TinyWalnutGames.MetVD.Authoring
     /// <summary>
     /// Job for analyzing biome complexity and determining optimization parameters
     /// </summary>
-    [BurstCompile]
     public partial struct BiomeOptimizationAnalysisJob : IJobEntity
     {
         [ReadOnly] public ComponentLookup<CoreBiome> biomeLookup;
         [ReadOnly] public ComponentLookup<BiomeArtProfileReference> artProfileLookup;
         [ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
 
+        [BurstCompile]
         public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
         {
             if (!artProfileLookup.TryGetComponent(entity, out var artProfileRef) || !artProfileRef.ProfileRef.IsValid())
@@ -219,12 +219,12 @@ namespace TinyWalnutGames.MetVD.Authoring
     /// <summary>
     /// Job for optimizing spatial coherence between neighboring biomes
     /// </summary>
-    [BurstCompile]
     public partial struct SpatialCoherenceOptimizationJob : IJobEntity
     {
         [ReadOnly] public ComponentLookup<CoreBiome> biomeLookup;
         [ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
 
+        [BurstCompile]
         public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
         {
             if (!nodeIdLookup.TryGetComponent(entity, out var nodeId))
@@ -415,20 +415,30 @@ namespace TinyWalnutGames.MetVD.Authoring
 
         private static float CalculateSymmetryBonus(int2 coordinates)
         {
-            // Simplified symmetry calculation without managed collections
+            // Fixed: Use stack-allocated fixed array instead of managed array for Burst compatibility
             float symmetryScore = 0f;
             int comparisons = 0;
             
-            // Check symmetry in 4 directions around the coordinate
-            int2[] offsets = {
-                new(1, 0), new(-1, 0),   // Horizontal
-                new(0, 1), new(0, -1),   // Vertical
-            };
+            // Check symmetry in 4 directions around the coordinate using fixed offsets
+            // int2[] offsets replaced with individual checks to avoid managed allocations
             
-            for (int i = 0; i < offsets.Length; i++)
+            // Horizontal symmetry
             {
-                int2 pos1 = coordinates + offsets[i];
-                int2 pos2 = coordinates - offsets[i];
+                int2 pos1 = coordinates + new int2(1, 0);
+                int2 pos2 = coordinates + new int2(-1, 0);
+                
+                float strength1 = DetermineBiomeConnectionStrength(pos1, coordinates);
+                float strength2 = DetermineBiomeConnectionStrength(pos2, coordinates);
+                float similarity = 1f - math.abs(strength1 - strength2);
+                
+                symmetryScore += similarity;
+                comparisons++;
+            }
+            
+            // Vertical symmetry
+            {
+                int2 pos1 = coordinates + new int2(0, 1);
+                int2 pos2 = coordinates + new int2(0, -1);
                 
                 float strength1 = DetermineBiomeConnectionStrength(pos1, coordinates);
                 float strength2 = DetermineBiomeConnectionStrength(pos2, coordinates);

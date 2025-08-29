@@ -16,9 +16,10 @@ namespace TinyWalnutGames.MetVD.Graph
     {
         /// <summary>
         /// Calculate minimum platform spacing based on jump physics
+        /// Fixed: Use output parameter instead of return for Burst compatibility
         /// </summary>
         [BurstCompile]
-        public static int2 CalculateMinimumPlatformSpacing(in JumpArcPhysics physics)
+        public static void CalculateMinimumPlatformSpacing(in JumpArcPhysics physics, out int2 result)
         {
             // Calculate horizontal distance based on jump capabilities
             var horizontalSpacing = (int)math.ceil(physics.JumpDistance * 0.8f); // 80% of max distance for safety
@@ -26,7 +27,7 @@ namespace TinyWalnutGames.MetVD.Graph
             // Calculate vertical spacing based on jump height
             var verticalSpacing = (int)math.ceil(physics.JumpHeight * 0.7f); // 70% of max height for reachability
             
-            return new int2(horizontalSpacing, verticalSpacing);
+            result = new int2(horizontalSpacing, verticalSpacing);
         }
         
         /// <summary>
@@ -80,9 +81,10 @@ namespace TinyWalnutGames.MetVD.Graph
         
         /// <summary>
         /// Calculate jump arc trajectory data
+        /// Fixed: Use output parameter instead of return for Burst compatibility
         /// </summary>
         [BurstCompile]
-        public static JumpArcData CalculateJumpArc(in int2 from, in int2 to, in JumpArcPhysics physics)
+        public static void CalculateJumpArc(in int2 from, in int2 to, in JumpArcPhysics physics, out JumpArcData result)
         {
             var delta = (float2)(to - from);
             var distance = math.length(delta);
@@ -102,7 +104,7 @@ namespace TinyWalnutGames.MetVD.Graph
             var initialVelocityX = delta.x / timeToTarget;
             var initialVelocityY = (delta.y + 0.5f * gravity * timeToTarget * timeToTarget) / timeToTarget;
                        
-            return new JumpArcData
+            result = new JumpArcData
             {
                 StartPosition = from,
                 EndPosition = to,
@@ -115,11 +117,13 @@ namespace TinyWalnutGames.MetVD.Graph
         
         /// <summary>
         /// Validate that a room's key areas are reachable using given movement abilities
+        /// Fixed: Use NativeArray.ReadOnly instead of NativeArray and RectInt in parameters
         /// </summary>
         [BurstCompile]
-        public static bool ValidateRoomReachability(in int2 entrance, NativeArray<int2> criticalAreas, 
+        public static bool ValidateRoomReachability(in int2 entrance, in NativeArray<int2>.ReadOnly criticalAreas, 
                                                    Ability availableAbilities, in JumpArcPhysics physics, 
-                                                   RectInt roomBounds, Allocator allocator)
+                                                   int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight, 
+                                                   Allocator allocator)
         {
             // implement an array to use with allocator
             NativeArray<int2> tempArray = new(criticalAreas.Length, allocator);
@@ -142,8 +146,8 @@ namespace TinyWalnutGames.MetVD.Graph
                 }
 
                 // Ensure critical area is within room bounds
-                if (criticalArea.x < roomBounds.x || criticalArea.x >= roomBounds.x + roomBounds.width ||
-                    criticalArea.y < roomBounds.y || criticalArea.y >= roomBounds.y + roomBounds.height)
+                if (criticalArea.x < roomBoundsX || criticalArea.x >= roomBoundsX + roomBoundsWidth ||
+                    criticalArea.y < roomBoundsY || criticalArea.y >= roomBoundsY + roomBoundsHeight)
                 {
                     continue; // Skip out-of-bounds areas
                 }
@@ -170,26 +174,31 @@ namespace TinyWalnutGames.MetVD.Graph
                     
                     if (!foundPath)
                     {
+                        tempArray.Dispose();
                         return false; // Critical area is unreachable
                     }
                 }
             }
             
+            tempArray.Dispose();
             return true; // All critical areas are reachable
         }
         
         /// <summary>
         /// Validate reachability using a single critical area (convenience overload)
+        /// Fixed: Use individual parameters instead of RectInt struct
         /// </summary>
         [BurstCompile]
         public static bool ValidateRoomReachability(in int2 entrance, in int2 criticalArea, 
                                                    Ability availableAbilities, in JumpArcPhysics physics, 
-                                                   RectInt roomBounds, Allocator allocator)
+                                                   int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight, 
+                                                   Allocator allocator)
         {
             var tempArray = new NativeArray<int2>(1, allocator);
             tempArray[0] = criticalArea;
             
-            bool result = ValidateRoomReachability(in entrance, tempArray, availableAbilities, in physics, roomBounds, allocator);
+            bool result = ValidateRoomReachability(in entrance, tempArray.AsReadOnly(), availableAbilities, in physics, 
+                                                  roomBoundsX, roomBoundsY, roomBoundsWidth, roomBoundsHeight, allocator);
             
             tempArray.Dispose();
             return result;

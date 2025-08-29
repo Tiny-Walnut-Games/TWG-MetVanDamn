@@ -259,7 +259,18 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             };
 
             // Act
-            bool isReachable = JumpArcSolver.ValidateRoomReachability(int2.zero, platforms, Ability.Jump, physics, roomBounds, allocator);
+            // Use the correct overload for ValidateRoomReachability (with 9 arguments)
+            bool isReachable = JumpArcSolver.ValidateRoomReachability(
+                int2.zero,
+                platforms.AsReadOnly(),
+                Ability.Jump,
+                physics,
+                roomBounds.x,
+                roomBounds.y,
+                roomBounds.width,
+                roomBounds.height,
+                allocator
+            );
 
             // Assert
             Assert.IsTrue(isReachable, "All platforms should be reachable with given jump physics");
