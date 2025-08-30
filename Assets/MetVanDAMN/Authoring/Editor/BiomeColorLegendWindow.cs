@@ -13,7 +13,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 {
     /// <summary>
     /// Enhanced biome color legend panel for the World Debugger
-    /// Addresses TODO: "Quick biome color legend panel in World Debugger"
     /// </summary>
     public class BiomeColorLegendWindow : EditorWindow
     {

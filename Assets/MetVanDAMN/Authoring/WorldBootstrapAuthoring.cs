@@ -37,7 +37,10 @@ namespace TinyWalnutGames.MetVD.Authoring
         [Tooltip("Minimum distance between districts")]
         [Range(5f, 50f)]
         public float districtMinDistance = 15f;
-        
+
+        [Tooltip("Number of attempts to place each district")]
+        public int districtPlacementAttempts = 10;
+
         [Tooltip("Weight for district placement")]
         [Range(0.1f, 2.0f)]
         public float districtWeight = 1.0f;
@@ -95,7 +98,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
             Gizmos.color = new Color(0.2f, 0.9f, 0.4f, 0.3f);
             Vector3 center = transform.position;
-            Vector3 size = new Vector3(worldSize.x, 0.1f, worldSize.y);
+            var size = new Vector3(worldSize.x, 0.1f, worldSize.y);
             Gizmos.DrawWireCube(center, size);
             
             Gizmos.color = new Color(0.2f, 0.9f, 0.4f, 0.1f);

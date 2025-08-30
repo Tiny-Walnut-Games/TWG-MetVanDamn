@@ -5,9 +5,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     [CreateAssetMenu(fileName = "MetVDGizmoSettings", menuName = "MetVanDAMN/Debug/Gizmo Settings", order = 10)]
     public class MetVDGizmoSettings : ScriptableObject
     {
-        [Header("District Bounds Visuals")] public Color districtColor = new Color(0.2f,0.8f,1f,0.35f);
-        public Color districtOutline = new Color(0.1f,0.6f,0.9f,1f);
-        public Color placedDistrictColor = new Color(0.1f,0.9f,0.8f,0.35f);
+        [Header("District Bounds Visuals")] public Color districtColor = new(0.2f,0.8f,1f,0.35f);
+        public Color districtOutline = new(0.1f,0.6f,0.9f,1f);
+        public Color placedDistrictColor = new(0.1f,0.9f,0.8f,0.35f);
         public Vector2 districtSize = new(6,6);
 
         [Header("Connection Visuals")] public Color connectionColor = new(0.9f,0.9f,0.3f,1f);

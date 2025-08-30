@@ -319,8 +319,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 );
 
                 // Apply preview material
-                Renderer renderer = visualIndicator.GetComponent<Renderer>();
-                if (renderer != null)
+                if (visualIndicator.TryGetComponent<Renderer>(out Renderer renderer))
                 {
                     Material previewMaterial = CreatePreviewMaterial(districtAuthoring.biomeType);
                     renderer.material = previewMaterial;

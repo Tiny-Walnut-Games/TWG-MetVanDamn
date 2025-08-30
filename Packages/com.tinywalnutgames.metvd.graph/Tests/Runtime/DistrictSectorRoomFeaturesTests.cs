@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
             _entityManager.AddComponentData(configEntity, worldConfig);
 
             // Create multiple unplaced districts (more than TargetSectors)
-            Entity[] districts = new Entity[12];
+            var districts = new Entity[12];
             for (int i = 0; i < districts.Length; i++)
             {
                 districts[i] = _entityManager.CreateEntity();

@@ -11,7 +11,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 {
     public static class AuthoringValidator
     {
-        [System.Serializable] public class ValidationReport { public List<ValidationIssue> issues=new(); public int errorCount; public int warningCount; public bool hasErrors=>errorCount>0; public bool hasWarnings=>warningCount>0; }
+        [System.Serializable] public class ValidationReport { public List<ValidationIssue> issues=new(); public int errorCount; public int warningCount; public bool HasErrors=>errorCount>0; public bool HasWarnings=>warningCount>0; }
         [System.Serializable] public class ValidationIssue { public ValidationSeverity severity; public string category; public string message; public Object targetObject; public Vector3 worldPosition; public ValidationIssue(ValidationSeverity s,string c,string m,Object target=null,Vector3 pos=default){severity=s;category=c;message=m;targetObject=target;worldPosition=pos;} }
         public enum ValidationSeverity { Error, Warning, Info }
 

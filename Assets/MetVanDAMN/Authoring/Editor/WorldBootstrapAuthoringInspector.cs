@@ -137,7 +137,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private void DrawAdvancedOptions(WorldBootstrapAuthoring bootstrap)
         {
             EditorGUILayout.HelpBox("Advanced options for fine-tuning generation behavior", MessageType.None);
-            // Future: Add more advanced options here
+            // TODO: Add SLIGHTLY more advanced options here - intentionally limited to allow customization without overwhelming
+            bootstrap.districtPlacementAttempts = EditorGUILayout.IntField(new GUIContent("District Placement Attempts", "Max attempts to place each district"), bootstrap.districtPlacementAttempts);
         }
 
         private void DrawPreviewSection(WorldBootstrapAuthoring bootstrap)
@@ -233,7 +234,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 // Draw world bounds in scene view
                 Handles.color = new Color(0.2f, 0.9f, 0.4f, 0.5f);
                 Vector3 center = bootstrap.transform.position;
-                Vector3 size = new Vector3(bootstrap.worldSize.x, 0, bootstrap.worldSize.y);
+                var size = new Vector3(bootstrap.worldSize.x, 0, bootstrap.worldSize.y);
                 
                 Handles.DrawWireCube(center, size);
                 

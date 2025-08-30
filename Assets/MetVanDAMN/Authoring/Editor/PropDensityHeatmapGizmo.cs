@@ -61,15 +61,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             Vector3 size = new Vector3(20f, 20f, 1f); // Default biome size
 
             // Try to get more accurate bounds from colliders or renderers
-            Collider collider = biomeTransform.GetComponent<Collider>();
-            if (collider != null)
+            if (biomeTransform.TryGetComponent<Collider>(out Collider collider))
             {
                 size = collider.bounds.size;
             }
             else
             {
-                Renderer renderer = biomeTransform.GetComponent<Renderer>();
-                if (renderer != null)
+                if (biomeTransform.TryGetComponent<Renderer>(out Renderer renderer))
                 {
                     size = renderer.bounds.size;
                 }

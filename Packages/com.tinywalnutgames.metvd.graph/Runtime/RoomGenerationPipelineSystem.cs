@@ -419,14 +419,14 @@ namespace TinyWalnutGames.MetVD.Graph
 
             private readonly void ProcessNavGeneration(Entity entity, ref RoomGenerationRequest request, RoomHierarchyData roomData, NodeId nodeId, ref Unity.Mathematics.Random random)
             {
-                // we should wait for a request to be completed before doing nav generation                                
+                // we should wait for a request to be completed
+                // before doing generation                                
                 if (request.IsComplete)
                 {
-                    // UnityEngine.Debug.LogWarning($"[RoomGenerationPipeline] Attempted Nav Generation on already completed room entity {entity.Index}. Skipping."); // REMOVED: Debug.LogWarning not allowed in Burst jobs
+                    // ⚠ Intention ⚠
                     // Navigation generation skip: entity.Index available for inspection when request.IsComplete
                     return;
-                }
-                // end of part one of @jmeyer1980's attempt to make use of the previously unused `request`
+                }                
 
                 // Calculate jump vectors and add movement-type-aware nav edges
 
@@ -510,10 +510,8 @@ namespace TinyWalnutGames.MetVD.Graph
                 platformPositions.Dispose();
                 obstaclePositions.Dispose();
 
-                // part 2 of @jmeyer1980's attempt to make use of the previously unused `request`
                 // Mark request as complete
                 request.IsComplete = true;
-                // end of part 2 of @jmeyer1980's attempt to make use of the previously unused `request`
             }
 
             private static bool IsTechBiome(BiomeType biomeType) => biomeType switch

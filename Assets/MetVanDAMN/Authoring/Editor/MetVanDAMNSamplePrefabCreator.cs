@@ -60,9 +60,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
             // Color coding for districts
             Renderer renderer = cube.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            renderer.material.color = new Color(0.2f, 0.8f, 0.2f, 0.8f); // Green
-            
+            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"))
+            {
+                color = new Color(0.2f, 0.8f, 0.2f, 0.8f) // Green
+            };
+
             SavePrefab(go, "District_Sample.prefab");
         }
         
@@ -84,9 +86,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
             // Color coding for connections
             Renderer renderer = cylinder.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            renderer.material.color = new Color(0.8f, 0.2f, 0.8f, 0.9f); // Magenta
-            
+            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"))
+            {
+                color = new Color(0.8f, 0.2f, 0.8f, 0.9f) // Magenta
+            };
+
             SavePrefab(go, "ConnectionAnchor_Sample.prefab");
         }
         
@@ -109,9 +113,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
             // Color coding for biome fields
             Renderer renderer = sphere.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            renderer.material.color = new Color(0.8f, 0.8f, 0.2f, 0.3f); // Yellow, transparent
-            
+            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"))
+            {
+                color = new Color(0.8f, 0.8f, 0.2f, 0.3f) // Yellow, transparent
+            };
+
             // Make it wireframe-like for field visualization
             renderer.material.SetFloat("_Mode", 2); // Transparent mode
             renderer.material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
@@ -153,32 +159,32 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 case "Hub":
                     wfcTile.sockets = new WfcSocketConfig[]
                     {
-                        new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
+                        new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
                     };
                     break;
                 case "Corridor":
                     wfcTile.sockets = new WfcSocketConfig[]
                     {
-                        new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
+                        new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
                     };
                     break;
                 case "Chamber":
                     wfcTile.sockets = new WfcSocketConfig[]
                     {
-                        new WfcSocketConfig { socketId = 2, direction = 0, requiredPolarity = Polarity.Sun, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-                        new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
+                        new() { socketId = 2, direction = 0, requiredPolarity = Polarity.Sun, isOpen = true },
+                        new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+                        new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
                     };
                     break;
                 case "Specialist":
                     wfcTile.sockets = new WfcSocketConfig[]
                     {
-                        new WfcSocketConfig { socketId = 3, direction = 1, requiredPolarity = Polarity.Heat, isOpen = true },
-                        new WfcSocketConfig { socketId = 2, direction = 3, requiredPolarity = Polarity.Heat, isOpen = true }
+                        new() { socketId = 3, direction = 1, requiredPolarity = Polarity.Heat, isOpen = true },
+                        new() { socketId = 2, direction = 3, requiredPolarity = Polarity.Heat, isOpen = true }
                     };
                     break;
             }

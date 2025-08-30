@@ -79,10 +79,10 @@ namespace TinyWalnutGames.MetVD.Authoring
             // Default socket configuration: basic open sockets in all directions
             sockets = new WfcSocketConfig[]
             {
-                new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-                new WfcSocketConfig { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-                new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
-                new WfcSocketConfig { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
+                new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+                new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+                new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
+                new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
             };
         }
     }

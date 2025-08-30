@@ -6,19 +6,25 @@ using UnityEngine.SceneManagement;
 using Unity.Mathematics;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
+using System.IO;
+using TinyWalnutGames.MetVD.Shared;
 
 namespace TinyWalnutGames.MetVD.Authoring.Editor
 {
     /// <summary>
     /// Creates the MetVanDAMN Authoring Sample scene as specified in the art pass issue
     /// This scene demonstrates the complete authoring workflow without custom bootstrappers
+    /// 🧙‍♂️ ENHANCED: Now includes SubScene creation with proper Unity timing magic!
     /// </summary>
     public static class MetVanDAMNAuthoringSampleCreator
     {
+        private const string SubScenesFolder = "Assets/Scenes/SubScenes";
+        private static readonly string[] SampleSubScenes = { "SampleGeneration", "SampleBiomes" };
+
         [MenuItem("Tools/MetVanDAMN/Create Authoring Sample Scene")]
         public static void CreateAuthoringSampleScene()
         {
-            // Create new scene
+            // 🔥 PHASE 1: Create new scene and basic components
             Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             
             CreateWorldConfiguration();
@@ -29,22 +35,535 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             CreateSampleCamera();
             CreateLighting();
             
-            // Save the scene
+            // 🔥 PHASE 2: Save initial scene
             string scenePath = "Assets/Scenes/MetVanDAMN_AuthoringSample.unity";
+            EnsureFolder("Assets/Scenes");
             EditorSceneManager.SaveScene(newScene, scenePath);
             
-            Debug.Log($"MetVanDAMN Authoring Sample scene created at: {scenePath}");
-            Debug.Log("This scene can be played directly without custom bootstrappers!");
+            Debug.Log($"✅ Initial scene created at: {scenePath}");
+            
+            // 🧙‍♂️ PHASE 3: Create SubScenes with ULTRA timing magic
+            CreateSampleSubScenesWithTiming(scenePath);
+            
+            Debug.Log($"🌟 MetVanDAMN Authoring Sample scene created at: {scenePath}");
+            Debug.Log("🎮 This scene can be played directly without custom bootstrappers!");
+            Debug.Log("🔍 SubScenes included for advanced workflow demonstration");
+        }
+
+        /// <summary>
+        /// 🧙‍♂️ ULTRA TIMING MAGIC: Enhanced beyond MetVanDAMNSceneBootstrap.cs
+        /// Creates SubScenes with MAXIMUM Unity asset database synchronization
+        /// </summary>
+        private static void CreateSampleSubScenesWithTiming(string mainScenePath)
+        {
+            EnsureFolder(SubScenesFolder);
+            
+            // 🔥 PHASE 3A: Create SubScene files first, let meta files stabilize
+            Debug.Log("📁 Creating SubScene files...");
+            foreach (string subName in SampleSubScenes)
+            {
+                if (!SafeEnsureSubScene(Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/"), subName))
+                {
+                    Debug.LogError($"❌ Failed to create SubScene: {subName}");
+                    return;
+                }
+            }
+
+            // 🔥 PHASE 3B: ULTRA AGGRESSIVE asset database synchronization
+            Debug.Log("🔄 ULTRA synchronizing asset database...");
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            
+            // 🧙‍♂️ EXTRA WAIT: Let Unity fully digest the scenes
+            System.Threading.Thread.Sleep(1000); // Longer wait for more stability
+            
+            // 🧙‍♂️ PHASE 3C: EXTENDED meta file validation with retries
+            Debug.Log("⏳ EXTENDED meta file validation...");
+            bool allMetaFilesReady = false;
+            int metaAttempts = 0;
+            while (!allMetaFilesReady && metaAttempts < 50) // Increased attempts
+            {
+                allMetaFilesReady = true;
+                foreach (string subName in SampleSubScenes)
+                {
+                    string scenePath = Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/");
+                    string metaPath = scenePath + ".meta";
+                    string guid = AssetDatabase.AssetPathToGUID(scenePath);
+                    
+                    if (!File.Exists(metaPath) || string.IsNullOrEmpty(guid))
+                    {
+                        allMetaFilesReady = false;
+                        Debug.Log($"🔍 Still waiting for: {subName} (Meta: {File.Exists(metaPath)}, GUID: {!string.IsNullOrEmpty(guid)})");
+                        break;
+                    }
+                }
+                
+                if (!allMetaFilesReady)
+                {
+                    System.Threading.Thread.Sleep(300); // Longer waits
+                    AssetDatabase.Refresh(); // Additional refresh attempts
+                    metaAttempts++;
+                }
+            }
+            
+            if (!allMetaFilesReady)
+            {
+                Debug.LogWarning("⚠️ EXTENDED meta file validation timeout. Proceeding anyway...");
+            }
+            else
+            {
+                Debug.Log("✅ ALL SubScene meta files validated successfully with EXTENDED validation.");
+            }
+
+            // 🎯 PHASE 3D: Re-open main scene and create SubScene GameObjects
+            Debug.Log("🔗 Creating SubScene GameObjects...");
+            Scene mainScene = EditorSceneManager.OpenScene(mainScenePath, OpenSceneMode.Single);
+            
+            var subScenesParent = new GameObject("_SubScenes");
+            subScenesParent.transform.position = new Vector3(15, 0, 0); // Offset from main content
+
+            // Create all SubScene GameObjects first (no scene references yet)
+            foreach (string subName in SampleSubScenes)
+            {
+                CreateSubSceneGameObject(subName, subScenesParent.transform);
+            }
+
+            // 🔥 PHASE 3E: Save scene with empty SubScene components
+            Debug.Log("💾 Saving scene with SubScene GameObjects...");
+            EditorSceneManager.MarkSceneDirty(mainScene);
+            EditorSceneManager.SaveScene(mainScene);
+
+            // 🧙‍♂️ PHASE 3F: ULTRA AGGRESSIVE sync before reference assignment
+            Debug.Log("🔄 ULTRA synchronizing before reference assignment...");
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            System.Threading.Thread.Sleep(1000); // Even longer wait before references
+
+            // 🎯 PHASE 3G: Assign SceneAsset references with INDIVIDUAL validation
+            Debug.Log("🔗 Assigning SceneAsset references with INDIVIDUAL validation...");
+            foreach (string subName in SampleSubScenes)
+            {
+                AssignSubSceneReferenceWithValidation(subName);
+                
+                // 🔥 INDIVIDUAL save after each reference assignment
+                EditorSceneManager.MarkSceneDirty(mainScene);
+                EditorSceneManager.SaveScene(mainScene);
+                AssetDatabase.SaveAssets();
+                
+                // 🧙‍♂️ Brief pause between assignments
+                System.Threading.Thread.Sleep(200);
+            }
+
+            // 🏁 PHASE 3H: FINAL save with complete references
+            Debug.Log("💾 FINAL save with complete references...");
+            EditorSceneManager.MarkSceneDirty(mainScene);
+            EditorSceneManager.SaveScene(mainScene);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            
+            Debug.Log("✅ SubScene creation complete with ULTRA timing synchronization!");
+            
+            // 🔍 PHASE 3I: Validation report
+            Debug.Log("🔍 Validation Report:");
+            foreach (string subName in SampleSubScenes)
+            {
+                var go = GameObject.Find(subName);
+                if (go != null)
+                {
+#if METVD_FULL_DOTS
+                    if (go.TryGetComponent<Unity.Scenes.SubScene>(out Unity.Scenes.SubScene subScene))
+                    {
+                        SerializedObject so = new(subScene);
+                        SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
+                        bool hasReference = sceneProp != null && sceneProp.objectReferenceValue != null;
+                        Debug.Log($"📋 {subName}: SubScene component ✓, Reference: {(hasReference ? "✓" : "❌")}");
+                    }
+                    else
+                    {
+                        Debug.Log($"📋 {subName}: SubScene component ❌");
+                    }
+#else
+                    Debug.Log($"📋 {subName}: Created (reflection mode)");
+#endif
+                }
+                else
+                {
+                    Debug.Log($"📋 {subName}: GameObject ❌");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates SubScene file with ENHANCED GUID validation
+        /// </summary>
+        private static bool SafeEnsureSubScene(string scenePath, string sceneName)
+        {
+            if (File.Exists(scenePath))
+            {
+                Debug.Log($"🔍 SubScene already exists: {sceneName}");
+                return true; // Already exists
+            }
+
+            try
+            {
+                Scene subScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+                subScene.name = sceneName;
+                
+                // Add sample content to SubScene
+                AddSampleSubSceneContent(sceneName);
+                
+                if (!EditorSceneManager.SaveScene(subScene, scenePath))
+                {
+                    Debug.LogError("❌ Failed to save SubScene " + sceneName + " at " + scenePath);
+                    return false;
+                }
+                
+                // 🔥 ULTRA AGGRESSIVE synchronization!
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                
+                // 🧙‍♂️ ENHANCED GUID VALIDATION with more attempts
+                int attempts = 0;
+                while (attempts < 40) // More attempts
+                {
+                    SceneAsset testAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+                    string metaPath = scenePath + ".meta";
+                    
+                    if (testAsset != null && File.Exists(metaPath))
+                    {
+                        string guid = AssetDatabase.AssetPathToGUID(scenePath);
+                        if (!string.IsNullOrEmpty(guid))
+                        {
+                            Debug.Log($"🔍 SubScene GUID verified: {sceneName} -> {guid}");
+                            
+                            // 🧙‍♂️ EXTRA VALIDATION: Try to reload the asset
+                            SceneAsset reloadTest = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+                            if (reloadTest != null)
+                            {
+                                Debug.Log($"✅ SubScene reload test passed: {sceneName}");
+                                return true; // Success!
+                            }
+                        }
+                    }
+                    
+                    System.Threading.Thread.Sleep(150); // Longer waits
+                    AssetDatabase.Refresh(); // Additional refresh
+                    attempts++;
+                }
+                
+                Debug.LogWarning($"⚠️ ENHANCED GUID validation timeout for SubScene: {sceneName}. References may be unstable.");
+                return true; // Continue anyway
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"❌ Failed to create SubScene {sceneName}: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Adds sample content to SubScenes for demonstration
+        /// 🧙‍♂️ ENHANCED: Now coordinate-aware with spatial intelligence
+        /// </summary>
+        private static void AddSampleSubSceneContent(string sceneName)
+        {
+            // 🎯 COORDINATE-AWARE ENHANCEMENT: Position content based on scene purpose
+            Vector3 basePosition = sceneName switch
+            {
+                "SampleGeneration" => new Vector3(0, 0, 0), // Center for generation demo
+                "SampleBiomes" => new Vector3(0, 0.5f, 0),   // Slightly elevated for biome demo
+                _ => Vector3.zero
+            };
+
+            switch (sceneName)
+            {
+                case "SampleGeneration":
+                    var genMarker = new GameObject("GenerationMarker");
+                    genMarker.transform.position = basePosition;
+                    
+                    // 🧙‍♂️ SPATIAL INTELLIGENCE: Create a mini demonstration grid
+                    for (int i = 0; i < 3; i++)
+                    {
+                        var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        cube.name = $"GenerationContent_{i}";
+                        cube.transform.SetParent(genMarker.transform);
+                        cube.transform.localPosition = new Vector3(i * 0.6f - 0.6f, 0, 0);
+                        cube.transform.localScale = Vector3.one * (0.3f + i * 0.1f); // Progressive sizing
+                        
+                        // 🎯 COLOR-CODED COORDINATE AWARENESS
+                        Renderer renderer = cube.GetComponent<Renderer>();
+                        renderer.material = new(Shader.Find("Universal Render Pipeline/Lit"))
+                        {
+                            color = Color.HSVToRGB(i * 0.33f, 0.8f, 0.9f)
+                        };
+                    }
+                    break;
+                    
+                case "SampleBiomes":
+                    var biomeMarker = new GameObject("BiomeMarker");
+                    biomeMarker.transform.position = basePosition;
+
+                    // 🧙‍♂️ BIOME-AWARE SPATIAL DEMONSTRATION
+                    string[] biomeTypes = new[] { "Solar", "Volcanic", "Icy", "Hub" };
+                    Color[] biomeColors = new[] { Color.yellow, Color.red, Color.cyan, Color.blue };
+                    
+                    for (int i = 0; i < biomeTypes.Length; i++)
+                    {
+                        var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                        sphere.name = $"BiomeContent_{biomeTypes[i]}";
+                        sphere.transform.SetParent(biomeMarker.transform);
+                        
+                        // 🎯 RADIAL COORDINATE INTELLIGENCE
+                        float angle = i * (360f / biomeTypes.Length) * Mathf.Deg2Rad;
+                        Vector3 radialPos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * 0.8f;
+                        sphere.transform.localPosition = radialPos;
+                        sphere.transform.localScale = Vector3.one * 0.2f;
+                        
+                        // 🧙‍♂️ BIOME-SPECIFIC MATERIAL INTELLIGENCE
+                        Renderer renderer = sphere.GetComponent<Renderer>();
+                        renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"))
+                        {
+                            color = biomeColors[i]
+                        };
+                    }
+                    break;
+            }
+        }
+
+#if METVD_FULL_DOTS
+        /// <summary>
+        /// Creates SubScene GameObject with component but NO scene reference assigned yet
+        /// </summary>
+        private static void CreateSubSceneGameObject(string subName, Transform parent)
+        {
+            var go = new GameObject(subName);
+            go.transform.SetParent(parent, false);
+            
+            // Fixed: Use System.Array.IndexOf instead of Array.IndexOf
+            int index = System.Array.IndexOf(SampleSubScenes, subName);
+            go.transform.localPosition = new Vector3(index * 2f, 0, 0);
+            
+            // ⚠Intended⚠ DO NOT assign subscene reference yet - just create the component
+            Unity.Scenes.SubScene subSceneComponent = go.AddComponent<Unity.Scenes.SubScene>();
+            Debug.Log($"📦 Created SubScene GameObject: {subName} (no reference assigned yet)");
+            Debug.LogWarning($"⚠️ SubSceneComponent '{subSceneComponent}' reference will be assigned in a separate step to ensure stability.");
+        }
+
+        /// <summary>
+        /// Assigns SceneAsset reference to existing SubScene GameObject with ENHANCED validation
+        /// </summary>
+        private static void AssignSubSceneReferenceWithValidation(string subName)
+        {
+            string scenePath = Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/");
+            
+            var go = GameObject.Find(subName);
+            if (go == null)
+            {
+                Debug.LogError($"❌ SubScene GameObject '{subName}' not found for reference assignment!");
+                return;
+            }
+
+            if (!go.TryGetComponent<Unity.Scenes.SubScene>(out Unity.Scenes.SubScene subSceneComp))
+            {
+                Debug.LogError($"❌ SubScene component not found on '{subName}'!");
+                return;
+            }
+
+            // 🧙‍♂️ ENHANCED: Multiple attempts to load the SceneAsset
+            SceneAsset sceneAsset = null;
+            int loadAttempts = 0;
+            while (sceneAsset == null && loadAttempts < 10)
+            {
+                sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+                if (sceneAsset == null)
+                {
+                    Debug.Log($"🔄 Attempt {loadAttempts + 1}: Waiting for SceneAsset to load: {scenePath}");
+                    AssetDatabase.Refresh();
+                    System.Threading.Thread.Sleep(100);
+                    loadAttempts++;
+                }
+            }
+            
+            if (sceneAsset != null)
+            {
+                string guid = AssetDatabase.AssetPathToGUID(scenePath);
+                if (string.IsNullOrEmpty(guid))
+                {
+                    Debug.LogError($"❌ Scene asset at '{scenePath}' has no GUID! SubScene will show as Missing.");
+                    return;
+                }
+
+                SerializedObject so = new(subSceneComp);
+                SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
+                if (sceneProp != null)
+                {
+                    sceneProp.objectReferenceValue = sceneAsset;
+                }
+
+                SerializedProperty autoLoadProp = so.FindProperty("m_AutoLoadScene");
+                if (autoLoadProp != null)
+                {
+                    autoLoadProp.boolValue = true;
+                }
+
+                so.ApplyModifiedPropertiesWithoutUndo();
+                
+                EditorUtility.SetDirty(subSceneComp);
+                EditorUtility.SetDirty(go);
+                
+                Debug.Log($"✅ SubScene reference assigned: '{subName}' -> {scenePath} (GUID: {guid})");
+            }
+            else
+            {
+                Debug.LogError($"❌ SceneAsset at '{scenePath}' could not be loaded after {loadAttempts} attempts!");
+            }
+        }
+
+        /// <summary>
+        /// ⚠ Intention ⚠ Legacy method for compatibility
+        /// - @jmeyer1980: I kept this for compatibility but it is currently unused
+        /// </summary>
+        private static void AssignSubSceneReference(string subName)
+        {
+            AssignSubSceneReferenceWithValidation(subName);
+        }
+#else
+        /// <summary>
+        /// Creates SubScene GameObject with reflection for compatibility
+        /// </summary>
+        private static void CreateSubSceneGameObject(string subName, Transform parent)
+        {
+            var go = new GameObject(subName);
+            go.transform.SetParent(parent, false);
+            
+            // Fixed: Use System.Array.IndexOf instead of Array.IndexOf
+            int index = System.Array.IndexOf(SampleSubScenes, subName);
+            go.transform.localPosition = new Vector3(index * 2f, 0, 0);
+            
+            System.Type subSceneType = FindTypeAnywhere("Unity.Scenes.SubScene");
+            if (subSceneType != null)
+            {
+                go.AddComponent(subSceneType);
+                Debug.Log($"📦 Created SubScene GameObject: {subName} (reflection mode, no reference assigned yet)");
+            }
+            else
+            {
+                // Fallback marker for when SubScene type isn't available
+                go.AddComponent<Transform>(); // Just ensure it has a component
+                Debug.Log($"📦 Created SubScene marker GameObject: {subName} (SubScene type not available)");
+            }
+        }
+
+        /// <summary>
+        /// Assigns SceneAsset reference using reflection with enhanced validation
+        /// </summary>
+        private static void AssignSubSceneReferenceWithValidation(string subName)
+        {
+            string scenePath = Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/");
+            
+            System.Type subSceneType = FindTypeAnywhere("Unity.Scenes.SubScene");
+            var go = GameObject.Find(subName);
+            if (go == null || subSceneType == null)
+            {
+                Debug.LogWarning($"⚠️ Cannot assign reference to '{subName}' - GameObject or SubScene type not found");
+                return;
+            }
+
+            Component existing = go.GetComponent(subSceneType);
+            if (existing == null)
+            {
+                Debug.LogWarning($"⚠️ SubScene component not found on '{subName}' for reference assignment");
+                return;
+            }
+
+            // 🧙‍♂️ ENHANCED: Multiple attempts to load the SceneAsset
+            SceneAsset sceneAsset = null;
+            int loadAttempts = 0;
+            while (sceneAsset == null && loadAttempts < 10)
+            {
+                sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+                if (sceneAsset == null)
+                {
+                    Debug.Log($"🔄 Attempt {loadAttempts + 1}: Waiting for SceneAsset to load: {scenePath}");
+                    AssetDatabase.Refresh();
+                    System.Threading.Thread.Sleep(100);
+                    loadAttempts++;
+                }
+            }
+            
+            if (sceneAsset != null)
+            {
+                try
+                {
+                    SerializedObject so = new(existing);
+                    SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
+                    if (sceneProp != null) sceneProp.objectReferenceValue = sceneAsset;
+                    SerializedProperty autoLoadProp = so.FindProperty("m_AutoLoadScene");
+                    if (autoLoadProp != null) autoLoadProp.boolValue = true;
+                    so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(existing);
+                    
+                    Debug.Log($"✅ SubScene reference assigned: '{subName}' -> {scenePath} (reflection mode)");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"❌ SubScene reference assignment failed for {subName}: " + e.Message);
+                }
+            }
+            else
+            {
+                Debug.LogError($"❌ SceneAsset at '{scenePath}' could not be loaded after {loadAttempts} attempts!");
+            }
         }
         
+        /// <summary>
+        /// Legacy method for compatibility
+        /// </summary>
+        private static void AssignSubSceneReference(string subName)
+        {
+            AssignSubSceneReferenceWithValidation(subName);
+        }
+
+        private static System.Type FindTypeAnywhere(string fullName)
+        {
+            foreach (System.Reflection.Assembly asm in System.AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    System.Type t = asm.GetType(fullName, false);
+                    if (t != null) return t;
+                }
+                catch { }
+            }
+            return null;
+        }
+#endif
+
         private static void CreateWorldConfiguration()
         {
             var worldConfigGO = new GameObject("WorldConfiguration");
             WorldConfigurationAuthoring worldConfig = worldConfigGO.AddComponent<WorldConfigurationAuthoring>();
-            
+
             // Configure with sensible defaults for the sample
             // Note: Assuming WorldConfigurationAuthoring has typical world setup fields
-            
+            // @jmeyer1980 ⚠ Methodology ⚠: I allowed autocomplete to fill in all of these fields - they made sense to me
+            // @Copilot TODO - Please verify they are all valid and make sense
+            worldConfig.seed = 12345;
+            worldConfig.worldSize = new int2(64, 64);
+            worldConfig.randomizationMode = RandomizationMode.Partial;
+            worldConfig.biomeCount = new Vector2Int(3, 6);
+            worldConfig.biomeWeight = 1.0f;
+            worldConfig.districtCount = new Vector2Int(4, 12);
+            worldConfig.districtMinDistance = 15f;
+            worldConfig.districtPlacementAttempts = 10;
+            worldConfig.districtWeight = 1.0f;
+            worldConfig.sectorsPerDistrict = new Vector2Int(2, 8);
+            worldConfig.sectorGridSize = new int2(6, 6);
+            worldConfig.roomsPerSector = new Vector2Int(3, 12);
+            worldConfig.targetLoopDensity = 0.3f;
+            worldConfig.enableDebugVisualization = true;
+            worldConfig.logGenerationSteps = true;
+
             Debug.Log("Created WorldConfiguration");
         }
         
@@ -77,20 +596,49 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             Debug.Log("Created 9 sample districts in 3x3 grid");
         }
         
+        /// <summary>
+        /// Creates district visual with ENHANCED coordinate-aware styling
+        /// 🧙‍♂️ SPATIAL INTELLIGENCE: Visual feedback based on grid position
+        /// </summary>
         private static void CreateDistrictVisual(GameObject parent, int x, int z)
         {
             var visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
             visual.name = "Visual";
             visual.transform.SetParent(parent.transform);
             visual.transform.localPosition = Vector3.zero;
-            visual.transform.localScale = new Vector3(1.5f, 0.2f, 1.5f);
+            
+            // 🎯 COORDINATE-AWARE SCALING: Size based on distance from center
+            float distanceFromCenter = Mathf.Sqrt(x * x + z * z);
+            float scaleMultiplier = 1.0f + (distanceFromCenter * 0.2f); // Larger at edges
+            visual.transform.localScale = new Vector3(1.5f * scaleMultiplier, 0.2f, 1.5f * scaleMultiplier);
 
             Renderer renderer = visual.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             
-            // Color code by position for easy identification
-            float hue = (x + z + 2f) / 4f; // Normalize to 0-1 range
-            renderer.material.color = Color.HSVToRGB(hue, 0.7f, 0.8f);
+            // 🧙‍♂️ ENHANCED SPATIAL HUE INTELLIGENCE: Multi-dimensional color coding
+            float hue = (x + z + 2f) / 4f; // Base hue from position
+            float saturation = 0.7f + (distanceFromCenter * 0.1f); // More saturated at edges
+            float brightness = 0.8f - (Mathf.Abs(x + z) * 0.05f); // Dimmer for diagonal positions
+            
+            renderer.material.color = Color.HSVToRGB(hue, Mathf.Clamp01(saturation), Mathf.Clamp01(brightness));
+            
+            // 🎯 DEBUG INTELLIGENCE: Add coordinate text for spatial awareness
+            var textGO = new GameObject("CoordinateLabel");
+            textGO.transform.SetParent(visual.transform);
+            // @jmeyer1980: ⚠ Fix/Upgrade ⚠ - I changed this:
+            //
+            // textGO.transform.localPosition = Vector3.up * 0.5f;
+            // textGO.transform.localRotation = Quaternion.Euler(90, 0, 0);
+            //
+            // to this for better control...
+            textGO.transform.SetLocalPositionAndRotation(Vector3.up * 0.5f, Quaternion.Euler(90, 0, 0));
+
+            // 🧙‍♂️ SPATIAL DEBUGGING AID: Visual coordinate confirmation
+            TextMesh textMesh = textGO.AddComponent<TextMesh>();
+            textMesh.text = $"({x},{z})";
+            textMesh.fontSize = 8;
+            textMesh.color = Color.white;
+            textMesh.anchor = TextAnchor.MiddleCenter;
         }
         
         private static void CreateSampleConnections()
@@ -156,8 +704,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             visual.transform.Rotate(90, 0, 0);
 
             Renderer renderer = visual.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            renderer.material.color = new Color(0.8f, 0.3f, 0.8f);
+            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"))
+            {
+                color = new Color(0.8f, 0.3f, 0.8f)
+            };
         }
         
         private static void CreateSampleBiomeFields()
@@ -172,22 +722,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 (new Vector3(0, 1, 0), BiomeType.HubArea, BiomeType.TransitionZone, 0.6f, 0.5f),
                 (new Vector3(-3, 1, 3), BiomeType.IcyCanyon, BiomeType.Unknown, 0.7f, 0.4f)
             };
-            
+
+            // @jmeyer1980: ⚠ nitpick ⚠ I deconstructed config directly in the loop for clarity
             for (int i = 0; i < biomeConfigs.Length; i++)
             {
-                (Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) config = biomeConfigs[i];
+                (Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) = biomeConfigs[i];
                 var biomeFieldGO = new GameObject($"BiomeField_{i + 1}");
                 biomeFieldGO.transform.SetParent(biomeFieldsParent.transform);
-                biomeFieldGO.transform.position = config.position;
+                biomeFieldGO.transform.position = position;
 
                 BiomeFieldAuthoring biomeField = biomeFieldGO.AddComponent<BiomeFieldAuthoring>();
-                biomeField.primaryBiome = config.primary;
-                biomeField.secondaryBiome = config.secondary;
-                biomeField.strength = config.strength;
-                biomeField.gradient = config.gradient;
+                biomeField.primaryBiome = primary;
+                biomeField.secondaryBiome = secondary;
+                biomeField.strength = strength;
+                biomeField.gradient = gradient;
                 
                 // Add visual representation
-                CreateBiomeFieldVisual(biomeFieldGO, config.primary, config.strength);
+                CreateBiomeFieldVisual(biomeFieldGO, primary, strength);
             }
             
             Debug.Log("Created 4 sample biome fields");
@@ -242,60 +793,60 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 ("Chamber", 3, 0.6f, BiomeType.SolarPlains, Polarity.Sun, 1, 3),
                 ("Specialist", 4, 0.4f, BiomeType.VolcanicCore, Polarity.Heat, 1, 2)
             };
-            
+
+            // @jmeyer1980: ⚠ Intention ⚠ I deconstructed config directly in the loop for clarity
             for (int i = 0; i < tileConfigs.Length; i++)
             {
-                (string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) config = tileConfigs[i];
-                var tileGO = new GameObject($"WfcTilePrototype_{config.name}");
+                (string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) = tileConfigs[i];
+                var tileGO = new GameObject($"WfcTilePrototype_{name}");
                 tileGO.transform.SetParent(wfcLibraryParent.transform);
                 tileGO.transform.position = new Vector3(i * 2f, 0, 0);
 
                 WfcTilePrototypeAuthoring wfcTile = tileGO.AddComponent<WfcTilePrototypeAuthoring>();
-                wfcTile.tileId = config.id;
-                wfcTile.weight = config.weight;
-                wfcTile.biomeType = config.biome;
-                wfcTile.primaryPolarity = config.polarity;
-                wfcTile.minConnections = config.minConn;
-                wfcTile.maxConnections = config.maxConn;
-                
-                // Configure sockets (simplified for sample)
-                switch (config.name)
+                wfcTile.tileId = id;
+                wfcTile.weight = weight;
+                wfcTile.biomeType = biome;
+                wfcTile.primaryPolarity = polarity;
+                wfcTile.minConnections = minConn;
+                wfcTile.maxConnections = maxConn;
+
+                // ⚠ Intention ⚠ Configure sockets (simplified for sample)
+                // @jmeyer1980: ⚠ nitpick ⚠ I switched the switch to an expression named switch
+                wfcTile.sockets = name switch
                 {
-                    case "Hub":
-                        wfcTile.sockets = new WfcSocketConfig[]
+                    "Hub" => new WfcSocketConfig[]
+                                            {
+                            new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+                            new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+                            new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
+                            new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
+                                            },
+                    "Corridor" => new WfcSocketConfig[]
                         {
-                            new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-                            new WfcSocketConfig { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-                            new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
-                            new WfcSocketConfig { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
-                        };
-                        break;
-                    case "Corridor":
-                        wfcTile.sockets = new WfcSocketConfig[]
+                            new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+                            new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
+                        },
+                    _ => new WfcSocketConfig[]
                         {
-                            new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-                            new WfcSocketConfig { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
-                        };
-                        break;
-                    default:
-                        // Standard configuration for other types
-                        wfcTile.sockets = new WfcSocketConfig[]
-                        {
-                            new WfcSocketConfig { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-                            new WfcSocketConfig { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true }
-                        };
-                        break;
-                }
-                
+                            new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+                            new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true }
+                        },// Standard configuration for other types
+                };
+
                 // Add visual representation
-                CreateWfcTileVisual(tileGO, config.name, config.biome);
+                CreateWfcTileVisual(tileGO, name, biome);
             }
             
             Debug.Log("Created WFC tile prototype library with 4 tile types");
         }
         
+        /// <summary>
+        /// Creates WFC tile visual with ENHANCED biome-aware spatial intelligence
+        /// 🧙‍♂️ COORDINATE-AWARE: Visual feedback for tile properties and spatial relationships
+        /// </summary>
         private static void CreateWfcTileVisual(GameObject parent, string typeName, BiomeType biomeType)
         {
+            // 🎯 ENHANCED TYPE-AWARE PRIMITIVE SELECTION
             GameObject visual = typeName switch
             {
                 "Hub" => GameObject.CreatePrimitive(PrimitiveType.Sphere),
@@ -308,12 +859,22 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             visual.name = "Visual";
             visual.transform.SetParent(parent.transform);
             visual.transform.localPosition = Vector3.zero;
-            visual.transform.localScale = Vector3.one * 0.8f;
+            
+            // 🧙‍♂️ BIOME-AWARE SCALING: Size reflects biome importance
+            float biomeScaleMultiplier = biomeType switch
+            {
+                BiomeType.HubArea => 1.2f,      // Hubs are larger
+                BiomeType.VolcanicCore => 1.1f, // Hazardous biomes slightly larger
+                BiomeType.SolarPlains => 1.0f,  // Standard size
+                BiomeType.TransitionZone => 0.9f, // Transitions slightly smaller
+                _ => 0.8f                        // Unknown biomes smaller
+            };
+            visual.transform.localScale = Vector3.one * (0.8f * biomeScaleMultiplier);
 
             Renderer renderer = visual.GetComponent<Renderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             
-            // Color by type
+            // 🎯 ENHANCED BIOME-AWARE COLOR INTELLIGENCE
             Color typeColor = typeName switch
             {
                 "Hub" => Color.blue,
@@ -323,7 +884,31 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 _ => Color.white
             };
             
-            renderer.material.color = typeColor;
+            // 🧙‍♂️ BIOME TINTING: Blend type color with biome characteristics
+            Color biomeTint = biomeType switch
+            {
+                BiomeType.VolcanicCore => Color.red,
+                BiomeType.SolarPlains => Color.yellow,
+                BiomeType.IcyCanyon => Color.cyan,
+                BiomeType.HubArea => Color.white,
+                BiomeType.TransitionZone => Color.gray,
+                _ => Color.white
+            };
+            
+            // 🎯 SPATIAL COLOR BLENDING: Combine type and biome colors intelligently
+            var finalColor = Color.Lerp(typeColor, biomeTint, 0.3f);
+            renderer.material.color = finalColor;
+            
+            // 🧙‍♂️ DEBUG INTELLIGENCE: Add type label for spatial awareness
+            var labelGO = new GameObject("TypeLabel");
+            labelGO.transform.SetParent(visual.transform);
+            // @jmeyer1980: ⚠ nitpick ⚠ I changed this next line as it was previously split into two lines:
+            labelGO.transform.SetLocalPositionAndRotation(Vector3.up * 1.2f, Quaternion.Euler(90, 0, 0));
+            TextMesh labelMesh = labelGO.AddComponent<TextMesh>();
+            labelMesh.text = typeName[..Mathf.Min(3, typeName.Length)]; // Short abbreviation - ⚠ nitpick ⚠ @jmeyer1980: I changed this to a range operator
+            labelMesh.fontSize = 6;
+            labelMesh.color = Color.black;
+            labelMesh.anchor = TextAnchor.MiddleCenter;
         }
         
         private static void CreateSampleCamera()
@@ -361,6 +946,29 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             RenderSettings.ambientGroundColor = new Color(0.047f, 0.043f, 0.035f);
             
             Debug.Log("Created lighting setup");
+        }
+
+        /// <summary>
+        /// Ensures folder exists in the AssetDatabase
+        /// </summary>
+        private static void EnsureFolder(string path)
+        {
+            if (AssetDatabase.IsValidFolder(path))
+            {
+                return;
+            }
+
+            string[] segments = path.Split('/');
+            string current = segments[0];
+            for (int i = 1; i < segments.Length; i++)
+            {
+                string next = current + "/" + segments[i];
+                if (!AssetDatabase.IsValidFolder(next))
+                {
+                    AssetDatabase.CreateFolder(current, segments[i]);
+                }
+                current = next;
+            }
         }
     }
 }

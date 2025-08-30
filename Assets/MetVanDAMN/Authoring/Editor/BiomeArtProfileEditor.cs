@@ -15,7 +15,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
     {
         public override void OnInspectorGUI()
         {
-            BiomeArtProfile profile = (BiomeArtProfile)target;
+            var profile = (BiomeArtProfile)target;
 
             // Ensure propSettings exists (non-destructive safeguard)
             if (profile.propSettings == null)

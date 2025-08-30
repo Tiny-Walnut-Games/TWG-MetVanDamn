@@ -115,7 +115,6 @@ namespace TinyWalnutGames.MetVD.Authoring
     public partial class AINavigationSystem : SystemBase
     {
         private EntityQuery _navigationRequestQuery;
-        private EntityQuery _navNodeQuery;
 
         protected override void OnCreate()
         {
@@ -124,12 +123,6 @@ namespace TinyWalnutGames.MetVD.Authoring
                 ComponentType.ReadWrite<AINavigationState>(),
                 ComponentType.ReadOnly<AgentCapabilities>(),
                 ComponentType.ReadWrite<PathNodeBufferElement>()
-            );
-
-            // Query for navigation nodes
-            _navNodeQuery = GetEntityQuery(
-                ComponentType.ReadOnly<NavNode>(),
-                ComponentType.ReadOnly<NavLinkBufferElement>()
             );
 
             RequireForUpdate(_navigationRequestQuery);
@@ -494,13 +487,6 @@ namespace TinyWalnutGames.MetVD.Authoring
                 Path = finalPath,
                 PathCosts = finalCosts
             };
-        }
-
-        // Legacy method for external compatibility
-        [System.Obsolete("Use PerformPathfinding instead to avoid Burst capture issues")]
-        private PathfindingResult PerformInlinePathfinding(uint startNodeId, uint targetNodeId, AgentCapabilities capabilities)
-        {
-            return PerformPathfinding(startNodeId, targetNodeId, capabilities);
         }
     }
 }

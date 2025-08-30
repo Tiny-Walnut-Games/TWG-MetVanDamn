@@ -6,7 +6,7 @@ using TinyWalnutGames.MetVD.Biome;
 namespace TinyWalnutGames.MetVD.Authoring
 {
     public class BiomeFieldAuthoring : MonoBehaviour
-    {
+    {        
         [Header("Biome Configuration")]
         public BiomeType biomeType = BiomeType.SolarPlains;
         public BiomeType primaryBiome = BiomeType.SolarPlains;
