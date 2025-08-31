@@ -1,434 +1,455 @@
 using NUnit.Framework;
+using TinyWalnutGames.MetVD.Core;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using TinyWalnutGames.MetVD.Core;
-using TinyWalnutGames.MetVD.Graph;
 
 namespace TinyWalnutGames.MetVD.Graph.Tests
-{
-    /// <summary>
-    /// Integration tests for the complete procedural room generation pipeline
-    /// Tests end-to-end functionality across different biome and skill combinations
-    /// </summary>
-    public class ProceduralRoomGenerationIntegrationTests
-    {
-        private World _testWorld;
-        private EntityManager _entityManager;
+	{
+	/// <summary>
+	/// Integration tests for the complete procedural room generation pipeline
+	/// Tests end-to-end functionality across different biome and skill combinations
+	/// </summary>
+	public class ProceduralRoomGenerationIntegrationTests
+		{
+		private World _testWorld;
+		private EntityManager _entityManager;
 
-        [SetUp]
-        public void SetUp()
-        {
-            _testWorld = new World("IntegrationTestWorld");
-            _entityManager = _testWorld.EntityManager;
-        }
+		[SetUp]
+		public void SetUp ()
+			{
+			this._testWorld = new World("IntegrationTestWorld");
+			this._entityManager = this._testWorld.EntityManager;
+			}
 
-        [TearDown]
-        public void TearDown()
-        {
-            if (_testWorld != null && _testWorld.IsCreated)
-            {
-                _testWorld.Dispose();
-            }
-        }
+		[TearDown]
+		public void TearDown ()
+			{
+			if (this._testWorld != null && this._testWorld.IsCreated)
+				{
+				this._testWorld.Dispose();
+				}
+			}
 
-        [Test]
-        public void BossRoom_SkillChallenge_GeneratesCorrectly()
-        {
-            // Arrange - Create a boss room with advanced skills
-            Entity roomEntity = CreateTestRoom(
-                RoomType.Boss, 
-                new RectInt(0, 0, 20, 16), 
-                BiomeType.VolcanicCore,
-                Ability.Jump | Ability.Dash | Ability.WallJump
-            );
+		[Test]
+		public void BossRoom_SkillChallenge_GeneratesCorrectly ()
+			{
+			// Arrange - Create a boss room with advanced skills
+			Entity roomEntity = this.CreateTestRoom(
+				RoomType.Boss,
+				new RectInt(0, 0, 20, 16),
+				BiomeType.VolcanicCore,
+				Ability.Jump | Ability.Dash | Ability.WallJump
+			);
 
-            // Act - Process room generation
-            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-            
-            // Assert - Boss rooms should use pattern-driven modular generation
-            Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, request.GeneratorType);
-            Assert.AreEqual(BiomeType.VolcanicCore, request.TargetBiome);
-            Assert.IsTrue((request.AvailableSkills & Ability.Dash) != 0);
-            
-            // Should have pattern buffer for skill challenges
-            Assert.IsTrue(_entityManager.HasBuffer<RoomPatternElement>(roomEntity));
-        }
+			// Act - Process room generation
+			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
-        [Test]
-        public void TreasureRoom_JumpTesting_ValidatesPhysics()
-        {
-            // Arrange - Create a treasure room for jump testing
-            Entity roomEntity = CreateTestRoom(
-                RoomType.Treasure,
-                new RectInt(0, 0, 12, 8),
-                BiomeType.CrystalCaverns,
-                Ability.Jump | Ability.DoubleJump
-            );
+			// Assert - Boss rooms should use pattern-driven modular generation
+			Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, request.GeneratorType);
+			Assert.AreEqual(BiomeType.VolcanicCore, request.TargetBiome);
+			Assert.IsTrue((request.AvailableSkills & Ability.Dash) != 0);
 
-            // Act
-            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-            JumpPhysicsData jumpPhysics = _entityManager.GetComponentData<JumpPhysicsData>(roomEntity);
+			// Should have pattern buffer for skill challenges
+			Assert.IsTrue(this._entityManager.HasBuffer<RoomPatternElement>(roomEntity));
+			}
 
-            // Assert - Treasure rooms should use parametric challenge generation
-            Assert.AreEqual(RoomGeneratorType.ParametricChallenge, request.GeneratorType);
-            Assert.IsTrue(_entityManager.HasComponent<JumpArcValidation>(roomEntity));
-            Assert.IsTrue(_entityManager.HasBuffer<JumpConnectionElement>(roomEntity));
-            Assert.AreEqual(4.0f, jumpPhysics.MaxJumpHeight);
-        }
+		[Test]
+		public void TreasureRoom_JumpTesting_ValidatesPhysics ()
+			{
+			// Arrange - Create a treasure room for jump testing
+			Entity roomEntity = this.CreateTestRoom(
+				RoomType.Treasure,
+				new RectInt(0, 0, 12, 8),
+				BiomeType.CrystalCaverns,
+				Ability.Jump | Ability.DoubleJump
+			);
 
-        [Test]
-        public void SkyBiome_CloudPlatforms_GeneratesMotion()
-        {
-            // Arrange - Create a room in sky biome
-            Entity roomEntity = CreateTestRoom(
-                RoomType.Normal,
-                new RectInt(0, 0, 16, 20), // Tall room
-                BiomeType.SkyGardens,
-                Ability.Jump | Ability.GlideSpeed
-            );
+			// Act
+			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			JumpPhysicsData jumpPhysics = this._entityManager.GetComponentData<JumpPhysicsData>(roomEntity);
 
-            // Act
-            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-            Biome biome = _entityManager.GetComponentData<Core.Biome>(roomEntity);
+			// Assert - Treasure rooms should use parametric challenge generation
+			Assert.AreEqual(RoomGeneratorType.ParametricChallenge, request.GeneratorType);
+			Assert.IsTrue(this._entityManager.HasComponent<JumpArcValidation>(roomEntity));
+			Assert.IsTrue(this._entityManager.HasBuffer<JumpConnectionElement>(roomEntity));
+			Assert.AreEqual(4.0f, jumpPhysics.MaxJumpHeight);
+			}
 
-            // Assert - Sky biomes should use layered platform generation
-            Assert.AreEqual(RoomGeneratorType.LayeredPlatformCloud, request.GeneratorType);
-            Assert.AreEqual(BiomeType.SkyGardens, request.TargetBiome);
-            Assert.AreEqual(Polarity.Wind, biome.PrimaryPolarity);
-        }
+		[Test]
+		public void SkyBiome_CloudPlatforms_GeneratesMotion ()
+			{
+			// Arrange - Create a room in sky biome
+			Entity roomEntity = this.CreateTestRoom(
+				RoomType.Normal,
+				new RectInt(0, 0, 16, 20), // Tall room
+				BiomeType.SkyGardens,
+				Ability.Jump | Ability.GlideSpeed
+			);
 
-        [Test]
-        public void HorizontalRoom_CorridorFlow_GeneratesRhythm()
-        {
-            // Arrange - Create a wide horizontal room
-            Entity roomEntity = CreateTestRoom(
-                RoomType.Normal,
-                new RectInt(0, 0, 24, 8), // Wide room (aspect ratio 3:1)
-                BiomeType.HubArea,
-                Ability.Jump
-            );
+			// Act
+			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			Biome biome = this._entityManager.GetComponentData<Biome>(roomEntity);
 
-            // Act
-            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			// Assert - Sky biomes should use layered platform generation
+			Assert.AreEqual(RoomGeneratorType.LayeredPlatformCloud, request.GeneratorType);
+			Assert.AreEqual(BiomeType.SkyGardens, request.TargetBiome);
+			Assert.AreEqual(Polarity.Wind, biome.PrimaryPolarity);
+			}
 
-            // Assert - Wide rooms should use linear corridor generation
-            Assert.AreEqual(RoomGeneratorType.LinearBranchingCorridor, request.GeneratorType);
-            Assert.AreEqual(RoomLayoutType.Horizontal, request.LayoutType);
-        }
+		[Test]
+		public void HorizontalRoom_CorridorFlow_GeneratesRhythm ()
+			{
+			// Arrange - Create a wide horizontal room
+			Entity roomEntity = this.CreateTestRoom(
+				RoomType.Normal,
+				new RectInt(0, 0, 24, 8), // Wide room (aspect ratio 3:1)
+				BiomeType.HubArea,
+				Ability.Jump
+			);
 
-        [Test]
-        public void VerticalRoom_StackedSegments_EnsuresConnectivity()
-        {
-            // Arrange - Create a tall vertical room
-            Entity roomEntity = CreateTestRoom(
-                RoomType.Normal,
-                new RectInt(0, 0, 8, 24), // Tall room (aspect ratio 1:3)
-                BiomeType.CrystalCaverns,
-                Ability.Jump | Ability.WallJump
-            );
+			// Act
+			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
-            // Act
-            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			// Assert - Wide rooms should use linear corridor generation
+			Assert.AreEqual(RoomGeneratorType.LinearBranchingCorridor, request.GeneratorType);
+			Assert.AreEqual(RoomLayoutType.Horizontal, request.LayoutType);
+			}
 
-            // Assert - Tall rooms should use stacked segment generation
-            Assert.AreEqual(RoomGeneratorType.StackedSegment, request.GeneratorType);
-            Assert.AreEqual(RoomLayoutType.Vertical, request.LayoutType);
-        }
+		[Test]
+		public void VerticalRoom_StackedSegments_EnsuresConnectivity ()
+			{
+			// Arrange - Create a tall vertical room
+			Entity roomEntity = this.CreateTestRoom(
+				RoomType.Normal,
+				new RectInt(0, 0, 8, 24), // Tall room (aspect ratio 1:3)
+				BiomeType.CrystalCaverns,
+				Ability.Jump | Ability.WallJump
+			);
 
-        [Test]
-        public void SecretAreas_WithBombSkill_GeneratesDestructibleWalls()
-        {
-            // Arrange - Create a room with bomb skill for secret access
-            Entity roomEntity = CreateTestRoom(
-                RoomType.Normal,
-                new RectInt(0, 0, 16, 12),
-                BiomeType.AncientRuins,
-                Ability.Jump | Ability.Bomb
-            );
+			// Act
+			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
-            // Act
-            SecretAreaConfig secretConfig = _entityManager.GetComponentData<SecretAreaConfig>(roomEntity);
+			// Assert - Tall rooms should use stacked segment generation
+			Assert.AreEqual(RoomGeneratorType.StackedSegment, request.GeneratorType);
+			Assert.AreEqual(RoomLayoutType.Vertical, request.LayoutType);
+			}
 
-            // Assert - Should have secret configuration with destructible walls
-            Assert.AreEqual(Ability.Bomb, secretConfig.SecretSkillRequirement);
-            Assert.IsTrue(secretConfig.UseDestructibleWalls);
-            Assert.AreEqual(0.15f, secretConfig.SecretAreaPercentage);
-        }
+		[Test]
+		public void SecretAreas_WithBombSkill_GeneratesDestructibleWalls ()
+			{
+			// Arrange - Create a room with bomb skill for secret access
+			Entity roomEntity = this.CreateTestRoom(
+				RoomType.Normal,
+				new RectInt(0, 0, 16, 12),
+				BiomeType.AncientRuins,
+				Ability.Jump | Ability.Bomb
+			);
 
-        [Test]
-        public void SaveRoom_SafeArea_UsesWeightedGeneration()
-        {
-            // Arrange - Create a save room (should be safe)
-            Entity roomEntity = CreateTestRoom(
-                RoomType.Save,
-                new RectInt(0, 0, 10, 10),
-                BiomeType.HubArea,
-                Ability.Jump
-            );
+			// Act
+			SecretAreaConfig secretConfig = this._entityManager.GetComponentData<SecretAreaConfig>(roomEntity);
 
-            // Act
-            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-            RoomStateData roomState = _entityManager.GetComponentData<RoomStateData>(roomEntity);
+			// Assert - Should have secret configuration with destructible walls
+			Assert.AreEqual(Ability.Bomb, secretConfig.SecretSkillRequirement);
+			Assert.IsTrue(secretConfig.UseDestructibleWalls);
+			Assert.AreEqual(0.15f, secretConfig.SecretAreaPercentage);
+			}
 
-            // Assert - Save rooms should use safe weighted generation
-            Assert.AreEqual(RoomGeneratorType.WeightedTilePrefab, request.GeneratorType);
-            Assert.AreEqual(0, roomState.TotalSecrets); // Save rooms don't have secrets
-        }
+		[Test]
+		public void SaveRoom_SafeArea_UsesWeightedGeneration ()
+			{
+			// Arrange - Create a save room (should be safe)
+			Entity roomEntity = this.CreateTestRoom(
+				RoomType.Save,
+				new RectInt(0, 0, 10, 10),
+				BiomeType.HubArea,
+				Ability.Jump
+			);
 
-        [Test]
-        public void BiomePolarity_MatchesRoomContent()
-        {
-            // Arrange - Create rooms in different biomes
-            Entity fireRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.VolcanicCore, Ability.Jump);
-            Entity iceRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.FrozenWastes, Ability.Jump);
+			// Act
+			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			RoomStateData roomState = this._entityManager.GetComponentData<RoomStateData>(roomEntity);
 
-            // Act
-            RoomGenerationRequest fireRequest = _entityManager.GetComponentData<RoomGenerationRequest>(fireRoomEntity);
-            RoomGenerationRequest iceRequest = _entityManager.GetComponentData<RoomGenerationRequest>(iceRoomEntity);
+			// Assert - Save rooms should use safe weighted generation
+			Assert.AreEqual(RoomGeneratorType.WeightedTilePrefab, request.GeneratorType);
+			Assert.AreEqual(0, roomState.TotalSecrets); // Save rooms don't have secrets
+			}
 
-            Biome fireBiome = _entityManager.GetComponentData<Core.Biome>(fireRoomEntity);
-            Biome iceBiome = _entityManager.GetComponentData<Core.Biome>(iceRoomEntity);
+		[Test]
+		public void BiomePolarity_MatchesRoomContent ()
+			{
+			// Arrange - Create rooms in different biomes
+			Entity fireRoomEntity = this.CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.VolcanicCore, Ability.Jump);
+			Entity iceRoomEntity = this.CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.FrozenWastes, Ability.Jump);
 
-            // Assert - Biome polarities should match room requests
-            Assert.AreEqual(Polarity.Heat, fireRequest.TargetPolarity);
-            Assert.AreEqual(Polarity.Cold, iceRequest.TargetPolarity);
-            Assert.AreEqual(Polarity.Heat, fireBiome.PrimaryPolarity);
-            Assert.AreEqual(Polarity.Cold, iceBiome.PrimaryPolarity);
-        }
+			// Act
+			RoomGenerationRequest fireRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(fireRoomEntity);
+			RoomGenerationRequest iceRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(iceRoomEntity);
 
-        [Test]
-        public void Pipeline_SixSteps_CompletesCorrectly()
-        {
-            // Arrange
-            Entity roomEntity = CreateTestRoom(
-                RoomType.Normal,
-                new RectInt(0, 0, 12, 12),
-                BiomeType.SolarPlains,
-                Ability.Jump
-            );
+			Biome fireBiome = this._entityManager.GetComponentData<Biome>(fireRoomEntity);
+			Biome iceBiome = this._entityManager.GetComponentData<Biome>(iceRoomEntity);
 
-            // Act - Simulate pipeline progression
-            RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-            
-            // Step 1: Biome Selection (already done in setup)
-            Assert.AreEqual(1, request.CurrentStep);
-            
-            // Simulate pipeline completion
-            request.CurrentStep = 6;
-            request.IsComplete = true;
-            _entityManager.SetComponentData(roomEntity, request);
+			// Assert - Biome polarities should match room requests
+			Assert.AreEqual(Polarity.Heat, fireRequest.TargetPolarity);
+			Assert.AreEqual(Polarity.Cold, iceRequest.TargetPolarity);
+			Assert.AreEqual(Polarity.Heat, fireBiome.PrimaryPolarity);
+			Assert.AreEqual(Polarity.Cold, iceBiome.PrimaryPolarity);
+			}
 
-            RoomGenerationRequest finalRequest = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+		[Test]
+		public void Pipeline_SixSteps_CompletesCorrectly ()
+			{
+			// Arrange
+			Entity roomEntity = this.CreateTestRoom(
+				RoomType.Normal,
+				new RectInt(0, 0, 12, 12),
+				BiomeType.SolarPlains,
+				Ability.Jump
+			);
 
-            // Assert - Pipeline should complete successfully
-            Assert.AreEqual(6, finalRequest.CurrentStep);
-            Assert.IsTrue(finalRequest.IsComplete);
-        }
+			// Act - Simulate pipeline progression
+			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
-        [Test]
-        public void JumpArcSolver_ValidatesRoomConnectivity()
-        {
-            // validate room bounds
-            RectInt roomBounds = new(0, 0, 16, 16);
-            Allocator allocator = Allocator.Temp;
+			// Step 1: Biome Selection (already done in setup)
+			Assert.AreEqual(1, request.CurrentStep);
 
-            // Arrange - Create platforms for connectivity test
-            var platformsFloat = new NativeArray<float2>(4, Allocator.Temp);
-            platformsFloat[0] = new float2(0, 0);
-            platformsFloat[1] = new float2(4, 2);
-            platformsFloat[2] = new float2(8, 1);
-            platformsFloat[3] = new float2(12, 3);
+			// Simulate pipeline completion
+			request.CurrentStep = 6;
+			request.IsComplete = true;
+			this._entityManager.SetComponentData(roomEntity, request);
 
-            // Convert float2 platforms to int2 as required by the API
-            var platforms = new NativeArray<int2>(platformsFloat.Length, Allocator.Temp);
-            for (int i = 0; i < platformsFloat.Length; i++)
-            {
-                platforms[i] = new int2((int)platformsFloat[i].x, (int)platformsFloat[i].y);
-            }
+			RoomGenerationRequest finalRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
-            var obstacles = new NativeArray<int2>(0, Allocator.Temp); // No obstacles
+			// Assert - Pipeline should complete successfully
+			Assert.AreEqual(6, finalRequest.CurrentStep);
+			Assert.IsTrue(finalRequest.IsComplete);
+			}
 
-            // Convert JumpPhysicsData to JumpArcPhysics as required by the API
-            var physics = new JumpArcPhysics
-            {
-                JumpHeight = 4.0f,
-                JumpDistance = 6.0f,
-                GravityScale = 9.81f
-            };
+		[Test]
+		public void JumpArcSolver_ValidatesRoomConnectivity ()
+			{
+			// validate room bounds
+			RectInt roomBounds = new(0, 0, 16, 16);
+			Allocator allocator = Allocator.Temp;
 
-            // Act
-            // Use the correct overload for ValidateRoomReachability (with 9 arguments)
-            bool isReachable = JumpArcSolver.ValidateRoomReachability(
-                int2.zero,
-                platforms.AsReadOnly(),
-                Ability.Jump,
-                physics,
-                roomBounds.x,
-                roomBounds.y,
-                roomBounds.width,
-                roomBounds.height,
-                allocator
-            );
+			// Arrange - Create platforms for connectivity test
+			var platformsFloat = new NativeArray<float2>(4, Allocator.Temp);
+			platformsFloat [ 0 ] = new float2(0, 0);
+			platformsFloat [ 1 ] = new float2(4, 2);
+			platformsFloat [ 2 ] = new float2(8, 1);
+			platformsFloat [ 3 ] = new float2(12, 3);
 
-            // Assert
-            Assert.IsTrue(isReachable, "All platforms should be reachable with given jump physics");
+			// Convert float2 platforms to int2 as required by the API
+			var platforms = new NativeArray<int2>(platformsFloat.Length, Allocator.Temp);
+			for (int i = 0; i < platformsFloat.Length; i++)
+				{
+				platforms [ i ] = new int2((int)platformsFloat [ i ].x, (int)platformsFloat [ i ].y);
+				}
 
-            // Cleanup
-            platformsFloat.Dispose();
-            platforms.Dispose();
-            obstacles.Dispose();
-        }
+			var obstacles = new NativeArray<int2>(0, Allocator.Temp); // No obstacles
 
-        [Test]
-        public void DifferentGenerators_ProduceUniqueContent()
-        {
-            // Arrange - Create rooms with different generator types
-            Entity patternRoom = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 16, 16), BiomeType.VolcanicCore, Ability.Dash);
-            Entity parametricRoom = CreateTestRoom(RoomType.Treasure, new RectInt(0, 0, 16, 16), BiomeType.CrystalCaverns, Ability.Jump);
-            Entity weightedRoom = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 16, 16), BiomeType.HubArea, Ability.Jump);
+			// Convert JumpPhysicsData to JumpArcPhysics as required by the API
+			var physics = new JumpArcPhysics
+				{
+				JumpHeight = 4.0f,
+				JumpDistance = 6.0f,
+				GravityScale = 9.81f
+				};
 
-            // Act
-            RoomGenerationRequest patternRequest = _entityManager.GetComponentData<RoomGenerationRequest>(patternRoom);
-            RoomGenerationRequest parametricRequest = _entityManager.GetComponentData<RoomGenerationRequest>(parametricRoom);
-            RoomGenerationRequest weightedRequest = _entityManager.GetComponentData<RoomGenerationRequest>(weightedRoom);
+			// Act
+			// Use the correct overload for ValidateRoomReachability (with 9 arguments)
+			bool isReachable = JumpArcSolver.ValidateRoomReachability(
+				int2.zero,
+				platforms.AsReadOnly(),
+				Ability.Jump,
+				physics,
+				roomBounds.x,
+				roomBounds.y,
+				roomBounds.width,
+				roomBounds.height,
+				allocator
+			);
 
-            // Assert - Each should use different generator type
-            Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, patternRequest.GeneratorType);
-            Assert.AreEqual(RoomGeneratorType.ParametricChallenge, parametricRequest.GeneratorType);
-            Assert.AreEqual(RoomGeneratorType.WeightedTilePrefab, weightedRequest.GeneratorType);
+			// Assert
+			Assert.IsTrue(isReachable, "All platforms should be reachable with given jump physics");
 
-            // Each should have different specialized components
-            Assert.IsTrue(_entityManager.HasBuffer<RoomPatternElement>(patternRoom));
-            Assert.IsTrue(_entityManager.HasComponent<JumpPhysicsData>(parametricRoom));
-            Assert.IsTrue(_entityManager.HasComponent<SecretAreaConfig>(weightedRoom));
-        }
+			// Cleanup
+			platformsFloat.Dispose();
+			platforms.Dispose();
+			obstacles.Dispose();
+			}
 
-        /// <summary>
-        /// Helper method to create a test room with all necessary components
-        /// </summary>
-        private Entity CreateTestRoom(RoomType roomType, RectInt bounds, BiomeType biomeType, Ability availableSkills)
-        {
-            Entity roomEntity = _entityManager.CreateEntity();
+		[Test]
+		public void DifferentGenerators_ProduceUniqueContent ()
+			{
+			// Arrange - Create rooms with different generator types
+			Entity patternRoom = this.CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 16, 16), BiomeType.VolcanicCore, Ability.Dash);
+			Entity parametricRoom = this.CreateTestRoom(RoomType.Treasure, new RectInt(0, 0, 16, 16), BiomeType.CrystalCaverns, Ability.Jump);
+			Entity weightedRoom = this.CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 16, 16), BiomeType.HubArea, Ability.Jump);
 
-            // Add core room data
-            var roomData = new RoomHierarchyData(bounds, roomType, true);
-            var nodeId = new NodeId(1, 2, 1, new int2(0, 0));
-            _entityManager.AddComponentData(roomEntity, roomData);
-            _entityManager.AddComponentData(roomEntity, nodeId);
+			// Act
+			RoomGenerationRequest patternRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(patternRoom);
+			RoomGenerationRequest parametricRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(parametricRoom);
+			RoomGenerationRequest weightedRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(weightedRoom);
 
-            // Add biome data
-            Polarity polarity = GetPolarityForBiome(biomeType);
-            var biome = new Core.Biome(biomeType, polarity, 1.0f, Polarity.None, 1.0f);
-            _entityManager.AddComponentData(roomEntity, biome);
+			// Assert - Each should use different generator type
+			Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, patternRequest.GeneratorType);
+			Assert.AreEqual(RoomGeneratorType.ParametricChallenge, parametricRequest.GeneratorType);
+			Assert.AreEqual(RoomGeneratorType.WeightedTilePrefab, weightedRequest.GeneratorType);
 
-            // Determine generator type
-            RoomGeneratorType generatorType = DetermineGeneratorType(roomType, bounds, biomeType);
+			// Each should have different specialized components
+			Assert.IsTrue(this._entityManager.HasBuffer<RoomPatternElement>(patternRoom));
+			Assert.IsTrue(this._entityManager.HasComponent<JumpPhysicsData>(parametricRoom));
+			Assert.IsTrue(this._entityManager.HasComponent<SecretAreaConfig>(weightedRoom));
+			}
 
-            // Create room generation request
-            var generationRequest = new RoomGenerationRequest(
-                generatorType,
-                biomeType,
-                polarity,
-                availableSkills,
-                12345
-            );
-            _entityManager.AddComponentData(roomEntity, generationRequest);
+		/// <summary>
+		/// Helper method to create a test room with all necessary components
+		/// </summary>
+		private Entity CreateTestRoom (RoomType roomType, RectInt bounds, BiomeType biomeType, Ability availableSkills)
+			{
+			Entity roomEntity = this._entityManager.CreateEntity();
 
-            // Add room management components
-            _entityManager.AddComponentData(roomEntity, new RoomStateData(CalculateSecrets(roomType)));
-            _entityManager.AddComponentData(roomEntity, CreateNavData(bounds, roomType));
-            _entityManager.AddBuffer<RoomFeatureElement>(roomEntity);
+			// Add core room data
+			var roomData = new RoomHierarchyData(bounds, roomType, true);
+			var nodeId = new NodeId(1, 2, 1, new int2(0, 0));
+			this._entityManager.AddComponentData(roomEntity, roomData);
+			this._entityManager.AddComponentData(roomEntity, nodeId);
 
-            // Add generator-specific components
-            AddSpecializedComponents(roomEntity, generatorType, availableSkills);
+			// Add biome data
+			Polarity polarity = GetPolarityForBiome(biomeType);
+			var biome = new Biome(biomeType, polarity, 1.0f, Polarity.None, 1.0f);
+			this._entityManager.AddComponentData(roomEntity, biome);
 
-            return roomEntity;
-        }
+			// Determine generator type
+			RoomGeneratorType generatorType = DetermineGeneratorType(roomType, bounds, biomeType);
 
-        private void AddSpecializedComponents(Entity entity, RoomGeneratorType generatorType, Ability availableSkills)
-        {
-            switch (generatorType)
-            {
-                case RoomGeneratorType.PatternDrivenModular:
-                    _entityManager.AddBuffer<RoomPatternElement>(entity);
-                    _entityManager.AddBuffer<RoomModuleElement>(entity);
-                    break;
+			// Create room generation request
+			var generationRequest = new RoomGenerationRequest(
+				generatorType,
+				biomeType,
+				polarity,
+				availableSkills,
+				12345
+			);
+			this._entityManager.AddComponentData(roomEntity, generationRequest);
 
-                case RoomGeneratorType.ParametricChallenge:
-                    var jumpPhysics = new JumpPhysicsData(4.0f, 6.0f, 9.81f, 5.0f, 
-                        (availableSkills & Ability.DoubleJump) != 0,
-                        (availableSkills & Ability.WallJump) != 0,
-                        (availableSkills & Ability.Dash) != 0);
-                    _entityManager.AddComponentData(entity, jumpPhysics);
-                    _entityManager.AddComponentData(entity, new JumpArcValidation(false, 0, 0));
-                    _entityManager.AddBuffer<JumpConnectionElement>(entity);
-                    break;
+			// Add room management components
+			this._entityManager.AddComponentData(roomEntity, new RoomStateData(CalculateSecrets(roomType)));
+			this._entityManager.AddComponentData(roomEntity, CreateNavData(bounds, roomType));
+			this._entityManager.AddBuffer<RoomFeatureElement>(roomEntity);
 
-                case RoomGeneratorType.WeightedTilePrefab:
-                    Ability secretSkill = (availableSkills & Ability.Bomb) != 0 ? Ability.Bomb : Ability.None;
-                    var secretConfig = new SecretAreaConfig(0.15f, new int2(2, 2), new int2(4, 4), 
-                        secretSkill, true, true);
-                    _entityManager.AddComponentData(entity, secretConfig);
-                    break;
-            }
-        }
+			// Add generator-specific components
+			this.AddSpecializedComponents(roomEntity, generatorType, availableSkills);
 
-        private static RoomGeneratorType DetermineGeneratorType(RoomType roomType, RectInt bounds, BiomeType biomeType)
-        {
-            float aspectRatio = (float)bounds.width / bounds.height;
+			return roomEntity;
+			}
 
-            return roomType switch
-            {
-                RoomType.Boss => RoomGeneratorType.PatternDrivenModular,
-                RoomType.Treasure => RoomGeneratorType.ParametricChallenge,
-                RoomType.Save or RoomType.Shop or RoomType.Hub => RoomGeneratorType.WeightedTilePrefab,
-                _ when IsSkyBiome(biomeType) => RoomGeneratorType.LayeredPlatformCloud,
-                _ when IsTerrainBiome(biomeType) => RoomGeneratorType.BiomeWeightedHeightmap,
-                _ when aspectRatio > 1.5f => RoomGeneratorType.LinearBranchingCorridor,
-                _ when aspectRatio < 0.67f => RoomGeneratorType.StackedSegment,
-                _ => RoomGeneratorType.WeightedTilePrefab
-            };
-        }
+		private void AddSpecializedComponents (Entity entity, RoomGeneratorType generatorType, Ability availableSkills)
+			{
+			switch (generatorType)
+				{
+				case RoomGeneratorType.PatternDrivenModular:
+					this._entityManager.AddBuffer<RoomPatternElement>(entity);
+					this._entityManager.AddBuffer<RoomModuleElement>(entity);
+					break;
 
-        private static Polarity GetPolarityForBiome(BiomeType biome)
-        {
-            return biome switch
-            {
-                BiomeType.SolarPlains => Polarity.Sun,
-                BiomeType.ShadowRealms => Polarity.Moon,
-                BiomeType.VolcanicCore => Polarity.Heat,
-                BiomeType.FrozenWastes => Polarity.Cold,
-                BiomeType.SkyGardens => Polarity.Wind,
-                BiomeType.PowerPlant => Polarity.Tech,
-                _ => Polarity.None
-            };
-        }
+				case RoomGeneratorType.ParametricChallenge:
+					var jumpPhysics = new JumpPhysicsData(4.0f, 6.0f, 9.81f, 5.0f,
+						(availableSkills & Ability.DoubleJump) != 0,
+						(availableSkills & Ability.WallJump) != 0,
+						(availableSkills & Ability.Dash) != 0);
+					this._entityManager.AddComponentData(entity, jumpPhysics);
+					this._entityManager.AddComponentData(entity, new JumpArcValidation(false, 0, 0));
+					this._entityManager.AddBuffer<JumpConnectionElement>(entity);
+					break;
 
-        private static bool IsSkyBiome(BiomeType biome) => 
-            biome == BiomeType.SkyGardens || biome == BiomeType.PlasmaFields;
+				case RoomGeneratorType.WeightedTilePrefab:
+					Ability secretSkill = (availableSkills & Ability.Bomb) != 0 ? Ability.Bomb : Ability.None;
+					var secretConfig = new SecretAreaConfig(0.15f, new int2(2, 2), new int2(4, 4),
+						secretSkill, true, true);
+					this._entityManager.AddComponentData(entity, secretConfig);
+					break;
+				case RoomGeneratorType.VerticalSegment:
+					break;
+				case RoomGeneratorType.HorizontalCorridor:
+					break;
+				case RoomGeneratorType.BiomeWeightedTerrain:
+					break;
+				case RoomGeneratorType.SkyBiomePlatform:
+					break;
+				case RoomGeneratorType.LinearBranchingCorridor:
+					break;
+				case RoomGeneratorType.StackedSegment:
+					break;
+				case RoomGeneratorType.LayeredPlatformCloud:
+					break;
+				case RoomGeneratorType.BiomeWeightedHeightmap:
+					break;
+				default:
+					break;
+				}
+			}
 
-        private static bool IsTerrainBiome(BiomeType biome) => 
-            biome == BiomeType.SolarPlains || biome == BiomeType.FrozenWastes;
+		private static RoomGeneratorType DetermineGeneratorType (RoomType roomType, RectInt bounds, BiomeType biomeType)
+			{
+			float aspectRatio = (float)bounds.width / bounds.height;
 
-        private static int CalculateSecrets(RoomType roomType)
-        {
-            return roomType switch
-            {
-                RoomType.Treasure => 2,
-                RoomType.Normal => 1,
-                RoomType.Boss => 1,
-                _ => 0
-            };
-        }
+			return roomType switch
+				{
+					RoomType.Boss => RoomGeneratorType.PatternDrivenModular,
+					RoomType.Treasure => RoomGeneratorType.ParametricChallenge,
+					RoomType.Save or RoomType.Shop or RoomType.Hub => RoomGeneratorType.WeightedTilePrefab,
+					_ when IsSkyBiome(biomeType) => RoomGeneratorType.LayeredPlatformCloud,
+					_ when IsTerrainBiome(biomeType) => RoomGeneratorType.BiomeWeightedHeightmap,
+					_ when aspectRatio > 1.5f => RoomGeneratorType.LinearBranchingCorridor,
+					_ when aspectRatio < 0.67f => RoomGeneratorType.StackedSegment,
+					_ => RoomGeneratorType.WeightedTilePrefab
+					};
+			}
 
-        private static RoomNavigationData CreateNavData(RectInt bounds, RoomType roomType)
-        {
-            var entrance = new int2(bounds.x + 1, bounds.y + 1);
-            bool isCritical = roomType == RoomType.Boss || roomType == RoomType.Entrance;
-            float traversalTime = (bounds.width + bounds.height) * 0.5f;
-            return new RoomNavigationData(entrance, isCritical, traversalTime);
-        }
-    }
-}
+		private static Polarity GetPolarityForBiome (BiomeType biome)
+			{
+			return biome switch
+				{
+					BiomeType.SolarPlains => Polarity.Sun,
+					BiomeType.ShadowRealms => Polarity.Moon,
+					BiomeType.VolcanicCore => Polarity.Heat,
+					BiomeType.FrozenWastes => Polarity.Cold,
+					BiomeType.SkyGardens => Polarity.Wind,
+					BiomeType.PowerPlant => Polarity.Tech,
+					_ => Polarity.None
+					};
+			}
+
+		private static bool IsSkyBiome (BiomeType biome)
+			{
+			return biome == BiomeType.SkyGardens || biome == BiomeType.PlasmaFields;
+			}
+
+		private static bool IsTerrainBiome (BiomeType biome)
+			{
+			return biome == BiomeType.SolarPlains || biome == BiomeType.FrozenWastes;
+			}
+
+		private static int CalculateSecrets (RoomType roomType)
+			{
+			return roomType switch
+				{
+					RoomType.Treasure => 2,
+					RoomType.Normal => 1,
+					RoomType.Boss => 1,
+					_ => 0
+					};
+			}
+
+		private static RoomNavigationData CreateNavData (RectInt bounds, RoomType roomType)
+			{
+			var entrance = new int2(bounds.x + 1, bounds.y + 1);
+			bool isCritical = roomType == RoomType.Boss || roomType == RoomType.Entrance;
+			float traversalTime = (bounds.width + bounds.height) * 0.5f;
+			return new RoomNavigationData(entrance, isCritical, traversalTime);
+			}
+		}
+	}

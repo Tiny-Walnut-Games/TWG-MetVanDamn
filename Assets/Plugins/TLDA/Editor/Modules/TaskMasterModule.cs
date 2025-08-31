@@ -1,595 +1,771 @@
 #if UNITY_EDITOR
-using UnityEditor;
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEngine;
 
 namespace LivingDevAgent.Editor.Modules
-{
-    /// <summary>
-    /// 🎯 TaskMaster Module - The DAW-Style Quest & Mission Timeline!
-    /// Unity Timeline-inspired task management with TODO parsing and temporal integration
-    /// 🎮 Features: Draggable nodes, timeline scrubbing, temporal scribe integration
-    /// </summary>
-    public class TaskMasterModule : ScribeModuleBase
-    {
-        // Timeline display state
-        private Vector2 _timelineScroll = Vector2.zero;
-        private float _timelineZoom = 1.0f;
-        private float _playheadPosition = 0f;
-        private bool _isPlaying = false;
-        private double _lastUpdateTime = 0;
-        
-        // Task management
-        private readonly List<TaskNode> _taskNodes = new();
-        private TaskNode _selectedNode = null;
-        private TaskNode _draggedNode = null;
-        private Vector2 _dragOffset = Vector2.zero;
-        
-        // Parsing engine
-        private readonly TaskParser _parser = new();
-        private List<string> _scannedFiles = new();
-        private float _lastScanTime = 0f;
-        private const float ScanInterval = 2f; // Auto-scan every 2 seconds
-        
-        public TaskMasterModule(TLDLScribeData data) : base(data) { }
+	{
+	/// <summary>
+	/// ⏰ TaskMaster Module - Scene View Time Tracking Overlay
+	/// Provides focused time tracking with scene view integration and ScriptableObject time-cards
+	/// Timer runs in background using EditorApplication.timeSinceStartup for accuracy
+	/// Time-cards can be imported to TLDL entries when tasks complete
+	/// </summary>
+	public class TaskMasterModule : ScribeModuleBase
+		{
+		// Timer state - persisted in ScriptableObject
+		private TimeCardData _activeTimeCard;
+		private bool _isTimerRunning = false;
+		private double _sessionStartTime = 0.0; // EditorApplication.timeSinceStartup
+		private double _accumulatedTime = 0.0; // Total session time in seconds
 
-        public override void Initialize()
-        {
-            base.Initialize();
-            RefreshTasksFromCodebase();
-        }
+		// Task management
+		private readonly List<string> _availableTasks = new()
+		{
+			"📝 Documentation Writing",
+			"🐛 Bug Investigation",
+			"⚡ Feature Development",
+			"🧪 Testing & Validation",
+			"🎨 UI/UX Design",
+			"🔧 Code Refactoring",
+			"📊 Research & Analysis",
+			"🏗️ Architecture Planning",
+			"💬 Code Review",
+			"🎯 Custom Task..."
+		};
 
-        public void DrawToolbar()
-        {
-            // Timeline controls - DAW style
-            if (GUILayout.Button(_isPlaying ? "⏸️" : "▶️", EditorStyles.toolbarButton, GUILayout.Width(30)))
-            {
-                _isPlaying = !_isPlaying;
-                if (_isPlaying)
-                {
-                    _lastUpdateTime = EditorApplication.timeSinceStartup;
-                    EditorApplication.update += UpdatePlayhead;
-                }
-                else
-                {
-                    EditorApplication.update -= UpdatePlayhead;
-                }
-            }
-            
-            if (GUILayout.Button("⏹️", EditorStyles.toolbarButton, GUILayout.Width(30)))
-            {
-                _isPlaying = false;
-                _playheadPosition = 0f;
-                EditorApplication.update -= UpdatePlayhead;
-            }
-            
-            GUILayout.Space(10);
-            
-            // Zoom controls
-            GUILayout.Label("🔍", GUILayout.Width(20));
-            _timelineZoom = GUILayout.HorizontalSlider(_timelineZoom, 0.1f, 3f, GUILayout.Width(80));
-            
-            GUILayout.Space(10);
-            
-            // Task management
-            if (GUILayout.Button("📝 New Task", EditorStyles.toolbarButton))
-            {
-                CreateNewTask();
-            }
-            
-            if (GUILayout.Button("🔄 Scan Code", EditorStyles.toolbarButton))
-            {
-                RefreshTasksFromCodebase();
-            }
-            
-            if (GUILayout.Button("🕐 Sync Timer", EditorStyles.toolbarButton))
-            {
-                SyncWithTemporalScribe();
-            }
-            
-            GUILayout.FlexibleSpace();
-            
-            // Stats
-            GUILayout.Label($"📋 {_taskNodes.Count} tasks", EditorStyles.miniLabel);
-        }
+		private int _selectedTaskIndex = 0;
+		private string _customTaskName = "";
+		private bool _showCustomTask = false;
 
-        public void DrawContent(Rect windowPosition)
-        {
-            // Auto-scan check
-            if (Time.realtimeSinceStartup - _lastScanTime > ScanInterval)
-            {
-                RefreshTasksFromCodebase();
-                _lastScanTime = Time.realtimeSinceStartup;
-            }
-            
-            DrawTimelineHeader(windowPosition);
-            DrawTimelineTracks(windowPosition);
-            DrawTaskInspector();
-        }
+		// Time-card management
+		private readonly List<TimeCardData> _allTimeCards = new();
+		private readonly string _timeCardDirectory = "Assets/TLDA/TimeCards/";
 
-        void DrawTimelineHeader(Rect windowPosition)
-        {
-            float headerHeight = 40f;
-            Rect headerRect = new(0, 0, windowPosition.width, headerHeight);
-            
-            // Time ruler - DAW style
-            GUI.Box(headerRect, "", EditorStyles.toolbar);
-            
-            float timelineWidth = windowPosition.width * _timelineZoom;
-            float secondsPerPixel = 0.1f / _timelineZoom;
-            
-            // Draw time markers
-            for (float time = 0; time < timelineWidth * secondsPerPixel; time += 1f)
-            {
-                float x = time / secondsPerPixel;
-                if (x > timelineWidth) break;
-                
-                EditorGUI.DrawRect(new Rect(x, headerHeight - 10, 1, 10), Color.gray);
-                
-                if (time % 5 == 0) // Major markers every 5 seconds
-                {
-                    GUI.Label(new Rect(x + 2, headerHeight - 25, 50, 20), $"{time:F0}s", EditorStyles.miniLabel);
-                }
-            }
-            
-            // Playhead
-            float playheadX = _playheadPosition / secondsPerPixel;
-            EditorGUI.DrawRect(new Rect(playheadX, 0, 2, headerHeight), Color.red);
-        }
+		// Scene view overlay state
+		private static bool _moduleEnabled = true; // Module can be completely disabled
+		private static bool _sceneViewOverlayEnabled = true; // Scene overlay works independently
+		private static Rect _overlayRect = new(10, 10, 300, 120);
+		private static bool _isDragging = false;
+		private static Vector2 _dragOffset;
 
-        void DrawTimelineTracks(Rect windowPosition)
-        {
-            float headerHeight = 40f;
-            float trackHeight = 60f;
-            float availableHeight = windowPosition.height - headerHeight - 100f; // Leave room for inspector
-            
-            _timelineScroll = EditorGUILayout.BeginScrollView(_timelineScroll, 
-                GUILayout.Height(availableHeight), GUILayout.ExpandHeight(true));
-            
-            // Group tasks by priority/type for tracks
-            var taskGroups = _taskNodes.GroupBy(t => GetTaskTrack(t)).OrderBy(g => g.Key);
-            
-            float currentY = 0;
-            foreach (var group in taskGroups)
-            {
-                DrawTrackHeader(group.Key, trackHeight, currentY);
-                DrawTrackTasks(group, trackHeight, currentY, windowPosition.width);
-                currentY += trackHeight;
-            }
-            
-            // Add some extra space for dropping new tasks
-            GUILayout.Space(trackHeight * 2);
-            
-            EditorGUILayout.EndScrollView();
-            
-            HandleTimelineInteraction(windowPosition);
-        }
+		// 🎯 NEW: Error tracking and validation
+		private static bool _initializationError = false;
+		private static string _lastError = "";
 
-        void DrawTrackHeader(string trackName, float trackHeight, float y)
-        {
-            Rect trackRect = EditorGUILayout.GetControlRect(false, trackHeight);
-            
-            // Track background
-            Color trackColor = GetTrackColor(trackName);
-            EditorGUI.DrawRect(new Rect(0, trackRect.y, 150, trackHeight), trackColor * 0.3f);
-            
-            // Track label
-            GUI.Label(new Rect(10, trackRect.y + trackHeight * 0.5f - 10, 140, 20), trackName, EditorStyles.boldLabel);
-        }
+		public TaskMasterModule (TLDLScribeData data) : base(data) { }
 
-        void DrawTrackTasks(IGrouping<string, TaskNode> taskGroup, float trackHeight, float trackY, float windowWidth)
-        {
-            foreach (var task in taskGroup)
-            {
-                DrawTaskNode(task, trackHeight, trackY, windowWidth);
-            }
-        }
+		public override void Initialize ()
+			{
+			try
+				{
+				// Ensure time-card directory exists
+				if (!System.IO.Directory.Exists(this._timeCardDirectory))
+					{
+					System.IO.Directory.CreateDirectory(this._timeCardDirectory);
+					AssetDatabase.Refresh();
+					}
 
-        void DrawTaskNode(TaskNode task, float trackHeight, float trackY, float windowWidth)
-        {
-            float nodeWidth = task.EstimatedDuration * 50f * _timelineZoom; // 50 pixels per hour at 1x zoom
-            float nodeX = task.StartTime * 50f * _timelineZoom;
-            
-            Rect nodeRect = new Rect(nodeX + 150, trackY + 5, nodeWidth, trackHeight - 10);
-            
-            // Node background
-            Color nodeColor = GetPriorityColor(task.Priority);
-            if (_selectedNode == task)
-                nodeColor = Color.yellow;
-            
-            EditorGUI.DrawRect(nodeRect, nodeColor);
-            EditorGUI.DrawRect(nodeRect, Color.black * 0.3f); // Border
-            
-            // Node content
-            GUIStyle nodeStyle = new(EditorStyles.label)
-            {
-                alignment = TextAnchor.MiddleLeft,
-                fontSize = 10,
-                normal = { textColor = Color.white }
-            };
-            
-            string nodeText = $"{task.Title}\n⏱️ {task.EstimatedDuration:F1}h";
-            if (task.IsLinkedToTimer)
-                nodeText += " 🕐";
-                
-            GUI.Label(nodeRect, nodeText, nodeStyle);
-            
-            // Handle interaction
-            if (Event.current.type == EventType.MouseDown && nodeRect.Contains(Event.current.mousePosition))
-            {
-                _selectedNode = task;
-                if (Event.current.button == 0) // Left click
-                {
-                    _draggedNode = task;
-                    _dragOffset = Event.current.mousePosition - new Vector2(nodeRect.x, nodeRect.y);
-                }
-                Event.current.Use();
-            }
-        }
+				// Load existing time-cards
+				this.LoadTimeCards();
 
-        void DrawTaskInspector()
-        {
-            EditorGUILayout.BeginVertical("box", GUILayout.Height(80));
-            GUILayout.Label("🎯 Task Inspector", EditorStyles.boldLabel);
-            
-            if (_selectedNode != null)
-            {
-                EditorGUILayout.BeginHorizontal();
-                _selectedNode.Title = EditorGUILayout.TextField("Title", _selectedNode.Title);
-                
-                if (GUILayout.Button("🗑️", GUILayout.Width(30)))
-                {
-                    _taskNodes.Remove(_selectedNode);
-                    _selectedNode = null;
-                }
-                EditorGUILayout.EndHorizontal();
-                
-                EditorGUILayout.BeginHorizontal();
-                _selectedNode.Priority = (TaskPriority)EditorGUILayout.EnumPopup("Priority", _selectedNode.Priority);
-                _selectedNode.EstimatedDuration = EditorGUILayout.FloatField("Duration (h)", _selectedNode.EstimatedDuration);
-                EditorGUILayout.EndHorizontal();
-                
-                EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button("🕐 Link to Timer"))
-                {
-                    LinkTaskToTimer(_selectedNode);
-                }
-                
-                if (GUILayout.Button("📝 Add to TLDL"))
-                {
-                    AddTaskToTLDL(_selectedNode);
-                }
-                EditorGUILayout.EndHorizontal();
-            }
-            else
-            {
-                GUILayout.Label("Select a task node to edit properties", EditorStyles.centeredGreyMiniLabel);
-            }
-            
-            EditorGUILayout.EndVertical();
-        }
+				// Restore active timer state if exists
+				this.RestoreActiveTimerState();
 
-        void HandleTimelineInteraction(Rect windowPosition)
-        {
-            Event e = Event.current;
-            
-            // Handle dragging
-            if (_draggedNode != null && e.type == EventType.MouseDrag)
-            {
-                Vector2 newPos = e.mousePosition - _dragOffset;
-                _draggedNode.StartTime = Mathf.Max(0, (newPos.x - 150) / (50f * _timelineZoom));
-                e.Use();
-            }
-            
-            if (e.type == EventType.MouseUp)
-            {
-                _draggedNode = null;
-            }
-            
-            // Handle playhead scrubbing
-            if (e.type == EventType.MouseDown && e.mousePosition.y < 40)
-            {
-                _playheadPosition = (e.mousePosition.x - 150) * 0.1f / _timelineZoom;
-                _playheadPosition = Mathf.Max(0, _playheadPosition);
-                e.Use();
-            }
-        }
+				// Subscribe to editor updates for background tracking
+				EditorApplication.update += this.OnEditorUpdate;
 
-        void UpdatePlayhead()
-        {
-            if (_isPlaying)
-            {
-                double currentTime = EditorApplication.timeSinceStartup;
-                _playheadPosition += (float)(currentTime - _lastUpdateTime);
-                _lastUpdateTime = currentTime;
-                
-                // Trigger events at playhead position
-                CheckTaskTriggers();
-                
-                // Force repaint
-                EditorWindow.focusedWindow?.Repaint();
-            }
-        }
+				// 🎯 ALWAYS register scene view overlay (independent of module state)
+				SceneView.duringSceneGui += this.OnSceneGUI;
 
-        void CheckTaskTriggers()
-        {
-            foreach (var task in _taskNodes)
-            {
-                if (!task.HasTriggered && _playheadPosition >= task.StartTime)
-                {
-                    task.HasTriggered = true;
-                    SetStatus($"🎯 Task triggered: {task.Title}");
-                    
-                    if (task.IsLinkedToTimer)
-                    {
-                        // Auto-start timer if linked
-                        _data.IsTimerActive = true;
-                        _data.SessionStartTime = System.DateTime.Now;
-                        _data.ActiveTaskDescription = task.Title;
-                    }
-                }
-            }
-        }
+				_initializationError = false;
+				this.SetStatus("⏰ TaskMaster initialized successfully");
+				}
+			catch (System.Exception ex)
+				{
+				_initializationError = true;
+				_lastError = ex.Message;
+				this.SetStatus($"❌ TaskMaster initialization failed: {ex.Message}");
+				Debug.LogError($"TaskMaster initialization error: {ex}");
+				}
+			}
 
-        void RefreshTasksFromCodebase()
-        {
-            var foundTasks = _parser.ParseProjectTasks();
-            
-            // Merge with existing tasks, avoiding duplicates
-            foreach (var parsedTask in foundTasks)
-            {
-                if (!_taskNodes.Any(t => t.Id == parsedTask.Id))
-                {
-                    _taskNodes.Add(parsedTask);
-                }
-            }
-            
-            SetStatus($"🔄 Scanned codebase: {foundTasks.Count} tasks found");
-        }
+		public override void Dispose ()
+			{
+			try
+				{
+				// Save any active session before disposing
+				if (this._isTimerRunning && this._activeTimeCard != null)
+					{
+					this.SaveCurrentSession();
+					}
 
-        void CreateNewTask()
-        {
-            var newTask = new TaskNode
-            {
-                Id = System.Guid.NewGuid().ToString(),
-                Title = "New Task",
-                Priority = TaskPriority.Medium,
-                EstimatedDuration = 1.0f,
-                StartTime = _playheadPosition,
-                Source = TaskSource.Manual
-            };
-            
-            _taskNodes.Add(newTask);
-            _selectedNode = newTask;
-        }
+				// Unsubscribe from updates
+				EditorApplication.update -= this.OnEditorUpdate;
 
-        void LinkTaskToTimer(TaskNode task)
-        {
-            task.IsLinkedToTimer = !task.IsLinkedToTimer;
-            
-            if (task.IsLinkedToTimer && _data.IsTimerActive)
-            {
-                _data.ActiveTaskDescription = task.Title;
-            }
-            
-            SetStatus($"🕐 Timer link {(task.IsLinkedToTimer ? "enabled" : "disabled")} for: {task.Title}");
-        }
+				// 🎯 ALWAYS unregister scene view overlay
+				SceneView.duringSceneGui -= this.OnSceneGUI;
 
-        void AddTaskToTLDL(TaskNode task)
-        {
-            if (string.IsNullOrEmpty(_data.NextSteps))
-                _data.NextSteps = "";
-            
-            _data.NextSteps += $"\n- {task.Title} (Est: {task.EstimatedDuration:F1}h)";
-            _data.IncludeNextSteps = true;
-            
-            SetStatus($"📝 Added task to TLDL: {task.Title}");
-        }
+				this.SetStatus("⏰ TaskMaster disposed cleanly");
+				}
+			catch (System.Exception ex)
+				{
+				Debug.LogError($"TaskMaster disposal error: {ex}");
+				}
+			}
 
-        void SyncWithTemporalScribe()
-        {
-            // Sync active timer with selected task
-            if (_data.IsTimerActive && _selectedNode != null)
-            {
-                _selectedNode.IsLinkedToTimer = true;
-                _selectedNode.ActualDuration = (float)(System.DateTime.Now - _data.SessionStartTime).TotalHours;
-            }
-            
-            SetStatus("🕐 Synced with Temporal Scribe");
-        }
+		// 🎯 FIXED: Scene View Overlay Rendering with proper event handling
+		private void OnSceneGUI (SceneView sceneView)
+			{
+			if (!_sceneViewOverlayEnabled) return;
 
-        string GetTaskTrack(TaskNode task)
-        {
-            return task.Priority switch
-            {
-                TaskPriority.Critical => "🔴 Critical",
-                TaskPriority.High => "🟡 High Priority",
-                TaskPriority.Medium => "🟢 Medium Priority",
-                TaskPriority.Low => "🔵 Low Priority",
-                _ => "⚪ Backlog"
-            };
-        }
+			// Begin GUI overlay
+			Handles.BeginGUI();
 
-        Color GetTrackColor(string trackName)
-        {
-            return trackName switch
-            {
-                "🔴 Critical" => Color.red,
-                "🟡 High Priority" => Color.yellow,
-                "🟢 Medium Priority" => Color.green,
-                "🔵 Low Priority" => Color.blue,
-                _ => Color.gray
-            };
-        }
+			// Background panel
+			GUI.Box(_overlayRect, "", EditorStyles.helpBox);
 
-        Color GetPriorityColor(TaskPriority priority)
-        {
-            return priority switch
-            {
-                TaskPriority.Critical => new Color(0.8f, 0.2f, 0.2f, 0.8f),
-                TaskPriority.High => new Color(0.8f, 0.6f, 0.2f, 0.8f),
-                TaskPriority.Medium => new Color(0.2f, 0.6f, 0.2f, 0.8f),
-                TaskPriority.Low => new Color(0.2f, 0.4f, 0.8f, 0.8f),
-                _ => new Color(0.5f, 0.5f, 0.5f, 0.8f)
-            };
-        }
+			// Make panel draggable
+			this.HandlePanelDragging();
 
-        public override void Dispose()
-        {
-            EditorApplication.update -= UpdatePlayhead;
-            base.Dispose();
-        }
-    }
+			// 🎯 CRITICAL FIX: Ensure proper GUI event handling
+			Event currentEvent = Event.current;
 
-    /// <summary>
-    /// 🎯 Task parsing engine for TODO comments and planning annotations
-    /// </summary>
-    public class TaskParser
-    {
-        private static readonly Regex TodoPattern = new(@"(?://|/\*|\#)\s*(?:TODO|FIXME|HACK|NOTE|BUG|OPTIMIZE|REFACTOR|@\w+)\s*:?\s*(.+?)(?:\*/|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex EstimatePattern = new(@"\b(\d+(?:\.\d+)?)\s*(?:h|hr|hrs|hour|hours|min|mins|minutes?|d|day|days)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex PriorityPattern = new(@"\b(critical|urgent|high|medium|low|p[0-4])\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+			// Draw timer content inside the panel with proper event scope
+			GUILayout.BeginArea(new Rect(_overlayRect.x + 5, _overlayRect.y + 5,
+									   _overlayRect.width - 10, _overlayRect.height - 10));
 
-        public List<TaskNode> ParseProjectTasks()
-        {
-            var tasks = new List<TaskNode>();
-            string[] codeFiles = System.IO.Directory.GetFiles(UnityEngine.Application.dataPath, "*.*", System.IO.SearchOption.AllDirectories)
-                .Where(f => IsCodeFile(f)).ToArray();
+			try
+				{
+				this.DrawSceneViewTimerContent();
+				}
+			catch (System.Exception ex)
+				{
+				// Prevent scene view from breaking on GUI errors
+				Debug.LogError($"Scene view timer error: {ex.Message}");
+				}
 
-            foreach (string file in codeFiles)
-            {
-                try
-                {
-                    string content = System.IO.File.ReadAllText(file);
-                    tasks.AddRange(ParseFileForTasks(file, content));
-                }
-                catch (System.Exception ex)
-                {
-                    UnityEngine.Debug.LogWarning($"Failed to parse file {file}: {ex.Message}");
-                }
-            }
+			GUILayout.EndArea();
 
-            return tasks;
-        }
+			Handles.EndGUI();
 
-        List<TaskNode> ParseFileForTasks(string filePath, string content)
-        {
-            var tasks = new List<TaskNode>();
-            string[] lines = content.Split('\n');
+			// Force repaint if timer is running for live updates
+			if (this._isTimerRunning)
+				{
+				sceneView.Repaint();
+				}
+			}
 
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string line = lines[i];
-                var match = TodoPattern.Match(line);
-                
-                if (match.Success)
-                {
-                    var task = new TaskNode
-                    {
-                        Id = $"{filePath}:{i + 1}",
-                        Title = match.Groups[1].Value.Trim(),
-                        FilePath = filePath,
-                        LineNumber = i + 1,
-                        Source = TaskSource.CodeComment,
-                        Priority = ExtractPriority(line),
-                        EstimatedDuration = ExtractEstimate(line),
-                        StartTime = tasks.Count * 0.5f // Stagger by 30 minutes
-                    };
-                    
-                    tasks.Add(task);
-                }
-            }
+		private void DrawSceneViewTimerContent ()
+			{
+			// 🎯 CRITICAL: Force immediate layout to prevent GUI ID conflicts
+			if (Event.current.type == EventType.Layout)
+				{
+				GUIUtility.GetControlID(FocusType.Passive);
+				}
 
-            return tasks;
-        }
+			// Header with timer display
+			using (new GUILayout.HorizontalScope())
+				{
+				string timerText = this.FormatCurrentTime();
+				GUIStyle timerStyle = new(EditorStyles.boldLabel)
+					{
+					normal = { textColor = this._isTimerRunning ? Color.green : Color.gray },
+					fontSize = 14
+					};
 
-        bool IsCodeFile(string filePath)
-        {
-            string ext = System.IO.Path.GetExtension(filePath).ToLower();
-            return ext == ".cs" || ext == ".js" || ext == ".ts" || ext == ".cpp" || ext == ".h" || 
-                   ext == ".py" || ext == ".md" || ext == ".yaml" || ext == ".yml";
-        }
+				GUILayout.Label($"⏰ {timerText}", timerStyle);
 
-        TaskPriority ExtractPriority(string text)
-        {
-            var match = PriorityPattern.Match(text);
-            if (!match.Success) return TaskPriority.Medium;
+				GUILayout.FlexibleSpace();
 
-            string priority = match.Groups[1].Value.ToLower();
-            return priority switch
-            {
-                "critical" or "urgent" or "p0" => TaskPriority.Critical,
-                "high" or "p1" => TaskPriority.High,
-                "medium" or "p2" => TaskPriority.Medium,
-                "low" or "p3" or "p4" => TaskPriority.Low,
-                _ => TaskPriority.Medium
-            };
-        }
+				// Toggle overlay visibility with proper event handling
+				if (GUILayout.Button("×", EditorStyles.miniButton, GUILayout.Width(20)))
+					{
+					_sceneViewOverlayEnabled = false;
+					Event.current.Use(); // Consume the event
+					SceneView.RepaintAll();
+					}
+				}
 
-        float ExtractEstimate(string text)
-        {
-            var match = EstimatePattern.Match(text);
-            if (!match.Success) return 1.0f;
+			// Current task display
+			if (this._isTimerRunning && this._activeTimeCard != null)
+				{
+				TaskData task = this._activeTimeCard.GetTask();
+				string taskDisplay = task != null ? task.TaskName : "Unnamed Task";
+				GUILayout.Label($"📋 {taskDisplay}", EditorStyles.miniLabel);
+				}
 
-            if (float.TryParse(match.Groups[1].Value, out float value))
-            {
-                string unit = match.Value.ToLower();
-                if (unit.Contains("min"))
-                    return value / 60f; // Convert minutes to hours
-                if (unit.Contains("d"))
-                    return value * 8f; // Convert days to hours (8h workday)
-                return value; // Already in hours
-            }
+			// Task selection dropdown with proper event handling
+			GUILayout.Space(2);
+			EditorGUI.BeginChangeCheck();
+			int newTaskIndex = EditorGUILayout.Popup(this._selectedTaskIndex, this._availableTasks.ToArray(), EditorStyles.popup);
+			if (EditorGUI.EndChangeCheck())
+				{
+				this._selectedTaskIndex = newTaskIndex;
+				this._showCustomTask = (this._availableTasks [ this._selectedTaskIndex ] == "🎯 Custom Task...");
+				Event.current.Use(); // Consume the event
+				SceneView.RepaintAll();
+				}
 
-            return 1.0f;
-        }
-    }
+			// Custom task field with proper event handling
+			if (this._showCustomTask)
+				{
+				EditorGUI.BeginChangeCheck();
+				string newCustomTaskName = EditorGUILayout.TextField(this._customTaskName, EditorStyles.textField);
+				if (EditorGUI.EndChangeCheck())
+					{
+					this._customTaskName = newCustomTaskName;
+					Event.current.Use(); // Consume the event
+					}
+				}
 
-    /// <summary>
-    /// 🎯 Task node data structure for timeline representation
-    /// </summary>
-    [System.Serializable]
-    public class TaskNode
-    {
-        public string Id;
-        public string Title;
-        public string Description;
-        public TaskPriority Priority = TaskPriority.Medium;
-        public TaskSource Source = TaskSource.Manual;
-        public float StartTime; // Timeline position in hours
-        public float EstimatedDuration = 1.0f; // Hours
-        public float ActualDuration = 0f; // Tracked time
-        public bool IsCompleted = false;
-        public bool IsLinkedToTimer = false;
-        public bool HasTriggered = false; // For timeline playback
-        
-        // Source tracking
-        public string FilePath;
-        public int LineNumber;
-        
-        // Dependencies (for future Gantt chart features)
-        public List<string> Dependencies = new();
-        public List<string> Blockers = new();
-    }
+			GUILayout.Space(3);
 
-    public enum TaskPriority
-    {
-        Critical,
-        High, 
-        Medium,
-        Low,
-        Backlog
-    }
+			// Clock In/Out controls with proper event handling
+			using (new GUILayout.HorizontalScope())
+				{
+				string buttonText = this._isTimerRunning ? "⏸️ Clock Out" : "▶️ Clock In";
+				Color buttonColor = this._isTimerRunning ? Color.red : Color.green;
 
-    public enum TaskSource
-    {
-        Manual,
-        CodeComment,
-        TLDLEntry,
-        GitIssue,
-        Imported
-    }
-}
+				Color originalColor = GUI.backgroundColor;
+				GUI.backgroundColor = buttonColor;
+
+				if (GUILayout.Button(buttonText, GUILayout.Height(25)))
+					{
+					try
+						{
+						if (this._isTimerRunning)
+							{
+							this.ClockOut();
+							}
+						else
+							{
+							this.ClockIn();
+							}
+						Event.current.Use(); // Consume the event
+						SceneView.RepaintAll();
+						}
+					catch (System.Exception ex)
+						{
+						Debug.LogError($"Timer button error: {ex.Message}");
+						}
+					}
+
+				GUI.backgroundColor = originalColor;
+
+				// Quick save button with proper event handling
+				using (new EditorGUI.DisabledScope(!this._isTimerRunning))
+					{
+					if (GUILayout.Button("💾", EditorStyles.miniButton, GUILayout.Width(25)))
+						{
+						try
+							{
+							this.SaveCurrentSession();
+							Event.current.Use(); // Consume the event
+							SceneView.RepaintAll();
+							}
+						catch (System.Exception ex)
+							{
+							Debug.LogError($"Save session error: {ex.Message}");
+							}
+						}
+					}
+
+				// Open TaskMaster panel button with proper event handling
+				if (GUILayout.Button("📊", EditorStyles.miniButton, GUILayout.Width(25)))
+					{
+					try
+						{
+						TLDLScribeWindow.ShowWindow();
+						// TODO: Switch to TaskMaster tab programmatically
+						Event.current.Use(); // Consume the event
+						}
+					catch (System.Exception ex)
+						{
+						Debug.LogError($"Open window error: {ex.Message}");
+						}
+					}
+				}
+			}
+
+		private void HandlePanelDragging ()
+			{
+			Event e = Event.current;
+
+			if (e.type == EventType.MouseDown && _overlayRect.Contains(e.mousePosition))
+				{
+				_isDragging = true;
+				_dragOffset = e.mousePosition - new Vector2(_overlayRect.x, _overlayRect.y);
+				e.Use();
+				}
+			else if (e.type == EventType.MouseDrag && _isDragging)
+				{
+				_overlayRect.position = e.mousePosition - _dragOffset;
+				e.Use();
+				}
+			else if (e.type == EventType.MouseUp)
+				{
+				_isDragging = false;
+				}
+			}
+
+		// 🎯 SCRIBE WINDOW: Time-card management panel only
+		public void DrawPanel ()
+			{
+			// If module is disabled, take ZERO space in the GUI
+			if (!_moduleEnabled)
+				{
+				return; // Component is "off" - no GUI space consumed
+				}
+
+			this.DrawPanel(new Rect(0, 0, 300, 400)); // Default size
+			}
+
+		public void DrawPanel (Rect rect)
+			{
+			// If module is disabled, take ZERO space in the GUI
+			if (!_moduleEnabled)
+				{
+				return; // Component is "off" - no GUI space consumed
+				}
+
+			// Show error state if initialization failed
+			if (_initializationError)
+				{
+				using (new GUI.GroupScope(rect))
+					{
+					EditorGUILayout.HelpBox($"⚠️ TaskMaster Error: {_lastError}", MessageType.Error);
+					if (GUILayout.Button("🔄 Retry Initialization"))
+						{
+						this.Initialize(); // Attempt to reinitialize
+						}
+					}
+				return;
+				}
+
+			// 🎯 FIXED: Use proper scroll view within allocated rect to prevent squishing
+			using (new EditorGUILayout.VerticalScope())
+				{
+				// Allocate the full rect height for content
+				Rect contentRect = EditorGUILayout.GetControlRect(false, rect.height, GUILayout.ExpandHeight(true));
+
+				// Create a scroll view within the allocated space
+				using var scrollScope = new EditorGUILayout.ScrollViewScope(Vector2.zero, GUILayout.Height(rect.height));
+				this.DrawPanelContent();
+				}
+			}
+
+		private void DrawPanelContent ()
+			{
+			// Module enable/disable toggle at the top
+			using (new EditorGUILayout.HorizontalScope())
+				{
+				EditorGUILayout.LabelField("⏰ TaskMaster", EditorStyles.boldLabel);
+
+				GUILayout.FlexibleSpace();
+
+				bool newModuleEnabled = EditorGUILayout.Toggle("Module Enabled:", _moduleEnabled);
+				if (newModuleEnabled != _moduleEnabled)
+					{
+					_moduleEnabled = newModuleEnabled;
+					if (!_moduleEnabled)
+						{
+						this.SetStatus("⏰ TaskMaster module disabled (taking zero GUI space)");
+						}
+					else
+						{
+						this.SetStatus("⏰ TaskMaster module enabled");
+						}
+					}
+				}
+
+			// Only show full content if module is enabled
+			if (!_moduleEnabled)
+				{
+				EditorGUILayout.HelpBox("TaskMaster module is disabled. Scene view timer still works independently.", MessageType.Info);
+				return;
+				}
+
+			EditorGUILayout.LabelField("Time-Card Management", EditorStyles.boldLabel);
+
+			// Scene view overlay toggle (independent of module state)
+			using (new EditorGUILayout.HorizontalScope())
+				{
+				bool newOverlayEnabled = EditorGUILayout.Toggle("Scene View Timer:", _sceneViewOverlayEnabled);
+				if (newOverlayEnabled != _sceneViewOverlayEnabled)
+					{
+					_sceneViewOverlayEnabled = newOverlayEnabled;
+					SceneView.RepaintAll();
+					}
+
+				if (GUILayout.Button("Reset Position", GUILayout.Width(100)))
+					{
+					_overlayRect = new Rect(10, 10, 300, 120);
+					SceneView.RepaintAll();
+					}
+				}
+
+			EditorGUILayout.Space();
+
+			// Current session info (read-only display)
+			using (new EditorGUILayout.VerticalScope("box"))
+				{
+				EditorGUILayout.LabelField("Current Session", EditorStyles.boldLabel);
+
+				if (this._isTimerRunning && this._activeTimeCard != null)
+					{
+					TaskData task = this._activeTimeCard.GetTask();
+					string taskName = task != null ? task.TaskName : "Unnamed Task";
+					EditorGUILayout.LabelField($"Task: {taskName}");
+					EditorGUILayout.LabelField($"Time: {this.FormatCurrentTime()}");
+					EditorGUILayout.LabelField($"Started: {this._activeTimeCard.GetStartTime():HH:mm:ss}");
+					}
+				else
+					{
+					EditorGUILayout.LabelField("No active session");
+					}
+				}
+
+			EditorGUILayout.Space();
+
+			// Time-card management
+			this.DrawTimeCardManagement();
+			}
+
+		private void DrawTimeCardManagement ()
+			{
+			EditorGUILayout.LabelField("📊 Time-Card Management", EditorStyles.boldLabel);
+
+			// Time-card list
+			if (this._allTimeCards.Count > 0)
+				{
+				using var scroll = new EditorGUILayout.ScrollViewScope(Vector2.zero, GUILayout.Height(150));
+				foreach (TimeCardData timeCard in this._allTimeCards.OrderByDescending(tc => tc.GetLastModified()))
+					{
+					this.DrawTimeCardEntry(timeCard);
+					}
+				}
+			else
+				{
+				EditorGUILayout.HelpBox("No time-cards found. Use the scene view timer to create your first time-card!", MessageType.Info);
+				}
+
+			EditorGUILayout.Space();
+
+			// Management buttons
+			using (new EditorGUILayout.HorizontalScope())
+				{
+				if (GUILayout.Button("🔄 Refresh Time-Cards"))
+					{
+					this.LoadTimeCards();
+					}
+
+				if (GUILayout.Button("📂 Open Time-Card Folder"))
+					{
+					EditorUtility.RevealInFinder(this._timeCardDirectory);
+					}
+
+				if (GUILayout.Button("📋 Import to TLDL"))
+					{
+					this.ShowTimeCardImportDialog();
+					}
+				}
+			}
+
+		private void ClockIn ()
+			{
+			string taskName = this.GetCurrentTaskName();
+			if (string.IsNullOrEmpty(taskName))
+				{
+				EditorUtility.DisplayDialog("No Task Selected", "Please select or enter a task name before clocking in.", "OK");
+				return;
+				}
+
+			// Create or resume time-card
+			this._activeTimeCard = this.GetOrCreateTimeCard(taskName);
+			this._isTimerRunning = true;
+			this._sessionStartTime = EditorApplication.timeSinceStartup;
+			this._accumulatedTime = 0.0;
+
+			// Create TaskData for this session
+			var taskData = TaskData.CreateTask(taskName, $"Work session on {taskName}", "@copilot", 1);
+
+			// Start the time-card with proper API
+			this._activeTimeCard.StartTimeCard(taskData);
+			EditorUtility.SetDirty(this._activeTimeCard);
+
+			this.SetStatus($"⏰ Clocked in: {taskName}");
+			SceneView.RepaintAll(); // Update scene view overlay
+			}
+
+		private void ClockOut ()
+			{
+			if (this._activeTimeCard == null) return;
+
+			// Calculate final session time
+			this.UpdateAccumulatedTime();
+
+			// End the time-card session properly
+			this._activeTimeCard.EndTimeCard();
+			EditorUtility.SetDirty(this._activeTimeCard);
+			AssetDatabase.SaveAssets();
+
+			TaskData task = this._activeTimeCard.GetTask();
+			string taskName = task != null ? task.TaskName : "Unknown Task";
+
+			this.SetStatus($"⏰ Clocked out: {this.FormatDuration(this._accumulatedTime)} on {taskName}");
+
+			this._isTimerRunning = false;
+			this._activeTimeCard = null;
+			SceneView.RepaintAll(); // Update scene view overlay
+			}
+
+		private void SaveCurrentSession ()
+			{
+			if (this._activeTimeCard == null || !this._isTimerRunning) return;
+
+			this.UpdateAccumulatedTime();
+
+			// For now, we'll end the current session and start a new one
+			// This preserves the session as a complete record
+			this._activeTimeCard.EndTimeCard();
+
+			// Create a new session for continued work
+			TaskData task = this._activeTimeCard.GetTask();
+			if (task != null)
+				{
+				var newTaskData = TaskData.CreateTask(task.TaskName, $"Continued work on {task.TaskName}", "@copilot", 1);
+				this._activeTimeCard.StartTimeCard(newTaskData);
+				}
+
+			EditorUtility.SetDirty(this._activeTimeCard);
+			AssetDatabase.SaveAssets();
+
+			// Reset for new session
+			this._sessionStartTime = EditorApplication.timeSinceStartup;
+			this._accumulatedTime = 0.0;
+
+			string taskName = task != null ? task.TaskName : "Unknown Task";
+			this.SetStatus($"💾 Session saved: {taskName}");
+			}
+
+		private void OnEditorUpdate ()
+			{
+			// Background timer update - runs regardless of window focus
+			if (this._isTimerRunning && this._activeTimeCard != null)
+				{
+				this.UpdateAccumulatedTime();
+
+				// Periodic save every 5 minutes for safety
+				if (this._accumulatedTime > 0 && (this._accumulatedTime % 300) < 1.0) // Every 5 minutes
+					{
+					EditorUtility.SetDirty(this._activeTimeCard);
+					}
+
+				// Repaint scene views to update timer display
+				SceneView.RepaintAll();
+				}
+			}
+
+		private void UpdateAccumulatedTime ()
+			{
+			if (this._isTimerRunning)
+				{
+				double currentTime = EditorApplication.timeSinceStartup;
+				double sessionTime = currentTime - this._sessionStartTime;
+				this._accumulatedTime += sessionTime;
+				this._sessionStartTime = currentTime;
+				}
+			}
+
+		private string GetCurrentTaskName ()
+			{
+			return this._showCustomTask
+				? string.IsNullOrEmpty(this._customTaskName) ? "" : this._customTaskName
+				: this._availableTasks [ this._selectedTaskIndex ];
+			}
+
+		private TimeCardData GetOrCreateTimeCard (string taskName)
+			{
+			// Look for existing time-card with matching task name
+			TimeCardData existing = this._allTimeCards.FirstOrDefault(tc =>
+			{
+				TaskData task = tc.GetTask();
+				return task != null && task.TaskName == taskName;
+			});
+
+			if (existing != null)
+				{
+				return existing;
+				}
+
+			// Create new time-card ScriptableObject
+			TimeCardData timeCard = ScriptableObject.CreateInstance<TimeCardData>();
+
+			string fileName = $"TimeCard_{this.SanitizeFileName(taskName)}_{System.DateTime.Now:yyyyMMdd_HHmmss}.asset";
+			string assetPath = System.IO.Path.Combine(this._timeCardDirectory, fileName);
+
+			AssetDatabase.CreateAsset(timeCard, assetPath);
+			AssetDatabase.SaveAssets();
+			AssetDatabase.Refresh();
+
+			this._allTimeCards.Add(timeCard);
+			return timeCard;
+			}
+
+		private void LoadTimeCards ()
+			{
+			this._allTimeCards.Clear();
+
+			if (!System.IO.Directory.Exists(this._timeCardDirectory)) return;
+
+			string [ ] guids = AssetDatabase.FindAssets("t:TimeCardData", new [ ] { this._timeCardDirectory });
+			foreach (string guid in guids)
+				{
+				string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+				TimeCardData timeCard = AssetDatabase.LoadAssetAtPath<TimeCardData>(assetPath);
+				if (timeCard != null)
+					{
+					this._allTimeCards.Add(timeCard);
+					}
+				}
+			}
+
+		private void RestoreActiveTimerState ()
+			{
+			// Look for active time-card using proper getter
+			TimeCardData activeCard = this._allTimeCards.FirstOrDefault(tc => tc.GetIsOngoing());
+			if (activeCard != null)
+				{
+				this._activeTimeCard = activeCard;
+				this._isTimerRunning = true;
+				this._sessionStartTime = EditorApplication.timeSinceStartup; // Reset to current time
+				this._accumulatedTime = 0.0; // Start fresh session
+
+				TaskData task = activeCard.GetTask();
+				string taskName = task != null ? task.TaskName : "Unknown Task";
+				this.SetStatus($"⏰ Restored active timer: {taskName}");
+				}
+			}
+
+		private void DrawTimeCardEntry (TimeCardData timeCard)
+			{
+			using (new EditorGUILayout.HorizontalScope("box"))
+				{
+				// Time-card info using proper getters
+				TaskData task = timeCard.GetTask();
+				string taskName = task != null ? task.TaskName : "Unknown Task";
+
+				EditorGUILayout.LabelField($"📋 {taskName}", EditorStyles.boldLabel, GUILayout.Width(150));
+				EditorGUILayout.LabelField($"⏱️ {timeCard.GetDurationInHours():F2}h", GUILayout.Width(80));
+				EditorGUILayout.LabelField($"📅 {timeCard.GetLastModified():MM/dd HH:mm}", EditorStyles.miniLabel, GUILayout.Width(80));
+
+				GUILayout.FlexibleSpace();
+
+				// Actions
+				if (GUILayout.Button("👁️", EditorStyles.miniButton, GUILayout.Width(25)))
+					{
+					Selection.activeObject = timeCard;
+					EditorGUIUtility.PingObject(timeCard);
+					}
+
+				if (GUILayout.Button("📝", EditorStyles.miniButton, GUILayout.Width(25)))
+					{
+					this.ImportTimeCardToTLDL(timeCard);
+					}
+
+				if (GUILayout.Button("🗑️", EditorStyles.miniButton, GUILayout.Width(25)))
+					{
+					if (EditorUtility.DisplayDialog("Delete Time-Card",
+						$"Delete time-card for '{taskName}'?", "Delete", "Cancel"))
+						{
+						this.DeleteTimeCard(timeCard);
+						}
+					}
+				}
+			}
+
+		private void ImportTimeCardToTLDL (TimeCardData timeCard)
+			{
+			TaskData task = timeCard.GetTask();
+			string taskName = task != null ? task.TaskName : "Unknown Task";
+
+			// Add time summary to TLDL using report data
+			string timeSummary = $"\n**Time Tracking - {taskName}:**\n";
+			timeSummary += $"- Total Duration: {timeCard.GetDurationInHours():F2} hours\n";
+			timeSummary += $"- Sessions: {timeCard.GetSessionCount()}\n";
+
+			// Add detailed report if available
+			string reportData = timeCard.GetReportData();
+			if (!string.IsNullOrEmpty(reportData))
+				{
+				timeSummary += $"- Details:\n{reportData}\n";
+				}
+
+			this._data.TechnicalDetails += timeSummary;
+			this._data.IncludeTechnicalDetails = true;
+
+			this.SetStatus($"📝 Imported time-card to TLDL: {taskName}");
+			}
+
+		private void ShowTimeCardImportDialog ()
+			{
+			if (this._allTimeCards.Count == 0)
+				{
+				EditorUtility.DisplayDialog("No Time-Cards", "No time-cards available to import.", "OK");
+				return;
+				}
+
+			var menu = new GenericMenu();
+			foreach (TimeCardData timeCard in this._allTimeCards)
+				{
+				TaskData task = timeCard.GetTask();
+				string taskName = task != null ? task.TaskName : "Unknown Task";
+				string duration = $"{timeCard.GetDurationInHours():F2}h";
+
+				menu.AddItem(new GUIContent($"{taskName} ({duration})"),
+						   false, () => this.ImportTimeCardToTLDL(timeCard));
+				}
+			menu.ShowAsContext();
+			}
+
+		private void DeleteTimeCard (TimeCardData timeCard)
+			{
+			this._allTimeCards.Remove(timeCard);
+			string assetPath = AssetDatabase.GetAssetPath(timeCard);
+			AssetDatabase.DeleteAsset(assetPath);
+			AssetDatabase.Refresh();
+
+			TaskData task = timeCard.GetTask();
+			string taskName = task != null ? task.TaskName : "Unknown Task";
+			this.SetStatus($"🗑️ Deleted time-card: {taskName}");
+			}
+
+		private string FormatCurrentTime ()
+			{
+			if (this._isTimerRunning)
+				{
+				this.UpdateAccumulatedTime();
+				return this.FormatDuration(this._accumulatedTime);
+				}
+			else
+				{
+				return "00:00:00";
+				}
+			}
+
+		private string FormatDuration (double seconds)
+			{
+			var timeSpan = System.TimeSpan.FromSeconds(seconds);
+			return $"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
+			}
+
+		private string SanitizeFileName (string fileName)
+			{
+			char [ ] invalids = System.IO.Path.GetInvalidFileNameChars();
+			return string.Join("_", fileName.Split(invalids, System.StringSplitOptions.RemoveEmptyEntries));
+			}
+		}
 #endif
+	}

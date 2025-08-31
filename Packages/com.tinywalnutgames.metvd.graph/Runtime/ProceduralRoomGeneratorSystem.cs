@@ -194,8 +194,8 @@ namespace TinyWalnutGames.MetVD.Graph
             int2 baseMaxSize = new(bounds.width, bounds.height);
 
             // Apply biome size modifier while respecting minimums
-            int2 minSize = (int2)math.max((float2)baseMinSize, (float2)baseMinSize * biomeSizeModifier);
-            int2 maxSize = (int2)math.max((float2)minSize, (float2)baseMaxSize * biomeSizeModifier);
+            var minSize = (int2)math.max((float2)baseMinSize, (float2)baseMinSize * biomeSizeModifier);
+            var maxSize = (int2)math.max((float2)minSize, (float2)baseMaxSize * biomeSizeModifier);
             MovementCapabilityTags movementTags = GenerateMovementCapabilities(generatorType, hierarchy.Type, ref random);
             float secretPercent = hierarchy.Type switch
             {

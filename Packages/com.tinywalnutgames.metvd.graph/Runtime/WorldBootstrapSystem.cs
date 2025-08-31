@@ -1,438 +1,435 @@
-using System;
+using TinyWalnutGames.MetVD.Biome;
+using TinyWalnutGames.MetVD.Core;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using Unity.Transforms;
-using TinyWalnutGames.MetVD.Core;
-using TinyWalnutGames.MetVD.Graph;
-using TinyWalnutGames.MetVD.Biome;
 
 namespace TinyWalnutGames.MetVD.Graph
-{
-    /// <summary>
-    /// System that handles the complete procedural bootstrap of the world hierarchy.
-    /// Generates Biomes → Districts → Sectors → Rooms from a single bootstrap configuration.
-    /// Runs before the existing DistrictLayoutSystem to provide districts to place.
-    /// </summary>
-    [BurstCompile]
-    [UpdateInGroup(typeof(InitializationSystemGroup))]
-    [UpdateBefore(typeof(DistrictLayoutSystem))]
-    public partial struct WorldBootstrapSystem : ISystem
-    {
-        private EntityQuery _bootstrapQuery;
-        private EntityQuery _inProgressQuery;
-        private EntityQuery _completeQuery;
+	{
+	/// <summary>
+	/// System that handles the complete procedural bootstrap of the world hierarchy.
+	/// Generates Biomes → Districts → Sectors → Rooms from a single bootstrap configuration.
+	/// Runs before the existing DistrictLayoutSystem to provide districts to place.
+	/// </summary>
+	[BurstCompile]
+	[UpdateInGroup(typeof(InitializationSystemGroup))]
+	[UpdateBefore(typeof(DistrictLayoutSystem))]
+	public partial struct WorldBootstrapSystem : ISystem
+		{
+		private EntityQuery _bootstrapQuery;
+		private EntityQuery _inProgressQuery;
+		private EntityQuery _completeQuery;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
-        {
-            _bootstrapQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<WorldBootstrapConfiguration>()
-                .WithNone<WorldBootstrapInProgressTag, WorldBootstrapCompleteTag>()
-                .Build(ref state);
-                
-            _inProgressQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<WorldBootstrapConfiguration, WorldBootstrapInProgressTag>()
-                .Build(ref state);
-                
-            _completeQuery = new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<WorldBootstrapCompleteTag>()
-                .Build(ref state);
+		[BurstCompile]
+		public void OnCreate (ref SystemState state)
+			{
+			this._bootstrapQuery = new EntityQueryBuilder(Allocator.Temp)
+				.WithAll<WorldBootstrapConfiguration>()
+				.WithNone<WorldBootstrapInProgressTag, WorldBootstrapCompleteTag>()
+				.Build(ref state);
 
-            state.RequireForUpdate(_bootstrapQuery);
-        }
+			this._inProgressQuery = new EntityQueryBuilder(Allocator.Temp)
+				.WithAll<WorldBootstrapConfiguration, WorldBootstrapInProgressTag>()
+				.Build(ref state);
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
-        {
-            // Skip if bootstrap is already complete
-            if (!_completeQuery.IsEmptyIgnoreFilter)
-            {
-                return;
-            }
+			this._completeQuery = new EntityQueryBuilder(Allocator.Temp)
+				.WithAll<WorldBootstrapCompleteTag>()
+				.Build(ref state);
 
-            // Skip if bootstrap is already in progress
-            if (!_inProgressQuery.IsEmptyIgnoreFilter)
-            {
-                return;
-            }
+			state.RequireForUpdate(this._bootstrapQuery);
+			}
 
-            // Get the bootstrap configuration
-            Entity bootstrapEntity = _bootstrapQuery.GetSingletonEntity();
-            WorldBootstrapConfiguration config = _bootstrapQuery.GetSingleton<WorldBootstrapConfiguration>();
+		[BurstCompile]
+		public void OnUpdate (ref SystemState state)
+			{
+			// Skip if bootstrap is already complete
+			if (!this._completeQuery.IsEmptyIgnoreFilter)
+				{
+				return;
+				}
 
-            // Mark bootstrap as in progress
-            state.EntityManager.AddComponentData(bootstrapEntity, new WorldBootstrapInProgressTag());
+			// Skip if bootstrap is already in progress
+			if (!this._inProgressQuery.IsEmptyIgnoreFilter)
+				{
+				return;
+				}
 
-            // Generate the world hierarchy
-            GenerateWorldHierarchy(ref state, config);
+			// Get the bootstrap configuration
+			Entity bootstrapEntity = this._bootstrapQuery.GetSingletonEntity();
+			WorldBootstrapConfiguration config = this._bootstrapQuery.GetSingleton<WorldBootstrapConfiguration>();
 
-            // Mark bootstrap as complete
-            state.EntityManager.RemoveComponent<WorldBootstrapInProgressTag>(bootstrapEntity);
-            var completeTag = new WorldBootstrapCompleteTag(
-                CalculateGeneratedBiomes(config),
-                CalculateGeneratedDistricts(config),
-                CalculateGeneratedSectors(config),
-                CalculateGeneratedRooms(config)
-            );
-            state.EntityManager.AddComponentData(bootstrapEntity, completeTag);
+			// Mark bootstrap as in progress
+			state.EntityManager.AddComponentData(bootstrapEntity, new WorldBootstrapInProgressTag());
 
-//#if UNITY_EDITOR || DEVELOPMENT_BUILD
-//            if (config.LogGenerationSteps)
-//            {
-//                // UnityEngine.Debug.Log($"🚀 WorldBootstrap: Generated {completeTag.DistrictsGenerated} districts, " +
-//                //                     $"{completeTag.SectorsGenerated} sectors, {completeTag.RoomsGenerated} rooms"); // REMOVED: Debug.Log not allowed in Burst jobs
-//                // Bootstrap metrics: districts, sectors, rooms available for inspection
-//            }
-//#endif
-        }
+			// Generate the world hierarchy
+			GenerateWorldHierarchy(ref state, config);
 
-        private static void GenerateWorldHierarchy(ref SystemState state, WorldBootstrapConfiguration config)
-        {
-            // Use seed or generate random one
-            uint actualSeed = config.Seed == 0 ? (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000 + 1) : (uint)config.Seed;
-            var random = new Unity.Mathematics.Random(actualSeed);
+			// Mark bootstrap as complete
+			state.EntityManager.RemoveComponent<WorldBootstrapInProgressTag>(bootstrapEntity);
+			var completeTag = new WorldBootstrapCompleteTag(
+				CalculateGeneratedBiomes(config),
+				CalculateGeneratedDistricts(config),
+				CalculateGeneratedSectors(config),
+				CalculateGeneratedRooms(config)
+			);
+			state.EntityManager.AddComponentData(bootstrapEntity, completeTag);
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (config.LogGenerationSteps)
-            {
-                // UnityEngine.Debug.Log($"🌍 WorldBootstrap: Starting generation with seed {actualSeed}"); // REMOVED: Debug.Log not allowed in Burst jobs
-                // Generation seed: actualSeed available for inspection
-            }
-#endif
+			//#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			//            if (config.LogGenerationSteps)
+			//            {
+			//                // UnityEngine.Debug.Log($"🚀 WorldBootstrap: Generated {completeTag.DistrictsGenerated} districts, " +
+			//                //                     $"{completeTag.SectorsGenerated} sectors, {completeTag.RoomsGenerated} rooms"); // REMOVED: Debug.Log not allowed in Burst jobs
+			//                // Bootstrap metrics: districts, sectors, rooms available for inspection
+			//            }
+			//#endif
+			}
 
-            // Step 1: Generate biome fields
-            GenerateBiomeFields(ref state, config, ref random);
-
-            // Step 2: Generate districts
-            GenerateDistricts(ref state, config, ref random);
-
-            // Note: Sectors and Rooms will be generated by the existing SectorRoomHierarchySystem
-            // once the DistrictLayoutSystem places the districts we just created
-        }
-
-        private static void GenerateBiomeFields(ref SystemState state, WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
-        {
-            int biomeCount = random.NextInt(config.BiomeSettings.BiomeCountRange.x, config.BiomeSettings.BiomeCountRange.y + 1);
-            
-            var biomeTypes = new NativeArray<BiomeType>(biomeCount, Allocator.Temp);
-            var biomePositions = new NativeArray<float2>(biomeCount, Allocator.Temp);
-
-            try
-            {
-                // Generate diverse biome types
-                GenerateBiomeTypes(biomeTypes, ref random);
-                
-                // Generate biome positions using Poisson disc sampling
-                GenerateBiomePositions(biomePositions, config.WorldSize, ref random);
-
-                // Create biome field entities
-                for (int i = 0; i < biomeCount; i++)
-                {
-                    CreateBiomeFieldEntity(ref state, biomeTypes[i], biomePositions[i], config, ref random);
-                }
+		private static void GenerateWorldHierarchy (ref SystemState state, WorldBootstrapConfiguration config)
+			{
+			// Use seed or generate random one
+			uint actualSeed = config.Seed == 0 ? (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000 + 1) : (uint)config.Seed;
+			var random = new Random(actualSeed);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                if (config.LogGenerationSteps)
-                {
-                    // UnityEngine.Debug.Log($"🌿 WorldBootstrap: Generated {biomeCount} biome fields"); // REMOVED: Debug.Log not allowed in Burst jobs
-                    // Biome field count: biomeCount available for inspection
-                }
+			if (config.LogGenerationSteps)
+				{
+				// UnityEngine.Debug.Log($"🌍 WorldBootstrap: Starting generation with seed {actualSeed}"); // REMOVED: Debug.Log not allowed in Burst jobs
+				// Generation seed: actualSeed available for inspection
+				}
 #endif
-            }
-            finally
-            {
-                if (biomeTypes.IsCreated)
-                {
-                    biomeTypes.Dispose();
-                }
 
-                if (biomePositions.IsCreated)
-                {
-                    biomePositions.Dispose();
-                }
-            }
-        }
+			// Step 1: Generate biome fields
+			GenerateBiomeFields(ref state, config, ref random);
 
-        private static void GenerateDistricts(ref SystemState state, WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
-        {
-            int districtCount = random.NextInt(config.DistrictSettings.DistrictCountRange.x, config.DistrictSettings.DistrictCountRange.y + 1);
-            
-            // Create districts at (0,0) coordinates - DistrictLayoutSystem will place them procedurally
-            for (int i = 0; i < districtCount; i++)
-            {
-                CreateDistrictEntity(ref state, (uint)(i + 1), config, ref random);
-            }
+			// Step 2: Generate districts
+			GenerateDistricts(ref state, config, ref random);
+
+			// Note: Sectors and Rooms will be generated by the existing SectorRoomHierarchySystem
+			// once the DistrictLayoutSystem places the districts we just created
+			}
+
+		private static void GenerateBiomeFields (ref SystemState state, WorldBootstrapConfiguration config, ref Random random)
+			{
+			int biomeCount = random.NextInt(config.BiomeSettings.BiomeCountRange.x, config.BiomeSettings.BiomeCountRange.y + 1);
+
+			var biomeTypes = new NativeArray<BiomeType>(biomeCount, Allocator.Temp);
+			var biomePositions = new NativeArray<float2>(biomeCount, Allocator.Temp);
+
+			try
+				{
+				// Generate diverse biome types
+				GenerateBiomeTypes(biomeTypes, ref random);
+
+				// Generate biome positions using Poisson disc sampling
+				GenerateBiomePositions(biomePositions, config.WorldSize, ref random);
+
+				// Create biome field entities
+				for (int i = 0; i < biomeCount; i++)
+					{
+					CreateBiomeFieldEntity(ref state, biomeTypes [ i ], biomePositions [ i ], config, ref random);
+					}
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (config.LogGenerationSteps)
-            {
-                // UnityEngine.Debug.Log($"🏰 WorldBootstrap: Generated {districtCount} districts for procedural placement"); // REMOVED: Debug.Log not allowed in Burst jobs
-                // District count: districtCount available for inspection
-            }
+				if (config.LogGenerationSteps)
+					{
+					// UnityEngine.Debug.Log($"🌿 WorldBootstrap: Generated {biomeCount} biome fields"); // REMOVED: Debug.Log not allowed in Burst jobs
+					// Biome field count: biomeCount available for inspection
+					}
 #endif
-        }
+				}
+			finally
+				{
+				if (biomeTypes.IsCreated)
+					{
+					biomeTypes.Dispose();
+					}
 
-        private static void GenerateBiomeTypes(NativeArray<BiomeType> biomeTypes, ref Unity.Mathematics.Random random)
-        {
-            // Available biome types (excluding Unknown)
-            var availableTypes = new NativeArray<BiomeType>(6, Allocator.Temp);
-            availableTypes[0] = BiomeType.SolarPlains;
-            availableTypes[1] = BiomeType.CrystalCaverns;
-            availableTypes[2] = BiomeType.ShadowRealms;
-            availableTypes[3] = BiomeType.VolcanicCore;
-            availableTypes[4] = BiomeType.FrozenWastes;
-            availableTypes[5] = BiomeType.HubArea;
+				if (biomePositions.IsCreated)
+					{
+					biomePositions.Dispose();
+					}
+				}
+			}
 
-            try
-            {
-                // Shuffle and select
-                for (int i = availableTypes.Length - 1; i > 0; i--)
-                {
-                    int j = random.NextInt(0, i + 1);
-                    (availableTypes[i], availableTypes[j]) = (availableTypes[j], availableTypes[i]);
-                }
+		private static void GenerateDistricts (ref SystemState state, WorldBootstrapConfiguration config, ref Random random)
+			{
+			int districtCount = random.NextInt(config.DistrictSettings.DistrictCountRange.x, config.DistrictSettings.DistrictCountRange.y + 1);
 
-                for (int i = 0; i < biomeTypes.Length; i++)
-                {
-                    biomeTypes[i] = availableTypes[i % availableTypes.Length];
-                }
-            }
-            finally
-            {
-                if (availableTypes.IsCreated)
-                {
-                    availableTypes.Dispose();
-                }
-            }
-        }
+			// Create districts at (0,0) coordinates - DistrictLayoutSystem will place them procedurally
+			for (int i = 0; i < districtCount; i++)
+				{
+				CreateDistrictEntity(ref state, (uint)(i + 1), config, ref random);
+				}
 
-        private static void GenerateBiomePositions(NativeArray<float2> positions, int2 worldSize, ref Unity.Mathematics.Random random)
-        {
-            float minDistance = math.min(worldSize.x, worldSize.y) * 0.3f;
-            int maxAttempts = 30;
-
-            for (int i = 0; i < positions.Length; i++)
-            {
-                bool validPosition = false;
-                int attempts = 0;
-
-                while (!validPosition && attempts < maxAttempts)
-                {
-                    float2 candidate = new(
-                        random.NextFloat(-worldSize.x * 0.4f, worldSize.x * 0.4f),
-                        random.NextFloat(-worldSize.y * 0.4f, worldSize.y * 0.4f)
-                    );
-
-                    validPosition = true;
-                    for (int j = 0; j < i; j++)
-                    {
-                        if (math.length(candidate - positions[j]) < minDistance)
-                        {
-                            validPosition = false;
-                            break;
-                        }
-                    }
-
-                    if (validPosition)
-                    {
-                        positions[i] = candidate;
-                    }
-
-                    attempts++;
-                }
-
-                if (!validPosition)
-                {
-                    // Fallback to random position
-                    positions[i] = new float2(
-                        random.NextFloat(-worldSize.x * 0.4f, worldSize.x * 0.4f),
-                        random.NextFloat(-worldSize.y * 0.4f, worldSize.y * 0.4f)
-                    );
-                }
-            }
-        }
-
-        private static void CreateBiomeFieldEntity(ref SystemState state, BiomeType biomeType, float2 position, 
-                                                 WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
-        {
-            Entity entity = state.EntityManager.CreateEntity();
-            
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            state.EntityManager.SetName(entity, $"BiomeField_{biomeType}_{position.x:g}_{position.y:g}");
+			if (config.LogGenerationSteps)
+				{
+				// UnityEngine.Debug.Log($"🏰 WorldBootstrap: Generated {districtCount} districts for procedural placement"); // REMOVED: Debug.Log not allowed in Burst jobs
+				// District count: districtCount available for inspection
+				}
 #endif
-            float strength = math.lerp(0.7f, 1.0f, config.BiomeSettings.BiomeWeight);
-            float gradient = random.NextFloat(0.3f, 0.8f);
-            BiomeType secondaryBiome = DetermineSecondaryBiome(biomeType, ref random);
-            state.EntityManager.AddComponentData(entity, new BiomeFieldData { PrimaryBiome = biomeType, SecondaryBiome = secondaryBiome, Strength = strength, Gradient = gradient });
-            (Polarity primaryPolarity, Polarity secondaryPolarity) = GetBiomePolarities(biomeType, secondaryBiome);
-            float difficultyModifier = CalculateBiomeDifficulty(biomeType, ref random);
-            state.EntityManager.AddComponentData(entity, new TinyWalnutGames.MetVD.Core.Biome(biomeType, primaryPolarity, strength, secondaryPolarity, difficultyModifier));
+			}
+
+		private static void GenerateBiomeTypes (NativeArray<BiomeType> biomeTypes, ref Random random)
+			{
+			// Available biome types (excluding Unknown)
+			var availableTypes = new NativeArray<BiomeType>(6, Allocator.Temp);
+			availableTypes [ 0 ] = BiomeType.SolarPlains;
+			availableTypes [ 1 ] = BiomeType.CrystalCaverns;
+			availableTypes [ 2 ] = BiomeType.ShadowRealms;
+			availableTypes [ 3 ] = BiomeType.VolcanicCore;
+			availableTypes [ 4 ] = BiomeType.FrozenWastes;
+			availableTypes [ 5 ] = BiomeType.HubArea;
+
+			try
+				{
+				// Shuffle and select
+				for (int i = availableTypes.Length - 1; i > 0; i--)
+					{
+					int j = random.NextInt(0, i + 1);
+					(availableTypes [ i ], availableTypes [ j ]) = (availableTypes [ j ], availableTypes [ i ]);
+					}
+
+				for (int i = 0; i < biomeTypes.Length; i++)
+					{
+					biomeTypes [ i ] = availableTypes [ i % availableTypes.Length ];
+					}
+				}
+			finally
+				{
+				if (availableTypes.IsCreated)
+					{
+					availableTypes.Dispose();
+					}
+				}
+			}
+
+		private static void GenerateBiomePositions (NativeArray<float2> positions, int2 worldSize, ref Random random)
+			{
+			float minDistance = math.min(worldSize.x, worldSize.y) * 0.3f;
+			int maxAttempts = 30;
+
+			for (int i = 0; i < positions.Length; i++)
+				{
+				bool validPosition = false;
+				int attempts = 0;
+
+				while (!validPosition && attempts < maxAttempts)
+					{
+					float2 candidate = new(
+						random.NextFloat(-worldSize.x * 0.4f, worldSize.x * 0.4f),
+						random.NextFloat(-worldSize.y * 0.4f, worldSize.y * 0.4f)
+					);
+
+					validPosition = true;
+					for (int j = 0; j < i; j++)
+						{
+						if (math.length(candidate - positions [ j ]) < minDistance)
+							{
+							validPosition = false;
+							break;
+							}
+						}
+
+					if (validPosition)
+						{
+						positions [ i ] = candidate;
+						}
+
+					attempts++;
+					}
+
+				if (!validPosition)
+					{
+					// Fallback to random position
+					positions [ i ] = new float2(
+						random.NextFloat(-worldSize.x * 0.4f, worldSize.x * 0.4f),
+						random.NextFloat(-worldSize.y * 0.4f, worldSize.y * 0.4f)
+					);
+					}
+				}
+			}
+
+		private static void CreateBiomeFieldEntity (ref SystemState state, BiomeType biomeType, float2 position,
+												 WorldBootstrapConfiguration config, ref Random random)
+			{
+			Entity entity = state.EntityManager.CreateEntity();
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+			state.EntityManager.SetName(entity, $"BiomeField_{biomeType}_{position.x:g}_{position.y:g}");
+#endif
+			float strength = math.lerp(0.7f, 1.0f, config.BiomeSettings.BiomeWeight);
+			float gradient = random.NextFloat(0.3f, 0.8f);
+			BiomeType secondaryBiome = DetermineSecondaryBiome(biomeType, ref random);
+			state.EntityManager.AddComponentData(entity, new BiomeFieldData { PrimaryBiome = biomeType, SecondaryBiome = secondaryBiome, Strength = strength, Gradient = gradient });
+			(Polarity primaryPolarity, Polarity secondaryPolarity) = GetBiomePolarities(biomeType, secondaryBiome);
+			float difficultyModifier = CalculateBiomeDifficulty(biomeType, ref random);
+			state.EntityManager.AddComponentData(entity, new Core.Biome(biomeType, primaryPolarity, strength, secondaryPolarity, difficultyModifier));
 #if UNITY_TRANSFORMS_LOCALTRANSFORM
             state.EntityManager.AddComponentData(entity, new LocalTransform { Position = new float3(position.x, 0, position.y), Rotation = quaternion.identity, Scale = CalculateBiomeInfluenceRadius(biomeType, config.WorldSize) });
 #endif
-            DynamicBuffer<BiomeInfluence> influenceBuffer = state.EntityManager.AddBuffer<BiomeInfluence>(entity);
-            PopulateBiomeInfluences(influenceBuffer, biomeType, secondaryBiome, strength, gradient);
+			DynamicBuffer<BiomeInfluence> influenceBuffer = state.EntityManager.AddBuffer<BiomeInfluence>(entity);
+			PopulateBiomeInfluences(influenceBuffer, biomeType, secondaryBiome, strength, gradient);
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (config.LogGenerationSteps)
-            {
-                // UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} (Strength: {strength:G}, Gradient: {gradient:G}, Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:G})"); // REMOVED: Debug.Log not allowed in Burst jobs
-                // Biome field creation: biomeType, position, strength, gradient, secondaryBiome, difficultyModifier available for inspection
-            }
+			if (config.LogGenerationSteps)
+				{
+				// UnityEngine.Debug.Log($"🌿 Created BiomeField: {biomeType} at {position} (Strength: {strength:G}, Gradient: {gradient:G}, Secondary: {secondaryBiome}, Difficulty: {difficultyModifier:G})"); // REMOVED: Debug.Log not allowed in Burst jobs
+				// Biome field creation: biomeType, position, strength, gradient, secondaryBiome, difficultyModifier available for inspection
+				}
 #endif
-        }
+			}
 
-        private static BiomeType DetermineSecondaryBiome(BiomeType primaryBiome, ref Unity.Mathematics.Random random)
-        {
-            // 30% chance of having a secondary biome for transition zones
-            if (random.NextFloat() > 0.3f)
-            {
-                return BiomeType.Unknown;
-            }
+		private static BiomeType DetermineSecondaryBiome (BiomeType primaryBiome, ref Random random)
+			{
+			// 30% chance of having a secondary biome for transition zones
+			if (random.NextFloat() > 0.3f)
+				{
+				return BiomeType.Unknown;
+				}
 
-            // Select compatible secondary biome based on primary
-            return primaryBiome switch
-            {
-                BiomeType.SolarPlains => random.NextBool() ? BiomeType.SkyGardens : BiomeType.HubArea,
-                BiomeType.CrystalCaverns => random.NextBool() ? BiomeType.FrozenWastes : BiomeType.AncientRuins,
-                BiomeType.ShadowRealms => random.NextBool() ? BiomeType.DeepUnderwater : BiomeType.VoidChambers,
-                BiomeType.VolcanicCore => random.NextBool() ? BiomeType.PowerPlant : BiomeType.PlasmaFields,
-                BiomeType.FrozenWastes => random.NextBool() ? BiomeType.IceCatacombs : BiomeType.CryogenicLabs,
-                BiomeType.HubArea => random.NextBool() ? BiomeType.TransitionZone : BiomeType.AncientRuins,
-                _ => BiomeType.TransitionZone
-            };
-        }
+			// Select compatible secondary biome based on primary
+			return primaryBiome switch
+				{
+					BiomeType.SolarPlains => random.NextBool() ? BiomeType.SkyGardens : BiomeType.HubArea,
+					BiomeType.CrystalCaverns => random.NextBool() ? BiomeType.FrozenWastes : BiomeType.AncientRuins,
+					BiomeType.ShadowRealms => random.NextBool() ? BiomeType.DeepUnderwater : BiomeType.VoidChambers,
+					BiomeType.VolcanicCore => random.NextBool() ? BiomeType.PowerPlant : BiomeType.PlasmaFields,
+					BiomeType.FrozenWastes => random.NextBool() ? BiomeType.IceCatacombs : BiomeType.CryogenicLabs,
+					BiomeType.HubArea => random.NextBool() ? BiomeType.TransitionZone : BiomeType.AncientRuins,
+					_ => BiomeType.TransitionZone
+					};
+			}
 
-        private static (Polarity primary, Polarity secondary) GetBiomePolarities(BiomeType primaryBiome, BiomeType secondaryBiome)
-        {
-            Polarity primary = primaryBiome switch
-            {
-                BiomeType.SolarPlains or BiomeType.SkyGardens => Polarity.Sun,
-                BiomeType.ShadowRealms or BiomeType.DeepUnderwater or BiomeType.VoidChambers => Polarity.Moon,
-                BiomeType.VolcanicCore or BiomeType.PowerPlant or BiomeType.PlasmaFields => Polarity.Heat,
-                BiomeType.FrozenWastes or BiomeType.IceCatacombs or BiomeType.CryogenicLabs or BiomeType.CrystalCaverns => Polarity.Cold,
-                BiomeType.HubArea or BiomeType.TransitionZone => Polarity.Any,
-                BiomeType.AncientRuins => Polarity.Earth | Polarity.Life,
-                _ => Polarity.None
-            };
+		private static (Polarity primary, Polarity secondary) GetBiomePolarities (BiomeType primaryBiome, BiomeType secondaryBiome)
+			{
+			Polarity primary = primaryBiome switch
+				{
+					BiomeType.SolarPlains or BiomeType.SkyGardens => Polarity.Sun,
+					BiomeType.ShadowRealms or BiomeType.DeepUnderwater or BiomeType.VoidChambers => Polarity.Moon,
+					BiomeType.VolcanicCore or BiomeType.PowerPlant or BiomeType.PlasmaFields => Polarity.Heat,
+					BiomeType.FrozenWastes or BiomeType.IceCatacombs or BiomeType.CryogenicLabs or BiomeType.CrystalCaverns => Polarity.Cold,
+					BiomeType.HubArea or BiomeType.TransitionZone => Polarity.Any,
+					BiomeType.AncientRuins => Polarity.Earth | Polarity.Life,
+					_ => Polarity.None
+					};
 
-            Polarity secondary = secondaryBiome == BiomeType.Unknown ? Polarity.None : GetBiomePolarities(secondaryBiome, BiomeType.Unknown).primary;
-            
-            return (primary, secondary);
-        }
+			Polarity secondary = secondaryBiome == BiomeType.Unknown ? Polarity.None : GetBiomePolarities(secondaryBiome, BiomeType.Unknown).primary;
 
-        private static float CalculateBiomeDifficulty(BiomeType biomeType, ref Unity.Mathematics.Random random)
-        {
-            float baseDifficulty = biomeType switch
-            {
-                BiomeType.HubArea => 0.5f,
-                BiomeType.SolarPlains or BiomeType.SkyGardens => 0.7f,
-                BiomeType.CrystalCaverns or BiomeType.FrozenWastes => 0.9f,
-                BiomeType.ShadowRealms or BiomeType.VolcanicCore => 1.2f,
-                BiomeType.DeepUnderwater or BiomeType.VoidChambers => 1.4f,
-                BiomeType.PowerPlant or BiomeType.PlasmaFields => 1.3f,
-                BiomeType.IceCatacombs or BiomeType.CryogenicLabs => 1.1f,
-                BiomeType.AncientRuins => 1.5f,
-                BiomeType.TransitionZone => random.NextFloat(0.6f, 1.1f),
-                _ => 1.0f
-            };
+			return (primary, secondary);
+			}
 
-            // Add some variance to difficulty
-            return math.clamp(baseDifficulty + random.NextFloat(-0.2f, 0.2f), 0.1f, 2.0f);
-        }
+		private static float CalculateBiomeDifficulty (BiomeType biomeType, ref Random random)
+			{
+			float baseDifficulty = biomeType switch
+				{
+					BiomeType.HubArea => 0.5f,
+					BiomeType.SolarPlains or BiomeType.SkyGardens => 0.7f,
+					BiomeType.CrystalCaverns or BiomeType.FrozenWastes => 0.9f,
+					BiomeType.ShadowRealms or BiomeType.VolcanicCore => 1.2f,
+					BiomeType.DeepUnderwater or BiomeType.VoidChambers => 1.4f,
+					BiomeType.PowerPlant or BiomeType.PlasmaFields => 1.3f,
+					BiomeType.IceCatacombs or BiomeType.CryogenicLabs => 1.1f,
+					BiomeType.AncientRuins => 1.5f,
+					BiomeType.TransitionZone => random.NextFloat(0.6f, 1.1f),
+					_ => 1.0f
+					};
 
-        private static float CalculateBiomeInfluenceRadius(BiomeType biomeType, int2 worldSize)
-        {
-            float baseRadius = math.min(worldSize.x, worldSize.y) * 0.4f;
+			// Add some variance to difficulty
+			return math.clamp(baseDifficulty + random.NextFloat(-0.2f, 0.2f), 0.1f, 2.0f);
+			}
 
-            // Adjust radius based on biome type
-            float multiplier = biomeType switch
-            {
-                BiomeType.HubArea => 1.5f,      // Hub areas have larger influence
-                BiomeType.TransitionZone => 1.2f, // Transition zones blend widely
-                BiomeType.VolcanicCore or BiomeType.PowerPlant => 0.8f, // Intense biomes have smaller radius
-                BiomeType.VoidChambers or BiomeType.DeepUnderwater => 0.7f, // Isolated biomes
-                _ => 1.0f
-            };
+		private static float CalculateBiomeInfluenceRadius (BiomeType biomeType, int2 worldSize)
+			{
+			float baseRadius = math.min(worldSize.x, worldSize.y) * 0.4f;
 
-            return baseRadius * multiplier;
-        }
+			// Adjust radius based on biome type
+			float multiplier = biomeType switch
+				{
+					BiomeType.HubArea => 1.5f,      // Hub areas have larger influence
+					BiomeType.TransitionZone => 1.2f, // Transition zones blend widely
+					BiomeType.VolcanicCore or BiomeType.PowerPlant => 0.8f, // Intense biomes have smaller radius
+					BiomeType.VoidChambers or BiomeType.DeepUnderwater => 0.7f, // Isolated biomes
+					_ => 1.0f
+					};
 
-        private static void PopulateBiomeInfluences(DynamicBuffer<BiomeInfluence> buffer, 
-                                                  BiomeType primaryBiome, BiomeType secondaryBiome, 
-                                                  float strength, float gradient)
-        {
-            // Add primary biome influence
-            buffer.Add(new BiomeInfluence
-            {
-                Biome = primaryBiome,
-                Influence = strength,
-                Distance = 0f
-            });
+			return baseRadius * multiplier;
+			}
 
-            // Add secondary biome influence if present
-            if (secondaryBiome != BiomeType.Unknown)
-            {
-                buffer.Add(new BiomeInfluence
-                {
-                    Biome = secondaryBiome,
-                    Influence = (1f - strength) * gradient, // Secondary influence based on gradient
-                    Distance = gradient * 10f // Approximate distance for blending
-                });
-            }
-        }
+		private static void PopulateBiomeInfluences (DynamicBuffer<BiomeInfluence> buffer,
+												  BiomeType primaryBiome, BiomeType secondaryBiome,
+												  float strength, float gradient)
+			{
+			// Add primary biome influence
+			buffer.Add(new BiomeInfluence
+				{
+				Biome = primaryBiome,
+				Influence = strength,
+				Distance = 0f
+				});
 
-        private static void CreateDistrictEntity(ref SystemState state, uint nodeId, 
-                                               WorldBootstrapConfiguration config, ref Unity.Mathematics.Random random)
-        {
-            Entity entity = state.EntityManager.CreateEntity();
-            
+			// Add secondary biome influence if present
+			if (secondaryBiome != BiomeType.Unknown)
+				{
+				buffer.Add(new BiomeInfluence
+					{
+					Biome = secondaryBiome,
+					Influence = (1f - strength) * gradient, // Secondary influence based on gradient
+					Distance = gradient * 10f // Approximate distance for blending
+					});
+				}
+			}
+
+		private static void CreateDistrictEntity (ref SystemState state, uint nodeId,
+											   WorldBootstrapConfiguration config, ref Random random)
+			{
+			Entity entity = state.EntityManager.CreateEntity();
+
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            state.EntityManager.SetName(entity, $"District_{nodeId}");
+			state.EntityManager.SetName(entity, $"District_{nodeId}");
 #endif
 
-            // Create district at (0,0) - DistrictLayoutSystem will place it
-            state.EntityManager.AddComponentData(entity, new NodeId(nodeId, 0, 0, int2.zero));
-            state.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
-            state.EntityManager.AddComponentData(entity, new SectorRefinementData(config.RoomSettings.TargetLoopDensity));
+			// Create district at (0,0) - DistrictLayoutSystem will place it
+			state.EntityManager.AddComponentData(entity, new NodeId(nodeId, 0, 0, int2.zero));
+			state.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
+			state.EntityManager.AddComponentData(entity, new SectorRefinementData(config.RoomSettings.TargetLoopDensity));
 
-            // Add sector hierarchy data for the SectorRoomHierarchySystem
-            int sectorCount = random.NextInt(config.SectorSettings.SectorsPerDistrictRange.x, config.SectorSettings.SectorsPerDistrictRange.y + 1);
-            state.EntityManager.AddComponentData(entity, new SectorHierarchyData(
-                config.SectorSettings.SectorGridSize, 
-                sectorCount, 
-                random.NextUInt()
-            ));
+			// Add sector hierarchy data for the SectorRoomHierarchySystem
+			int sectorCount = random.NextInt(config.SectorSettings.SectorsPerDistrictRange.x, config.SectorSettings.SectorsPerDistrictRange.y + 1);
+			state.EntityManager.AddComponentData(entity, new SectorHierarchyData(
+				config.SectorSettings.SectorGridSize,
+				sectorCount,
+				random.NextUInt()
+			));
 
-            // Add required buffers
-            state.EntityManager.AddBuffer<ConnectionBufferElement>(entity);
-            state.EntityManager.AddBuffer<GateConditionBufferElement>(entity);
-        }
+			// Add required buffers
+			state.EntityManager.AddBuffer<ConnectionBufferElement>(entity);
+			state.EntityManager.AddBuffer<GateConditionBufferElement>(entity);
+			}
 
-        private static int CalculateGeneratedBiomes(WorldBootstrapConfiguration config)
-        {
-            return (config.BiomeSettings.BiomeCountRange.x + config.BiomeSettings.BiomeCountRange.y) / 2;
-        }
+		private static int CalculateGeneratedBiomes (WorldBootstrapConfiguration config)
+			{
+			return (config.BiomeSettings.BiomeCountRange.x + config.BiomeSettings.BiomeCountRange.y) / 2;
+			}
 
-        private static int CalculateGeneratedDistricts(WorldBootstrapConfiguration config)
-        {
-            return (config.DistrictSettings.DistrictCountRange.x + config.DistrictSettings.DistrictCountRange.y) / 2;
-        }
+		private static int CalculateGeneratedDistricts (WorldBootstrapConfiguration config)
+			{
+			return (config.DistrictSettings.DistrictCountRange.x + config.DistrictSettings.DistrictCountRange.y) / 2;
+			}
 
-        private static int CalculateGeneratedSectors(WorldBootstrapConfiguration config)
-        {
-            int avgDistricts = CalculateGeneratedDistricts(config);
-            int avgSectorsPerDistrict = (config.SectorSettings.SectorsPerDistrictRange.x + config.SectorSettings.SectorsPerDistrictRange.y) / 2;
-            return avgDistricts * avgSectorsPerDistrict;
-        }
+		private static int CalculateGeneratedSectors (WorldBootstrapConfiguration config)
+			{
+			int avgDistricts = CalculateGeneratedDistricts(config);
+			int avgSectorsPerDistrict = (config.SectorSettings.SectorsPerDistrictRange.x + config.SectorSettings.SectorsPerDistrictRange.y) / 2;
+			return avgDistricts * avgSectorsPerDistrict;
+			}
 
-        private static int CalculateGeneratedRooms(WorldBootstrapConfiguration config)
-        {
-            int avgSectors = CalculateGeneratedSectors(config);
-            int avgRoomsPerSector = (config.RoomSettings.RoomsPerSectorRange.x + config.RoomSettings.RoomsPerSectorRange.y) / 2;
-            return avgSectors * avgRoomsPerSector;
-        }
-    }
-}
+		private static int CalculateGeneratedRooms (WorldBootstrapConfiguration config)
+			{
+			int avgSectors = CalculateGeneratedSectors(config);
+			int avgRoomsPerSector = (config.RoomSettings.RoomsPerSectorRange.x + config.RoomSettings.RoomsPerSectorRange.y) / 2;
+			return avgSectors * avgRoomsPerSector;
+			}
+		}
+	}
