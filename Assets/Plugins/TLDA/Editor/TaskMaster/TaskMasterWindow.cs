@@ -458,6 +458,15 @@ namespace LivingDevAgent.Editor.TaskMaster
 			public string AssignedTo = "@copilot";
 			}
 
+		/// <summary>
+		/// ScriptableObject container for TaskCard persistence
+		/// </summary>
+		[CreateAssetMenu(fileName = "TaskCard", menuName = "TaskMaster/Task Card")]
+		public class TaskCardAsset : ScriptableObject
+			{
+			public TaskCard TaskCard;
+			}
+
 		[Serializable]
 		public struct ProjectStats
 			{
@@ -472,8 +481,24 @@ namespace LivingDevAgent.Editor.TaskMaster
 		// Implementation stubs - IMPLEMENTING ACTUAL FUNCTIONALITY
 		private void LoadTasksFromAssets ()
 			{
-			// TODO: Load TaskCard data from ScriptableObjects or persistent storage
-			Debug.Log("🎯 TaskMaster: Loading tasks from assets...");
+			this._allTasks.Clear();
+			
+			// 🔍 Look for TaskCard assets in the project
+			string[] guids = AssetDatabase.FindAssets("t:TaskCardAsset");
+			Debug.Log($"🎯 TaskMaster: Found {guids.Length} TaskCard assets");
+			
+			foreach (string guid in guids)
+				{
+				string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+				TaskCardAsset asset = AssetDatabase.LoadAssetAtPath<TaskCardAsset>(assetPath);
+				if (asset != null && asset.TaskCard != null)
+					{
+					this._allTasks.Add(asset.TaskCard);
+					Debug.Log($"📋 Loaded task: {asset.TaskCard.Title}");
+					}
+				}
+			
+			Debug.Log($"🎯 TaskMaster: Loaded {this._allTasks.Count} tasks from assets");
 			}
 
 		private void CreateSampleTasks ()
@@ -509,8 +534,37 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		private void SnapToTimelineScale ()
 			{
-			// TODO: Adjust timeline view based on selected scale
-			Debug.Log($"🗓️ Snapping to {this._currentScale} view");
+			// Adjust timeline view to align with selected scale
+			switch (this._currentScale)
+				{
+				case TimelineScale.Day:
+					// Snap to start of day
+					this._timelineCenter = this._timelineCenter.Date;
+					break;
+				case TimelineScale.Week:
+					// Snap to start of week (Sunday)
+					this._timelineCenter = this._timelineCenter.Date.AddDays(-(int)this._timelineCenter.DayOfWeek);
+					break;
+				case TimelineScale.Month:
+					// Snap to start of month
+					this._timelineCenter = new DateTime(this._timelineCenter.Year, this._timelineCenter.Month, 1);
+					break;
+				case TimelineScale.Year:
+					// Snap to start of year
+					this._timelineCenter = new DateTime(this._timelineCenter.Year, 1, 1);
+					break;
+				case TimelineScale.FiveYear:
+					// Snap to start of 5-year period
+					int fiveYearStart = (this._timelineCenter.Year / 5) * 5;
+					this._timelineCenter = new DateTime(fiveYearStart, 1, 1);
+					break;
+				case TimelineScale.TenYear:
+					// Snap to start of decade
+					int decadeStart = (this._timelineCenter.Year / 10) * 10;
+					this._timelineCenter = new DateTime(decadeStart, 1, 1);
+					break;
+				}
+			Debug.Log($"🗓️ Snapped to {this._currentScale} view: {this._timelineCenter:yyyy-MM-dd}");
 			}
 
 		private void NavigateTimeline (int direction)
@@ -567,12 +621,86 @@ namespace LivingDevAgent.Editor.TaskMaster
 				};
 
 			this._allTasks.Add(newTask);
+			
+			// 💾 SAVE: Persist the new task to disk
+			SaveTaskCard(newTask);
+			
 			this._newTaskTitle = ""; // Clear input field
 
-			Debug.Log($"✅ Created new task: {newTask.Title}");
+			Debug.Log($"✅ Created and saved new task: {newTask.Title}");
 			}
 
-		private void ZoomIn ()
+		/// <summary>
+		/// Save a TaskCard to persistent storage as a ScriptableObject asset
+		/// </summary>
+		private void SaveTaskCard (TaskCard taskCard)
+			{
+			try
+				{
+				// Create asset directory if it doesn't exist
+				string assetDir = "Assets/TLDA/TaskMaster/Tasks";
+				if (!AssetDatabase.IsValidFolder(assetDir))
+					{
+					if (!AssetDatabase.IsValidFolder("Assets/TLDA"))
+						AssetDatabase.CreateFolder("Assets", "TLDA");
+					if (!AssetDatabase.IsValidFolder("Assets/TLDA/TaskMaster"))
+						AssetDatabase.CreateFolder("Assets/TLDA", "TaskMaster");
+					if (!AssetDatabase.IsValidFolder("Assets/TLDA/TaskMaster/Tasks"))
+						AssetDatabase.CreateFolder("Assets/TLDA/TaskMaster", "Tasks");
+					}
+
+				// Create a safe filename from the task title
+				string safeTitle = taskCard.Title;
+				foreach (char invalidChar in System.IO.Path.GetInvalidFileNameChars())
+					{
+					safeTitle = safeTitle.Replace(invalidChar, '_');
+					}
+				if (safeTitle.Length > 50) 
+					safeTitle = safeTitle.Substring(0, 50);
+
+				string fileName = $"Task_{safeTitle}_{taskCard.Id.Substring(0, 8)}.asset";
+				string assetPath = $"{assetDir}/{fileName}";
+
+				// Create the ScriptableObject asset
+				TaskCardAsset asset = CreateInstance<TaskCardAsset>();
+				asset.TaskCard = taskCard;
+
+				AssetDatabase.CreateAsset(asset, assetPath);
+				AssetDatabase.SaveAssets();
+				AssetDatabase.Refresh();
+
+				Debug.Log($"💾 TaskMaster: Saved task '{taskCard.Title}' to {assetPath}");
+				}
+			catch (System.Exception ex)
+				{
+				Debug.LogError($"❌ TaskMaster: Failed to save task '{taskCard.Title}': {ex.Message}");
+				}
+			}
+
+		/// <summary>
+		/// Update an existing TaskCard in persistent storage
+		/// </summary>
+		private void UpdateTaskCard (TaskCard taskCard)
+			{
+			// Find the existing asset and update it
+			string[] guids = AssetDatabase.FindAssets("t:TaskCardAsset");
+			foreach (string guid in guids)
+				{
+				string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+				TaskCardAsset asset = AssetDatabase.LoadAssetAtPath<TaskCardAsset>(assetPath);
+				if (asset != null && asset.TaskCard != null && asset.TaskCard.Id == taskCard.Id)
+					{
+					asset.TaskCard = taskCard;
+					EditorUtility.SetDirty(asset);
+					AssetDatabase.SaveAssets();
+					Debug.Log($"💾 TaskMaster: Updated task '{taskCard.Title}'");
+					return;
+					}
+				}
+			
+			// If not found, save as new
+			SaveTaskCard(taskCard);
+			}
 			{
 			if (this._currentZoomIndex < this._zoomLevels.Length - 1)
 				{
@@ -608,8 +736,96 @@ namespace LivingDevAgent.Editor.TaskMaster
 			{
 			// 🎯 THE CHRONAS CONNECTION!
 			Debug.Log("⏳ Importing time data from Chronas...");
-			EditorUtility.DisplayDialog("Chronas Integration",
-				"Feature coming soon! This will import time cards from Chronas focus-immune tracker.", "OK");
+			
+			try 
+				{
+				// Access Chronas time cards using reflection (since they're in different assembly)
+				var chronasType = System.Type.GetType("LivingDevAgent.Editor.Chronas.ChronasTimeTracker");
+				if (chronasType == null)
+					{
+					EditorUtility.DisplayDialog("Chronas Not Found", 
+						"ChronasTimeTracker not found. Make sure the Chronas module is available.", "OK");
+					return;
+					}
+
+				// Get time cards field using reflection
+				var timeCardsField = chronasType.GetField("_timeCards", 
+					System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+				if (timeCardsField == null)
+					{
+					EditorUtility.DisplayDialog("Chronas Integration Error", 
+						"Unable to access Chronas time cards. The internal API may have changed.", "OK");
+					return;
+					}
+
+				// Get the time cards
+				var timeCards = timeCardsField.GetValue(null) as System.Collections.IList;
+				if (timeCards == null || timeCards.Count == 0)
+					{
+					EditorUtility.DisplayDialog("No Time Cards", 
+						"No time cards found in Chronas. Start and stop a timer in Chronas first.", "OK");
+					return;
+					}
+
+				int importedCount = 0;
+				foreach (var timeCardObj in timeCards)
+					{
+					// Get properties using reflection
+					var taskNameProp = timeCardObj.GetType().GetProperty("TaskName");
+					var durationProp = timeCardObj.GetType().GetProperty("DurationSeconds");
+					var startTimeProp = timeCardObj.GetType().GetProperty("StartTime");
+
+					if (taskNameProp != null && durationProp != null)
+						{
+						string taskName = taskNameProp.GetValue(timeCardObj) as string;
+						double durationSeconds = (double)durationProp.GetValue(timeCardObj);
+						System.DateTime startTime = (System.DateTime)startTimeProp.GetValue(timeCardObj);
+
+						// Find existing task with matching name or create new one
+						TaskCard existingTask = this._allTasks.FirstOrDefault(t => 
+							string.Equals(t.Title, taskName, System.StringComparison.OrdinalIgnoreCase));
+
+						if (existingTask != null)
+							{
+							// Update existing task
+							existingTask.TimeTracked += (float)(durationSeconds / 3600.0); // Convert to hours
+							UpdateTaskCard(existingTask);
+							Debug.Log($"⏳ Updated task '{taskName}' with {durationSeconds/3600.0:F2}h");
+							}
+						else
+							{
+							// Create new task from time card
+							var newTask = new TaskCard
+								{
+								Title = taskName,
+								Description = $"Imported from Chronas time tracking (started {startTime:yyyy-MM-dd HH:mm})",
+								Priority = TaskPriority.Medium,
+								Status = TaskStatus.InProgress,
+								TimeTracked = (float)(durationSeconds / 3600.0),
+								CreatedAt = startTime,
+								AssignedTo = "@copilot"
+								};
+							
+							this._allTasks.Add(newTask);
+							SaveTaskCard(newTask);
+							Debug.Log($"⏳ Created task '{taskName}' with {durationSeconds/3600.0:F2}h");
+							}
+						
+						importedCount++;
+						}
+					}
+
+				EditorUtility.DisplayDialog("Chronas Import Complete", 
+					$"Successfully imported {importedCount} time entries from Chronas.\n\nTime tracking data has been merged with existing tasks or created new tasks.", "OK");
+				
+				Debug.Log($"✅ Chronas import complete: {importedCount} entries processed");
+				}
+			catch (System.Exception ex)
+				{
+				Debug.LogError($"❌ Chronas import failed: {ex.Message}");
+				EditorUtility.DisplayDialog("Import Failed", 
+					$"Failed to import from Chronas: {ex.Message}", "OK");
+				}
 			}
 
 		private void ExportTimeReport ()
@@ -1345,24 +1561,173 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		private void DrawTimelineTracks ()
 			{
-			// TODO: Implement actual timeline rendering
 			using (new EditorGUILayout.VerticalScope("box"))
 				{
-				EditorGUILayout.LabelField("📅 Timeline tracks will be rendered here");
-				EditorGUILayout.LabelField("🚧 Coming soon: Multi-scale timeline visualization");
+				EditorGUILayout.LabelField($"📅 Timeline - {this._currentScale} View", EditorStyles.boldLabel);
+				
+				// Draw time scale header
+				this.DrawTimeScaleHeader();
+				
+				GUILayout.Space(5);
+				
+				// Group tasks by status for timeline tracks
+				var todoTasks = this._allTasks.Where(t => t.Status == TaskStatus.ToDo).ToList();
+				var inProgressTasks = this._allTasks.Where(t => t.Status == TaskStatus.InProgress).ToList();
+				var completedTasks = this._allTasks.Where(t => t.Status == TaskStatus.Done).ToList();
+				var blockedTasks = this._allTasks.Where(t => t.Status == TaskStatus.Blocked).ToList();
 
-				// Show tasks in simple list for now
-				foreach (TaskCard task in this._allTasks)
+				// Draw timeline tracks
+				this.DrawTimelineTrack("📋 To Do", todoTasks, new Color(0.7f, 0.7f, 0.7f, 0.3f));
+				this.DrawTimelineTrack("🚀 In Progress", inProgressTasks, new Color(0.2f, 0.8f, 1f, 0.3f));
+				this.DrawTimelineTrack("✅ Completed", completedTasks, new Color(0.2f, 1f, 0.2f, 0.3f));
+				this.DrawTimelineTrack("🚫 Blocked", blockedTasks, new Color(1f, 0.3f, 0.3f, 0.3f));
+				}
+			}
+
+		private void DrawTimeScaleHeader ()
+			{
+			using (new EditorGUILayout.HorizontalScope())
+				{
+				// Calculate time range based on current scale and center
+				var (startDate, endDate) = this.GetTimelineRange();
+				
+				EditorGUILayout.LabelField($"📅 {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}", EditorStyles.centeredGreyMiniLabel);
+				
+				GUILayout.FlexibleSpace();
+				
+				if (GUILayout.Button("⬅️", EditorStyles.miniButtonLeft, GUILayout.Width(30)))
+					this.NavigateTimeline(-1);
+				if (GUILayout.Button("Today", EditorStyles.miniButtonMid, GUILayout.Width(50)))
+					this.NavigateToToday();
+				if (GUILayout.Button("➡️", EditorStyles.miniButtonRight, GUILayout.Width(30)))
+					this.NavigateTimeline(1);
+				}
+			}
+
+		private void DrawTimelineTrack (string trackName, List<TaskCard> tasks, Color trackColor)
+			{
+			using (new EditorGUILayout.VerticalScope("box"))
+				{
+				// Track header
+				using (new EditorGUILayout.HorizontalScope())
 					{
-					using (new EditorGUILayout.HorizontalScope())
+					EditorGUILayout.LabelField(trackName, EditorStyles.boldLabel, GUILayout.Width(120));
+					EditorGUILayout.LabelField($"({tasks.Count} tasks)", EditorStyles.miniLabel, GUILayout.Width(60));
+					}
+
+				if (tasks.Count > 0)
+					{
+					// Draw timeline bar background
+					Rect timelineRect = GUILayoutUtility.GetRect(0, 30, GUILayout.ExpandWidth(true));
+					EditorGUI.DrawRect(timelineRect, trackColor);
+
+					// Calculate task positions on timeline
+					var (startDate, endDate) = this.GetTimelineRange();
+					double totalDays = (endDate - startDate).TotalDays;
+
+					foreach (TaskCard task in tasks)
 						{
-						GUILayout.Label(this.GetPriorityEmoji(task.Priority), GUILayout.Width(20));
-						EditorGUILayout.LabelField(task.Title, GUILayout.Width(200));
-						EditorGUILayout.LabelField(task.Status.ToString(), GUILayout.Width(100));
-						EditorGUILayout.LabelField($"{task.TimeTracked:F1}h", GUILayout.Width(50));
+						// Calculate task position (simple: use creation date)
+						double taskDays = (task.CreatedAt - startDate).TotalDays;
+						if (taskDays >= 0 && taskDays <= totalDays)
+							{
+							float xPos = (float)(taskDays / totalDays) * timelineRect.width;
+							Rect taskRect = new Rect(timelineRect.x + xPos, timelineRect.y + 5, 20, 20);
+							
+							// Draw task marker
+							Color taskColor = this.GetPriorityColor(task.Priority);
+							EditorGUI.DrawRect(taskRect, taskColor);
+							
+							// Task tooltip on hover
+							if (taskRect.Contains(Event.current.mousePosition))
+								{
+								GUI.Label(new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y - 20, 200, 20), 
+									$"{task.Title} ({task.Priority})", EditorStyles.helpBox);
+								}
+							
+							// Click to select task
+							if (Event.current.type == EventType.MouseDown && taskRect.Contains(Event.current.mousePosition))
+								{
+								this._selectedTask = task;
+								Event.current.Use();
+								}
+							}
+						}
+
+					// Show tasks in list below timeline
+					foreach (TaskCard task in tasks.Take(3)) // Show first 3 tasks
+						{
+						using (new EditorGUILayout.HorizontalScope())
+							{
+							GUILayout.Label(this.GetPriorityEmoji(task.Priority), GUILayout.Width(20));
+							EditorGUILayout.LabelField(task.Title, GUILayout.MaxWidth(150));
+							if (task.TimeTracked > 0)
+								EditorGUILayout.LabelField($"{task.TimeTracked:F1}h", GUILayout.Width(40));
+							GUILayout.FlexibleSpace();
+							if (GUILayout.Button("Select", EditorStyles.miniButton, GUILayout.Width(50)))
+								this._selectedTask = task;
+							}
+						}
+						
+					if (tasks.Count > 3)
+						{
+						EditorGUILayout.LabelField($"... and {tasks.Count - 3} more", EditorStyles.centeredGreyMiniLabel);
 						}
 					}
+				else
+					{
+					EditorGUILayout.LabelField("No tasks in this track", EditorStyles.centeredGreyMiniLabel);
+					}
 				}
+			}
+
+		private (DateTime start, DateTime end) GetTimelineRange ()
+			{
+			DateTime start, end;
+			switch (this._currentScale)
+				{
+				case TimelineScale.Day:
+					start = this._timelineCenter.Date;
+					end = start.AddDays(1);
+					break;
+				case TimelineScale.Week:
+					start = this._timelineCenter.Date.AddDays(-(int)this._timelineCenter.DayOfWeek);
+					end = start.AddDays(7);
+					break;
+				case TimelineScale.Month:
+					start = new DateTime(this._timelineCenter.Year, this._timelineCenter.Month, 1);
+					end = start.AddMonths(1);
+					break;
+				case TimelineScale.Year:
+					start = new DateTime(this._timelineCenter.Year, 1, 1);
+					end = start.AddYears(1);
+					break;
+				case TimelineScale.FiveYear:
+					start = new DateTime(this._timelineCenter.Year - 2, 1, 1);
+					end = start.AddYears(5);
+					break;
+				case TimelineScale.TenYear:
+					start = new DateTime(this._timelineCenter.Year - 5, 1, 1);
+					end = start.AddYears(10);
+					break;
+				default:
+					start = DateTime.Now.Date;
+					end = start.AddDays(7);
+					break;
+				}
+			return (start, end);
+			}
+
+		private Color GetPriorityColor (TaskPriority priority)
+			{
+			return priority switch
+				{
+				TaskPriority.Critical => Color.red,
+				TaskPriority.High => Color.yellow,
+				TaskPriority.Medium => Color.green,
+				TaskPriority.Low => Color.blue,
+				_ => Color.gray
+				};
 			}
 
 		private Texture2D CreateTaskCardBackground (TaskCard task)
