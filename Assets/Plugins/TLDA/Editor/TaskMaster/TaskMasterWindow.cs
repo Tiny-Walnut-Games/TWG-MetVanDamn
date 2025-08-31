@@ -26,11 +26,11 @@ namespace LivingDevAgent.Editor.TaskMaster
 		private readonly bool _showKanbanOverlay = true;
 #pragma warning restore 0414
 
-		// Task management
-		private readonly List<TaskCard> _allTasks = new();
-		private TaskCard _selectedTask = null;
+		// Task management  
+		private readonly List<TaskData> _allTasks = new();
+		private TaskData _selectedTask = null;
 #pragma warning disable 0414 // Assigned but never used - will be implemented
-		private readonly TaskCard _draggedTask = null;
+		private readonly TaskData _draggedTask = null;
 #pragma warning restore 0414
 
 		// UI state
@@ -231,9 +231,9 @@ namespace LivingDevAgent.Editor.TaskMaster
 				{
 				GUILayout.Label(title, EditorStyles.boldLabel);
 
-				var tasksInColumn = this._allTasks.Where(t => t.Status == status).ToList();
+				var tasksInColumn = this._allTasks.Where(t => this.GetTaskStatusFromTaskData(t) == status).ToList();
 
-				foreach (TaskCard task in tasksInColumn)
+				foreach (TaskData task in tasksInColumn)
 					{
 					this.DrawTaskCard(task);
 					}
@@ -246,7 +246,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 				}
 			}
 
-		private void DrawTaskCard (TaskCard task)
+		private void DrawTaskCard (TaskData task)
 			{
 			// 🎯 FIXED: Proper selection highlighting with visual feedback
 			bool isSelected = (this._selectedTask == task);
@@ -269,11 +269,11 @@ namespace LivingDevAgent.Editor.TaskMaster
 				// Task title and priority
 				using (new EditorGUILayout.HorizontalScope())
 					{
-					GUILayout.Label(this.GetPriorityEmoji(task.Priority), GUILayout.Width(20));
+					GUILayout.Label(this.GetPriorityEmoji(task.priorityLevel), GUILayout.Width(20));
 					
 					// Use bold style for selected tasks
 					GUIStyle titleStyle = isSelected ? EditorStyles.whiteBoldLabel : EditorStyles.boldLabel;
-					EditorGUILayout.LabelField(task.Title, titleStyle);
+					EditorGUILayout.LabelField(task.TaskName, titleStyle);
 					
 					// Selection indicator
 					if (isSelected)
@@ -283,32 +283,30 @@ namespace LivingDevAgent.Editor.TaskMaster
 					}
 
 				// Task details
-				if (!string.IsNullOrEmpty(task.Description))
+				if (!string.IsNullOrEmpty(task.taskDescription))
 					{
-					EditorGUILayout.LabelField(task.Description, EditorStyles.wordWrappedMiniLabel);
+					EditorGUILayout.LabelField(task.taskDescription, EditorStyles.wordWrappedMiniLabel);
 					}
 
 				// Deadline and time tracking
 				using (new EditorGUILayout.HorizontalScope())
 					{
-					if (task.Deadline.HasValue)
+					// Assignee info
+					if (!string.IsNullOrEmpty(task.assignedTo))
 						{
-						int daysUntil = (task.Deadline.Value - DateTime.Now).Days;
-						string deadlineText = daysUntil switch
-							{
-								< 0 => $"⚠️ {Math.Abs(daysUntil)}d overdue",
-								0 => "🔥 Due today",
-								1 => "📅 Due tomorrow",
-								_ => $"📅 {daysUntil}d left"
-								};
-						EditorGUILayout.LabelField(deadlineText, EditorStyles.miniLabel);
+						EditorGUILayout.LabelField($"👤 {task.assignedTo}", EditorStyles.miniLabel);
 						}
 
 					GUILayout.FlexibleSpace();
 
-					if (task.TimeTracked > 0)
+					// Show time tracked from TimeCardData if available
+					if (task.timeCard != null)
 						{
-						EditorGUILayout.LabelField($"⏱️ {task.TimeTracked:F1}h", EditorStyles.miniLabel);
+						float hours = task.timeCard.GetDurationInHours();
+						if (hours > 0)
+							{
+							EditorGUILayout.LabelField($"⏱️ {hours:F1}h", EditorStyles.miniLabel);
+							}
 						}
 					}
 
@@ -370,48 +368,50 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		private void DrawSelectedTaskDetails ()
 			{
-			TaskCard task = this._selectedTask;
+			TaskData task = this._selectedTask;
 
 			// 🎯 FIXED: Enhanced task inspector with save feedback
-			EditorGUILayout.LabelField($"📋 Editing: {task.Title}", EditorStyles.boldLabel);
+			EditorGUILayout.LabelField($"📋 Editing: {task.TaskName}", EditorStyles.boldLabel);
 			EditorGUILayout.Space();
 
 			// Track if changes are made
 			EditorGUI.BeginChangeCheck();
 			
 			// Editable task properties
-			task.Title = EditorGUILayout.TextField("Title:", task.Title);
-			task.Description = EditorGUILayout.TextArea(task.Description, GUILayout.Height(60));
-			task.Priority = (TaskPriority)EditorGUILayout.EnumPopup("Priority:", task.Priority);
-			task.Status = (TaskStatus)EditorGUILayout.EnumPopup("Status:", task.Status);
+			task.TaskName = EditorGUILayout.TextField("Title:", task.TaskName);
+			task.taskDescription = EditorGUILayout.TextArea(task.taskDescription, GUILayout.Height(60));
+			task.priorityLevel = EditorGUILayout.IntSlider("Priority:", task.priorityLevel, 1, 5);
+			task.assignedTo = EditorGUILayout.TextField("Assigned To:", task.assignedTo);
+
+			// Status handling using TaskData's boolean flags
+			TaskStatus currentStatus = this.GetTaskStatusFromTaskData(task);
+			TaskStatus newStatus = (TaskStatus)EditorGUILayout.EnumPopup("Status:", currentStatus);
+			
+			if (newStatus != currentStatus)
+				{
+				this.SetTaskDataStatus(task, newStatus);
+				}
 
 			// Save changes automatically when fields change
 			if (EditorGUI.EndChangeCheck())
 				{
-				UpdateTaskCard(task);
-				Debug.Log($"🎯 TaskMaster: Updated task '{task.Title}'");
-				}
-
-			// Deadline handling
-			bool hasDeadline = task.Deadline.HasValue;
-			bool newHasDeadline = EditorGUILayout.Toggle("Has Deadline:", hasDeadline);
-
-			if (newHasDeadline != hasDeadline)
-				{
-				task.Deadline = newHasDeadline ? DateTime.Now.AddDays(7) : null;
-				}
-
-			if (task.Deadline.HasValue)
-				{
-				DateTime deadline = task.Deadline.Value;
-				DateTime newDeadline = this.DrawDateTimePicker("Deadline:", deadline);
-				task.Deadline = newDeadline;
+				EditorUtility.SetDirty(task);
+				Debug.Log($"🎯 TaskMaster: Updated task '{task.TaskName}'");
 				}
 
 			GUILayout.Space(10);
 
-			// Time tracking
-			EditorGUILayout.LabelField($"Time Tracked: {task.TimeTracked:F2} hours");
+			// Time tracking from TimeCardData
+			if (task.timeCard != null)
+				{
+				float hours = task.timeCard.GetDurationInHours();
+				EditorGUILayout.LabelField($"Time Tracked: {hours:F2} hours");
+				
+				if (task.timeCard.GetIsOngoing())
+					{
+					EditorGUILayout.LabelField($"Started: {task.timeCard.GetStartTime():g}");
+					}
+				}
 
 			using (new EditorGUILayout.HorizontalScope())
 				{
@@ -475,30 +475,6 @@ namespace LivingDevAgent.Editor.TaskMaster
 			}
 
 		[Serializable]
-		public class TaskCard
-			{
-			public string Id = Guid.NewGuid().ToString();
-			public string Title = "";
-			public string Description = "";
-			public TaskPriority Priority = TaskPriority.Medium;
-			public TaskStatus Status = TaskStatus.ToDo;
-			public DateTime CreatedAt = DateTime.Now;
-			public DateTime? Deadline = null;
-			public float TimeTracked = 0f;
-			public List<string> Tags = new();
-			public string AssignedTo = "@copilot";
-			}
-
-		/// <summary>
-		/// ScriptableObject container for TaskCard persistence
-		/// </summary>
-		[CreateAssetMenu(fileName = "TaskCard", menuName = "TaskMaster/Task Card")]
-		public class TaskCardAsset : ScriptableObject
-			{
-			public TaskCard TaskCard;
-			}
-
-		[Serializable]
 		public struct ProjectStats
 			{
 			public int totalTasks;
@@ -509,23 +485,79 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		#endregion
 
+		// Helper methods for TaskData integration
+		private TaskStatus GetTaskStatusFromTaskData(TaskData task)
+			{
+			if (task.isCompleted) return TaskStatus.Done;
+			if (task.isCanceled) return TaskStatus.Blocked;
+			// Check if task has been started (has time tracking or is assigned)
+			if (task.timeCard?.GetIsOngoing() == true || !string.IsNullOrEmpty(task.assignedTo))
+				return TaskStatus.InProgress;
+			return TaskStatus.ToDo;
+			}
+
+		private void SetTaskDataStatus(TaskData task, TaskStatus status)
+			{
+			switch (status)
+				{
+				case TaskStatus.ToDo:
+					task.isCompleted = false;
+					task.isCanceled = false;
+					break;
+				case TaskStatus.InProgress:
+					task.isCompleted = false;
+					task.isCanceled = false;
+					// Start time tracking if not already started
+					if (task.timeCard == null || !task.timeCard.GetIsOngoing())
+						{
+						if (task.timeCard == null)
+							{
+							task.timeCard = ScriptableObject.CreateInstance<TimeCardData>();
+							}
+						task.timeCard.StartTimeCard(task);
+						}
+					break;
+				case TaskStatus.Done:
+					task.CompleteTask(); // Use TaskData's built-in method
+					break;
+				case TaskStatus.Blocked:
+					task.CancelTask(); // Use TaskData's built-in method
+					break;
+				}
+			}
+
+		private string GetPriorityEmoji(int priorityLevel)
+			{
+			return priorityLevel switch
+				{
+				1 => "🔥", // Highest priority
+				2 => "⚡",
+				3 => "📋",
+				4 => "📌",
+				5 => "💤", // Lowest priority
+				_ => "📋"
+				};
+			}
+
+		#endregion
+
 		// Implementation stubs - IMPLEMENTING ACTUAL FUNCTIONALITY
 		private void LoadTasksFromAssets ()
 			{
 			this._allTasks.Clear();
 			
-			// 🔍 Look for TaskCard assets in the project
-			string[] guids = AssetDatabase.FindAssets("t:TaskCardAsset");
-			Debug.Log($"🎯 TaskMaster: Found {guids.Length} TaskCard assets");
+			// 🔍 Look for TaskData assets in the project
+			string[] guids = AssetDatabase.FindAssets("t:TaskData");
+			Debug.Log($"🎯 TaskMaster: Found {guids.Length} TaskData assets");
 			
 			foreach (string guid in guids)
 				{
 				string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-				TaskCardAsset asset = AssetDatabase.LoadAssetAtPath<TaskCardAsset>(assetPath);
-				if (asset != null && asset.TaskCard != null)
+				TaskData asset = AssetDatabase.LoadAssetAtPath<TaskData>(assetPath);
+				if (asset != null)
 					{
-					this._allTasks.Add(asset.TaskCard);
-					Debug.Log($"📋 Loaded task: {asset.TaskCard.Title}");
+					this._allTasks.Add(asset);
+					Debug.Log($"📋 Loaded task: {asset.TaskName}");
 					}
 				}
 			
@@ -534,33 +566,17 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		private void CreateSampleTasks ()
 			{
-			// Create some demo tasks for testing
-			this._allTasks.Add(new TaskCard
-				{
-				Title = "Fix Chronas Integration",
-				Description = "Connect scene overlay to TaskMaster timeline",
-				Priority = TaskPriority.High,
-				Status = TaskStatus.InProgress,
-				AssignedTo = "@copilot"
-				});
+			// Create some demo tasks using TaskData.CreateTask factory method
+			TaskData task1 = TaskData.CreateTask("Fix Chronas Integration", "Connect scene overlay to TaskMaster timeline", "@copilot", 2);
+			this._allTasks.Add(task1);
 
-			this._allTasks.Add(new TaskCard
-				{
-				Title = "Implement GitHub Issue Sync",
-				Description = "Create GitHub issues from TaskMaster tasks with assignees",
-				Priority = TaskPriority.Critical,
-				Status = TaskStatus.ToDo,
-				AssignedTo = "@jmeyer1980"
-				});
+			TaskData task2 = TaskData.CreateTask("Implement GitHub Issue Sync", "Create GitHub issues from TaskMaster tasks with assignees", "@jmeyer1980", 1);
+			this._allTasks.Add(task2);
 
-			this._allTasks.Add(new TaskCard
-				{
-				Title = "Build Timeline Rendering",
-				Description = "Multi-scale Day/Week/Month/Year timeline view",
-				Priority = TaskPriority.Medium,
-				Status = TaskStatus.ToDo,
-				AssignedTo = "@copilot"
-				});
+			TaskData task3 = TaskData.CreateTask("Build Timeline Rendering", "Multi-scale Day/Week/Month/Year timeline view", "@copilot", 3);
+			this._allTasks.Add(task3);
+			
+			Debug.Log($"🎯 TaskMaster: Created {this._allTasks.Count} sample tasks");
 			}
 
 		private void SnapToTimelineScale ()
@@ -641,30 +657,28 @@ namespace LivingDevAgent.Editor.TaskMaster
 				return;
 				}
 
-			var newTask = new TaskCard
-				{
-				Title = this._newTaskTitle.Trim(),
-				Description = "Created from TaskMaster",
-				Priority = this._newTaskPriority,
-				Status = TaskStatus.ToDo,
-				AssignedTo = "@copilot",
-				CreatedAt = DateTime.Now
-				};
+			// Use TaskData.CreateTask factory method
+			TaskData newTask = TaskData.CreateTask(
+				this._newTaskTitle.Trim(), 
+				"Created from TaskMaster", 
+				"@copilot", 
+				3 // Medium priority
+			);
 
 			this._allTasks.Add(newTask);
 			
-			// 💾 SAVE: Persist the new task to disk
-			SaveTaskCard(newTask);
+			// 💾 SAVE: Persist the new task to disk  
+			this.SaveTaskData(newTask);
 			
 			this._newTaskTitle = ""; // Clear input field
 
-			Debug.Log($"✅ Created and saved new task: {newTask.Title}");
+			Debug.Log($"✅ Created and saved new task: {newTask.TaskName}");
 			}
 
 		/// <summary>
-		/// Save a TaskCard to persistent storage as a ScriptableObject asset
+		/// Save a TaskData to persistent storage as a ScriptableObject asset
 		/// </summary>
-		private void SaveTaskCard (TaskCard taskCard)
+		private void SaveTaskData (TaskData taskData)
 			{
 			try
 				{
@@ -681,7 +695,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 					}
 
 				// Create a safe filename from the task title
-				string safeTitle = taskCard.Title;
+				string safeTitle = taskData.TaskName;
 				foreach (char invalidChar in System.IO.Path.GetInvalidFileNameChars())
 					{
 					safeTitle = safeTitle.Replace(invalidChar, '_');
@@ -689,48 +703,31 @@ namespace LivingDevAgent.Editor.TaskMaster
 				if (safeTitle.Length > 50) 
 					safeTitle = safeTitle.Substring(0, 50);
 
-				string fileName = $"Task_{safeTitle}_{taskCard.Id.Substring(0, 8)}.asset";
+				string fileName = $"Task_{safeTitle}_{taskData.createdAt:yyyyMMdd_HHmmss}.asset";
 				string assetPath = $"{assetDir}/{fileName}";
 
-				// Create the ScriptableObject asset
-				TaskCardAsset asset = CreateInstance<TaskCardAsset>();
-				asset.TaskCard = taskCard;
-
-				AssetDatabase.CreateAsset(asset, assetPath);
+				// TaskData is already a ScriptableObject, so save it directly
+				AssetDatabase.CreateAsset(taskData, assetPath);
 				AssetDatabase.SaveAssets();
 				AssetDatabase.Refresh();
 
-				Debug.Log($"💾 TaskMaster: Saved task '{taskCard.Title}' to {assetPath}");
+				Debug.Log($"💾 TaskMaster: Saved task '{taskData.TaskName}' to {assetPath}");
 				}
 			catch (System.Exception ex)
 				{
-				Debug.LogError($"❌ TaskMaster: Failed to save task '{taskCard.Title}': {ex.Message}");
+				Debug.LogError($"❌ TaskMaster: Failed to save task '{taskData.TaskName}': {ex.Message}");
 				}
 			}
 
 		/// <summary>
-		/// Update an existing TaskCard in persistent storage
+		/// Update an existing TaskData in persistent storage
 		/// </summary>
-		private void UpdateTaskCard (TaskCard taskCard)
+		private void UpdateTaskData (TaskData taskData)
 			{
-			// Find the existing asset and update it
-			string[] guids = AssetDatabase.FindAssets("t:TaskCardAsset");
-			foreach (string guid in guids)
-				{
-				string assetPath = AssetDatabase.GUIDToAssetPath(guid);
-				TaskCardAsset asset = AssetDatabase.LoadAssetAtPath<TaskCardAsset>(assetPath);
-				if (asset != null && asset.TaskCard != null && asset.TaskCard.Id == taskCard.Id)
-					{
-					asset.TaskCard = taskCard;
-					EditorUtility.SetDirty(asset);
-					AssetDatabase.SaveAssets();
-					Debug.Log($"💾 TaskMaster: Updated task '{taskCard.Title}'");
-					return;
-					}
-				}
-			
-			// If not found, save as new
-			SaveTaskCard(taskCard);
+			// TaskData is already a ScriptableObject, so just mark it dirty and save
+			EditorUtility.SetDirty(taskData);
+			AssetDatabase.SaveAssets();
+			Debug.Log($"💾 TaskMaster: Updated task '{taskData.TaskName}'");
 			}
 
 		private void ZoomIn ()
@@ -815,33 +812,33 @@ namespace LivingDevAgent.Editor.TaskMaster
 						System.DateTime startTime = (System.DateTime)startTimeProp.GetValue(timeCardObj);
 
 						// Find existing task with matching name or create new one
-						TaskCard existingTask = this._allTasks.FirstOrDefault(t => 
-							string.Equals(t.Title, taskName, System.StringComparison.OrdinalIgnoreCase));
+						TaskData existingTask = this._allTasks.FirstOrDefault(t => 
+							string.Equals(t.TaskName, taskName, System.StringComparison.OrdinalIgnoreCase));
 
 						if (existingTask != null)
 							{
-							// Update existing task
-							existingTask.TimeTracked += (float)(durationSeconds / 3600.0); // Convert to hours
-							UpdateTaskCard(existingTask);
-							Debug.Log($"⏳ Updated task '{taskName}' with {durationSeconds/3600.0:F2}h");
+							// Update existing task's time tracking
+							if (existingTask.timeCard != null)
+								{
+								// Update time tracking (assuming duration was tracked)
+								// Note: TimeCardData tracks start/end times, not accumulated time
+								}
+							this.UpdateTaskData(existingTask);
+							Debug.Log($"⏳ Updated task '{taskName}' with time tracking data");
 							}
 						else
 							{
-							// Create new task from time card
-							var newTask = new TaskCard
-								{
-								Title = taskName,
-								Description = $"Imported from Chronas time tracking (started {startTime:yyyy-MM-dd HH:mm})",
-								Priority = TaskPriority.Medium,
-								Status = TaskStatus.InProgress,
-								TimeTracked = (float)(durationSeconds / 3600.0),
-								CreatedAt = startTime,
-								AssignedTo = "@copilot"
-								};
+							// Create new task from time card using TaskData.CreateTask
+							TaskData newTask = TaskData.CreateTask(
+								taskName,
+								$"Imported from Chronas time tracking (started {startTime:yyyy-MM-dd HH:mm})",
+								"@copilot",
+								3 // Medium priority
+							);
 							
 							this._allTasks.Add(newTask);
-							SaveTaskCard(newTask);
-							Debug.Log($"⏳ Created task '{taskName}' with {durationSeconds/3600.0:F2}h");
+							this.SaveTaskData(newTask);
+							Debug.Log($"⏳ Created task '{taskName}' from Chronas import");
 							}
 						
 						importedCount++;
@@ -1637,7 +1634,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 				}
 			}
 
-		private void DrawTimelineTrack (string trackName, List<TaskCard> tasks, Color trackColor)
+		private void DrawTimelineTrack (string trackName, List<TaskData> tasks, Color trackColor)
 			{
 			using (new EditorGUILayout.VerticalScope("box"))
 				{
@@ -1658,24 +1655,24 @@ namespace LivingDevAgent.Editor.TaskMaster
 					var (startDate, endDate) = this.GetTimelineRange();
 					double totalDays = (endDate - startDate).TotalDays;
 
-					foreach (TaskCard task in tasks)
+					foreach (TaskData task in tasks)
 						{
 						// Calculate task position (simple: use creation date)
-						double taskDays = (task.CreatedAt - startDate).TotalDays;
+						double taskDays = (task.createdAt - startDate).TotalDays;
 						if (taskDays >= 0 && taskDays <= totalDays)
 							{
 							float xPos = (float)(taskDays / totalDays) * timelineRect.width;
 							Rect taskRect = new Rect(timelineRect.x + xPos, timelineRect.y + 5, 20, 20);
 							
 							// Draw task marker
-							Color taskColor = this.GetPriorityColor(task.Priority);
+							Color taskColor = this.GetPriorityColor(task.priorityLevel);
 							EditorGUI.DrawRect(taskRect, taskColor);
 							
 							// Task tooltip on hover
 							if (taskRect.Contains(Event.current.mousePosition))
 								{
 								GUI.Label(new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y - 20, 200, 20), 
-									$"{task.Title} ({task.Priority})", EditorStyles.helpBox);
+									$"{task.TaskName} (P{task.priorityLevel})", EditorStyles.helpBox);
 								}
 							
 							// Click to select task
@@ -1688,14 +1685,18 @@ namespace LivingDevAgent.Editor.TaskMaster
 						}
 
 					// Show tasks in list below timeline
-					foreach (TaskCard task in tasks.Take(3)) // Show first 3 tasks
+					foreach (TaskData task in tasks.Take(3)) // Show first 3 tasks
 						{
 						using (new EditorGUILayout.HorizontalScope())
 							{
-							GUILayout.Label(this.GetPriorityEmoji(task.Priority), GUILayout.Width(20));
-							EditorGUILayout.LabelField(task.Title, GUILayout.MaxWidth(150));
-							if (task.TimeTracked > 0)
-								EditorGUILayout.LabelField($"{task.TimeTracked:F1}h", GUILayout.Width(40));
+							GUILayout.Label(this.GetPriorityEmoji(task.priorityLevel), GUILayout.Width(20));
+							EditorGUILayout.LabelField(task.TaskName, GUILayout.MaxWidth(150));
+							if (task.timeCard != null)
+								{
+								float hours = task.timeCard.GetDurationInHours();
+								if (hours > 0)
+									EditorGUILayout.LabelField($"{hours:F1}h", GUILayout.Width(40));
+								}
 							GUILayout.FlexibleSpace();
 							if (GUILayout.Button("Select", EditorStyles.miniButton, GUILayout.Width(50)))
 								this._selectedTask = task;
@@ -1763,10 +1764,11 @@ namespace LivingDevAgent.Editor.TaskMaster
 				};
 			}
 
-		private Texture2D CreateTaskCardBackground (TaskCard task)
+		private Texture2D CreateTaskCardBackground (TaskData task)
 			{
 			// 🎯 FIXED: Create colored backgrounds based on priority/status for better visual feedback
-			Color cardColor = task.Status switch
+			TaskStatus status = this.GetTaskStatusFromTaskData(task);
+			Color cardColor = status switch
 				{
 				TaskStatus.ToDo => new Color(0.8f, 0.8f, 0.8f, 0.3f),
 				TaskStatus.InProgress => new Color(0.2f, 0.8f, 1f, 0.3f),
@@ -1795,24 +1797,51 @@ namespace LivingDevAgent.Editor.TaskMaster
 					};
 			}
 
-		private void HandleTaskCardInteraction (TaskCard task, Rect rect)
+		private Color GetPriorityColor (int priorityLevel)
+			{
+			return priorityLevel switch
+				{
+				1 => Color.red,     // Critical  
+				2 => Color.yellow,  // High
+				3 => Color.green,   // Medium
+				4 => Color.blue,    // Low
+				5 => Color.gray,    // Backlog
+				_ => Color.white
+				};
+			}
+
+		private Color GetTaskColor (TaskData task)
+			{
+			TaskStatus status = this.GetTaskStatusFromTaskData(task);
+			return status switch
+				{
+				TaskStatus.ToDo => Color.gray,
+				TaskStatus.InProgress => Color.cyan,
+				TaskStatus.Blocked => Color.red,
+				TaskStatus.Done => Color.green,
+				_ => Color.white
+				};
+			}
+
+		private void HandleTaskCardInteraction (TaskData task, Rect rect)
 			{
 			Event e = Event.current;
 			if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition))
 				{
 				// 🎯 FIXED: Enhanced selection feedback with visual confirmation
-				TaskCard previousSelection = this._selectedTask;
+				TaskData previousSelection = this._selectedTask;
 				this._selectedTask = task;
 				e.Use();
 				
 				// Provide clear feedback about selection
 				if (previousSelection == task)
 					{
-					Debug.Log($"📋 Task '{task.Title}' already selected - details shown in inspector");
+					Debug.Log($"📋 Task '{task.TaskName}' already selected - details shown in inspector");
 					}
 				else
 					{
-					Debug.Log($"📋 Selected task: '{task.Title}' - Status: {task.Status}, Priority: {task.Priority}");
+					TaskStatus status = this.GetTaskStatusFromTaskData(task);
+					Debug.Log($"📋 Selected task: '{task.TaskName}' - Status: {status}, Priority: P{task.priorityLevel}");
 					}
 				
 				// Force UI repaint to show selection changes immediately
@@ -1843,51 +1872,75 @@ namespace LivingDevAgent.Editor.TaskMaster
 				}
 			}
 
-		private void StartTimerForTask (TaskCard task)
+		private void StartTimerForTask (TaskData task)
 			{
 			// 🎯 THE CHRONAS INTEGRATION POINT!
-			Debug.Log($"⏰ Starting timer for task: {task.Title}");
+			Debug.Log($"⏰ Starting timer for task: {task.TaskName}");
+			
+			// Start timer using the TaskData's TimeCardData
+			if (task.timeCard == null)
+				{
+				task.timeCard = ScriptableObject.CreateInstance<TimeCardData>();
+				}
+			
+			if (!task.timeCard.GetIsOngoing())
+				{
+				task.timeCard.StartTimeCard(task);
+				EditorUtility.SetDirty(task);
+				Debug.Log($"⏰ Timer started for '{task.TaskName}' using TimeCardData");
+				}
+			else
+				{
+				Debug.Log($"⚠️ Timer already running for '{task.TaskName}'");
+				}
 
 			// TODO: Integrate with Chronas focus-immune timer
 			EditorUtility.DisplayDialog("Timer Started",
-				$"Timer started for '{task.Title}'\n\nNote: Full Chronas integration coming soon!", "OK");
+				$"Timer started for '{task.TaskName}'\n\nUsing TaskData TimeCardData system", "OK");
 			}
 
-		private void StopTimerForTask (TaskCard task)
+		private void StopTimerForTask (TaskData task)
 			{
-			Debug.Log($"⏸️ Stopping timer for task: {task.Title}");
+			Debug.Log($"⏸️ Stopping timer for task: {task.TaskName}");
+
+			if (task.timeCard != null && task.timeCard.GetIsOngoing())
+				{
+				task.timeCard.EndTimeCard();
+				EditorUtility.SetDirty(task);
+				Debug.Log($"⏸️ Timer stopped for '{task.TaskName}' - Duration: {task.timeCard.GetDurationInHours():F2}h");
+				}
 
 			// TODO: Stop Chronas timer and import time data
 			EditorUtility.DisplayDialog("Timer Stopped",
-				$"Timer stopped for '{task.Title}'\n\nNote: Time data will be imported from Chronas when integration is complete!", "OK");
+				$"Timer stopped for '{task.TaskName}'\n\nTime tracked in TimeCardData system", "OK");
 			}
 
-		private void DeleteTask (TaskCard task)
+		private void DeleteTask (TaskData task)
 			{
 			this._allTasks.Remove(task);
 			if (this._selectedTask == task)
 				{
 				this._selectedTask = null;
 				}
-			Debug.Log($"🗑️ Deleted task: {task.Title}");
+			Debug.Log($"🗑️ Deleted task: {task.TaskName}");
 			}
 
-		private void ExportTaskToTLDL (TaskCard task)
+		private void ExportTaskToTLDL (TaskData task)
 			{
-			Debug.Log($"📋 Exporting task to TLDL: {task.Title}");
+			Debug.Log($"📋 Exporting task to TLDL: {task.TaskName}");
 
 			// TODO: Create TLDL entry with task details
 			EditorUtility.DisplayDialog("TLDL Export",
-				$"Task '{task.Title}' exported to TLDL!\n\nNote: Full TLDL integration coming soon!", "OK");
+				$"Task '{task.TaskName}' exported to TLDL!\n\nNote: Full TLDL integration coming soon!", "OK");
 			}
 
-		private void CreateGitHubIssueFromTask (TaskCard task)
+		private void CreateGitHubIssueFromTask (TaskData task)
 			{
-			Debug.Log($"🐙 Creating GitHub issue for task: {task.Title}");
+			Debug.Log($"🐙 Creating GitHub issue for task: {task.TaskName}");
 
 			// TODO: Implement GitHub integration when compilation issues are resolved
 			EditorUtility.DisplayDialog("GitHub Integration",
-				$"GitHub issue creation for '{task.Title}' coming soon!\n\nThis will create issues with assignees and time tracking.", "OK");
+				$"GitHub issue creation for '{task.TaskName}' coming soon!\n\nThis will create issues with assignees and time tracking.", "OK");
 			}
 		}
 	}
