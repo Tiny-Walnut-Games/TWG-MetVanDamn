@@ -248,11 +248,21 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		private void DrawTaskCard (TaskCard task)
 			{
+			// 🎯 FIXED: Proper selection highlighting with visual feedback
+			bool isSelected = (this._selectedTask == task);
+			
 			var cardStyle = new GUIStyle("box")
 				{
 				normal = { background = this.CreateTaskCardBackground(task) },
 				padding = new RectOffset(8, 8, 8, 8)
 				};
+
+			// Add selection highlighting
+			Color originalColor = GUI.backgroundColor;
+			if (isSelected)
+				{
+				GUI.backgroundColor = new Color(1f, 1f, 0.3f, 1f); // Yellow highlight
+				}
 
 			using (new EditorGUILayout.VerticalScope(cardStyle))
 				{
@@ -260,11 +270,15 @@ namespace LivingDevAgent.Editor.TaskMaster
 				using (new EditorGUILayout.HorizontalScope())
 					{
 					GUILayout.Label(this.GetPriorityEmoji(task.Priority), GUILayout.Width(20));
-					EditorGUILayout.LabelField(task.Title, EditorStyles.boldLabel);
-
-					if (this._selectedTask == task)
+					
+					// Use bold style for selected tasks
+					GUIStyle titleStyle = isSelected ? EditorStyles.whiteBoldLabel : EditorStyles.boldLabel;
+					EditorGUILayout.LabelField(task.Title, titleStyle);
+					
+					// Selection indicator
+					if (isSelected)
 						{
-						GUI.backgroundColor = Color.yellow;
+						GUILayout.Label("👈 SELECTED", EditorStyles.miniLabel, GUILayout.Width(80));
 						}
 					}
 
@@ -302,6 +316,9 @@ namespace LivingDevAgent.Editor.TaskMaster
 				Rect cardRect = GUILayoutUtility.GetLastRect();
 				this.HandleTaskCardInteraction(task, cardRect);
 				}
+				
+			// Restore original background color
+			GUI.backgroundColor = originalColor;
 			}
 
 		private void DrawTimelineView ()
@@ -355,11 +372,25 @@ namespace LivingDevAgent.Editor.TaskMaster
 			{
 			TaskCard task = this._selectedTask;
 
+			// 🎯 FIXED: Enhanced task inspector with save feedback
+			EditorGUILayout.LabelField($"📋 Editing: {task.Title}", EditorStyles.boldLabel);
+			EditorGUILayout.Space();
+
+			// Track if changes are made
+			EditorGUI.BeginChangeCheck();
+			
 			// Editable task properties
 			task.Title = EditorGUILayout.TextField("Title:", task.Title);
 			task.Description = EditorGUILayout.TextArea(task.Description, GUILayout.Height(60));
 			task.Priority = (TaskPriority)EditorGUILayout.EnumPopup("Priority:", task.Priority);
 			task.Status = (TaskStatus)EditorGUILayout.EnumPopup("Status:", task.Status);
+
+			// Save changes automatically when fields change
+			if (EditorGUI.EndChangeCheck())
+				{
+				UpdateTaskCard(task);
+				Debug.Log($"🎯 TaskMaster: Updated task '{task.Title}'");
+				}
 
 			// Deadline handling
 			bool hasDeadline = task.Deadline.HasValue;
@@ -701,6 +732,8 @@ namespace LivingDevAgent.Editor.TaskMaster
 			// If not found, save as new
 			SaveTaskCard(taskCard);
 			}
+
+		private void ZoomIn ()
 			{
 			if (this._currentZoomIndex < this._zoomLevels.Length - 1)
 				{
@@ -1732,8 +1765,21 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		private Texture2D CreateTaskCardBackground (TaskCard task)
 			{
-			// TODO: Create colored backgrounds based on priority/status
-			return null;
+			// 🎯 FIXED: Create colored backgrounds based on priority/status for better visual feedback
+			Color cardColor = task.Status switch
+				{
+				TaskStatus.ToDo => new Color(0.8f, 0.8f, 0.8f, 0.3f),
+				TaskStatus.InProgress => new Color(0.2f, 0.8f, 1f, 0.3f),
+				TaskStatus.Blocked => new Color(1f, 0.3f, 0.3f, 0.3f),
+				TaskStatus.Done => new Color(0.2f, 1f, 0.2f, 0.3f),
+				_ => new Color(0.7f, 0.7f, 0.7f, 0.3f)
+				};
+
+			// Create a simple colored texture
+			var texture = new Texture2D(1, 1);
+			texture.SetPixel(0, 0, cardColor);
+			texture.Apply();
+			return texture;
 			}
 
 		private string GetPriorityEmoji (TaskPriority priority)
@@ -1754,9 +1800,23 @@ namespace LivingDevAgent.Editor.TaskMaster
 			Event e = Event.current;
 			if (e.type == EventType.MouseDown && rect.Contains(e.mousePosition))
 				{
+				// 🎯 FIXED: Enhanced selection feedback with visual confirmation
+				TaskCard previousSelection = this._selectedTask;
 				this._selectedTask = task;
 				e.Use();
-				Debug.Log($"📋 Selected task: {task.Title}");
+				
+				// Provide clear feedback about selection
+				if (previousSelection == task)
+					{
+					Debug.Log($"📋 Task '{task.Title}' already selected - details shown in inspector");
+					}
+				else
+					{
+					Debug.Log($"📋 Selected task: '{task.Title}' - Status: {task.Status}, Priority: {task.Priority}");
+					}
+				
+				// Force UI repaint to show selection changes immediately
+				Repaint();
 				}
 			}
 

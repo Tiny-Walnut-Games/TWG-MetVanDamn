@@ -320,9 +320,10 @@ namespace LivingDevAgent.Editor.Chronas
 				double currentSessionTime = GetCurrentSessionTime();
 				string timeText = FormatDuration(currentSessionTime);
 				
-				// 🔒 DEBUG: Add status information to time display
+				// 🔒 ENHANCED DEBUG: Detailed status information to help diagnose false timer logging
 				string statusIcon = _isTracking ? "🟢" : "🔴";
-				string debugText = $"{statusIcon} {timeText}";
+				string statusText = _isTracking ? "RUNNING" : "STOPPED";
+				string debugText = $"{statusIcon} {timeText} ({statusText})";
 				
 				var timerStyle = new GUIStyle(EditorStyles.boldLabel)
 					{
@@ -345,6 +346,17 @@ namespace LivingDevAgent.Editor.Chronas
 					{
 					_overlayEnabled = false;
 					SceneView.RepaintAll();
+					}
+				}
+
+			// 🔒 ENHANCED DEBUG: Show detailed timer state for troubleshooting
+			if (_isTracking)
+				{
+				using (new GUILayout.HorizontalScope())
+					{
+					double currentTime = EditorApplication.timeSinceStartup;
+					double sessionTime = currentTime - _sessionStartTime;
+					GUILayout.Label($"📊 Session: {sessionTime:F1}s, Total: {_accumulatedTime:F1}s", EditorStyles.miniLabel);
 					}
 				}
 
@@ -384,13 +396,34 @@ namespace LivingDevAgent.Editor.Chronas
 
 				if (GUILayout.Button(buttonText, GUILayout.Height(25)))
 					{
+					// 🔒 ENHANCED DEBUG: Provide immediate feedback on button press
+					string currentTaskName = GetCurrentTaskName();
 					if (_isTracking)
 						{
+						Debug.Log($"🔒 Chronas: User clicked STOP button for '{_currentTaskName}'");
 						StopTracking();
 						}
 					else
 						{
-						StartTracking();
+						Debug.Log($"🔒 Chronas: User clicked START button for '{currentTaskName}'");
+						if (string.IsNullOrEmpty(currentTaskName))
+							{
+							Debug.LogWarning("🔒 Chronas: Cannot start - no task selected");
+							EditorUtility.DisplayDialog("No Task Selected", "Please select a task from the dropdown or enter a custom task name.", "OK");
+							}
+						else
+							{
+							StartTracking();
+							// Verify timer actually started
+							if (_isTracking)
+								{
+								Debug.Log($"🔒 Chronas: Timer successfully started for '{_currentTaskName}'");
+								}
+							else
+								{
+								Debug.LogError("🔒 Chronas: Timer failed to start - check console for errors");
+								}
+							}
 						}
 					SceneView.RepaintAll();
 					}
