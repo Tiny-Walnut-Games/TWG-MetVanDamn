@@ -71,9 +71,9 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			// Create arrays for district data
-			var districtEntities = new NativeArray<Entity>(districtCount, Allocator.Temp);
-			var districtPositions = new NativeArray<int2>(districtCount, Allocator.Temp);
-			var districtNodeIds = new NativeArray<uint>(districtCount, Allocator.Temp);
+			NativeArray<Entity> districtEntities = new NativeArray<Entity>(districtCount, Allocator.Temp);
+			NativeArray<int2> districtPositions = new NativeArray<int2>(districtCount, Allocator.Temp);
+			NativeArray<uint> districtNodeIds = new NativeArray<uint>(districtCount, Allocator.Temp);
 
 			int districtIndex = 0;
 			for (int i = 0; i < nodeIds.Length; i++)
@@ -127,7 +127,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				Entity sourceEntity = districtEntities [ i ];
 
 				// Find K nearest neighbors
-				var distances = new NativeArray<DistanceEntry>(districtPositions.Length - 1, Allocator.Temp);
+				NativeArray<DistanceEntry> distances = new NativeArray<DistanceEntry>(districtPositions.Length - 1, Allocator.Temp);
 				int entryIndex = 0;
 
 				for (int j = 0; j < districtPositions.Length; j++)

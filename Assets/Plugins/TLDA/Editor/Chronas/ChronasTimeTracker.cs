@@ -21,15 +21,18 @@ namespace LivingDevAgent.Editor.Chronas
 		private static bool _isDragging = false;
 		private static Vector2 _dragOffset;
 
-		// Timer state
+		// 🔒 SECURITY HARDENED: Timer state with validation and access control
 		private static bool _isTracking = false;
 		private static double _sessionStartTime = 0.0;
 		private static double _accumulatedTime = 0.0;
 		private static string _currentTaskName = "";
+		private static readonly object _timerLock = new object(); // Thread safety
 
-		// 🎯 FOCUS-IMMUNE: Static timer registration
+		// 🛡️ SECURITY: Focus-immune timer with session validation
 		private static bool _staticTimerInitialized = false;
 		private static System.DateTime _systemTimeStart = System.DateTime.MinValue;
+		private static System.DateTime _lastValidationTime = System.DateTime.MinValue;
+		private static readonly System.TimeSpan _maxSessionDuration = System.TimeSpan.FromHours(12); // Prevent runaway sessions
 
 		// Task selection
 		private static readonly List<string> _quickTasks = new()
@@ -51,7 +54,51 @@ namespace LivingDevAgent.Editor.Chronas
 		private static readonly List<ChronasTimeCard> _timeCards = new();
 		private static readonly string _timeCardDirectory = "Assets/TLDA/Chronas/TimeCards/";
 
-		[MenuItem("Tools/Living Dev Agent/Chronas Time Tracker", priority = 30)]
+		// 🔒 SECURITY VALIDATION METHODS
+		private static bool ValidateTaskName (string taskName)
+			{
+			if (string.IsNullOrWhiteSpace(taskName))
+				return false;
+			if (taskName.Length > 100) // Prevent excessive task names
+				return false;
+			if (taskName.Contains("..") || taskName.Contains("/") || taskName.Contains("\\"))
+				return false; // Prevent path traversal attempts
+			return true;
+			}
+
+		private static bool ValidateTimerSession ()
+			{
+			lock (_timerLock)
+				{
+				if (!_isTracking)
+					return true;
+
+				// Check for runaway sessions
+				var currentTime = System.DateTime.Now;
+				var sessionDuration = currentTime - _systemTimeStart;
+				
+				if (sessionDuration > _maxSessionDuration)
+					{
+					Debug.LogWarning($"⚠️ Chronas: Session exceeded maximum duration ({_maxSessionDuration.TotalHours:F1}h). Auto-stopping for security.");
+					ForceStopTrackingUnsafe();
+					return false;
+					}
+
+				// Update validation timestamp
+				_lastValidationTime = currentTime;
+				return true;
+				}
+			}
+
+		private static void ForceStopTrackingUnsafe ()
+			{
+			// Called within lock, no additional locking needed
+			Debug.LogWarning($"🔒 Chronas: Force-stopping timer session for '{_currentTaskName}' after {FormatDuration(_accumulatedTime)}");
+			_isTracking = false;
+			_currentTaskName = "";
+			_accumulatedTime = 0.0;
+			_systemTimeStart = System.DateTime.MinValue;
+			}
 		public static void ShowWindow ()
 			{
 			// Ensure focus-immune timer is initialized
@@ -103,7 +150,10 @@ namespace LivingDevAgent.Editor.Chronas
 			if (state == PlayModeStateChange.ExitingEditMode && _isTracking)
 				{
 				// Save current session before entering play mode
-				SaveCurrentSession();
+				lock (_timerLock)
+					{
+					SaveCurrentSessionUnsafe();
+					}
 				}
 			}
 
@@ -335,7 +385,10 @@ namespace LivingDevAgent.Editor.Chronas
 					{
 					if (GUILayout.Button("💾", EditorStyles.miniButton, GUILayout.Width(25)))
 						{
-						SaveCurrentSession();
+						lock (_timerLock)
+							{
+							SaveCurrentSessionUnsafe();
+							}
 						SceneView.RepaintAll();
 						}
 					}
@@ -363,18 +416,24 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		// 🎯 FOCUS-IMMUNE: Static editor update method
+		// 🔒 SECURITY: Thread-safe editor update method with validation
 		private static void OnStaticEditorUpdate ()
 			{
-			// Background time accumulation - runs regardless of window focus
-			if (_isTracking)
-				{
-				UpdateAccumulatedTime();
+			// Validate session security first
+			if (!ValidateTimerSession())
+				return;
 
-				// Periodic auto-save every 5 minutes for safety
-				if (_accumulatedTime > 0 && (_accumulatedTime % 300) < 1.0)
+			lock (_timerLock)
+				{
+				if (_isTracking)
 					{
-					SaveCurrentSession();
+					UpdateAccumulatedTimeUnsafe();
+
+					// Periodic auto-save every 5 minutes for safety
+					if (_accumulatedTime > 0 && (_accumulatedTime % 300) < 1.0)
+						{
+						SaveCurrentSessionUnsafe();
+						}
 					}
 				}
 			}
@@ -382,54 +441,67 @@ namespace LivingDevAgent.Editor.Chronas
 		private static void StartTracking ()
 			{
 			string taskName = GetCurrentTaskName();
-			if (string.IsNullOrEmpty(taskName))
+			
+			// 🔒 SECURITY: Validate task name
+			if (!ValidateTaskName(taskName))
 				{
-				EditorUtility.DisplayDialog("No Task", "Please select or enter a task name.", "OK");
+				EditorUtility.DisplayDialog("Invalid Task Name", 
+					"Task name is invalid. Please ensure it's not empty, under 100 characters, and doesn't contain path separators.", "OK");
 				return;
 				}
 
-			_currentTaskName = taskName;
-			_isTracking = true;
-			_sessionStartTime = EditorApplication.timeSinceStartup;
-			_systemTimeStart = System.DateTime.Now; // Track system time for verification
-			_accumulatedTime = 0.0;
+			lock (_timerLock)
+				{
+				if (_isTracking)
+					{
+					EditorUtility.DisplayDialog("Timer Already Running", 
+						$"Timer is already running for '{_currentTaskName}'. Stop the current session before starting a new one.", "OK");
+					return;
+					}
 
-			Debug.Log($"⏳ Chronas: Started FOCUS-IMMUNE tracking '{taskName}'");
+				_currentTaskName = taskName;
+				_isTracking = true;
+				_sessionStartTime = EditorApplication.timeSinceStartup;
+				_systemTimeStart = System.DateTime.Now;
+				_lastValidationTime = System.DateTime.Now;
+				_accumulatedTime = 0.0;
+
+				Debug.Log($"🔒 Chronas: Started SECURE timer session '{taskName}' at {_systemTimeStart:HH:mm:ss}");
+				}
 			}
 
 		private static void StopTracking ()
 			{
-            // ⚠ Intention ⚠ - @jmeyer1980 - IL for legibility
-            if (!_isTracking) return;
+			lock (_timerLock)
+				{
+				if (!_isTracking)
+					{
+					Debug.LogWarning("🔒 Chronas: Stop requested but no timer is running");
+					return;
+					}
 
-			UpdateAccumulatedTime();
-			SaveTimeCard();
+				UpdateAccumulatedTimeUnsafe();
+				
+				var sessionDuration = System.DateTime.Now - _systemTimeStart;
+				var totalTrackedTime = _accumulatedTime;
+				var taskName = _currentTaskName;
 
-			Debug.Log($"⏳ Chronas: Stopped tracking '{_currentTaskName}' - {FormatDuration(_accumulatedTime)}");
+				// 🔒 SECURITY: Save before clearing sensitive data
+				SaveTimeCardUnsafe();
 
-			_isTracking = false;
-			_currentTaskName = "";
-			_accumulatedTime = 0.0;
-			_systemTimeStart = System.DateTime.MinValue;
+				Debug.Log($"🔒 Chronas: Stopped timer '{taskName}' - Session: {sessionDuration:hh\\:mm\\:ss}, Tracked: {FormatDuration(totalTrackedTime)}");
+
+				// Clear sensitive data
+				_isTracking = false;
+				_currentTaskName = "";
+				_accumulatedTime = 0.0;
+				_systemTimeStart = System.DateTime.MinValue;
+				_lastValidationTime = System.DateTime.MinValue;
+				}
 			}
 
-		private static void SaveCurrentSession ()
-			{
-			// ⚠ Intention ⚠ - @jmeyer1980 - IL for legibility
-			if (!_isTracking) return;
-
-			UpdateAccumulatedTime();
-			SaveTimeCard();
-
-			// Reset for new session
-			_sessionStartTime = EditorApplication.timeSinceStartup;
-			_systemTimeStart = System.DateTime.Now;
-			_accumulatedTime = 0.0;
-
-			Debug.Log($"⏳ Chronas: Auto-saved session for '{_currentTaskName}'");
-			}
-
-		private static void UpdateAccumulatedTime ()
+		// 🔒 SECURITY: Thread-safe helper methods (called within lock)
+		private static void UpdateAccumulatedTimeUnsafe ()
 			{
 			if (_isTracking)
 				{
@@ -440,21 +512,31 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static double GetCurrentSessionTime ()
+		private static void SaveCurrentSessionUnsafe ()
 			{
-			// ⚠ Intention ⚠ - @jmeyer1980 - IL for legibility
-			return !_isTracking ? 0.0 : _accumulatedTime + (EditorApplication.timeSinceStartup - _sessionStartTime);
+			if (!_isTracking)
+				return;
+
+			UpdateAccumulatedTimeUnsafe();
+			SaveTimeCardUnsafe();
+
+			// Reset for new session
+			_sessionStartTime = EditorApplication.timeSinceStartup;
+			_systemTimeStart = System.DateTime.Now;
+			_accumulatedTime = 0.0;
+
+			Debug.Log($"🔒 Chronas: Auto-saved session for '{_currentTaskName}'");
 			}
 
-		private static string GetCurrentTaskName ()
+		private static void SaveTimeCardUnsafe ()
 			{
-			return _quickTasks [ _selectedTaskIndex ] == "🎯 Custom..."
-				? string.IsNullOrEmpty(_customTaskName) ? "" : _customTaskName
-				: _quickTasks [ _selectedTaskIndex ];
-			}
+			// Validate data before saving
+			if (string.IsNullOrWhiteSpace(_currentTaskName) || _accumulatedTime <= 0)
+				{
+				Debug.LogWarning("🔒 Chronas: Skipping save - invalid task name or time data");
+				return;
+				}
 
-		private static void SaveTimeCard ()
-			{
 			var timeCard = new ChronasTimeCard
 				{
 				TaskName = _currentTaskName,
@@ -464,18 +546,54 @@ namespace LivingDevAgent.Editor.Chronas
 				LastModified = System.DateTime.Now
 				};
 
-			// Save as ScriptableObject
-			string fileName = $"ChronasCard_{SanitizeFileName(_currentTaskName)}_{System.DateTime.Now:yyyyMMdd_HHmmss}.asset";
+			// 🔒 SECURITY: Sanitize filename to prevent path traversal
+			string sanitizedTaskName = SanitizeFileName(_currentTaskName);
+			if (sanitizedTaskName.Length > 50) // Prevent excessively long filenames
+				sanitizedTaskName = sanitizedTaskName.Substring(0, 50);
+
+			string fileName = $"ChronasCard_{sanitizedTaskName}_{System.DateTime.Now:yyyyMMdd_HHmmss}.asset";
 			string assetPath = System.IO.Path.Combine(_timeCardDirectory, fileName);
 
-			ChronasTimeCardAsset asset = CreateInstance<ChronasTimeCardAsset>();
-			asset.TimeCard = timeCard;
+			try
+				{
+				ChronasTimeCardAsset asset = CreateInstance<ChronasTimeCardAsset>();
+				asset.TimeCard = timeCard;
 
-			AssetDatabase.CreateAsset(asset, assetPath);
-			AssetDatabase.SaveAssets();
-			AssetDatabase.Refresh();
+				AssetDatabase.CreateAsset(asset, assetPath);
+				AssetDatabase.SaveAssets();
+				AssetDatabase.Refresh();
 
-			_timeCards.Add(timeCard);
+				_timeCards.Add(timeCard);
+				Debug.Log($"🔒 Chronas: Securely saved time card for '{_currentTaskName}' ({FormatDuration(_accumulatedTime)})");
+				}
+			catch (System.Exception ex)
+				{
+				Debug.LogError($"🔒 Chronas: Failed to save time card: {ex.Message}");
+				}
+			}
+
+		private static double GetCurrentSessionTime ()
+			{
+			lock (_timerLock)
+				{
+				if (!_isTracking)
+					return 0.0;
+				
+				// 🔒 SECURITY: Validate timer state before returning time
+				if (!ValidateTimerSession())
+					return 0.0;
+					
+				double currentTime = EditorApplication.timeSinceStartup;
+				double sessionTime = currentTime - _sessionStartTime;
+				return _accumulatedTime + sessionTime;
+				}
+			}
+
+		private static string GetCurrentTaskName ()
+			{
+			return _quickTasks [ _selectedTaskIndex ] == "🎯 Custom..."
+				? string.IsNullOrEmpty(_customTaskName) ? "" : _customTaskName
+				: _quickTasks [ _selectedTaskIndex ];
 			}
 
 		private static void LoadTimeCards ()

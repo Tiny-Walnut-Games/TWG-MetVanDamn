@@ -124,7 +124,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			Vector3 anchor = cam.transform.position + cam.transform.forward * 10f;
 			Handles.color = Color.yellow;
-			Handles.Label(anchor, $"Randomization Mode: {worldConfig.randomizationMode}\nSeed: {worldConfig.seed}\nWorld Size: {worldConfig.worldSize}");
+			Handles.Label(anchor, $"Randomization Mode: {worldConfig.RandomizationMode}\nSeed: {worldConfig.Seed}\nWorld Size: {worldConfig.WorldSize}");
 			}
 
 		private static void DrawDistrictGizmos (DistrictAuthoring district)

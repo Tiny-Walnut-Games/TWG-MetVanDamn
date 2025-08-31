@@ -11,7 +11,8 @@
         "TinyWalnutGames.MetVD.Core",
         "TinyWalnutGames.MetVD.Shared",
         "TinyWalnutGames.MetVD.Graph",
-        "TinyWalnutGames.MetVD.Biome"
+        "TinyWalnutGames.MetVD.Biome",
+        "TinyWalnutGames.GridLayerEditor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
