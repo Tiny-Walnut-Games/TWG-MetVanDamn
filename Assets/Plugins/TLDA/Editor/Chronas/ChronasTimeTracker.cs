@@ -71,7 +71,10 @@ namespace LivingDevAgent.Editor.Chronas
 			lock (_timerLock)
 				{
 				if (!_isTracking)
+					{
+					// Not tracking, no validation needed
 					return true;
+					}
 
 				// Check for runaway sessions
 				var currentTime = System.DateTime.Now;
@@ -85,7 +88,15 @@ namespace LivingDevAgent.Editor.Chronas
 					}
 
 				// Update validation timestamp
+				var previousValidationTime = _lastValidationTime;
 				_lastValidationTime = currentTime;
+				
+				// 🔒 DEBUG: Log validation success (only every 30 seconds to avoid spam)
+				if ((currentTime - previousValidationTime).TotalSeconds > 30)
+					{
+					Debug.Log($"🔒 Chronas: Timer validation passed - Running for {sessionDuration:hh\\:mm\\:ss}, Task: '{_currentTaskName}'");
+					}
+				
 				return true;
 				}
 			}
@@ -306,14 +317,20 @@ namespace LivingDevAgent.Editor.Chronas
 			// Timer display with focus-immune indicator
 			using (new GUILayout.HorizontalScope())
 				{
-				string timeText = FormatDuration(GetCurrentSessionTime());
+				double currentSessionTime = GetCurrentSessionTime();
+				string timeText = FormatDuration(currentSessionTime);
+				
+				// 🔒 DEBUG: Add status information to time display
+				string statusIcon = _isTracking ? "🟢" : "🔴";
+				string debugText = $"{statusIcon} {timeText}";
+				
 				var timerStyle = new GUIStyle(EditorStyles.boldLabel)
 					{
 					normal = { textColor = _isTracking ? Color.green : Color.gray },
 					fontSize = 14
 					};
 
-				GUILayout.Label($"⏳ {timeText}", timerStyle);
+				GUILayout.Label($"⏳ {debugText}", timerStyle);
 
 				// Focus-immune indicator
 				if (_isTracking)
@@ -447,6 +464,7 @@ namespace LivingDevAgent.Editor.Chronas
 				{
 				EditorUtility.DisplayDialog("Invalid Task Name", 
 					"Task name is invalid. Please ensure it's not empty, under 100 characters, and doesn't contain path separators.", "OK");
+				Debug.LogWarning($"🔒 Chronas: Start tracking failed - invalid task name: '{taskName}'");
 				return;
 				}
 
@@ -456,6 +474,7 @@ namespace LivingDevAgent.Editor.Chronas
 					{
 					EditorUtility.DisplayDialog("Timer Already Running", 
 						$"Timer is already running for '{_currentTaskName}'. Stop the current session before starting a new one.", "OK");
+					Debug.LogWarning($"🔒 Chronas: Start tracking failed - timer already running for '{_currentTaskName}'");
 					return;
 					}
 
@@ -466,7 +485,8 @@ namespace LivingDevAgent.Editor.Chronas
 				_lastValidationTime = System.DateTime.Now;
 				_accumulatedTime = 0.0;
 
-				Debug.Log($"🔒 Chronas: Started SECURE timer session '{taskName}' at {_systemTimeStart:HH:mm:ss}");
+				Debug.Log($"🔒 Chronas: STARTED timer session '{taskName}' at {_systemTimeStart:HH:mm:ss} (Unity time: {_sessionStartTime:F2})");
+				Debug.Log($"🔒 Chronas: Timer status - IsTracking: {_isTracking}, TaskName: '{_currentTaskName}', StartTime: {_sessionStartTime}");
 				}
 			}
 
@@ -577,23 +597,43 @@ namespace LivingDevAgent.Editor.Chronas
 			lock (_timerLock)
 				{
 				if (!_isTracking)
+					{
+					// 🔒 DEBUG: Not tracking
 					return 0.0;
+					}
 				
 				// 🔒 SECURITY: Validate timer state before returning time
 				if (!ValidateTimerSession())
+					{
+					// 🔒 DEBUG: Validation failed, timer was stopped
+					Debug.LogWarning("🔒 Chronas: GetCurrentSessionTime - validation failed, timer stopped");
 					return 0.0;
+					}
 					
 				double currentTime = EditorApplication.timeSinceStartup;
 				double sessionTime = currentTime - _sessionStartTime;
-				return _accumulatedTime + sessionTime;
+				double totalTime = _accumulatedTime + sessionTime;
+				
+				// 🔒 DEBUG: Log current time calculation (only occasionally to avoid spam)
+				if (UnityEngine.Random.value < 0.01f) // ~1% chance
+					{
+					Debug.Log($"🔒 Chronas: Time calc - Current: {currentTime:F2}, Start: {_sessionStartTime:F2}, Session: {sessionTime:F2}, Accumulated: {_accumulatedTime:F2}, Total: {totalTime:F2}");
+					}
+				
+				return totalTime;
 				}
 			}
 
 		private static string GetCurrentTaskName ()
 			{
-			return _quickTasks [ _selectedTaskIndex ] == "🎯 Custom..."
+			string taskName = _quickTasks [ _selectedTaskIndex ] == "🎯 Custom..."
 				? string.IsNullOrEmpty(_customTaskName) ? "" : _customTaskName
 				: _quickTasks [ _selectedTaskIndex ];
+				
+			// 🔒 DEBUG: Log task name selection
+			Debug.Log($"🔒 Chronas: GetCurrentTaskName - Selected index: {_selectedTaskIndex}, Task: '{_quickTasks[_selectedTaskIndex]}', Custom: '{_customTaskName}', Result: '{taskName}'");
+			
+			return taskName;
 			}
 
 		private static void LoadTimeCards ()
