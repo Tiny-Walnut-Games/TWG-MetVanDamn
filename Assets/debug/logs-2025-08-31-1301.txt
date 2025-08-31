@@ -1,0 +1,858 @@
+Leak Detected : Persistent allocates 1 individual allocations. To find out more please enable 'Preferences > Jobs > Leak Detection Level > Enabled With Stack Trace' and reproduce the leak again.
+
+⏳ Chronas: Focus-immune timer system initialized
+UnityEngine.Debug:Log (object)
+LivingDevAgent.Editor.Chronas.ChronasTimeTracker:EnsureStaticTimerInitialized () (at Assets/Plugins/TLDA/Editor/Chronas/ChronasTimeTracker.cs:97)
+LivingDevAgent.Editor.Chronas.ChronasTimeTracker:InitializeChronasStatic () (at Assets/Plugins/TLDA/Editor/Chronas/ChronasTimeTracker.cs:70)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadMethodAttributes ()
+
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.CinemachineZoneGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomNavigationGeneratorSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.SimulationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:471)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+Unity.Entities.DefaultWorldInitialization:AddSystemToRootLevelSystemGroupsInternal (Unity.Entities.World,Unity.Collections.NativeList`1<Unity.Entities.SystemTypeIndex>) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorldInitialization.cs:295)
+Unity.Entities.DefaultWorldInitialization:Initialize (string,bool) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorldInitialization.cs:147)
+Unity.Entities.AutomaticWorldBootstrap:Initialize () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities.Hybrid/Injection/AutomaticWorldBootstrap.cs:16)
+
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.CinemachineZoneGeneratorSystemTest targeting TinyWalnutGames.MetVD.Graph.RoomNavigationGeneratorSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.SimulationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:471)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+Unity.Entities.DefaultWorldInitialization:AddSystemToRootLevelSystemGroupsInternal (Unity.Entities.World,Unity.Collections.NativeList`1<Unity.Entities.SystemTypeIndex>) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorldInitialization.cs:295)
+Unity.Entities.DefaultWorldInitialization:Initialize (string,bool) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorldInitialization.cs:147)
+Unity.Entities.AutomaticWorldBootstrap:Initialize () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities.Hybrid/Injection/AutomaticWorldBootstrap.cs:16)
+
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Authoring.BiomeArtIntegrationSystem targeting TinyWalnutGames.MetVD.Biome.BiomeFieldSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.PresentationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:498)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+Unity.Entities.DefaultWorldInitialization:AddSystemToRootLevelSystemGroupsInternal (Unity.Entities.World,Unity.Collections.NativeList`1<Unity.Entities.SystemTypeIndex>) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorldInitialization.cs:296)
+Unity.Entities.DefaultWorldInitialization:Initialize (string,bool) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorldInitialization.cs:147)
+Unity.Entities.AutomaticWorldBootstrap:Initialize () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities.Hybrid/Injection/AutomaticWorldBootstrap.cs:16)
+
+ArgumentException: Seed must be non-zero
+Unity.Mathematics.Random.CheckInitState () (at ./Library/PackageCache/com.unity.mathematics@8017b507cc74/Unity.Mathematics/random.cs:687)
+TinyWalnutGames.MetVD.Graph.StackedSegmentGenerator.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/TerrainAndSkyGenerators.cs:37)
+TinyWalnutGames.MetVD.Graph.StackedSegmentGenerator.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) (at <c0c8221057d340c0b0151819a4e2d267>:0)
+Unity.Entities.SystemBaseRegistry+<>c__DisplayClass9_0.<SelectBurstFn>b__0 (System.IntPtr system, System.IntPtr state) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.<>c__DisplayClass9_0:<SelectBurstFn>b__0(IntPtr, IntPtr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:253)
+Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:wrapper_native_indirect_0000013E89935888(IntPtr&, Void*)
+Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke(Void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate(Void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem(SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+ArgumentException: Seed must be non-zero
+Unity.Mathematics.Random.CheckInitState () (at ./Library/PackageCache/com.unity.mathematics@8017b507cc74/Unity.Mathematics/random.cs:687)
+TinyWalnutGames.MetVD.Graph.PatternDrivenModularGenerator.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/SpecializedGenerators.cs:56)
+TinyWalnutGames.MetVD.Graph.PatternDrivenModularGenerator.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) (at <c0c8221057d340c0b0151819a4e2d267>:0)
+Unity.Entities.SystemBaseRegistry+<>c__DisplayClass9_0.<SelectBurstFn>b__0 (System.IntPtr system, System.IntPtr state) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.<>c__DisplayClass9_0:<SelectBurstFn>b__0(IntPtr, IntPtr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:253)
+Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:wrapper_native_indirect_0000013E89935888(IntPtr&, Void*)
+Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke(Void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate(Void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem(SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+ArgumentException: Seed must be non-zero
+Unity.Mathematics.Random.CheckInitState () (at ./Library/PackageCache/com.unity.mathematics@8017b507cc74/Unity.Mathematics/random.cs:687)
+TinyWalnutGames.MetVD.Graph.LinearBranchingCorridorGenerator.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/TerrainAndSkyGenerators.cs:283)
+TinyWalnutGames.MetVD.Graph.LinearBranchingCorridorGenerator.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) (at <c0c8221057d340c0b0151819a4e2d267>:0)
+Unity.Entities.SystemBaseRegistry+<>c__DisplayClass9_0.<SelectBurstFn>b__0 (System.IntPtr system, System.IntPtr state) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.<>c__DisplayClass9_0:<SelectBurstFn>b__0(IntPtr, IntPtr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:253)
+Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:wrapper_native_indirect_0000013E89935888(IntPtr&, Void*)
+Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke(Void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate(Void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem(SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+'TinyWalnutGames.MetVD.Graph.BiomeWeightedHeightmapGenerator' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.BiomeWeightedHeightmapGenerator:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/TerrainAndSkyGenerators.cs:790)
+TinyWalnutGames.MetVD.Graph.BiomeWeightedHeightmapGenerator:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.ScriptBehaviourUpdateOrder/DummyDelegateWrapper:TriggerUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+'TinyWalnutGames.MetVD.Graph.LayeredPlatformCloudGenerator' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.LayeredPlatformCloudGenerator:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/TerrainAndSkyGenerators.cs:975)
+TinyWalnutGames.MetVD.Graph.LayeredPlatformCloudGenerator:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.ScriptBehaviourUpdateOrder/DummyDelegateWrapper:TriggerUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+'TinyWalnutGames.MetVD.Graph.ParametricChallengeGenerator' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.ParametricChallengeGenerator:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/SpecializedGenerators.cs:294)
+TinyWalnutGames.MetVD.Graph.ParametricChallengeGenerator:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.ScriptBehaviourUpdateOrder/DummyDelegateWrapper:TriggerUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+ArgumentException: Seed must be non-zero
+Unity.Mathematics.Random.CheckInitState () (at ./Library/PackageCache/com.unity.mathematics@8017b507cc74/Unity.Mathematics/random.cs:687)
+TinyWalnutGames.MetVD.Graph.WeightedTilePrefabGenerator.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/SpecializedGenerators.cs:452)
+TinyWalnutGames.MetVD.Graph.WeightedTilePrefabGenerator.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) (at <c0c8221057d340c0b0151819a4e2d267>:0)
+Unity.Entities.SystemBaseRegistry+<>c__DisplayClass9_0.<SelectBurstFn>b__0 (System.IntPtr system, System.IntPtr state) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.<>c__DisplayClass9_0:<SelectBurstFn>b__0(IntPtr, IntPtr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:253)
+Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:wrapper_native_indirect_0000013E89935888(IntPtr&, Void*)
+Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke(Void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate(Void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem(SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+'TinyWalnutGames.MetVD.Graph.StackedSegmentGenerator' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.StackedSegmentGenerator:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/TerrainAndSkyGenerators.cs:40)
+TinyWalnutGames.MetVD.Graph.StackedSegmentGenerator:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.ScriptBehaviourUpdateOrder/DummyDelegateWrapper:TriggerUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+'TinyWalnutGames.MetVD.Graph.PatternDrivenModularGenerator' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.PatternDrivenModularGenerator:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/SpecializedGenerators.cs:59)
+TinyWalnutGames.MetVD.Graph.PatternDrivenModularGenerator:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.ScriptBehaviourUpdateOrder/DummyDelegateWrapper:TriggerUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+'TinyWalnutGames.MetVD.Graph.LinearBranchingCorridorGenerator' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.LinearBranchingCorridorGenerator:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/TerrainAndSkyGenerators.cs:286)
+TinyWalnutGames.MetVD.Graph.LinearBranchingCorridorGenerator:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.ScriptBehaviourUpdateOrder/DummyDelegateWrapper:TriggerUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+'TinyWalnutGames.MetVD.Graph.WeightedTilePrefabGenerator' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.WeightedTilePrefabGenerator:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/SpecializedGenerators.cs:455)
+TinyWalnutGames.MetVD.Graph.WeightedTilePrefabGenerator:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.ScriptBehaviourUpdateOrder/DummyDelegateWrapper:TriggerUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+'TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+0x00007ff95708f66e (Unity) Stacktrace::GetStacktrace
+0x00007ff9555ed5ba (Unity) DefaultBurstRuntimeLogCallback
+0x00007ff954f500ba (Unity) BurstCompilerService_CUSTOM_RuntimeLog
+0x00007ff9ae7355e4 (4a38bc113434df773f6db83811c9365) Unity.Burst.BurstRuntime.RuntimeLog (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.burst@f7a407abf4d5/Runtime/BurstRuntime.cs:137)
+0x00007ff9ae79fdf8 (4a38bc113434df773f6db83811c9365) Unity.Entities.SystemState.CheckOnUpdate_Query (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+0x00007ff9ae7d1bc6 (4a38bc113434df773f6db83811c9365) Unity.Entities.SystemState.GetEntityQuery (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:836)
+0x00007ff9ae7ce884 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.OnUpdate (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Packages/com.tinywalnutgames.metvd.graph/Runtime/ConnectionBuilderSystem.cs:91)
+0x00007ff9ae7ced64 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.__codegen__OnUpdate$BurstManaged (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7cd569 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.TinyWalnutGames.MetVD.Graph.__codegen__OnUpdate_00000016$BurstDirectCall.Invoke (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7d1d93 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.__codegen__OnUpdate(System.IntPtr self, System.IntPtr state) -> void_7a9ec800d1284b88bb30cac0935c1294 from TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7cd20e (4a38bc113434df773f6db83811c9365) a179114a25c7beba78ffd7967b3f5de5
+0x00007ffa6affa890 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.SystemBaseRegistry.CallForwardingFunction (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:326)
+0x00007ffa6affa91e (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.SystemBaseRegistry.CallOnUpdate (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:377)
+0x00007ffa6affb367 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:854)
+0x00007ffa6affb271 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall.Invoke (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ffa6aff95bb (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate(void* pSystemState) -> void_3c812db5936b7ced36a795a75393872d from Unity.Entities, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ffa6aff9414 (1e42cc7ffb83bf8d2f03a45c34db91e) 7bf3b3dc1c88cb657fd69b548232391d
+0x0000013cdbfc5e00 (Mono JIT Code) (wrapper managed-to-native) Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:wrapper_native_indirect_0000013E89935888 (intptr&,void*)
+0x0000013cdbfc5963 (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+0x0000013cdbfc58eb (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+0x0000013cdbfc555b (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:892)
+0x0000013cdbfc1683 (Mono JIT Code) Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+0x0000013cdbfc1113 (Mono JIT Code) Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+0x0000013cdbfc0f93 (Mono JIT Code) Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:170)
+0x0000013cdbfc02cb (Mono JIT Code) Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:420)
+0x0000013d2542c3d8 (Mono JIT Code) TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests:RuleRandomizationSystem_WithFullMode_ShouldRandomizeEverything () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralLayoutSystemTests.cs:205)
+0x0000013cdbdcf756 (Mono JIT Code) (wrapper runtime-invoke) object:runtime_invoke_void__this__ (object,intptr,intptr,intptr)
+0x00007ffa17c36d5e (mono-2.0-bdwgc) mono_jit_runtime_invoke (at C:/build/output/Unity-Technologies/mono/mono/mini/mini-runtime.c:3445)
+0x00007ffa17b78714 (mono-2.0-bdwgc) do_runtime_invoke (at C:/build/output/Unity-Technologies/mono/mono/metadata/object.c:3068)
+0x00007ffa17b7f7c6 (mono-2.0-bdwgc) mono_runtime_try_invoke_array (at C:/build/output/Unity-Technologies/mono/mono/metadata/object.c:5774)
+0x00007ffa17ab1a21 (mono-2.0-bdwgc) ves_icall_InternalInvoke (at C:/build/output/Unity-Technologies/mono/mono/metadata/icall.c:4038)
+0x00007ffa17ad7cd1 (mono-2.0-bdwgc) ves_icall_InternalInvoke_raw (at C:/build/output/Unity-Technologies/mono/mono/metadata/icall-def.h:692)
+0x0000013ca429cd90 (Mono JIT Code) (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo:InternalInvoke (System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+0x0000013ca429bbbb (Mono JIT Code) System.Reflection.RuntimeMethodInfo:Invoke (object,System.Reflection.BindingFlags,System.Reflection.Binder,object[],System.Globalization.CultureInfo)
+0x0000013c29d9641e (Mono JIT Code) System.Reflection.MethodBase:Invoke (object,object[])
+0x0000013d252df443 (Mono JIT Code) NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+0x0000013d252df1f3 (Mono JIT Code) NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+0x0000013d252df199 (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252df0bb (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252deed3 (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252dec2b (Mono JIT Code) UnityEngine.TestTools.UnityTestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/UnityTestMethodCommand.cs:19)
+0x0000013d252deb34 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<>c__DisplayClass2_0:<Execute>b__0 () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:24)
+0x0000013d252dea75 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:CaptureException (NUnit.Framework.Internal.TestResult,System.Action) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:73)
+0x0000013d252de9eb (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:ExecuteAndCheckLog (UnityEngine.TestTools.Logging.LogScope,NUnit.Framework.Internal.TestResult,System.Action) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:83)
+0x0000013d252de8a3 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:24)
+0x0000013d252de0d9 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:36)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d252dda3a (Mono JIT Code) UnityEngine.TestTools.ImmediateEnumerableCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/ImmediateEnumerableCommand.cs:18)
+0x0000013d2513f190 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:219)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d2531faf6 (Mono JIT Code) UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+0x0000013d2531f196 (Mono JIT Code) UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+0x0000013d2531e98b (Mono JIT Code) UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+0x0000013d2531e0da (Mono JIT Code) UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+0x0000013d2531d979 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.DefaultTestWorkItem/<PerformWork>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/DefaultTestWorkItem.cs:50)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d2513296b (Mono JIT Code) UnityEngine.TestTools.TestRunner.PlaymodeTestsController/<TestRunnerCoroutine>d__24:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/TestRunner/PlaymodeTestsController.cs:93)<message truncated>
+'TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+0x00007ff95708f66e (Unity) Stacktrace::GetStacktrace
+0x00007ff9555ed5ba (Unity) DefaultBurstRuntimeLogCallback
+0x00007ff954f500ba (Unity) BurstCompilerService_CUSTOM_RuntimeLog
+0x00007ff9ae7355e4 (4a38bc113434df773f6db83811c9365) Unity.Burst.BurstRuntime.RuntimeLog (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.burst@f7a407abf4d5/Runtime/BurstRuntime.cs:137)
+0x00007ff9ae79fdf8 (4a38bc113434df773f6db83811c9365) Unity.Entities.SystemState.CheckOnUpdate_Query (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+0x00007ff9ae7d1bc6 (4a38bc113434df773f6db83811c9365) Unity.Entities.SystemState.GetEntityQuery (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:836)
+0x00007ff9ae7ce884 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.OnUpdate (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Packages/com.tinywalnutgames.metvd.graph/Runtime/ConnectionBuilderSystem.cs:91)
+0x00007ff9ae7ced64 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.__codegen__OnUpdate$BurstManaged (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7cd569 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.TinyWalnutGames.MetVD.Graph.__codegen__OnUpdate_00000016$BurstDirectCall.Invoke (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7d1d93 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.__codegen__OnUpdate(System.IntPtr self, System.IntPtr state) -> void_7a9ec800d1284b88bb30cac0935c1294 from TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7cd20e (4a38bc113434df773f6db83811c9365) a179114a25c7beba78ffd7967b3f5de5
+0x00007ffa6affa890 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.SystemBaseRegistry.CallForwardingFunction (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:326)
+0x00007ffa6affa91e (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.SystemBaseRegistry.CallOnUpdate (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:377)
+0x00007ffa6affb367 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:854)
+0x00007ffa6affb271 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall.Invoke (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ffa6aff95bb (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate(void* pSystemState) -> void_3c812db5936b7ced36a795a75393872d from Unity.Entities, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ffa6aff9414 (1e42cc7ffb83bf8d2f03a45c34db91e) 7bf3b3dc1c88cb657fd69b548232391d
+0x0000013cdbfc5e00 (Mono JIT Code) (wrapper managed-to-native) Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:wrapper_native_indirect_0000013E89935888 (intptr&,void*)
+0x0000013cdbfc5963 (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+0x0000013cdbfc58eb (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+0x0000013cdbfc555b (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:892)
+0x0000013cdbfc1683 (Mono JIT Code) Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+0x0000013cdbfc1113 (Mono JIT Code) Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+0x0000013cdbfc0f93 (Mono JIT Code) Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:170)
+0x0000013cdbfc02cb (Mono JIT Code) Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:420)
+0x0000013d2542f630 (Mono JIT Code) TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests:RuleRandomizationSystem_WithNoneMode_ShouldUseCuratedRules () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralLayoutSystemTests.cs:246)
+0x0000013cdbdcf756 (Mono JIT Code) (wrapper runtime-invoke) object:runtime_invoke_void__this__ (object,intptr,intptr,intptr)
+0x00007ffa17c36d5e (mono-2.0-bdwgc) mono_jit_runtime_invoke (at C:/build/output/Unity-Technologies/mono/mono/mini/mini-runtime.c:3445)
+0x00007ffa17b78714 (mono-2.0-bdwgc) do_runtime_invoke (at C:/build/output/Unity-Technologies/mono/mono/metadata/object.c:3068)
+0x00007ffa17b7f7c6 (mono-2.0-bdwgc) mono_runtime_try_invoke_array (at C:/build/output/Unity-Technologies/mono/mono/metadata/object.c:5774)
+0x00007ffa17ab1a21 (mono-2.0-bdwgc) ves_icall_InternalInvoke (at C:/build/output/Unity-Technologies/mono/mono/metadata/icall.c:4038)
+0x00007ffa17ad7cd1 (mono-2.0-bdwgc) ves_icall_InternalInvoke_raw (at C:/build/output/Unity-Technologies/mono/mono/metadata/icall-def.h:692)
+0x0000013ca429cd90 (Mono JIT Code) (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo:InternalInvoke (System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+0x0000013ca429bbbb (Mono JIT Code) System.Reflection.RuntimeMethodInfo:Invoke (object,System.Reflection.BindingFlags,System.Reflection.Binder,object[],System.Globalization.CultureInfo)
+0x0000013c29d9641e (Mono JIT Code) System.Reflection.MethodBase:Invoke (object,object[])
+0x0000013d252df443 (Mono JIT Code) NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+0x0000013d252df1f3 (Mono JIT Code) NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+0x0000013d252df199 (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252df0bb (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252deed3 (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252dec2b (Mono JIT Code) UnityEngine.TestTools.UnityTestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/UnityTestMethodCommand.cs:19)
+0x0000013d252deb34 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<>c__DisplayClass2_0:<Execute>b__0 () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:24)
+0x0000013d252dea75 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:CaptureException (NUnit.Framework.Internal.TestResult,System.Action) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:73)
+0x0000013d252de9eb (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:ExecuteAndCheckLog (UnityEngine.TestTools.Logging.LogScope,NUnit.Framework.Internal.TestResult,System.Action) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:83)
+0x0000013d252de8a3 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:24)
+0x0000013d252de0d9 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:36)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d252dda3a (Mono JIT Code) UnityEngine.TestTools.ImmediateEnumerableCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/ImmediateEnumerableCommand.cs:18)
+0x0000013d2513f190 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:219)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d2531faf6 (Mono JIT Code) UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+0x0000013d2531f196 (Mono JIT Code) UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+0x0000013d2531e98b (Mono JIT Code) UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+0x0000013d2531e0da (Mono JIT Code) UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+0x0000013d2531d979 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.DefaultTestWorkItem/<PerformWork>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/DefaultTestWorkItem.cs:50)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d2513296b (Mono JIT Code) UnityEngine.TestTools.TestRunner.PlaymodeTestsController/<TestRunnerCoroutine>d__24:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/TestRunner/PlaymodeTestsController.cs:93)
+0x0<message truncated>
+'TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+0x00007ff95708f66e (Unity) Stacktrace::GetStacktrace
+0x00007ff9555ed5ba (Unity) DefaultBurstRuntimeLogCallback
+0x00007ff954f500ba (Unity) BurstCompilerService_CUSTOM_RuntimeLog
+0x00007ff9ae7355e4 (4a38bc113434df773f6db83811c9365) Unity.Burst.BurstRuntime.RuntimeLog (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.burst@f7a407abf4d5/Runtime/BurstRuntime.cs:137)
+0x00007ff9ae79fdf8 (4a38bc113434df773f6db83811c9365) Unity.Entities.SystemState.CheckOnUpdate_Query (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+0x00007ff9ae7d1bc6 (4a38bc113434df773f6db83811c9365) Unity.Entities.SystemState.GetEntityQuery (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:836)
+0x00007ff9ae7ce884 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.OnUpdate (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Packages/com.tinywalnutgames.metvd.graph/Runtime/ConnectionBuilderSystem.cs:91)
+0x00007ff9ae7ced64 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.__codegen__OnUpdate$BurstManaged (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7cd569 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.TinyWalnutGames.MetVD.Graph.__codegen__OnUpdate_00000016$BurstDirectCall.Invoke (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7d1d93 (4a38bc113434df773f6db83811c9365) TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem.__codegen__OnUpdate(System.IntPtr self, System.IntPtr state) -> void_7a9ec800d1284b88bb30cac0935c1294 from TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ff9ae7cd20e (4a38bc113434df773f6db83811c9365) a179114a25c7beba78ffd7967b3f5de5
+0x00007ffa6affa890 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.SystemBaseRegistry.CallForwardingFunction (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:326)
+0x00007ffa6affa91e (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.SystemBaseRegistry.CallOnUpdate (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:377)
+0x00007ffa6affb367 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:854)
+0x00007ffa6affb271 (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall.Invoke (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ffa6aff95bb (1e42cc7ffb83bf8d2f03a45c34db91e) Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate(void* pSystemState) -> void_3c812db5936b7ced36a795a75393872d from Unity.Entities, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null (at E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/PackageCache/com.unity.burst@f7a407abf4d5/.Runtime/unknown/unknown:0)
+0x00007ffa6aff9414 (1e42cc7ffb83bf8d2f03a45c34db91e) 7bf3b3dc1c88cb657fd69b548232391d
+0x0000013cdbfc5e00 (Mono JIT Code) (wrapper managed-to-native) Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:wrapper_native_indirect_0000013E89935888 (intptr&,void*)
+0x0000013cdbfc5963 (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+0x0000013cdbfc58eb (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+0x0000013cdbfc555b (Mono JIT Code) Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:892)
+0x0000013cdbfc1683 (Mono JIT Code) Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+0x0000013cdbfc1113 (Mono JIT Code) Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+0x0000013cdbfc0f93 (Mono JIT Code) Unity.Entities.InitializationSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:170)
+0x0000013cdbfc02cb (Mono JIT Code) Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:420)
+0x0000013d255e05d0 (Mono JIT Code) TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests:RuleRandomizationSystem_WithPartialMode_ShouldRandomizeBiomes () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralLayoutSystemTests.cs:165)
+0x0000013cdbdcf756 (Mono JIT Code) (wrapper runtime-invoke) object:runtime_invoke_void__this__ (object,intptr,intptr,intptr)
+0x00007ffa17c36d5e (mono-2.0-bdwgc) mono_jit_runtime_invoke (at C:/build/output/Unity-Technologies/mono/mono/mini/mini-runtime.c:3445)
+0x00007ffa17b78714 (mono-2.0-bdwgc) do_runtime_invoke (at C:/build/output/Unity-Technologies/mono/mono/metadata/object.c:3068)
+0x00007ffa17b7f7c6 (mono-2.0-bdwgc) mono_runtime_try_invoke_array (at C:/build/output/Unity-Technologies/mono/mono/metadata/object.c:5774)
+0x00007ffa17ab1a21 (mono-2.0-bdwgc) ves_icall_InternalInvoke (at C:/build/output/Unity-Technologies/mono/mono/metadata/icall.c:4038)
+0x00007ffa17ad7cd1 (mono-2.0-bdwgc) ves_icall_InternalInvoke_raw (at C:/build/output/Unity-Technologies/mono/mono/metadata/icall-def.h:692)
+0x0000013ca429cd90 (Mono JIT Code) (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo:InternalInvoke (System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+0x0000013ca429bbbb (Mono JIT Code) System.Reflection.RuntimeMethodInfo:Invoke (object,System.Reflection.BindingFlags,System.Reflection.Binder,object[],System.Globalization.CultureInfo)
+0x0000013c29d9641e (Mono JIT Code) System.Reflection.MethodBase:Invoke (object,object[])
+0x0000013d252df443 (Mono JIT Code) NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+0x0000013d252df1f3 (Mono JIT Code) NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+0x0000013d252df199 (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252df0bb (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252deed3 (Mono JIT Code) NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+0x0000013d252dec2b (Mono JIT Code) UnityEngine.TestTools.UnityTestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/UnityTestMethodCommand.cs:19)
+0x0000013d252deb34 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<>c__DisplayClass2_0:<Execute>b__0 () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:24)
+0x0000013d252dea75 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:CaptureException (NUnit.Framework.Internal.TestResult,System.Action) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:73)
+0x0000013d252de9eb (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:ExecuteAndCheckLog (UnityEngine.TestTools.Logging.LogScope,NUnit.Framework.Internal.TestResult,System.Action) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:83)
+0x0000013d252de8a3 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:24)
+0x0000013d252de0d9 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.UnityLogCheckDelegatingCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/UnityLogCheckDelegatingCommand.cs:36)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d252dda3a (Mono JIT Code) UnityEngine.TestTools.ImmediateEnumerableCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext) (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/ImmediateEnumerableCommand.cs:18)
+0x0000013d2513f190 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:219)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d2513f129 (Mono JIT Code) UnityEngine.TestTools.BeforeAfterTestCommandBase`1/<ExecuteEnumerable>d__16<T_REF>:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/BeforeAfterTestCommandBase.cs:212)
+0x0000013d2531faf6 (Mono JIT Code) UnityEngine.TestTools.RetryCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/RetryCommand.cs:37)
+0x0000013d2531f196 (Mono JIT Code) UnityEngine.TestTools.RepeatCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/RepeatCommand.cs:36)
+0x0000013d2531e98b (Mono JIT Code) UnityEngine.TestTools.IgnoreTestCommand/<ExecuteEnumerable>d__3:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/IgnoreTestCommand.cs:42)
+0x0000013d2531e0da (Mono JIT Code) UnityEngine.TestTools.StrictCheckCommand/<ExecuteEnumerable>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Commands/StrictCheckCommand.cs:29)
+0x0000013d2531d979 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.DefaultTestWorkItem/<PerformWork>d__2:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/DefaultTestWorkItem.cs:50)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d251429e2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<RunChildren>d__17:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:207)
+0x0000013d25132fa2 (Mono JIT Code) UnityEngine.TestRunner.NUnitExtensions.Runner.CompositeWorkItem/<PerformWork>d__13:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/NUnitExtensions/Runner/CompositeWorkItem.cs:82)
+0x0000013d2513296b (Mono JIT Code) UnityEngine.TestTools.TestRunner.PlaymodeTestsController/<TestRunnerCoroutine>d__24:MoveNext () (at ./Library/PackageCache/com.unity.test-framework@a6f5be5f149c/UnityEngine.TestRunner/TestRunner/PlaymodeTestsController.cs:93)
+<message truncated>
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.ProceduralRoomGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomManagementSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:498)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests:CinemachineZoneGenerator_CreatesBiomeSpecificCameraSettings () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralRoomGenerationTests.cs:121)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.CinemachineZoneGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomNavigationGeneratorSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.SimulationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:471)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests:CinemachineZoneGenerator_CreatesBiomeSpecificCameraSettings () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralRoomGenerationTests.cs:122)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.ProceduralRoomGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomManagementSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:498)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests:CompleteGenerationPipeline_ProcessesRoomCorrectly () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralRoomGenerationTests.cs:201)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.CinemachineZoneGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomNavigationGeneratorSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.SimulationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:471)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests:CompleteGenerationPipeline_ProcessesRoomCorrectly () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralRoomGenerationTests.cs:202)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.ProceduralRoomGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomManagementSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:498)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests:NavigationGenerator_CreatesMovementConnections_WithCorrectAbilityTags () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralRoomGenerationTests.cs:81)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.ProceduralRoomGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomManagementSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.ComponentSystemSorter:WarnAboutAnySystemAttributeBadness (int,Unity.Entities.ComponentSystemGroup) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemSorter.cs:498)
+Unity.Entities.ComponentSystemGroup:GenerateMasterUpdateList () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:484)
+Unity.Entities.ComponentSystemGroup:RecurseUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:404)
+Unity.Entities.ComponentSystemGroup:SortSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:592)
+TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests:ProceduralRoomGenerator_CreatesRoomTemplate_WithCorrectCapabilityTags () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/ProceduralRoomGenerationTests.cs:49)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+'TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictWfcSystem.cs:47)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests:EmptyCandidateBuffer_SetsContradiction () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/DistrictWfcSystemTests.cs:92)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+'TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictWfcSystem.cs:47)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests:Initialization_AddsCandidates_SetsInProgress () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/DistrictWfcSystemTests.cs:51)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+'TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictWfcSystem.cs:47)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests:MissingCandidateBuffer_MarksFailed () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/DistrictWfcSystemTests.cs:101)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+'TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictWfcSystem.cs:47)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests:OverIterationThreshold_TriggersRandomCollapse () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/DistrictWfcSystemTests.cs:115)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+'TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictWfcSystem.cs:47)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests:Progression_IncrementsIteration_EntropyReflectsCandidateCount () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/DistrictWfcSystemTests.cs:64)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+'TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+UnityEngine.Debug:LogWarning (object)
+Unity.Debug:LogWarning (object) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:13)
+Unity.Entities.SystemState:CheckOnUpdate_Query () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:552)
+Unity.Entities.SystemState:GetEntityQuery (Unity.Entities.EntityQueryBuilder&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemState.cs:874)
+Unity.Entities.EntityQueryBuilder:Build (Unity.Entities.SystemState&) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQueryBuilder.cs:1902)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:OnUpdate (Unity.Entities.SystemState&) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictWfcSystem.cs:47)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem:__codegen__OnUpdate (intptr,intptr)
+Unity.Entities.SystemBaseRegistry/<>c__DisplayClass9_0:<SelectBurstFn>b__0 (intptr,intptr) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:249)
+Unity.Entities.WorldUnmanagedImpl/Unity.Entities.UnmanagedUpdate_00001677$BurstDirectCall:Invoke (void*)
+Unity.Entities.WorldUnmanagedImpl:UnmanagedUpdate (void*)
+Unity.Entities.WorldUnmanagedImpl:UpdateSystem (Unity.Entities.SystemHandle) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:891)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Entities.ComponentSystemGroup:OnUpdate () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.SystemBase:Update () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests:SingleCandidate_CollapsesToCompleted () (at ./Packages/com.tinywalnutgames.metvd.graph/Tests/Runtime/DistrictWfcSystemTests.cs:78)
+System.Reflection.MethodBase:Invoke (object,object[])
+NUnit.Framework.Internal.Reflect:InvokeMethod (System.Reflection.MethodInfo,object,object[])
+NUnit.Framework.Internal.MethodWrapper:Invoke (object,object[])
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunNonAsyncTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:RunTestMethod (NUnit.Framework.Internal.ITestExecutionContext)
+NUnit.Framework.Internal.Commands.TestMethodCommand:Execute (NUnit.Framework.Internal.ITestExecutionContext)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+Saving results to: C:/Users/Jerry/AppData/LocalLow/DefaultCompany/TWG-MetVanDamn\TestResults.xml
+
+Executing IPostBuildCleanup for: Unity.PerformanceTesting.Editor.TestRunBuilder.
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+
+
+.\Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs(246,13): Burst error BC1025: Accessing the type `TinyWalnutGames.MetVD.Core.BiomeType` (e.g. using `typeof`) is not supported
+
+ at TinyWalnutGames.MetVD.Graph.RoomManagementSystem.DetermineBiomeFromNodeId(TinyWalnutGames.MetVD.Core.NodeId* nodeId) (at .\Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs:246)
+ at TinyWalnutGames.MetVD.Graph.RoomManagementSystem.InitializeRoomGenerationRequest(Unity.Entities.EntityManager* entityManager, Unity.Entities.Entity roomEntity, TinyWalnutGames.MetVD.Graph.RoomHierarchyData* roomData, TinyWalnutGames.MetVD.Core.NodeId* nodeId, TinyWalnutGames.MetVD.Graph.ProgressionAnalysis progression, ref Unity.Mathematics.Random random) (at .\Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs:212)
+ at TinyWalnutGames.MetVD.Graph.RoomManagementSystem.OnUpdate(TinyWalnutGames.MetVD.Graph.RoomManagementSystem* this, ref Unity.Entities.SystemState state) (at .\Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs:195)
+ at TinyWalnutGames.MetVD.Graph.RoomManagementSystem.__codegen__OnUpdate$BurstManaged(System.IntPtr self, System.IntPtr state)
+ at TinyWalnutGames.MetVD.Graph.RoomManagementSystem.TinyWalnutGames.MetVD.Graph.__codegen__OnUpdate_000000BA$BurstDirectCall.Invoke(System.IntPtr self, System.IntPtr state)
+ at TinyWalnutGames.MetVD.Graph.RoomManagementSystem.__codegen__OnUpdate(System.IntPtr self, System.IntPtr state)
+
+
+While compiling job:
+TinyWalnutGames.MetVD.Graph.JumpArcSolver, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::IsReachable(Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|TinyWalnutGames.MetVD.Core.Ability, TinyWalnutGames.MetVD.Core, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|TinyWalnutGames.MetVD.Graph.JumpArcPhysics&, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)
+TinyWalnutGames.MetVD.Graph.RoomManagementSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.RuleRandomizationSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.PatternDrivenModularGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.LayeredPlatformCloudGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.WeightedTilePrefabGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.WeightedTilePrefabGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.ParametricChallengeGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.RoomGenerationPipelineSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.JumpArcSolver, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::IsWithinRoomBounds(Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.BiomeWeightedHeightmapGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.ParametricChallengeGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.BiomeWeightedHeightmapGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.LinearBranchingCorridorGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.JumpArcSolver, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::ValidateRoomReachability(Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Collections.NativeArray`1+ReadOnly[[Unity.Mathematics.int2, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|TinyWalnutGames.MetVD.Core.Ability, TinyWalnutGames.MetVD.Core, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|TinyWalnutGames.MetVD.Graph.JumpArcPhysics&, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Collections.Allocator, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)
+TinyWalnutGames.MetVD.Graph.SectorRefineSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.RoomManagementSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.LinearBranchingCorridorGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.StackedSegmentGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.DistrictLayoutSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.LayeredPlatformCloudGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+Unity.Entities.JobChunkExtensions+JobChunkProducer`1[[TinyWalnutGames.MetVD.Graph.SectorRefinementJob, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], Unity.Entities, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Execute(Unity.Entities.JobChunkExtensions+JobChunkWrapper`1[[TinyWalnutGames.MetVD.Graph.SectorRefinementJob, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]&, Unity.Entities, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Jobs.LowLevel.Unsafe.JobRanges&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.StackedSegmentGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.JumpArcSolver, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::CalculateMinimumPlatformSpacing(TinyWalnutGames.MetVD.Graph.JumpArcPhysics&, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)
+TinyWalnutGames.MetVD.Graph.JumpArcSolver, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::ValidateRoomReachability(Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|TinyWalnutGames.MetVD.Core.Ability, TinyWalnutGames.MetVD.Core, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|TinyWalnutGames.MetVD.Graph.JumpArcPhysics&, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Collections.Allocator, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)
+TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.DistrictLayoutSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.PatternDrivenModularGenerator, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.RoomGenerationPipelineSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.DistrictWfcSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.SectorRefineSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnUpdate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.JumpArcSolver, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::CalculateJumpArc(Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Mathematics.int2&, Unity.Mathematics, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|TinyWalnutGames.MetVD.Graph.JumpArcPhysics&, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|TinyWalnutGames.MetVD.Graph.JumpArcData&, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)
+TinyWalnutGames.MetVD.Graph.RuleRandomizationSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)
+TinyWalnutGames.MetVD.Graph.WorldBootstrapSystem, TinyWalnutGames.MetVD.Graph, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::__codegen__OnCreate(System.<message truncated>
+
+Severity	Code	Description	Project	File	Line	Suppression State	Details
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\DistrictWfcSystem__System_8320966320.g.cs	74		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\DistrictWfcSystem__System_8320966320.g.cs	74		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\RoomGenerationPipelineSystem__System_16610318210.g.cs	146		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\RoomGenerationPipelineSystem__System_16610318210.g.cs	146		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\RoomGenerationPipelineSystem__System_16610318210.g.cs	146		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924820.g.cs	121		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924820.g.cs	121		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924820.g.cs	121		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924821.g.cs	206		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924821.g.cs	206		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924821.g.cs	206		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924822.g.cs	117		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924822.g.cs	117		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SpecializedGenerators__System_1664924822.g.cs	117		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604440.g.cs	100		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604440.g.cs	100		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604440.g.cs	100		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604441.g.cs	96		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604441.g.cs	96		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604441.g.cs	96		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604442.g.cs	69		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604442.g.cs	69		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604442.g.cs	69		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604443.g.cs	86		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604443.g.cs	86		
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	TinyWalnutGames.MetVD.Graph.Player	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\TerrainAndSkyGenerators__System_2191604443.g.cs	86		
+
+
+Build started at 3:15 AM...
+------ Build started: Project: TinyWalnutGames.MetVD.Shared.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Utility, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Utility.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Shared, Configuration: Debug Any CPU ------
+------ Build started: Project: LivingDevAgent.Editor, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Tests.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Biome.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.GridLayerEditor, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Player, Configuration: Debug Any CPU ------
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/RoomGenerationPipelineSystem__System_16610318210.g.cs(145,888): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/RoomGenerationPipelineSystem__System_16610318210.g.cs(145,1042): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/RoomGenerationPipelineSystem__System_16610318210.g.cs(145,1192): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604440.g.cs(98,888): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604440.g.cs(98,1042): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604440.g.cs(98,1192): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604441.g.cs(94,888): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604441.g.cs(94,1042): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604441.g.cs(94,1192): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604442.g.cs(67,888): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604442.g.cs(67,1042): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604442.g.cs(67,1192): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604443.g.cs(84,888): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604443.g.cs(84,1042): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/TerrainAndSkyGenerators__System_2191604443.g.cs(84,1192): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924820.g.cs(119,888): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924820.g.cs(119,1042): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924820.g.cs(119,1192): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924821.g.cs(204,888): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924821.g.cs(204,1042): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924821.g.cs(204,1192): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924822.g.cs(116,1264): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924822.g.cs(116,1418): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/SpecializedGenerators__System_1664924822.g.cs(116,1568): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/DistrictWfcSystem__System_8320966320.g.cs(74,620): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Graph/DistrictWfcSystem__System_8320966320.g.cs(74,761): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+------ Build started: Project: TinyWalnutGames.MetVD.Biome, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Tests.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Samples.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Samples, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Editor, Configuration: Debug Any CPU ------
+========== Build: 21 succeeded or up-to-date, 1 failed, 0 skipped ==========
+========== Build completed at 3:16 AM and took 06.366 seconds ==========

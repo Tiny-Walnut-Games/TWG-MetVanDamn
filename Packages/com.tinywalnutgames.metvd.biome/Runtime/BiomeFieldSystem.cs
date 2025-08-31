@@ -394,7 +394,7 @@ namespace TinyWalnutGames.MetVD.Biome
 					// For now, we preserve the potential for future expansion
 					float errorDensity = (float)recordIndex / math.max(1, buffer.Length);
 					// Error density calculation enables future health scoring systems
-					Debug.LogWarning($"High polarity coherence issues detected at NodeId {nodeId._value} with error density {errorDensity:F2}"); // Add this at the top of the file with the other using directives
+					Debug.LogWarning($"High polarity coherence issues detected at NodeId {nodeId._value} with error density {errorDensity:d}"); // Add this at the top of the file with the other using directives
 					}
 				}
 			}
