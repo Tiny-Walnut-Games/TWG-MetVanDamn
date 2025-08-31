@@ -186,18 +186,41 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// 🧙‍♂️ TIMING FIX: Ensure Unity has fully processed the scene structure
 			EditorApplication.delayCall += () =>
 			{
-				// This ensures Unity's editor has fully processed the scene before we assign references
-				foreach (string subName in SubSceneNames)
+				Debug.Log("🔗 Phase 8 DELAYED: Starting SceneAsset reference assignment...");
+				
+				// Double-check that root scene is still active
+				Scene rootForReferenceAssignment = SceneManager.GetSceneByPath(rootPath);
+				if (!rootForReferenceAssignment.IsValid() || !rootForReferenceAssignment.isLoaded)
 					{
-					AssignSubSceneReference(subName);
+					Debug.LogError("❌ Root scene not available for reference assignment in delayed call!");
+					return;
 					}
 
-				// Note: Phase 9 moved into EditorApplication.delayCall above for proper timing
-				// The delay ensures Unity has fully processed the scene structure before final save
+				SceneManager.SetActiveScene(rootForReferenceAssignment);
+				Debug.Log($"🔗 Active scene confirmed: {SceneManager.GetActiveScene().name}");
+
+				// Assign references with detailed logging
+				int successCount = 0;
+				foreach (string subName in SubSceneNames)
+					{
+					Debug.Log($"🔗 Attempting reference assignment for: {subName}");
+					bool success = AssignSubSceneReferenceWithValidation(subName);
+					if (success) successCount++;
+					}
+
+				// Final save and validation
 				AssetDatabase.SaveAssets();
 				AssetDatabase.Refresh();
+				
+				Debug.Log($"✅ SubScene reference assignment completed: {successCount}/{SubSceneNames.Length} successful");
 				string note = _fallbackTriggeredThisRun ? " (one or more sub‑scenes created via fallback)" : string.Empty;
 				Debug.Log("✅ MetVanDAMN baseline scene + " + SubSceneNames.Length + " sub‑scenes created at " + rootPath + note);
+				
+				if (successCount < SubSceneNames.Length)
+					{
+					Debug.LogWarning($"⚠️ {SubSceneNames.Length - successCount} SubScene reference assignments failed. Check console for details.");
+					}
+				
 				if (_fallbackTriggeredThisRun)
 					{
 					Debug.LogWarning("Some sub‑scenes were created using fallback (Single) mode because additive creation was unavailable. Re-run the bootstrap later if you need to refresh links.");
@@ -206,14 +229,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				Debug.Log("   Next: Open the scene and press Play for immediate worldgen smoke validation.");
 			};
 
-			// @jmeyer1980 TODO: ⚠ Intention ⚠ This is temporarily moved into the delayCall above to test if later timeing helps
-			ReopenRootIfNeeded();
-			Scene activeRoot = SceneManager.GetSceneByPath(rootPath);
-			if (!activeRoot.IsValid() || !activeRoot.isLoaded)
-				{
-				Debug.LogError("❌ Root scene not properly loaded for reference assignment!");
-				return;
-				}
+			// 🔗 CRITICAL: Remove conflicting code - all validation moved to delayCall
+			// The delayCall above handles all scene validation and reference assignment
 			}
 
 		private static void ReopenRootIfNeeded ()
@@ -646,37 +663,60 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		/// <summary>
-		/// Assigns SceneAsset reference to existing SubScene GameObject
-		/// 🔥 ENHANCED: Now includes proper GUID assignment to _SceneGUID field!
+		/// Assigns SceneAsset reference to existing SubScene GameObject with comprehensive validation
+		/// 🔥 ENHANCED: Returns success status and includes detailed error reporting
 		/// </summary>
-		private static void AssignSubSceneReference (string subName)
+		private static bool AssignSubSceneReferenceWithValidation (string subName)
 			{
 			string scenePath = Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/");
 
-#if METVD_FULL_DOTS
+			// 🔍 VALIDATION: Check if scene file exists
+			if (!System.IO.File.Exists(scenePath))
+				{
+				Debug.LogError($"❌ Scene file does not exist: {scenePath}");
+				return false;
+				}
+
+			// 🔍 VALIDATION: Check if GameObject exists
 			var go = GameObject.Find(subName);
 			if (go == null)
 				{
-				Debug.LogError($"❌ SubScene GameObject '{subName}' not found for reference assignment!");
-				return;
+				Debug.LogError($"❌ SubScene GameObject '{subName}' not found! Available GameObjects: {string.Join(", ", Object.FindObjectsOfType<GameObject>().Select(obj => obj.name))}");
+				return false;
 				}
 
+			Debug.Log($"✅ Found GameObject: {subName}");
+
+#if METVD_FULL_DOTS
+			// 🔍 VALIDATION: Check if SubScene component exists
 			if (!go.TryGetComponent(out SubScene subSceneComp))
 				{
-				Debug.LogError($"❌ SubScene component not found on '{subName}'!");
-				return;
+				Debug.LogError($"❌ SubScene component not found on '{subName}'! Components: {string.Join(", ", go.GetComponents<Component>().Select(c => c.GetType().Name))}");
+				return false;
 				}
 
-			SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
-			if (sceneAsset != null)
-				{
-				string guid = AssetDatabase.AssetPathToGUID(scenePath);
-				if (string.IsNullOrEmpty(guid))
-					{
-					Debug.LogError($"❌ Scene asset at '{scenePath}' has no GUID! SubScene will show as Missing.");
-					return;
-					}
+			Debug.Log($"✅ Found SubScene component on: {subName}");
 
+			// 🔍 VALIDATION: Load SceneAsset and verify GUID
+			SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+			if (sceneAsset == null)
+				{
+				Debug.LogError($"❌ Failed to load SceneAsset from path: {scenePath}");
+				return false;
+				}
+
+			string guid = AssetDatabase.AssetPathToGUID(scenePath);
+			if (string.IsNullOrEmpty(guid))
+				{
+				Debug.LogError($"❌ Scene asset at '{scenePath}' has no GUID! SubScene will show as Missing.");
+				return false;
+				}
+
+			Debug.Log($"✅ SceneAsset loaded with GUID: {guid}");
+
+			// 🔗 ASSIGNMENT: Set SceneAsset reference and GUID
+			try
+				{
 				SerializedObject so = new(subSceneComp);
 
 				// 🎯 CRITICAL: Assign the SceneAsset reference
@@ -684,137 +724,156 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				if (sceneProp != null)
 					{
 					sceneProp.objectReferenceValue = sceneAsset;
+					Debug.Log($"✅ Set m_SceneAsset reference for {subName}");
+					}
+				else
+					{
+					Debug.LogWarning($"⚠️ m_SceneAsset property not found on {subName}");
 					}
 
 				// 🔥 THE MISSING PIECE: Assign the _SceneGUID field!
 				SerializedProperty sceneGuidProp = so.FindProperty("_SceneGUID");
 				if (sceneGuidProp != null)
 					{
-					// Unity's GUID is stored as a 128-bit value split into 4 uint32s
 					SerializedProperty guidValueProp = sceneGuidProp.FindPropertyRelative("Value");
 					if (guidValueProp != null)
 						{
 						// 🧙‍♂️ GUID CONVERSION MAGIC: Convert string GUID to Unity's 4x uint32 format
-						var unityGuid = new Guid(guid);
+						var unityGuid = new System.Guid(guid);
 						byte [ ] guidBytes = unityGuid.ToByteArray();
 
-						uint x = BitConverter.ToUInt32(guidBytes, 0);
-						uint y = BitConverter.ToUInt32(guidBytes, 4);
-						uint z = BitConverter.ToUInt32(guidBytes, 8);
-						uint w = BitConverter.ToUInt32(guidBytes, 12);
+						uint x = System.BitConverter.ToUInt32(guidBytes, 0);
+						uint y = System.BitConverter.ToUInt32(guidBytes, 4);
+						uint z = System.BitConverter.ToUInt32(guidBytes, 8);
+						uint w = System.BitConverter.ToUInt32(guidBytes, 12);
 
 						SerializedProperty xProp = guidValueProp.FindPropertyRelative("x");
 						SerializedProperty yProp = guidValueProp.FindPropertyRelative("y");
 						SerializedProperty zProp = guidValueProp.FindPropertyRelative("z");
 						SerializedProperty wProp = guidValueProp.FindPropertyRelative("w");
 
-						// ⚠Intended formatting⚠: easier to read inline ifs when short like this
 						if (xProp != null) xProp.uintValue = x;
 						if (yProp != null) yProp.uintValue = y;
 						if (zProp != null) zProp.uintValue = z;
 						if (wProp != null) wProp.uintValue = w;
 
-						Debug.Log($"🔥 GUID assigned to _SceneGUID: {guid} -> ({x:X8}, {y:X8}, {z:X8}, {w:X8})");
+						Debug.Log($"✅ Set _SceneGUID for {subName}: {guid} -> ({x:X8}, {y:X8}, {z:X8}, {w:X8})");
+						}
+					else
+						{
+						Debug.LogWarning($"⚠️ _SceneGUID.Value property not found on {subName}");
 						}
 					}
+				else
+					{
+					Debug.LogWarning($"⚠️ _SceneGUID property not found on {subName}");
+					}
 
+				// 🔗 ASSIGNMENT: Set auto-load
 				SerializedProperty autoLoadProp = so.FindProperty("m_AutoLoadScene");
 				if (autoLoadProp != null)
 					{
 					autoLoadProp.boolValue = true;
+					Debug.Log($"✅ Set m_AutoLoadScene = true for {subName}");
 					}
 
-				so.ApplyModifiedPropertiesWithoutUndo();
+				// 💾 SAVE: Apply changes
+				bool applied = so.ApplyModifiedPropertiesWithoutUndo();
+				if (!applied)
+					{
+					Debug.LogWarning($"⚠️ Failed to apply SerializedObject changes for {subName}");
+					}
 
 				EditorUtility.SetDirty(subSceneComp);
 				EditorUtility.SetDirty(go);
 
-				Debug.Log($"✅ SubScene reference AND GUID assigned: '{subName}' -> {scenePath} (GUID: {guid})");
+				Debug.Log($"✅ SubScene reference assignment completed for '{subName}' -> {scenePath}");
+				return true;
 				}
-			else
+			catch (System.Exception ex)
 				{
-				Debug.LogError($"❌ SceneAsset at '{scenePath}' could not be loaded for reference assignment!");
+				Debug.LogError($"❌ Exception during SubScene assignment for {subName}: {ex.Message}");
+				return false;
 				}
 #else
-            Type subSceneType = FindTypeAnywhere("Unity.Scenes.SubScene");
-            var go = GameObject.Find(subName);
-            if (go == null || subSceneType == null)
-            {
-                Debug.LogWarning($"⚠️ Cannot assign reference to '{subName}' - GameObject or SubScene type not found");
-                return;
-            }
+			// 🔍 VALIDATION: Reflection mode assignment
+			Type subSceneType = FindTypeAnywhere("Unity.Scenes.SubScene");
+			if (subSceneType == null)
+				{
+				Debug.LogWarning($"⚠️ SubScene type not found via reflection - using marker instead for {subName}");
+				return true; // Not a failure, just using fallback
+				}
 
-            Component existing = go.GetComponent(subSceneType);
-            if (existing == null)
-            {
-                Debug.LogWarning($"⚠️ SubScene component not found on '{subName}' for reference assignment");
-                return;
-            }
+			Component existing = go.GetComponent(subSceneType);
+			if (existing == null)
+				{
+				Debug.LogError($"❌ SubScene component not found on '{subName}' in reflection mode");
+				return false;
+				}
 
-            SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
-            if (sceneAsset != null)
-            {
-                try
-                {
-                    string guid = AssetDatabase.AssetPathToGUID(scenePath);
-                    if (string.IsNullOrEmpty(guid))
-                    {
-                        Debug.LogError($"❌ Scene asset at '{scenePath}' has no GUID! SubScene will show as Missing.");
-                        return;
-                    }
+			// Similar assignment logic for reflection mode
+			SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+			if (sceneAsset == null)
+				{
+				Debug.LogError($"❌ Failed to load SceneAsset from path: {scenePath} (reflection mode)");
+				return false;
+				}
 
-                    SerializedObject so = new(existing);
-                    
-                    // 🎯 CRITICAL: Assign the SceneAsset reference
-                    SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
-                    if (sceneProp != null) sceneProp.objectReferenceValue = sceneAsset;
-                    
-                    // 🔥 THE MISSING PIECE: Assign the _SceneGUID field! (Reflection mode)
-                    SerializedProperty sceneGuidProp = so.FindProperty("_SceneGUID");
-                    if (sceneGuidProp != null)
-                    {
-                        SerializedProperty guidValueProp = sceneGuidProp.FindPropertyRelative("Value");
-                        if (guidValueProp != null)
-                        {
-                            // 🧙‍♂️ GUID CONVERSION MAGIC: Convert string GUID to Unity's 4x uint32 format
-                            System.Guid unityGuid = new System.Guid(guid);
-                            byte[] guidBytes = unityGuid.ToByteArray();
-                            
-                            uint x = System.BitConverter.ToUInt32(guidBytes, 0);
-                            uint y = System.BitConverter.ToUInt32(guidBytes, 4);
-                            uint z = System.BitConverter.ToUInt32(guidBytes, 8);
-                            uint w = System.BitConverter.ToUInt32(guidBytes, 12);
-                            
-                            SerializedProperty xProp = guidValueProp.FindPropertyRelative("x");
-                            SerializedProperty yProp = guidValueProp.FindPropertyRelative("y");
-                            SerializedProperty zProp = guidValueProp.FindPropertyRelative("z");
-                            SerializedProperty wProp = guidValueProp.FindPropertyRelative("w");
-                            
-                            if (xProp != null) xProp.uintValue = x;
-                            if (yProp != null) yProp.uintValue = y;
-                            if (zProp != null) zProp.uintValue = z;
-                            if (wProp != null) wProp.uintValue = w;
-                            
-                            Debug.Log($"🔥 GUID assigned to _SceneGUID (reflection): {guid} -> ({x:X8}, {y:X8}, {z:X8}, {w:X8})");
-                        }
-                    }
-                    
-                    SerializedProperty autoLoadProp = so.FindProperty("m_AutoLoadScene");
-                    if (autoLoadProp != null) autoLoadProp.boolValue = true;
-                    so.ApplyModifiedProperties();
-                    EditorUtility.SetDirty(existing);
-                    
-                    Debug.Log($"✅ SubScene reference AND GUID assigned: '{subName}' -> {scenePath} (reflection mode, GUID: {guid})");
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning($"❌ SubScene reference assignment failed for {subName}: " + e.Message);
-                }
-            }
-            else
-            {
-                Debug.LogError($"❌ SceneAsset at '{scenePath}' could not be loaded for reference assignment!");
-            }
+			string guid = AssetDatabase.AssetPathToGUID(scenePath);
+			if (string.IsNullOrEmpty(guid))
+				{
+				Debug.LogError($"❌ Scene asset at '{scenePath}' has no GUID! (reflection mode)");
+				return false;
+				}
+
+			try
+				{
+				SerializedObject so = new(existing);
+				
+				SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
+				if (sceneProp != null) sceneProp.objectReferenceValue = sceneAsset;
+				
+				// GUID assignment for reflection mode
+				SerializedProperty sceneGuidProp = so.FindProperty("_SceneGUID");
+				if (sceneGuidProp != null)
+					{
+					SerializedProperty guidValueProp = sceneGuidProp.FindPropertyRelative("Value");
+					if (guidValueProp != null)
+						{
+						var unityGuid = new System.Guid(guid);
+						byte[] guidBytes = unityGuid.ToByteArray();
+						
+						uint x = System.BitConverter.ToUInt32(guidBytes, 0);
+						uint y = System.BitConverter.ToUInt32(guidBytes, 4);
+						uint z = System.BitConverter.ToUInt32(guidBytes, 8);
+						uint w = System.BitConverter.ToUInt32(guidBytes, 12);
+						
+						SerializedProperty xProp = guidValueProp.FindPropertyRelative("x");
+						SerializedProperty yProp = guidValueProp.FindPropertyRelative("y");
+						SerializedProperty zProp = guidValueProp.FindPropertyRelative("z");
+						SerializedProperty wProp = guidValueProp.FindPropertyRelative("w");
+						
+						if (xProp != null) xProp.uintValue = x;
+						if (yProp != null) yProp.uintValue = y;
+						if (zProp != null) zProp.uintValue = z;
+						if (wProp != null) wProp.uintValue = w;
+						}
+					}
+				
+				SerializedProperty autoLoadProp = so.FindProperty("m_AutoLoadScene");
+				if (autoLoadProp != null) autoLoadProp.boolValue = true;
+				
+				so.ApplyModifiedProperties();
+				EditorUtility.SetDirty(existing);
+				
+				Debug.Log($"✅ SubScene reference assignment completed (reflection mode): '{subName}' -> {scenePath}");
+				return true;
+				}
+			catch (System.Exception ex)
+				{
+				Debug.LogError($"❌ Exception during SubScene assignment (reflection mode) for {subName}: {ex.Message}");
+				return false;
+				}
 #endif
 			}
 		}
