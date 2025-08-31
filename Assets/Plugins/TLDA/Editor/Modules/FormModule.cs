@@ -18,16 +18,16 @@ namespace LivingDevAgent.Editor.Modules
 
 		public void ResetSwitchFlags ()
 			{
-			this.ShouldSwitchToEditor = false;
-			this.ShouldSwitchToPreview = false;
+			ShouldSwitchToEditor = false;
+			ShouldSwitchToPreview = false;
 			}
 
 		public void DrawToolbar ()
 			{
 			// 🕐 Time Tracking Controls (Prime Position!)
-			if (this._data.IsTimerActive)
+			if (_data.IsTimerActive)
 				{
-				System.TimeSpan elapsed = System.DateTime.Now - this._data.SessionStartTime;
+				System.TimeSpan elapsed = System.DateTime.Now - _data.SessionStartTime;
 				string timerText = $"⏱️ {elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}";
 
 				// Active timer display with clock out
@@ -35,19 +35,19 @@ namespace LivingDevAgent.Editor.Modules
 
 				if (GUILayout.Button("🕐 Clock Out", EditorStyles.toolbarButton, GUILayout.Width(80)))
 					{
-					this.ClockOut();
+					ClockOut();
 					}
 				}
 			else
 				{
 				if (GUILayout.Button("🕐 Clock In", EditorStyles.toolbarButton, GUILayout.Width(80)))
 					{
-					this.ClockIn();
+					ClockIn();
 					}
 
-				if (this._data.TotalSessionMinutes > 0)
+				if (_data.TotalSessionMinutes > 0)
 					{
-					GUILayout.Label($"📊 {this._data.TotalSessionMinutes:F0}m", EditorStyles.miniLabel, GUILayout.Width(60));
+					GUILayout.Label($"📊 {_data.TotalSessionMinutes:F0}m", EditorStyles.miniLabel, GUILayout.Width(60));
 					}
 				}
 
@@ -56,37 +56,37 @@ namespace LivingDevAgent.Editor.Modules
 			// Form operations
 			if (GUILayout.Button("🎯 Generate → Editor", EditorStyles.toolbarButton))
 				{
-				if (this.WarnOverwriteRawIfDirty())
+				if (WarnOverwriteRawIfDirty())
 					{
-					string md = this.BuildMarkdown();
-					this._data.RawContent = md;
-					this._data.RawGeneratedSnapshot = md;
-					this._data.RawDirty = false;
-					this.ShouldSwitchToEditor = true;
-					this.SetStatus("🎯 Generated content from form into Editor");
+					string md = BuildMarkdown();
+					_data.RawContent = md;
+					_data.RawGeneratedSnapshot = md;
+					_data.RawDirty = false;
+					ShouldSwitchToEditor = true;
+					SetStatus("🎯 Generated content from form into Editor");
 					}
 				}
 
 			if (GUILayout.Button("📄 Create TLDL", EditorStyles.toolbarButton))
 				{
-				this.TryCreateTLDL();
+				TryCreateTLDL();
 				}
 			}
 
 		public void DrawContent (Rect windowPosition)
 			{
 			float viewportHeight = Mathf.Max(140f, windowPosition.height - 220f);
-			this._data.FormScroll = EditorGUILayout.BeginScrollView(this._data.FormScroll, GUILayout.Height(viewportHeight), GUILayout.ExpandHeight(true));
+			_data.FormScroll = EditorGUILayout.BeginScrollView(_data.FormScroll, GUILayout.Height(viewportHeight), GUILayout.ExpandHeight(true));
 
 			// Header section
-			this.DrawHeaderSection();
+			DrawHeaderSection();
 
 			// Sections toggles and content
-			this.DrawSectionsToggles();
-			this.DrawSectionEditors(); // 🎯 NEW: Detailed section editors
+			DrawSectionsToggles();
+			DrawSectionEditors(); // 🎯 NEW: Detailed section editors
 
 			// Auto-sync controls
-			this.DrawAutoSyncControls();
+			DrawAutoSyncControls();
 
 			EditorGUILayout.EndScrollView();
 			}
@@ -96,19 +96,19 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("📋 Header", EditorStyles.boldLabel);
 
-			this.DrawHelp("Title", "Short, descriptive. Used in the filename.");
-			this._data.Title = EditorGUILayout.TextField("Title", this._data.Title);
+			DrawHelp("Title", "Short, descriptive. Used in the filename.");
+			_data.Title = EditorGUILayout.TextField("Title", _data.Title);
 
-			this._data.Author = EditorGUILayout.TextField("Author", string.IsNullOrWhiteSpace(this._data.Author) ? "@copilot" : this._data.Author);
+			_data.Author = EditorGUILayout.TextField("Author", string.IsNullOrWhiteSpace(_data.Author) ? "@copilot" : _data.Author);
 
-			this.DrawPlaceholder("Context", "Issue #XX, Feature Name, or short description.");
-			this._data.Context = EditorGUILayout.TextArea(this._data.Context, _textAreaWrap, GUILayout.MinHeight(40), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Context", "Issue #XX, Feature Name, or short description.");
+			_data.Context = EditorGUILayout.TextArea(_data.Context, _textAreaWrap, GUILayout.MinHeight(40), GUILayout.ExpandWidth(true));
 
-			this.DrawPlaceholder("Summary", "One line describing the result.");
-			this._data.Summary = EditorGUILayout.TextArea(this._data.Summary, _textAreaWrap, GUILayout.MinHeight(40), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Summary", "One line describing the result.");
+			_data.Summary = EditorGUILayout.TextArea(_data.Summary, _textAreaWrap, GUILayout.MinHeight(40), GUILayout.ExpandWidth(true));
 
-			this.DrawPlaceholder("Tags (comma-separated)", "e.g., Chronicle Keeper, LDA, Docs");
-			this._data.TagsCsv = EditorGUILayout.TextField("Tags", this._data.TagsCsv);
+			DrawPlaceholder("Tags (comma-separated)", "e.g., Chronicle Keeper, LDA, Docs");
+			_data.TagsCsv = EditorGUILayout.TextField("Tags", _data.TagsCsv);
 
 			EditorGUILayout.EndVertical();
 			}
@@ -118,17 +118,17 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🗂️ Sections", EditorStyles.boldLabel);
 
-			this._data.IncludeDiscoveries = EditorGUILayout.ToggleLeft("🔍 Include Discoveries", this._data.IncludeDiscoveries);
-			this._data.IncludeActions = EditorGUILayout.ToggleLeft("⚡ Include Actions Taken", this._data.IncludeActions);
-			this._data.IncludeTechnicalDetails = EditorGUILayout.ToggleLeft("🔧 Include Technical Details", this._data.IncludeTechnicalDetails);
-			this._data.IncludeTerminalProof = EditorGUILayout.ToggleLeft("💻 Include Terminal Proof", this._data.IncludeTerminalProof);
-			this._data.IncludeDependencies = EditorGUILayout.ToggleLeft("📦 Include Dependencies", this._data.IncludeDependencies);
-			this._data.IncludeLessons = EditorGUILayout.ToggleLeft("🎓 Include Lessons Learned", this._data.IncludeLessons);
-			this._data.IncludeNextSteps = EditorGUILayout.ToggleLeft("🚀 Include Next Steps", this._data.IncludeNextSteps);
-			this._data.IncludeReferences = EditorGUILayout.ToggleLeft("🔗 Include References", this._data.IncludeReferences);
-			this._data.IncludeDevTimeTravel = EditorGUILayout.ToggleLeft("⏰ Include DevTimeTravel", this._data.IncludeDevTimeTravel);
-			this._data.IncludeMetadata = EditorGUILayout.ToggleLeft("📊 Include Metadata", this._data.IncludeMetadata);
-			this._data.IncludeImages = EditorGUILayout.ToggleLeft("🖼️ Include Images", this._data.IncludeImages);
+			_data.IncludeDiscoveries = EditorGUILayout.ToggleLeft("🔍 Include Discoveries", _data.IncludeDiscoveries);
+			_data.IncludeActions = EditorGUILayout.ToggleLeft("⚡ Include Actions Taken", _data.IncludeActions);
+			_data.IncludeTechnicalDetails = EditorGUILayout.ToggleLeft("🔧 Include Technical Details", _data.IncludeTechnicalDetails);
+			_data.IncludeTerminalProof = EditorGUILayout.ToggleLeft("💻 Include Terminal Proof", _data.IncludeTerminalProof);
+			_data.IncludeDependencies = EditorGUILayout.ToggleLeft("📦 Include Dependencies", _data.IncludeDependencies);
+			_data.IncludeLessons = EditorGUILayout.ToggleLeft("🎓 Include Lessons Learned", _data.IncludeLessons);
+			_data.IncludeNextSteps = EditorGUILayout.ToggleLeft("🚀 Include Next Steps", _data.IncludeNextSteps);
+			_data.IncludeReferences = EditorGUILayout.ToggleLeft("🔗 Include References", _data.IncludeReferences);
+			_data.IncludeDevTimeTravel = EditorGUILayout.ToggleLeft("⏰ Include DevTimeTravel", _data.IncludeDevTimeTravel);
+			_data.IncludeMetadata = EditorGUILayout.ToggleLeft("📊 Include Metadata", _data.IncludeMetadata);
+			_data.IncludeImages = EditorGUILayout.ToggleLeft("🖼️ Include Images", _data.IncludeImages);
 
 			EditorGUILayout.EndVertical();
 			}
@@ -136,59 +136,59 @@ namespace LivingDevAgent.Editor.Modules
 		// 🎯 NEW: Complete section editors for all toggles
 		private void DrawSectionEditors ()
 			{
-			if (this._data.IncludeDiscoveries)
+			if (_data.IncludeDiscoveries)
 				{
-				this.DrawDiscoveriesSection();
+				DrawDiscoveriesSection();
 				}
 
-			if (this._data.IncludeActions)
+			if (_data.IncludeActions)
 				{
-				this.DrawActionsSection();
+				DrawActionsSection();
 				}
 
-			if (this._data.IncludeTechnicalDetails)
+			if (_data.IncludeTechnicalDetails)
 				{
-				this.DrawTechnicalDetailsSection();
+				DrawTechnicalDetailsSection();
 				}
 
-			if (this._data.IncludeTerminalProof)
+			if (_data.IncludeTerminalProof)
 				{
-				this.DrawTerminalProofSection();
+				DrawTerminalProofSection();
 				}
 
-			if (this._data.IncludeDependencies)
+			if (_data.IncludeDependencies)
 				{
-				this.DrawDependenciesSection();
+				DrawDependenciesSection();
 				}
 
-			if (this._data.IncludeLessons)
+			if (_data.IncludeLessons)
 				{
-				this.DrawLessonsSection();
+				DrawLessonsSection();
 				}
 
-			if (this._data.IncludeNextSteps)
+			if (_data.IncludeNextSteps)
 				{
-				this.DrawNextStepsSection();
+				DrawNextStepsSection();
 				}
 
-			if (this._data.IncludeReferences)
+			if (_data.IncludeReferences)
 				{
-				this.DrawReferencesSection();
+				DrawReferencesSection();
 				}
 
-			if (this._data.IncludeDevTimeTravel)
+			if (_data.IncludeDevTimeTravel)
 				{
-				this.DrawDevTimeTravelSection();
+				DrawDevTimeTravelSection();
 				}
 
-			if (this._data.IncludeMetadata)
+			if (_data.IncludeMetadata)
 				{
-				this.DrawMetadataSection();
+				DrawMetadataSection();
 				}
 
-			if (this._data.IncludeImages)
+			if (_data.IncludeImages)
 				{
-				this.DrawImagesSection();
+				DrawImagesSection();
 				}
 			}
 
@@ -197,8 +197,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🔍 Discoveries", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("Key findings", "What did you discover? New patterns, unexpected behaviors, root causes...");
-			this._data.DiscoveriesText = EditorGUILayout.TextArea(this._data.DiscoveriesText ?? "", _textAreaWrap, GUILayout.MinHeight(80), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Key findings", "What did you discover? New patterns, unexpected behaviors, root causes...");
+			_data.DiscoveriesText = EditorGUILayout.TextArea(_data.DiscoveriesText ?? "", _textAreaWrap, GUILayout.MinHeight(80), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -208,8 +208,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("⚡ Actions Taken", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("What did you do?", "Step-by-step actions, changes made, commands run...");
-			this._data.ActionsTaken = EditorGUILayout.TextArea(this._data.ActionsTaken ?? "", _textAreaWrap, GUILayout.MinHeight(80), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("What did you do?", "Step-by-step actions, changes made, commands run...");
+			_data.ActionsTaken = EditorGUILayout.TextArea(_data.ActionsTaken ?? "", _textAreaWrap, GUILayout.MinHeight(80), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -219,8 +219,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🔧 Technical Details", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("Architecture insights", "Code patterns, system design, technical decisions...");
-			this._data.TechnicalDetails = EditorGUILayout.TextArea(this._data.TechnicalDetails ?? "", _textAreaWrap, GUILayout.MinHeight(80), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Architecture insights", "Code patterns, system design, technical decisions...");
+			_data.TechnicalDetails = EditorGUILayout.TextArea(_data.TechnicalDetails ?? "", _textAreaWrap, GUILayout.MinHeight(80), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -230,8 +230,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("💻 Terminal Proof", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("Command output", "Terminal commands and their output as evidence...");
-			this._data.TerminalProof = EditorGUILayout.TextArea(this._data.TerminalProof ?? "", EditorStyles.textArea, GUILayout.MinHeight(100), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Command output", "Terminal commands and their output as evidence...");
+			_data.TerminalProof = EditorGUILayout.TextArea(_data.TerminalProof ?? "", EditorStyles.textArea, GUILayout.MinHeight(100), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -241,8 +241,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("📦 Dependencies", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("Dependencies used", "Libraries, packages, tools, systems this work depends on...");
-			this._data.Dependencies = EditorGUILayout.TextArea(this._data.Dependencies ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Dependencies used", "Libraries, packages, tools, systems this work depends on...");
+			_data.Dependencies = EditorGUILayout.TextArea(_data.Dependencies ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -252,8 +252,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🎓 Lessons Learned", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("What did you learn?", "Insights, gotchas, best practices discovered...");
-			this._data.LessonsLearned = EditorGUILayout.TextArea(this._data.LessonsLearned ?? "", _textAreaWrap, GUILayout.MinHeight(80), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("What did you learn?", "Insights, gotchas, best practices discovered...");
+			_data.LessonsLearned = EditorGUILayout.TextArea(_data.LessonsLearned ?? "", _textAreaWrap, GUILayout.MinHeight(80), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -263,8 +263,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🚀 Next Steps", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("Future work", "What should be done next? Follow-up tasks, improvements...");
-			this._data.NextSteps = EditorGUILayout.TextArea(this._data.NextSteps ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Future work", "What should be done next? Follow-up tasks, improvements...");
+			_data.NextSteps = EditorGUILayout.TextArea(_data.NextSteps ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -274,8 +274,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🔗 References", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("Links and references", "URLs, documentation, related issues, commit hashes...");
-			this._data.References = EditorGUILayout.TextArea(this._data.References ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Links and references", "URLs, documentation, related issues, commit hashes...");
+			_data.References = EditorGUILayout.TextArea(_data.References ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -285,8 +285,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("⏰ DevTimeTravel", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("Context snapshots", "Environment state, configuration snapshots, timeline context...");
-			this._data.DevTimeTravel = EditorGUILayout.TextArea(this._data.DevTimeTravel ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Context snapshots", "Environment state, configuration snapshots, timeline context...");
+			_data.DevTimeTravel = EditorGUILayout.TextArea(_data.DevTimeTravel ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -296,8 +296,8 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🖼️ Images", EditorStyles.boldLabel);
 
-			this.DrawPlaceholder("Image references", "Relative paths to images, screenshots, diagrams...");
-			this._data.ImagePaths = EditorGUILayout.TextArea(this._data.ImagePaths ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Image references", "Relative paths to images, screenshots, diagrams...");
+			_data.ImagePaths = EditorGUILayout.TextArea(_data.ImagePaths ?? "", _textAreaWrap, GUILayout.MinHeight(60), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.HelpBox("💡 Images will be embedded in generated markdown. Use paths relative to the TLDL file.", MessageType.Info);
 
@@ -310,18 +310,18 @@ namespace LivingDevAgent.Editor.Modules
 			GUILayout.Label("📊 Metadata", EditorStyles.boldLabel);
 
 			// 🕐 Time Tracking Section
-			this.DrawTimeTrackingSection();
+			DrawTimeTrackingSection();
 
 			EditorGUILayout.Space(5);
 			EditorGUILayout.LabelField("Additional Properties", EditorStyles.boldLabel);
 
-			this._data.Complexity = (ComplexityLevel)EditorGUILayout.EnumPopup("Complexity", this._data.Complexity);
-			this._data.Impact = (ImpactLevel)EditorGUILayout.EnumPopup("Impact", this._data.Impact);
-			this._data.Duration = EditorGUILayout.TextField("Duration", this._data.Duration ?? "");
-			this._data.TeamMembers = EditorGUILayout.TextField("Team Members", this._data.TeamMembers ?? "");
+			_data.Complexity = (ComplexityLevel)EditorGUILayout.EnumPopup("Complexity", _data.Complexity);
+			_data.Impact = (ImpactLevel)EditorGUILayout.EnumPopup("Impact", _data.Impact);
+			_data.Duration = EditorGUILayout.TextField("Duration", _data.Duration ?? "");
+			_data.TeamMembers = EditorGUILayout.TextField("Team Members", _data.TeamMembers ?? "");
 
-			this.DrawPlaceholder("Additional metadata", "Custom metadata, metrics, measurements...");
-			this._data.CustomMetadata = EditorGUILayout.TextArea(this._data.CustomMetadata ?? "", _textAreaWrap, GUILayout.MinHeight(40), GUILayout.ExpandWidth(true));
+			DrawPlaceholder("Additional metadata", "Custom metadata, metrics, measurements...");
+			_data.CustomMetadata = EditorGUILayout.TextArea(_data.CustomMetadata ?? "", _textAreaWrap, GUILayout.MinHeight(40), GUILayout.ExpandWidth(true));
 
 			EditorGUILayout.EndVertical();
 			}
@@ -336,67 +336,67 @@ namespace LivingDevAgent.Editor.Modules
 				GUILayout.Label("🕐 Time Tracking", EditorStyles.boldLabel);
 				GUILayout.FlexibleSpace();
 
-				if (this._data.IsTimerActive)
+				if (_data.IsTimerActive)
 					{
 					// Show active timer with live updates
-					System.TimeSpan elapsed = System.DateTime.Now - this._data.SessionStartTime;
+					System.TimeSpan elapsed = System.DateTime.Now - _data.SessionStartTime;
 					GUILayout.Label($"⏱️ {elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}", EditorStyles.boldLabel);
 					}
 				else
 					{
-					GUILayout.Label($"📊 Total: {this._data.TotalSessionMinutes:F1}m", EditorStyles.miniLabel);
+					GUILayout.Label($"📊 Total: {_data.TotalSessionMinutes:F1}m", EditorStyles.miniLabel);
 					}
 				}
 
 			// Task description for current session
-			if (this._data.IsTimerActive)
+			if (_data.IsTimerActive)
 				{
-				this.DrawPlaceholder("Current task", "What are you working on right now?");
-				this._data.ActiveTaskDescription = EditorGUILayout.TextField("Active Task", this._data.ActiveTaskDescription ?? "");
+				DrawPlaceholder("Current task", "What are you working on right now?");
+				_data.ActiveTaskDescription = EditorGUILayout.TextField("Active Task", _data.ActiveTaskDescription ?? "");
 				}
 
 			// Clock In/Out Controls
 			using (new EditorGUILayout.HorizontalScope())
 				{
-				if (this._data.IsTimerActive)
+				if (_data.IsTimerActive)
 					{
 					if (GUILayout.Button("🕐 Clock Out", GUILayout.Height(30)))
 						{
-						this.ClockOut();
+						ClockOut();
 						}
 
 					if (GUILayout.Button("⏸️ Pause & Note", GUILayout.Width(120), GUILayout.Height(30)))
 						{
-						this.PauseWithNote();
+						PauseWithNote();
 						}
 					}
 				else
 					{
 					if (GUILayout.Button("🕐 Clock In", GUILayout.Height(30)))
 						{
-						this.ClockIn();
+						ClockIn();
 						}
 
-					using (new EditorGUI.DisabledScope(this._data.TimeSessions.Count == 0))
+					using (new EditorGUI.DisabledScope(_data.TimeSessions.Count == 0))
 						{
 						if (GUILayout.Button("📈 View Sessions", GUILayout.Width(120), GUILayout.Height(30)))
 							{
-							this.ShowSessionHistory();
+							ShowSessionHistory();
 							}
 						}
 					}
 				}
 
 			// Session summary
-			if (this._data.TimeSessions.Count > 0)
+			if (_data.TimeSessions.Count > 0)
 				{
 				EditorGUILayout.Space(3);
-				TimeSession lastSession = this._data.TimeSessions [ ^1 ];
+				TimeSession lastSession = _data.TimeSessions [ ^1 ];
 				EditorGUILayout.LabelField($"Last: {lastSession.StartTime:HH:mm}-{lastSession.EndTime:HH:mm} ({lastSession.DurationMinutes:F1}m)", EditorStyles.miniLabel);
 
-				if (this._data.TimeSessions.Count > 1)
+				if (_data.TimeSessions.Count > 1)
 					{
-					EditorGUILayout.LabelField($"Sessions today: {this._data.TimeSessions.Count} | Total: {this._data.TotalSessionMinutes:F1}m", EditorStyles.miniLabel);
+					EditorGUILayout.LabelField($"Sessions today: {_data.TimeSessions.Count} | Total: {_data.TotalSessionMinutes:F1}m", EditorStyles.miniLabel);
 					}
 				}
 
@@ -405,33 +405,33 @@ namespace LivingDevAgent.Editor.Modules
 
 		private void ClockIn ()
 			{
-			this._data.IsTimerActive = true;
-			this._data.SessionStartTime = System.DateTime.Now;
-			this._data.ActiveTaskDescription = this._data.Title ?? "Documentation Task";
-			this.SetStatus($"🕐 Clocked in at {this._data.SessionStartTime:HH:mm} - Timer started!");
+			_data.IsTimerActive = true;
+			_data.SessionStartTime = System.DateTime.Now;
+			_data.ActiveTaskDescription = _data.Title ?? "Documentation Task";
+			SetStatus($"🕐 Clocked in at {_data.SessionStartTime:HH:mm} - Timer started!");
 
 			// Force GUI repaint for live timer
-			EditorApplication.update += this.UpdateTimer;
+			EditorApplication.update += UpdateTimer;
 			}
 
 		private void ClockOut ()
 			{
-			if (!this._data.IsTimerActive) return;
+			if (!_data.IsTimerActive) return;
 
-			var session = new TimeSession(this._data.SessionStartTime, this._data.ActiveTaskDescription);
+			var session = new TimeSession(_data.SessionStartTime, _data.ActiveTaskDescription);
 			session.EndSession("Session completed");
 
-			this._data.TimeSessions.Add(session);
-			this._data.TotalSessionMinutes += session.DurationMinutes;
-			this._data.IsTimerActive = false;
+			_data.TimeSessions.Add(session);
+			_data.TotalSessionMinutes += session.DurationMinutes;
+			_data.IsTimerActive = false;
 
 			// Update duration field with accumulated time
-			this._data.Duration = $"{this._data.TotalSessionMinutes:F1} minutes";
+			_data.Duration = $"{_data.TotalSessionMinutes:F1} minutes";
 
-			this.SetStatus($"🕐 Clocked out! Session: {session.DurationMinutes:F1}m | Total: {this._data.TotalSessionMinutes:F1}m");
+			SetStatus($"🕐 Clocked out! Session: {session.DurationMinutes:F1}m | Total: {_data.TotalSessionMinutes:F1}m");
 
 			// Stop GUI updates
-			EditorApplication.update -= this.UpdateTimer;
+			EditorApplication.update -= UpdateTimer;
 			}
 
 		private void PauseWithNote ()
@@ -450,12 +450,12 @@ namespace LivingDevAgent.Editor.Modules
 
 			if (note.Contains("completed"))
 				{
-				this.ClockOut();
+				ClockOut();
 				}
 			else
 				{
 				// Just add a note but keep timer running
-				this.SetStatus($"📝 Session note added: {note}");
+				SetStatus($"📝 Session note added: {note}");
 				}
 			}
 
@@ -463,11 +463,11 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			var content = new System.Text.StringBuilder();
 			content.AppendLine("📊 Time Tracking History");
-			content.AppendLine($"Total Sessions: {this._data.TimeSessions.Count}");
-			content.AppendLine($"Total Time: {this._data.TotalSessionMinutes:F1} minutes ({this._data.TotalSessionMinutes / 60:F1} hours)");
+			content.AppendLine($"Total Sessions: {_data.TimeSessions.Count}");
+			content.AppendLine($"Total Time: {_data.TotalSessionMinutes:F1} minutes ({_data.TotalSessionMinutes / 60:F1} hours)");
 			content.AppendLine();
 
-			foreach (TimeSession session in this._data.TimeSessions)
+			foreach (TimeSession session in _data.TimeSessions)
 				{
 				content.AppendLine($"• {session}");
 				}
@@ -477,9 +477,9 @@ namespace LivingDevAgent.Editor.Modules
 
 		private void UpdateTimer ()
 			{
-			if (!this._data.IsTimerActive)
+			if (!_data.IsTimerActive)
 				{
-				EditorApplication.update -= this.UpdateTimer;
+				EditorApplication.update -= UpdateTimer;
 				return;
 				}
 
@@ -494,32 +494,32 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			EditorGUILayout.BeginVertical("box");
 			EditorGUILayout.LabelField("🔄 Form → Editor Sync", EditorStyles.boldLabel);
-			this._data.AutoSyncEditor = EditorGUILayout.ToggleLeft("Auto-sync changes to Editor (raw)", this._data.AutoSyncEditor);
+			_data.AutoSyncEditor = EditorGUILayout.ToggleLeft("Auto-sync changes to Editor (raw)", _data.AutoSyncEditor);
 
 			using (new EditorGUILayout.HorizontalScope())
 				{
 				if (GUILayout.Button("📝 Update Editor From Form", GUILayout.Width(200)))
 					{
-					if (this.WarnOverwriteRawIfDirty())
+					if (WarnOverwriteRawIfDirty())
 						{
-						this._data.RawContent = this.BuildMarkdown();
-						this._data.RawGeneratedSnapshot = this._data.RawContent;
-						this._data.RawDirty = false;
-						this.ShouldSwitchToEditor = true;
-						this._data.LastFormSnapshot = this.BuildFormSnapshot();
-						this.SetStatus("📝 Editor updated from form");
+						_data.RawContent = BuildMarkdown();
+						_data.RawGeneratedSnapshot = _data.RawContent;
+						_data.RawDirty = false;
+						ShouldSwitchToEditor = true;
+						_data.LastFormSnapshot = BuildFormSnapshot();
+						SetStatus("📝 Editor updated from form");
 						}
 					}
 				if (GUILayout.Button("👀 Preview From Form", GUILayout.Width(160)))
 					{
-					if (this.WarnOverwriteRawIfDirty())
+					if (WarnOverwriteRawIfDirty())
 						{
-						this._data.RawContent = this.BuildMarkdown();
-						this._data.RawGeneratedSnapshot = this._data.RawContent;
-						this._data.RawDirty = false;
-						this._data.LastFormSnapshot = this.BuildFormSnapshot();
-						this.ShouldSwitchToPreview = true;
-						this.SetStatus("👀 Preview generated from form");
+						_data.RawContent = BuildMarkdown();
+						_data.RawGeneratedSnapshot = _data.RawContent;
+						_data.RawDirty = false;
+						_data.LastFormSnapshot = BuildFormSnapshot();
+						ShouldSwitchToPreview = true;
+						SetStatus("👀 Preview generated from form");
 						}
 					}
 				}
@@ -528,22 +528,22 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 
 			// Auto-sync processing
-			if (this._data.AutoSyncEditor)
+			if (_data.AutoSyncEditor)
 				{
-				string snap = this.BuildFormSnapshot();
-				if (snap != this._data.LastFormSnapshot)
+				string snap = BuildFormSnapshot();
+				if (snap != _data.LastFormSnapshot)
 					{
-					if (this._data.RawDirty)
+					if (_data.RawDirty)
 						{
-						this.SetStatus("🔄 Auto-sync skipped (raw editor has manual edits)");
+						SetStatus("🔄 Auto-sync skipped (raw editor has manual edits)");
 						}
 					else
 						{
-						this._data.RawContent = this.BuildMarkdown();
-						this._data.RawGeneratedSnapshot = this._data.RawContent;
-						this._data.RawDirty = false;
-						this._data.LastFormSnapshot = snap;
-						this.SetStatus("🔄 Editor auto-synced from form");
+						_data.RawContent = BuildMarkdown();
+						_data.RawGeneratedSnapshot = _data.RawContent;
+						_data.RawDirty = false;
+						_data.LastFormSnapshot = snap;
+						SetStatus("🔄 Editor auto-synced from form");
 						}
 					}
 				}
@@ -551,7 +551,7 @@ namespace LivingDevAgent.Editor.Modules
 
 		private bool WarnOverwriteRawIfDirty ()
 			{
-			return !this._data.RawDirty || EditorUtility.DisplayDialog("Overwrite Raw Editor?", "You have unsaved manual edits in the raw editor. Overwrite with regenerated content?", "Overwrite", "Cancel");
+			return !_data.RawDirty || EditorUtility.DisplayDialog("Overwrite Raw Editor?", "You have unsaved manual edits in the raw editor. Overwrite with regenerated content?", "Overwrite", "Cancel");
 			}
 
 		private string BuildMarkdown ()
@@ -561,14 +561,14 @@ namespace LivingDevAgent.Editor.Modules
 
 			// Header
 			sb.AppendLine("# 📜 TLDL Entry");
-			sb.AppendLine($"**Entry ID:** TLDL-{System.DateTime.UtcNow:yyyy-MM-dd}-{ScribeUtils.SanitizeTitle(this._data.Title)}");
-			sb.AppendLine($"**Author:** {(this._data.Author?.Trim().Length > 0 ? this._data.Author.Trim() : "@copilot")}");
-			sb.AppendLine($"**Context:** {this._data.Context}");
-			sb.AppendLine($"**Summary:** {this._data.Summary}");
+			sb.AppendLine($"**Entry ID:** TLDL-{System.DateTime.UtcNow:yyyy-MM-dd}-{ScribeUtils.SanitizeTitle(_data.Title)}");
+			sb.AppendLine($"**Author:** {(_data.Author?.Trim().Length > 0 ? _data.Author.Trim() : "@copilot")}");
+			sb.AppendLine($"**Context:** {_data.Context}");
+			sb.AppendLine($"**Summary:** {_data.Summary}");
 
-			if (!string.IsNullOrWhiteSpace(this._data.TagsCsv))
+			if (!string.IsNullOrWhiteSpace(_data.TagsCsv))
 				{
-				sb.AppendLine($"**Tags:** {this._data.TagsCsv}");
+				sb.AppendLine($"**Tags:** {_data.TagsCsv}");
 				}
 
 			sb.AppendLine();
@@ -580,87 +580,87 @@ namespace LivingDevAgent.Editor.Modules
 			sb.AppendLine();
 
 			// Dynamic sections based on toggles
-			if (this._data.IncludeDiscoveries && !string.IsNullOrWhiteSpace(this._data.DiscoveriesText))
+			if (_data.IncludeDiscoveries && !string.IsNullOrWhiteSpace(_data.DiscoveriesText))
 				{
 				sb.AppendLine("## 🔍 Discoveries");
 				sb.AppendLine();
-				sb.AppendLine(this._data.DiscoveriesText);
+				sb.AppendLine(_data.DiscoveriesText);
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeActions && !string.IsNullOrWhiteSpace(this._data.ActionsTaken))
+			if (_data.IncludeActions && !string.IsNullOrWhiteSpace(_data.ActionsTaken))
 				{
 				sb.AppendLine("## ⚡ Actions Taken");
 				sb.AppendLine();
-				sb.AppendLine(this._data.ActionsTaken);
+				sb.AppendLine(_data.ActionsTaken);
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeTechnicalDetails && !string.IsNullOrWhiteSpace(this._data.TechnicalDetails))
+			if (_data.IncludeTechnicalDetails && !string.IsNullOrWhiteSpace(_data.TechnicalDetails))
 				{
 				sb.AppendLine("## 🔧 Technical Details");
 				sb.AppendLine();
-				sb.AppendLine(this._data.TechnicalDetails);
+				sb.AppendLine(_data.TechnicalDetails);
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeTerminalProof && !string.IsNullOrWhiteSpace(this._data.TerminalProof))
+			if (_data.IncludeTerminalProof && !string.IsNullOrWhiteSpace(_data.TerminalProof))
 				{
 				sb.AppendLine("## 💻 Terminal Proof");
 				sb.AppendLine();
 				sb.AppendLine("```");
-				sb.AppendLine(this._data.TerminalProof);
+				sb.AppendLine(_data.TerminalProof);
 				sb.AppendLine("```");
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeDependencies && !string.IsNullOrWhiteSpace(this._data.Dependencies))
+			if (_data.IncludeDependencies && !string.IsNullOrWhiteSpace(_data.Dependencies))
 				{
 				sb.AppendLine("## 📦 Dependencies");
 				sb.AppendLine();
-				sb.AppendLine(this._data.Dependencies);
+				sb.AppendLine(_data.Dependencies);
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeLessons && !string.IsNullOrWhiteSpace(this._data.LessonsLearned))
+			if (_data.IncludeLessons && !string.IsNullOrWhiteSpace(_data.LessonsLearned))
 				{
 				sb.AppendLine("## 🎓 Lessons Learned");
 				sb.AppendLine();
-				sb.AppendLine(this._data.LessonsLearned);
+				sb.AppendLine(_data.LessonsLearned);
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeNextSteps && !string.IsNullOrWhiteSpace(this._data.NextSteps))
+			if (_data.IncludeNextSteps && !string.IsNullOrWhiteSpace(_data.NextSteps))
 				{
 				sb.AppendLine("## 🚀 Next Steps");
 				sb.AppendLine();
-				sb.AppendLine(this._data.NextSteps);
+				sb.AppendLine(_data.NextSteps);
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeReferences && !string.IsNullOrWhiteSpace(this._data.References))
+			if (_data.IncludeReferences && !string.IsNullOrWhiteSpace(_data.References))
 				{
 				sb.AppendLine("## 🔗 References");
 				sb.AppendLine();
-				sb.AppendLine(this._data.References);
+				sb.AppendLine(_data.References);
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeDevTimeTravel && !string.IsNullOrWhiteSpace(this._data.DevTimeTravel))
+			if (_data.IncludeDevTimeTravel && !string.IsNullOrWhiteSpace(_data.DevTimeTravel))
 				{
 				sb.AppendLine("## ⏰ DevTimeTravel");
 				sb.AppendLine();
-				sb.AppendLine(this._data.DevTimeTravel);
+				sb.AppendLine(_data.DevTimeTravel);
 				sb.AppendLine();
 				}
 
-			if (this._data.IncludeImages && !string.IsNullOrWhiteSpace(this._data.ImagePaths))
+			if (_data.IncludeImages && !string.IsNullOrWhiteSpace(_data.ImagePaths))
 				{
 				sb.AppendLine("## 🖼️ Images");
 				sb.AppendLine();
 
 				// Process image paths and embed them
-				string [ ] imagePaths = this._data.ImagePaths.Split('\n');
+				string [ ] imagePaths = _data.ImagePaths.Split('\n');
 				foreach (string imagePath in imagePaths)
 					{
 					string trimmedPath = imagePath.Trim();
@@ -672,47 +672,47 @@ namespace LivingDevAgent.Editor.Modules
 					}
 				}
 
-			if (this._data.IncludeMetadata)
+			if (_data.IncludeMetadata)
 				{
 				sb.AppendLine("## 📊 Metadata");
 				sb.AppendLine();
-				sb.AppendLine($"**Complexity:** {this._data.Complexity}");
-				sb.AppendLine($"**Impact:** {this._data.Impact}");
+				sb.AppendLine($"**Complexity:** {_data.Complexity}");
+				sb.AppendLine($"**Impact:** {_data.Impact}");
 
-				if (!string.IsNullOrWhiteSpace(this._data.Duration))
-					sb.AppendLine($"**Duration:** {this._data.Duration}");
+				if (!string.IsNullOrWhiteSpace(_data.Duration))
+					sb.AppendLine($"**Duration:** {_data.Duration}");
 
-				if (!string.IsNullOrWhiteSpace(this._data.TeamMembers))
-					sb.AppendLine($"**Team Members:** {this._data.TeamMembers}");
+				if (!string.IsNullOrWhiteSpace(_data.TeamMembers))
+					sb.AppendLine($"**Team Members:** {_data.TeamMembers}");
 
 				sb.AppendLine($"**Created:** {System.DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
 
 				// Time Tracking Metadata
-				if (this._data.TimeSessions.Count > 0)
+				if (_data.TimeSessions.Count > 0)
 					{
 					sb.AppendLine();
 					sb.AppendLine("### ⏱️ Time Tracking");
-					sb.AppendLine($"**Total Sessions:** {this._data.TimeSessions.Count}");
-					sb.AppendLine($"**Total Time:** {this._data.TotalSessionMinutes:F1} minutes ({this._data.TotalSessionMinutes / 60:F1} hours)");
+					sb.AppendLine($"**Total Sessions:** {_data.TimeSessions.Count}");
+					sb.AppendLine($"**Total Time:** {_data.TotalSessionMinutes:F1} minutes ({_data.TotalSessionMinutes / 60:F1} hours)");
 
-					if (this._data.IsTimerActive)
+					if (_data.IsTimerActive)
 						{
-						double currentElapsed = (System.DateTime.Now - this._data.SessionStartTime).TotalMinutes;
-						sb.AppendLine($"**Active Session:** {currentElapsed:F1}m (started {this._data.SessionStartTime:HH:mm})");
+						double currentElapsed = (System.DateTime.Now - _data.SessionStartTime).TotalMinutes;
+						sb.AppendLine($"**Active Session:** {currentElapsed:F1}m (started {_data.SessionStartTime:HH:mm})");
 						}
 
 					sb.AppendLine();
 					sb.AppendLine("**Session History:**");
-					foreach (TimeSession session in this._data.TimeSessions)
+					foreach (TimeSession session in _data.TimeSessions)
 						{
 						sb.AppendLine($"- {session.StartTime:MM/dd HH:mm}-{session.EndTime:HH:mm}: {session.DurationMinutes:F1}m - {session.TaskDescription}");
 						}
 					}
 
-				if (!string.IsNullOrWhiteSpace(this._data.CustomMetadata))
+				if (!string.IsNullOrWhiteSpace(_data.CustomMetadata))
 					{
 					sb.AppendLine();
-					sb.AppendLine(this._data.CustomMetadata);
+					sb.AppendLine(_data.CustomMetadata);
 					}
 				sb.AppendLine();
 				}
@@ -724,24 +724,24 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			// Enhanced snapshot for auto-sync detection
 			var sb = new System.Text.StringBuilder();
-			sb.Append(this._data.Title).Append('|').Append(this._data.Author).Append('|').Append(this._data.Context).Append('|').Append(this._data.Summary).Append('|').Append(this._data.TagsCsv);
-			sb.Append('|').Append(this._data.IncludeDiscoveries).Append(this._data.IncludeActions).Append(this._data.IncludeTechnicalDetails);
-			sb.Append('|').Append(this._data.IncludeTerminalProof).Append(this._data.IncludeDependencies).Append(this._data.IncludeLessons);
-			sb.Append('|').Append(this._data.IncludeNextSteps).Append(this._data.IncludeReferences).Append(this._data.IncludeDevTimeTravel);
-			sb.Append('|').Append(this._data.IncludeMetadata).Append(this._data.IncludeImages);
+			sb.Append(_data.Title).Append('|').Append(_data.Author).Append('|').Append(_data.Context).Append('|').Append(_data.Summary).Append('|').Append(_data.TagsCsv);
+			sb.Append('|').Append(_data.IncludeDiscoveries).Append(_data.IncludeActions).Append(_data.IncludeTechnicalDetails);
+			sb.Append('|').Append(_data.IncludeTerminalProof).Append(_data.IncludeDependencies).Append(_data.IncludeLessons);
+			sb.Append('|').Append(_data.IncludeNextSteps).Append(_data.IncludeReferences).Append(_data.IncludeDevTimeTravel);
+			sb.Append('|').Append(_data.IncludeMetadata).Append(_data.IncludeImages);
 
 			// Include content hashes for sections
-			sb.Append('|').Append(this._data.DiscoveriesText?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.ActionsTaken?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.TechnicalDetails?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.TerminalProof?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.Dependencies?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.LessonsLearned?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.NextSteps?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.References?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.DevTimeTravel?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.ImagePaths?.GetHashCode() ?? 0);
-			sb.Append('|').Append(this._data.CustomMetadata?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.DiscoveriesText?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.ActionsTaken?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.TechnicalDetails?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.TerminalProof?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.Dependencies?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.LessonsLearned?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.NextSteps?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.References?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.DevTimeTravel?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.ImagePaths?.GetHashCode() ?? 0);
+			sb.Append('|').Append(_data.CustomMetadata?.GetHashCode() ?? 0);
 
 			return sb.ToString();
 			}
@@ -751,31 +751,31 @@ namespace LivingDevAgent.Editor.Modules
 			try
 				{
 				string date = System.DateTime.UtcNow.ToString("yyyy-MM-dd");
-				string safeTitle = ScribeUtils.SanitizeTitle(this._data.Title);
+				string safeTitle = ScribeUtils.SanitizeTitle(_data.Title);
 				if (string.IsNullOrEmpty(safeTitle))
 					safeTitle = "Entry";
 
 				string fileName = $"TLDL-{date}-{safeTitle}.md";
-				string targetFolder = this.ResolveActiveFolder(this.GetApplication());
+				string targetFolder = ResolveActiveFolder(GetApplication());
 				if (!System.IO.Directory.Exists(targetFolder))
 					{
 					System.IO.Directory.CreateDirectory(targetFolder);
 					}
 
 				string absPath = System.IO.Path.Combine(targetFolder, fileName);
-				string md = this.BuildMarkdown();
+				string md = BuildMarkdown();
 				System.IO.File.WriteAllText(absPath, md, new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
-				this._data.CurrentFilePath = absPath;
-				this._data.RawContent = md;
-				this._data.RawGeneratedSnapshot = md;
-				this._data.RawDirty = false;
+				_data.CurrentFilePath = absPath;
+				_data.RawContent = md;
+				_data.RawGeneratedSnapshot = md;
+				_data.RawDirty = false;
 
-				this.SetStatus($"📄 TLDL created: {this.MakeProjectRelative(absPath)}");
+				SetStatus($"📄 TLDL created: {MakeProjectRelative(absPath)}");
 				}
 			catch (System.Exception ex)
 				{
-				this.SetStatus($"❌ Error creating TLDL: {ex.Message}");
+				SetStatus($"❌ Error creating TLDL: {ex.Message}");
 				}
 			}
 
@@ -787,10 +787,10 @@ namespace LivingDevAgent.Editor.Modules
 
 		private string ResolveActiveFolder (string applicationPath)
 			{
-			return !string.IsNullOrEmpty(this._data.ActiveDirPath)
-				? this._data.ActiveDirPath
-				: !string.IsNullOrEmpty(this._data.RootPath)
-				? this._data.RootPath
+			return !string.IsNullOrEmpty(_data.ActiveDirPath)
+				? _data.ActiveDirPath
+				: !string.IsNullOrEmpty(_data.RootPath)
+				? _data.RootPath
 				: System.IO.Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
 			}
 

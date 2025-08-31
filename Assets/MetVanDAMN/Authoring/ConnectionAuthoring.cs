@@ -23,7 +23,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		private void OnValidate ()
 			{
-			if (this.from == this.to && this.from != null)
+			if (from == to && from != null)
 				{
 				Debug.LogWarning("ConnectionAuthoring: 'from' and 'to' reference the same district.", this);
 				}

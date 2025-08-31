@@ -46,15 +46,15 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void Start ()
 			{
-			this.InitializeDemoWorld();
-			this.CreateDemoRoom();
+			InitializeDemoWorld();
+			CreateDemoRoom();
 			}
 
 		private void OnDestroy ()
 			{
-			if (this._demoWorld != null && this._demoWorld.IsCreated)
+			if (_demoWorld != null && _demoWorld.IsCreated)
 				{
-				this._demoWorld.Dispose();
+				_demoWorld.Dispose();
 				}
 			}
 
@@ -63,15 +63,15 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// </summary>
 		private void InitializeDemoWorld ()
 			{
-			this._demoWorld = new World("ProceduralRoomGenerationDemo");
-			this._entityManager = this._demoWorld.EntityManager;
+			_demoWorld = new World("ProceduralRoomGenerationDemo");
+			_entityManager = _demoWorld.EntityManager;
 
 			// Add the procedural room generation systems
-			InitializationSystemGroup systemGroup = this._demoWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+			InitializationSystemGroup systemGroup = _demoWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
 
 			// Systems are manually added for this demonstration world
 			// This provides complete control over the generation pipeline
-			if (this.logGenerationSteps)
+			if (logGenerationSteps)
 				{
 				Debug.Log("Demo World initialized with procedural room generation systems");
 				}
@@ -82,61 +82,61 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// </summary>
 		public void CreateDemoRoom ()
 			{
-			if (this._entityManager == null)
+			if (_entityManager == null)
 				{
 				return;
 				}
 
 			// Clean up previous room if it exists
-			if (this._demoRoomEntity != Entity.Null && this._entityManager.Exists(this._demoRoomEntity))
+			if (_demoRoomEntity != Entity.Null && _entityManager.Exists(_demoRoomEntity))
 				{
-				this._entityManager.DestroyEntity(this._demoRoomEntity);
+				_entityManager.DestroyEntity(_demoRoomEntity);
 				}
 
 			// Create new room entity
-			this._demoRoomEntity = this._entityManager.CreateEntity();
+			_demoRoomEntity = _entityManager.CreateEntity();
 
 			// Add core room data
-			var roomBounds = new RectInt(0, 0, this.roomWidth, this.roomHeight);
-			var roomData = new RoomHierarchyData(roomBounds, this.roomType, true);
+			var roomBounds = new RectInt(0, 0, roomWidth, roomHeight);
+			var roomData = new RoomHierarchyData(roomBounds, roomType, true);
 			var nodeId = new NodeId(1, 2, 1, new int2(0, 0));
 
-			this._entityManager.AddComponentData(this._demoRoomEntity, roomData);
-			this._entityManager.AddComponentData(this._demoRoomEntity, nodeId);
+			_entityManager.AddComponentData(_demoRoomEntity, roomData);
+			_entityManager.AddComponentData(_demoRoomEntity, nodeId);
 
 			// Create biome data
-			Core.Biome biome = this.CreateBiomeFromType(this.targetBiome);
-			this._entityManager.AddComponentData(this._demoRoomEntity, biome);
+			Core.Biome biome = CreateBiomeFromType(targetBiome);
+			_entityManager.AddComponentData(_demoRoomEntity, biome);
 
 			// Determine generator type based on Best Fit Matrix
-			RoomGeneratorType generatorType = this.DetermineOptimalGenerator(this.roomType, roomBounds, this.targetBiome);
+			RoomGeneratorType generatorType = DetermineOptimalGenerator(roomType, roomBounds, targetBiome);
 
 			// Build available skills mask
-			Ability availableSkills = this.BuildSkillsMask();
+			Ability availableSkills = BuildSkillsMask();
 
 			// Create room generation request
 			var generationRequest = new RoomGenerationRequest(
 				generatorType,
-				this.targetBiome,
+				targetBiome,
 				biome.PrimaryPolarity,
 				availableSkills,
-				this.generationSeed
+				generationSeed
 			);
 
-			this._entityManager.AddComponentData(this._demoRoomEntity, generationRequest);
+			_entityManager.AddComponentData(_demoRoomEntity, generationRequest);
 
 			// Add specialized components based on generator type
-			this.AddGeneratorSpecificComponents(generatorType);
+			AddGeneratorSpecificComponents(generatorType);
 
 			// Add room management components
-			this._entityManager.AddComponentData(this._demoRoomEntity, new RoomStateData(this.CalculateSecretCount()));
-			this._entityManager.AddComponentData(this._demoRoomEntity, this.CreateNavigationData(roomBounds));
-			this._entityManager.AddBuffer<RoomFeatureElement>(this._demoRoomEntity);
+			_entityManager.AddComponentData(_demoRoomEntity, new RoomStateData(CalculateSecretCount()));
+			_entityManager.AddComponentData(_demoRoomEntity, CreateNavigationData(roomBounds));
+			_entityManager.AddBuffer<RoomFeatureElement>(_demoRoomEntity);
 
-			if (this.logGenerationSteps)
+			if (logGenerationSteps)
 				{
-				Debug.Log($"Created demo room: {this.roomType} using {generatorType} generator in {this.targetBiome} biome");
-				Debug.Log($"Room size: {this.roomWidth}x{this.roomHeight}, Skills: {availableSkills}");
+				Debug.Log($"Created demo room: {roomType} using {generatorType} generator in {targetBiome} biome");
+				Debug.Log($"Room size: {roomWidth}x{roomHeight}, Skills: {availableSkills}");
 				}
 			}
 
@@ -150,7 +150,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			// Apply Best Fit Matrix logic
 			return roomType switch
 				{
-					RoomType.Boss when this.useSkillGates => RoomGeneratorType.PatternDrivenModular,
+					RoomType.Boss when useSkillGates => RoomGeneratorType.PatternDrivenModular,
 					RoomType.Treasure => RoomGeneratorType.ParametricChallenge,
 					RoomType.Save or RoomType.Shop or RoomType.Hub => RoomGeneratorType.WeightedTilePrefab,
 					_ when IsSkyBiome(biome) => RoomGeneratorType.LayeredPlatformCloud,
@@ -168,32 +168,32 @@ namespace TinyWalnutGames.MetVD.Samples
 			{
 			Ability skills = Ability.None;
 
-			if (this.hasJump)
+			if (hasJump)
 				{
 				skills |= Ability.Jump;
 				}
 
-			if (this.hasDoubleJump)
+			if (hasDoubleJump)
 				{
 				skills |= Ability.DoubleJump;
 				}
 
-			if (this.hasWallJump)
+			if (hasWallJump)
 				{
 				skills |= Ability.WallJump;
 				}
 
-			if (this.hasDash)
+			if (hasDash)
 				{
 				skills |= Ability.Dash;
 				}
 
-			if (this.hasGrapple)
+			if (hasGrapple)
 				{
 				skills |= Ability.Grapple;
 				}
 
-			if (this.hasBomb)
+			if (hasBomb)
 				{
 				skills |= Ability.Bomb;
 				}
@@ -228,28 +228,28 @@ namespace TinyWalnutGames.MetVD.Samples
 			switch (generatorType)
 				{
 				case RoomGeneratorType.PatternDrivenModular:
-					this._entityManager.AddBuffer<RoomPatternElement>(this._demoRoomEntity);
-					this._entityManager.AddBuffer<RoomModuleElement>(this._demoRoomEntity);
+					_entityManager.AddBuffer<RoomPatternElement>(_demoRoomEntity);
+					_entityManager.AddBuffer<RoomModuleElement>(_demoRoomEntity);
 					break;
 
 				case RoomGeneratorType.ParametricChallenge:
 					var jumpPhysics = new JumpPhysicsData(
-						this.maxJumpHeight, this.maxJumpDistance, this.gravity, this.movementSpeed,
-						this.hasDoubleJump, this.hasWallJump, this.hasDash
+						maxJumpHeight, maxJumpDistance, gravity, movementSpeed,
+						hasDoubleJump, hasWallJump, hasDash
 					);
-					this._entityManager.AddComponentData(this._demoRoomEntity, jumpPhysics);
-					this._entityManager.AddComponentData(this._demoRoomEntity, new JumpArcValidation(false, 0, 0));
-					this._entityManager.AddBuffer<JumpConnectionElement>(this._demoRoomEntity);
+					_entityManager.AddComponentData(_demoRoomEntity, jumpPhysics);
+					_entityManager.AddComponentData(_demoRoomEntity, new JumpArcValidation(false, 0, 0));
+					_entityManager.AddBuffer<JumpConnectionElement>(_demoRoomEntity);
 					break;
 
 				case RoomGeneratorType.WeightedTilePrefab:
-					if (this.enableSecrets)
+					if (enableSecrets)
 						{
 						var secretConfig = new SecretAreaConfig(
 							0.15f, new int2(2, 2), new int2(4, 4),
-							this.hasBomb ? Ability.Bomb : Ability.None, true, true
+							hasBomb ? Ability.Bomb : Ability.None, true, true
 						);
-						this._entityManager.AddComponentData(this._demoRoomEntity, secretConfig);
+						_entityManager.AddComponentData(_demoRoomEntity, secretConfig);
 						}
 					break;
 				case RoomGeneratorType.VerticalSegment:
@@ -279,8 +279,8 @@ namespace TinyWalnutGames.MetVD.Samples
 		private RoomNavigationData CreateNavigationData (RectInt bounds)
 			{
 			var primaryEntrance = new int2(bounds.x + 1, bounds.y + 1);
-			bool isCriticalPath = this.roomType == RoomType.Boss || this.roomType == RoomType.Entrance || this.roomType == RoomType.Exit;
-			float traversalTime = this.CalculateTraversalTime(bounds);
+			bool isCriticalPath = roomType == RoomType.Boss || roomType == RoomType.Entrance || roomType == RoomType.Exit;
+			float traversalTime = CalculateTraversalTime(bounds);
 
 			return new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime);
 			}
@@ -292,7 +292,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			{
 			float baseTime = (bounds.width + bounds.height) * 0.5f;
 
-			return this.roomType switch
+			return roomType switch
 				{
 					RoomType.Boss => baseTime * 3.0f,      // Boss fights take longer
 					RoomType.Treasure => baseTime * 2.0f,  // Puzzle rooms take longer
@@ -306,13 +306,13 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// </summary>
 		private int CalculateSecretCount ()
 			{
-			if (!this.enableSecrets)
+			if (!enableSecrets)
 				{
 				return 0;
 				}
 
-			int area = this.roomWidth * this.roomHeight;
-			return this.roomType switch
+			int area = roomWidth * roomHeight;
+			return roomType switch
 				{
 					RoomType.Treasure => math.max(2, area / 20),
 					RoomType.Normal => area / 40,
@@ -340,8 +340,8 @@ namespace TinyWalnutGames.MetVD.Samples
 		[ContextMenu("Regenerate Room")]
 		public void RegenerateRoom ()
 			{
-			this.generationSeed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
-			this.CreateDemoRoom();
+			generationSeed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
+			CreateDemoRoom();
 			}
 
 		/// <summary>
@@ -350,10 +350,10 @@ namespace TinyWalnutGames.MetVD.Samples
 		[ContextMenu("Demo All Generator Types")]
 		public void DemoAllGeneratorTypes ()
 			{
-			RoomType originalType = this.roomType;
-			BiomeType originalBiome = this.targetBiome;
+			RoomType originalType = roomType;
+			BiomeType originalBiome = targetBiome;
 
-			this.StartCoroutine(this.DemoGeneratorSequence(originalType, originalBiome));
+			StartCoroutine(DemoGeneratorSequence(originalType, originalBiome));
 			}
 
 		private System.Collections.IEnumerator DemoGeneratorSequence (RoomType originalType, BiomeType originalBiome)
@@ -369,18 +369,18 @@ namespace TinyWalnutGames.MetVD.Samples
 
 			foreach ((RoomType type, BiomeType biome, string description) in generatorTypes)
 				{
-				this.roomType = type;
-				this.targetBiome = biome;
-				this.CreateDemoRoom();
+				roomType = type;
+				targetBiome = biome;
+				CreateDemoRoom();
 
 				Debug.Log($"Generated: {description}");
 				yield return new WaitForSeconds(2.0f);
 				}
 
 			// Restore original settings
-			this.roomType = originalType;
-			this.targetBiome = originalBiome;
-			this.CreateDemoRoom();
+			roomType = originalType;
+			targetBiome = originalBiome;
+			CreateDemoRoom();
 			}
 
 		/// <summary>
@@ -388,39 +388,39 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// </summary>
 		private void OnDrawGizmos ()
 			{
-			if (!Application.isPlaying || this._entityManager == null || !this._entityManager.Exists(this._demoRoomEntity))
+			if (!Application.isPlaying || _entityManager == null || !_entityManager.Exists(_demoRoomEntity))
 				{
 				return;
 				}
 
-			this.DrawRoomBounds();
+			DrawRoomBounds();
 
-			if (this.showJumpArcs)
+			if (showJumpArcs)
 				{
-				this.DrawJumpArcs();
+				DrawJumpArcs();
 				}
 
-			if (this.showSecretAreas)
+			if (showSecretAreas)
 				{
-				this.DrawSecretAreas();
+				DrawSecretAreas();
 				}
 			}
 
 		private void DrawRoomBounds ()
 			{
 			Gizmos.color = Color.white;
-			var bounds = new Vector3(this.roomWidth, this.roomHeight, 1);
-			Gizmos.DrawWireCube(this.transform.position + bounds * 0.5f, bounds);
+			var bounds = new Vector3(roomWidth, roomHeight, 1);
+			Gizmos.DrawWireCube(transform.position + bounds * 0.5f, bounds);
 			}
 
 		private void DrawJumpArcs ()
 			{
-			if (!this._entityManager.HasBuffer<JumpConnectionElement>(this._demoRoomEntity))
+			if (!_entityManager.HasBuffer<JumpConnectionElement>(_demoRoomEntity))
 				{
 				return;
 				}
 
-			DynamicBuffer<JumpConnectionElement> connections = this._entityManager.GetBuffer<JumpConnectionElement>(this._demoRoomEntity);
+			DynamicBuffer<JumpConnectionElement> connections = _entityManager.GetBuffer<JumpConnectionElement>(_demoRoomEntity);
 			Gizmos.color = Color.green;
 
 			foreach (JumpConnectionElement connection in connections)
@@ -428,20 +428,20 @@ namespace TinyWalnutGames.MetVD.Samples
 				var from = new Vector3(connection.FromPosition.x, connection.FromPosition.y, 0);
 				var to = new Vector3(connection.ToPosition.x, connection.ToPosition.y, 0);
 
-				Gizmos.DrawLine(this.transform.position + from, this.transform.position + to);
-				Gizmos.DrawSphere(this.transform.position + from, 0.2f);
-				Gizmos.DrawSphere(this.transform.position + to, 0.2f);
+				Gizmos.DrawLine(transform.position + from, transform.position + to);
+				Gizmos.DrawSphere(transform.position + from, 0.2f);
+				Gizmos.DrawSphere(transform.position + to, 0.2f);
 				}
 			}
 
 		private void DrawSecretAreas ()
 			{
-			if (!this._entityManager.HasBuffer<RoomFeatureElement>(this._demoRoomEntity))
+			if (!_entityManager.HasBuffer<RoomFeatureElement>(_demoRoomEntity))
 				{
 				return;
 				}
 
-			DynamicBuffer<RoomFeatureElement> features = this._entityManager.GetBuffer<RoomFeatureElement>(this._demoRoomEntity);
+			DynamicBuffer<RoomFeatureElement> features = _entityManager.GetBuffer<RoomFeatureElement>(_demoRoomEntity);
 
 			foreach (RoomFeatureElement feature in features)
 				{
@@ -449,7 +449,7 @@ namespace TinyWalnutGames.MetVD.Samples
 					{
 					Gizmos.color = Color.yellow;
 					var pos = new Vector3(feature.Position.x, feature.Position.y, 0);
-					Gizmos.DrawCube(this.transform.position + pos, Vector3.one * 0.8f);
+					Gizmos.DrawCube(transform.position + pos, Vector3.one * 0.8f);
 					}
 				}
 			}

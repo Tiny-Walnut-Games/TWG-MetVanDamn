@@ -48,13 +48,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		public AINavigationState (uint currentNodeId, uint targetNodeId = 0)
 			{
-			this.CurrentNodeId = currentNodeId;
-			this.TargetNodeId = targetNodeId;
-			this.Status = PathfindingStatus.Idle;
-			this.PathLength = 0;
-			this.CurrentPathStep = 0;
-			this.PathCost = 0.0f;
-			this.LastPathfindTime = 0.0;
+			CurrentNodeId = currentNodeId;
+			TargetNodeId = targetNodeId;
+			Status = PathfindingStatus.Idle;
+			PathLength = 0;
+			CurrentPathStep = 0;
+			PathCost = 0.0f;
+			LastPathfindTime = 0.0;
 			}
 		}
 
@@ -119,14 +119,14 @@ namespace TinyWalnutGames.MetVD.Authoring
 		protected override void OnCreate ()
 			{
 			// Query for entities requesting pathfinding
-			this._navigationRequestQuery = this.GetEntityQuery(
+			_navigationRequestQuery = GetEntityQuery(
 				ComponentType.ReadWrite<AINavigationState>(),
 				ComponentType.ReadOnly<AgentCapabilities>(),
 				ComponentType.ReadWrite<PathNodeBufferElement>()
 			);
 
-			this.RequireForUpdate(this._navigationRequestQuery);
-			this.RequireForUpdate<NavigationGraph>();
+			RequireForUpdate(_navigationRequestQuery);
+			RequireForUpdate<NavigationGraph>();
 			}
 
 		protected override void OnUpdate ()
@@ -139,7 +139,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			double currentTime = SystemAPI.Time.ElapsedTime;
 
-			this.Entities
+			Entities
 				.WithoutBurst() // Required for SystemAPI calls and complex pathfinding
 				.ForEach((Entity entity, ref AINavigationState navState, in AgentCapabilities capabilities) =>
 				{
@@ -163,7 +163,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					navState.LastPathfindTime = currentTime;
 
 					// Perform pathfinding with proper method call
-					PathfindingResult pathfindingResult = this.PerformPathfinding(navState.CurrentNodeId, navState.TargetNodeId, capabilities);
+					PathfindingResult pathfindingResult = PerformPathfinding(navState.CurrentNodeId, navState.TargetNodeId, capabilities);
 
 					// Update navigation state based on result
 					if (pathfindingResult.Success)
@@ -229,15 +229,15 @@ namespace TinyWalnutGames.MetVD.Authoring
 				// Initialize starting node
 				openSet.Add(startNodeId);
 				gScore [ startNodeId ] = 0.0f;
-				fScore [ startNodeId ] = this.CalculateHeuristicCostEstimate(startNodeId, targetNodeId);
+				fScore [ startNodeId ] = CalculateHeuristicCostEstimate(startNodeId, targetNodeId);
 
 				while (openSet.Length > 0)
 					{
-					uint currentNodeId = this.GetLowestFScoreNodeValue(openSet, fScore);
+					uint currentNodeId = GetLowestFScoreNodeValue(openSet, fScore);
 
 					if (currentNodeId == targetNodeId)
 						{
-						result = this.ReconstructPathResult(cameFrom, gScore, currentNodeId, startNodeId);
+						result = ReconstructPathResult(cameFrom, gScore, currentNodeId, startNodeId);
 						break;
 						}
 
@@ -245,7 +245,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					visited.Add(currentNodeId);
 
 					// Process neighbors
-					Entity currentEntity = this.FindEntityByNodeIdValue(currentNodeId);
+					Entity currentEntity = FindEntityByNodeIdValue(currentNodeId);
 					if (currentEntity == Entity.Null || !SystemAPI.HasBuffer<NavLinkBufferElement>(currentEntity))
 						{
 						continue;
@@ -267,7 +267,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 							continue;
 							}
 
-						float traversalCost = this.CalculateArcAwareTraversalCostValue(link, capabilities, currentNodeId, neighborId);
+						float traversalCost = CalculateArcAwareTraversalCostValue(link, capabilities, currentNodeId, neighborId);
 						float tentativeGScore = gScore [ currentNodeId ] + traversalCost;
 
 						if (!openSet.Contains(neighborId))
@@ -281,7 +281,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 						cameFrom [ neighborId ] = currentNodeId;
 						gScore [ neighborId ] = tentativeGScore;
-						fScore [ neighborId ] = tentativeGScore + this.CalculateHeuristicCostEstimate(neighborId, targetNodeId);
+						fScore [ neighborId ] = tentativeGScore + CalculateHeuristicCostEstimate(neighborId, targetNodeId);
 						}
 					}
 
@@ -320,8 +320,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		private float CalculateHeuristicCostEstimate (uint fromNodeId, uint toNodeId)
 			{
-			Entity fromEntity = this.FindEntityByNodeIdValue(fromNodeId);
-			Entity toEntity = this.FindEntityByNodeIdValue(toNodeId);
+			Entity fromEntity = FindEntityByNodeIdValue(fromNodeId);
+			Entity toEntity = FindEntityByNodeIdValue(toNodeId);
 
 			if (fromEntity == Entity.Null || toEntity == Entity.Null)
 				{
@@ -337,7 +337,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			NavNode toNode = SystemAPI.GetComponent<NavNode>(toEntity);
 
 			// ✅ FIXED: Added the missing CalculateMovementHeuristic method
-			return this.CalculateMovementHeuristic(fromNode.WorldPosition, toNode.WorldPosition);
+			return CalculateMovementHeuristic(fromNode.WorldPosition, toNode.WorldPosition);
 			}
 
 		/// <summary>
@@ -359,7 +359,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				if (verticalDistance > 0)
 					{
 					// Arc trajectory cost: accounts for both horizontal and vertical components
-					float arcMultiplier = this.CalculateJumpArcMultiplier(horizontalDistance, verticalDistance);
+					float arcMultiplier = CalculateJumpArcMultiplier(horizontalDistance, verticalDistance);
 					baseCost *= arcMultiplier;
 					}
 				else
@@ -411,7 +411,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			Entity foundEntity = Entity.Null;
 
-			this.Entities.ForEach((Entity entity, in NodeId id) =>
+			Entities.ForEach((Entity entity, in NodeId id) =>
 			{
 				if (id._value == nodeId)
 					{
@@ -432,8 +432,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			if ((link.RequiredAbilities & (Ability.Jump | Ability.DoubleJump | Ability.WallJump | Ability.Dash |
 										  Ability.ArcJump | Ability.ChargedJump | Ability.TeleportArc | Ability.Grapple)) != 0)
 				{
-				Entity fromEntity = this.FindEntityByNodeIdValue(fromNodeId);
-				Entity toEntity = this.FindEntityByNodeIdValue(toNodeId);
+				Entity fromEntity = FindEntityByNodeIdValue(fromNodeId);
+				Entity toEntity = FindEntityByNodeIdValue(toNodeId);
 
 				if (fromEntity != Entity.Null && toEntity != Entity.Null &&
 					SystemAPI.HasComponent<NavNode>(fromEntity) && SystemAPI.HasComponent<NavNode>(toEntity))

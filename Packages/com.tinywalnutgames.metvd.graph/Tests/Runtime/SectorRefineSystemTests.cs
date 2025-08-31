@@ -13,14 +13,14 @@ namespace TinyWalnutGames.MetVD.Tests
 		{
 		protected override void OnUpdate ()
 			{
-			ComponentLookup<WfcState> wfcStateLookup = this.GetComponentLookup<WfcState>(true);
-			ComponentLookup<NodeId> nodeIdLookup = this.GetComponentLookup<NodeId>(true);
-			BufferLookup<ConnectionBufferElement> connectionBufferLookup = this.GetBufferLookup<ConnectionBufferElement>();
-			BufferLookup<GateConditionBufferElement> gateBufferLookup = this.GetBufferLookup<GateConditionBufferElement>();
+			ComponentLookup<WfcState> wfcStateLookup = GetComponentLookup<WfcState>(true);
+			ComponentLookup<NodeId> nodeIdLookup = GetComponentLookup<NodeId>(true);
+			BufferLookup<ConnectionBufferElement> connectionBufferLookup = GetBufferLookup<ConnectionBufferElement>();
+			BufferLookup<GateConditionBufferElement> gateBufferLookup = GetBufferLookup<GateConditionBufferElement>();
 
-			uint baseSeed = (uint)(this.World.Unmanaged.Time.ElapsedTime * 997.0);
+			uint baseSeed = (uint)(World.Unmanaged.Time.ElapsedTime * 997.0);
 			var random = new Unity.Mathematics.Random(baseSeed == 0 ? 1u : baseSeed);
-			float delta = this.World.Unmanaged.Time.DeltaTime;
+			float delta = World.Unmanaged.Time.DeltaTime;
 
 			var job = new SectorRefinementJob
 				{
@@ -31,7 +31,7 @@ namespace TinyWalnutGames.MetVD.Tests
 				Random = random,
 				DeltaTime = delta
 				};
-			this.Dependency = job.ScheduleParallel(this.Dependency);
+			Dependency = job.ScheduleParallel(Dependency);
 			}
 		}
 
@@ -47,31 +47,31 @@ namespace TinyWalnutGames.MetVD.Tests
 		[SetUp]
 		public void SetUp ()
 			{
-			this._world = new World("SectorRefineTestWorld");
-			this._simGroup = this._world.GetOrCreateSystemManaged<SimulationSystemGroup>();
-			SectorRefineTestDriverSystem driver = this._world.GetOrCreateSystemManaged<SectorRefineTestDriverSystem>();
-			this._simGroup.AddSystemToUpdateList(driver);
-			this._simGroup.SortSystems();
+			_world = new World("SectorRefineTestWorld");
+			_simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+			SectorRefineTestDriverSystem driver = _world.GetOrCreateSystemManaged<SectorRefineTestDriverSystem>();
+			_simGroup.AddSystemToUpdateList(driver);
+			_simGroup.SortSystems();
 			}
 
 		[TearDown]
 		public void TearDown ()
 			{
-			if (this._world != null && this._world.IsCreated)
+			if (_world != null && _world.IsCreated)
 				{
-				this._world.Dispose();
+				_world.Dispose();
 				}
 			}
 
 		[Test]
 		public void PlanningPhase_Completes_WhenWfcCompleted ()
 			{
-			EntityManager em = this._world.EntityManager;
+			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
 			em.AddComponentData(e, new WfcState(WfcGenerationState.Completed));
 			em.AddComponentData(e, new SectorRefinementData(0.3f) { Phase = SectorRefinementPhase.Planning });
 
-			this._simGroup.Update();
+			_simGroup.Update();
 
 			SectorRefinementData data = em.GetComponentData<SectorRefinementData>(e);
 			Assert.AreEqual(SectorRefinementPhase.LoopCreation, data.Phase, "Phase should advance to LoopCreation after planning with completed WFC.");
@@ -83,7 +83,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void LoopCreation_PhaseAdvances_WhenTargetLoopsAlreadyReached ()
 			{
-			EntityManager em = this._world.EntityManager;
+			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
 			em.AddComponentData(e, new SectorRefinementData(0.3f)
 				{
@@ -93,7 +93,7 @@ namespace TinyWalnutGames.MetVD.Tests
 				});
 			em.AddBuffer<ConnectionBufferElement>(e); // required for loop phase logic path
 
-			this._simGroup.Update();
+			_simGroup.Update();
 
 			SectorRefinementData data = em.GetComponentData<SectorRefinementData>(e);
 			Assert.AreEqual(SectorRefinementPhase.LockPlacement, data.Phase, "Should move to LockPlacement when loop target achieved.");
@@ -102,7 +102,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void LockPlacement_AddsHardLocks_AndAdvancesToPathValidation ()
 			{
-			EntityManager em = this._world.EntityManager;
+			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
 			em.AddComponentData(e, new SectorRefinementData(0.3f)
 				{
@@ -112,7 +112,7 @@ namespace TinyWalnutGames.MetVD.Tests
 				});
 			em.AddBuffer<GateConditionBufferElement>(e);
 
-			this._simGroup.Update();
+			_simGroup.Update();
 
 			SectorRefinementData data = em.GetComponentData<SectorRefinementData>(e);
 			Assert.AreEqual(SectorRefinementPhase.PathValidation, data.Phase, "Should proceed to PathValidation after lock placement.");
@@ -122,7 +122,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void PathValidation_Completes_WhenLoopsAndLocksPresent ()
 			{
-			EntityManager em = this._world.EntityManager;
+			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
 			em.AddComponentData(e, new SectorRefinementData(0.3f)
 				{
@@ -132,7 +132,7 @@ namespace TinyWalnutGames.MetVD.Tests
 				HardLockCount = 1
 				});
 
-			this._simGroup.Update();
+			_simGroup.Update();
 
 			SectorRefinementData data = em.GetComponentData<SectorRefinementData>(e);
 			Assert.AreEqual(SectorRefinementPhase.Completed, data.Phase, "Valid path setup should mark refinement Completed.");
@@ -141,7 +141,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void PathValidation_Fails_WhenNoLoopsOrLocks ()
 			{
-			EntityManager em = this._world.EntityManager;
+			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
 			em.AddComponentData(e, new SectorRefinementData(0.3f)
 				{
@@ -151,7 +151,7 @@ namespace TinyWalnutGames.MetVD.Tests
 				HardLockCount = 0
 				});
 
-			this._simGroup.Update();
+			_simGroup.Update();
 
 			SectorRefinementData data = em.GetComponentData<SectorRefinementData>(e);
 			Assert.AreEqual(SectorRefinementPhase.Failed, data.Phase, "Missing loops & locks over thresholds should Fail refinement.");

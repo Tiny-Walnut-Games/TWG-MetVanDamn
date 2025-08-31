@@ -12,10 +12,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		{
 		public override void Bake (WfcTilePrototypeAuthoring authoring)
 			{
-			Entity entity = this.GetEntity(TransformUsageFlags.None);
+			Entity entity = GetEntity(TransformUsageFlags.None);
 
 			// Add the tile prototype component
-			this.AddComponent(entity, new WfcTilePrototype(
+			AddComponent(entity, new WfcTilePrototype(
 				authoring.tileId,
 				authoring.weight,
 				authoring.biomeType,
@@ -27,7 +27,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Add socket buffer if sockets are defined
 			if (authoring.sockets != null && authoring.sockets.Length > 0)
 				{
-				DynamicBuffer<WfcSocketBufferElement> socketBuffer = this.AddBuffer<WfcSocketBufferElement>(entity);
+				DynamicBuffer<WfcSocketBufferElement> socketBuffer = AddBuffer<WfcSocketBufferElement>(entity);
 
 				foreach (WfcSocketConfig socketConfig in authoring.sockets)
 					{
@@ -42,7 +42,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 
 			// Add the authoring component as a component object for editor sync
-			this.AddComponentObject(entity, authoring);
+			AddComponentObject(entity, authoring);
 			}
 		}
 	}

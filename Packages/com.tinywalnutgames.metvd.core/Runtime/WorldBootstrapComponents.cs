@@ -16,8 +16,8 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public BiomeGenerationSettings (int2 biomeCountRange, float biomeWeight)
 			{
-			this.BiomeCountRange = biomeCountRange;
-			this.BiomeWeight = biomeWeight;
+			BiomeCountRange = biomeCountRange;
+			BiomeWeight = biomeWeight;
 			}
 		}
 
@@ -29,9 +29,9 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public DistrictGenerationSettings (int2 districtCountRange, float districtMinDistance, float districtWeight)
 			{
-			this.DistrictCountRange = districtCountRange;
-			this.DistrictMinDistance = districtMinDistance;
-			this.DistrictWeight = districtWeight;
+			DistrictCountRange = districtCountRange;
+			DistrictMinDistance = districtMinDistance;
+			DistrictWeight = districtWeight;
 			}
 		}
 
@@ -42,8 +42,8 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public SectorGenerationSettings (int2 sectorsPerDistrictRange, int2 sectorGridSize)
 			{
-			this.SectorsPerDistrictRange = sectorsPerDistrictRange;
-			this.SectorGridSize = sectorGridSize;
+			SectorsPerDistrictRange = sectorsPerDistrictRange;
+			SectorGridSize = sectorGridSize;
 			}
 		}
 
@@ -54,8 +54,8 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public RoomGenerationSettings (int2 roomsPerSectorRange, float targetLoopDensity)
 			{
-			this.RoomsPerSectorRange = roomsPerSectorRange;
-			this.TargetLoopDensity = targetLoopDensity;
+			RoomsPerSectorRange = roomsPerSectorRange;
+			TargetLoopDensity = targetLoopDensity;
 			}
 		}
 
@@ -87,15 +87,15 @@ namespace TinyWalnutGames.MetVD.Core
 			bool enableDebugVisualization,
 			bool logGenerationSteps)
 			{
-			this.Seed = seed;
-			this.WorldSize = worldSize;
-			this.RandomizationMode = randomizationMode;
-			this.BiomeSettings = biomeSettings;
-			this.DistrictSettings = districtSettings;
-			this.SectorSettings = sectorSettings;
-			this.RoomSettings = roomSettings;
-			this.EnableDebugVisualization = enableDebugVisualization;
-			this.LogGenerationSteps = logGenerationSteps;
+			Seed = seed;
+			WorldSize = worldSize;
+			RandomizationMode = randomizationMode;
+			BiomeSettings = biomeSettings;
+			DistrictSettings = districtSettings;
+			SectorSettings = sectorSettings;
+			RoomSettings = roomSettings;
+			EnableDebugVisualization = enableDebugVisualization;
+			LogGenerationSteps = logGenerationSteps;
 			}
 		}
 
@@ -116,10 +116,10 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public WorldBootstrapCompleteTag (int biomes, int districts, int sectors, int rooms)
 			{
-			this.BiomesGenerated = biomes;
-			this.DistrictsGenerated = districts;
-			this.SectorsGenerated = sectors;
-			this.RoomsGenerated = rooms;
+			BiomesGenerated = biomes;
+			DistrictsGenerated = districts;
+			SectorsGenerated = sectors;
+			RoomsGenerated = rooms;
 			}
 		}
 	}

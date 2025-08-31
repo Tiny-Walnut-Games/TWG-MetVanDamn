@@ -23,11 +23,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this.socketBufferLookup = state.GetBufferLookup<WfcSocketBufferElement>(true);
-			this.candidateBufferLookup = state.GetBufferLookup<WfcCandidateBufferElement>();
+			socketBufferLookup = state.GetBufferLookup<WfcSocketBufferElement>(true);
+			candidateBufferLookup = state.GetBufferLookup<WfcCandidateBufferElement>();
 			state.RequireForUpdate<WfcState>();
 			// Optional layout done tag (do not require so tests without it still run)
-			this._layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+			_layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<DistrictLayoutDoneTag>()
 				.Build(ref state);
 			}
@@ -37,8 +37,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public void OnUpdate (ref SystemState state)
 			{
-			this.socketBufferLookup.Update(ref state);
-			this.candidateBufferLookup.Update(ref state);
+			socketBufferLookup.Update(ref state);
+			candidateBufferLookup.Update(ref state);
 
 			float deltaTime = state.WorldUnmanaged.Time.DeltaTime;
 			uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 911.0);
@@ -54,8 +54,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			var wfcJob = new WfcProcessingJob
 				{
-				CandidateBufferLookup = this.candidateBufferLookup,
-				SocketBufferLookup = this.socketBufferLookup,
+				CandidateBufferLookup = candidateBufferLookup,
+				SocketBufferLookup = socketBufferLookup,
 				DeltaTime = deltaTime,
 				BaseSeed = baseSeed,
 				Entities = entities,
@@ -80,13 +80,13 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			public void Execute ()
 				{
-				var random = new Random(this.BaseSeed == 0 ? 1u : this.BaseSeed);
+				var random = new Random(BaseSeed == 0 ? 1u : BaseSeed);
 
-				for (int i = 0; i < this.Entities.Length; i++)
+				for (int i = 0; i < Entities.Length; i++)
 					{
-					Entity entity = this.Entities [ i ];
-					RefRW<WfcState> wfcState = this.WfcStates.GetRefRW(entity);
-					RefRO<NodeId> nodeId = this.NodeIds.GetRefRO(entity);
+					Entity entity = Entities [ i ];
+					RefRW<WfcState> wfcState = WfcStates.GetRefRW(entity);
+					RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
 
 					var entityRandom = new Random((uint)(entity.Index * 1103515245u) ^ random.state);
 					NodeId nodeIdRO = nodeId.ValueRO;
@@ -94,10 +94,10 @@ namespace TinyWalnutGames.MetVD.Graph
 					switch (wfcState.ValueRO.State)
 						{
 						case WfcGenerationState.Initialized:
-							this.ProcessInitialized(entity, wfcState, entityRandom, nodeIdRO);
+							ProcessInitialized(entity, wfcState, entityRandom, nodeIdRO);
 							break;
 						case WfcGenerationState.InProgress:
-							this.ProcessInProgress(entity, wfcState, nodeIdRO, entityRandom);
+							ProcessInProgress(entity, wfcState, nodeIdRO, entityRandom);
 							break;
 						case WfcGenerationState.Completed:
 						case WfcGenerationState.Failed:
@@ -115,26 +115,26 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			private void ProcessInitialized (Entity entity, RefRW<WfcState> wfcState, Random random, in NodeId nodeId)
 				{
-				if (!this.CandidateBufferLookup.HasBuffer(entity))
+				if (!CandidateBufferLookup.HasBuffer(entity))
 					{
 					wfcState.ValueRW.State = WfcGenerationState.Failed;
 					return;
 					}
 
-				this.InitializeCandidates(entity, random, nodeId);
-				wfcState.ValueRW.Entropy = this.CandidateBufferLookup [ entity ].Length;
+				InitializeCandidates(entity, random, nodeId);
+				wfcState.ValueRW.Entropy = CandidateBufferLookup [ entity ].Length;
 				wfcState.ValueRW.State = WfcGenerationState.InProgress;
 				}
 
 			private void ProcessInProgress (Entity entity, RefRW<WfcState> wfcState, in NodeId nodeId, Random random)
 				{
-				if (!this.CandidateBufferLookup.HasBuffer(entity))
+				if (!CandidateBufferLookup.HasBuffer(entity))
 					{
 					wfcState.ValueRW.State = WfcGenerationState.Failed;
 					return;
 					}
 
-				DynamicBuffer<WfcCandidateBufferElement> candidates = this.CandidateBufferLookup [ entity ];
+				DynamicBuffer<WfcCandidateBufferElement> candidates = CandidateBufferLookup [ entity ];
 				if (candidates.Length == 0)
 					{
 					wfcState.ValueRW.State = WfcGenerationState.Contradiction;
@@ -150,14 +150,14 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 
 				// Process constraints and entropy reduction
-				this.PropagateConstraints(entity, candidates, nodeId, random);
+				PropagateConstraints(entity, candidates, nodeId, random);
 				wfcState.ValueRW.Iteration++;
 				wfcState.ValueRW.Entropy = candidates.Length;
 
 				// Force collapse after many iterations
 				if (wfcState.ValueRO.Iteration > 100 && candidates.Length > 1)
 					{
-					uint selectedTileId = this.CollapseRandomly(candidates, random);
+					uint selectedTileId = CollapseRandomly(candidates, random);
 					if (selectedTileId == 0)
 						{
 						wfcState.ValueRW.State = WfcGenerationState.Failed;
@@ -173,12 +173,12 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			private readonly void InitializeCandidates (Entity entity, Random random, in NodeId nodeId)
 				{
-				if (!this.CandidateBufferLookup.HasBuffer(entity))
+				if (!CandidateBufferLookup.HasBuffer(entity))
 					{
 					return;
 					}
 
-				DynamicBuffer<WfcCandidateBufferElement> candidates = this.CandidateBufferLookup [ entity ];
+				DynamicBuffer<WfcCandidateBufferElement> candidates = CandidateBufferLookup [ entity ];
 				candidates.Clear();
 
 				// Fix: Explicit conversion from int2 to float2 for Burst compatibility
@@ -200,9 +200,9 @@ namespace TinyWalnutGames.MetVD.Graph
 				for (int i = candidates.Length - 1; i >= 0; i--)
 					{
 					WfcCandidateBufferElement candidate = candidates [ i ];
-					bool isValid = this.ValidateBiomeCompatibility(candidate.TileId, nodeId, random)
-								   & this.ValidatePolarityCompatibility(candidate.TileId, nodeId, random)
-								   & this.ValidateSocketConstraints(entity, candidate.TileId, nodeId, random);
+					bool isValid = ValidateBiomeCompatibility(candidate.TileId, nodeId, random)
+								   & ValidatePolarityCompatibility(candidate.TileId, nodeId, random)
+								   & ValidateSocketConstraints(entity, candidate.TileId, nodeId, random);
 					if (!isValid)
 						{
 						candidates.RemoveAt(i);
@@ -210,7 +210,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						}
 
 					// Apply entropy reduction
-					float entropyReduction = this.DeltaTime * 0.1f;
+					float entropyReduction = DeltaTime * 0.1f;
 					candidate.Weight = math.max(0.05f, candidate.Weight - entropyReduction);
 
 					// Apply distance-based weight adjustments
@@ -244,7 +244,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			private readonly bool ValidateSocketConstraints (Entity entity, uint tileId, in NodeId nodeId, Random random)
 				{
-				if (!this.SocketBufferLookup.HasBuffer(entity))
+				if (!SocketBufferLookup.HasBuffer(entity))
 					{
 					return true;
 					}

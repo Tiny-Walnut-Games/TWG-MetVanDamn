@@ -26,11 +26,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this._biomeLookup = state.GetComponentLookup<Core.Biome>(true);
-			this._jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
-			this._secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
-			this._roomFeatureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
-			this._roomModuleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
+			_biomeLookup = state.GetComponentLookup<Core.Biome>(true);
+			_jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
+			_secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
+			_roomFeatureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
+			_roomModuleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
 
 			state.RequireForUpdate<RoomGenerationRequest>();
 			}
@@ -38,11 +38,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
 		public void OnUpdate (ref SystemState state)
 			{
-			this._biomeLookup.Update(ref state);
-			this._jumpPhysicsLookup.Update(ref state);
-			this._secretConfigLookup.Update(ref state);
-			this._roomFeatureBufferLookup.Update(ref state);
-			this._roomModuleBufferLookup.Update(ref state);
+			_biomeLookup.Update(ref state);
+			_jumpPhysicsLookup.Update(ref state);
+			_secretConfigLookup.Update(ref state);
+			_roomFeatureBufferLookup.Update(ref state);
+			_roomModuleBufferLookup.Update(ref state);
 
 			// Improved seed generation combining multiple entropy sources
 			float deltaTime = state.WorldUnmanaged.Time.DeltaTime;
@@ -67,11 +67,11 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			var pipelineJob = new PipelineProcessingJob
 				{
-				BiomeLookup = this._biomeLookup,
-				JumpPhysicsLookup = this._jumpPhysicsLookup,
-				SecretConfigLookup = this._secretConfigLookup,
-				RoomFeatureBufferLookup = this._roomFeatureBufferLookup,
-				RoomModuleBufferLookup = this._roomModuleBufferLookup,
+				BiomeLookup = _biomeLookup,
+				JumpPhysicsLookup = _jumpPhysicsLookup,
+				SecretConfigLookup = _secretConfigLookup,
+				RoomFeatureBufferLookup = _roomFeatureBufferLookup,
+				RoomModuleBufferLookup = _roomModuleBufferLookup,
 				Entities = entities,
 				Requests = requests,
 				RoomData = roomData,
@@ -99,15 +99,15 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			public void Execute ()
 				{
-				var masterRandom = new Unity.Mathematics.Random(this.BaseSeed); // I do not believe in discarding until after it's fully used.
+				var masterRandom = new Unity.Mathematics.Random(BaseSeed); // I do not believe in discarding until after it's fully used.
 				int processedRoomCount = 0;
 
-				for (int i = 0; i < this.Entities.Length; i++)
+				for (int i = 0; i < Entities.Length; i++)
 					{
-					Entity entity = this.Entities [ i ];
-					RefRW<RoomGenerationRequest> request = this.Requests.GetRefRW(entity);
-					RefRW<RoomHierarchyData> roomData = this.RoomData.GetRefRW(entity);
-					RefRO<NodeId> nodeId = this.NodeIds.GetRefRO(entity);
+					Entity entity = Entities [ i ];
+					RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
+					RefRW<RoomHierarchyData> roomData = RoomData.GetRefRW(entity);
+					RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
 
 					if (request.ValueRO.IsComplete)
 						{
@@ -120,7 +120,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					switch (request.ValueRO.CurrentStep)
 						{
 						case 1:
-							this.ProcessBiomeSelection(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO);
+							ProcessBiomeSelection(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO);
 							break;
 						case 2:
 							ProcessLayoutTypeDecision(ref request.ValueRW, roomData.ValueRO);
@@ -129,13 +129,13 @@ namespace TinyWalnutGames.MetVD.Graph
 							ProcessRoomGeneratorChoice(ref request.ValueRW, roomData.ValueRO);
 							break;
 						case 4:
-							this.ProcessContentPass(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
+							ProcessContentPass(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
 							break;
 						case 5:
-							this.ProcessBiomeOverrides(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
+							ProcessBiomeOverrides(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
 							break;
 						case 6:
-							this.ProcessNavGeneration(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
+							ProcessNavGeneration(entity, ref request.ValueRW, roomData.ValueRO, nodeId.ValueRO, ref entityRandom);
 							break;
 						default:
 							request.ValueRW.IsComplete = true;
@@ -170,14 +170,14 @@ namespace TinyWalnutGames.MetVD.Graph
 				// Apply biome-specific prop/hazard sets
 
 				// If we don't have biome data, use fallback
-				if (!this.BiomeLookup.HasComponent(entity))
+				if (!BiomeLookup.HasComponent(entity))
 					{
 					request.TargetBiome = BiomeType.HubArea;
 					request.TargetPolarity = Polarity.None;
 					return;
 					}
 
-				Core.Biome biome = this.BiomeLookup [ entity ];
+				Core.Biome biome = BiomeLookup [ entity ];
 				request.TargetBiome = biome.Type;
 				request.TargetPolarity = biome.PrimaryPolarity;
 
@@ -310,12 +310,12 @@ namespace TinyWalnutGames.MetVD.Graph
 				{
 				// Step 4: Place hazards, props, secrets + Run Jump Arc Solver
 
-				if (!this.RoomFeatureBufferLookup.HasBuffer(entity))
+				if (!RoomFeatureBufferLookup.HasBuffer(entity))
 					{
 					return;
 					}
 
-				DynamicBuffer<RoomFeatureElement> features = this.RoomFeatureBufferLookup [ entity ];
+				DynamicBuffer<RoomFeatureElement> features = RoomFeatureBufferLookup [ entity ];
 				RectInt bounds = roomData.Bounds;
 
 				// Clear existing features for regeneration
@@ -362,9 +362,9 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 
 				// Add secret areas if configured
-				if (this.SecretConfigLookup.HasComponent(entity))
+				if (SecretConfigLookup.HasComponent(entity))
 					{
-					SecretAreaConfig secretConfig = this.SecretConfigLookup [ entity ];
+					SecretAreaConfig secretConfig = SecretConfigLookup [ entity ];
 					AddSecretAreas(features, bounds, secretConfig, request, ref random);
 					}
 				}
@@ -374,12 +374,12 @@ namespace TinyWalnutGames.MetVD.Graph
 				// Step 5: Apply visual and mechanical overrides
 				// (e.g., moving clouds in sky biome, tech zone hazards)
 
-				if (!this.RoomFeatureBufferLookup.HasBuffer(entity))
+				if (!RoomFeatureBufferLookup.HasBuffer(entity))
 					{
 					return;
 					}
 
-				DynamicBuffer<RoomFeatureElement> features = this.RoomFeatureBufferLookup [ entity ];
+				DynamicBuffer<RoomFeatureElement> features = RoomFeatureBufferLookup [ entity ];
 
 				// Use coordinate-based environmental effects
 				float environmentalFactor = CalculateEnvironmentalFactor(nodeId, roomData);
@@ -430,12 +430,12 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				// Calculate jump vectors and add movement-type-aware nav edges
 
-				if (!this.RoomFeatureBufferLookup.HasBuffer(entity))
+				if (!RoomFeatureBufferLookup.HasBuffer(entity))
 					{
 					return;
 					}
 
-				DynamicBuffer<RoomFeatureElement> features = this.RoomFeatureBufferLookup [ entity ];
+				DynamicBuffer<RoomFeatureElement> features = RoomFeatureBufferLookup [ entity ];
 				RectInt bounds = roomData.Bounds; // Use the parameter
 
 				// Collect platform positions for jump arc validation
@@ -459,9 +459,9 @@ namespace TinyWalnutGames.MetVD.Graph
 				float navigationComplexity = CalculateNavigationComplexity(nodeId, roomData);
 
 				// Run Jump Arc Solver validation if we have jump physics data
-				if (this.JumpPhysicsLookup.HasComponent(entity) && platformPositions.Length > 1)
+				if (JumpPhysicsLookup.HasComponent(entity) && platformPositions.Length > 1)
 					{
-					JumpPhysicsData jumpPhysics = this.JumpPhysicsLookup [ entity ];
+					JumpPhysicsData jumpPhysics = JumpPhysicsLookup [ entity ];
 					// Build int2 array of critical positions (platforms considered critical)
 					var criticalPlatforms = new NativeArray<int2>(platformPositions.Length, Allocator.Temp);
 					for (int i = 0; i < platformPositions.Length; i++)

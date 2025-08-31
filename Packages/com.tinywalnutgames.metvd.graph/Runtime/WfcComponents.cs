@@ -32,10 +32,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public WfcSocket (uint socketId, byte direction, Polarity requiredPolarity = Polarity.None, bool isOpen = true)
 			{
-			this.SocketId = socketId;
-			this.Direction = (byte)(direction % 4);
-			this.RequiredPolarity = requiredPolarity;
-			this.IsOpen = isOpen;
+			SocketId = socketId;
+			Direction = (byte)(direction % 4);
+			RequiredPolarity = requiredPolarity;
+			IsOpen = isOpen;
 			}
 
 		/// <summary>
@@ -43,22 +43,22 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public readonly bool IsCompatibleWith (WfcSocket other)
 			{
-			if (!this.IsOpen || !other.IsOpen)
+			if (!IsOpen || !other.IsOpen)
 				{
 				return false;
 				}
 
 			// Sockets must have matching IDs and opposite directions
-			bool directionMatch = (this.Direction + 2) % 4 == other.Direction;
-			bool idMatch = this.SocketId == other.SocketId;
+			bool directionMatch = (Direction + 2) % 4 == other.Direction;
+			bool idMatch = SocketId == other.SocketId;
 
 			// Check polarity compatibility (bitmask overlap, with Any/None treated as wildcards)
 			bool polarityMatch =
-				this.RequiredPolarity == Polarity.Any ||
+				RequiredPolarity == Polarity.Any ||
 				other.RequiredPolarity == Polarity.Any ||
-				this.RequiredPolarity == Polarity.None ||
+				RequiredPolarity == Polarity.None ||
 				other.RequiredPolarity == Polarity.None ||
-				(this.RequiredPolarity & other.RequiredPolarity) != 0;
+				(RequiredPolarity & other.RequiredPolarity) != 0;
 
 			return directionMatch && idMatch && polarityMatch;
 			}
@@ -113,13 +113,13 @@ namespace TinyWalnutGames.MetVD.Graph
 		public WfcTilePrototype (uint tileId, float weight = 1.0f, BiomeType biomeType = BiomeType.Unknown,
 							   Polarity primaryPolarity = Polarity.None, byte minConnections = 1, byte maxConnections = 4)
 			{
-			this.TileId = tileId;
-			this.Weight = math.max(0.01f, weight);
-			this.BiomeType = biomeType;
-			this.PrimaryPolarity = primaryPolarity;
+			TileId = tileId;
+			Weight = math.max(0.01f, weight);
+			BiomeType = biomeType;
+			PrimaryPolarity = primaryPolarity;
 			// Explicit int math then cast to byte to avoid Unity.Mathematics overload ambiguity
-			this.MinConnections = (byte)math.min(minConnections, 4);
-			this.MaxConnections = (byte)math.min(maxConnections, 4);
+			MinConnections = (byte)math.min(minConnections, 4);
+			MaxConnections = (byte)math.min(maxConnections, 4);
 			}
 		}
 
@@ -155,11 +155,11 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public WfcState (WfcGenerationState state = WfcGenerationState.Initialized)
 			{
-			this.State = state;
-			this.Iteration = 0;
-			this.Entropy = int.MaxValue;
-			this.IsCollapsed = false;
-			this.AssignedTileId = 0;
+			State = state;
+			Iteration = 0;
+			Entropy = int.MaxValue;
+			IsCollapsed = false;
+			AssignedTileId = 0;
 			}
 		}
 
@@ -186,8 +186,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public WfcCandidateBufferElement (uint tileId, float weight = 1.0f)
 			{
-			this.TileId = tileId;
-			this.Weight = weight;
+			TileId = tileId;
+			Weight = weight;
 			}
 		}
 	}

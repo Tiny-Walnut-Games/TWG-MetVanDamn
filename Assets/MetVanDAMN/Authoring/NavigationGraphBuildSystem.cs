@@ -24,60 +24,60 @@ namespace TinyWalnutGames.MetVD.Authoring
 		protected override void OnCreate ()
 			{
 			// 🔥 GET THE ECB SYSTEM REFERENCE FOR REAL
-			this._endInitEcbSystem = this.World.GetOrCreateSystemManaged<EndInitializationEntityCommandBufferSystem>();
+			_endInitEcbSystem = World.GetOrCreateSystemManaged<EndInitializationEntityCommandBufferSystem>();
 
 			// Query for districts that can become navigation nodes
-			this._districtQuery = this.GetEntityQuery(
+			_districtQuery = GetEntityQuery(
 				ComponentType.ReadOnly<LocalTransform>(),
 				ComponentType.ReadOnly<NodeId>(),
 				ComponentType.Exclude<NavNode>() // Only process districts that haven't been converted yet
 			);
 
 			// Query for connections between districts
-			this._connectionQuery = this.GetEntityQuery(
+			_connectionQuery = GetEntityQuery(
 				ComponentType.ReadOnly<Connection>()
 			);
 
 			// Query for gate conditions
-			this._gateQuery = this.GetEntityQuery(
+			_gateQuery = GetEntityQuery(
 				ComponentType.ReadOnly<GateConditionBufferElement>(),
 				ComponentType.ReadOnly<NodeId>()
 			);
 
 			// Query for navigation graph singleton
-			this._navigationGraphQuery = this.GetEntityQuery(
+			_navigationGraphQuery = GetEntityQuery(
 				ComponentType.ReadOnly<NavigationGraph>()
 			);
 
-			this.RequireForUpdate(this._districtQuery);
+			RequireForUpdate(_districtQuery);
 			}
 
 		protected override void OnUpdate ()
 			{
 			// 🔥 CREATE ACTUAL ECB INSTANCE - NOT JUST COMMENTS
-			EntityCommandBuffer ecb = this._endInitEcbSystem.CreateCommandBuffer();
+			EntityCommandBuffer ecb = _endInitEcbSystem.CreateCommandBuffer();
 
 			// 🔥 USE ECB FOR SINGLETON CREATION - NO MORE DIRECT ENTITYMANAGER
-			if (this._navigationGraphQuery.IsEmpty)
+			if (_navigationGraphQuery.IsEmpty)
 				{
 				Entity newNavGraphEntity = ecb.CreateEntity();
 				ecb.AddComponent(newNavGraphEntity, new NavigationGraph());
 				}
 
 			// Skip if no districts to process
-			if (this._districtQuery.IsEmpty)
+			if (_districtQuery.IsEmpty)
 				{
 				return;
 				}
 
 			// Build navigation nodes from districts using ECB
-			int nodeCount = this.BuildNavigationNodesWithActualECB(ecb);
+			int nodeCount = BuildNavigationNodesWithActualECB(ecb);
 
 			// Build navigation links from connections and gates
-			int linkCount = this.BuildNavigationLinks();
+			int linkCount = BuildNavigationLinks();
 
 			// Update navigation graph statistics if it exists
-			if (!this._navigationGraphQuery.IsEmpty)
+			if (!_navigationGraphQuery.IsEmpty)
 				{
 				Entity navGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
 				NavigationGraph navGraph = SystemAPI.GetSingleton<NavigationGraph>();
@@ -92,7 +92,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 
 			// 🔥 TELL ECB SYSTEM TO EXECUTE AFTER OUR JOBS
-			this._endInitEcbSystem.AddJobHandleForProducer(this.Dependency);
+			_endInitEcbSystem.AddJobHandleForProducer(Dependency);
 			}
 
 		/// <summary>
@@ -103,7 +103,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			int nodeCount = 0;
 
 			// Convert districts to navigation nodes
-			this.Entities
+			Entities
 				.WithNone<NavNode>()
 				.ForEach((Entity entity, in LocalTransform transform, in NodeId nodeId) =>
 				{
@@ -147,14 +147,14 @@ namespace TinyWalnutGames.MetVD.Authoring
 			int linkCount = 0;
 
 			// Process all connections to create navigation links
-			this.Entities
+			Entities
 				.ForEach((Entity entity, in Connection connection) =>
 				{
 					Connection conn = connection;
 
 					// Find source and destination entities
-					Entity sourceEntity = this.FindEntityByNodeId(conn.FromNodeId);
-					Entity destEntity = this.FindEntityByNodeId(conn.ToNodeId);
+					Entity sourceEntity = FindEntityByNodeId(conn.FromNodeId);
+					Entity destEntity = FindEntityByNodeId(conn.ToNodeId);
 
 					if (sourceEntity == Entity.Null || destEntity == Entity.Null)
 						{
@@ -162,7 +162,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 						}
 
 					// Check for gate conditions on source or destination
-					GateConditionCollection gateConditions = this.CollectGateConditions(sourceEntity, destEntity);
+					GateConditionCollection gateConditions = CollectGateConditions(sourceEntity, destEntity);
 
 					// Create navigation link with gate conditions
 					NavLink navLink = CreateNavLinkFromConnection(conn, gateConditions);
@@ -200,7 +200,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			Entity foundEntity = Entity.Null;
 
-			this.Entities.ForEach((Entity entity, in NodeId id) =>
+			Entities.ForEach((Entity entity, in NodeId id) =>
 			{
 				if (id._value == nodeId)
 					{
@@ -301,18 +301,18 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			public void Add (GateCondition gate)
 				{
-				switch (this.Count)
+				switch (Count)
 					{
-					case 0: this._gate0 = gate; break;
-					case 1: this._gate1 = gate; break;
-					case 2: this._gate2 = gate; break;
-					case 3: this._gate3 = gate; break;
+					case 0: _gate0 = gate; break;
+					case 1: _gate1 = gate; break;
+					case 2: _gate2 = gate; break;
+					case 3: _gate3 = gate; break;
 					default:
 						break;
 					}
-				if (this.Count < 4)
+				if (Count < 4)
 					{
-					this.Count++;
+					Count++;
 					}
 				}
 
@@ -322,10 +322,10 @@ namespace TinyWalnutGames.MetVD.Authoring
 					{
 					return index switch
 						{
-							0 => this._gate0,
-							1 => this._gate1,
-							2 => this._gate2,
-							3 => this._gate3,
+							0 => _gate0,
+							1 => _gate1,
+							2 => _gate2,
+							3 => _gate3,
 							_ => default
 							};
 					}

@@ -61,13 +61,13 @@ namespace TinyWalnutGames.MetVD.Core
 		public Connection (uint fromNodeId, uint toNodeId, ConnectionType type = ConnectionType.Bidirectional,
 						 Polarity requiredPolarity = Polarity.None, float traversalCost = 1.0f)
 			{
-			this.FromNodeId = fromNodeId;
-			this.ToNodeId = toNodeId;
-			this.Type = type;
-			this.RequiredPolarity = requiredPolarity;
-			this.TraversalCost = math.max(0.1f, traversalCost);
-			this.IsActive = true;
-			this.IsDiscovered = false;
+			FromNodeId = fromNodeId;
+			ToNodeId = toNodeId;
+			Type = type;
+			RequiredPolarity = requiredPolarity;
+			TraversalCost = math.max(0.1f, traversalCost);
+			IsActive = true;
+			IsDiscovered = false;
 			}
 
 		/// <summary>
@@ -75,15 +75,15 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly bool CanTraverseFrom (uint nodeId, Polarity availablePolarity)
 			{
-			if (!this.IsActive)
+			if (!IsActive)
 				{
 				return false;
 				}
 
 			// Check if starting from the correct node
-			bool validDirection = (this.Type == ConnectionType.Bidirectional)
-				? (nodeId == this.FromNodeId || nodeId == this.ToNodeId)
-				: (nodeId == this.FromNodeId);
+			bool validDirection = (Type == ConnectionType.Bidirectional)
+				? (nodeId == FromNodeId || nodeId == ToNodeId)
+				: (nodeId == FromNodeId);
 
 			if (!validDirection)
 				{
@@ -91,9 +91,9 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Check polarity requirements
-			return this.RequiredPolarity == Polarity.None || this.RequiredPolarity == Polarity.Any
+			return RequiredPolarity == Polarity.None || RequiredPolarity == Polarity.Any
 				? true
-				: (availablePolarity & this.RequiredPolarity) != 0;
+				: (availablePolarity & RequiredPolarity) != 0;
 			}
 
 		/// <summary>
@@ -101,18 +101,18 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly uint GetDestination (uint sourceNodeId)
 			{
-			if (this.Type == ConnectionType.Bidirectional)
+			if (Type == ConnectionType.Bidirectional)
 				{
-				return sourceNodeId == this.FromNodeId ? this.ToNodeId : this.FromNodeId;
+				return sourceNodeId == FromNodeId ? ToNodeId : FromNodeId;
 				}
 
-			return sourceNodeId == this.FromNodeId ? this.ToNodeId : 0; // 0 indicates invalid traversal
+			return sourceNodeId == FromNodeId ? ToNodeId : 0; // 0 indicates invalid traversal
 			}
 
 		public override readonly string ToString ()
 			{
-			string direction = this.Type == ConnectionType.Bidirectional ? "<->" : "->";
-			return $"Connection({this.FromNodeId} {direction} {this.ToNodeId}, {this.Type}, {this.RequiredPolarity})";
+			string direction = Type == ConnectionType.Bidirectional ? "<->" : "->";
+			return $"Connection({FromNodeId} {direction} {ToNodeId}, {Type}, {RequiredPolarity})";
 			}
 		}
 

@@ -37,7 +37,7 @@ namespace LivingDevAgent.Editor.Modules
 
         public ScribeModuleBase(TLDLScribeData data)
         {
-            this._data = data;
+            _data = data;
             InitializeSharedStyles();
         }
 
@@ -279,12 +279,12 @@ namespace LivingDevAgent.Editor.Modules
         /// </summary>
         protected void SetStatus(string message)
         {
-            if (this._window == null)
+            if (_window == null)
             {
                 return;
             }
 
-            Type windowType = this._window.GetType();
+            Type windowType = _window.GetType();
             
             // Intelligent caching: Transform unused reflection overhead into performance gain
             if (!_setStatusMethodCache.TryGetValue(windowType, out MethodInfo cachedMethod))
@@ -304,7 +304,7 @@ namespace LivingDevAgent.Editor.Modules
             // Enhanced error handling with meaningful feedback
             try
             {
-                cachedMethod?.Invoke(this._window, new object[] { message });
+                cachedMethod?.Invoke(_window, new object[] { message });
             }
             catch (Exception)
             {
@@ -320,7 +320,7 @@ namespace LivingDevAgent.Editor.Modules
         /// </summary>
         public void SetWindow(object window)
         {
-            this._window = window;
+            _window = window;
             
             // Future expansion: Window capability detection and optimization
             if (window != null)

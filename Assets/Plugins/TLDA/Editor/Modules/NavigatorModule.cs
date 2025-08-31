@@ -20,38 +20,38 @@ namespace LivingDevAgent.Editor.Modules
 		public override void Initialize ()
 			{
 			// Load persisted root if available; otherwise, default to TLDA docs
-			this._data.RootPath = EditorPrefs.GetString(TLDLScribeData.EditorPrefsRootKey, string.Empty);
-			if (string.IsNullOrEmpty(this._data.RootPath))
+			_data.RootPath = EditorPrefs.GetString(TLDLScribeData.EditorPrefsRootKey, string.Empty);
+			if (string.IsNullOrEmpty(_data.RootPath))
 				{
 				string defaultFolder = Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
 				if (Directory.Exists(defaultFolder))
 					{
-					this._data.RootPath = defaultFolder;
+					_data.RootPath = defaultFolder;
 					}
 				}
-			if (!string.IsNullOrEmpty(this._data.RootPath) && Directory.Exists(this._data.RootPath))
+			if (!string.IsNullOrEmpty(_data.RootPath) && Directory.Exists(_data.RootPath))
 				{
-				if (string.IsNullOrEmpty(this._data.ActiveDirPath))
+				if (string.IsNullOrEmpty(_data.ActiveDirPath))
 					{
-					this._data.ActiveDirPath = this._data.RootPath;
+					_data.ActiveDirPath = _data.RootPath;
 					}
 				}
 
-			this.InitializeStyles();
+			InitializeStyles();
 			}
 
 		public override void Dispose ()
 			{
 			foreach (KeyValuePair<string, Texture2D> kvp in
-				from kvp in this._data.ImageCache
+				from kvp in _data.ImageCache
 				where kvp.Value != null
 				select kvp)
 				{
 				UnityEngine.Object.DestroyImmediate(kvp.Value);
 				}
 
-			this._data.ImageCache.Clear();
-			this._data.ImageCacheOrder.Clear();
+			_data.ImageCache.Clear();
+			_data.ImageCacheOrder.Clear();
 			}
 
 		public void DrawToolbar ()
@@ -60,19 +60,19 @@ namespace LivingDevAgent.Editor.Modules
 			GUIContent rootIcon = new("📁 Root…", "Choose the root folder for your documentation tree");
 			if (GUILayout.Button(rootIcon, EditorStyles.toolbarButton, GUILayout.Width(80)))
 				{
-				this.ChooseRootFolder();
+				ChooseRootFolder();
 				}
 
-			using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(this._data.RootPath)))
+			using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_data.RootPath)))
 				{
 				if (GUILayout.Button("🔍 Open", EditorStyles.toolbarButton, GUILayout.Width(70)))
 					{
-					this.OpenInFileBrowser(this._data.RootPath);
+					OpenInFileBrowser(_data.RootPath);
 					}
 
 				if (GUILayout.Button("🔄", EditorStyles.toolbarButton, GUILayout.Width(30)))
 					{
-					this.RefreshNavigator();
+					RefreshNavigator();
 					}
 				}
 			}
@@ -89,30 +89,30 @@ namespace LivingDevAgent.Editor.Modules
 
 				if (GUILayout.Button("⚙️", EditorStyles.miniButton, GUILayout.Width(25)))
 					{
-					this.ShowNavigatorSettings();
+					ShowNavigatorSettings();
 					}
 				}
 
 			// Root path display
 			using (new EditorGUILayout.HorizontalScope())
 				{
-				EditorGUILayout.TextField("Root", string.IsNullOrEmpty(this._data.RootPath) ? "(not set)" : this._data.RootPath);
+				EditorGUILayout.TextField("Root", string.IsNullOrEmpty(_data.RootPath) ? "(not set)" : _data.RootPath);
 				}
 
 			// File tree with enhanced styling
-			this._data.NavScroll = EditorGUILayout.BeginScrollView(this._data.NavScroll, GUILayout.ExpandHeight(true));
+			_data.NavScroll = EditorGUILayout.BeginScrollView(_data.NavScroll, GUILayout.ExpandHeight(true));
 
-			if (string.IsNullOrEmpty(this._data.RootPath))
+			if (string.IsNullOrEmpty(_data.RootPath))
 				{
 				EditorGUILayout.HelpBox("🌟 Choose a root folder to begin your documentation journey!", MessageType.Info);
 				}
-			else if (!Directory.Exists(this._data.RootPath))
+			else if (!Directory.Exists(_data.RootPath))
 				{
 				EditorGUILayout.HelpBox("⚠️ Root folder not found. Please choose a new root.", MessageType.Warning);
 				}
 			else
 				{
-				this.DrawDirectoryNode(this._data.RootPath, 0, this.GetIndent(0));
+				DrawDirectoryNode(_data.RootPath, 0, GetIndent(0));
 				}
 
 			EditorGUILayout.EndScrollView();
@@ -121,21 +121,21 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.Space(4);
 			using (new EditorGUI.DisabledScope(true))
 				{
-				EditorGUILayout.TextField("📂 Active", string.IsNullOrEmpty(this._data.ActiveDirPath) ? "(none)" : this._data.ActiveDirPath);
+				EditorGUILayout.TextField("📂 Active", string.IsNullOrEmpty(_data.ActiveDirPath) ? "(none)" : _data.ActiveDirPath);
 				}
 
 			using (new EditorGUILayout.HorizontalScope())
 				{
-				using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(this._data.ActiveDirPath)))
+				using (new EditorGUI.DisabledScope(string.IsNullOrEmpty(_data.ActiveDirPath)))
 					{
 					if (GUILayout.Button("🔍 Open"))
 						{
-						this.OpenInFileBrowser(this._data.ActiveDirPath);
+						OpenInFileBrowser(_data.ActiveDirPath);
 						}
 
 					if (GUILayout.Button("➕ Folder"))
 						{
-						this.CreateChildFolder();
+						CreateChildFolder();
 						}
 					}
 				}
@@ -144,25 +144,25 @@ namespace LivingDevAgent.Editor.Modules
 		private void ShowNavigatorSettings ()
 			{
 			GenericMenu menu = new();
-			menu.AddItem(new("📁 Choose New Root"), false, this.ChooseRootFolder);
-			menu.AddItem(new("🔄 Refresh Navigator"), false, this.RefreshNavigator);
+			menu.AddItem(new("📁 Choose New Root"), false, ChooseRootFolder);
+			menu.AddItem(new("🔄 Refresh Navigator"), false, RefreshNavigator);
 			menu.AddSeparator("");
-			menu.AddItem(new("🗑️ Clear Image Cache"), false, this.ClearImageCache);
+			menu.AddItem(new("🗑️ Clear Image Cache"), false, ClearImageCache);
 			menu.ShowAsContext();
 			}
 
 		private void ClearImageCache ()
 			{
-			foreach (KeyValuePair<string, Texture2D> kvp in this._data.ImageCache)
+			foreach (KeyValuePair<string, Texture2D> kvp in _data.ImageCache)
 				{
 				if (kvp.Value != null)
 					{
 					UnityEngine.Object.DestroyImmediate(kvp.Value);
 					}
 				}
-			this._data.ImageCache.Clear();
-			this._data.ImageCacheOrder.Clear();
-			this.SetStatus("🗑️ Image cache cleared");
+			_data.ImageCache.Clear();
+			_data.ImageCacheOrder.Clear();
+			SetStatus("🗑️ Image cache cleared");
 			}
 
 		private void DrawDirectoryNode (string path, int depth, string indent)
@@ -178,25 +178,25 @@ namespace LivingDevAgent.Editor.Modules
 				folderName = path;
 				}
 
-			if (!this._data.FolderExpanded.ContainsKey(path))
+			if (!_data.FolderExpanded.ContainsKey(path))
 				{
-				this._data.FolderExpanded [ path ] = depth <= 1; // expand root/top-level by default
+				_data.FolderExpanded [ path ] = depth <= 1; // expand root/top-level by default
 				}
 
 			string labelPrefix = indent ?? string.Empty;
 			using (new EditorGUILayout.HorizontalScope())
 				{
-				string folderIcon = this._data.FolderExpanded [ path ] ? "📂" : "📁";
-				this._data.FolderExpanded [ path ] = EditorGUILayout.Foldout(this._data.FolderExpanded [ path ], $"{folderIcon} {labelPrefix}{folderName}", true);
+				string folderIcon = _data.FolderExpanded [ path ] ? "📂" : "📁";
+				_data.FolderExpanded [ path ] = EditorGUILayout.Foldout(_data.FolderExpanded [ path ], $"{folderIcon} {labelPrefix}{folderName}", true);
 
 				if (GUILayout.Button("✅", EditorStyles.miniButton, GUILayout.Width(25)))
 					{
-					this._data.ActiveDirPath = path;
-					this.SetStatus($"📂 Active directory: {path}");
+					_data.ActiveDirPath = path;
+					SetStatus($"📂 Active directory: {path}");
 					}
 				}
 
-			if (!this._data.FolderExpanded [ path ]) return; // @jmeyer1980 ⚠ Intention ⚠ - IL for legibility
+			if (!_data.FolderExpanded [ path ]) return; // @jmeyer1980 ⚠ Intention ⚠ - IL for legibility
 
 			try
 				{
@@ -206,7 +206,7 @@ namespace LivingDevAgent.Editor.Modules
 				foreach (string d in subDirs)
 					{
 					EditorGUI.indentLevel++;
-					this.DrawDirectoryNode(d, depth + 1, this.GetIndent(depth + 1));
+					DrawDirectoryNode(d, depth + 1, GetIndent(depth + 1));
 					EditorGUI.indentLevel--;
 					}
 
@@ -218,7 +218,7 @@ namespace LivingDevAgent.Editor.Modules
 					string ext = Path.GetExtension(f);
 					if (!TLDLScribeData.AllowedExts.Contains(ext)) continue;
 
-					this.DrawFileNode(f, indent, depth);
+					DrawFileNode(f, indent, depth);
 					}
 				}
 			catch (Exception e)
@@ -237,28 +237,28 @@ namespace LivingDevAgent.Editor.Modules
 				bool isImage = TLDLScribeData.ImageExts.Contains(Path.GetExtension(filePath));
 
 				// File type emoji
-				string fileIcon = this.GetFileIcon(Path.GetExtension(filePath));
+				string fileIcon = GetFileIcon(Path.GetExtension(filePath));
 
 				// Optional thumbnail for images
 				if (isImage)
 					{
-					this.DrawImageThumbnail(filePath);
+					DrawImageThumbnail(filePath);
 					}
 
 				if (GUILayout.Button($"{fileIcon} {fileLabel}", EditorStyles.label))
 					{
 					if (isImage)
 						{
-						this.CopyImageMarkdownLink(filePath);
+						CopyImageMarkdownLink(filePath);
 						}
 					else
 						{
-						this.LoadFile(filePath);
+						LoadFile(filePath);
 						}
 					}
 
 				// Action buttons
-				this.DrawFileActionButtons(filePath, isImage);
+				DrawFileActionButtons(filePath, isImage);
 
 				EditorGUI.indentLevel--;
 				}
@@ -266,7 +266,7 @@ namespace LivingDevAgent.Editor.Modules
 
 		private void DrawImageThumbnail (string filePath)
 			{
-			if (!this._data.ImageCache.TryGetValue(filePath, out Texture2D tex) || tex == null)
+			if (!_data.ImageCache.TryGetValue(filePath, out Texture2D tex) || tex == null)
 				{
 				try
 					{
@@ -276,7 +276,7 @@ namespace LivingDevAgent.Editor.Modules
 						tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
 						if (tex.LoadImage(bytes))
 							{
-							this.AddTextureToCache(filePath, tex);
+							AddTextureToCache(filePath, tex);
 							}
 						else
 							{
@@ -288,7 +288,7 @@ namespace LivingDevAgent.Editor.Modules
 				catch { /* ignore IO/format errors */ }
 				}
 
-			if (this._data.ImageCache.TryGetValue(filePath, out Texture2D thumb) && thumb != null)
+			if (_data.ImageCache.TryGetValue(filePath, out Texture2D thumb) && thumb != null)
 				{
 				const float maxThumb = 36f;
 				float aspect = (float)thumb.width / Mathf.Max(1, thumb.height);
@@ -308,20 +308,20 @@ namespace LivingDevAgent.Editor.Modules
 				{
 				if (GUILayout.Button("📖", EditorStyles.miniButton, GUILayout.Width(25)))
 					{
-					this.LoadFile(filePath);
+					LoadFile(filePath);
 					}
 				}
 
 			if (GUILayout.Button("🔍", EditorStyles.miniButton, GUILayout.Width(25)))
 				{
-				this.OpenContainingFolderOfFile(filePath);
+				OpenContainingFolderOfFile(filePath);
 				}
 
 			if (isImage)
 				{
 				if (GUILayout.Button("➕", EditorStyles.miniButton, GUILayout.Width(25)))
 					{
-					this.InsertImageAtCursor(filePath);
+					InsertImageAtCursor(filePath);
 					}
 				}
 
@@ -329,13 +329,13 @@ namespace LivingDevAgent.Editor.Modules
 				{
 				try
 					{
-					string copy = this.DuplicateFile(filePath);
-					this.SetStatus($"📋 Duplicated: {this.MakeProjectRelative(copy)}");
-					this.RefreshNavigator();
+					string copy = DuplicateFile(filePath);
+					SetStatus($"📋 Duplicated: {MakeProjectRelative(copy)}");
+					RefreshNavigator();
 					}
 				catch (Exception ex)
 					{
-					this.SetStatus($"❌ Duplicate failed: {ex.Message}");
+					SetStatus($"❌ Duplicate failed: {ex.Message}");
 					}
 				}
 			}
@@ -356,17 +356,17 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			if (tex == null) return; // @jmeyer1980 ⚠ Intention ⚠ - IL for legibility
 
-			this._data.ImageCache [ key ] = tex;
-			this._data.ImageCacheOrder.Add(key);
-			if (this._data.ImageCacheOrder.Count > TLDLScribeData.ImageCacheMax)
+			_data.ImageCache [ key ] = tex;
+			_data.ImageCacheOrder.Add(key);
+			if (_data.ImageCacheOrder.Count > TLDLScribeData.ImageCacheMax)
 				{
-				string oldest = this._data.ImageCacheOrder [ 0 ];
-				this._data.ImageCacheOrder.RemoveAt(0);
-				if (this._data.ImageCache.TryGetValue(oldest, out Texture2D oldTex) && oldTex != null)
+				string oldest = _data.ImageCacheOrder [ 0 ];
+				_data.ImageCacheOrder.RemoveAt(0);
+				if (_data.ImageCache.TryGetValue(oldest, out Texture2D oldTex) && oldTex != null)
 					{
 					UnityEngine.Object.DestroyImmediate(oldTex);
 					}
-				this._data.ImageCache.Remove(oldest);
+				_data.ImageCache.Remove(oldest);
 				}
 			}
 
@@ -378,22 +378,22 @@ namespace LivingDevAgent.Editor.Modules
 		// File operations
 		private void ChooseRootFolder ()
 			{
-			string start = string.IsNullOrEmpty(this._data.RootPath) ? Application.dataPath : this._data.RootPath;
+			string start = string.IsNullOrEmpty(_data.RootPath) ? Application.dataPath : _data.RootPath;
 			string picked = EditorUtility.OpenFolderPanel("Choose Sudo-GitBook Root", start, "");
 			if (!string.IsNullOrEmpty(picked))
 				{
-				this._data.RootPath = picked;
-				this._data.ActiveDirPath = this._data.RootPath;
-				EditorPrefs.SetString(TLDLScribeData.EditorPrefsRootKey, this._data.RootPath);
-				this.SetStatus($"📁 Root set to: {this._data.RootPath}");
-				this.RefreshNavigator();
+				_data.RootPath = picked;
+				_data.ActiveDirPath = _data.RootPath;
+				EditorPrefs.SetString(TLDLScribeData.EditorPrefsRootKey, _data.RootPath);
+				SetStatus($"📁 Root set to: {_data.RootPath}");
+				RefreshNavigator();
 				}
 			}
 
 		// Replace the RefreshNavigator method to cast _window to EditorWindow before calling Repaint
 		private void RefreshNavigator ()
 			{
-			if (this._window is EditorWindow editorWindow)
+			if (_window is EditorWindow editorWindow)
 				{
 				editorWindow.Repaint();
 				}
@@ -401,10 +401,10 @@ namespace LivingDevAgent.Editor.Modules
 
 		private void CreateChildFolder ()
 			{
-			string parent = this._data.ActiveDirPath;
+			string parent = _data.ActiveDirPath;
 			if (string.IsNullOrEmpty(parent))
 				{
-				parent = this.ResolveActiveFolder();
+				parent = ResolveActiveFolder();
 				}
 
 			string name = EditorUtility.SaveFilePanel("New Folder Name", parent, "NewFolder", "");
@@ -423,13 +423,13 @@ namespace LivingDevAgent.Editor.Modules
 						Directory.CreateDirectory(dir);
 						}
 
-					this._data.ActiveDirPath = dir;
-					this.SetStatus($"📁 Folder ready: {dir}");
-					this.RefreshNavigator();
+					_data.ActiveDirPath = dir;
+					SetStatus($"📁 Folder ready: {dir}");
+					RefreshNavigator();
 					}
 				catch (Exception ex)
 					{
-					this.SetStatus($"❌ Failed to create folder: {ex.Message}");
+					SetStatus($"❌ Failed to create folder: {ex.Message}");
 					}
 				}
 			}
@@ -437,9 +437,9 @@ namespace LivingDevAgent.Editor.Modules
 		private string ResolveActiveFolder ()
 			{
 			// @jmeyer1980 ⚠ Intention ⚠ - IL for legibility
-			if (!string.IsNullOrEmpty(this._data.ActiveDirPath)) return this._data.ActiveDirPath;
+			if (!string.IsNullOrEmpty(_data.ActiveDirPath)) return _data.ActiveDirPath;
 
-			if (!string.IsNullOrEmpty(this._data.RootPath)) return this._data.RootPath;
+			if (!string.IsNullOrEmpty(_data.RootPath)) return _data.RootPath;
 
 			string fallback = Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
 			return fallback;
@@ -464,45 +464,45 @@ namespace LivingDevAgent.Editor.Modules
 			try
 				{
 				string text = File.ReadAllText(absPath);
-				this._data.CurrentFilePath = absPath;
-				this._data.RawContent = text;
-				this._data.RawGeneratedSnapshot = text;
-				this._data.RawDirty = false;
-				this.ParseBasicMetadata(text);
-				this.SetStatus($"📖 Loaded: {this.MakeProjectRelative(absPath)}");
+				_data.CurrentFilePath = absPath;
+				_data.RawContent = text;
+				_data.RawGeneratedSnapshot = text;
+				_data.RawDirty = false;
+				ParseBasicMetadata(text);
+				SetStatus($"📖 Loaded: {MakeProjectRelative(absPath)}");
 				}
 			catch (Exception ex)
 				{
-				this.SetStatus($"❌ Failed to load file: {ex.Message}");
+				SetStatus($"❌ Failed to load file: {ex.Message}");
 				}
 			}
 
 		private void CopyImageMarkdownLink (string filePath)
 			{
-			string baseDir = string.IsNullOrEmpty(this._data.CurrentFilePath) ? this.ResolveActiveFolder() : Path.GetDirectoryName(this._data.CurrentFilePath);
+			string baseDir = string.IsNullOrEmpty(_data.CurrentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_data.CurrentFilePath);
 			if (string.IsNullOrEmpty(baseDir))
 				{
-				baseDir = this.ResolveActiveFolder();
+				baseDir = ResolveActiveFolder();
 				}
 
 			string rel = GetRelativePath(baseDir, filePath).Replace('\\', '/');
 			string alt = Path.GetFileNameWithoutExtension(filePath);
 			string md = $"![{alt}]({rel})";
 			EditorGUIUtility.systemCopyBuffer = md;
-			this.SetStatus($"📋 Link copied: {rel}");
+			SetStatus($"📋 Link copied: {rel}");
 			}
 
 		private void InsertImageAtCursor (string filePath)
 			{
-			string baseDir = string.IsNullOrEmpty(this._data.CurrentFilePath) ? this.ResolveActiveFolder() : Path.GetDirectoryName(this._data.CurrentFilePath);
+			string baseDir = string.IsNullOrEmpty(_data.CurrentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_data.CurrentFilePath);
 			if (string.IsNullOrEmpty(baseDir))
 				{
-				baseDir = this.ResolveActiveFolder();
+				baseDir = ResolveActiveFolder();
 				}
 
 			string rel = GetRelativePath(baseDir, filePath).Replace('\\', '/');
 			// This would be handled by the editor module
-			this.SetStatus($"🖼️ Ready to insert: {rel}");
+			SetStatus($"🖼️ Ready to insert: {rel}");
 			}
 
 		private string DuplicateFile (string srcPath)
@@ -512,7 +512,7 @@ namespace LivingDevAgent.Editor.Modules
 				throw new FileNotFoundException("Source file not found", srcPath);
 				}
 
-			string target = this.GenerateUniqueCopyPath(srcPath);
+			string target = GenerateUniqueCopyPath(srcPath);
 			File.Copy(srcPath, target, overwrite: false);
 			return target;
 			}
@@ -546,17 +546,17 @@ namespace LivingDevAgent.Editor.Modules
 					if (line.StartsWith("**Author:"))
 						{
 						string v = line [ "**Author:**".Length.. ].Trim();
-						if (!string.IsNullOrEmpty(v)) this._data.Author = v;
+						if (!string.IsNullOrEmpty(v)) _data.Author = v;
 						}
 					else if (line.StartsWith("**Summary:"))
 						{
 						string v = line [ "**Summary:**".Length.. ].Trim();
-						if (!string.IsNullOrEmpty(v)) this._data.Summary = v;
+						if (!string.IsNullOrEmpty(v)) _data.Summary = v;
 						}
 					else if (line.StartsWith("**Context:"))
 						{
 						string v = line [ "**Context:**".Length.. ].Trim();
-						if (!string.IsNullOrEmpty(v)) this._data.Context = v;
+						if (!string.IsNullOrEmpty(v)) _data.Context = v;
 						}
 					else if (line.StartsWith("**Tags"))
 						{
@@ -566,7 +566,7 @@ namespace LivingDevAgent.Editor.Modules
 							string v = line [ (idx + 1).. ].Trim();
 							if (!string.IsNullOrEmpty(v))
 								{
-								this._data.TagsCsv = v.Replace('#', ' ').Replace("  ", " ").Trim().Replace(' ', ',');
+								_data.TagsCsv = v.Replace('#', ' ').Replace("  ", " ").Trim().Replace(' ', ',');
 								}
 							}
 						}
@@ -636,17 +636,17 @@ namespace LivingDevAgent.Editor.Modules
 		private void InitializeStyles ()
 			{
 			// 🔥 FORCE RECREATION: Always destroy cached textures when initializing
-			if (this._navBackgroundStyle?.normal?.background != null)
+			if (_navBackgroundStyle?.normal?.background != null)
 				{
-				UnityEngine.Object.DestroyImmediate(this._navBackgroundStyle.normal.background);
-				this._navBackgroundStyle = null; // Force complete recreation
+				UnityEngine.Object.DestroyImmediate(_navBackgroundStyle.normal.background);
+				_navBackgroundStyle = null; // Force complete recreation
 				}
 
 			// 🎨 Create completely new style with solid background
-			this._navBackgroundStyle = new GUIStyle("Box")
+			_navBackgroundStyle = new GUIStyle("Box")
 				{
 				normal = {
-					background = this.CreateNavBackgroundTexture(),
+					background = CreateNavBackgroundTexture(),
 					textColor = EditorGUIUtility.isProSkin ? Color.white : Color.black
 				},
 				border = new RectOffset(1, 1, 1, 1),
@@ -658,11 +658,11 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			// 🔄 PUBLIC method to force complete style refresh
 			// Call this when the window gains focus to override Unity's caching
-			this._navBackgroundStyle = null;
-			this.InitializeStyles();
+			_navBackgroundStyle = null;
+			InitializeStyles();
 
 			// Force immediate repaint of window
-			if (this._window is EditorWindow editorWindow)
+			if (_window is EditorWindow editorWindow)
 				{
 				editorWindow.Repaint();
 				}

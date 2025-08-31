@@ -283,8 +283,8 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public bool IsValid
 			{
-			readonly get => this.isValidFlag > 0;
-			set => this.isValidFlag = (byte)(value ? 1 : 0);
+			readonly get => isValidFlag > 0;
+			set => isValidFlag = (byte)(value ? 1 : 0);
 			}
 
 		/// <summary>
@@ -293,8 +293,8 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public JumpArcValidityState ValidityState
 			{
-			readonly get => (JumpArcValidityState)this.isValidFlag;
-			set => this.isValidFlag = (byte)value;
+			readonly get => (JumpArcValidityState)isValidFlag;
+			set => isValidFlag = (byte)value;
 			}
 
 		/// <summary>
@@ -303,14 +303,14 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public readonly float GetCoordinateAwareValidityScore ()
 			{
-			if (!this.IsValid)
+			if (!IsValid)
 				{
 				return 0f;
 				}
 
 			// Calculate spatial complexity based on coordinate patterns
-			float distance = math.length((float2)(this.EndPosition - this.StartPosition));
-			float heightDifference = math.abs(this.EndPosition.y - this.StartPosition.y);
+			float distance = math.length((float2)(EndPosition - StartPosition));
+			float heightDifference = math.abs(EndPosition.y - StartPosition.y);
 
 			// Distance-based validity scoring
 			float distanceScore = math.clamp(1f - (distance / 20f), 0.1f, 1f);
@@ -321,7 +321,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				1f; // Horizontal/downward jumps are easier
 
 			// Coordinate pattern influence (prime numbers, symmetry, etc.)
-			float patternScore = this.CalculateCoordinatePatternScore(this.StartPosition, this.EndPosition);
+			float patternScore = CalculateCoordinatePatternScore(StartPosition, EndPosition);
 
 			return (distanceScore + heightScore + patternScore) / 3f;
 			}

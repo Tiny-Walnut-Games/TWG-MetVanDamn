@@ -9,8 +9,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		public override void Bake (GateConditionAuthoring authoring)
 			{
 			UnityEngine.GameObject targetGo = authoring.target != null ? authoring.target.gameObject : authoring.gameObject;
-			Entity targetEntity = this.GetEntity(targetGo, TransformUsageFlags.Dynamic);
-			DynamicBuffer<GateConditionBufferElement> buffer = this.AddBuffer<GateConditionBufferElement>(targetEntity);
+			Entity targetEntity = GetEntity(targetGo, TransformUsageFlags.Dynamic);
+			DynamicBuffer<GateConditionBufferElement> buffer = AddBuffer<GateConditionBufferElement>(targetEntity);
 			var gate = new GateCondition(
 				authoring.requiredPolarity,
 				authoring.requiredAbilities,

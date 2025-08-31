@@ -19,11 +19,11 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public SectorRefinementData (float targetLoopDensity = 0.3f)
 			{
-			this.Phase = SectorRefinementPhase.Planning;
-			this.LoopCount = 0;
-			this.HardLockCount = 0;
-			this.TargetLoopDensity = math.clamp(targetLoopDensity, 0.1f, 1.0f);
-			this.CriticalPathLength = 0;
+			Phase = SectorRefinementPhase.Planning;
+			LoopCount = 0;
+			HardLockCount = 0;
+			TargetLoopDensity = math.clamp(targetLoopDensity, 0.1f, 1.0f);
+			CriticalPathLength = 0;
 			}
 		}
 
@@ -50,20 +50,20 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this.wfcStateLookup = state.GetComponentLookup<WfcState>(true);
-			this.nodeIdLookup = state.GetComponentLookup<NodeId>(true);
-			this.connectionBufferLookup = state.GetBufferLookup<ConnectionBufferElement>();
-			this.gateBufferLookup = state.GetBufferLookup<GateConditionBufferElement>();
+			wfcStateLookup = state.GetComponentLookup<WfcState>(true);
+			nodeIdLookup = state.GetComponentLookup<NodeId>(true);
+			connectionBufferLookup = state.GetBufferLookup<ConnectionBufferElement>();
+			gateBufferLookup = state.GetBufferLookup<GateConditionBufferElement>();
 			state.RequireForUpdate<SectorRefinementData>();
 			}
 
 		[BurstCompile]
 		public void OnUpdate (ref SystemState state)
 			{
-			this.wfcStateLookup.Update(ref state);
-			this.nodeIdLookup.Update(ref state);
-			this.connectionBufferLookup.Update(ref state);
-			this.gateBufferLookup.Update(ref state);
+			wfcStateLookup.Update(ref state);
+			nodeIdLookup.Update(ref state);
+			connectionBufferLookup.Update(ref state);
+			gateBufferLookup.Update(ref state);
 
 			float deltaTime = state.WorldUnmanaged.Time.DeltaTime;
 			uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 997.0); // prime multiplier for better distribution
@@ -71,10 +71,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			var refinementJob = new SectorRefinementJob
 				{
-				WfcStateLookup = this.wfcStateLookup,
-				NodeIdLookup = this.nodeIdLookup,
-				ConnectionBufferLookup = this.connectionBufferLookup,
-				GateBufferLookup = this.gateBufferLookup,
+				WfcStateLookup = wfcStateLookup,
+				NodeIdLookup = nodeIdLookup,
+				ConnectionBufferLookup = connectionBufferLookup,
+				GateBufferLookup = gateBufferLookup,
 				Random = random,
 				DeltaTime = deltaTime
 				};
@@ -96,21 +96,21 @@ namespace TinyWalnutGames.MetVD.Graph
 		public void Execute ([ChunkIndexInQuery] int chunkIndex, Entity entity, ref SectorRefinementData refinementData)
 			{
 			// Blend chunk index into per-entity seed so parameter is meaningfully consumed
-			var random = new Random((uint)(entity.Index * 73856093 ^ chunkIndex * 19349663) + this.Random.state);
+			var random = new Random((uint)(entity.Index * 73856093 ^ chunkIndex * 19349663) + Random.state);
 
 			switch (refinementData.Phase)
 				{
 				case SectorRefinementPhase.Planning:
-					this.PlanRefinement(entity, ref refinementData, ref random);
+					PlanRefinement(entity, ref refinementData, ref random);
 					break;
 				case SectorRefinementPhase.LoopCreation:
-					this.CreateLoops(entity, ref refinementData, ref random);
+					CreateLoops(entity, ref refinementData, ref random);
 					break;
 				case SectorRefinementPhase.LockPlacement:
-					this.PlaceHardLocks(entity, ref refinementData, ref random);
+					PlaceHardLocks(entity, ref refinementData, ref random);
 					break;
 				case SectorRefinementPhase.PathValidation:
-					this.ValidatePaths(entity, ref refinementData);
+					ValidatePaths(entity, ref refinementData);
 					break;
 				case SectorRefinementPhase.Completed:
 				case SectorRefinementPhase.Failed:
@@ -122,9 +122,9 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		private void PlanRefinement (Entity entity, ref SectorRefinementData refinementData, ref Random random)
 			{
-			if (this.WfcStateLookup.HasComponent(entity))
+			if (WfcStateLookup.HasComponent(entity))
 				{
-				WfcState wfcState = this.WfcStateLookup [ entity ];
+				WfcState wfcState = WfcStateLookup [ entity ];
 				if (wfcState.State != WfcGenerationState.Completed)
 					{
 					return;
@@ -139,20 +139,20 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		private void CreateLoops (Entity entity, ref SectorRefinementData refinementData, ref Random random)
 			{
-			if (!this.ConnectionBufferLookup.HasBuffer(entity))
+			if (!ConnectionBufferLookup.HasBuffer(entity))
 				{
 				refinementData.Phase = SectorRefinementPhase.LockPlacement;
 				return;
 				}
-			DynamicBuffer<ConnectionBufferElement> connections = this.ConnectionBufferLookup [ entity ];
+			DynamicBuffer<ConnectionBufferElement> connections = ConnectionBufferLookup [ entity ];
 			int loopsToCreate = (int)(refinementData.CriticalPathLength * refinementData.TargetLoopDensity) - refinementData.LoopCount;
 			for (int i = 0; i < math.min(loopsToCreate, 3); i++)
 				{
 				// Slightly modulate loop probability by frame delta to use DeltaTime meaningfully
-				float loopProbability = (0.7f - (i * 0.1f)) * math.saturate(1f - (this.DeltaTime * 0.05f));
+				float loopProbability = (0.7f - (i * 0.1f)) * math.saturate(1f - (DeltaTime * 0.05f));
 				if (random.NextFloat() < loopProbability)
 					{
-					this.CreateLoop(connections, ref refinementData, ref random, i);
+					CreateLoop(connections, ref refinementData, ref random, i);
 					}
 				}
 			int targetLoops = (int)(refinementData.CriticalPathLength * refinementData.TargetLoopDensity);
@@ -169,7 +169,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			uint endNode = (uint)((loopIndex + 1) * pathSegment + random.NextInt(1, 4));
 			if (startNode != endNode && startNode < 100 && endNode < 100)
 				{
-				var loopConnection = new Connection(endNode, startNode, ConnectionType.OneWay, this.DeterminePolarityForLoop(loopIndex, ref random), 2.0f + (loopIndex * 0.5f));
+				var loopConnection = new Connection(endNode, startNode, ConnectionType.OneWay, DeterminePolarityForLoop(loopIndex, ref random), 2.0f + (loopIndex * 0.5f));
 				connections.Add(loopConnection);
 				refinementData.LoopCount++;
 				}
@@ -190,20 +190,20 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		private void PlaceHardLocks (Entity entity, ref SectorRefinementData refinementData, ref Random random)
 			{
-			if (!this.GateBufferLookup.HasBuffer(entity))
+			if (!GateBufferLookup.HasBuffer(entity))
 				{
 				refinementData.Phase = SectorRefinementPhase.PathValidation;
 				return;
 				}
-			DynamicBuffer<GateConditionBufferElement> gates = this.GateBufferLookup [ entity ];
+			DynamicBuffer<GateConditionBufferElement> gates = GateBufferLookup [ entity ];
 			if (refinementData.HardLockCount == 0)
 				{
 				int lockPosition = random.NextInt(6, 11);
 				// Use lockPosition to derive a minimum skill level (scaled)
 				float minimumSkill = lockPosition * 0.05f; // 0.3 – 0.5 range
 				var firstLock = new GateCondition(
-					this.GetRandomPolarity(ref random, 0),
-					this.GetRandomAbility(ref random, 0),
+					GetRandomPolarity(ref random, 0),
+					GetRandomAbility(ref random, 0),
 					GateSoftness.Hard,
 					minimumSkill,
 					(FixedString64Bytes)$"First Hard Lock @Pos{lockPosition}");
@@ -215,8 +215,8 @@ namespace TinyWalnutGames.MetVD.Graph
 				{
 				float minSkill = 0.1f + refinementData.HardLockCount * 0.1f;
 				var additionalLock = new GateCondition(
-					this.GetRandomPolarity(ref random, refinementData.HardLockCount),
-					this.GetRandomAbility(ref random, refinementData.HardLockCount),
+					GetRandomPolarity(ref random, refinementData.HardLockCount),
+					GetRandomAbility(ref random, refinementData.HardLockCount),
 					GateSoftness.Hard,
 					minSkill,
 					(FixedString64Bytes)$"Hard Lock {refinementData.HardLockCount + 1}");

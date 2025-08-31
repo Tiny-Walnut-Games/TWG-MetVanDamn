@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		{
 		public override void Bake (WorldBootstrapAuthoring authoring)
 			{
-			Entity entity = this.GetEntity(TransformUsageFlags.None);
+			Entity entity = GetEntity(TransformUsageFlags.None);
 			// Map authoring ranges to *Range fields
 			var biomeSettings = new BiomeGenerationSettings
 				{
@@ -44,8 +44,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				authoring.enableDebugVisualization,
 				authoring.logGenerationSteps
 			);
-			this.AddComponent(entity, bootstrapConfig);
-			this.AddComponent(entity, new WorldConfiguration
+			AddComponent(entity, bootstrapConfig);
+			AddComponent(entity, new WorldConfiguration
 				{
 				Seed = authoring.seed,
 				WorldSize = authoring.worldSize,

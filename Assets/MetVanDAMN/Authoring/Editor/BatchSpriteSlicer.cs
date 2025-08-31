@@ -92,11 +92,11 @@ namespace TinyWalnutGames.Tools.Editor
 				"Requires the 2D Sprite package (com.unity.2d.sprite).", MessageType.Info);
 
 			GUILayout.Space(10);
-			this.useCellSize = EditorGUILayout.Toggle("Use Cell Size", this.useCellSize);
+			useCellSize = EditorGUILayout.Toggle("Use Cell Size", useCellSize);
 
-			if (this.useCellSize)
+			if (useCellSize)
 				{
-				this.cellSize = EditorGUILayout.Vector2Field("Cell Size", this.cellSize);
+				cellSize = EditorGUILayout.Vector2Field("Cell Size", cellSize);
 				EditorGUILayout.HelpBox(
 					"Set the width and height (in pixels) for each sprite cell. " +
 					"The slicer will automatically determine the number of columns and rows based on the texture size.",
@@ -108,14 +108,14 @@ namespace TinyWalnutGames.Tools.Editor
 				EditorGUILayout.HelpBox(
 					"Specify the number of columns and rows to divide the texture into. " +
 					"Each cell will be sized to fit the grid.", MessageType.None);
-				this.columns = EditorGUILayout.IntField("Columns", this.columns);
-				this.rows = EditorGUILayout.IntField("Rows", this.rows);
+				columns = EditorGUILayout.IntField("Columns", columns);
+				rows = EditorGUILayout.IntField("Rows", rows);
 				}
 
 			EditorGUILayout.Space();
 
-			this.pivotAlignment = (SpriteAlignment)EditorGUILayout.EnumPopup("Pivot Alignment", this.pivotAlignment);
-			this.ignoreEmptyRects = EditorGUILayout.Toggle("Ignore Empty Rects", this.ignoreEmptyRects);
+			pivotAlignment = (SpriteAlignment)EditorGUILayout.EnumPopup("Pivot Alignment", pivotAlignment);
+			ignoreEmptyRects = EditorGUILayout.Toggle("Ignore Empty Rects", ignoreEmptyRects);
 
 			EditorGUILayout.Space();
 
@@ -126,7 +126,7 @@ namespace TinyWalnutGames.Tools.Editor
 				"Copy the current sprite slice rectangles from the first selected texture. " +
 				"You can paste this layout onto other textures of similar proportions.")))
 				{
-				this.CopySlicesFromSelected();
+				CopySlicesFromSelected();
 				}
 			EditorGUILayout.HelpBox(
 				"Copy the slice layout from the first selected texture. " +
@@ -144,7 +144,7 @@ namespace TinyWalnutGames.Tools.Editor
 						Debug.LogWarning("No textures selected. Please select textures to paste slices.");
 						return;
 						}
-					this.PasteSlicesToSelected();
+					PasteSlicesToSelected();
 					}
 				EditorGUILayout.HelpBox(
 					"Paste the copied slice layout onto all selected textures. " +
@@ -165,7 +165,7 @@ namespace TinyWalnutGames.Tools.Editor
 					Debug.LogWarning("No textures selected. Please select textures to adjust pivots.");
 					return;
 					}
-				this.AdjustPivotOfSelectedSlices();
+				AdjustPivotOfSelectedSlices();
 				}
 			EditorGUILayout.HelpBox(
 				"Change the pivot alignment for all slices in the selected textures. " +
@@ -186,7 +186,7 @@ namespace TinyWalnutGames.Tools.Editor
 					return;
 					}
 
-				this.SliceSelectedSprites();
+				SliceSelectedSprites();
 				}
 			EditorGUILayout.HelpBox(
 				"Slice all selected textures into a grid based on the current settings. " +
@@ -200,17 +200,17 @@ namespace TinyWalnutGames.Tools.Editor
 			using (new EditorGUI.DisabledScope(true))
 				{
 				EditorGUILayout.LabelField("Current Settings:", EditorStyles.miniLabel);
-				EditorGUILayout.LabelField($"  Mode: {(this.useCellSize ? "Cell Size" : "Grid")}", EditorStyles.miniLabel);
-				if (this.useCellSize)
+				EditorGUILayout.LabelField($"  Mode: {(useCellSize ? "Cell Size" : "Grid")}", EditorStyles.miniLabel);
+				if (useCellSize)
 					{
-					EditorGUILayout.LabelField($"  Cell Size: {this.cellSize.x}x{this.cellSize.y}", EditorStyles.miniLabel);
+					EditorGUILayout.LabelField($"  Cell Size: {cellSize.x}x{cellSize.y}", EditorStyles.miniLabel);
 					}
 				else
 					{
-					EditorGUILayout.LabelField($"  Grid: {this.columns}x{this.rows}", EditorStyles.miniLabel);
+					EditorGUILayout.LabelField($"  Grid: {columns}x{rows}", EditorStyles.miniLabel);
 					}
-				EditorGUILayout.LabelField($"  Pivot: {this.pivotAlignment}", EditorStyles.miniLabel);
-				EditorGUILayout.LabelField($"  Ignore Empty: {this.ignoreEmptyRects}", EditorStyles.miniLabel);
+				EditorGUILayout.LabelField($"  Pivot: {pivotAlignment}", EditorStyles.miniLabel);
+				EditorGUILayout.LabelField($"  Ignore Empty: {ignoreEmptyRects}", EditorStyles.miniLabel);
 
 				if (copiedRects != null)
 					{
@@ -436,8 +436,8 @@ namespace TinyWalnutGames.Tools.Editor
 				// Update alignment and pivot for each rect
 				for (int i = 0; i < rects.Count; i++)
 					{
-					rects [ i ].alignment = this.pivotAlignment;
-					rects [ i ].pivot = this.GetPivotForAlignment(this.pivotAlignment);
+					rects [ i ].alignment = pivotAlignment;
+					rects [ i ].pivot = GetPivotForAlignment(pivotAlignment);
 					}
 
 				dataProvider.SetSpriteRects(rects.ToArray());
@@ -482,17 +482,17 @@ namespace TinyWalnutGames.Tools.Editor
 
 				int actualColumns, actualRows, spriteWidth, spriteHeight;
 
-				if (this.useCellSize)
+				if (useCellSize)
 					{
-					spriteWidth = Mathf.Max(1, Mathf.RoundToInt(this.cellSize.x));
-					spriteHeight = Mathf.Max(1, Mathf.RoundToInt(this.cellSize.y));
+					spriteWidth = Mathf.Max(1, Mathf.RoundToInt(cellSize.x));
+					spriteHeight = Mathf.Max(1, Mathf.RoundToInt(cellSize.y));
 					actualColumns = Mathf.Max(1, texWidth / spriteWidth);
 					actualRows = Mathf.Max(1, texHeight / spriteHeight);
 					}
 				else
 					{
-					actualColumns = Mathf.Max(1, this.columns);
-					actualRows = Mathf.Max(1, this.rows);
+					actualColumns = Mathf.Max(1, columns);
+					actualRows = Mathf.Max(1, rows);
 					spriteWidth = texWidth / actualColumns;
 					spriteHeight = texHeight / actualRows;
 					}
@@ -553,7 +553,7 @@ namespace TinyWalnutGames.Tools.Editor
 						bool isEmpty = false;
 
 						// Check if the rectangle is empty if ignoreEmptyRects is true
-						if (this.ignoreEmptyRects)
+						if (ignoreEmptyRects)
 							{
 							Color [ ] pixels = texture.GetPixels(
 								Mathf.RoundToInt(cellRect.x),
@@ -574,7 +574,7 @@ namespace TinyWalnutGames.Tools.Editor
 								}
 							}
 
-						if (this.ignoreEmptyRects && isEmpty)
+						if (ignoreEmptyRects && isEmpty)
 							{
 							continue;
 							}
@@ -583,8 +583,8 @@ namespace TinyWalnutGames.Tools.Editor
 							{
 							name = $"{obj.name}_{x}_{y}",
 							rect = cellRect,
-							alignment = this.pivotAlignment,
-							pivot = this.GetPivotForAlignment(this.pivotAlignment)
+							alignment = pivotAlignment,
+							pivot = GetPivotForAlignment(pivotAlignment)
 							};
 
 						spriteRects.Add(rect);

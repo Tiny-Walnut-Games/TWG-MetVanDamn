@@ -180,14 +180,14 @@ namespace TinyWalnutGames.MetVD.Core
 					BiomeComplexityTier complexityTier = BiomeComplexityTier.Moderate,
 					BiomeRarity rarity = BiomeRarity.Common, float coordinateInfluence = 0.7f)
 			{
-			this.Type = type;
-			this.PrimaryPolarity = primaryPolarity;
-			this.SecondaryPolarity = secondaryPolarity;
-			this.PolarityStrength = math.clamp(polarityStrength, 0.0f, 1.0f);
-			this.DifficultyModifier = math.max(0.1f, difficultyModifier);
-			this.ComplexityTier = complexityTier;
-			this.Rarity = rarity;
-			this.CoordinateInfluenceStrength = math.clamp(coordinateInfluence, 0.0f, 2.0f);
+			Type = type;
+			PrimaryPolarity = primaryPolarity;
+			SecondaryPolarity = secondaryPolarity;
+			PolarityStrength = math.clamp(polarityStrength, 0.0f, 1.0f);
+			DifficultyModifier = math.max(0.1f, difficultyModifier);
+			ComplexityTier = complexityTier;
+			Rarity = rarity;
+			CoordinateInfluenceStrength = math.clamp(coordinateInfluence, 0.0f, 2.0f);
 			}
 
 		/// <summary>
@@ -196,8 +196,8 @@ namespace TinyWalnutGames.MetVD.Core
 		public readonly bool IsCompatibleWith (Polarity requiredPolarity)
 			{
 			return requiredPolarity != Polarity.Any && requiredPolarity != Polarity.None
-				? (this.PrimaryPolarity & requiredPolarity) != 0 ||
-					   (this.SecondaryPolarity & requiredPolarity) != 0
+				? (PrimaryPolarity & requiredPolarity) != 0 ||
+					   (SecondaryPolarity & requiredPolarity) != 0
 				: true;
 			}
 
@@ -208,16 +208,16 @@ namespace TinyWalnutGames.MetVD.Core
 		public readonly float CalculatePolarityResonance (Biome otherBiome)
 			{
 			// Base resonance from shared polarities
-			float primaryResonance = this.CalculatePolarityOverlap(this.PrimaryPolarity, otherBiome.PrimaryPolarity);
-			float secondaryResonance = this.CalculatePolarityOverlap(this.SecondaryPolarity, otherBiome.SecondaryPolarity);
-			float crossResonance = this.CalculatePolarityOverlap(this.PrimaryPolarity, otherBiome.SecondaryPolarity) +
-								 this.CalculatePolarityOverlap(this.SecondaryPolarity, otherBiome.PrimaryPolarity);
+			float primaryResonance = CalculatePolarityOverlap(PrimaryPolarity, otherBiome.PrimaryPolarity);
+			float secondaryResonance = CalculatePolarityOverlap(SecondaryPolarity, otherBiome.SecondaryPolarity);
+			float crossResonance = CalculatePolarityOverlap(PrimaryPolarity, otherBiome.SecondaryPolarity) +
+								 CalculatePolarityOverlap(SecondaryPolarity, otherBiome.PrimaryPolarity);
 
 			// Weight the resonances - primary connections are strongest
 			float totalResonance = (primaryResonance * 0.5f) + (secondaryResonance * 0.3f) + (crossResonance * 0.2f);
 
 			// Apply polarity strength modulation
-			float strengthModulation = (this.PolarityStrength + otherBiome.PolarityStrength) * 0.5f;
+			float strengthModulation = (PolarityStrength + otherBiome.PolarityStrength) * 0.5f;
 
 			return math.clamp(totalResonance * strengthModulation, 0.0f, 1.0f);
 			}
@@ -229,16 +229,16 @@ namespace TinyWalnutGames.MetVD.Core
 		public readonly float GetSpatialComplexityFactor (int2 worldCoordinates)
 			{
 			// Base complexity from tier
-			float tierComplexity = ((int)this.ComplexityTier + 1) * 0.2f; // 0.2 to 1.0
+			float tierComplexity = ((int)ComplexityTier + 1) * 0.2f; // 0.2 to 1.0
 
 			// Rarity influences complexity at distance
 			float distanceFromOrigin = math.length(worldCoordinates);
-			float rarityInfluence = ((int)this.Rarity + 1) * 0.15f; // 0.15 to 0.75
+			float rarityInfluence = ((int)Rarity + 1) * 0.15f; // 0.15 to 0.75
 			float distanceScaledRarity = rarityInfluence * math.min(distanceFromOrigin / 20.0f, 1.0f);
 
 			// Coordinate pattern influence using mathematical beauty
-			float coordinatePattern = this.CalculateCoordinatePatternFactor(worldCoordinates);
-			float patternInfluence = coordinatePattern * this.CoordinateInfluenceStrength;
+			float coordinatePattern = CalculateCoordinatePatternFactor(worldCoordinates);
+			float patternInfluence = coordinatePattern * CoordinateInfluenceStrength;
 
 			// Combine factors with weighted importance
 			float totalComplexity = (tierComplexity * 0.4f) + (distanceScaledRarity * 0.3f) + (patternInfluence * 0.3f);
@@ -253,26 +253,26 @@ namespace TinyWalnutGames.MetVD.Core
 		public readonly bool ShouldUseCoordinateWarping ()
 			{
 			// Transcendent biomes always use warping
-			if (this.ComplexityTier == BiomeComplexityTier.Transcendent)
+			if (ComplexityTier == BiomeComplexityTier.Transcendent)
 				{
 				return true;
 				}
 
 			// Complex biomes usually use warping
-			if (this.ComplexityTier == BiomeComplexityTier.Complex)
+			if (ComplexityTier == BiomeComplexityTier.Complex)
 				{
 				return true;
 				}
 
 			// Certain biome types are naturally warp-friendly
-			return this.Type switch
+			return Type switch
 				{
 					BiomeType.VoidChambers => true,    // Void warps reality
 					BiomeType.PlasmaFields => true,    // Plasma is inherently chaotic
 					BiomeType.Cosmic => true,          // Space bends coordinates
 					BiomeType.CrystalCaverns => true,  // Crystals refract space
 					BiomeType.ShadowRealms => true,    // Shadows distort perception
-					_ => this.ComplexityTier >= BiomeComplexityTier.Moderate
+					_ => ComplexityTier >= BiomeComplexityTier.Moderate
 					};
 			}
 
@@ -283,11 +283,11 @@ namespace TinyWalnutGames.MetVD.Core
 		public readonly float GetBaseMaterialAnimationSpeed ()
 			{
 			// Base speed from polarity - dual polarities create more dynamic animations
-			float polaritySpeed = (this.PrimaryPolarity != Polarity.None ? 0.5f : 0.0f) +
-								(this.SecondaryPolarity != Polarity.None ? 0.3f : 0.0f);
+			float polaritySpeed = (PrimaryPolarity != Polarity.None ? 0.5f : 0.0f) +
+								(SecondaryPolarity != Polarity.None ? 0.3f : 0.0f);
 
 			// Biome-specific speed modifiers
-			float biomeSpeedModifier = this.Type switch
+			float biomeSpeedModifier = Type switch
 				{
 					BiomeType.PlasmaFields => 2.0f,     // Fastest animation
 					BiomeType.VoidChambers => 1.8f,     // Very fast, chaotic
@@ -302,9 +302,9 @@ namespace TinyWalnutGames.MetVD.Core
 					};
 
 			// Apply complexity tier scaling
-			float complexityScaling = 1.0f + ((int)this.ComplexityTier * 0.2f);
+			float complexityScaling = 1.0f + ((int)ComplexityTier * 0.2f);
 
-			return polaritySpeed * biomeSpeedModifier * complexityScaling * this.PolarityStrength;
+			return polaritySpeed * biomeSpeedModifier * complexityScaling * PolarityStrength;
 			}
 
 		/// <summary>
@@ -314,17 +314,17 @@ namespace TinyWalnutGames.MetVD.Core
 		private readonly float CalculateCoordinatePatternFactor (int2 coordinates)
 			{
 			// Prime number influence - creates irregular but pleasing patterns
-			float primeInfluence = (this.IsPrime(math.abs(coordinates.x)) ? 0.3f : 0.0f) +
-								 (this.IsPrime(math.abs(coordinates.y)) ? 0.3f : 0.0f);
+			float primeInfluence = (IsPrime(math.abs(coordinates.x)) ? 0.3f : 0.0f) +
+								 (IsPrime(math.abs(coordinates.y)) ? 0.3f : 0.0f);
 
 			// Golden ratio spiral influence - natural mathematical beauty
-			float spiralInfluence = this.CalculateGoldenSpiralInfluence(coordinates);
+			float spiralInfluence = CalculateGoldenSpiralInfluence(coordinates);
 
 			// Symmetry influence - balanced, harmonious patterns
-			float symmetryInfluence = this.CalculateSymmetryInfluence(coordinates);
+			float symmetryInfluence = CalculateSymmetryInfluence(coordinates);
 
 			// Fibonacci influence - organic growth patterns
-			float fibonacciInfluence = this.CalculateFibonacciInfluence(coordinates);
+			float fibonacciInfluence = CalculateFibonacciInfluence(coordinates);
 
 			// Combine influences with natural weighting
 			return (primeInfluence * 0.3f) + (spiralInfluence * 0.25f) +
@@ -454,7 +454,7 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public override readonly string ToString ()
 			{
-			return $"Biome({this.Type}, {this.PrimaryPolarity}, Strength:{this.PolarityStrength:F2}, Tier:{this.ComplexityTier}, Rarity:{this.Rarity})";
+			return $"Biome({Type}, {PrimaryPolarity}, Strength:{PolarityStrength:F2}, Tier:{ComplexityTier}, Rarity:{Rarity})";
 			}
 		}
 

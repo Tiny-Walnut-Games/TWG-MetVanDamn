@@ -175,20 +175,20 @@ namespace LivingDevAgent.Editor.Modules
 
 		public TimeSession (DateTime startTime, string taskDescription = "")
 			{
-			this.StartTime = startTime;
-			this.TaskDescription = taskDescription;
+			StartTime = startTime;
+			TaskDescription = taskDescription;
 			}
 
 		public void EndSession (string notes = "")
 			{
-			this.EndTime = DateTime.Now;
-			this.DurationMinutes = (this.EndTime - this.StartTime).TotalMinutes;
-			this.SessionNotes = notes;
+			EndTime = DateTime.Now;
+			DurationMinutes = (EndTime - StartTime).TotalMinutes;
+			SessionNotes = notes;
 			}
 
 		public override string ToString ()
 			{
-			return $"{this.StartTime:HH:mm} - {this.EndTime:HH:mm} ({this.DurationMinutes:F1}m): {this.TaskDescription}";
+			return $"{StartTime:HH:mm} - {EndTime:HH:mm} ({DurationMinutes:F1}m): {TaskDescription}";
 			}
 		}
 	}

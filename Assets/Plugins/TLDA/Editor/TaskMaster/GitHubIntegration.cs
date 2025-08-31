@@ -1,4 +1,6 @@
 #if UNITY_EDITOR
+using LivingDevAgent.Editor.TaskMaster;
+using LivingDevAgent.Editor.Modules;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -37,7 +39,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 			window.Show();
 			}
 
-		public static async Task<bool> CreateGitHubIssue (TaskMasterWindow.TaskCard task)
+		public static async Task<bool> CreateGitHubIssue (TaskData task)
 			{
 			if (!IsConfigured())
 				{
@@ -53,7 +55,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 				if (result != null)
 					{
-					Debug.Log($"✅ Created GitHub issue for task: {task.Title}");
+					Debug.Log($"✅ Created GitHub issue for task: {task.TaskName}");
 					return true;
 					}
 				}
@@ -66,32 +68,31 @@ namespace LivingDevAgent.Editor.TaskMaster
 			return false;
 			}
 
-		private static string CreateIssueFromTask (TaskMasterWindow.TaskCard task)
+		private static string CreateIssueFromTask (TaskData task)
 			{
-			string assignee = GetGitHubUsername(task.AssignedTo);
+			string assignee = GetGitHubUsername(task.assignedTo);
 			string [ ] labels = GetLabelsFromTask(task);
 
-			string issueBody = $"{task.Description}\n\n";
+			string issueBody = $"{task.taskDescription}\n\n";
 			issueBody += $"**Task Details:**\n";
-			issueBody += $"- Priority: {task.Priority}\n";
-			issueBody += $"- Status: {task.Status}\n";
-			issueBody += $"- Created: {task.CreatedAt:yyyy-MM-dd HH:mm}\n";
+			issueBody += $"- Priority: {task.priorityLevel}\n";
+			issueBody += $"- Status: {(task.isCompleted ? "Done" : task.isCanceled ? "Blocked" : "In Progress")}\n";
+			issueBody += $"- Created: {task.createdAt:yyyy-MM-dd HH:mm}\n";
 
-			if (task.Deadline.HasValue)
+			if (task.timeCard != null)
 				{
-				issueBody += $"- Deadline: {task.Deadline.Value:yyyy-MM-dd}\n";
-				}
-
-			if (task.TimeTracked > 0)
-				{
-				issueBody += $"- Time Tracked: {task.TimeTracked:F2} hours\n";
+				float hours = task.timeCard.GetDurationInHours();
+				if (hours > 0)
+					{
+					issueBody += $"- Time Tracked: {hours:F2} hours\n";
+					}
 				}
 
 			issueBody += $"\n---\n*Created from TaskMaster*";
 
 			var issueData = new
 				{
-				title = task.Title,
+				title = task.TaskName,
 				body = issueBody,
 				assignees = !string.IsNullOrEmpty(assignee) ? new [ ] { assignee } : new string [ 0 ],
 				labels
@@ -111,22 +112,19 @@ namespace LivingDevAgent.Editor.TaskMaster
 			return taskAssignee?.StartsWith("@") == true ? taskAssignee [ 1.. ] : taskAssignee;
 			}
 
-		private static string [ ] GetLabelsFromTask (TaskMasterWindow.TaskCard task)
+		private static string [ ] GetLabelsFromTask (TaskData task)
 			{
 			var labels = new List<string>
 			{
                 // Add priority label
-                $"priority-{task.Priority.ToString().ToLower()}",
+                $"priority-{task.priorityLevel}",
 
-                // Add status label
-                $"status-{task.Status.ToString().ToLower()}",
+                // Add status label  
+                $"status-{(task.isCompleted ? "done" : task.isCanceled ? "blocked" : "in-progress")}",
 
                 // Add TaskMaster label
                 "taskmaster"
 			};
-
-			// Add task-specific tags if any
-			labels.AddRange(task.Tags.Where(tag => !string.IsNullOrEmpty(tag)));
 
 			return labels.ToArray();
 			}
@@ -176,11 +174,13 @@ namespace LivingDevAgent.Editor.TaskMaster
 		private string _githubToken = "";
 		private string _repositoryOwner = "";
 		private string _repositoryName = "";
-		private Vector2 _scrollPosition;
+		private Vector2 _scrollPosition = Vector2.zero; // 🎯 FIXED: Initialize scroll position
 
 		private void OnGUI ()
 			{
 			using var scroll = new EditorGUILayout.ScrollViewScope(this._scrollPosition);
+			this._scrollPosition = scroll.scrollPosition; // 🎯 FIXED: Update scroll position
+			
 			GUILayout.Label("🐙 GitHub Integration Setup", EditorStyles.boldLabel);
 
 			EditorGUILayout.Space();

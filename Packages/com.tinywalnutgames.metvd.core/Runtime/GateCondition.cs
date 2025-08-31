@@ -145,15 +145,15 @@ namespace TinyWalnutGames.MetVD.Core
 							bool isDefault = false,
 							uint requiredConnectionId = 0)
 			{
-			this.RequiredPolarity = requiredPolarity;
-			this.RequiredAbilities = requiredAbilities;
-			this.Softness = softness;
-			this.MinimumSkillLevel = math.clamp(minimumSkillLevel, 0.0f, 1.0f);
-			this.IsActive = true;
-			this.IsUnlocked = false;
+			RequiredPolarity = requiredPolarity;
+			RequiredAbilities = requiredAbilities;
+			Softness = softness;
+			MinimumSkillLevel = math.clamp(minimumSkillLevel, 0.0f, 1.0f);
+			IsActive = true;
+			IsUnlocked = false;
 			this.isDefault = isDefault;
 			this.requiredConnectionId = requiredConnectionId;
-			this.Description = description;
+			Description = description;
 			}
 
 		/// <summary>
@@ -161,19 +161,19 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly bool CanPass (Polarity availablePolarity, Ability availableAbilities, float playerSkillLevel = 0.0f)
 			{
-			if (!this.IsActive || this.IsUnlocked)
+			if (!IsActive || IsUnlocked)
 				{
 				return true;
 				}
 
 			// Polarity rule: Hard gates require ALL required bits; softer gates require ANY bit.
-			bool polarityMatch = this.RequiredPolarity == Polarity.None || this.RequiredPolarity == Polarity.Any ||
-								  (this.Softness == GateSoftness.Hard
-									? (availablePolarity & this.RequiredPolarity) == this.RequiredPolarity
-									: (availablePolarity & this.RequiredPolarity) != 0);
+			bool polarityMatch = RequiredPolarity == Polarity.None || RequiredPolarity == Polarity.Any ||
+								  (Softness == GateSoftness.Hard
+									? (availablePolarity & RequiredPolarity) == RequiredPolarity
+									: (availablePolarity & RequiredPolarity) != 0);
 
-			bool abilityMatch = this.RequiredAbilities == Ability.None ||
-								 (availableAbilities & this.RequiredAbilities) == this.RequiredAbilities;
+			bool abilityMatch = RequiredAbilities == Ability.None ||
+								 (availableAbilities & RequiredAbilities) == RequiredAbilities;
 
 			// If hard requirements are met, gate can be passed
 			if (polarityMatch && abilityMatch)
@@ -182,10 +182,10 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Check for skill-based bypass
-			if (this.Softness != GateSoftness.Hard && playerSkillLevel >= this.MinimumSkillLevel)
+			if (Softness != GateSoftness.Hard && playerSkillLevel >= MinimumSkillLevel)
 				{
 				// Skill bypass is possible but becomes harder with stricter requirements
-				float bypassDifficulty = (float)this.Softness / 5.0f; // Convert to 0.0-1.0 range
+				float bypassDifficulty = (float)Softness / 5.0f; // Convert to 0.0-1.0 range
 				return playerSkillLevel >= (1.0f - bypassDifficulty);
 				}
 
@@ -201,22 +201,22 @@ namespace TinyWalnutGames.MetVD.Core
 			Polarity missingPolarity = Polarity.None;
 			Ability missingAbilities = Ability.None;
 
-			if (this.RequiredPolarity != Polarity.None && this.RequiredPolarity != Polarity.Any)
+			if (RequiredPolarity != Polarity.None && RequiredPolarity != Polarity.Any)
 				{
 				// Reflect the same ALL vs ANY rule for Hard vs soft when reporting missing bits.
-				if (this.Softness == GateSoftness.Hard)
+				if (Softness == GateSoftness.Hard)
 					{
-					missingPolarity = (this.RequiredPolarity & ~availablePolarity);
+					missingPolarity = (RequiredPolarity & ~availablePolarity);
 					}
-				else if ((availablePolarity & this.RequiredPolarity) == 0)
+				else if ((availablePolarity & RequiredPolarity) == 0)
 					{
-					missingPolarity = this.RequiredPolarity; // none of the acceptable bits present
+					missingPolarity = RequiredPolarity; // none of the acceptable bits present
 					}
 				}
 
-			if (this.RequiredAbilities != Ability.None)
+			if (RequiredAbilities != Ability.None)
 				{
-				missingAbilities = this.RequiredAbilities & ~availableAbilities;
+				missingAbilities = RequiredAbilities & ~availableAbilities;
 				}
 
 			return (missingPolarity, missingAbilities);
@@ -224,7 +224,7 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public override readonly string ToString ()
 			{
-			return $"Gate({this.RequiredPolarity}, {this.RequiredAbilities}, {this.Softness}, Active:{this.IsActive})";
+			return $"Gate({RequiredPolarity}, {RequiredAbilities}, {Softness}, Active:{IsActive})";
 			}
 		}
 

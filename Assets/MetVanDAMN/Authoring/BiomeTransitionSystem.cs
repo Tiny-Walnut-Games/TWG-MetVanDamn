@@ -34,7 +34,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		protected override void OnCreate ()
 			{
 			// Query for nodes that can participate in transitions (have biome + node id + connections)
-			this._biomeNodeQuery = this.GetEntityQuery(new EntityQueryDesc
+			_biomeNodeQuery = GetEntityQuery(new EntityQueryDesc
 				{
 				All = new ComponentType [ ]
 				{
@@ -48,8 +48,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 		protected override void OnUpdate ()
 			{
 			// Build a lookup from NodeId._value -> Entity for neighbor resolution (one per frame)
-			NativeArray<Entity> nodeEntities = this._biomeNodeQuery.ToEntityArray(Allocator.Temp);
-			NativeArray<NodeId> nodeIds = this._biomeNodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+			NativeArray<Entity> nodeEntities = _biomeNodeQuery.ToEntityArray(Allocator.Temp);
+			NativeArray<NodeId> nodeIds = _biomeNodeQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
 			var nodeMap = new NativeHashMap<uint, Entity>(nodeEntities.Length, Allocator.Temp);
 			for (int i = 0; i < nodeEntities.Length; i++)
 				{
@@ -57,7 +57,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 
 			// Process transitions
-			this.Entities
+			Entities
 				.WithName("BiomeTransitionDetection")
 				.WithReadOnly(nodeMap)
 				.WithStructuralChanges()
@@ -81,9 +81,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 						if (nodeMap.TryGetValue(neighborNodeId, out Entity neighborEntity))
 							{
-							if (this.EntityManager.HasComponent<CoreBiome>(neighborEntity))
+							if (EntityManager.HasComponent<CoreBiome>(neighborEntity))
 								{
-								CoreBiome neighborBiomeData = this.EntityManager.GetComponentData<CoreBiome>(neighborEntity);
+								CoreBiome neighborBiomeData = EntityManager.GetComponentData<CoreBiome>(neighborEntity);
 								if (neighborBiomeData.Type != biome.Type && neighborBiomeData.Type != BiomeType.Unknown)
 									{
 									hasTransition = true;
@@ -106,21 +106,21 @@ namespace TinyWalnutGames.MetVD.Authoring
 							TransitionTilesApplied = false
 							};
 
-						if (this.EntityManager.HasComponent<BiomeTransition>(entity))
+						if (EntityManager.HasComponent<BiomeTransition>(entity))
 							{
-							this.EntityManager.SetComponentData(entity, transition);
+							EntityManager.SetComponentData(entity, transition);
 							}
 						else
 							{
-							this.EntityManager.AddComponentData(entity, transition);
+							EntityManager.AddComponentData(entity, transition);
 							}
 						}
 					else
 						{
-						if (this.EntityManager.HasComponent<BiomeTransition>(entity))
+						if (EntityManager.HasComponent<BiomeTransition>(entity))
 							{
 							// Remove transition component if no longer valid
-							this.EntityManager.RemoveComponent<BiomeTransition>(entity);
+							EntityManager.RemoveComponent<BiomeTransition>(entity);
 							}
 						}
 				}).Run();
@@ -144,7 +144,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		{
 		protected override void OnUpdate ()
 			{
-			this.Entities
+			Entities
 				.WithStructuralChanges()
 				.ForEach((Entity entity, ref BiomeTransition transition,
 						 in CoreBiome biome, in NodeId nodeId,
@@ -167,7 +167,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 						return;
 						}
 
-					this.ApplyTransitionTiles(artProfile, transition, nodeId);
+					ApplyTransitionTiles(artProfile, transition, nodeId);
 					transition.TransitionTilesApplied = true;
 				}).Run();
 			}

@@ -19,7 +19,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		protected override void OnCreate ()
 			{
 			// Rooms that have content generated but no navigation generated
-			this._roomsWithContentQuery = this.GetEntityQuery(
+			_roomsWithContentQuery = GetEntityQuery(
 				ComponentType.ReadOnly<NodeId>(),
 				ComponentType.ReadOnly<RoomHierarchyData>(),
 				ComponentType.ReadOnly<RoomTemplate>(),
@@ -27,15 +27,15 @@ namespace TinyWalnutGames.MetVD.Graph
 				ComponentType.ReadWrite<RoomNavigationElement>()
 			);
 
-			this.RequireForUpdate(this._roomsWithContentQuery);
+			RequireForUpdate(_roomsWithContentQuery);
 			}
 
 		protected override void OnUpdate ()
 			{
-			using NativeArray<Entity> roomEntities = this._roomsWithContentQuery.ToEntityArray(Allocator.Temp);
-			using NativeArray<NodeId> nodeIds = this._roomsWithContentQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-			using NativeArray<RoomHierarchyData> roomData = this._roomsWithContentQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
-			using NativeArray<RoomTemplate> templates = this._roomsWithContentQuery.ToComponentDataArray<RoomTemplate>(Allocator.Temp);
+			using NativeArray<Entity> roomEntities = _roomsWithContentQuery.ToEntityArray(Allocator.Temp);
+			using NativeArray<NodeId> nodeIds = _roomsWithContentQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+			using NativeArray<RoomHierarchyData> roomData = _roomsWithContentQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+			using NativeArray<RoomTemplate> templates = _roomsWithContentQuery.ToComponentDataArray<RoomTemplate>(Allocator.Temp);
 
 			for (int i = 0; i < roomEntities.Length; i++)
 				{
@@ -45,18 +45,18 @@ namespace TinyWalnutGames.MetVD.Graph
 				RoomTemplate template = templates [ i ];
 
 				// Check if navigation already generated
-				ProceduralRoomGenerated genStatus = this.EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+				ProceduralRoomGenerated genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
 				if (genStatus.NavigationGenerated)
 					{
 					continue;
 					}
 
 				// Generate navigation for this room
-				GenerateRoomNavigation(this.EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
+				GenerateRoomNavigation(EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
 
 				// Update generation status
 				genStatus.NavigationGenerated = true;
-				this.EntityManager.SetComponentData(roomEntity, genStatus);
+				EntityManager.SetComponentData(roomEntity, genStatus);
 				}
 			}
 

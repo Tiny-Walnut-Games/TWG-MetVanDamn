@@ -46,10 +46,10 @@ namespace TinyWalnutGames.MetVD.Graph
 		public MovementCapabilityTags (Ability required, Ability optional = Ability.None,
 									 BiomeAffinity biome = BiomeAffinity.Any, float difficulty = 0.5f)
 			{
-			this.RequiredSkills = required;
-			this.OptionalSkills = optional;
-			this.BiomeType = biome;
-			this.DifficultyRating = math.clamp(difficulty, 0.0f, 1.0f);
+			RequiredSkills = required;
+			OptionalSkills = optional;
+			BiomeType = biome;
+			DifficultyRating = math.clamp(difficulty, 0.0f, 1.0f);
 			}
 		}
 
@@ -78,7 +78,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public BiomeAffinityComponent (BiomeAffinity affinity)
 			{
-			this.Affinity = affinity;
+			Affinity = affinity;
 			}
 		}
 
@@ -100,13 +100,13 @@ namespace TinyWalnutGames.MetVD.Graph
 						   int2 minSize, int2 maxSize, float secretPercent = 0.1f,
 						   bool jumpValidation = true, uint templateId = 0)
 			{
-			this.GeneratorType = type;
-			this.CapabilityTags = tags;
-			this.MinSize = minSize;
-			this.MaxSize = maxSize;
-			this.SecretAreaPercentage = math.clamp(secretPercent, 0.0f, 0.5f);
-			this.RequiresJumpValidation = jumpValidation;
-			this.TemplateId = templateId;
+			GeneratorType = type;
+			CapabilityTags = tags;
+			MinSize = minSize;
+			MaxSize = maxSize;
+			SecretAreaPercentage = math.clamp(secretPercent, 0.0f, 0.5f);
+			RequiresJumpValidation = jumpValidation;
+			TemplateId = templateId;
 			}
 		}
 
@@ -124,11 +124,11 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public ProceduralRoomGenerated (uint seed)
 			{
-			this.ContentGenerated = false;
-			this.NavigationGenerated = false;
-			this.CinemachineGenerated = false;
-			this.GenerationSeed = seed;
-			this.GenerationTime = 0.0f;
+			ContentGenerated = false;
+			NavigationGenerated = false;
+			CinemachineGenerated = false;
+			GenerationSeed = seed;
+			GenerationTime = 0.0f;
 			}
 		}
 
@@ -147,11 +147,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		public RoomNavigationElement (int2 from, int2 to, Ability movement = Ability.Jump,
 								   float cost = 1.0f, bool secret = false)
 			{
-			this.FromPosition = from;
-			this.ToPosition = to;
-			this.RequiredMovement = movement;
-			this.TraversalCost = cost;
-			this.IsSecret = secret;
+			FromPosition = from;
+			ToPosition = to;
+			RequiredMovement = movement;
+			TraversalCost = cost;
+			IsSecret = secret;
 			}
 		}
 
@@ -172,13 +172,13 @@ namespace TinyWalnutGames.MetVD.Graph
 		public JumpArcPhysics (float height = 3.0f, float distance = 4.0f, float doubleBonus = 1.5f,
 							 float gravity = 1.0f, float wallHeight = 2.0f, float dash = 6.0f)
 			{
-			this.JumpHeight = height;
-			this.JumpDistance = distance;
-			this.DoubleJumpBonus = doubleBonus;
-			this.GravityScale = gravity;
-			this.WallJumpHeight = wallHeight;
-			this.DashDistance = dash;
-			this.GlideSpeed = 2.0f;
+			JumpHeight = height;
+			JumpDistance = distance;
+			DoubleJumpBonus = doubleBonus;
+			GravityScale = gravity;
+			WallJumpHeight = wallHeight;
+			DashDistance = dash;
+			GlideSpeed = 2.0f;
 			}
 		}
 
@@ -192,8 +192,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public SkillTag (Ability required, Ability optional = Ability.None)
 			{
-			this.RequiredSkills = required;
-			this.OptionalSkills = optional;
+			RequiredSkills = required;
+			OptionalSkills = optional;
 			}
 		}
 
@@ -209,10 +209,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public RoomPatternElement (int2 position, RoomFeatureType featureType, uint seed, Ability requiredAbility = Ability.None)
 			{
-			this.Position = position;
-			this.FeatureType = featureType;
-			this.Seed = seed;
-			this.RequiredAbility = requiredAbility;
+			Position = position;
+			FeatureType = featureType;
+			Seed = seed;
+			RequiredAbility = requiredAbility;
 			}
 		}
 
@@ -227,9 +227,9 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public RoomModuleElement (Entity modulePrefab, int2 position, float weight = 1.0f)
 			{
-			this.ModulePrefab = modulePrefab;
-			this.Position = position;
-			this.Weight = weight;
+			ModulePrefab = modulePrefab;
+			Position = position;
+			Weight = weight;
 			}
 		}
 
@@ -253,51 +253,51 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public RoomGenerationRequest (RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed)
 			{
-			this.GeneratorType = generatorType;
-			this.RoomEntity = roomEntity;
-			this.RoomBounds = bounds;
-			this.Seed = seed;
-			this.GenerationSeed = seed;
-			this.AvailableSkills = Ability.None;
-			this.TargetBiomeAffinity = BiomeAffinity.Any;
-			this.TargetBiome = BiomeType.Unknown;
-			this.TargetPolarity = Polarity.None;
-			this.IsComplete = false;
-			this.CurrentStep = 1;
-			this.LayoutType = RoomLayoutType.Horizontal;
+			GeneratorType = generatorType;
+			RoomEntity = roomEntity;
+			RoomBounds = bounds;
+			Seed = seed;
+			GenerationSeed = seed;
+			AvailableSkills = Ability.None;
+			TargetBiomeAffinity = BiomeAffinity.Any;
+			TargetBiome = BiomeType.Unknown;
+			TargetPolarity = Polarity.None;
+			IsComplete = false;
+			CurrentStep = 1;
+			LayoutType = RoomLayoutType.Horizontal;
 			}
 
 		public RoomGenerationRequest (RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed, Ability availableSkills)
 			{
-			this.GeneratorType = generatorType;
-			this.RoomEntity = roomEntity;
-			this.RoomBounds = bounds;
-			this.Seed = seed;
-			this.GenerationSeed = seed;
-			this.AvailableSkills = availableSkills;
-			this.TargetBiomeAffinity = BiomeAffinity.Any;
-			this.TargetBiome = BiomeType.Unknown;
-			this.TargetPolarity = Polarity.None;
-			this.IsComplete = false;
-			this.CurrentStep = 1;
-			this.LayoutType = RoomLayoutType.Horizontal;
+			GeneratorType = generatorType;
+			RoomEntity = roomEntity;
+			RoomBounds = bounds;
+			Seed = seed;
+			GenerationSeed = seed;
+			AvailableSkills = availableSkills;
+			TargetBiomeAffinity = BiomeAffinity.Any;
+			TargetBiome = BiomeType.Unknown;
+			TargetPolarity = Polarity.None;
+			IsComplete = false;
+			CurrentStep = 1;
+			LayoutType = RoomLayoutType.Horizontal;
 			}
 
 		// Alternative constructor matching the calling pattern in RoomManagementSystem.cs
 		public RoomGenerationRequest (RoomGeneratorType generatorType, BiomeType targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
 			{
-			this.GeneratorType = generatorType;
-			this.RoomEntity = Entity.Null; // Will be set by caller
-			this.RoomBounds = new int2(16, 16); // Default bounds
-			this.Seed = seed;
-			this.GenerationSeed = seed;
-			this.AvailableSkills = availableSkills;
-			this.TargetBiomeAffinity = ConvertBiomeTypeToAffinity(targetBiome);
-			this.TargetBiome = targetBiome;
-			this.TargetPolarity = targetPolarity;
-			this.IsComplete = false;
-			this.CurrentStep = 1;
-			this.LayoutType = RoomLayoutType.Horizontal;
+			GeneratorType = generatorType;
+			RoomEntity = Entity.Null; // Will be set by caller
+			RoomBounds = new int2(16, 16); // Default bounds
+			Seed = seed;
+			GenerationSeed = seed;
+			AvailableSkills = availableSkills;
+			TargetBiomeAffinity = ConvertBiomeTypeToAffinity(targetBiome);
+			TargetBiome = targetBiome;
+			TargetPolarity = targetPolarity;
+			IsComplete = false;
+			CurrentStep = 1;
+			LayoutType = RoomLayoutType.Horizontal;
 			}
 
 		private static BiomeAffinity ConvertBiomeTypeToAffinity (BiomeType biomeType)
@@ -372,30 +372,30 @@ namespace TinyWalnutGames.MetVD.Graph
 		public bool HasGlide;
 
 		// Compatibility shims for JumpArcSolver usage
-		public readonly float MaxJumpHeight => this.JumpHeight; // compatibility
-		public readonly float DashDistance => this.HasGlide ? 6.0f : 4.0f; // compatibility shim
-		public readonly float WallJumpHeight => this.HasWallJump ? this.JumpHeight * 0.8f : 0.0f; // compatibility shim
+		public readonly float MaxJumpHeight => JumpHeight; // compatibility
+		public readonly float DashDistance => HasGlide ? 6.0f : 4.0f; // compatibility shim
+		public readonly float WallJumpHeight => HasWallJump ? JumpHeight * 0.8f : 0.0f; // compatibility shim
 
 		public JumpPhysicsData (float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
 			{
-			this.JumpHeight = height;
-			this.JumpDistance = distance;
-			this.GravityScale = gravity;
-			this.MaxFallSpeed = 10.0f;
-			this.HasDoubleJump = false;
-			this.HasWallJump = false;
-			this.HasGlide = false;
+			JumpHeight = height;
+			JumpDistance = distance;
+			GravityScale = gravity;
+			MaxFallSpeed = 10.0f;
+			HasDoubleJump = false;
+			HasWallJump = false;
+			HasGlide = false;
 			}
 
 		public JumpPhysicsData (float height, float distance, float gravity, float maxFallSpeed, bool doubleJump, bool wallJump, bool glide)
 			{
-			this.JumpHeight = height;
-			this.JumpDistance = distance;
-			this.GravityScale = gravity;
-			this.MaxFallSpeed = maxFallSpeed;
-			this.HasDoubleJump = doubleJump;
-			this.HasWallJump = wallJump;
-			this.HasGlide = glide;
+			JumpHeight = height;
+			JumpDistance = distance;
+			GravityScale = gravity;
+			MaxFallSpeed = maxFallSpeed;
+			HasDoubleJump = doubleJump;
+			HasWallJump = wallJump;
+			HasGlide = glide;
 			}
 		}
 
@@ -414,34 +414,34 @@ namespace TinyWalnutGames.MetVD.Graph
 		public float SecretAreaPercentage;
 		public bool UseAlternateRoutes;
 		public bool UseDestructibleWalls;
-		public readonly Ability SecretSkillRequirement => this.RequiredSkillForAccess; // test compatibility
+		public readonly Ability SecretSkillRequirement => RequiredSkillForAccess; // test compatibility
 
 		public SecretAreaConfig (float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
 			{
-			this.SecretProbability = probability;
-			this.MaxSecretsPerRoom = maxSecrets;
-			this.RequiredSkillForAccess = requiredSkill;
-			this.MinSecretSize = new int2(2, 2);
-			this.MaxSecretSize = new int2(4, 4);
-			this.AllowStackedSecrets = false;
-			this.RequireHiddenAccess = true;
-			this.SecretAreaPercentage = 0.15f;
-			this.UseAlternateRoutes = false;
-			this.UseDestructibleWalls = false;
+			SecretProbability = probability;
+			MaxSecretsPerRoom = maxSecrets;
+			RequiredSkillForAccess = requiredSkill;
+			MinSecretSize = new int2(2, 2);
+			MaxSecretSize = new int2(4, 4);
+			AllowStackedSecrets = false;
+			RequireHiddenAccess = true;
+			SecretAreaPercentage = 0.15f;
+			UseAlternateRoutes = false;
+			UseDestructibleWalls = false;
 			}
 
 		public SecretAreaConfig (float probability, int2 minSize, int2 maxSize, Ability requiredSkill, bool allowStacked, bool requireHidden)
 			{
-			this.SecretProbability = probability;
-			this.MaxSecretsPerRoom = 2;
-			this.RequiredSkillForAccess = requiredSkill;
-			this.MinSecretSize = minSize;
-			this.MaxSecretSize = maxSize;
-			this.AllowStackedSecrets = allowStacked;
-			this.RequireHiddenAccess = requireHidden;
-			this.SecretAreaPercentage = 0.15f;
-			this.UseAlternateRoutes = false;
-			this.UseDestructibleWalls = false;
+			SecretProbability = probability;
+			MaxSecretsPerRoom = 2;
+			RequiredSkillForAccess = requiredSkill;
+			MinSecretSize = minSize;
+			MaxSecretSize = maxSize;
+			AllowStackedSecrets = allowStacked;
+			RequireHiddenAccess = requireHidden;
+			SecretAreaPercentage = 0.15f;
+			UseAlternateRoutes = false;
+			UseDestructibleWalls = false;
 			}
 		}
 
@@ -456,9 +456,9 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public JumpArcValidation (bool isValid = true, float maxDistance = 8.0f, float minHeight = 2.0f)
 			{
-			this.IsValid = isValid;
-			this.MaxJumpDistance = maxDistance;
-			this.MinJumpHeight = minHeight;
+			IsValid = isValid;
+			MaxJumpDistance = maxDistance;
+			MinJumpHeight = minHeight;
 			}
 		}
 
@@ -472,34 +472,34 @@ namespace TinyWalnutGames.MetVD.Graph
 		public Ability RequiredAbility;
 		public float Angle;
 		public float Velocity;
-		public readonly int2 FromPosition => this.StartPosition; // compatibility
-		public readonly int2 ToPosition => this.EndPosition; // compatibility
+		public readonly int2 FromPosition => StartPosition; // compatibility
+		public readonly int2 ToPosition => EndPosition; // compatibility
 
 		public JumpConnectionElement (int2 start, int2 end, Ability requiredAbility = Ability.None)
 			{
-			this.StartPosition = start;
-			this.EndPosition = end;
-			this.RequiredAbility = requiredAbility;
-			this.Angle = 0f;
-			this.Velocity = 0f;
+			StartPosition = start;
+			EndPosition = end;
+			RequiredAbility = requiredAbility;
+			Angle = 0f;
+			Velocity = 0f;
 			}
 
 		public JumpConnectionElement (int2 start, int2 end, float angle, float velocity)
 			{
-			this.StartPosition = start;
-			this.EndPosition = end;
-			this.RequiredAbility = Ability.Jump;
-			this.Angle = angle;
-			this.Velocity = velocity;
+			StartPosition = start;
+			EndPosition = end;
+			RequiredAbility = Ability.Jump;
+			Angle = angle;
+			Velocity = velocity;
 			}
 
 		public JumpConnectionElement (int2 start, int2 end, Ability requiredAbility, float angle)
 			{
-			this.StartPosition = start;
-			this.EndPosition = end;
-			this.RequiredAbility = requiredAbility;
-			this.Angle = angle;
-			this.Velocity = 0f;
+			StartPosition = start;
+			EndPosition = end;
+			RequiredAbility = requiredAbility;
+			Angle = angle;
+			Velocity = 0f;
 			}
 		}
 	}

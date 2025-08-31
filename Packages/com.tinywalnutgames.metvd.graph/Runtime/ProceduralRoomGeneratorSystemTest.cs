@@ -18,7 +18,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		protected override void OnUpdate ()
 			{
 			// Drive the unmanaged system through SimulationSystemGroup
-			SimulationSystemGroup simGroup = this.World.GetOrCreateSystemManaged<SimulationSystemGroup>();
+			SimulationSystemGroup simGroup = World.GetOrCreateSystemManaged<SimulationSystemGroup>();
 			// ProceduralRoomGeneratorSystem is automatically part of SimulationSystemGroup via [UpdateInGroup]
 			// Removed invalid call: simGroup.RequireForUpdate(World.Unmanaged);
 			// If you need to ensure the group updates, you can call simGroup.Update() directly if appropriate:

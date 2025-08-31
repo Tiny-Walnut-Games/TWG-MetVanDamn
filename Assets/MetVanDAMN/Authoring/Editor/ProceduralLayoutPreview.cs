@@ -36,32 +36,32 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// Configuration section
 			GUILayout.Label("Preview Configuration", EditorStyles.boldLabel);
-			this._previewDistrictCount = EditorGUILayout.IntField("District Count", this._previewDistrictCount);
-			this._previewWorldSize.x = EditorGUILayout.IntField("World Width", this._previewWorldSize.x);
-			this._previewWorldSize.y = EditorGUILayout.IntField("World Height", this._previewWorldSize.y);
-			this._previewMode = (RandomizationMode)EditorGUILayout.EnumPopup("Randomization Mode", this._previewMode);
-			this._previewSeed = (uint)EditorGUILayout.IntField("Seed", (int)this._previewSeed);
+			_previewDistrictCount = EditorGUILayout.IntField("District Count", _previewDistrictCount);
+			_previewWorldSize.x = EditorGUILayout.IntField("World Width", _previewWorldSize.x);
+			_previewWorldSize.y = EditorGUILayout.IntField("World Height", _previewWorldSize.y);
+			_previewMode = (RandomizationMode)EditorGUILayout.EnumPopup("Randomization Mode", _previewMode);
+			_previewSeed = (uint)EditorGUILayout.IntField("Seed", (int)_previewSeed);
 
 			EditorGUILayout.Space();
 
 			// Scene analysis section
 			GUILayout.Label("Current Scene", EditorStyles.boldLabel);
-			this._worldConfig = FindFirstObjectByType<WorldConfigurationAuthoring>();
-			this._districts = FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			_worldConfig = FindFirstObjectByType<WorldConfigurationAuthoring>();
+			_districts = FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 
-			if (this._worldConfig != null)
+			if (_worldConfig != null)
 				{
-				EditorGUILayout.LabelField("World Config Found", this._worldConfig.name);
-				EditorGUILayout.LabelField("Current Seed", this._worldConfig.seed.ToString());
-				EditorGUILayout.LabelField("Current World Size", this._worldConfig.worldSize.ToString());
-				EditorGUILayout.LabelField("Randomization Mode", this._worldConfig.randomizationMode.ToString());
+				EditorGUILayout.LabelField("World Config Found", _worldConfig.name);
+				EditorGUILayout.LabelField("Current Seed", _worldConfig.seed.ToString());
+				EditorGUILayout.LabelField("Current World Size", _worldConfig.worldSize.ToString());
+				EditorGUILayout.LabelField("Randomization Mode", _worldConfig.randomizationMode.ToString());
 				}
 			else
 				{
 				EditorGUILayout.HelpBox("No WorldConfigurationAuthoring found in scene", MessageType.Warning);
 				}
 
-			EditorGUILayout.LabelField("Districts in Scene", this._districts.Length.ToString());
+			EditorGUILayout.LabelField("Districts in Scene", _districts.Length.ToString());
 
 			EditorGUILayout.Space();
 
@@ -70,22 +70,22 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			if (GUILayout.Button("Preview Layout Algorithm"))
 				{
-				this.PreviewLayoutAlgorithm();
+				PreviewLayoutAlgorithm();
 				}
 
 			if (GUILayout.Button("Generate Preview Districts"))
 				{
-				this.GeneratePreviewDistricts();
+				GeneratePreviewDistricts();
 				}
 
-			if (this._worldConfig != null && GUILayout.Button("Apply Preview Settings to Scene"))
+			if (_worldConfig != null && GUILayout.Button("Apply Preview Settings to Scene"))
 				{
-				this.ApplyPreviewSettingsToScene();
+				ApplyPreviewSettingsToScene();
 				}
 
-			if (this._districts.Length > 0 && GUILayout.Button("Show District Info"))
+			if (_districts.Length > 0 && GUILayout.Button("Show District Info"))
 				{
-				this.ShowDistrictInfo();
+				ShowDistrictInfo();
 				}
 
 			EditorGUILayout.Space();
@@ -100,29 +100,29 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private void PreviewLayoutAlgorithm ()
 			{
 			Debug.Log($"🔮 Previewing Layout Algorithm");
-			Debug.Log($"   Districts: {this._previewDistrictCount}");
-			Debug.Log($"   World Size: {this._previewWorldSize}");
-			Debug.Log($"   Randomization: {this._previewMode}");
-			Debug.Log($"   Seed: {this._previewSeed}");
+			Debug.Log($"   Districts: {_previewDistrictCount}");
+			Debug.Log($"   World Size: {_previewWorldSize}");
+			Debug.Log($"   Randomization: {_previewMode}");
+			Debug.Log($"   Seed: {_previewSeed}");
 
 			// Simulate the district placement algorithm
-			var random = new Unity.Mathematics.Random(this._previewSeed);
-			DistrictPlacementStrategy strategy = this._previewDistrictCount > 16 ?
+			var random = new Unity.Mathematics.Random(_previewSeed);
+			DistrictPlacementStrategy strategy = _previewDistrictCount > 16 ?
 				DistrictPlacementStrategy.JitteredGrid :
 				DistrictPlacementStrategy.PoissonDisc;
 
 			Debug.Log($"   Strategy: {strategy}");
 
 			// Generate positions using the same algorithm as DistrictLayoutSystem
-			var positions = new int2 [ this._previewDistrictCount ];
+			var positions = new int2 [ _previewDistrictCount ];
 
 			if (strategy == DistrictPlacementStrategy.PoissonDisc)
 				{
-				this.GeneratePreviewPoissonDisc(positions, this._previewWorldSize, ref random);
+				GeneratePreviewPoissonDisc(positions, _previewWorldSize, ref random);
 				}
 			else
 				{
-				this.GeneratePreviewJitteredGrid(positions, this._previewWorldSize, ref random);
+				GeneratePreviewJitteredGrid(positions, _previewWorldSize, ref random);
 				}
 
 			Debug.Log("   Calculated Positions:");
@@ -132,7 +132,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 
 			// Simulate rule randomization
-			this.PreviewRuleRandomization(ref random);
+			PreviewRuleRandomization(ref random);
 			}
 
 		private void GeneratePreviewPoissonDisc (int2 [ ] positions, int2 worldSize, ref Unity.Mathematics.Random random)
@@ -208,9 +208,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void PreviewRuleRandomization (ref Unity.Mathematics.Random random)
 			{
-			Debug.Log($"🎲 Rule Randomization Preview (Mode: {this._previewMode})");
+			Debug.Log($"🎲 Rule Randomization Preview (Mode: {_previewMode})");
 
-			switch (this._previewMode)
+			switch (_previewMode)
 				{
 				case RandomizationMode.None:
 					Debug.Log("   Biome Polarities: Sun|Moon|Heat|Cold (curated)");
@@ -218,14 +218,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					break;
 
 				case RandomizationMode.Partial:
-					Polarity polarities = this.GenerateRandomPolarities(ref random, false);
+					Polarity polarities = GenerateRandomPolarities(ref random, false);
 					Debug.Log($"   Biome Polarities: {polarities} (randomized)");
 					Debug.Log("   Upgrades: Jump|DoubleJump|Dash|WallJump (curated)");
 					break;
 
 				case RandomizationMode.Full:
-					Polarity fullPolarities = this.GenerateRandomPolarities(ref random, true);
-					uint upgrades = this.GenerateRandomUpgrades(ref random);
+					Polarity fullPolarities = GenerateRandomPolarities(ref random, true);
+					uint upgrades = GenerateRandomUpgrades(ref random);
 					Debug.Log($"   Biome Polarities: {fullPolarities} (randomized)");
 					Debug.Log($"   Upgrades: 0x{upgrades:X} (randomized, always includes Jump)");
 					break;
@@ -274,17 +274,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Create actual district authoring objects in the scene for preview
 			Debug.Log("🏗️ Generate Preview Districts - Creating scene objects");
 
-			if (this._worldConfig == null)
+			if (_worldConfig == null)
 				{
 				Debug.LogWarning("Cannot generate preview districts: No WorldGenerationConfig assigned");
 				return;
 				}
 
 			// Clear existing preview districts
-			this.ClearExistingPreviewDistricts();
+			ClearExistingPreviewDistricts();
 
 			// Calculate district positions based on preview settings
-			List<Vector3> districtPositions = this.CalculateDistrictPositions();
+			List<Vector3> districtPositions = CalculateDistrictPositions();
 
 			// Create parent object for organization
 			var previewParent = new GameObject("[PREVIEW] Generated Districts");
@@ -302,8 +302,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				// Add DistrictAuthoring component
 				DistrictAuthoring districtAuthoring = districtGO.AddComponent<DistrictAuthoring>();
 				districtAuthoring.nodeId = (uint)(1000 + i); // Preview node IDs start from 1000
-				districtAuthoring.districtType = this.GetRandomDistrictType();
-				districtAuthoring.biomeType = this.GetRandomBiomeType();
+				districtAuthoring.districtType = GetRandomDistrictType();
+				districtAuthoring.biomeType = GetRandomBiomeType();
 				districtAuthoring.size = new float2(UnityEngine.Random.Range(50f, 150f), UnityEngine.Random.Range(50f, 150f));
 
 				// Add visual indicator for preview
@@ -320,7 +320,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				// Apply preview material
 				if (visualIndicator.TryGetComponent(out Renderer renderer))
 					{
-					Material previewMaterial = this.CreatePreviewMaterial(districtAuthoring.biomeType);
+					Material previewMaterial = CreatePreviewMaterial(districtAuthoring.biomeType);
 					renderer.material = previewMaterial;
 					}
 
@@ -352,26 +352,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private List<Vector3> CalculateDistrictPositions ()
 			{
 			var positions = new List<Vector3>();
-			var random = new Unity.Mathematics.Random(this._previewSeed);
+			var random = new Unity.Mathematics.Random(_previewSeed);
 
 			// Calculate grid-based positions with some randomization
-			int gridSize = Mathf.CeilToInt(Mathf.Sqrt(this._previewWorldSize.x * this._previewWorldSize.y / 10000f)); // Rough district count
-			float spacingX = this._previewWorldSize.x / gridSize;
-			float spacingY = this._previewWorldSize.y / gridSize;
+			int gridSize = Mathf.CeilToInt(Mathf.Sqrt(_previewWorldSize.x * _previewWorldSize.y / 10000f)); // Rough district count
+			float spacingX = _previewWorldSize.x / gridSize;
+			float spacingY = _previewWorldSize.y / gridSize;
 
 			for (int x = 0; x < gridSize; x++)
 				{
 				for (int y = 0; y < gridSize; y++)
 					{
 					var basePosition = new Vector3(
-						x * spacingX - this._previewWorldSize.x * 0.5f,
+						x * spacingX - _previewWorldSize.x * 0.5f,
 						0f,
-						y * spacingY - this._previewWorldSize.y * 0.5f
+						y * spacingY - _previewWorldSize.y * 0.5f
 					);
 
 					// Add randomization based on mode
 					Vector3 randomOffset = Vector3.zero;
-					switch (this._previewMode)
+					switch (_previewMode)
 						{
 						case RandomizationMode.Partial:
 							randomOffset = new Vector3(
@@ -444,25 +444,25 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void ApplyPreviewSettingsToScene ()
 			{
-			if (this._worldConfig != null)
+			if (_worldConfig != null)
 				{
-				Undo.RecordObject(this._worldConfig, "Apply Preview Settings");
-				this._worldConfig.seed = (int)this._previewSeed;
-				this._worldConfig.worldSize = this._previewWorldSize;
-				this._worldConfig.randomizationMode = this._previewMode;
-				EditorUtility.SetDirty(this._worldConfig);
+				Undo.RecordObject(_worldConfig, "Apply Preview Settings");
+				_worldConfig.seed = (int)_previewSeed;
+				_worldConfig.worldSize = _previewWorldSize;
+				_worldConfig.randomizationMode = _previewMode;
+				EditorUtility.SetDirty(_worldConfig);
 				Debug.Log("✅ Applied preview settings to WorldConfigurationAuthoring");
 				}
 			}
 
 		private void ShowDistrictInfo ()
 			{
-			Debug.Log($"📋 District Information ({this._districts.Length} districts):");
+			Debug.Log($"📋 District Information ({_districts.Length} districts):");
 
 			int unplacedCount = 0;
 			int placedCount = 0;
 
-			foreach (DistrictAuthoring district in this._districts)
+			foreach (DistrictAuthoring district in _districts)
 				{
 				bool isUnplaced = district.gridCoordinates.x == 0 && district.gridCoordinates.y == 0;
 				if (isUnplaced)

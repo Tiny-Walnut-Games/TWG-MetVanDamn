@@ -27,15 +27,15 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void Start ()
 			{
-			this.SetupSmokeTestWorld();
+			SetupSmokeTestWorld();
 			}
 
 		private void Update ()
 			{
 			// Periodically re-draw bounds if debug visualization enabled (consumes field each frame)
-			if (this.enableDebugVisualization && Time.frameCount % 120 == 0)
+			if (enableDebugVisualization && Time.frameCount % 120 == 0)
 				{
-				this.DebugDrawBounds();
+				DebugDrawBounds();
 				}
 			}
 
@@ -43,72 +43,72 @@ namespace TinyWalnutGames.MetVD.Samples
 		private void OnValidate ()
 			{
 			// Respond immediately in editor when toggled so value is meaningfully used
-			if (Application.isPlaying == false && this.enableDebugVisualization)
+			if (Application.isPlaying == false && enableDebugVisualization)
 				{
-				this.DebugDrawBounds();
+				DebugDrawBounds();
 				}
 			}
 #endif
 
 		private void SetupSmokeTestWorld ()
 			{
-			this.defaultWorld = World.DefaultGameObjectInjectionWorld;
-			this.entityManager = this.defaultWorld.EntityManager;
+			defaultWorld = World.DefaultGameObjectInjectionWorld;
+			entityManager = defaultWorld.EntityManager;
 
-			if (this.logGenerationSteps)
+			if (logGenerationSteps)
 				{
 				Debug.Log("🚀 MetVanDAMN Smoke Test: Starting world generation...");
 				}
 
-			this.CreateWorldConfiguration();
-			this.CreateDistrictEntities();
-			this.CreateBiomeFieldEntities();
+			CreateWorldConfiguration();
+			CreateDistrictEntities();
+			CreateBiomeFieldEntities();
 
-			if (this.enableDebugVisualization)
+			if (enableDebugVisualization)
 				{
-				this.DebugDrawBounds();
+				DebugDrawBounds();
 				}
 
-			if (this.logGenerationSteps)
+			if (logGenerationSteps)
 				{
-				Debug.Log($"✅ MetVanDAMN Smoke Test: World setup complete with seed {this.worldSeed}");
-				Debug.Log($"   World size: {this.worldSize.x}x{this.worldSize.y}");
-				Debug.Log($"   Target sectors: {this.targetSectorCount}");
+				Debug.Log($"✅ MetVanDAMN Smoke Test: World setup complete with seed {worldSeed}");
+				Debug.Log($"   World size: {worldSize.x}x{worldSize.y}");
+				Debug.Log($"   Target sectors: {targetSectorCount}");
 				Debug.Log("   Systems will begin generation on next frame.");
 				}
 			}
 
 		private void CreateWorldConfiguration ()
 			{
-			Entity configEntity = this.entityManager.CreateEntity();
-			this.entityManager.SetName(configEntity, "WorldConfiguration");
+			Entity configEntity = entityManager.CreateEntity();
+			entityManager.SetName(configEntity, "WorldConfiguration");
 
-			this.entityManager.AddComponentData(configEntity, new WorldSeed { Value = this.worldSeed });
-			this.entityManager.AddComponentData(configEntity, new WorldBounds
+			entityManager.AddComponentData(configEntity, new WorldSeed { Value = worldSeed });
+			entityManager.AddComponentData(configEntity, new WorldBounds
 				{
-				Min = new int2(-this.worldSize.x / 2, -this.worldSize.y / 2),
-				Max = new int2(this.worldSize.x / 2, this.worldSize.y / 2)
+				Min = new int2(-worldSize.x / 2, -worldSize.y / 2),
+				Max = new int2(worldSize.x / 2, worldSize.y / 2)
 				});
 
 			// Integrate targetSectorCount with generation pipeline
-			this.entityManager.AddComponentData(configEntity, new WorldGenerationConfig
+			entityManager.AddComponentData(configEntity, new WorldGenerationConfig
 				{
-				TargetSectorCount = this.targetSectorCount,
-				MaxDistrictCount = this.targetSectorCount * 4, // Allow room for subdivision
-				BiomeTransitionRadius = this.biomeTransitionRadius
+				TargetSectorCount = targetSectorCount,
+				MaxDistrictCount = targetSectorCount * 4, // Allow room for subdivision
+				BiomeTransitionRadius = biomeTransitionRadius
 				});
 			}
 
 		private void CreateDistrictEntities ()
 			{
 			// Use targetSectorCount to determine how many districts to create
-			int actualDistrictCount = math.min(this.targetSectorCount, 24); // Reasonable upper limit
+			int actualDistrictCount = math.min(targetSectorCount, 24); // Reasonable upper limit
 			int gridSize = (int)math.ceil(math.sqrt(actualDistrictCount));
 
-			Entity hubEntity = this.entityManager.CreateEntity();
-			this.entityManager.SetName(hubEntity, "HubDistrict");
+			Entity hubEntity = entityManager.CreateEntity();
+			entityManager.SetName(hubEntity, "HubDistrict");
 
-			this.entityManager.AddComponentData(hubEntity, new NodeId
+			entityManager.AddComponentData(hubEntity, new NodeId
 				{
 				Coordinates = int2.zero,
 				Level = 0,
@@ -116,9 +116,9 @@ namespace TinyWalnutGames.MetVD.Samples
 				ParentId = 0
 				});
 
-			this.entityManager.AddComponentData(hubEntity, new WfcState());
-			this.entityManager.AddBuffer<WfcCandidateBufferElement>(hubEntity);
-			this.entityManager.AddBuffer<ConnectionBufferElement>(hubEntity);
+			entityManager.AddComponentData(hubEntity, new WfcState());
+			entityManager.AddBuffer<WfcCandidateBufferElement>(hubEntity);
+			entityManager.AddBuffer<ConnectionBufferElement>(hubEntity);
 
 			int districtId = 1;
 			int districtsCreated = 0;
@@ -133,10 +133,10 @@ namespace TinyWalnutGames.MetVD.Samples
 						continue; // Skip hub position
 						}
 
-					Entity districtEntity = this.entityManager.CreateEntity();
-					this.entityManager.SetName(districtEntity, $"District_{x}_{y}");
+					Entity districtEntity = entityManager.CreateEntity();
+					entityManager.SetName(districtEntity, $"District_{x}_{y}");
 
-					this.entityManager.AddComponentData(districtEntity, new NodeId
+					entityManager.AddComponentData(districtEntity, new NodeId
 						{
 						Coordinates = new int2(x * 10, y * 10),
 						Level = (byte)(math.abs(x) + math.abs(y)),
@@ -144,40 +144,40 @@ namespace TinyWalnutGames.MetVD.Samples
 						ParentId = 0
 						});
 
-					this.entityManager.AddComponentData(districtEntity, new WfcState());
-					this.entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);
-					this.entityManager.AddBuffer<ConnectionBufferElement>(districtEntity);
-					this.entityManager.AddComponentData(districtEntity, new SectorRefinementData(0.3f));
-					this.entityManager.AddBuffer<GateConditionBufferElement>(districtEntity);
+					entityManager.AddComponentData(districtEntity, new WfcState());
+					entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);
+					entityManager.AddBuffer<ConnectionBufferElement>(districtEntity);
+					entityManager.AddComponentData(districtEntity, new SectorRefinementData(0.3f));
+					entityManager.AddBuffer<GateConditionBufferElement>(districtEntity);
 
 					districtsCreated++;
 					}
 				}
 
-			if (this.logGenerationSteps)
+			if (logGenerationSteps)
 				{
-				Debug.Log($"Created {districtsCreated} districts based on targetSectorCount ({this.targetSectorCount})");
+				Debug.Log($"Created {districtsCreated} districts based on targetSectorCount ({targetSectorCount})");
 				}
 			}
 
 		private void CreateBiomeFieldEntities ()
 			{
-			this.CreatePolarityField(Polarity.Sun, new float2(15, 15), "SunField");
-			this.CreatePolarityField(Polarity.Moon, new float2(-15, -15), "MoonField");
-			this.CreatePolarityField(Polarity.Heat, new float2(15, -15), "HeatField");
-			this.CreatePolarityField(Polarity.Cold, new float2(-15, 15), "ColdField");
+			CreatePolarityField(Polarity.Sun, new float2(15, 15), "SunField");
+			CreatePolarityField(Polarity.Moon, new float2(-15, -15), "MoonField");
+			CreatePolarityField(Polarity.Heat, new float2(15, -15), "HeatField");
+			CreatePolarityField(Polarity.Cold, new float2(-15, 15), "ColdField");
 			}
 
 		private void CreatePolarityField (Polarity polarity, float2 center, string name)
 			{
-			Entity fieldEntity = this.entityManager.CreateEntity();
-			this.entityManager.SetName(fieldEntity, name);
+			Entity fieldEntity = entityManager.CreateEntity();
+			entityManager.SetName(fieldEntity, name);
 
-			this.entityManager.AddComponentData(fieldEntity, new PolarityFieldData
+			entityManager.AddComponentData(fieldEntity, new PolarityFieldData
 				{
 				Polarity = polarity,
 				Center = center,
-				Radius = this.biomeTransitionRadius,
+				Radius = biomeTransitionRadius,
 				Strength = 0.8f
 				});
 			}
@@ -185,7 +185,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		private void DebugDrawBounds ()
 			{
 			var color = new Color(0.2f, 0.9f, 0.4f, 0.6f);
-			var half = new float3(this.worldSize.x * 0.5f, 0, this.worldSize.y * 0.5f);
+			var half = new float3(worldSize.x * 0.5f, 0, worldSize.y * 0.5f);
 			Debug.DrawLine(new Vector3(-half.x, 0, -half.z), new Vector3(half.x, 0, -half.z), color, 1f);
 			Debug.DrawLine(new Vector3(half.x, 0, -half.z), new Vector3(half.x, 0, half.z), color, 1f);
 			Debug.DrawLine(new Vector3(half.x, 0, half.z), new Vector3(-half.x, 0, half.z), color, 1f);
@@ -194,7 +194,7 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void OnDestroy ()
 			{
-			if (this.logGenerationSteps)
+			if (logGenerationSteps)
 				{
 				Debug.Log("🔚 MetVanDAMN Smoke Test: Scene cleanup complete");
 				}

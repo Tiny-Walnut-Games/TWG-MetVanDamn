@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace LivingDevAgent.Editor
+namespace LivingDevAgent.Editor.Modules
 	{
 	// ⚠ Intent ⚠ - @jmeyer1980
 	// This class is for Taskmaster use, it is not intended for manual use.

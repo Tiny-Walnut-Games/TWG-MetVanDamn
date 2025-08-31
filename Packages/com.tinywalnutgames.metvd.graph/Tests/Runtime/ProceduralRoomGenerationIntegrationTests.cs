@@ -19,16 +19,16 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		[SetUp]
 		public void SetUp ()
 			{
-			this._testWorld = new World("IntegrationTestWorld");
-			this._entityManager = this._testWorld.EntityManager;
+			_testWorld = new World("IntegrationTestWorld");
+			_entityManager = _testWorld.EntityManager;
 			}
 
 		[TearDown]
 		public void TearDown ()
 			{
-			if (this._testWorld != null && this._testWorld.IsCreated)
+			if (_testWorld != null && _testWorld.IsCreated)
 				{
-				this._testWorld.Dispose();
+				_testWorld.Dispose();
 				}
 			}
 
@@ -36,7 +36,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void BossRoom_SkillChallenge_GeneratesCorrectly ()
 			{
 			// Arrange - Create a boss room with advanced skills
-			Entity roomEntity = this.CreateTestRoom(
+			Entity roomEntity = CreateTestRoom(
 				RoomType.Boss,
 				new RectInt(0, 0, 20, 16),
 				BiomeType.VolcanicCore,
@@ -44,7 +44,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			);
 
 			// Act - Process room generation
-			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
 			// Assert - Boss rooms should use pattern-driven modular generation
 			Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, request.GeneratorType);
@@ -52,14 +52,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			Assert.IsTrue((request.AvailableSkills & Ability.Dash) != 0);
 
 			// Should have pattern buffer for skill challenges
-			Assert.IsTrue(this._entityManager.HasBuffer<RoomPatternElement>(roomEntity));
+			Assert.IsTrue(_entityManager.HasBuffer<RoomPatternElement>(roomEntity));
 			}
 
 		[Test]
 		public void TreasureRoom_JumpTesting_ValidatesPhysics ()
 			{
 			// Arrange - Create a treasure room for jump testing
-			Entity roomEntity = this.CreateTestRoom(
+			Entity roomEntity = CreateTestRoom(
 				RoomType.Treasure,
 				new RectInt(0, 0, 12, 8),
 				BiomeType.CrystalCaverns,
@@ -67,13 +67,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			);
 
 			// Act
-			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-			JumpPhysicsData jumpPhysics = this._entityManager.GetComponentData<JumpPhysicsData>(roomEntity);
+			RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			JumpPhysicsData jumpPhysics = _entityManager.GetComponentData<JumpPhysicsData>(roomEntity);
 
 			// Assert - Treasure rooms should use parametric challenge generation
 			Assert.AreEqual(RoomGeneratorType.ParametricChallenge, request.GeneratorType);
-			Assert.IsTrue(this._entityManager.HasComponent<JumpArcValidation>(roomEntity));
-			Assert.IsTrue(this._entityManager.HasBuffer<JumpConnectionElement>(roomEntity));
+			Assert.IsTrue(_entityManager.HasComponent<JumpArcValidation>(roomEntity));
+			Assert.IsTrue(_entityManager.HasBuffer<JumpConnectionElement>(roomEntity));
 			Assert.AreEqual(4.0f, jumpPhysics.MaxJumpHeight);
 			}
 
@@ -81,7 +81,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void SkyBiome_CloudPlatforms_GeneratesMotion ()
 			{
 			// Arrange - Create a room in sky biome
-			Entity roomEntity = this.CreateTestRoom(
+			Entity roomEntity = CreateTestRoom(
 				RoomType.Normal,
 				new RectInt(0, 0, 16, 20), // Tall room
 				BiomeType.SkyGardens,
@@ -89,8 +89,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			);
 
 			// Act
-			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-			Biome biome = this._entityManager.GetComponentData<Biome>(roomEntity);
+			RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			Biome biome = _entityManager.GetComponentData<Biome>(roomEntity);
 
 			// Assert - Sky biomes should use layered platform generation
 			Assert.AreEqual(RoomGeneratorType.LayeredPlatformCloud, request.GeneratorType);
@@ -102,7 +102,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void HorizontalRoom_CorridorFlow_GeneratesRhythm ()
 			{
 			// Arrange - Create a wide horizontal room
-			Entity roomEntity = this.CreateTestRoom(
+			Entity roomEntity = CreateTestRoom(
 				RoomType.Normal,
 				new RectInt(0, 0, 24, 8), // Wide room (aspect ratio 3:1)
 				BiomeType.HubArea,
@@ -110,7 +110,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			);
 
 			// Act
-			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
 			// Assert - Wide rooms should use linear corridor generation
 			Assert.AreEqual(RoomGeneratorType.LinearBranchingCorridor, request.GeneratorType);
@@ -121,7 +121,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void VerticalRoom_StackedSegments_EnsuresConnectivity ()
 			{
 			// Arrange - Create a tall vertical room
-			Entity roomEntity = this.CreateTestRoom(
+			Entity roomEntity = CreateTestRoom(
 				RoomType.Normal,
 				new RectInt(0, 0, 8, 24), // Tall room (aspect ratio 1:3)
 				BiomeType.CrystalCaverns,
@@ -129,7 +129,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			);
 
 			// Act
-			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
 			// Assert - Tall rooms should use stacked segment generation
 			Assert.AreEqual(RoomGeneratorType.StackedSegment, request.GeneratorType);
@@ -140,7 +140,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void SecretAreas_WithBombSkill_GeneratesDestructibleWalls ()
 			{
 			// Arrange - Create a room with bomb skill for secret access
-			Entity roomEntity = this.CreateTestRoom(
+			Entity roomEntity = CreateTestRoom(
 				RoomType.Normal,
 				new RectInt(0, 0, 16, 12),
 				BiomeType.AncientRuins,
@@ -148,7 +148,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			);
 
 			// Act
-			SecretAreaConfig secretConfig = this._entityManager.GetComponentData<SecretAreaConfig>(roomEntity);
+			SecretAreaConfig secretConfig = _entityManager.GetComponentData<SecretAreaConfig>(roomEntity);
 
 			// Assert - Should have secret configuration with destructible walls
 			Assert.AreEqual(Ability.Bomb, secretConfig.SecretSkillRequirement);
@@ -160,7 +160,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void SaveRoom_SafeArea_UsesWeightedGeneration ()
 			{
 			// Arrange - Create a save room (should be safe)
-			Entity roomEntity = this.CreateTestRoom(
+			Entity roomEntity = CreateTestRoom(
 				RoomType.Save,
 				new RectInt(0, 0, 10, 10),
 				BiomeType.HubArea,
@@ -168,8 +168,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			);
 
 			// Act
-			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-			RoomStateData roomState = this._entityManager.GetComponentData<RoomStateData>(roomEntity);
+			RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			RoomStateData roomState = _entityManager.GetComponentData<RoomStateData>(roomEntity);
 
 			// Assert - Save rooms should use safe weighted generation
 			Assert.AreEqual(RoomGeneratorType.WeightedTilePrefab, request.GeneratorType);
@@ -180,15 +180,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void BiomePolarity_MatchesRoomContent ()
 			{
 			// Arrange - Create rooms in different biomes
-			Entity fireRoomEntity = this.CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.VolcanicCore, Ability.Jump);
-			Entity iceRoomEntity = this.CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.FrozenWastes, Ability.Jump);
+			Entity fireRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.VolcanicCore, Ability.Jump);
+			Entity iceRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.FrozenWastes, Ability.Jump);
 
 			// Act
-			RoomGenerationRequest fireRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(fireRoomEntity);
-			RoomGenerationRequest iceRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(iceRoomEntity);
+			RoomGenerationRequest fireRequest = _entityManager.GetComponentData<RoomGenerationRequest>(fireRoomEntity);
+			RoomGenerationRequest iceRequest = _entityManager.GetComponentData<RoomGenerationRequest>(iceRoomEntity);
 
-			Biome fireBiome = this._entityManager.GetComponentData<Biome>(fireRoomEntity);
-			Biome iceBiome = this._entityManager.GetComponentData<Biome>(iceRoomEntity);
+			Biome fireBiome = _entityManager.GetComponentData<Biome>(fireRoomEntity);
+			Biome iceBiome = _entityManager.GetComponentData<Biome>(iceRoomEntity);
 
 			// Assert - Biome polarities should match room requests
 			Assert.AreEqual(Polarity.Heat, fireRequest.TargetPolarity);
@@ -201,7 +201,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void Pipeline_SixSteps_CompletesCorrectly ()
 			{
 			// Arrange
-			Entity roomEntity = this.CreateTestRoom(
+			Entity roomEntity = CreateTestRoom(
 				RoomType.Normal,
 				new RectInt(0, 0, 12, 12),
 				BiomeType.SolarPlains,
@@ -209,7 +209,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			);
 
 			// Act - Simulate pipeline progression
-			RoomGenerationRequest request = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
 			// Step 1: Biome Selection (already done in setup)
 			Assert.AreEqual(1, request.CurrentStep);
@@ -217,9 +217,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			// Simulate pipeline completion
 			request.CurrentStep = 6;
 			request.IsComplete = true;
-			this._entityManager.SetComponentData(roomEntity, request);
+			_entityManager.SetComponentData(roomEntity, request);
 
-			RoomGenerationRequest finalRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
+			RoomGenerationRequest finalRequest = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
 
 			// Assert - Pipeline should complete successfully
 			Assert.AreEqual(6, finalRequest.CurrentStep);
@@ -284,14 +284,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void DifferentGenerators_ProduceUniqueContent ()
 			{
 			// Arrange - Create rooms with different generator types
-			Entity patternRoom = this.CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 16, 16), BiomeType.VolcanicCore, Ability.Dash);
-			Entity parametricRoom = this.CreateTestRoom(RoomType.Treasure, new RectInt(0, 0, 16, 16), BiomeType.CrystalCaverns, Ability.Jump);
-			Entity weightedRoom = this.CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 16, 16), BiomeType.HubArea, Ability.Jump);
+			Entity patternRoom = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 16, 16), BiomeType.VolcanicCore, Ability.Dash);
+			Entity parametricRoom = CreateTestRoom(RoomType.Treasure, new RectInt(0, 0, 16, 16), BiomeType.CrystalCaverns, Ability.Jump);
+			Entity weightedRoom = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 16, 16), BiomeType.HubArea, Ability.Jump);
 
 			// Act
-			RoomGenerationRequest patternRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(patternRoom);
-			RoomGenerationRequest parametricRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(parametricRoom);
-			RoomGenerationRequest weightedRequest = this._entityManager.GetComponentData<RoomGenerationRequest>(weightedRoom);
+			RoomGenerationRequest patternRequest = _entityManager.GetComponentData<RoomGenerationRequest>(patternRoom);
+			RoomGenerationRequest parametricRequest = _entityManager.GetComponentData<RoomGenerationRequest>(parametricRoom);
+			RoomGenerationRequest weightedRequest = _entityManager.GetComponentData<RoomGenerationRequest>(weightedRoom);
 
 			// Assert - Each should use different generator type
 			Assert.AreEqual(RoomGeneratorType.PatternDrivenModular, patternRequest.GeneratorType);
@@ -299,9 +299,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			Assert.AreEqual(RoomGeneratorType.WeightedTilePrefab, weightedRequest.GeneratorType);
 
 			// Each should have different specialized components
-			Assert.IsTrue(this._entityManager.HasBuffer<RoomPatternElement>(patternRoom));
-			Assert.IsTrue(this._entityManager.HasComponent<JumpPhysicsData>(parametricRoom));
-			Assert.IsTrue(this._entityManager.HasComponent<SecretAreaConfig>(weightedRoom));
+			Assert.IsTrue(_entityManager.HasBuffer<RoomPatternElement>(patternRoom));
+			Assert.IsTrue(_entityManager.HasComponent<JumpPhysicsData>(parametricRoom));
+			Assert.IsTrue(_entityManager.HasComponent<SecretAreaConfig>(weightedRoom));
 			}
 
 		/// <summary>
@@ -309,18 +309,18 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		/// </summary>
 		private Entity CreateTestRoom (RoomType roomType, RectInt bounds, BiomeType biomeType, Ability availableSkills)
 			{
-			Entity roomEntity = this._entityManager.CreateEntity();
+			Entity roomEntity = _entityManager.CreateEntity();
 
 			// Add core room data
 			var roomData = new RoomHierarchyData(bounds, roomType, true);
 			var nodeId = new NodeId(1, 2, 1, new int2(0, 0));
-			this._entityManager.AddComponentData(roomEntity, roomData);
-			this._entityManager.AddComponentData(roomEntity, nodeId);
+			_entityManager.AddComponentData(roomEntity, roomData);
+			_entityManager.AddComponentData(roomEntity, nodeId);
 
 			// Add biome data
 			Polarity polarity = GetPolarityForBiome(biomeType);
 			var biome = new Biome(biomeType, polarity, 1.0f, Polarity.None, 1.0f);
-			this._entityManager.AddComponentData(roomEntity, biome);
+			_entityManager.AddComponentData(roomEntity, biome);
 
 			// Determine generator type
 			RoomGeneratorType generatorType = DetermineGeneratorType(roomType, bounds, biomeType);
@@ -333,15 +333,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				availableSkills,
 				12345
 			);
-			this._entityManager.AddComponentData(roomEntity, generationRequest);
+			_entityManager.AddComponentData(roomEntity, generationRequest);
 
 			// Add room management components
-			this._entityManager.AddComponentData(roomEntity, new RoomStateData(CalculateSecrets(roomType)));
-			this._entityManager.AddComponentData(roomEntity, CreateNavData(bounds, roomType));
-			this._entityManager.AddBuffer<RoomFeatureElement>(roomEntity);
+			_entityManager.AddComponentData(roomEntity, new RoomStateData(CalculateSecrets(roomType)));
+			_entityManager.AddComponentData(roomEntity, CreateNavData(bounds, roomType));
+			_entityManager.AddBuffer<RoomFeatureElement>(roomEntity);
 
 			// Add generator-specific components
-			this.AddSpecializedComponents(roomEntity, generatorType, availableSkills);
+			AddSpecializedComponents(roomEntity, generatorType, availableSkills);
 
 			return roomEntity;
 			}
@@ -351,8 +351,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			switch (generatorType)
 				{
 				case RoomGeneratorType.PatternDrivenModular:
-					this._entityManager.AddBuffer<RoomPatternElement>(entity);
-					this._entityManager.AddBuffer<RoomModuleElement>(entity);
+					_entityManager.AddBuffer<RoomPatternElement>(entity);
+					_entityManager.AddBuffer<RoomModuleElement>(entity);
 					break;
 
 				case RoomGeneratorType.ParametricChallenge:
@@ -360,16 +360,16 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 						(availableSkills & Ability.DoubleJump) != 0,
 						(availableSkills & Ability.WallJump) != 0,
 						(availableSkills & Ability.Dash) != 0);
-					this._entityManager.AddComponentData(entity, jumpPhysics);
-					this._entityManager.AddComponentData(entity, new JumpArcValidation(false, 0, 0));
-					this._entityManager.AddBuffer<JumpConnectionElement>(entity);
+					_entityManager.AddComponentData(entity, jumpPhysics);
+					_entityManager.AddComponentData(entity, new JumpArcValidation(false, 0, 0));
+					_entityManager.AddBuffer<JumpConnectionElement>(entity);
 					break;
 
 				case RoomGeneratorType.WeightedTilePrefab:
 					Ability secretSkill = (availableSkills & Ability.Bomb) != 0 ? Ability.Bomb : Ability.None;
 					var secretConfig = new SecretAreaConfig(0.15f, new int2(2, 2), new int2(4, 4),
 						secretSkill, true, true);
-					this._entityManager.AddComponentData(entity, secretConfig);
+					_entityManager.AddComponentData(entity, secretConfig);
 					break;
 				case RoomGeneratorType.VerticalSegment:
 					break;

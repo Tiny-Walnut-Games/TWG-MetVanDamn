@@ -169,20 +169,20 @@ namespace TinyWalnutGames.MetVD.Graph
 				WorldConfiguration worldConfig = default;
 				if (!_worldConfigQuery.IsEmpty)
 					worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
-				using var roomEntities = _roomsToGenerateQuery.ToEntityArray(Allocator.Temp);
-				using var nodeIds = _roomsToGenerateQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-				using var roomData = _roomsToGenerateQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+				using NativeArray<Entity> roomEntities = _roomsToGenerateQuery.ToEntityArray(Allocator.Temp);
+				using NativeArray<NodeId> nodeIds = _roomsToGenerateQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+				using NativeArray<RoomHierarchyData> roomData = _roomsToGenerateQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
 				for (int i = 0; i < roomEntities.Length; i++)
 					{
-					var roomEntity = roomEntities[i];
-					var nodeId = nodeIds[i];
-					var hierarchy = roomData[i];
+					Entity roomEntity = roomEntities[i];
+					NodeId nodeId = nodeIds[i];
+					RoomHierarchyData hierarchy = roomData[i];
 					uint roomSeed = GenerateRoomSeed(worldConfig.Seed, nodeId);
 					var random = new Unity.Mathematics.Random(roomSeed == 0 ? 1u : roomSeed);
-					var biomeAffinity = DetermineBiomeAffinity(nodeId, ref random);
+					BiomeAffinity biomeAffinity = DetermineBiomeAffinity(nodeId, ref random);
 					bool layoutOrientation = DetermineLayoutOrientation(hierarchy, biomeAffinity, ref random);
-					var generatorType = SelectRoomGenerator(hierarchy.Type, biomeAffinity, layoutOrientation, ref random);
-					var roomTemplate = CreateRoomTemplate(generatorType, hierarchy, biomeAffinity, ref random);
+					RoomGeneratorType generatorType = SelectRoomGenerator(hierarchy.Type, biomeAffinity, layoutOrientation, ref random);
+					RoomTemplate roomTemplate = CreateRoomTemplate(generatorType, hierarchy, biomeAffinity, ref random);
 					state.EntityManager.AddComponentData(roomEntity, roomTemplate);
 					state.EntityManager.AddComponentData(roomEntity, new ProceduralRoomGenerated(roomSeed));
 					if (!state.EntityManager.HasBuffer<RoomNavigationElement>(roomEntity))

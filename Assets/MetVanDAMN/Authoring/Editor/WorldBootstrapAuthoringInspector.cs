@@ -26,7 +26,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		public override void OnInspectorGUI ()
 			{
-			var bootstrap = (WorldBootstrapAuthoring)this.target;
+			var bootstrap = (WorldBootstrapAuthoring)target;
 
 			EditorGUILayout.Space();
 			EditorGUILayout.HelpBox(
@@ -37,45 +37,45 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.Space();
 
 			// Main configuration
-			this.DrawWorldConfiguration(bootstrap);
+			DrawWorldConfiguration(bootstrap);
 
 			EditorGUILayout.Space();
 
 			// Generation ranges
-			this._showGenerationRanges = EditorGUILayout.Foldout(this._showGenerationRanges, "Generation Ranges", true);
-			if (this._showGenerationRanges)
+			_showGenerationRanges = EditorGUILayout.Foldout(_showGenerationRanges, "Generation Ranges", true);
+			if (_showGenerationRanges)
 				{
 				EditorGUI.indentLevel++;
-				this.DrawGenerationRanges(bootstrap);
+				DrawGenerationRanges(bootstrap);
 				EditorGUI.indentLevel--;
 				}
 
 			EditorGUILayout.Space();
 
 			// Debug options
-			this._showDebugOptions = EditorGUILayout.Foldout(this._showDebugOptions, "Debug Options", true);
-			if (this._showDebugOptions)
+			_showDebugOptions = EditorGUILayout.Foldout(_showDebugOptions, "Debug Options", true);
+			if (_showDebugOptions)
 				{
 				EditorGUI.indentLevel++;
-				this.DrawDebugOptions(bootstrap);
+				DrawDebugOptions(bootstrap);
 				EditorGUI.indentLevel--;
 				}
 
 			EditorGUILayout.Space();
 
 			// Advanced options
-			this._showAdvancedOptions = EditorGUILayout.Foldout(this._showAdvancedOptions, "Advanced Options", false);
-			if (this._showAdvancedOptions)
+			_showAdvancedOptions = EditorGUILayout.Foldout(_showAdvancedOptions, "Advanced Options", false);
+			if (_showAdvancedOptions)
 				{
 				EditorGUI.indentLevel++;
-				this.DrawAdvancedOptions(bootstrap);
+				DrawAdvancedOptions(bootstrap);
 				EditorGUI.indentLevel--;
 				}
 
 			EditorGUILayout.Space();
 
 			// Preview section
-			this.DrawPreviewSection(bootstrap);
+			DrawPreviewSection(bootstrap);
 
 			if (GUI.changed)
 				{
@@ -149,7 +149,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			GUI.backgroundColor = new Color(0.7f, 1.0f, 0.7f);
 			if (GUILayout.Button("🔄 Preview Generation", GUILayout.Height(30)))
 				{
-				this.PreviewGeneration(bootstrap);
+				PreviewGeneration(bootstrap);
 				}
 			GUI.backgroundColor = Color.white;
 
@@ -163,15 +163,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			EditorGUILayout.EndHorizontal();
 
-			if (this._hasPreviewData)
+			if (_hasPreviewData)
 				{
 				EditorGUILayout.Space(5);
 				EditorGUILayout.BeginVertical("box");
-				EditorGUILayout.LabelField($"Preview Results (Seed: {this._lastPreviewSeed})", EditorStyles.miniBoldLabel);
-				EditorGUILayout.LabelField($"🌿 Biomes: {this._previewBiomes}");
-				EditorGUILayout.LabelField($"🏰 Districts: {this._previewDistricts}");
-				EditorGUILayout.LabelField($"🏘️ Sectors: {this._previewSectors}");
-				EditorGUILayout.LabelField($"🏠 Rooms: {this._previewRooms}");
+				EditorGUILayout.LabelField($"Preview Results (Seed: {_lastPreviewSeed})", EditorStyles.miniBoldLabel);
+				EditorGUILayout.LabelField($"🌿 Biomes: {_previewBiomes}");
+				EditorGUILayout.LabelField($"🏰 Districts: {_previewDistricts}");
+				EditorGUILayout.LabelField($"🏘️ Sectors: {_previewSectors}");
+				EditorGUILayout.LabelField($"🏠 Rooms: {_previewRooms}");
 				EditorGUILayout.EndVertical();
 				}
 
@@ -188,13 +188,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			uint seed = bootstrap.seed == 0 ? (uint)UnityEngine.Random.Range(1, int.MaxValue) : (uint)bootstrap.seed;
 			var random = new Unity.Mathematics.Random(seed);
 
-			this._previewBiomes = random.NextInt(bootstrap.biomeCount.x, bootstrap.biomeCount.y + 1);
-			this._previewDistricts = random.NextInt(bootstrap.districtCount.x, bootstrap.districtCount.y + 1);
+			_previewBiomes = random.NextInt(bootstrap.biomeCount.x, bootstrap.biomeCount.y + 1);
+			_previewDistricts = random.NextInt(bootstrap.districtCount.x, bootstrap.districtCount.y + 1);
 
 			int totalSectors = 0;
 			int totalRooms = 0;
 
-			for (int i = 0; i < this._previewDistricts; i++)
+			for (int i = 0; i < _previewDistricts; i++)
 				{
 				int sectors = random.NextInt(bootstrap.sectorsPerDistrict.x, bootstrap.sectorsPerDistrict.y + 1);
 				totalSectors += sectors;
@@ -206,14 +206,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					}
 				}
 
-			this._previewSectors = totalSectors;
-			this._previewRooms = totalRooms;
-			this._lastPreviewSeed = seed;
-			this._hasPreviewData = true;
+			_previewSectors = totalSectors;
+			_previewRooms = totalRooms;
+			_lastPreviewSeed = seed;
+			_hasPreviewData = true;
 
 			if (bootstrap.logGenerationSteps)
 				{
-				Debug.Log($"🔮 WorldBootstrap Preview: {this._previewDistricts} districts, {this._previewSectors} sectors, {this._previewRooms} rooms (Seed: {seed})");
+				Debug.Log($"🔮 WorldBootstrap Preview: {_previewDistricts} districts, {_previewSectors} sectors, {_previewRooms} rooms (Seed: {seed})");
 				}
 
 			// Update the seed if it was 0 (random)
@@ -226,7 +226,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void OnSceneGUI ()
 			{
-			var bootstrap = (WorldBootstrapAuthoring)this.target;
+			var bootstrap = (WorldBootstrapAuthoring)target;
 
 			if (bootstrap.enableDebugVisualization)
 				{

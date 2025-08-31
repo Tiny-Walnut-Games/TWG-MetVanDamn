@@ -24,9 +24,9 @@ namespace TinyWalnutGames.MetVD.Biome
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this.biomeLookup = state.GetComponentLookup<Core.Biome>();
-			this.nodeIdLookup = state.GetComponentLookup<NodeId>(true);
-			this.connectionBufferLookup = state.GetBufferLookup<ConnectionBufferElement>(true);
+			biomeLookup = state.GetComponentLookup<Core.Biome>();
+			nodeIdLookup = state.GetComponentLookup<NodeId>(true);
+			connectionBufferLookup = state.GetBufferLookup<ConnectionBufferElement>(true);
 
 			// Require biome components to run
 			state.RequireForUpdate<Core.Biome>();
@@ -35,9 +35,9 @@ namespace TinyWalnutGames.MetVD.Biome
 		[BurstCompile]
 		public void OnUpdate (ref SystemState state)
 			{
-			this.biomeLookup.Update(ref state);
-			this.nodeIdLookup.Update(ref state);
-			this.connectionBufferLookup.Update(ref state);
+			biomeLookup.Update(ref state);
+			nodeIdLookup.Update(ref state);
+			connectionBufferLookup.Update(ref state);
 
 			float deltaTime = state.WorldUnmanaged.Time.DeltaTime;
 
@@ -48,9 +48,9 @@ namespace TinyWalnutGames.MetVD.Biome
 			// Process biome field assignment directly using IJobEntity pattern like other systems
 			var biomeJob = new BiomeFieldJob
 				{
-				BiomeLookup = this.biomeLookup,
-				NodeIdLookup = this.nodeIdLookup,
-				ConnectionBufferLookup = this.connectionBufferLookup,
+				BiomeLookup = biomeLookup,
+				NodeIdLookup = nodeIdLookup,
+				ConnectionBufferLookup = connectionBufferLookup,
 				Random = random,
 				DeltaTime = deltaTime
 				};
@@ -75,36 +75,36 @@ namespace TinyWalnutGames.MetVD.Biome
 		public readonly void Execute ([ChunkIndexInQuery] int chunkIndex, Entity entity, ref Core.Biome biome, in NodeId nodeId)
 			{
 			// Use chunkIndex / entity to seed jitter for consistent variety
-			var random = new Random((this.Random.state + (uint)(chunkIndex * 961748927)) ^ (uint)entity.Index);
+			var random = new Random((Random.state + (uint)(chunkIndex * 961748927)) ^ (uint)entity.Index);
 
 			// Skip processing if biome is already fully configured
 			if (biome.Type != BiomeType.Unknown && biome.PolarityStrength > 0.1f)
 				{
 				// Still update difficulty modifier to utilize DeltaTime parameter
-				this.UpdateDifficultyModifier(ref biome, this.DeltaTime);
+				UpdateDifficultyModifier(ref biome, DeltaTime);
 				return;
 				}
 
 			// Assign biome type if unknown
 			if (biome.Type == BiomeType.Unknown)
 				{
-				biome.Type = this.AssignBiomeType(nodeId, biome.PrimaryPolarity, ref random);
+				biome.Type = AssignBiomeType(nodeId, biome.PrimaryPolarity, ref random);
 				}
 
 			// Calculate polarity strength based on position and neighbors
 			if (biome.PolarityStrength <= 0.1f)
 				{
-				biome.PolarityStrength = this.CalculatePolarityStrength(entity, nodeId, biome, ref random);
+				biome.PolarityStrength = CalculatePolarityStrength(entity, nodeId, biome, ref random);
 				}
 
 			// Assign secondary polarity for mixed biomes
 			if (biome.SecondaryPolarity == Polarity.None && biome.Type == BiomeType.TransitionZone)
 				{
-				biome.SecondaryPolarity = this.GetComplementaryPolarity(biome.PrimaryPolarity);
+				biome.SecondaryPolarity = GetComplementaryPolarity(biome.PrimaryPolarity);
 				}
 
 			// Update difficulty modifier based on polarity complexity
-			this.UpdateDifficultyModifier(ref biome, this.DeltaTime);
+			UpdateDifficultyModifier(ref biome, DeltaTime);
 			}
 
 		private readonly BiomeType AssignBiomeType (NodeId nodeId, Polarity primaryPolarity, ref Random random)
@@ -149,7 +149,7 @@ namespace TinyWalnutGames.MetVD.Biome
 		private readonly float CalculatePolarityStrength (Entity entity, NodeId nodeId, Core.Biome biome, ref Random random)
 			{
 			// Base strength from biome type
-			float baseStrength = this.GetBasePolarityStrength(biome.Type);
+			float baseStrength = GetBasePolarityStrength(biome.Type);
 
 			// Modify based on position - central areas are weaker
 			float2 worldPos = new(nodeId.Coordinates);
@@ -314,25 +314,25 @@ namespace TinyWalnutGames.MetVD.Biome
 
 		protected override void OnCreate ()
 			{
-			this.biomeLookup = this.GetComponentLookup<Core.Biome>(true);
-			this.nodeIdLookup = this.GetComponentLookup<NodeId>(true);
+			biomeLookup = GetComponentLookup<Core.Biome>(true);
+			nodeIdLookup = GetComponentLookup<NodeId>(true);
 			}
 
 		protected override void OnUpdate ()
 			{
-			this.biomeLookup.Update(ref this.CheckedStateRef);
-			this.nodeIdLookup.Update(ref this.CheckedStateRef);
+			biomeLookup.Update(ref CheckedStateRef);
+			nodeIdLookup.Update(ref CheckedStateRef);
 
 			// Validation job runs only occasionally
-			if (this.World.Time.ElapsedTime % 5.0 < this.World.Time.DeltaTime)
+			if (World.Time.ElapsedTime % 5.0 < World.Time.DeltaTime)
 				{
 				var validationJob = new BiomeValidationJob
 					{
-					BiomeLookup = this.biomeLookup,
-					NodeIdLookup = this.nodeIdLookup
+					BiomeLookup = biomeLookup,
+					NodeIdLookup = nodeIdLookup
 					};
 
-				this.Dependency = validationJob.ScheduleParallel(this.Dependency);
+				Dependency = validationJob.ScheduleParallel(Dependency);
 				}
 			}
 		}
@@ -529,7 +529,7 @@ namespace TinyWalnutGames.MetVD.Biome
 
 		protected override void OnCreate ()
 			{
-			this._missingBufferQuery = this.GetEntityQuery(new EntityQueryDesc
+			_missingBufferQuery = GetEntityQuery(new EntityQueryDesc
 				{
 				All = new [ ] { ComponentType.ReadOnly<Core.Biome>() },
 				None = new [ ] { ComponentType.ReadOnly<BiomeValidationRecord>() }
@@ -538,19 +538,19 @@ namespace TinyWalnutGames.MetVD.Biome
 
 		protected override void OnUpdate ()
 			{
-			if (this._missingBufferQuery.IsEmptyIgnoreFilter)
+			if (_missingBufferQuery.IsEmptyIgnoreFilter)
 				{
 				return;
 				}
 
-			NativeArray<Entity> entities = this._missingBufferQuery.ToEntityArray(Allocator.Temp);
+			NativeArray<Entity> entities = _missingBufferQuery.ToEntityArray(Allocator.Temp);
 			var ecb = new EntityCommandBuffer(Allocator.Temp);
 			int buffersCreated = 0; // Track buffer creation for system health monitoring
 			
 			for (int i = 0; i < entities.Length; i++)
 				{
 				// Capture buffer creation result for validation system performance analytics
-				var validationBuffer = ecb.AddBuffer<BiomeValidationRecord>(entities[i]);
+				DynamicBuffer<BiomeValidationRecord> validationBuffer = ecb.AddBuffer<BiomeValidationRecord>(entities[i]);
 				buffersCreated++;
 				
 				// Use the buffer reference for intelligent initialization
@@ -572,7 +572,7 @@ namespace TinyWalnutGames.MetVD.Biome
 					}
 				}
 			
-			ecb.Playback(this.EntityManager);
+			ecb.Playback(EntityManager);
 			ecb.Dispose();
 			entities.Dispose();
 			

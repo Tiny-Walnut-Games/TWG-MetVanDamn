@@ -26,7 +26,7 @@ namespace LivingDevAgent.Editor.Chronas
 		private static double _sessionStartTime = 0.0;
 		private static double _accumulatedTime = 0.0;
 		private static string _currentTaskName = "";
-		private static readonly object _timerLock = new object(); // Thread safety
+		private static readonly object _timerLock = new(); // Thread safety
 
 		// 🛡️ SECURITY: Focus-immune timer with session validation
 		private static bool _staticTimerInitialized = false;
@@ -77,8 +77,8 @@ namespace LivingDevAgent.Editor.Chronas
 					}
 
 				// Check for runaway sessions
-				var currentTime = System.DateTime.Now;
-				var sessionDuration = currentTime - _systemTimeStart;
+				System.DateTime currentTime = System.DateTime.Now;
+				System.TimeSpan sessionDuration = currentTime - _systemTimeStart;
 				
 				if (sessionDuration > _maxSessionDuration)
 					{
@@ -88,7 +88,7 @@ namespace LivingDevAgent.Editor.Chronas
 					}
 
 				// Update validation timestamp
-				var previousValidationTime = _lastValidationTime;
+				System.DateTime previousValidationTime = _lastValidationTime;
 				_lastValidationTime = currentTime;
 				
 				// 🔒 DEBUG: Log validation success (only every 30 seconds to avoid spam)
@@ -184,7 +184,7 @@ namespace LivingDevAgent.Editor.Chronas
 
 		private void OnGUI ()
 			{
-			this.DrawChronasControls();
+			DrawChronasControls();
 			}
 
 		private void DrawChronasControls ()
@@ -253,7 +253,7 @@ namespace LivingDevAgent.Editor.Chronas
 				using var scroll = new EditorGUILayout.ScrollViewScope(Vector2.zero, GUILayout.Height(150));
 				foreach (ChronasTimeCard timeCard in _timeCards.OrderByDescending(tc => tc.LastModified).Take(10))
 					{
-					this.DrawTimeCardEntry(timeCard);
+					DrawTimeCardEntry(timeCard);
 					}
 				}
 			else
@@ -278,7 +278,7 @@ namespace LivingDevAgent.Editor.Chronas
 
 				if (GUILayout.Button("📤 Export to TaskMaster"))
 					{
-					this.ExportToTaskMaster();
+					ExportToTaskMaster();
 					}
 				}
 			}
@@ -534,10 +534,10 @@ namespace LivingDevAgent.Editor.Chronas
 					}
 
 				UpdateAccumulatedTimeUnsafe();
-				
-				var sessionDuration = System.DateTime.Now - _systemTimeStart;
-				var totalTrackedTime = _accumulatedTime;
-				var taskName = _currentTaskName;
+
+				System.TimeSpan sessionDuration = System.DateTime.Now - _systemTimeStart;
+				double totalTrackedTime = _accumulatedTime;
+				string taskName = _currentTaskName;
 
 				// 🔒 SECURITY: Save before clearing sensitive data
 				SaveTimeCardUnsafe();
@@ -602,7 +602,7 @@ namespace LivingDevAgent.Editor.Chronas
 			// 🔒 SECURITY: Sanitize filename to prevent path traversal
 			string sanitizedTaskName = SanitizeFileName(_currentTaskName);
 			if (sanitizedTaskName.Length > 50) // Prevent excessively long filenames
-				sanitizedTaskName = sanitizedTaskName.Substring(0, 50);
+				sanitizedTaskName = sanitizedTaskName[ ..50 ];
 
 			string fileName = $"ChronasCard_{sanitizedTaskName}_{System.DateTime.Now:yyyyMMdd_HHmmss}.asset";
 			string assetPath = System.IO.Path.Combine(_timeCardDirectory, fileName);
@@ -699,7 +699,7 @@ namespace LivingDevAgent.Editor.Chronas
 
 				if (GUILayout.Button("🗑️", EditorStyles.miniButton, GUILayout.Width(25)))
 					{
-					this.DeleteTimeCard(timeCard);
+					DeleteTimeCard(timeCard);
 					}
 				}
 			}
@@ -747,7 +747,7 @@ namespace LivingDevAgent.Editor.Chronas
 
 			if (EditorUtility.DisplayDialog("Export to TaskMaster", exportSummary, "Export", "Cancel"))
 				{
-				this.PerformTaskMasterExport();
+				PerformTaskMasterExport();
 				}
 			}
 

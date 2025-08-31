@@ -22,21 +22,21 @@ namespace TinyWalnutGames.MetVD.Graph
 		// Removed BurstCompile from OnCreate (BC1028: managed array allocation inside Burst)
 		public void OnCreate (ref SystemState state)
 			{
-			this._layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadWrite<DistrictLayoutDoneTag>());
-			this._districtsQuery = state.GetEntityQuery(
+			_layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadWrite<DistrictLayoutDoneTag>());
+			_districtsQuery = state.GetEntityQuery(
 				ComponentType.ReadOnly<NodeId>(),
 				ComponentType.ReadWrite<ConnectionBufferElement>()
 			);
 
-			state.RequireForUpdate(this._layoutDoneQuery);
-			state.RequireForUpdate(this._districtsQuery);
+			state.RequireForUpdate(_layoutDoneQuery);
+			state.RequireForUpdate(_districtsQuery);
 			}
 
 		[BurstCompile]
 		public void OnUpdate (ref SystemState state)
 			{
 			// Check if we need to build connections
-			NativeArray<DistrictLayoutDoneTag> layoutDoneArray = this._layoutDoneQuery.ToComponentDataArray<DistrictLayoutDoneTag>(Allocator.Temp);
+			NativeArray<DistrictLayoutDoneTag> layoutDoneArray = _layoutDoneQuery.ToComponentDataArray<DistrictLayoutDoneTag>(Allocator.Temp);
 			if (layoutDoneArray.Length == 0)
 				{
 				return;
@@ -52,8 +52,8 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			// Get all districts
-			NativeArray<Entity> entities = this._districtsQuery.ToEntityArray(Allocator.Temp);
-			NativeArray<NodeId> nodeIds = this._districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+			NativeArray<Entity> entities = _districtsQuery.ToEntityArray(Allocator.Temp);
+			NativeArray<NodeId> nodeIds = _districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
 
 			// Filter to level 0 districts only
 			int districtCount = 0;
@@ -71,9 +71,9 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			// Create arrays for district data
-			NativeArray<Entity> districtEntities = new NativeArray<Entity>(districtCount, Allocator.Temp);
-			NativeArray<int2> districtPositions = new NativeArray<int2>(districtCount, Allocator.Temp);
-			NativeArray<uint> districtNodeIds = new NativeArray<uint>(districtCount, Allocator.Temp);
+			var districtEntities = new NativeArray<Entity>(districtCount, Allocator.Temp);
+			var districtPositions = new NativeArray<int2>(districtCount, Allocator.Temp);
+			var districtNodeIds = new NativeArray<uint>(districtCount, Allocator.Temp);
 
 			int districtIndex = 0;
 			for (int i = 0; i < nodeIds.Length; i++)
@@ -102,7 +102,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			);
 
 			// Update layout done tag with connection count
-			Entity layoutDoneEntity = this._layoutDoneQuery.GetSingletonEntity();
+			Entity layoutDoneEntity = _layoutDoneQuery.GetSingletonEntity();
 			state.EntityManager.SetComponentData(layoutDoneEntity, new DistrictLayoutDoneTag(districtCount, connectionCount));
 			}
 
@@ -127,7 +127,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				Entity sourceEntity = districtEntities [ i ];
 
 				// Find K nearest neighbors
-				NativeArray<DistanceEntry> distances = new NativeArray<DistanceEntry>(districtPositions.Length - 1, Allocator.Temp);
+				var distances = new NativeArray<DistanceEntry>(districtPositions.Length - 1, Allocator.Temp);
 				int entryIndex = 0;
 
 				for (int j = 0; j < districtPositions.Length; j++)

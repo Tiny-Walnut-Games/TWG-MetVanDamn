@@ -18,17 +18,17 @@ namespace TinyWalnutGames.MetVD.Tests
 		[SetUp]
 		public void SetUp ()
 			{
-			this.testWorld = new World("TestWorld");
+			testWorld = new World("TestWorld");
 			// Use Simulation group to drive updates; systems may be registered by bootstrap in play mode
-			this.simGroup = this.testWorld.GetOrCreateSystemManaged<SimulationSystemGroup>();
+			simGroup = testWorld.GetOrCreateSystemManaged<SimulationSystemGroup>();
 			}
 
 		[TearDown]
 		public void TearDown ()
 			{
-			if (this.testWorld != null && this.testWorld.IsCreated)
+			if (testWorld != null && testWorld.IsCreated)
 				{
-				this.testWorld.Dispose();
+				testWorld.Dispose();
 				}
 			}
 
@@ -39,13 +39,13 @@ namespace TinyWalnutGames.MetVD.Tests
 			// (addresses blocker #3 - Random in parallel jobs)
 
 			// Create a test entity with WFC component
-			Entity entity = this.testWorld.EntityManager.CreateEntity();
-			this.testWorld.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
+			Entity entity = testWorld.EntityManager.CreateEntity();
+			testWorld.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
 
 			// Group update should not throw even if WFC is not present in this world
 			Assert.DoesNotThrow(() =>
 			{
-				this.simGroup.Update();
+				simGroup.Update();
 			}, "WFC system should handle parallel random generation safely");
 			}
 
@@ -91,13 +91,13 @@ namespace TinyWalnutGames.MetVD.Tests
 				// Create test entities for WFC processing
 				for (int i = 0; i < 5; i++)
 					{
-					Entity entity = this.testWorld.EntityManager.CreateEntity();
-					this.testWorld.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
-					this.testWorld.EntityManager.AddBuffer<WfcCandidateBufferElement>(entity);
+					Entity entity = testWorld.EntityManager.CreateEntity();
+					testWorld.EntityManager.AddComponentData(entity, new WfcState(WfcGenerationState.Initialized));
+					testWorld.EntityManager.AddBuffer<WfcCandidateBufferElement>(entity);
 					}
 
 				// Update group; should not throw
-				Assert.DoesNotThrow(() => this.simGroup.Update(), $"WFC update should not throw on frame {frame}");
+				Assert.DoesNotThrow(() => simGroup.Update(), $"WFC update should not throw on frame {frame}");
 
 				yield return null;
 				}

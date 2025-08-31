@@ -17,11 +17,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return;
 				}
 
-			Entity connectionEntity = this.GetEntity(TransformUsageFlags.None);
-			Entity fromEntity = this.GetEntity(authoring.from.gameObject, TransformUsageFlags.None);
-			Entity toEntity = this.GetEntity(authoring.to.gameObject, TransformUsageFlags.None);
+			Entity connectionEntity = GetEntity(TransformUsageFlags.None);
+			Entity fromEntity = GetEntity(authoring.from.gameObject, TransformUsageFlags.None);
+			Entity toEntity = GetEntity(authoring.to.gameObject, TransformUsageFlags.None);
 
-			this.AddComponent(connectionEntity, new ConnectionEdge
+			AddComponent(connectionEntity, new ConnectionEdge
 				{
 				From = fromEntity,
 				To = toEntity,

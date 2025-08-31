@@ -48,13 +48,13 @@ namespace TinyWalnutGames.MetVD.Core
 		public NavNode (uint nodeId, float3 worldPosition, BiomeType biomeType = BiomeType.Unknown,
 					  Polarity primaryPolarity = Polarity.None, float baseTraversalCost = 1.0f)
 			{
-			this.NodeId = nodeId;
-			this.WorldPosition = worldPosition;
-			this.BiomeType = biomeType;
-			this.PrimaryPolarity = primaryPolarity;
-			this.IsActive = true;
-			this.IsDiscovered = false;
-			this.BaseTraversalCost = math.max(0.1f, baseTraversalCost);
+			NodeId = nodeId;
+			WorldPosition = worldPosition;
+			BiomeType = biomeType;
+			PrimaryPolarity = primaryPolarity;
+			IsActive = true;
+			IsDiscovered = false;
+			BaseTraversalCost = math.max(0.1f, baseTraversalCost);
 			}
 
 		/// <summary>
@@ -62,20 +62,20 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly bool IsCompatibleWith (AgentCapabilities capabilities)
 			{
-			if (!this.IsActive)
+			if (!IsActive)
 				{
 				return false;
 				}
 
 			// Check if agent can handle this node's polarity environment
-			return this.PrimaryPolarity != Polarity.None && this.PrimaryPolarity != Polarity.Any
-				? (capabilities.AvailablePolarity & this.PrimaryPolarity) != 0
+			return PrimaryPolarity != Polarity.None && PrimaryPolarity != Polarity.Any
+				? (capabilities.AvailablePolarity & PrimaryPolarity) != 0
 				: true;
 			}
 
 		public override readonly string ToString ()
 			{
-			return $"NavNode({this.NodeId}, {this.BiomeType}, {this.PrimaryPolarity}, Active:{this.IsActive})";
+			return $"NavNode({NodeId}, {BiomeType}, {PrimaryPolarity}, Active:{IsActive})";
 			}
 		}
 
@@ -145,17 +145,17 @@ namespace TinyWalnutGames.MetVD.Core
 					  float baseCost = 1.0f, float polarityMismatchCostMultiplier = 5.0f,
 					  GateSoftness gateSoftness = GateSoftness.Hard, FixedString64Bytes description = default)
 			{
-			this.FromNodeId = fromNodeId;
-			this.ToNodeId = toNodeId;
-			this.ConnectionType = connectionType;
-			this.RequiredPolarity = requiredPolarity;
-			this.RequiredAbilities = requiredAbilities;
-			this.BaseCost = math.max(0.1f, baseCost);
-			this.PolarityMismatchCostMultiplier = math.max(1.0f, polarityMismatchCostMultiplier);
-			this.IsActive = true;
-			this.IsDiscovered = false;
-			this.GateSoftness = gateSoftness;
-			this.Description = description;
+			FromNodeId = fromNodeId;
+			ToNodeId = toNodeId;
+			ConnectionType = connectionType;
+			RequiredPolarity = requiredPolarity;
+			RequiredAbilities = requiredAbilities;
+			BaseCost = math.max(0.1f, baseCost);
+			PolarityMismatchCostMultiplier = math.max(1.0f, polarityMismatchCostMultiplier);
+			IsActive = true;
+			IsDiscovered = false;
+			GateSoftness = gateSoftness;
+			Description = description;
 			}
 
 		/// <summary>
@@ -163,15 +163,15 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly bool CanTraverseWith (AgentCapabilities capabilities, uint fromNodeId)
 			{
-			if (!this.IsActive)
+			if (!IsActive)
 				{
 				return false;
 				}
 
 			// Check if traversing from the correct node
-			bool validDirection = (this.ConnectionType == ConnectionType.Bidirectional)
-				? (fromNodeId == this.FromNodeId || fromNodeId == this.ToNodeId)
-				: (fromNodeId == this.FromNodeId);
+			bool validDirection = (ConnectionType == ConnectionType.Bidirectional)
+				? (fromNodeId == FromNodeId || fromNodeId == ToNodeId)
+				: (fromNodeId == FromNodeId);
 
 			if (!validDirection)
 				{
@@ -179,21 +179,21 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// For hard gates, strict requirement checking
-			if (this.GateSoftness == GateSoftness.Hard)
+			if (GateSoftness == GateSoftness.Hard)
 				{
 				// Check polarity requirements
-				if (this.RequiredPolarity != Polarity.None && this.RequiredPolarity != Polarity.Any)
+				if (RequiredPolarity != Polarity.None && RequiredPolarity != Polarity.Any)
 					{
-					if ((capabilities.AvailablePolarity & this.RequiredPolarity) == 0)
+					if ((capabilities.AvailablePolarity & RequiredPolarity) == 0)
 						{
 						return false;
 						}
 					}
 
 				// Check ability requirements  
-				if (this.RequiredAbilities != Ability.None)
+				if (RequiredAbilities != Ability.None)
 					{
-					if ((capabilities.AvailableAbilities & this.RequiredAbilities) != this.RequiredAbilities)
+					if ((capabilities.AvailableAbilities & RequiredAbilities) != RequiredAbilities)
 						{
 						return false;
 						}
@@ -209,38 +209,38 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly float CalculateTraversalCost (AgentCapabilities capabilities)
 			{
-			if (!this.IsActive)
+			if (!IsActive)
 				{
 				return float.MaxValue;
 				}
 
-			float effectiveCost = this.BaseCost;
+			float effectiveCost = BaseCost;
 
 			// Apply polarity mismatch penalty for soft gates
-			if (this.RequiredPolarity != Polarity.None && this.RequiredPolarity != Polarity.Any)
+			if (RequiredPolarity != Polarity.None && RequiredPolarity != Polarity.Any)
 				{
-				if ((capabilities.AvailablePolarity & this.RequiredPolarity) == 0)
+				if ((capabilities.AvailablePolarity & RequiredPolarity) == 0)
 					{
-					effectiveCost *= this.PolarityMismatchCostMultiplier;
+					effectiveCost *= PolarityMismatchCostMultiplier;
 					}
 				}
 
 			// Apply ability mismatch penalty with jump-specific considerations
-			if (this.RequiredAbilities != Ability.None)
+			if (RequiredAbilities != Ability.None)
 				{
-				if ((capabilities.AvailableAbilities & this.RequiredAbilities) != this.RequiredAbilities)
+				if ((capabilities.AvailableAbilities & RequiredAbilities) != RequiredAbilities)
 					{
-					effectiveCost *= this.PolarityMismatchCostMultiplier;
+					effectiveCost *= PolarityMismatchCostMultiplier;
 					}
 				else
 					{
 					// Apply movement efficiency bonuses for specific abilities
-					effectiveCost *= this.CalculateMovementEfficiencyMultiplier(capabilities.AvailableAbilities);
+					effectiveCost *= CalculateMovementEfficiencyMultiplier(capabilities.AvailableAbilities);
 					}
 				}
 
 			// Apply gate softness modifier
-			float softnessMultiplier = this.GateSoftness switch
+			float softnessMultiplier = GateSoftness switch
 				{
 					GateSoftness.Hard => 1.0f,
 					GateSoftness.VeryDifficult => 1.2f,
@@ -259,16 +259,16 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly float CalculateTraversalCost (AgentCapabilities capabilities, float3 fromPosition, float3 toPosition)
 			{
-			float baseCost = this.CalculateTraversalCost(capabilities);
+			float baseCost = CalculateTraversalCost(capabilities);
 			if (baseCost >= float.MaxValue)
 				{
 				return baseCost;
 				}
 
 			// Add arc trajectory cost for jump-based movements
-			if (this.HasJumpMovementRequirement())
+			if (HasJumpMovementRequirement())
 				{
-				float arcCost = this.CalculateArcTraversalCost(fromPosition, toPosition, capabilities.AvailableAbilities);
+				float arcCost = CalculateArcTraversalCost(fromPosition, toPosition, capabilities.AvailableAbilities);
 				baseCost *= arcCost;
 				}
 
@@ -283,33 +283,33 @@ namespace TinyWalnutGames.MetVD.Core
 			float multiplier = 1.0f;
 
 			// Check for movement ability efficiency bonuses
-			if ((this.RequiredAbilities & Ability.Jump) != 0 && (availableAbilities & Ability.DoubleJump) != 0)
+			if ((RequiredAbilities & Ability.Jump) != 0 && (availableAbilities & Ability.DoubleJump) != 0)
 				{
 				multiplier *= 0.8f; // Double jump makes regular jumps more efficient
 				}
 
-			if ((this.RequiredAbilities & Ability.WallJump) != 0 && (availableAbilities & Ability.Climb) != 0)
+			if ((RequiredAbilities & Ability.WallJump) != 0 && (availableAbilities & Ability.Climb) != 0)
 				{
 				multiplier *= 0.7f; // Climbing ability improves wall jump efficiency
 				}
 
-			if ((this.RequiredAbilities & Ability.Dash) != 0 && (availableAbilities & Ability.GlideSpeed) != 0)
+			if ((RequiredAbilities & Ability.Dash) != 0 && (availableAbilities & Ability.GlideSpeed) != 0)
 				{
 				multiplier *= 0.9f; // Glide extends dash effectiveness
 				}
 
 			// Arc-based ability synergies
-			if ((this.RequiredAbilities & Ability.Jump) != 0 && (availableAbilities & Ability.ArcJump) != 0)
+			if ((RequiredAbilities & Ability.Jump) != 0 && (availableAbilities & Ability.ArcJump) != 0)
 				{
 				multiplier *= 0.75f; // Arc jump provides superior jump control
 				}
 
-			if ((this.RequiredAbilities & Ability.DoubleJump) != 0 && (availableAbilities & Ability.ChargedJump) != 0)
+			if ((RequiredAbilities & Ability.DoubleJump) != 0 && (availableAbilities & Ability.ChargedJump) != 0)
 				{
 				multiplier *= 0.85f; // Charged jump reduces double jump necessity
 				}
 
-			if ((this.RequiredAbilities & Ability.Grapple) != 0 && (availableAbilities & Ability.AllArcMovement) != 0)
+			if ((RequiredAbilities & Ability.Grapple) != 0 && (availableAbilities & Ability.AllArcMovement) != 0)
 				{
 				multiplier *= 0.8f; // Arc movement abilities complement grappling
 				}
@@ -328,7 +328,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		private readonly bool HasJumpMovementRequirement ()
 			{
-			return (this.RequiredAbilities & (Ability.Jump | Ability.DoubleJump | Ability.WallJump | Ability.Dash |
+			return (RequiredAbilities & (Ability.Jump | Ability.DoubleJump | Ability.WallJump | Ability.Dash |
 										Ability.ArcJump | Ability.ChargedJump | Ability.TeleportArc | Ability.Grapple)) != 0;
 			}
 
@@ -439,18 +439,18 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly uint GetDestination (uint sourceNodeId)
 			{
-			if (this.ConnectionType == ConnectionType.Bidirectional)
+			if (ConnectionType == ConnectionType.Bidirectional)
 				{
-				return sourceNodeId == this.FromNodeId ? this.ToNodeId : this.FromNodeId;
+				return sourceNodeId == FromNodeId ? ToNodeId : FromNodeId;
 				}
 
-			return sourceNodeId == this.FromNodeId ? this.ToNodeId : 0; // 0 indicates invalid traversal
+			return sourceNodeId == FromNodeId ? ToNodeId : 0; // 0 indicates invalid traversal
 			}
 
 		public override readonly string ToString ()
 			{
-			string direction = this.ConnectionType == ConnectionType.Bidirectional ? "<->" : "->";
-			return $"NavLink({this.FromNodeId} {direction} {this.ToNodeId}, {this.RequiredPolarity}, Cost:{this.BaseCost:F1})";
+			string direction = ConnectionType == ConnectionType.Bidirectional ? "<->" : "->";
+			return $"NavLink({FromNodeId} {direction} {ToNodeId}, {RequiredPolarity}, Cost:{BaseCost:F1})";
 			}
 		}
 
@@ -491,11 +491,11 @@ namespace TinyWalnutGames.MetVD.Core
 							   FixedString32Bytes agentType = default,
 							   bool canShareDiscoveredPaths = true)
 			{
-			this.AvailablePolarity = availablePolarity;
-			this.AvailableAbilities = availableAbilities;
-			this.SkillLevel = math.clamp(skillLevel, 0.0f, 1.0f);
-			this.AgentType = agentType;
-			this.CanShareDiscoveredPaths = canShareDiscoveredPaths;
+			AvailablePolarity = availablePolarity;
+			AvailableAbilities = availableAbilities;
+			SkillLevel = math.clamp(skillLevel, 0.0f, 1.0f);
+			AgentType = agentType;
+			CanShareDiscoveredPaths = canShareDiscoveredPaths;
 			}
 
 		/// <summary>
@@ -503,12 +503,12 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly bool CanPassGate (GateCondition gate)
 			{
-			return gate.CanPass(this.AvailablePolarity, this.AvailableAbilities, this.SkillLevel);
+			return gate.CanPass(AvailablePolarity, AvailableAbilities, SkillLevel);
 			}
 
 		public override readonly string ToString ()
 			{
-			return $"AgentCapabilities({this.AvailablePolarity}, {this.AvailableAbilities}, Skill:{this.SkillLevel:F2})";
+			return $"AgentCapabilities({AvailablePolarity}, {AvailableAbilities}, Skill:{SkillLevel:F2})";
 			}
 		}
 
@@ -557,16 +557,16 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public NavigationGraph (int nodeCount = 0, int linkCount = 0)
 			{
-			this.NodeCount = nodeCount;
-			this.LinkCount = linkCount;
-			this.IsReady = false;
-			this.LastRebuildTime = 0.0;
-			this.UnreachableAreaCount = 0;
+			NodeCount = nodeCount;
+			LinkCount = linkCount;
+			IsReady = false;
+			LastRebuildTime = 0.0;
+			UnreachableAreaCount = 0;
 			}
 
 		public override readonly string ToString ()
 			{
-			return $"NavigationGraph({this.NodeCount} nodes, {this.LinkCount} links, Ready:{this.IsReady})";
+			return $"NavigationGraph({NodeCount} nodes, {LinkCount} links, Ready:{IsReady})";
 			}
 		}
 	}

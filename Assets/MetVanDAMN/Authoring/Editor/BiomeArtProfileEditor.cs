@@ -13,7 +13,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		{
 		public override void OnInspectorGUI ()
 			{
-			var profile = (BiomeArtProfile)this.target;
+			var profile = (BiomeArtProfile)target;
 
 			// Ensure propSettings exists (non-destructive safeguard)
 			if (profile.propSettings == null)
@@ -23,7 +23,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 
 			// Draw default inspector
-			this.DrawDefaultInspector();
+			DrawDefaultInspector();
 
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Validation", EditorStyles.boldLabel);
@@ -55,11 +55,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.BeginHorizontal();
 			if (GUILayout.Button("Auto-Configure Default Layers"))
 				{
-				this.AutoConfigureDefaultLayers(profile);
+				AutoConfigureDefaultLayers(profile);
 				}
 			if (GUILayout.Button("Create Test Tilemap"))
 				{
-				this.CreateTestTilemap(profile);
+				CreateTestTilemap(profile);
 				}
 			EditorGUILayout.EndHorizontal();
 			}

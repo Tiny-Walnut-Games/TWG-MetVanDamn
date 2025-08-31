@@ -8,8 +8,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	{
 	public static class AuthoringValidator
 		{
-		[System.Serializable] public class ValidationReport { public List<ValidationIssue> issues = new(); public int errorCount; public int warningCount; public bool HasErrors => this.errorCount > 0; public bool HasWarnings => this.warningCount > 0; }
-		[System.Serializable] public class ValidationIssue { public ValidationSeverity severity; public string category; public string message; public Object targetObject; public Vector3 worldPosition; public ValidationIssue (ValidationSeverity s, string c, string m, Object target = null, Vector3 pos = default) { this.severity = s; this.category = c; this.message = m; this.targetObject = target; this.worldPosition = pos; } }
+		[System.Serializable] public class ValidationReport { public List<ValidationIssue> issues = new(); public int errorCount; public int warningCount; public bool HasErrors => errorCount > 0; public bool HasWarnings => warningCount > 0; }
+		[System.Serializable] public class ValidationIssue { public ValidationSeverity severity; public string category; public string message; public Object targetObject; public Vector3 worldPosition; public ValidationIssue (ValidationSeverity s, string c, string m, Object target = null, Vector3 pos = default) { severity = s; category = c; message = m; targetObject = target; worldPosition = pos; } }
 		public enum ValidationSeverity { Error, Warning, Info }
 
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Validate Scene Authoring")] public static void ValidateSceneAuthoring () { ValidationReport report = ValidateScene(); DisplayValidationReport(report); }

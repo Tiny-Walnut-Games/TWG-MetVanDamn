@@ -7,8 +7,8 @@ using UnityEngine;
 namespace TinyWalnutGames.MetVD.Graph
 	{
 	public static class HierarchyConstants { public const uint SectorIdMultiplier = 1000; public const uint RoomsPerSectorMultiplier = 100; }
-	public struct SectorHierarchyData : IComponentData { public int2 LocalGridSize; public int SectorCount; public bool IsSubdivided; public uint SectorSeed; public SectorHierarchyData (int2 localGridSize, int sectorCount, uint sectorSeed) { this.LocalGridSize = localGridSize; this.SectorCount = sectorCount; this.IsSubdivided = false; this.SectorSeed = sectorSeed; } }
-	public struct RoomHierarchyData : IComponentData { public RectInt Bounds; public RoomType Type; public bool IsLeafRoom; public RoomHierarchyData (RectInt bounds, RoomType type, bool isLeafRoom = false) { this.Bounds = bounds; this.Type = type; this.IsLeafRoom = isLeafRoom; } }
+	public struct SectorHierarchyData : IComponentData { public int2 LocalGridSize; public int SectorCount; public bool IsSubdivided; public uint SectorSeed; public SectorHierarchyData (int2 localGridSize, int sectorCount, uint sectorSeed) { LocalGridSize = localGridSize; SectorCount = sectorCount; IsSubdivided = false; SectorSeed = sectorSeed; } }
+	public struct RoomHierarchyData : IComponentData { public RectInt Bounds; public RoomType Type; public bool IsLeafRoom; public RoomHierarchyData (RectInt bounds, RoomType type, bool isLeafRoom = false) { Bounds = bounds; Type = type; IsLeafRoom = isLeafRoom; } }
 	public enum RoomType : byte { Normal, Entrance, Exit, Boss, Treasure, Shop, Save, Hub }
 
 	[UpdateInGroup(typeof(InitializationSystemGroup))]
@@ -18,25 +18,25 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _districtsQuery; private EntityQuery _layoutDoneQuery;
 		public void OnCreate (ref SystemState state)
 			{
-			this._districtsQuery = new EntityQueryBuilder(Allocator.Temp)
+			_districtsQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<NodeId, SectorHierarchyData>()
 				.Build(ref state);
-			this._layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+			_layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<DistrictLayoutDoneTag>()
 				.Build(ref state);
-			state.RequireForUpdate(this._districtsQuery);
-			state.RequireForUpdate(this._layoutDoneQuery);
+			state.RequireForUpdate(_districtsQuery);
+			state.RequireForUpdate(_layoutDoneQuery);
 			}
 		public void OnUpdate (ref SystemState state)
 			{
-			if (this._layoutDoneQuery.IsEmptyIgnoreFilter)
+			if (_layoutDoneQuery.IsEmptyIgnoreFilter)
 				{
 				return;
 				}
 
-			using NativeArray<Entity> entities = this._districtsQuery.ToEntityArray(Allocator.Temp);
-			using NativeArray<NodeId> nodeIds = this._districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-			using NativeArray<SectorHierarchyData> sectorData = this._districtsQuery.ToComponentDataArray<SectorHierarchyData>(Allocator.Temp);
+			using NativeArray<Entity> entities = _districtsQuery.ToEntityArray(Allocator.Temp);
+			using NativeArray<NodeId> nodeIds = _districtsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+			using NativeArray<SectorHierarchyData> sectorData = _districtsQuery.ToComponentDataArray<SectorHierarchyData>(Allocator.Temp);
 			for (int i = 0; i < entities.Length; i++)
 				{
 				NodeId nodeId = nodeIds [ i ]; SectorHierarchyData sectorHierarchy = sectorData [ i ];

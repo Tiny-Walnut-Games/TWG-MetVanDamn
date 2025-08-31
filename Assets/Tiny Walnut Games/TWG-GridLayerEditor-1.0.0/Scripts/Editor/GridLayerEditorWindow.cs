@@ -77,7 +77,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <param name="config">The GridLayerConfig to set.</param>
 		public void SetConfig (GridLayerConfig config)
 			{
-			this._config = config;
+			_config = config;
 			}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <returns>The current GridLayerConfig.</returns>
 		public GridLayerConfig GetConfig ()
 			{
-			return this._config;
+			return _config;
 			}
 
 		/// <summary>
@@ -94,12 +94,12 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// </summary>
 		public void ApplyPlatformerPreset ()
 			{
-			if (this._config == null)
+			if (_config == null)
 				{
 				return;
 				}
 
-			this._config.layerNames = new [ ] { "WalkableGround", "Ladders", "Hazards" };
+			_config.layerNames = new [ ] { "WalkableGround", "Ladders", "Hazards" };
 			}
 
 		/// <summary>
@@ -109,12 +109,12 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <param name="enabled">Whether the layer should be enabled or disabled.</param>
 		public void ToggleLayer (string layerName, bool enabled)
 			{
-			if (this._config == null)
+			if (_config == null)
 				{
 				return;
 				}
 
-			string [ ] names = this._config.layerNames ?? new string [ 0 ];
+			string [ ] names = _config.layerNames ?? new string [ 0 ];
 			if (enabled)
 				{
 				if (!System.Array.Exists(names, l => l == layerName))
@@ -122,12 +122,12 @@ namespace TinyWalnutGames.GridLayerEditor
 					string [ ] newNames = new string [ names.Length + 1 ];
 					names.CopyTo(newNames, 0);
 					newNames [ names.Length ] = layerName;
-					this._config.layerNames = newNames;
+					_config.layerNames = newNames;
 					}
 				}
 			else
 				{
-				this._config.layerNames = System.Array.FindAll(names, l => l != layerName);
+				_config.layerNames = System.Array.FindAll(names, l => l != layerName);
 				}
 			}
 
@@ -136,12 +136,12 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// </summary>
 		public void CreateGridWithLayers ()
 			{
-			if (this._config == null || this._config.layerNames == null)
+			if (_config == null || _config.layerNames == null)
 				{
 				return;
 				}
 
-			TwoDimensionalGridSetup.CreateCustomGrid(this._config.layerNames);
+			TwoDimensionalGridSetup.CreateCustomGrid(_config.layerNames);
 			}
 
 		/// <summary>
@@ -185,15 +185,15 @@ namespace TinyWalnutGames.GridLayerEditor
 		private void OnEnable ()
 			{
 			// Get all Unity layers
-			this.unityLayers = this.GetAllUnityLayerNames();
-			this.layerSelections = new bool [ this.unityLayers.Length ];
+			unityLayers = GetAllUnityLayerNames();
+			layerSelections = new bool [ unityLayers.Length ];
 
 			// Initialize selections from config
-			if (this.config != null)
+			if (config != null)
 				{
-				for (int i = 0; i < this.unityLayers.Length; i++)
+				for (int i = 0; i < unityLayers.Length; i++)
 					{
-					this.layerSelections [ i ] = this.config.layerNames.Contains(this.unityLayers [ i ]);
+					layerSelections [ i ] = config.layerNames.Contains(unityLayers [ i ]);
 					}
 				}
 			}
@@ -222,25 +222,25 @@ namespace TinyWalnutGames.GridLayerEditor
 		private void OnGUI ()
 			{
 			// Field to assign or create a GridLayerConfig asset
-			this.config = (GridLayerConfig)EditorGUILayout.ObjectField("Config Asset", this.config, typeof(GridLayerConfig), false);
+			config = (GridLayerConfig)EditorGUILayout.ObjectField("Config Asset", config, typeof(GridLayerConfig), false);
 
-			if (this.config == null)
+			if (config == null)
 				{
 				EditorGUILayout.HelpBox("Assign or create a GridLayerConfig asset.", MessageType.Info);
 				// Button to create a default platformer config asset
 				if (GUILayout.Button("Create Platformer Default Config"))
 					{
-					this.config = CreateInstance<GridLayerConfig>();
-					this.config.layerNames = (string [ ])PlatformerLayers.Clone();
-					AssetDatabase.CreateAsset(this.config, "Assets/GridLayerConfig.asset");
+					config = CreateInstance<GridLayerConfig>();
+					config.layerNames = (string [ ])PlatformerLayers.Clone();
+					AssetDatabase.CreateAsset(config, "Assets/GridLayerConfig.asset");
 					AssetDatabase.SaveAssets();
 					}
 				// Button to create a default top-down config asset
 				if (GUILayout.Button("Create Top-Down Default Config"))
 					{
-					this.config = CreateInstance<GridLayerConfig>();
-					this.config.layerNames = (string [ ])TopDownLayers.Clone();
-					AssetDatabase.CreateAsset(this.config, "Assets/GridLayerConfig.asset");
+					config = CreateInstance<GridLayerConfig>();
+					config.layerNames = (string [ ])TopDownLayers.Clone();
+					AssetDatabase.CreateAsset(config, "Assets/GridLayerConfig.asset");
 					AssetDatabase.SaveAssets();
 					}
 				return;
@@ -249,7 +249,7 @@ namespace TinyWalnutGames.GridLayerEditor
 			EditorGUILayout.LabelField("Edit Layer Names:", EditorStyles.boldLabel);
 
 			// Display and edit the layerNames array from the config asset
-			SerializedObject so = new(this.config);
+			SerializedObject so = new(config);
 			SerializedProperty layersProp = so.FindProperty("layerNames");
 			EditorGUILayout.PropertyField(layersProp, true);
 			so.ApplyModifiedProperties();
@@ -259,16 +259,16 @@ namespace TinyWalnutGames.GridLayerEditor
 			// Button to apply platformer preset to the config asset
 			if (GUILayout.Button("Apply Platformer Preset"))
 				{
-				Undo.RecordObject(this.config, "Apply Platformer Preset");
-				this.config.layerNames = (string [ ])PlatformerLayers.Clone();
-				EditorUtility.SetDirty(this.config);
+				Undo.RecordObject(config, "Apply Platformer Preset");
+				config.layerNames = (string [ ])PlatformerLayers.Clone();
+				EditorUtility.SetDirty(config);
 				}
 			// Button to apply top-down preset to the config asset
 			if (GUILayout.Button("Apply Top-Down Preset"))
 				{
-				Undo.RecordObject(this.config, "Apply Top-Down Preset");
-				this.config.layerNames = (string [ ])TopDownLayers.Clone();
-				EditorUtility.SetDirty(this.config);
+				Undo.RecordObject(config, "Apply Top-Down Preset");
+				config.layerNames = (string [ ])TopDownLayers.Clone();
+				EditorUtility.SetDirty(config);
 				}
 
 			EditorGUILayout.Space();
@@ -276,23 +276,23 @@ namespace TinyWalnutGames.GridLayerEditor
 			// Button to create a grid in the scene using the current config's layers
 			if (GUILayout.Button("Create Grid With These Layers"))
 				{
-				TwoDimensionalGridSetup.CreateCustomGrid(this.config.layerNames);
+				TwoDimensionalGridSetup.CreateCustomGrid(config.layerNames);
 				}
 
 			EditorGUILayout.Space();
 
 			// Unity layer selection UI
 			EditorGUILayout.LabelField("Select Unity Layers for Grid", EditorStyles.boldLabel);
-			for (int i = 0; i < this.unityLayers.Length; i++)
+			for (int i = 0; i < unityLayers.Length; i++)
 				{
-				this.layerSelections [ i ] = EditorGUILayout.ToggleLeft(this.unityLayers [ i ], this.layerSelections [ i ]);
+				layerSelections [ i ] = EditorGUILayout.ToggleLeft(unityLayers [ i ], layerSelections [ i ]);
 				}
 
 			// Update config.layerNames when selection changes
 			if (GUI.changed)
 				{
-				this.config.layerNames = this.unityLayers.Where((layer, idx) => this.layerSelections [ idx ]).ToArray();
-				EditorUtility.SetDirty(this.config);
+				config.layerNames = unityLayers.Where((layer, idx) => layerSelections [ idx ]).ToArray();
+				EditorUtility.SetDirty(config);
 				}
 
 			EditorGUILayout.Space();
@@ -306,11 +306,11 @@ namespace TinyWalnutGames.GridLayerEditor
 			// Set recommended layers buttons
 			if (GUILayout.Button("Set Recommended Platformer Layers"))
 				{
-				this.SetRecommendedLayers(PlatformerLayers);
+				SetRecommendedLayers(PlatformerLayers);
 				}
 			if (GUILayout.Button("Set Recommended Top Down Layers"))
 				{
-				this.SetRecommendedLayers(TopDownLayers);
+				SetRecommendedLayers(TopDownLayers);
 				}
 			}
 
@@ -320,13 +320,13 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <param name="recommended">Array of recommended layer names.</param>
 		private void SetRecommendedLayers (string [ ] recommended)
 			{
-			for (int i = 0; i < this.unityLayers.Length; i++)
+			for (int i = 0; i < unityLayers.Length; i++)
 				{
-				this.layerSelections [ i ] = recommended.Contains(this.unityLayers [ i ]);
+				layerSelections [ i ] = recommended.Contains(unityLayers [ i ]);
 				}
-			this.config.layerNames = this.unityLayers.Where((layer, idx) => this.layerSelections [ idx ]).ToArray();
-			EditorUtility.SetDirty(this.config);
-			this.Repaint();
+			config.layerNames = unityLayers.Where((layer, idx) => layerSelections [ idx ]).ToArray();
+			EditorUtility.SetDirty(config);
+			Repaint();
 			}
 		}
 	}

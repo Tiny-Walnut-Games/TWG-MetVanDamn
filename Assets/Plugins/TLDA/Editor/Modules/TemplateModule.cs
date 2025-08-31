@@ -19,7 +19,7 @@ namespace LivingDevAgent.Editor.Modules
 
 		public override void Initialize ()
 			{
-			this.EnsureTemplatesLoaded();
+			EnsureTemplatesLoaded();
 			}
 
 		public void DrawToolbar ()
@@ -30,12 +30,12 @@ namespace LivingDevAgent.Editor.Modules
 			if (GUILayout.Button(templateIcon, EditorStyles.toolbarButton, GUILayout.Width(100)))
 				{
 				// Quick template dropdown or open template selector
-				this.ShowTemplateQuickMenu();
+				ShowTemplateQuickMenu();
 				}
 
 			if (GUILayout.Button("📋 Create Issue", EditorStyles.toolbarButton, GUILayout.Width(100)))
 				{
-				this.CreateIssueFromSelectedTemplate();
+				CreateIssueFromSelectedTemplate();
 				}
 			}
 
@@ -51,39 +51,39 @@ namespace LivingDevAgent.Editor.Modules
 
 				if (GUILayout.Button("🔄", EditorStyles.miniButton, GUILayout.Width(30)))
 					{
-					this.RefreshTemplates();
+					RefreshTemplates();
 					}
 				}
 
-			this.EnsureTemplatesLoaded();
-			if (this._data.Templates == null || this._data.Templates.Count == 0)
+			EnsureTemplatesLoaded();
+			if (_data.Templates == null || _data.Templates.Count == 0)
 				{
 				EditorGUILayout.HelpBox("📚 No templates found. Ensure templates/comments/registry.yaml exists at project root.", MessageType.Warning);
 				return;
 				}
 
-			string [ ] items = new string [ this._data.Templates.Count ];
-			for (int i = 0; i < this._data.Templates.Count; i++)
+			string [ ] items = new string [ _data.Templates.Count ];
+			for (int i = 0; i < _data.Templates.Count; i++)
 				{
-				items [ i ] = string.IsNullOrEmpty(this._data.Templates [ i ].Title) ? this._data.Templates [ i ].Key : this._data.Templates [ i ].Title;
+				items [ i ] = string.IsNullOrEmpty(_data.Templates [ i ].Title) ? _data.Templates [ i ].Key : _data.Templates [ i ].Title;
 				}
-			this._data.SelectedTemplateIndex = EditorGUILayout.Popup("Template", this._data.SelectedTemplateIndex, items);
+			_data.SelectedTemplateIndex = EditorGUILayout.Popup("Template", _data.SelectedTemplateIndex, items);
 
 			using (new EditorGUILayout.HorizontalScope())
 				{
 				if (GUILayout.Button("📝 Load Template → Editor"))
 					{
-					this.LoadTemplateToEditor();
+					LoadTemplateToEditor();
 					}
 				if (GUILayout.Button("🎯 Create Issue From Template"))
 					{
-					this.CreateIssueFromSelectedTemplate();
+					CreateIssueFromSelectedTemplate();
 					}
 				}
 
 			using (new EditorGUI.DisabledScope(true))
 				{
-				EditorGUILayout.TextField("Issues Directory", this.GetIssuesDirectory());
+				EditorGUILayout.TextField("Issues Directory", GetIssuesDirectory());
 				}
 
 			EditorGUILayout.EndVertical();
@@ -91,21 +91,21 @@ namespace LivingDevAgent.Editor.Modules
 
 		private void ShowTemplateQuickMenu ()
 			{
-			if (this._data.Templates == null || this._data.Templates.Count == 0)
+			if (_data.Templates == null || _data.Templates.Count == 0)
 				{
-				this.SetStatus("No templates available - check templates/comments/registry.yaml");
+				SetStatus("No templates available - check templates/comments/registry.yaml");
 				return;
 				}
 
 			var menu = new GenericMenu();
-			for (int i = 0; i < this._data.Templates.Count; i++)
+			for (int i = 0; i < _data.Templates.Count; i++)
 				{
 				int index = i; // Capture for closure
-				string displayName = string.IsNullOrEmpty(this._data.Templates [ i ].Title) ? this._data.Templates [ i ].Key : this._data.Templates [ i ].Title;
-				menu.AddItem(new GUIContent(displayName), this._data.SelectedTemplateIndex == i, () =>
+				string displayName = string.IsNullOrEmpty(_data.Templates [ i ].Title) ? _data.Templates [ i ].Key : _data.Templates [ i ].Title;
+				menu.AddItem(new GUIContent(displayName), _data.SelectedTemplateIndex == i, () =>
 				{
-					this._data.SelectedTemplateIndex = index;
-					this.LoadTemplateToEditor();
+					_data.SelectedTemplateIndex = index;
+					LoadTemplateToEditor();
 				});
 				}
 			menu.ShowAsContext();
@@ -113,43 +113,43 @@ namespace LivingDevAgent.Editor.Modules
 
 		private void LoadTemplateToEditor ()
 			{
-			if (this._data.Templates == null || this._data.SelectedTemplateIndex >= this._data.Templates.Count)
+			if (_data.Templates == null || _data.SelectedTemplateIndex >= _data.Templates.Count)
 				{
-				this.SetStatus("❌ No template selected");
+				SetStatus("❌ No template selected");
 				return;
 				}
 
-			string md = this.LoadTemplateMarkdown(this._data.Templates [ this._data.SelectedTemplateIndex ]);
-			this._data.RawContent = md ?? string.Empty;
-			this.SetStatus($"📖 Loaded template: {this._data.Templates [ this._data.SelectedTemplateIndex ].Key}");
+			string md = LoadTemplateMarkdown(_data.Templates [ _data.SelectedTemplateIndex ]);
+			_data.RawContent = md ?? string.Empty;
+			SetStatus($"📖 Loaded template: {_data.Templates [ _data.SelectedTemplateIndex ].Key}");
 			}
 
 		private void CreateIssueFromSelectedTemplate ()
 			{
-			if (this._data.Templates == null || this._data.SelectedTemplateIndex >= this._data.Templates.Count)
+			if (_data.Templates == null || _data.SelectedTemplateIndex >= _data.Templates.Count)
 				{
-				this.SetStatus("❌ No template selected");
+				SetStatus("❌ No template selected");
 				return;
 				}
 
-			this.CreateIssueFromTemplate(this._data.Templates [ this._data.SelectedTemplateIndex ]);
+			CreateIssueFromTemplate(_data.Templates [ _data.SelectedTemplateIndex ]);
 			}
 
 		private void RefreshTemplates ()
 			{
-			this._data.Templates = null;
-			this.EnsureTemplatesLoaded();
-			this.SetStatus($"🔄 Templates refreshed - found {this._data.Templates?.Count ?? 0} templates");
+			_data.Templates = null;
+			EnsureTemplatesLoaded();
+			SetStatus($"🔄 Templates refreshed - found {_data.Templates?.Count ?? 0} templates");
 			}
 
 		private void EnsureTemplatesLoaded ()
 			{
-			if (this._data.Templates != null) return;
+			if (_data.Templates != null) return;
 
 			try
 				{
-				this._data.Templates = new System.Collections.Generic.List<TemplateInfo>();
-				string root = this.GetProjectRoot();
+				_data.Templates = new System.Collections.Generic.List<TemplateInfo>();
+				string root = GetProjectRoot();
 				string registry = Path.Combine(root, "templates", "comments", "registry.yaml");
 				if (!File.Exists(registry))
 					{
@@ -171,7 +171,7 @@ namespace LivingDevAgent.Editor.Modules
 						{
 						if (!string.IsNullOrEmpty(currentKey) && !string.IsNullOrEmpty(currentFile))
 							{
-							this._data.Templates.Add(new TemplateInfo
+							_data.Templates.Add(new TemplateInfo
 								{
 								Key = currentKey,
 								Title = currentTitle,
@@ -202,7 +202,7 @@ namespace LivingDevAgent.Editor.Modules
 
 				if (!string.IsNullOrEmpty(currentKey) && !string.IsNullOrEmpty(currentFile))
 					{
-					this._data.Templates.Add(new TemplateInfo
+					_data.Templates.Add(new TemplateInfo
 						{
 						Key = currentKey,
 						Title = currentTitle,
@@ -213,7 +213,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			catch (Exception ex)
 				{
-				this.SetStatus($"❌ Failed to load templates: {ex.Message}");
+				SetStatus($"❌ Failed to load templates: {ex.Message}");
 				}
 			}
 
@@ -221,48 +221,48 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			try
 				{
-				string issuesDir = this.GetIssuesDirectory();
+				string issuesDir = GetIssuesDirectory();
 				if (!Directory.Exists(issuesDir))
 					{
 					Directory.CreateDirectory(issuesDir);
 					}
 
-				this.EnsureIssuesReadme(issuesDir);
+				EnsureIssuesReadme(issuesDir);
 
-				string safeTitle = string.IsNullOrWhiteSpace(this._data.Title) ? "Issue" : ScribeUtils.SanitizeTitle(this._data.Title);
+				string safeTitle = string.IsNullOrWhiteSpace(_data.Title) ? "Issue" : ScribeUtils.SanitizeTitle(_data.Title);
 				string fileName = $"Issue-{DateTime.UtcNow:yyyy-MM-dd}-{safeTitle}.md";
 				string absPath = Path.Combine(issuesDir, fileName);
 
 				var header = new StringBuilder();
-				header.AppendLine($"# 🎯 Issue: {(this._data.Title ?? "Untitled")}");
-				header.AppendLine($"**Created:** {this.GetCreatedTs()}");
-				if (!string.IsNullOrWhiteSpace(this._data.Context))
+				header.AppendLine($"# 🎯 Issue: {(_data.Title ?? "Untitled")}");
+				header.AppendLine($"**Created:** {GetCreatedTs()}");
+				if (!string.IsNullOrWhiteSpace(_data.Context))
 					{
-					header.AppendLine($"**Context:** {this._data.Context}");
+					header.AppendLine($"**Context:** {_data.Context}");
 					}
 
-				if (!string.IsNullOrWhiteSpace(this._data.Summary))
+				if (!string.IsNullOrWhiteSpace(_data.Summary))
 					{
-					header.AppendLine($"**Summary:** {this._data.Summary}");
+					header.AppendLine($"**Summary:** {_data.Summary}");
 					}
 
 				header.AppendLine();
 
-				string body = this.LoadTemplateMarkdown(info) ?? string.Empty;
+				string body = LoadTemplateMarkdown(info) ?? string.Empty;
 				File.WriteAllText(absPath, header + body, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
-				this._data.CurrentFilePath = absPath;
-				this._data.RawContent = header + body;
-				this._data.RawGeneratedSnapshot = this._data.RawContent;
-				this._data.RawDirty = false;
+				_data.CurrentFilePath = absPath;
+				_data.RawContent = header + body;
+				_data.RawGeneratedSnapshot = _data.RawContent;
+				_data.RawDirty = false;
 
-				this.SetStatus($"🎯 Issue created: {this.MakeProjectRelative(absPath)}");
+				SetStatus($"🎯 Issue created: {MakeProjectRelative(absPath)}");
 
-				this.PostWriteImport(absPath);
+				PostWriteImport(absPath);
 				}
 			catch (Exception ex)
 				{
-				this.SetStatus($"❌ Failed to create issue: {ex.Message}");
+				SetStatus($"❌ Failed to create issue: {ex.Message}");
 				}
 			}
 
@@ -309,7 +309,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			catch (Exception ex)
 				{
-				this.SetStatus($"❌ Failed to read template: {ex.Message}");
+				SetStatus($"❌ Failed to read template: {ex.Message}");
 				return null;
 				}
 			}
@@ -321,7 +321,7 @@ namespace LivingDevAgent.Editor.Modules
 
 		private string GetIssuesDirectory ()
 			{
-			return Path.Combine(this.GetProjectRoot(), "TLDL", "issues");
+			return Path.Combine(GetProjectRoot(), "TLDL", "issues");
 			}
 
 		private void EnsureIssuesReadme (string issuesDir)
@@ -340,7 +340,7 @@ namespace LivingDevAgent.Editor.Modules
 				sb.AppendLine("🎯 Issues created here follow template-driven archetypes for consistent documentation.");
 
 				File.WriteAllText(readme, sb.ToString(), new UTF8Encoding(false));
-				this.PostWriteImport(readme);
+				PostWriteImport(readme);
 				}
 			catch (Exception ex)
 				{
@@ -364,7 +364,7 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			if (string.IsNullOrEmpty(absPath)) return;
 
-			string unityPath = this.MakeUnityPath(absPath);
+			string unityPath = MakeUnityPath(absPath);
 			if (!string.IsNullOrEmpty(unityPath))
 				{
 				AssetDatabase.ImportAsset(unityPath, ImportAssetOptions.ForceSynchronousImport);

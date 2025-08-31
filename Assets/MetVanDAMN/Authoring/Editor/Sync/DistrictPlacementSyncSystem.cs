@@ -16,16 +16,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private EntityQuery _districtQuery;
 		protected override void OnCreate ()
 			{
-			this._districtQuery = this.GetEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<DistrictAuthoring>());
-			this.RequireForUpdate(this._districtQuery);
+			_districtQuery = GetEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<DistrictAuthoring>());
+			RequireForUpdate(_districtQuery);
 			}
 
 		protected override void OnUpdate ()
 			{
-			ComponentTypeHandle<NodeId> nodeIdHandle = this.GetComponentTypeHandle<NodeId>(true); // not used directly but keeps pattern
-			Unity.Collections.NativeArray<NodeId> nodeIds = this._districtQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
-			Unity.Collections.NativeArray<Entity> entities = this._districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
-			EntityManager em = this.EntityManager;
+			ComponentTypeHandle<NodeId> nodeIdHandle = GetComponentTypeHandle<NodeId>(true); // not used directly but keeps pattern
+			Unity.Collections.NativeArray<NodeId> nodeIds = _districtQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
+			Unity.Collections.NativeArray<Entity> entities = _districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+			EntityManager em = EntityManager;
 			try
 				{
 				for (int i = 0; i < entities.Length; i++)

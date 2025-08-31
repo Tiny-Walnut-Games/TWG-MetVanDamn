@@ -15,15 +15,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		[SetUp]
 		public void SetUp ()
 			{
-			this.testWorld = new World("Test World");
+			testWorld = new World("Test World");
 			}
 
 		[TearDown]
 		public void TearDown ()
 			{
-			if (this.testWorld?.IsCreated == true)
+			if (testWorld?.IsCreated == true)
 				{
-				this.testWorld.Dispose();
+				testWorld.Dispose();
 				}
 			}
 
@@ -32,7 +32,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			{
 			// Test that the StackedSegmentGenerator system can be created
 			// For ISystem (unmanaged) types, we test by getting the simulation group
-			InitializationSystemGroup simGroup = this.testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+			InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
 			Assert.IsNotNull(simGroup);
 
 			// The system should be automatically registered in the group via [UpdateInGroup]
@@ -44,7 +44,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void LinearBranchingCorridorGenerator_CanBeCreated ()
 			{
 			// Test that the LinearBranchingCorridorGenerator system can be created
-			InitializationSystemGroup simGroup = this.testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+			InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
 			Assert.IsNotNull(simGroup);
 			}
 
@@ -52,7 +52,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void BiomeWeightedHeightmapGenerator_CanBeCreated ()
 			{
 			// Test that the BiomeWeightedHeightmapGenerator system can be created
-			InitializationSystemGroup simGroup = this.testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+			InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
 			Assert.IsNotNull(simGroup);
 			}
 
@@ -60,7 +60,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void LayeredPlatformCloudGenerator_CanBeCreated ()
 			{
 			// Test that the LayeredPlatformCloudGenerator system can be created
-			InitializationSystemGroup simGroup = this.testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
+			InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
 			Assert.IsNotNull(simGroup);
 			}
 

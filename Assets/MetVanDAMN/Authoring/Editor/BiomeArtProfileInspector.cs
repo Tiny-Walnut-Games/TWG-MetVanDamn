@@ -123,53 +123,53 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		public override void OnInspectorGUI ()
 			{
-			this.profile = (BiomeArtProfile)this.target;
+			profile = (BiomeArtProfile)target;
 
 			// Header with biome information
 			EditorGUILayout.Space();
-			EditorGUILayout.LabelField($"Biome: {this.profile.biomeName}", EditorStyles.boldLabel);
+			EditorGUILayout.LabelField($"Biome: {profile.biomeName}", EditorStyles.boldLabel);
 
-			if (!string.IsNullOrEmpty(this.profile.biomeName))
+			if (!string.IsNullOrEmpty(profile.biomeName))
 				{
 				EditorGUILayout.LabelField($"Debug Color:", EditorStyles.miniLabel);
-				EditorGUI.DrawRect(GUILayoutUtility.GetRect(100, 20), this.profile.debugColor);
+				EditorGUI.DrawRect(GUILayoutUtility.GetRect(100, 20), profile.debugColor);
 				}
 
 			EditorGUILayout.Space();
 
 			// Draw default inspector
-			this.DrawDefaultInspector();
+			DrawDefaultInspector();
 
 			EditorGUILayout.Space();
 
 			// Advanced settings section
-			this.showAdvancedSettings = EditorGUILayout.Foldout(this.showAdvancedSettings, "Advanced Prop Placement Analysis", true);
-			if (this.showAdvancedSettings && this.profile.propSettings != null)
+			showAdvancedSettings = EditorGUILayout.Foldout(showAdvancedSettings, "Advanced Prop Placement Analysis", true);
+			if (showAdvancedSettings && profile.propSettings != null)
 				{
-				this.DrawAdvancedSettings();
+				DrawAdvancedSettings();
 				}
 
 			// Preview statistics
-			this.showPreviewStats = EditorGUILayout.Foldout(this.showPreviewStats, "Placement Preview Statistics", true);
-			if (this.showPreviewStats && this.profile.propSettings != null)
+			showPreviewStats = EditorGUILayout.Foldout(showPreviewStats, "Placement Preview Statistics", true);
+			if (showPreviewStats && profile.propSettings != null)
 				{
-				this.DrawPreviewStats();
+				DrawPreviewStats();
 				}
 
 			// Quick actions
 			EditorGUILayout.Space();
-			this.DrawQuickActions();
+			DrawQuickActions();
 			}
 
 		private void DrawAdvancedSettings ()
 			{
 			EditorGUI.indentLevel++;
 
-			PropPlacementSettings settings = this.profile.propSettings;
+			PropPlacementSettings settings = profile.propSettings;
 
 			// Strategy information
 			EditorGUILayout.LabelField("Strategy Analysis", EditorStyles.boldLabel);
-			string strategyDescription = this.GetStrategyDescription(settings.strategy);
+			string strategyDescription = GetStrategyDescription(settings.strategy);
 			EditorGUILayout.HelpBox(strategyDescription, MessageType.Info);
 
 			// Density analysis
@@ -216,7 +216,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			{
 			EditorGUI.indentLevel++;
 
-			PropPlacementSettings settings = this.profile.propSettings;
+			PropPlacementSettings settings = profile.propSettings;
 
 			// Estimated prop counts
 			EditorGUILayout.LabelField("Estimated Props per Biome", EditorStyles.boldLabel);
@@ -245,7 +245,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Quality rating
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Quality Rating", EditorStyles.boldLabel);
-			string qualityRating = this.CalculateQualityRating(settings);
+			string qualityRating = CalculateQualityRating(settings);
 			EditorGUILayout.LabelField($"Current Rating: {qualityRating}");
 
 			EditorGUI.indentLevel--;
@@ -259,7 +259,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			if (GUILayout.Button("Validate Setup"))
 				{
-				this.ValidateProfile();
+				ValidateProfile();
 				}
 
 			if (GUILayout.Button("Reset to Defaults"))
@@ -268,7 +268,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					"This will reset the prop placement settings to default values. Continue?",
 					"Reset", "Cancel"))
 					{
-					this.ResetToDefaults();
+					ResetToDefaults();
 					}
 				}
 
@@ -353,28 +353,28 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			{
 			var issues = new System.Collections.Generic.List<string>();
 
-			if (string.IsNullOrEmpty(this.profile.biomeName))
+			if (string.IsNullOrEmpty(profile.biomeName))
 				{
 				issues.Add("Biome name is empty");
 				}
 
-			if (this.profile.propSettings == null)
+			if (profile.propSettings == null)
 				{
 				issues.Add("Prop settings are not configured");
 				}
 			else
 				{
-				if (this.profile.propSettings.propPrefabs == null || this.profile.propSettings.propPrefabs.Length == 0)
+				if (profile.propSettings.propPrefabs == null || profile.propSettings.propPrefabs.Length == 0)
 					{
 					issues.Add("No prop prefabs assigned");
 					}
 
-				if (this.profile.propSettings.allowedPropLayers.Count == 0)
+				if (profile.propSettings.allowedPropLayers.Count == 0)
 					{
 					issues.Add("No allowed prop layers specified");
 					}
 
-				if (this.profile.propSettings.baseDensity <= 0)
+				if (profile.propSettings.baseDensity <= 0)
 					{
 					issues.Add("Base density must be greater than 0");
 					}
@@ -395,7 +395,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void ResetToDefaults ()
 			{
-			this.profile.propSettings = new PropPlacementSettings
+			profile.propSettings = new PropPlacementSettings
 				{
 				strategy = PropPlacementStrategy.Clustered,
 				baseDensity = 0.1f,
@@ -408,7 +408,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				useSpatialOptimization = true
 				};
 
-			EditorUtility.SetDirty(this.profile);
+			EditorUtility.SetDirty(profile);
 			}
 		}
 	}

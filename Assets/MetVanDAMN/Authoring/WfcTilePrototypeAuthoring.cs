@@ -41,41 +41,41 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private void OnValidate ()
 			{
 			// Ensure tile ID is not zero
-			if (this.tileId == 0)
+			if (tileId == 0)
 				{
-				this.tileId = 1;
+				tileId = 1;
 				}
 
 			// Ensure weight is positive
-			if (this.weight <= 0)
+			if (weight <= 0)
 				{
-				this.weight = 0.01f;
+				weight = 0.01f;
 				}
 
 			// Ensure connection constraints are valid
-			this.minConnections = (byte)Mathf.Clamp(this.minConnections, 0, 4);
-			this.maxConnections = (byte)Mathf.Clamp(this.maxConnections, this.minConnections, 4);
+			minConnections = (byte)Mathf.Clamp(minConnections, 0, 4);
+			maxConnections = (byte)Mathf.Clamp(maxConnections, minConnections, 4);
 
 			// Validate socket array length
-			if (this.sockets != null && this.sockets.Length > 4)
+			if (sockets != null && sockets.Length > 4)
 				{
-				System.Array.Resize(ref this.sockets, 4);
-				Debug.LogWarning($"WfcTilePrototypeAuthoring: Socket array truncated to 4 elements on {this.name}", this);
+				System.Array.Resize(ref sockets, 4);
+				Debug.LogWarning($"WfcTilePrototypeAuthoring: Socket array truncated to 4 elements on {name}", this);
 				}
 			}
 
 		private void Reset ()
 			{
 			// Provide sensible defaults when component is first added
-			this.tileId = (uint)(this.GetInstanceID() & 0x7FFFFFFF); // Unique but positive ID
-			this.weight = 1.0f;
-			this.biomeType = BiomeType.Unknown;
-			this.primaryPolarity = Polarity.None;
-			this.minConnections = 1;
-			this.maxConnections = 4;
+			tileId = (uint)(GetInstanceID() & 0x7FFFFFFF); // Unique but positive ID
+			weight = 1.0f;
+			biomeType = BiomeType.Unknown;
+			primaryPolarity = Polarity.None;
+			minConnections = 1;
+			maxConnections = 4;
 
 			// Default socket configuration: basic open sockets in all directions
-			this.sockets = new WfcSocketConfig [ ]
+			sockets = new WfcSocketConfig [ ]
 			{
 				new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 				new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
@@ -109,7 +109,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// </summary>
 		public readonly WfcSocket ToWfcSocket ()
 			{
-			return new WfcSocket(this.socketId, this.direction, this.requiredPolarity, this.isOpen);
+			return new WfcSocket(socketId, direction, requiredPolarity, isOpen);
 			}
 		}
 	}

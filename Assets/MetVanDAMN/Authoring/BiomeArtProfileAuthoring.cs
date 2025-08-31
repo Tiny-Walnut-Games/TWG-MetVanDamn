@@ -36,9 +36,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 		{
 		public override void Bake (BiomeArtProfileAuthoring authoring)
 			{
-			Entity entity = this.GetEntity(TransformUsageFlags.None);
+			Entity entity = GetEntity(TransformUsageFlags.None);
 
-			this.AddComponent(entity, new BiomeArtProfileReference
+			AddComponent(entity, new BiomeArtProfileReference
 				{
 				ProfileRef = new UnityObjectRef<BiomeArtProfile> { Value = authoring.artProfile },
 				IsApplied = false,
@@ -48,21 +48,21 @@ namespace TinyWalnutGames.MetVD.Authoring
 			BiomeType biomeType = authoring.biomeTypeOverride;
 			if (authoring.autoConfigureBiomeType && authoring.artProfile != null)
 				{
-				biomeType = this.InferBiomeTypeFromProfileName(authoring.artProfile.biomeName);
+				biomeType = InferBiomeTypeFromProfileName(authoring.artProfile.biomeName);
 				}
 
 			// Safe add/update of biome component without relying on HasComponent (not exposed in some Baker API versions)
 			var biomeComponent = new CoreBiome(biomeType, Polarity.None);
 			try
 				{
-				this.AddComponent(entity, biomeComponent);
+				AddComponent(entity, biomeComponent);
 				}
 			catch (System.InvalidOperationException)
 				{
 				// Component likely already added by another baker; attempt to update
 				try
 					{
-					this.SetComponent(entity, biomeComponent);
+					SetComponent(entity, biomeComponent);
 					}
 				catch
 					{

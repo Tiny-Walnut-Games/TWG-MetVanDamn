@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace LivingDevAgent.Editor
+namespace LivingDevAgent.Editor.Modules
 	{
 	// ⚠ Intent ⚠ - @jmeyer1980
 	// This class is for Taskmaster use, it is not intended for manual use.
@@ -27,8 +27,14 @@ namespace LivingDevAgent.Editor
 		private float DurationInMinutes => (float)(this.endTime - this.startTime).TotalMinutes;
 		private float DurationInSeconds => (float)(this.endTime - this.startTime).TotalSeconds;
 		private bool IsOngoing => this.endTime == default;
-		private bool IsCompleted => this.endTime != default;
-		private readonly DateTime lastModified;
+		
+		// 🎯 CORE FEATURE: Completion tracking separate from ongoing status
+		// Used for time tracking analytics and task completion reporting
+		private bool IsCompleted => this.endTime != default && this.taskName != null;
+		
+		// 🎯 FIXED: Initialize lastModified and update it when timecard changes
+		private DateTime lastModified = DateTime.Now;
+		
 		// This information is then used to generate a report for the task,
 		// using a private string to hold the parsed collection of data from this time card.
 		// This can be requested by Taskmaster, or other API, via public method(s) for reporting purposes.
@@ -74,12 +80,20 @@ namespace LivingDevAgent.Editor
 			return this.IsOngoing;
 			}
 
+		public bool GetIsCompleted ()
+			{
+			return this.IsCompleted;
+			}
+
 		public void StartTimeCard (TaskData associatedTask)
 			{
 			this.taskName = associatedTask;
 			this.startTime = DateTime.Now;
 			this.endTime = default;
 			this.reportData = string.Empty;
+			
+			// 🎯 FIXED: Update lastModified when starting timecard
+			this.lastModified = DateTime.Now;
 			}
 
 		public void EndTimeCard ()
@@ -88,6 +102,9 @@ namespace LivingDevAgent.Editor
 				{
 				this.endTime = DateTime.Now;
 				this.GenerateReportData();
+				
+				// 🎯 FIXED: Update lastModified when ending timecard
+				this.lastModified = DateTime.Now;
 				}
 			else
 				{
@@ -120,6 +137,9 @@ namespace LivingDevAgent.Editor
         public void IncrementSessionCount()
         {
             this.Sessions++;
+			
+			// 🎯 FIXED: Update lastModified when incrementing sessions
+			this.lastModified = DateTime.Now;
         }
 
         // 💡 Expansion Opportunity 💡 - @jmeyer1980

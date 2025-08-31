@@ -17,17 +17,17 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		protected override void OnCreate ()
 			{
-			this._navNodeQuery = this.GetEntityQuery(
+			_navNodeQuery = GetEntityQuery(
 				ComponentType.ReadOnly<NavNode>(),
 				ComponentType.ReadOnly<NavLinkBufferElement>()
 			);
 
-			this._navigationGraphQuery = this.GetEntityQuery(
+			_navigationGraphQuery = GetEntityQuery(
 				ComponentType.ReadOnly<NavigationGraph>()
 			);
 
-			this.RequireForUpdate(this._navNodeQuery);
-			this.RequireForUpdate(this._navigationGraphQuery);
+			RequireForUpdate(_navNodeQuery);
+			RequireForUpdate(_navigationGraphQuery);
 			}
 
 		protected override void OnUpdate ()
@@ -39,7 +39,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 
 			// Perform reachability analysis with different agent capability sets
-			int unreachableCount = this.PerformReachabilityAnalysis();
+			int unreachableCount = PerformReachabilityAnalysis();
 
 			// Update navigation graph state
 			SystemAPI.SetSingleton(navGraph);
@@ -56,12 +56,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 			int unreachableCount = 0;
 
 			// Test reachability with different agent capability profiles
-			NativeArray<AgentCapabilities> testCapabilities = this.GetTestCapabilityProfiles();
+			NativeArray<AgentCapabilities> testCapabilities = GetTestCapabilityProfiles();
 
 			for (int profileIndex = 0; profileIndex < testCapabilities.Length; profileIndex++)
 				{
 				AgentCapabilities capabilities = testCapabilities [ profileIndex ];
-				NativeArray<bool> reachabilityResults = this.AnalyzeReachability(capabilities);
+				NativeArray<bool> reachabilityResults = AnalyzeReachability(capabilities);
 
 				// Count unreachable nodes for this capability profile
 				for (int i = 0; i < reachabilityResults.Length; i++)
@@ -106,7 +106,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Collect all navigation nodes
 			var nodeIds = new NativeList<uint>(256, Allocator.Temp);
 
-			this.Entities.WithAll<NavNode>().ForEach((in NavNode navNode) =>
+			Entities.WithAll<NavNode>().ForEach((in NavNode navNode) =>
 			{
 				if (navNode.IsActive)
 					{
@@ -124,7 +124,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			// Start from first node and see what we can reach
 			uint startNodeId = nodeIds [ 0 ];
-			NativeHashSet<uint> reachableNodes = this.FloodFillReachability(startNodeId, capabilities);
+			NativeHashSet<uint> reachableNodes = FloodFillReachability(startNodeId, capabilities);
 
 			// Mark reachable nodes
 			for (int i = 0; i < nodeIds.Length; i++)
@@ -149,7 +149,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			while (queue.Count > 0)
 				{
 				uint currentNodeId = queue.Dequeue();
-				Entity currentEntity = this.FindEntityByNodeId(currentNodeId);
+				Entity currentEntity = FindEntityByNodeId(currentNodeId);
 
 				if (currentEntity == Entity.Null || !SystemAPI.HasBuffer<NavLinkBufferElement>(currentEntity))
 					{
@@ -185,7 +185,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			Entity foundEntity = Entity.Null;
 
-			this.Entities.WithAll<NodeId>().ForEach((Entity entity, in NodeId id) =>
+			Entities.WithAll<NodeId>().ForEach((Entity entity, in NodeId id) =>
 			{
 				if (id._value == nodeId)
 					{
@@ -213,25 +213,25 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		public NavigationValidationReport (int totalNodes, int totalLinks, Allocator allocator = Allocator.Temp)
 			{
-			this.TotalNodes = totalNodes;
-			this.TotalLinks = totalLinks;
-			this.UnreachableNodeCount = 0;
-			this.IsolatedComponentCount = 0;
-			this.HasUnreachableAreas = false;
-			this.UnreachableNodeIds = new NativeList<uint>(totalNodes, allocator);
-			this.Issues = new NativeList<NavigationIssue>(32, allocator);
+			TotalNodes = totalNodes;
+			TotalLinks = totalLinks;
+			UnreachableNodeCount = 0;
+			IsolatedComponentCount = 0;
+			HasUnreachableAreas = false;
+			UnreachableNodeIds = new NativeList<uint>(totalNodes, allocator);
+			Issues = new NativeList<NavigationIssue>(32, allocator);
 			}
 
 		public void Dispose ()
 			{
-			if (this.UnreachableNodeIds.IsCreated)
+			if (UnreachableNodeIds.IsCreated)
 				{
-				this.UnreachableNodeIds.Dispose();
+				UnreachableNodeIds.Dispose();
 				}
 
-			if (this.Issues.IsCreated)
+			if (Issues.IsCreated)
 				{
-				this.Issues.Dispose();
+				Issues.Dispose();
 				}
 			}
 		}
@@ -252,12 +252,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 							  uint relatedNodeId = 0, Polarity requiredPolarity = Polarity.None,
 							  Ability requiredAbilities = Ability.None)
 			{
-			this.Type = type;
-			this.NodeId = nodeId;
-			this.RelatedNodeId = relatedNodeId;
-			this.RequiredPolarity = requiredPolarity;
-			this.RequiredAbilities = requiredAbilities;
-			this.Description = description;
+			Type = type;
+			NodeId = nodeId;
+			RelatedNodeId = relatedNodeId;
+			RequiredPolarity = requiredPolarity;
+			RequiredAbilities = requiredAbilities;
+			Description = description;
 			}
 		}
 

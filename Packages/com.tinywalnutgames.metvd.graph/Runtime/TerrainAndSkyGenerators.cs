@@ -24,15 +24,15 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this._jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
-			this._featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
+			_jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
+			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
 		public void OnUpdate (ref SystemState state)
 			{
-			this._jumpPhysicsLookup.Update(ref state);
-			this._featureBufferLookup.Update(ref state);
+			_jumpPhysicsLookup.Update(ref state);
+			_featureBufferLookup.Update(ref state);
 
 			var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
 
@@ -48,8 +48,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			var stackedJob = new StackedGenerationJob
 				{
-				JumpPhysicsLookup = this._jumpPhysicsLookup,
-				FeatureBufferLookup = this._featureBufferLookup,
+				JumpPhysicsLookup = _jumpPhysicsLookup,
+				FeatureBufferLookup = _featureBufferLookup,
 				Entities = entities,
 				Requests = requests,
 				RoomData = roomData,
@@ -74,36 +74,36 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			public void Execute ()
 				{
-				for (int i = 0; i < this.Entities.Length; i++)
+				for (int i = 0; i < Entities.Length; i++)
 					{
-					Entity entity = this.Entities [ i ];
-					RefRW<RoomGenerationRequest> request = this.Requests.GetRefRW(entity);
+					Entity entity = Entities [ i ];
+					RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
 
 					if (request.ValueRO.GeneratorType != RoomGeneratorType.StackedSegment || request.ValueRO.IsComplete)
 						{
 						continue;
 						}
 
-					if (!this.FeatureBufferLookup.HasBuffer(entity))
+					if (!FeatureBufferLookup.HasBuffer(entity))
 						{
 						continue;
 						}
 
-					DynamicBuffer<RoomFeatureElement> features = this.FeatureBufferLookup [ entity ];
-					RefRO<RoomHierarchyData> roomDataRO = this.RoomData.GetRefRO(entity);
-					RefRO<NodeId> nodeId = this.NodeIds.GetRefRO(entity);
+					DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup [ entity ];
+					RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
+					RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
 					RectInt bounds = roomDataRO.ValueRO.Bounds;
 					features.Clear();
 
-					var entityRandom = new Unity.Mathematics.Random(this.BaseRandom.state + (uint)entity.Index);
+					var entityRandom = new Unity.Mathematics.Random(BaseRandom.state + (uint)entity.Index);
 
 					int segmentCount = math.max(3, bounds.height / 4);
 					int segmentHeight = bounds.height / segmentCount;
 
 					float jumpHeight = 3.0f;
-					if (this.JumpPhysicsLookup.HasComponent(entity))
+					if (JumpPhysicsLookup.HasComponent(entity))
 						{
-						jumpHeight = this.JumpPhysicsLookup [ entity ].JumpHeight;
+						jumpHeight = JumpPhysicsLookup [ entity ].JumpHeight;
 						}
 
 					// Use nodeId coordinates to influence segment placement and connectivity patterns
@@ -270,15 +270,15 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this._featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
-			this._secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
+			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
+			_secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
 		public void OnUpdate (ref SystemState state)
 			{
-			this._featureBufferLookup.Update(ref state);
-			this._secretConfigLookup.Update(ref state);
+			_featureBufferLookup.Update(ref state);
+			_secretConfigLookup.Update(ref state);
 
 			var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
 
@@ -294,8 +294,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			var corridorJob = new CorridorGenerationJob
 				{
-				FeatureBufferLookup = this._featureBufferLookup,
-				SecretConfigLookup = this._secretConfigLookup,
+				FeatureBufferLookup = _featureBufferLookup,
+				SecretConfigLookup = _secretConfigLookup,
 				Entities = entities,
 				Requests = requests,
 				RoomData = roomData,
@@ -320,28 +320,28 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			public void Execute ()
 				{
-				for (int i = 0; i < this.Entities.Length; i++)
+				for (int i = 0; i < Entities.Length; i++)
 					{
-					Entity entity = this.Entities [ i ];
-					RefRW<RoomGenerationRequest> request = this.Requests.GetRefRW(entity);
+					Entity entity = Entities [ i ];
+					RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
 
 					if (request.ValueRO.GeneratorType != RoomGeneratorType.LinearBranchingCorridor || request.ValueRO.IsComplete)
 						{
 						continue;
 						}
 
-					if (!this.FeatureBufferLookup.HasBuffer(entity))
+					if (!FeatureBufferLookup.HasBuffer(entity))
 						{
 						continue;
 						}
 
-					DynamicBuffer<RoomFeatureElement> features = this.FeatureBufferLookup [ entity ];
-					RefRO<RoomHierarchyData> roomDataRO = this.RoomData.GetRefRO(entity);
-					RefRO<NodeId> nodeId = this.NodeIds.GetRefRO(entity);
+					DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup [ entity ];
+					RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
+					RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
 					RectInt bounds = roomDataRO.ValueRO.Bounds;
 					features.Clear();
 
-					var entityRandom = new Unity.Mathematics.Random(this.BaseRandom.state + (uint)entity.Index);
+					var entityRandom = new Unity.Mathematics.Random(BaseRandom.state + (uint)entity.Index);
 
 					int beatCount = math.max(4, bounds.width / 6);
 					int beatWidth = bounds.width / beatCount;
@@ -357,9 +357,9 @@ namespace TinyWalnutGames.MetVD.Graph
 						GenerateBeat(features, bounds, beatX, beatWidth, beatType, beat, request.ValueRO.GenerationSeed, ref entityRandom);
 						}
 
-					if (this.SecretConfigLookup.HasComponent(entity))
+					if (SecretConfigLookup.HasComponent(entity))
 						{
-						SecretAreaConfig secretConfig = this.SecretConfigLookup [ entity ];
+						SecretAreaConfig secretConfig = SecretConfigLookup [ entity ];
 						GenerateBranchingPaths(features, bounds, secretConfig, request.ValueRO.GenerationSeed, ref entityRandom, rhythmComplexity);
 						}
 
@@ -776,15 +776,15 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this._biomeLookup = state.GetComponentLookup<Core.Biome>(true);
-			this._featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
+			_biomeLookup = state.GetComponentLookup<Core.Biome>(true);
+			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
 		public void OnUpdate (ref SystemState state)
 			{
-			this._biomeLookup.Update(ref state);
-			this._featureBufferLookup.Update(ref state);
+			_biomeLookup.Update(ref state);
+			_featureBufferLookup.Update(ref state);
 
 			// Gather entities for job processing
 			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
@@ -798,8 +798,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			var heightmapJob = new HeightmapGenerationJob
 				{
-				BiomeLookup = this._biomeLookup,
-				FeatureBufferLookup = this._featureBufferLookup,
+				BiomeLookup = _biomeLookup,
+				FeatureBufferLookup = _featureBufferLookup,
 				Entities = entities,
 				Requests = requests,
 				RoomData = roomData,
@@ -822,27 +822,27 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			public void Execute ()
 				{
-				for (int i = 0; i < this.Entities.Length; i++)
+				for (int i = 0; i < Entities.Length; i++)
 					{
-					Entity entity = this.Entities [ i ];
-					RefRW<RoomGenerationRequest> request = this.Requests.GetRefRW(entity);
+					Entity entity = Entities [ i ];
+					RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
 
 					if (request.ValueRO.GeneratorType != RoomGeneratorType.BiomeWeightedHeightmap || request.ValueRO.IsComplete)
 						{
 						continue;
 						}
 
-					if (!this.FeatureBufferLookup.HasBuffer(entity))
+					if (!FeatureBufferLookup.HasBuffer(entity))
 						{
 						continue;
 						}
 
-					DynamicBuffer<RoomFeatureElement> features = this.FeatureBufferLookup [ entity ];
-					RefRO<RoomHierarchyData> roomDataRO = this.RoomData.GetRefRO(entity);
+					DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup [ entity ];
+					RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
 					RectInt bounds = roomDataRO.ValueRO.Bounds;
 					features.Clear();
 
-					Core.Biome biome = this.BiomeLookup.HasComponent(entity) ? this.BiomeLookup [ entity ] :
+					Core.Biome biome = BiomeLookup.HasComponent(entity) ? BiomeLookup [ entity ] :
 							   new Core.Biome(BiomeType.SolarPlains, Polarity.Sun);
 
 					GenerateBiomeHeightmap(features, bounds, biome, request.ValueRO.GenerationSeed);
@@ -961,15 +961,15 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this._featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
-			this._biomeLookup = state.GetComponentLookup<Core.Biome>(true);
+			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
+			_biomeLookup = state.GetComponentLookup<Core.Biome>(true);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
 		public void OnUpdate (ref SystemState state)
 			{
-			this._featureBufferLookup.Update(ref state);
-			this._biomeLookup.Update(ref state);
+			_featureBufferLookup.Update(ref state);
+			_biomeLookup.Update(ref state);
 
 			// Gather entities for job processing
 			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
@@ -983,8 +983,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			var cloudJob = new CloudGenerationJob
 				{
-				FeatureBufferLookup = this._featureBufferLookup,
-				BiomeLookup = this._biomeLookup,
+				FeatureBufferLookup = _featureBufferLookup,
+				BiomeLookup = _biomeLookup,
 				Entities = entities,
 				Requests = requests,
 				RoomData = roomData,
@@ -1007,28 +1007,28 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			public void Execute ()
 				{
-				for (int i = 0; i < this.Entities.Length; i++)
+				for (int i = 0; i < Entities.Length; i++)
 					{
-					Entity entity = this.Entities [ i ];
-					RefRW<RoomGenerationRequest> request = this.Requests.GetRefRW(entity);
+					Entity entity = Entities [ i ];
+					RefRW<RoomGenerationRequest> request = Requests.GetRefRW(entity);
 
 					if (request.ValueRO.GeneratorType != RoomGeneratorType.LayeredPlatformCloud || request.ValueRO.IsComplete)
 						{
 						continue;
 						}
 
-					if (!this.FeatureBufferLookup.HasBuffer(entity))
+					if (!FeatureBufferLookup.HasBuffer(entity))
 						{
 						continue;
 						}
 
-					DynamicBuffer<RoomFeatureElement> features = this.FeatureBufferLookup [ entity ];
-					RefRO<RoomHierarchyData> roomDataRO = this.RoomData.GetRefRO(entity);
-					RefRO<NodeId> nodeId = this.NodeIds.GetRefRO(entity);
+					DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup [ entity ];
+					RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
+					RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
 					RectInt bounds = roomDataRO.ValueRO.Bounds;
 					features.Clear();
 
-					Core.Biome biome = this.BiomeLookup.HasComponent(entity) ? this.BiomeLookup [ entity ] :
+					Core.Biome biome = BiomeLookup.HasComponent(entity) ? BiomeLookup [ entity ] :
 							   new Core.Biome(BiomeType.SkyGardens, Polarity.Wind);
 
 					var random = new Unity.Mathematics.Random(request.ValueRO.GenerationSeed + (uint)entity.Index);

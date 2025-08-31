@@ -139,11 +139,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			return new BiomeCheckerMaterialOverride.CheckerComplexitySettings
 				{
-				coordinateInfluenceStrength = this.coordinateInfluenceStrength,
-				distanceScalingFactor = this.distanceScalingFactor,
-				polarityAnimationSpeed = this.polarityAnimationSpeed,
-				enableCoordinateWarping = this.enableCoordinateWarping,
-				complexityTierMultiplier = this.complexityTierMultiplier
+				coordinateInfluenceStrength = coordinateInfluenceStrength,
+				distanceScalingFactor = distanceScalingFactor,
+				polarityAnimationSpeed = polarityAnimationSpeed,
+				enableCoordinateWarping = enableCoordinateWarping,
+				complexityTierMultiplier = complexityTierMultiplier
 				};
 			}
 
@@ -274,7 +274,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// <summary>
 		/// Convenient access to prop prefabs for backward compatibility
 		/// </summary>
-		public GameObject [ ] PropPrefabs => this.propSettings?.propPrefabs ?? new GameObject [ 0 ];
+		public GameObject [ ] PropPrefabs => propSettings?.propPrefabs ?? new GameObject [ 0 ];
 
 		/// <summary>
 		/// Convenient access to all tiles for backward compatibility
@@ -284,24 +284,24 @@ namespace TinyWalnutGames.MetVD.Authoring
 			get
 				{
 				var tileList = new List<TileBase>();
-				if (this.floorTile != null)
+				if (floorTile != null)
 					{
-					tileList.Add(this.floorTile);
+					tileList.Add(floorTile);
 					}
 
-				if (this.wallTile != null)
+				if (wallTile != null)
 					{
-					tileList.Add(this.wallTile);
+					tileList.Add(wallTile);
 					}
 
-				if (this.backgroundTile != null)
+				if (backgroundTile != null)
 					{
-					tileList.Add(this.backgroundTile);
+					tileList.Add(backgroundTile);
 					}
 
-				if (this.transitionTiles != null)
+				if (transitionTiles != null)
 					{
-					tileList.AddRange(this.transitionTiles);
+					tileList.AddRange(transitionTiles);
 					}
 
 				return tileList.ToArray();
@@ -315,9 +315,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 		public void ApplyCheckerOverrideIfEnabled (Tilemap tilemap, Core.BiomeType biome,
 			Core.NodeId nodeId)
 			{
-			if (this.checkerSettings?.enableCheckerOverride == true && tilemap != null)
+			if (checkerSettings?.enableCheckerOverride == true && tilemap != null)
 				{
-				BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = this.checkerSettings.ToComplexitySettings();
+				BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = checkerSettings.ToComplexitySettings();
 				BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome, nodeId, complexitySettings);
 				}
 			}

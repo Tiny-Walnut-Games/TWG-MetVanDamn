@@ -23,19 +23,19 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		protected override void OnCreate ()
 			{
-			this._roomsWithNavigationQuery = new EntityQueryBuilder(Allocator.Temp)
+			_roomsWithNavigationQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<NodeId, RoomHierarchyData, RoomTemplate, ProceduralRoomGenerated>()
 				.WithNone<CinemachineZoneData>()
-				.Build(this.EntityManager);
-			this.RequireForUpdate(this._roomsWithNavigationQuery);
+				.Build(EntityManager);
+			RequireForUpdate(_roomsWithNavigationQuery);
 			}
 
 		protected override void OnUpdate ()
 			{
-			using NativeArray<Entity> roomEntities = this._roomsWithNavigationQuery.ToEntityArray(Allocator.Temp);
-			using NativeArray<NodeId> nodeIds = this._roomsWithNavigationQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
-			using NativeArray<RoomHierarchyData> roomData = this._roomsWithNavigationQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
-			using NativeArray<RoomTemplate> templates = this._roomsWithNavigationQuery.ToComponentDataArray<RoomTemplate>(Allocator.Temp);
+			using NativeArray<Entity> roomEntities = _roomsWithNavigationQuery.ToEntityArray(Allocator.Temp);
+			using NativeArray<NodeId> nodeIds = _roomsWithNavigationQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+			using NativeArray<RoomHierarchyData> roomData = _roomsWithNavigationQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+			using NativeArray<RoomTemplate> templates = _roomsWithNavigationQuery.ToComponentDataArray<RoomTemplate>(Allocator.Temp);
 
 			for (int i = 0; i < roomEntities.Length; i++)
 				{
@@ -44,19 +44,19 @@ namespace TinyWalnutGames.MetVD.Graph
 				RoomHierarchyData hierarchy = roomData [ i ];
 				RoomTemplate template = templates [ i ];
 
-				ProceduralRoomGenerated genStatus = this.EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
+				ProceduralRoomGenerated genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
 				if (genStatus.CinemachineGenerated)
 					{
 					continue;
 					}
 
 				var sw = Stopwatch.StartNew();
-				GenerateCinemachineZone(this.EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
+				GenerateCinemachineZone(EntityManager, roomEntity, hierarchy, template, nodeId, ref genStatus);
 				sw.Stop();
 				genStatus.GenerationTime += (float)sw.Elapsed.TotalSeconds;
 
 				genStatus.CinemachineGenerated = true;
-				this.EntityManager.SetComponentData(roomEntity, genStatus);
+				EntityManager.SetComponentData(roomEntity, genStatus);
 				}
 			}
 
@@ -307,7 +307,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		public float3 Min;
 		public float3 Max;
-		public readonly float3 Center => (this.Min + this.Max) * 0.5f; // DO NOT REMOVE readonly FOR SANITY
-		public readonly float3 Size => this.Max - this.Min; // DO NOT REMOVE readonly FOR SANITY
+		public readonly float3 Center => (Min + Max) * 0.5f; // DO NOT REMOVE readonly FOR SANITY
+		public readonly float3 Size => Max - Min; // DO NOT REMOVE readonly FOR SANITY
 		}
 	}

@@ -19,21 +19,21 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		[SetUp]
 		public void SetUp ()
 			{
-			this._testWorld = new World("TestWorld");
-			this._entityManager = this._testWorld.EntityManager;
+			_testWorld = new World("TestWorld");
+			_entityManager = _testWorld.EntityManager;
 			}
 
 		[TearDown]
 		public void TearDown ()
 			{
-			this._testWorld?.Dispose();
+			_testWorld?.Dispose();
 			}
 
 		[Test]
 		public void DistrictLayoutSystem_RespectsTargetSectors ()
 			{
 			// Create world configuration with specific TargetSectors
-			Entity configEntity = this._entityManager.CreateEntity();
+			Entity configEntity = _entityManager.CreateEntity();
 			var worldConfig = new WorldConfiguration
 				{
 				Seed = 12345,
@@ -41,15 +41,15 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				TargetSectors = 8,
 				RandomizationMode = RandomizationMode.Partial
 				};
-			this._entityManager.AddComponentData(configEntity, worldConfig);
+			_entityManager.AddComponentData(configEntity, worldConfig);
 
 			// Create multiple unplaced districts (more than TargetSectors)
 			var districts = new Entity [ 12 ];
 			for (int i = 0; i < districts.Length; i++)
 				{
-				districts [ i ] = this._entityManager.CreateEntity();
-				this._entityManager.AddComponentData(districts [ i ], new NodeId((uint)(i + 1), 0, 0, int2.zero));
-				this._entityManager.AddComponentData(districts [ i ], new WfcState());
+				districts [ i ] = _entityManager.CreateEntity();
+				_entityManager.AddComponentData(districts [ i ], new NodeId((uint)(i + 1), 0, 0, int2.zero));
+				_entityManager.AddComponentData(districts [ i ], new WfcState());
 				}
 
 			// Simulate DistrictLayoutSystem logic
@@ -101,13 +101,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		public void RoomManagement_CreatesProperFeatures ()
 			{
 			// Create a room entity with hierarchy data
-			Entity roomEntity = this._entityManager.CreateEntity();
+			Entity roomEntity = _entityManager.CreateEntity();
 			var roomBounds = new RectInt(0, 0, 10, 8);
 			var roomData = new RoomHierarchyData(roomBounds, RoomType.Boss, true);
 			var nodeId = new NodeId(12345, 2, 1000, new int2(5, 4));
 
-			this._entityManager.AddComponentData(roomEntity, roomData);
-			this._entityManager.AddComponentData(roomEntity, nodeId);
+			_entityManager.AddComponentData(roomEntity, roomData);
+			_entityManager.AddComponentData(roomEntity, nodeId);
 
 			// Test room state data creation
 			var roomState = new RoomStateData(3);

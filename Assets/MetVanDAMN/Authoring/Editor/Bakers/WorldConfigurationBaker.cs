@@ -8,8 +8,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		{
 		public override void Bake (WorldConfigurationAuthoring authoring)
 			{
-			Entity entity = this.GetEntity(TransformUsageFlags.None);
-			this.AddComponent(entity, new WorldConfiguration
+			Entity entity = GetEntity(TransformUsageFlags.None);
+			AddComponent(entity, new WorldConfiguration
 				{
 				Seed = authoring.seed,
 				WorldSize = authoring.worldSize,

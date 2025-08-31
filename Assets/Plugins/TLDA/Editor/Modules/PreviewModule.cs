@@ -18,7 +18,7 @@ namespace LivingDevAgent.Editor.Modules
 		public void DrawContent (Rect windowPosition)
 			{
 			// Always render from raw if available, otherwise show placeholder
-			string md = !string.IsNullOrEmpty(this._data.RawContent) ? this._data.RawContent : this.GetPlaceholderMarkdown();
+			string md = !string.IsNullOrEmpty(_data.RawContent) ? _data.RawContent : GetPlaceholderMarkdown();
 
 			using (new EditorGUILayout.VerticalScope())
 				{
@@ -32,20 +32,20 @@ namespace LivingDevAgent.Editor.Modules
 
 					if (GUILayout.Button("🔄", EditorStyles.miniButton, GUILayout.Width(30)))
 						{
-						this.SetStatus("🔄 Preview refreshed");
+						SetStatus("🔄 Preview refreshed");
 						}
 					}
 
 				// Preview area
 				float viewportHeight = Mathf.Max(120f, windowPosition.height - 220f);
-				this._data.PreviewScroll = EditorGUILayout.BeginScrollView(this._data.PreviewScroll, GUILayout.Height(viewportHeight), GUILayout.ExpandHeight(true));
+				_data.PreviewScroll = EditorGUILayout.BeginScrollView(_data.PreviewScroll, GUILayout.Height(viewportHeight), GUILayout.ExpandHeight(true));
 
-				this.RenderMarkdown(md);
+				RenderMarkdown(md);
 
 				EditorGUILayout.EndScrollView();
 
 				// Bottom info
-				this.DrawPreviewInfo();
+				DrawPreviewInfo();
 				}
 			}
 
@@ -53,10 +53,10 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			using (new EditorGUILayout.HorizontalScope())
 				{
-				if (!string.IsNullOrEmpty(this._data.RawContent))
+				if (!string.IsNullOrEmpty(_data.RawContent))
 					{
-					int lines = this._data.RawContent.Split('\n').Length;
-					int chars = this._data.RawContent.Length;
+					int lines = _data.RawContent.Split('\n').Length;
+					int chars = _data.RawContent.Length;
 					GUILayout.Label($"📊 {lines} lines, {chars} characters", EditorStyles.miniLabel);
 					}
 				else
@@ -66,7 +66,7 @@ namespace LivingDevAgent.Editor.Modules
 
 				GUILayout.FlexibleSpace();
 
-				if (this._data.RawDirty)
+				if (_data.RawDirty)
 					{
 					GUILayout.Label("✏️ Unsaved changes", EditorStyles.miniLabel);
 					}
@@ -117,7 +117,7 @@ namespace LivingDevAgent.Editor.Modules
 					{
 					string alt = imgMatch.Groups [ 1 ].Value;
 					string path = imgMatch.Groups [ 2 ].Value;
-					this.RenderImagePlaceholder(path, alt);
+					RenderImagePlaceholder(path, alt);
 					continue;
 					}
 
@@ -127,7 +127,7 @@ namespace LivingDevAgent.Editor.Modules
 					bool isChecked = line.IndexOf("[x]", StringComparison.OrdinalIgnoreCase) >= 0;
 					string text = Regex.Replace(line, @"^\s*[-*]\s\[( |x|X)\]\s", "");
 					EditorGUI.BeginDisabledGroup(true);
-					EditorGUILayout.ToggleLeft(this.ApplyInlineFormatting(text), isChecked);
+					EditorGUILayout.ToggleLeft(ApplyInlineFormatting(text), isChecked);
 					EditorGUI.EndDisabledGroup();
 					continue;
 					}
@@ -135,20 +135,20 @@ namespace LivingDevAgent.Editor.Modules
 				// Headers
 				if (line.StartsWith("### "))
 					{
-					EditorGUILayout.LabelField(this.ApplyInlineFormatting(line [ 4.. ]), _h3);
+					EditorGUILayout.LabelField(ApplyInlineFormatting(line [ 4.. ]), _h3);
 					}
 				else if (line.StartsWith("## "))
 					{
-					EditorGUILayout.LabelField(this.ApplyInlineFormatting(line [ 3.. ]), _h2);
+					EditorGUILayout.LabelField(ApplyInlineFormatting(line [ 3.. ]), _h2);
 					}
 				else if (line.StartsWith("# "))
 					{
-					EditorGUILayout.LabelField(this.ApplyInlineFormatting(line [ 2.. ]), _h1);
+					EditorGUILayout.LabelField(ApplyInlineFormatting(line [ 2.. ]), _h1);
 					}
 				// List items
 				else if (line.StartsWith("- ") || line.StartsWith("* "))
 					{
-					EditorGUILayout.LabelField("• " + this.ApplyInlineFormatting(line [ 2.. ]), _listItem);
+					EditorGUILayout.LabelField("• " + ApplyInlineFormatting(line [ 2.. ]), _listItem);
 					}
 				// Empty lines
 				else if (string.IsNullOrWhiteSpace(line))
@@ -158,7 +158,7 @@ namespace LivingDevAgent.Editor.Modules
 				// Regular text
 				else
 					{
-					EditorGUILayout.LabelField(this.ApplyInlineFormatting(line), _bodyWrap);
+					EditorGUILayout.LabelField(ApplyInlineFormatting(line), _bodyWrap);
 					}
 				}
 			}

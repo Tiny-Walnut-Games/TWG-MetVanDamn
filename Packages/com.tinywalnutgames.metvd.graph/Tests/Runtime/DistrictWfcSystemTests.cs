@@ -14,25 +14,25 @@ namespace TinyWalnutGames.MetVD.Tests
 		[SetUp]
 		public void SetUp ()
 			{
-			this._world = new World("DistrictWfcTestWorld");
-			this._simGroup = this._world.GetOrCreateSystemManaged<SimulationSystemGroup>();
-			SystemHandle systemHandle = this._world.GetOrCreateSystem(typeof(DistrictWfcSystem));
-			this._simGroup.AddSystemToUpdateList(systemHandle);
-			this._simGroup.SortSystems();
+			_world = new World("DistrictWfcTestWorld");
+			_simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+			SystemHandle systemHandle = _world.GetOrCreateSystem(typeof(DistrictWfcSystem));
+			_simGroup.AddSystemToUpdateList(systemHandle);
+			_simGroup.SortSystems();
 			}
 
 		[TearDown]
 		public void TearDown ()
 			{
-			if (this._world.IsCreated)
+			if (_world.IsCreated)
 				{
-				this._world.Dispose();
+				_world.Dispose();
 				}
 			}
 
 		private Entity CreateBaseEntity (WfcGenerationState initial, bool withBuffer = true, int iteration = 0)
 			{
-			EntityManager em = this._world.EntityManager;
+			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
 			em.AddComponentData(e, new WfcState(initial) { Iteration = iteration });
 			em.AddComponentData(e, new NodeId { _value = 0, Coordinates = int2.zero, Level = 0, ParentId = 0 });
@@ -47,9 +47,9 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void Initialization_AddsCandidates_SetsInProgress ()
 			{
-			Entity e = this.CreateBaseEntity(WfcGenerationState.Initialized, withBuffer: true);
-			this._simGroup.Update();
-			EntityManager em = this._world.EntityManager;
+			Entity e = CreateBaseEntity(WfcGenerationState.Initialized, withBuffer: true);
+			_simGroup.Update();
+			EntityManager em = _world.EntityManager;
 			WfcState state = em.GetComponentData<WfcState>(e);
 			DynamicBuffer<WfcCandidateBufferElement> candidates = em.GetBuffer<WfcCandidateBufferElement>(e);
 			Assert.AreEqual(WfcGenerationState.InProgress, state.State);
@@ -60,10 +60,10 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void Progression_IncrementsIteration_EntropyReflectsCandidateCount ()
 			{
-			Entity e = this.CreateBaseEntity(WfcGenerationState.Initialized, withBuffer: true);
-			this._simGroup.Update(); // initialization
-			this._simGroup.Update(); // progression
-			WfcState state = this._world.EntityManager.GetComponentData<WfcState>(e);
+			Entity e = CreateBaseEntity(WfcGenerationState.Initialized, withBuffer: true);
+			_simGroup.Update(); // initialization
+			_simGroup.Update(); // progression
+			WfcState state = _world.EntityManager.GetComponentData<WfcState>(e);
 			Assert.GreaterOrEqual(state.Iteration, 1);
 			Assert.Greater(state.Entropy, 0);
 			}
@@ -71,11 +71,11 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void SingleCandidate_CollapsesToCompleted ()
 			{
-			EntityManager em = this._world.EntityManager;
-			Entity e = this.CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true, iteration: 5);
+			EntityManager em = _world.EntityManager;
+			Entity e = CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true, iteration: 5);
 			DynamicBuffer<WfcCandidateBufferElement> buffer = em.GetBuffer<WfcCandidateBufferElement>(e);
 			buffer.Add(new WfcCandidateBufferElement(3, 1.0f));
-			this._simGroup.Update();
+			_simGroup.Update();
 			WfcState state = em.GetComponentData<WfcState>(e);
 			Assert.AreEqual(WfcGenerationState.Completed, state.State);
 			Assert.AreEqual(3u, state.AssignedTileId);
@@ -85,11 +85,11 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void EmptyCandidateBuffer_SetsContradiction ()
 			{
-			EntityManager em = this._world.EntityManager;
-			Entity e = this.CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true);
+			EntityManager em = _world.EntityManager;
+			Entity e = CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true);
 			DynamicBuffer<WfcCandidateBufferElement> buffer = em.GetBuffer<WfcCandidateBufferElement>(e);
 			buffer.Clear();
-			this._simGroup.Update();
+			_simGroup.Update();
 			WfcState state = em.GetComponentData<WfcState>(e);
 			Assert.AreEqual(WfcGenerationState.Contradiction, state.State);
 			}
@@ -97,22 +97,22 @@ namespace TinyWalnutGames.MetVD.Tests
 		[Test]
 		public void MissingCandidateBuffer_MarksFailed ()
 			{
-			Entity e = this.CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: false);
-			this._simGroup.Update();
-			WfcState state = this._world.EntityManager.GetComponentData<WfcState>(e);
+			Entity e = CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: false);
+			_simGroup.Update();
+			WfcState state = _world.EntityManager.GetComponentData<WfcState>(e);
 			Assert.AreEqual(WfcGenerationState.Failed, state.State);
 			}
 
 		[Test]
 		public void OverIterationThreshold_TriggersRandomCollapse ()
 			{
-			EntityManager em = this._world.EntityManager;
-			Entity e = this.CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true, iteration: 101);
+			EntityManager em = _world.EntityManager;
+			Entity e = CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true, iteration: 101);
 			DynamicBuffer<WfcCandidateBufferElement> buffer = em.GetBuffer<WfcCandidateBufferElement>(e);
 			buffer.Add(new WfcCandidateBufferElement(1, 0.4f));
 			buffer.Add(new WfcCandidateBufferElement(2, 0.3f));
 			buffer.Add(new WfcCandidateBufferElement(3, 0.3f));
-			this._simGroup.Update();
+			_simGroup.Update();
 			WfcState state = em.GetComponentData<WfcState>(e);
 			Assert.AreEqual(WfcGenerationState.Completed, state.State);
 			Assert.IsTrue(state.IsCollapsed);

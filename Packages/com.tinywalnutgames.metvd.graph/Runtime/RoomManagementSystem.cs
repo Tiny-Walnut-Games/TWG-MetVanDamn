@@ -39,11 +39,11 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public RoomStateData (int totalSecrets = 0)
 			{
-			this.IsVisited = false;
-			this.IsExplored = false;
-			this.SecretsFound = 0;
-			this.TotalSecrets = totalSecrets;
-			this.CompletionPercentage = 0.0f;
+			IsVisited = false;
+			IsExplored = false;
+			SecretsFound = 0;
+			TotalSecrets = totalSecrets;
+			CompletionPercentage = 0.0f;
 			}
 		}
 
@@ -74,10 +74,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public RoomNavigationData (int2 primaryEntrance, bool isCriticalPath = false, float traversalTime = 5.0f)
 			{
-			this.EntranceCount = 1;
-			this.PrimaryEntrance = primaryEntrance;
-			this.IsCriticalPath = isCriticalPath;
-			this.TraversalTime = traversalTime;
+			EntranceCount = 1;
+			PrimaryEntrance = primaryEntrance;
+			IsCriticalPath = isCriticalPath;
+			TraversalTime = traversalTime;
 			}
 		}
 
@@ -92,9 +92,9 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public RoomFeatureElement (RoomFeatureType type, int2 position, uint featureId = 0)
 			{
-			this.Type = type;
-			this.Position = position;
-			this.FeatureId = featureId;
+			Type = type;
+			Position = position;
+			FeatureId = featureId;
 			}
 		}
 
@@ -109,9 +109,9 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public ProgressionAnalysis (NodeId nodeId)
 			{
-			this.DistanceFromOrigin = math.length((float2)nodeId.Coordinates);
-			this.ProgressionTier = CalculateProgressionTier(this.DistanceFromOrigin);
-			this.SpatialHash = CalculateSpatialHash(nodeId);
+			DistanceFromOrigin = math.length((float2)nodeId.Coordinates);
+			ProgressionTier = CalculateProgressionTier(DistanceFromOrigin);
+			SpatialHash = CalculateSpatialHash(nodeId);
 			}
 
 		private static int CalculateProgressionTier (float distance)
@@ -137,7 +137,8 @@ namespace TinyWalnutGames.MetVD.Graph
 	public partial struct RoomManagementSystem : ISystem
 		{
 		private EntityQuery _roomsQuery;
-		private EntityQuery _sectorsQuery;
+		// Future feature: Sector management integration
+		// private EntityQuery _sectorsQuery;
 
 		// Burst-compatible static arrays for enum values
 		private static readonly BiomeType [ ] ValidBiomes = new BiomeType [ ]
@@ -199,22 +200,23 @@ namespace TinyWalnutGames.MetVD.Graph
 		public void OnCreate (ref SystemState state)
 			{
 			// Use EntityQueryBuilder to avoid managed params array allocation
-			this._roomsQuery = new EntityQueryBuilder(Allocator.Temp)
+			_roomsQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<RoomHierarchyData, NodeId>()
 				.Build(ref state);
-			this._sectorsQuery = new EntityQueryBuilder(Allocator.Temp)
-				.WithAll<SectorHierarchyData, NodeId>()
-				.Build(ref state);
-			state.RequireForUpdate(this._roomsQuery);
+			// Future feature: Sector management integration
+			// _sectorsQuery = new EntityQueryBuilder(Allocator.Temp)
+			//	.WithAll<SectorHierarchyData, NodeId>()
+			//	.Build(ref state);
+			state.RequireForUpdate(_roomsQuery);
 			}
 
 		[BurstCompile]
 		public void OnUpdate (ref SystemState state)
 			{
 			// Get all rooms that need management data
-			using NativeArray<Entity> roomEntities = this._roomsQuery.ToEntityArray(Allocator.Temp);
-			using NativeArray<RoomHierarchyData> roomHierarchyData = this._roomsQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
-			using NativeArray<NodeId> roomNodeIds = this._roomsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+			using NativeArray<Entity> roomEntities = _roomsQuery.ToEntityArray(Allocator.Temp);
+			using NativeArray<RoomHierarchyData> roomHierarchyData = _roomsQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
+			using NativeArray<NodeId> roomNodeIds = _roomsQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
 
 			for (int i = 0; i < roomEntities.Length; i++)
 				{
@@ -239,7 +241,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				state.EntityManager.AddComponentData(entity, new RoomStateData(totalSecrets));
 
 				// Add navigation data
-				bool isCriticalPath = roomData.Type == RoomType.Entrance || roomData.Type == RoomType.Exit || roomData.Type == RoomType.Boss;
+				bool isCriticalPath = roomData.Type is RoomType.Entrance or RoomType.Exit or RoomType.Boss;
 				float traversalTime = CalculateTraversalTime(in roomData.Bounds, roomData.Type);
 				CalculatePrimaryEntrance(in roomData.Bounds, out int2 primaryEntrance);
 				state.EntityManager.AddComponentData(entity, new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime));

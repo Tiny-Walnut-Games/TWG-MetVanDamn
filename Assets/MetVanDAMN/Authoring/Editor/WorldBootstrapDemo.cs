@@ -29,19 +29,19 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[ContextMenu("Apply Demo Configuration")]
 		public void ApplyDemoConfiguration ()
 			{
-			if (this.targetBootstrap == null)
+			if (targetBootstrap == null)
 				{
-				this.targetBootstrap = FindFirstObjectByType<WorldBootstrapAuthoring>();
-				if (this.targetBootstrap == null)
+				targetBootstrap = FindFirstObjectByType<WorldBootstrapAuthoring>();
+				if (targetBootstrap == null)
 					{
 					Debug.LogError("No WorldBootstrapAuthoring found in scene. Add one first.");
 					return;
 					}
 				}
 
-			this.ApplyConfiguration();
-			UnityEditor.EditorUtility.SetDirty(this.targetBootstrap);
-			Debug.Log($"✅ Applied {this.demoType} configuration to WorldBootstrapAuthoring");
+			ApplyConfiguration();
+			UnityEditor.EditorUtility.SetDirty(targetBootstrap);
+			Debug.Log($"✅ Applied {demoType} configuration to WorldBootstrapAuthoring");
 			}
 
 		private void OnValidate ()
@@ -51,33 +51,33 @@ namespace TinyWalnutGames.MetVD.Authoring
 				return;
 				}
 
-			if (this.targetBootstrap != null && this.demoType != DemoType.Custom)
+			if (targetBootstrap != null && demoType != DemoType.Custom)
 				{
-				this.ApplyConfiguration();
+				ApplyConfiguration();
 				}
 			}
 #endif
 
 		private void ApplyConfiguration ()
 			{
-			if (this.targetBootstrap == null)
+			if (targetBootstrap == null)
 				{
 				return;
 				}
 
-			switch (this.demoType)
+			switch (demoType)
 				{
 				case DemoType.SmallWorld:
-					this.ConfigureSmallWorld();
+					ConfigureSmallWorld();
 					break;
 				case DemoType.MediumWorld:
-					this.ConfigureMediumWorld();
+					ConfigureMediumWorld();
 					break;
 				case DemoType.LargeWorld:
-					this.ConfigureLargeWorld();
+					ConfigureLargeWorld();
 					break;
 				case DemoType.DenseWorld:
-					this.ConfigureDenseWorld();
+					ConfigureDenseWorld();
 					break;
 				case DemoType.Custom:
 					// Don't modify - use inspector values
@@ -90,107 +90,107 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private void ConfigureSmallWorld ()
 			{
 			// Quick testing configuration
-			this.targetBootstrap.seed = 42;
-			this.targetBootstrap.worldSize = new int2(40, 40);
-			this.targetBootstrap.randomizationMode = RandomizationMode.Partial;
+			targetBootstrap.seed = 42;
+			targetBootstrap.worldSize = new int2(40, 40);
+			targetBootstrap.randomizationMode = RandomizationMode.Partial;
 
-			this.targetBootstrap.biomeCount = new Vector2Int(2, 4);
-			this.targetBootstrap.biomeWeight = 1.0f;
+			targetBootstrap.biomeCount = new Vector2Int(2, 4);
+			targetBootstrap.biomeWeight = 1.0f;
 
-			this.targetBootstrap.districtCount = new Vector2Int(3, 5);
-			this.targetBootstrap.districtMinDistance = 10f;
-			this.targetBootstrap.districtWeight = 1.0f;
+			targetBootstrap.districtCount = new Vector2Int(3, 5);
+			targetBootstrap.districtMinDistance = 10f;
+			targetBootstrap.districtWeight = 1.0f;
 
-			this.targetBootstrap.sectorsPerDistrict = new Vector2Int(2, 4);
-			this.targetBootstrap.sectorGridSize = new int2(4, 4);
+			targetBootstrap.sectorsPerDistrict = new Vector2Int(2, 4);
+			targetBootstrap.sectorGridSize = new int2(4, 4);
 
-			this.targetBootstrap.roomsPerSector = new Vector2Int(3, 8);
-			this.targetBootstrap.targetLoopDensity = 0.3f;
+			targetBootstrap.roomsPerSector = new Vector2Int(3, 8);
+			targetBootstrap.targetLoopDensity = 0.3f;
 
-			this.targetBootstrap.enableDebugVisualization = true;
-			this.targetBootstrap.logGenerationSteps = true;
+			targetBootstrap.enableDebugVisualization = true;
+			targetBootstrap.logGenerationSteps = true;
 			}
 
 		private void ConfigureMediumWorld ()
 			{
 			// Balanced gameplay configuration
-			this.targetBootstrap.seed = 0; // Random
-			this.targetBootstrap.worldSize = new int2(64, 64);
-			this.targetBootstrap.randomizationMode = RandomizationMode.Partial;
+			targetBootstrap.seed = 0; // Random
+			targetBootstrap.worldSize = new int2(64, 64);
+			targetBootstrap.randomizationMode = RandomizationMode.Partial;
 
-			this.targetBootstrap.biomeCount = new Vector2Int(3, 6);
-			this.targetBootstrap.biomeWeight = 1.2f;
+			targetBootstrap.biomeCount = new Vector2Int(3, 6);
+			targetBootstrap.biomeWeight = 1.2f;
 
-			this.targetBootstrap.districtCount = new Vector2Int(6, 10);
-			this.targetBootstrap.districtMinDistance = 15f;
-			this.targetBootstrap.districtWeight = 1.0f;
+			targetBootstrap.districtCount = new Vector2Int(6, 10);
+			targetBootstrap.districtMinDistance = 15f;
+			targetBootstrap.districtWeight = 1.0f;
 
-			this.targetBootstrap.sectorsPerDistrict = new Vector2Int(3, 6);
-			this.targetBootstrap.sectorGridSize = new int2(6, 6);
+			targetBootstrap.sectorsPerDistrict = new Vector2Int(3, 6);
+			targetBootstrap.sectorGridSize = new int2(6, 6);
 
-			this.targetBootstrap.roomsPerSector = new Vector2Int(4, 10);
-			this.targetBootstrap.targetLoopDensity = 0.4f;
+			targetBootstrap.roomsPerSector = new Vector2Int(4, 10);
+			targetBootstrap.targetLoopDensity = 0.4f;
 
-			this.targetBootstrap.enableDebugVisualization = true;
-			this.targetBootstrap.logGenerationSteps = false;
+			targetBootstrap.enableDebugVisualization = true;
+			targetBootstrap.logGenerationSteps = false;
 			}
 
 		private void ConfigureLargeWorld ()
 			{
 			// Epic adventure configuration
-			this.targetBootstrap.seed = 0; // Random
-			this.targetBootstrap.worldSize = new int2(100, 100);
-			this.targetBootstrap.randomizationMode = RandomizationMode.Full;
+			targetBootstrap.seed = 0; // Random
+			targetBootstrap.worldSize = new int2(100, 100);
+			targetBootstrap.randomizationMode = RandomizationMode.Full;
 
-			this.targetBootstrap.biomeCount = new Vector2Int(4, 8);
-			this.targetBootstrap.biomeWeight = 1.5f;
+			targetBootstrap.biomeCount = new Vector2Int(4, 8);
+			targetBootstrap.biomeWeight = 1.5f;
 
-			this.targetBootstrap.districtCount = new Vector2Int(10, 15);
-			this.targetBootstrap.districtMinDistance = 20f;
-			this.targetBootstrap.districtWeight = 0.8f;
+			targetBootstrap.districtCount = new Vector2Int(10, 15);
+			targetBootstrap.districtMinDistance = 20f;
+			targetBootstrap.districtWeight = 0.8f;
 
-			this.targetBootstrap.sectorsPerDistrict = new Vector2Int(4, 8);
-			this.targetBootstrap.sectorGridSize = new int2(8, 8);
+			targetBootstrap.sectorsPerDistrict = new Vector2Int(4, 8);
+			targetBootstrap.sectorGridSize = new int2(8, 8);
 
-			this.targetBootstrap.roomsPerSector = new Vector2Int(5, 12);
-			this.targetBootstrap.targetLoopDensity = 0.5f;
+			targetBootstrap.roomsPerSector = new Vector2Int(5, 12);
+			targetBootstrap.targetLoopDensity = 0.5f;
 
-			this.targetBootstrap.enableDebugVisualization = false; // Too large for gizmos
-			this.targetBootstrap.logGenerationSteps = true;
+			targetBootstrap.enableDebugVisualization = false; // Too large for gizmos
+			targetBootstrap.logGenerationSteps = true;
 			}
 
 		private void ConfigureDenseWorld ()
 			{
 			// High detail configuration
-			this.targetBootstrap.seed = 12345;
-			this.targetBootstrap.worldSize = new int2(80, 80);
-			this.targetBootstrap.randomizationMode = RandomizationMode.Partial;
+			targetBootstrap.seed = 12345;
+			targetBootstrap.worldSize = new int2(80, 80);
+			targetBootstrap.randomizationMode = RandomizationMode.Partial;
 
-			this.targetBootstrap.biomeCount = new Vector2Int(3, 5);
-			this.targetBootstrap.biomeWeight = 1.0f;
+			targetBootstrap.biomeCount = new Vector2Int(3, 5);
+			targetBootstrap.biomeWeight = 1.0f;
 
-			this.targetBootstrap.districtCount = new Vector2Int(5, 8);
-			this.targetBootstrap.districtMinDistance = 18f;
-			this.targetBootstrap.districtWeight = 1.2f;
+			targetBootstrap.districtCount = new Vector2Int(5, 8);
+			targetBootstrap.districtMinDistance = 18f;
+			targetBootstrap.districtWeight = 1.2f;
 
-			this.targetBootstrap.sectorsPerDistrict = new Vector2Int(6, 12);
-			this.targetBootstrap.sectorGridSize = new int2(10, 10);
+			targetBootstrap.sectorsPerDistrict = new Vector2Int(6, 12);
+			targetBootstrap.sectorGridSize = new int2(10, 10);
 
-			this.targetBootstrap.roomsPerSector = new Vector2Int(8, 15);
-			this.targetBootstrap.targetLoopDensity = 0.6f;
+			targetBootstrap.roomsPerSector = new Vector2Int(8, 15);
+			targetBootstrap.targetLoopDensity = 0.6f;
 
-			this.targetBootstrap.enableDebugVisualization = true;
-			this.targetBootstrap.logGenerationSteps = true;
+			targetBootstrap.enableDebugVisualization = true;
+			targetBootstrap.logGenerationSteps = true;
 			}
 
 #if UNITY_EDITOR
 		[ContextMenu("Calculate Estimated Totals")]
 		public void CalculateEstimatedTotals ()
 			{
-			if (this.targetBootstrap == null)
+			if (targetBootstrap == null)
 				{
-				this.targetBootstrap = FindFirstObjectByType<WorldBootstrapAuthoring>();
-				if (this.targetBootstrap == null)
+				targetBootstrap = FindFirstObjectByType<WorldBootstrapAuthoring>();
+				if (targetBootstrap == null)
 					{
 					Debug.LogError("No WorldBootstrapAuthoring found in scene.");
 					return;
@@ -198,20 +198,20 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 
 			// Calculate estimated totals (using averages)
-			float avgBiomes = (this.targetBootstrap.biomeCount.x + this.targetBootstrap.biomeCount.y) * 0.5f;
-			float avgDistricts = (this.targetBootstrap.districtCount.x + this.targetBootstrap.districtCount.y) * 0.5f;
-			float avgSectorsPerDistrict = (this.targetBootstrap.sectorsPerDistrict.x + this.targetBootstrap.sectorsPerDistrict.y) * 0.5f;
-			float avgRoomsPerSector = (this.targetBootstrap.roomsPerSector.x + this.targetBootstrap.roomsPerSector.y) * 0.5f;
+			float avgBiomes = (targetBootstrap.biomeCount.x + targetBootstrap.biomeCount.y) * 0.5f;
+			float avgDistricts = (targetBootstrap.districtCount.x + targetBootstrap.districtCount.y) * 0.5f;
+			float avgSectorsPerDistrict = (targetBootstrap.sectorsPerDistrict.x + targetBootstrap.sectorsPerDistrict.y) * 0.5f;
+			float avgRoomsPerSector = (targetBootstrap.roomsPerSector.x + targetBootstrap.roomsPerSector.y) * 0.5f;
 
 			float totalSectors = avgDistricts * avgSectorsPerDistrict;
 			float totalRooms = totalSectors * avgRoomsPerSector;
 
-			Debug.Log($"📊 Estimated Totals for {this.demoType}:\n" +
+			Debug.Log($"📊 Estimated Totals for {demoType}:\n" +
 					 $"🌿 Biomes: ~{avgBiomes:F1}\n" +
 					 $"🏰 Districts: ~{avgDistricts:F1}\n" +
 					 $"🏘️ Sectors: ~{totalSectors:F1}\n" +
 					 $"🏠 Rooms: ~{totalRooms:F1}\n" +
-					 $"🌍 World Size: {this.targetBootstrap.worldSize.x}x{this.targetBootstrap.worldSize.y}");
+					 $"🌍 World Size: {targetBootstrap.worldSize.x}x{targetBootstrap.worldSize.y}");
 			}
 #endif
 		}

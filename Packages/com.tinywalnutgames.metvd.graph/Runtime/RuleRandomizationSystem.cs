@@ -35,10 +35,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public WorldRuleSet (Polarity biomePolarityMask, uint availableUpgradesMask, bool upgradesRandomized, uint ruleSeed)
 			{
-			this.BiomePolarityMask = biomePolarityMask;
-			this.AvailableUpgradesMask = availableUpgradesMask;
-			this.UpgradesRandomized = upgradesRandomized;
-			this.RuleSeed = ruleSeed;
+			BiomePolarityMask = biomePolarityMask;
+			AvailableUpgradesMask = availableUpgradesMask;
+			UpgradesRandomized = upgradesRandomized;
+			RuleSeed = ruleSeed;
 			}
 		}
 
@@ -52,8 +52,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		public RuleRandomizationDoneTag (RandomizationMode mode, uint ruleCount = 0)
 			{
-			this.Mode = mode;
-			this.GeneratedRuleCount = ruleCount;
+			Mode = mode;
+			GeneratedRuleCount = ruleCount;
 			}
 		}
 
@@ -72,37 +72,37 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this._worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
+			_worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WorldConfiguration>()
 				.Build(ref state);
-			this._layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+			_layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<DistrictLayoutDoneTag>()
 				.Build(ref state);
-			this._rulesDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+			_rulesDoneQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<RuleRandomizationDoneTag>()
 				.Build(ref state);
 
-			state.RequireForUpdate(this._worldConfigQuery);
-			state.RequireForUpdate(this._layoutDoneQuery);
+			state.RequireForUpdate(_worldConfigQuery);
+			state.RequireForUpdate(_layoutDoneQuery);
 			}
 
 		[BurstCompile]
 		public void OnUpdate (ref SystemState state)
 			{
 			// Skip if rules already generated
-			if (!this._rulesDoneQuery.IsEmptyIgnoreFilter)
+			if (!_rulesDoneQuery.IsEmptyIgnoreFilter)
 				{
 				return;
 				}
 
 			// Wait for district layout to complete
-			if (this._layoutDoneQuery.IsEmptyIgnoreFilter)
+			if (_layoutDoneQuery.IsEmptyIgnoreFilter)
 				{
 				return;
 				}
 
-			WorldConfiguration worldConfig = this._worldConfigQuery.GetSingleton<WorldConfiguration>();
-			DistrictLayoutDoneTag layoutDone = this._layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
+			WorldConfiguration worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
+			DistrictLayoutDoneTag layoutDone = _layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
 
 			// Generate rules based on randomization mode
 			var random = new Random((uint)(worldConfig.Seed + 42));

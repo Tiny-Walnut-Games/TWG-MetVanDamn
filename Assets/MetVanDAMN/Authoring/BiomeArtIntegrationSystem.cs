@@ -48,19 +48,19 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		public void OnCreate (ref SystemState state)
 			{
-			this.biomeLookup = state.GetComponentLookup<CoreBiome>(true);
-			this.artProfileLookup = state.GetComponentLookup<BiomeArtProfileReference>();
-			this.nodeIdLookup = state.GetComponentLookup<NodeId>(true);
+			biomeLookup = state.GetComponentLookup<CoreBiome>(true);
+			artProfileLookup = state.GetComponentLookup<BiomeArtProfileReference>();
+			nodeIdLookup = state.GetComponentLookup<NodeId>(true);
 
 			// Query for all biomes with art profiles
-			this.biomeQuery = state.GetEntityQuery(
+			biomeQuery = state.GetEntityQuery(
 				ComponentType.ReadOnly<CoreBiome>(),
 				ComponentType.ReadOnly<BiomeArtProfileReference>(),
 				ComponentType.ReadOnly<NodeId>()
 			);
 
 			// Query for biomes that need optimization analysis
-			this.unprocessedBiomeQuery = state.GetEntityQuery(
+			unprocessedBiomeQuery = state.GetEntityQuery(
 				ComponentType.ReadOnly<CoreBiome>(),
 				ComponentType.ReadOnly<BiomeArtProfileReference>(),
 				ComponentType.ReadOnly<NodeId>(),
@@ -74,14 +74,14 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		public void OnUpdate (ref SystemState state)
 			{
-			this.biomeLookup.Update(ref state);
-			this.artProfileLookup.Update(ref state);
-			this.nodeIdLookup.Update(ref state);
+			biomeLookup.Update(ref state);
+			artProfileLookup.Update(ref state);
+			nodeIdLookup.Update(ref state);
 
 			// Use biomeQuery for coordinate-aware complexity analysis and spatial distribution monitoring
-			if (!this.biomeQuery.IsEmpty)
+			if (!biomeQuery.IsEmpty)
 				{
-				int totalBiomes = this.biomeQuery.CalculateEntityCount();
+				int totalBiomes = biomeQuery.CalculateEntityCount();
 
 				// Log spatial distribution for debugging (coordinate-aware usage of biomeQuery)
 				Debug.Log($"BiomeArtIntegration: Analyzing spatial distribution across {totalBiomes} biomes");
@@ -95,23 +95,23 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 
 			// Run pre-pass optimization analysis on unprocessed biomes
-			if (!this.unprocessedBiomeQuery.IsEmpty)
+			if (!unprocessedBiomeQuery.IsEmpty)
 				{
 				var analysisJob = new BiomeOptimizationAnalysisJob
 					{
-					biomeLookup = this.biomeLookup,
-					artProfileLookup = this.artProfileLookup,
-					nodeIdLookup = this.nodeIdLookup
+					biomeLookup = biomeLookup,
+					artProfileLookup = artProfileLookup,
+					nodeIdLookup = nodeIdLookup
 					};
 
-				state.Dependency = analysisJob.ScheduleParallel(this.unprocessedBiomeQuery, state.Dependency);
+				state.Dependency = analysisJob.ScheduleParallel(unprocessedBiomeQuery, state.Dependency);
 				}
 
 			// Run spatial coherence optimization for high-priority biomes
 			var spatialOptimizationJob = new SpatialCoherenceOptimizationJob
 				{
-				biomeLookup = this.biomeLookup,
-				nodeIdLookup = this.nodeIdLookup
+				biomeLookup = biomeLookup,
+				nodeIdLookup = nodeIdLookup
 				};
 
 			EntityQuery spatialQuery = state.GetEntityQuery(
@@ -140,7 +140,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		// [BurstCompile] - REMOVED: Job accesses Unity managed objects via ProfileRef.Value
 		public void Execute (Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
 			{
-			if (!this.artProfileLookup.TryGetComponent(entity, out BiomeArtProfileReference artProfileRef) || !artProfileRef.ProfileRef.IsValid())
+			if (!artProfileLookup.TryGetComponent(entity, out BiomeArtProfileReference artProfileRef) || !artProfileRef.ProfileRef.IsValid())
 				{
 				return;
 				}
@@ -269,7 +269,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[BurstCompile]
 		public void Execute (Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
 			{
-			if (!this.nodeIdLookup.TryGetComponent(entity, out NodeId nodeId))
+			if (!nodeIdLookup.TryGetComponent(entity, out NodeId nodeId))
 				{
 				return;
 				}
@@ -599,10 +599,10 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			// Get EntityCommandBuffer for structural changes
 			BeginInitializationEntityCommandBufferSystem.Singleton ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
-			EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(this.World.Unmanaged);
+			EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(World.Unmanaged);
 
 			// Process biome art profiles that need tilemap creation
-			this.Entities
+			Entities
 				.WithoutBurst() // Required for GameObject creation
 				.ForEach((Entity entity, ref BiomeArtProfileReference artProfileRef, in CoreBiome biome, in NodeId nodeId) =>
 				{
@@ -625,13 +625,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 						}
 
 					// Create tilemap based on projection type
-					Grid grid = this.CreateBiomeSpecificTilemap(artProfileRef.ProjectionType, artProfile, biome, nodeId);
+					Grid grid = CreateBiomeSpecificTilemap(artProfileRef.ProjectionType, artProfile, biome, nodeId);
 
 					// Place props using the integrated AdvancedPropPlacer
-					this.PlaceBiomeProps(artProfile, biome, nodeId, grid);
+					PlaceBiomeProps(artProfile, biome, nodeId, grid);
 
 					// Apply checkered material override for debugging if enabled
-					this.ApplyCheckerOverrideToGrid(grid, artProfile, biome, nodeId);
+					ApplyCheckerOverrideToGrid(grid, artProfile, biome, nodeId);
 
 					// Mark as applied using ECB to avoid structural changes during iteration
 					BiomeArtProfileReference updatedProfileRef = artProfileRef;
@@ -731,12 +731,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private Grid CreateBiomeSpecificTilemap (ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
 			{
 			// Get appropriate layer configuration based on projection type
-			string [ ] layerNames = this.GetLayerNamesForProjection(projectionType);
+			string [ ] layerNames = GetLayerNamesForProjection(projectionType);
 
 			// Create grid with appropriate projection settings (factory methods are void; capture before/after set)
 			Grid [ ] existing = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
 			HashSet<Grid> before = new(existing);
-			this.InvokeProjectionCreation(projectionType);
+			InvokeProjectionCreation(projectionType);
 			Grid createdGrid = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
 				.Where(g => !before.Contains(g))
 				.OrderByDescending(g => g.GetInstanceID())
@@ -775,7 +775,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					}
 
 				// Apply biome-specific tiles to the created layers
-				this.ApplyBiomeTilesToLayers(artProfile, layerNames, createdGrid);
+				ApplyBiomeTilesToLayers(artProfile, layerNames, createdGrid);
 				}
 
 			return createdGrid;
@@ -832,11 +832,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 			gridGO.transform.position = Vector3.zero;
 
 			// Create tilemap layers for this grid
-			string [ ] layerNames = this.GetLayerNamesForProjection(projectionType);
+			string [ ] layerNames = GetLayerNamesForProjection(projectionType);
 			for (int i = 0; i < layerNames.Length; i++)
 				{
 				int flippedZ = layerNames.Length - 1 - i;
-				this.CreateTilemapLayer(gridGO.transform, layerNames [ i ], flippedZ);
+				CreateTilemapLayer(gridGO.transform, layerNames [ i ], flippedZ);
 				}
 			}
 
@@ -879,7 +879,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					}
 
 				// Apply biome-specific tiles based on layer type
-				this.ApplyTileToLayer(tilemap, renderer, layerName, artProfile);
+				ApplyTileToLayer(tilemap, renderer, layerName, artProfile);
 				}
 			}
 
@@ -960,11 +960,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				// Each tilemap layer gets coordinate-aware material based on its purpose
 				string layerName = tilemap.name;
-				BiomeCheckerMaterialOverride.CheckerComplexitySettings layerAdjustedSettings = this.AdjustComplexitySettingsForLayer(complexitySettings, layerName);
+				BiomeCheckerMaterialOverride.CheckerComplexitySettings layerAdjustedSettings = AdjustComplexitySettingsForLayer(complexitySettings, layerName);
 
 				// Use ApplyCheckerOverrideIfEnabled for individual tilemap processing
 				// This integrates the previously unused method into the workflow
-				this.ApplyCheckerOverrideIfEnabled(tilemap, artProfile, biome, nodeId);
+				ApplyCheckerOverrideIfEnabled(tilemap, artProfile, biome, nodeId);
 
 				// Also apply the advanced grid-wide settings
 				BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome.Type, nodeId, layerAdjustedSettings);

@@ -17,12 +17,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void OnEnable ()
 			{
-			if (this._settings == null)
+			if (_settings == null)
 				{
 				string [ ] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
 				if (guids.Length > 0)
 					{
-					this._settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids [ 0 ]));
+					_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids [ 0 ]));
 					}
 				}
 			}
@@ -30,20 +30,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private void OnGUI ()
 			{
 			EditorGUILayout.LabelField("MetVanDAMN World Debug", EditorStyles.boldLabel);
-			this._settings = (MetVDGizmoSettings)EditorGUILayout.ObjectField("Gizmo Settings", this._settings, typeof(MetVDGizmoSettings), false);
-			if (this._settings == null)
+			_settings = (MetVDGizmoSettings)EditorGUILayout.ObjectField("Gizmo Settings", _settings, typeof(MetVDGizmoSettings), false);
+			if (_settings == null)
 				{
 				if (GUILayout.Button("Create Gizmo Settings Asset"))
 					{
-					this._settings = CreateInstance<MetVDGizmoSettings>();
-					AssetDatabase.CreateAsset(this._settings, "Assets/MetVanDAMN/Authoring/Editor/Gizmos/MetVDGizmoSettings.asset");
+					_settings = CreateInstance<MetVDGizmoSettings>();
+					AssetDatabase.CreateAsset(_settings, "Assets/MetVanDAMN/Authoring/Editor/Gizmos/MetVDGizmoSettings.asset");
 					AssetDatabase.SaveAssets();
 					}
 				return;
 				}
 
-			this._scroll = EditorGUILayout.BeginScrollView(this._scroll);
-			SerializedObject so = new(this._settings);
+			_scroll = EditorGUILayout.BeginScrollView(_scroll);
+			SerializedObject so = new(_settings);
 			so.Update();
 			SerializedProperty prop = so.GetIterator();
 			bool enter = true;

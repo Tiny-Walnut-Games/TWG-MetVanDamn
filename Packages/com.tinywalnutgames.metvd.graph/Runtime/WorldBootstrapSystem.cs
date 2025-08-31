@@ -24,40 +24,40 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this._bootstrapQuery = new EntityQueryBuilder(Allocator.Temp)
+			_bootstrapQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WorldBootstrapConfiguration>()
 				.WithNone<WorldBootstrapInProgressTag, WorldBootstrapCompleteTag>()
 				.Build(ref state);
 
-			this._inProgressQuery = new EntityQueryBuilder(Allocator.Temp)
+			_inProgressQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WorldBootstrapConfiguration, WorldBootstrapInProgressTag>()
 				.Build(ref state);
 
-			this._completeQuery = new EntityQueryBuilder(Allocator.Temp)
+			_completeQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WorldBootstrapCompleteTag>()
 				.Build(ref state);
 
-			state.RequireForUpdate(this._bootstrapQuery);
+			state.RequireForUpdate(_bootstrapQuery);
 			}
 
 		[BurstCompile]
 		public void OnUpdate (ref SystemState state)
 			{
 			// Skip if bootstrap is already complete
-			if (!this._completeQuery.IsEmptyIgnoreFilter)
+			if (!_completeQuery.IsEmptyIgnoreFilter)
 				{
 				return;
 				}
 
 			// Skip if bootstrap is already in progress
-			if (!this._inProgressQuery.IsEmptyIgnoreFilter)
+			if (!_inProgressQuery.IsEmptyIgnoreFilter)
 				{
 				return;
 				}
 
 			// Get the bootstrap configuration
-			Entity bootstrapEntity = this._bootstrapQuery.GetSingletonEntity();
-			WorldBootstrapConfiguration config = this._bootstrapQuery.GetSingleton<WorldBootstrapConfiguration>();
+			Entity bootstrapEntity = _bootstrapQuery.GetSingletonEntity();
+			WorldBootstrapConfiguration config = _bootstrapQuery.GetSingleton<WorldBootstrapConfiguration>();
 
 			// Mark bootstrap as in progress
 			state.EntityManager.AddComponentData(bootstrapEntity, new WorldBootstrapInProgressTag());

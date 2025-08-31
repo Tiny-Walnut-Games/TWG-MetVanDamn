@@ -15,19 +15,19 @@ namespace TinyWalnutGames.MetVD.Core
 
 		public void OnCreate (ref SystemState state)
 			{
-			this._edgeQuery = state.GetEntityQuery(ComponentType.ReadOnly<ConnectionEdge>());
-			this._doneQuery = state.GetEntityQuery(ComponentType.ReadOnly<ConnectionGraphBuiltTag>());
-			state.RequireForUpdate(this._edgeQuery);
+			_edgeQuery = state.GetEntityQuery(ComponentType.ReadOnly<ConnectionEdge>());
+			_doneQuery = state.GetEntityQuery(ComponentType.ReadOnly<ConnectionGraphBuiltTag>());
+			state.RequireForUpdate(_edgeQuery);
 			}
 
 		public void OnUpdate (ref SystemState state)
 			{
-			if (this._edgeQuery.IsEmpty || !this._doneQuery.IsEmptyIgnoreFilter)
+			if (_edgeQuery.IsEmpty || !_doneQuery.IsEmptyIgnoreFilter)
 				{
 				return; // nothing to do OR already built
 				}
 
-			NativeArray<ConnectionEdge> edges = this._edgeQuery.ToComponentDataArray<ConnectionEdge>(Allocator.Temp); // small one-shot copy
+			NativeArray<ConnectionEdge> edges = _edgeQuery.ToComponentDataArray<ConnectionEdge>(Allocator.Temp); // small one-shot copy
 			EntityManager em = state.EntityManager;
 
 			for (int i = 0; i < edges.Length; i++)

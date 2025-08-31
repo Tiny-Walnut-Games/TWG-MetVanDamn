@@ -21,48 +21,48 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
-			this._unplacedQuery = new EntityQueryBuilder(Allocator.Temp)
+			_unplacedQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<NodeId, WfcState>()
 				.Build(ref state);
-			this._worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
+			_worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WorldConfiguration>()
 				.Build(ref state);
-			this._layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
+			_layoutDoneQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<DistrictLayoutDoneTag>()
 				.Build(ref state);
 			// Only require unplaced districts; world config now optional (fallback if missing)
-			state.RequireForUpdate(this._unplacedQuery);
+			state.RequireForUpdate(_unplacedQuery);
 			}
 
 		[BurstCompile]
 		public void OnUpdate (ref SystemState state)
 			{
-			if (!this._layoutDoneQuery.IsEmptyIgnoreFilter)
+			if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
 				{
 				return;
 				}
 
 			// Fallback configuration if authoring/baker did not supply one (e.g., tests / legacy bootstrap)
 			WorldConfiguration worldConfig;
-			if (this._worldConfigQuery.IsEmptyIgnoreFilter)
+			if (_worldConfigQuery.IsEmptyIgnoreFilter)
 				{
 				worldConfig = new WorldConfiguration { Seed = (int)(state.WorldUnmanaged.Time.ElapsedTime * 1000 + 1), WorldSize = new int2(64, 64), TargetSectors = 0, RandomizationMode = RandomizationMode.None };
-				if (!this._loggedFallback && SystemAPI.Time.ElapsedTime > 0)
+				if (!_loggedFallback && SystemAPI.Time.ElapsedTime > 0)
 					{
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 					// UnityEngine.Debug.LogWarning("DistrictLayoutSystem: WorldConfiguration missing. Using fallback defaults (64x64, all sectors)."); // REMOVED: Debug.LogWarning not allowed in Burst jobs
 					// Fallback configuration: 64x64, all sectors (check _loggedFallback flag to see if fallback was used)
 #endif
-					this._loggedFallback = true;
+					_loggedFallback = true;
 					}
 				}
 			else
 				{
-				worldConfig = this._worldConfigQuery.GetSingleton<WorldConfiguration>();
+				worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
 				}
 
-			NativeArray<Entity> unplacedEntities = this._unplacedQuery.ToEntityArray(Allocator.Temp);
-			NativeArray<NodeId> nodeIds = this._unplacedQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
+			NativeArray<Entity> unplacedEntities = _unplacedQuery.ToEntityArray(Allocator.Temp);
+			NativeArray<NodeId> nodeIds = _unplacedQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
 			try
 				{
 				// Collect all level 0 districts still at (0,0)

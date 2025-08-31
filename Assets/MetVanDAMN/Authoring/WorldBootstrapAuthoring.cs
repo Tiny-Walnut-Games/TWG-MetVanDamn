@@ -70,35 +70,35 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private void OnValidate ()
 			{
 			// Ensure valid ranges
-			this.biomeCount.x = Mathf.Max(1, this.biomeCount.x);
-			this.biomeCount.y = Mathf.Max(this.biomeCount.x, this.biomeCount.y);
+			biomeCount.x = Mathf.Max(1, biomeCount.x);
+			biomeCount.y = Mathf.Max(biomeCount.x, biomeCount.y);
 
-			this.districtCount.x = Mathf.Max(1, this.districtCount.x);
-			this.districtCount.y = Mathf.Max(this.districtCount.x, this.districtCount.y);
+			districtCount.x = Mathf.Max(1, districtCount.x);
+			districtCount.y = Mathf.Max(districtCount.x, districtCount.y);
 
-			this.sectorsPerDistrict.x = Mathf.Max(1, this.sectorsPerDistrict.x);
-			this.sectorsPerDistrict.y = Mathf.Max(this.sectorsPerDistrict.x, this.sectorsPerDistrict.y);
+			sectorsPerDistrict.x = Mathf.Max(1, sectorsPerDistrict.x);
+			sectorsPerDistrict.y = Mathf.Max(sectorsPerDistrict.x, sectorsPerDistrict.y);
 
-			this.roomsPerSector.x = Mathf.Max(1, this.roomsPerSector.x);
-			this.roomsPerSector.y = Mathf.Max(this.roomsPerSector.x, this.roomsPerSector.y);
+			roomsPerSector.x = Mathf.Max(1, roomsPerSector.x);
+			roomsPerSector.y = Mathf.Max(roomsPerSector.x, roomsPerSector.y);
 
-			this.sectorGridSize = math.max(new int2(2, 2), this.sectorGridSize);
+			sectorGridSize = math.max(new int2(2, 2), sectorGridSize);
 			}
 
 #if UNITY_EDITOR
 		private void OnDrawGizmos ()
 			{
-			if (this.enableDebugVisualization)
+			if (enableDebugVisualization)
 				{
-				this.DrawWorldBounds();
+				DrawWorldBounds();
 				}
 			}
 
 		private void DrawWorldBounds ()
 			{
 			Gizmos.color = new Color(0.2f, 0.9f, 0.4f, 0.3f);
-			Vector3 center = this.transform.position;
-			var size = new Vector3(this.worldSize.x, 0.1f, this.worldSize.y);
+			Vector3 center = transform.position;
+			var size = new Vector3(worldSize.x, 0.1f, worldSize.y);
 			Gizmos.DrawWireCube(center, size);
 
 			Gizmos.color = new Color(0.2f, 0.9f, 0.4f, 0.1f);

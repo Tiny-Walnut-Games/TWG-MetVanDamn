@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -681,7 +682,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			var go = GameObject.Find(subName);
 			if (go == null)
 				{
-				Debug.LogError($"❌ SubScene GameObject '{subName}' not found! Available GameObjects: {string.Join(", ", Object.FindObjectsOfType<GameObject>().Select(obj => obj.name))}");
+				Debug.LogError($"❌ SubScene GameObject '{subName}' not found! Available GameObjects: {string.Join(", ", UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsSortMode.InstanceID).Select(obj => obj.name))}");
 				return false;
 				}
 
