@@ -6,7 +6,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	{
 	public class WorldConfigurationBaker : Baker<WorldConfigurationAuthoring>
 		{
-		public override void Bake (WorldConfigurationAuthoring authoring)
+		public override void Bake(WorldConfigurationAuthoring authoring)
 			{
 			Entity entity = GetEntity(TransformUsageFlags.None);
 			AddComponent(entity, new WorldConfiguration

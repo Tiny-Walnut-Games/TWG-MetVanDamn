@@ -137,7 +137,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public FixedString64Bytes Description;
 
-		public GateCondition (Polarity requiredPolarity = Polarity.None,
+		public GateCondition(Polarity requiredPolarity = Polarity.None,
 							Ability requiredAbilities = Ability.None,
 							GateSoftness softness = GateSoftness.Hard,
 							float minimumSkillLevel = 0.0f,
@@ -159,7 +159,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Check if the gate can be passed with given polarity and abilities
 		/// </summary>
-		public readonly bool CanPass (Polarity availablePolarity, Ability availableAbilities, float playerSkillLevel = 0.0f)
+		public readonly bool CanPass(Polarity availablePolarity, Ability availableAbilities, float playerSkillLevel = 0.0f)
 			{
 			if (!IsActive || IsUnlocked)
 				{
@@ -195,7 +195,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Get the missing requirements for passing this gate
 		/// </summary>
-		public readonly (Polarity missingPolarity, Ability missingAbilities) GetMissingRequirements (
+		public readonly (Polarity missingPolarity, Ability missingAbilities) GetMissingRequirements(
 			Polarity availablePolarity, Ability availableAbilities)
 			{
 			Polarity missingPolarity = Polarity.None;
@@ -222,7 +222,7 @@ namespace TinyWalnutGames.MetVD.Core
 			return (missingPolarity, missingAbilities);
 			}
 
-		public override readonly string ToString ()
+		public override readonly string ToString()
 			{
 			return $"Gate({RequiredPolarity}, {RequiredAbilities}, {Softness}, Active:{IsActive})";
 			}
@@ -236,7 +236,7 @@ namespace TinyWalnutGames.MetVD.Core
 		{
 		public GateCondition Value;
 
-		public static implicit operator GateCondition (GateConditionBufferElement e) => e.Value;
-		public static implicit operator GateConditionBufferElement (GateCondition e) => new() { Value = e };
+		public static implicit operator GateCondition(GateConditionBufferElement e) => e.Value;
+		public static implicit operator GateConditionBufferElement(GateCondition e) => new() { Value = e };
 		}
 	}

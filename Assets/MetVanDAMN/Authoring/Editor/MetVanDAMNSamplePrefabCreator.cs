@@ -16,7 +16,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private const string PrefabPath = "Assets/MetVanDAMN/Prefabs/Samples/";
 
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Sample Creation/Create Sample Prefabs")]
-		public static void CreateAllSamplePrefabs ()
+		public static void CreateAllSamplePrefabs()
 			{
 			// Ensure directory exists
 			if (!AssetDatabase.IsValidFolder("Assets/MetVanDAMN/Prefabs"))
@@ -39,7 +39,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log("MetVanDAMN sample prefabs created successfully!");
 			}
 
-		private static void CreateDistrictPrefab ()
+		private static void CreateDistrictPrefab()
 			{
 			var go = new GameObject("District_Sample");
 
@@ -68,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SavePrefab(go, "District_Sample.prefab");
 			}
 
-		private static void CreateConnectionAnchorPrefab ()
+		private static void CreateConnectionAnchorPrefab()
 			{
 			var go = new GameObject("ConnectionAnchor_Sample");
 
@@ -94,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SavePrefab(go, "ConnectionAnchor_Sample.prefab");
 			}
 
-		private static void CreateBiomeFieldPrefab ()
+		private static void CreateBiomeFieldPrefab()
 			{
 			var go = new GameObject("BiomeField_Sample");
 
@@ -136,7 +136,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SavePrefab(go, "BiomeField_Sample.prefab");
 			}
 
-		private static void CreateWfcTilePrototypePrefabs ()
+		private static void CreateWfcTilePrototypePrefabs()
 			{
 			// Create different tile prototype samples
 			CreateWfcTilePrototype("Hub", 1, 1.0f, BiomeType.HubArea, Polarity.None, 2, 4);
@@ -145,7 +145,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			CreateWfcTilePrototype("Specialist", 4, 0.4f, BiomeType.VolcanicCore, Polarity.Heat, 1, 2);
 			}
 
-		private static void CreateWfcTilePrototype (string name, uint tileId, float weight, BiomeType biomeType, Polarity polarity, byte minConn, byte maxConn)
+		private static void CreateWfcTilePrototype(string name, uint tileId, float weight, BiomeType biomeType, Polarity polarity, byte minConn, byte maxConn)
 			{
 			var go = new GameObject($"WfcTilePrototype_{name}");
 
@@ -241,7 +241,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SavePrefab(go, $"WfcTilePrototype_{name}.prefab");
 			}
 
-		private static void SavePrefab (GameObject go, string filename)
+		private static void SavePrefab(GameObject go, string filename)
 			{
 			try
 				{

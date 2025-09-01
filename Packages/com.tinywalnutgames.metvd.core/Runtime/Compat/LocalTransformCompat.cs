@@ -14,7 +14,7 @@ namespace TinyWalnutGames.MetVD.Core.Compat
 		public quaternion Rotation;
 		public float Scale;
 
-		public static LocalTransformCompat FromPosition (float3 p)
+		public static LocalTransformCompat FromPosition(float3 p)
 			{
 			return new() { Position = p, Rotation = quaternion.identity, Scale = 1f };
 			}
@@ -22,12 +22,12 @@ namespace TinyWalnutGames.MetVD.Core.Compat
 
 	internal static class LocalTransformCompatExtensions
 		{
-		public static float3 GetPosition (ref this LocalTransformCompat t)
+		public static float3 GetPosition(ref this LocalTransformCompat t)
 			{
 			return t.Position;
 			}
 
-		public static void SetPosition (ref this LocalTransformCompat t, float3 p)
+		public static void SetPosition(ref this LocalTransformCompat t, float3 p)
 			{
 			t.Position = p;
 			}

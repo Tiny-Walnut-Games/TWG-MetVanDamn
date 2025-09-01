@@ -21,7 +21,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _layoutDoneQuery; // optional
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			socketBufferLookup = state.GetBufferLookup<WfcSocketBufferElement>(true);
 			candidateBufferLookup = state.GetBufferLookup<WfcCandidateBufferElement>();
@@ -35,7 +35,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		// Replace the body of WfcProcessingJob.Execute() to avoid using SystemAPI.Query inside the job.
 		// Instead, pass in a NativeArray of entities to process, and use Component/BufferLookups.
 
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			socketBufferLookup.Update(ref state);
 			candidateBufferLookup.Update(ref state);
@@ -72,7 +72,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			// Complete the job immediately to ensure synchronization
 			state.Dependency.Complete();
-			
+
 			entities.Dispose();
 			}
 
@@ -86,7 +86,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			public ComponentLookup<WfcState> WfcStates;
 			[ReadOnly] public ComponentLookup<NodeId> NodeIds;
 
-			public void Execute ()
+			public void Execute()
 				{
 				var random = new Random(BaseSeed == 0 ? 1u : BaseSeed);
 
@@ -121,7 +121,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private void ProcessInitialized (Entity entity, RefRW<WfcState> wfcState, Random random, in NodeId nodeId)
+			private void ProcessInitialized(Entity entity, RefRW<WfcState> wfcState, Random random, in NodeId nodeId)
 				{
 				if (!CandidateBufferLookup.HasBuffer(entity))
 					{
@@ -134,7 +134,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				wfcState.ValueRW.State = WfcGenerationState.InProgress;
 				}
 
-			private void ProcessInProgress (Entity entity, RefRW<WfcState> wfcState, in NodeId nodeId, Random random)
+			private void ProcessInProgress(Entity entity, RefRW<WfcState> wfcState, in NodeId nodeId, Random random)
 				{
 				if (!CandidateBufferLookup.HasBuffer(entity))
 					{
@@ -179,7 +179,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private readonly void InitializeCandidates (Entity entity, Random random, in NodeId nodeId)
+			private readonly void InitializeCandidates(Entity entity, Random random, in NodeId nodeId)
 				{
 				if (!CandidateBufferLookup.HasBuffer(entity))
 					{
@@ -201,7 +201,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				candidates.Add(new WfcCandidateBufferElement(4, (0.2f + distance * 0.5f) * entityVariance));
 				}
 
-			private readonly void PropagateConstraints (Entity entity, DynamicBuffer<WfcCandidateBufferElement> candidates, in NodeId nodeId, Random random)
+			private readonly void PropagateConstraints(Entity entity, DynamicBuffer<WfcCandidateBufferElement> candidates, in NodeId nodeId, Random random)
 				{
 				var coords = (float2)nodeId.Coordinates;
 
@@ -237,20 +237,20 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private readonly bool ValidateBiomeCompatibility (uint tileId, in NodeId nodeId, Random random)
+			private readonly bool ValidateBiomeCompatibility(uint tileId, in NodeId nodeId, Random random)
 				{
 				var coords = (float2)nodeId.Coordinates;
 				float d = math.length(coords);
 				return d > 60f && tileId == 1 ? random.NextFloat() < 0.1f : true;
 				}
 
-			private readonly bool ValidatePolarityCompatibility (uint tileId, in NodeId nodeId, Random random)
+			private readonly bool ValidatePolarityCompatibility(uint tileId, in NodeId nodeId, Random random)
 				{
 				int parity = (nodeId.Coordinates.x ^ nodeId.Coordinates.y) & 1;
 				return parity == 1 && tileId == 4 ? random.NextFloat() > 0.2f : true;
 				}
 
-			private readonly bool ValidateSocketConstraints (Entity entity, uint tileId, in NodeId nodeId, Random random)
+			private readonly bool ValidateSocketConstraints(Entity entity, uint tileId, in NodeId nodeId, Random random)
 				{
 				if (!SocketBufferLookup.HasBuffer(entity))
 					{
@@ -262,7 +262,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return (tileId & 1) == 0 && centerFactor < 0.2f ? random.NextFloat() > 0.3f : true;
 				}
 
-			private readonly uint CollapseRandomly (DynamicBuffer<WfcCandidateBufferElement> candidates, Random random)
+			private readonly uint CollapseRandomly(DynamicBuffer<WfcCandidateBufferElement> candidates, Random random)
 				{
 				if (candidates.Length == 0)
 					{

@@ -27,7 +27,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 #if UNITY_EDITOR
 		[ContextMenu("Apply Demo Configuration")]
-		public void ApplyDemoConfiguration ()
+		public void ApplyDemoConfiguration()
 			{
 			if (targetBootstrap == null)
 				{
@@ -44,7 +44,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			Debug.Log($"✅ Applied {demoType} configuration to WorldBootstrapAuthoring");
 			}
 
-		private void OnValidate ()
+		private void OnValidate()
 			{
 			if (Application.isPlaying)
 				{
@@ -58,7 +58,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			}
 #endif
 
-		private void ApplyConfiguration ()
+		private void ApplyConfiguration()
 			{
 			if (targetBootstrap == null)
 				{
@@ -87,7 +87,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private void ConfigureSmallWorld ()
+		private void ConfigureSmallWorld()
 			{
 			// Quick testing configuration
 			targetBootstrap.seed = 42;
@@ -111,7 +111,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			targetBootstrap.logGenerationSteps = true;
 			}
 
-		private void ConfigureMediumWorld ()
+		private void ConfigureMediumWorld()
 			{
 			// Balanced gameplay configuration
 			targetBootstrap.seed = 0; // Random
@@ -135,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			targetBootstrap.logGenerationSteps = false;
 			}
 
-		private void ConfigureLargeWorld ()
+		private void ConfigureLargeWorld()
 			{
 			// Epic adventure configuration
 			targetBootstrap.seed = 0; // Random
@@ -159,7 +159,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			targetBootstrap.logGenerationSteps = true;
 			}
 
-		private void ConfigureDenseWorld ()
+		private void ConfigureDenseWorld()
 			{
 			// High detail configuration
 			targetBootstrap.seed = 12345;
@@ -185,7 +185,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 #if UNITY_EDITOR
 		[ContextMenu("Calculate Estimated Totals")]
-		public void CalculateEstimatedTotals ()
+		public void CalculateEstimatedTotals()
 			{
 			if (targetBootstrap == null)
 				{

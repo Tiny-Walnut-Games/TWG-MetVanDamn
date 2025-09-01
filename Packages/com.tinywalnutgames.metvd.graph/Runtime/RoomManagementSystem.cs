@@ -37,7 +37,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public float CompletionPercentage;
 
-		public RoomStateData (int totalSecrets = 0)
+		public RoomStateData(int totalSecrets = 0)
 			{
 			IsVisited = false;
 			IsExplored = false;
@@ -72,7 +72,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public float TraversalTime;
 
-		public RoomNavigationData (int2 primaryEntrance, bool isCriticalPath = false, float traversalTime = 5.0f)
+		public RoomNavigationData(int2 primaryEntrance, bool isCriticalPath = false, float traversalTime = 5.0f)
 			{
 			EntranceCount = 1;
 			PrimaryEntrance = primaryEntrance;
@@ -90,7 +90,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public int2 Position;
 		public uint FeatureId;
 
-		public RoomFeatureElement (RoomFeatureType type, int2 position, uint featureId = 0)
+		public RoomFeatureElement(RoomFeatureType type, int2 position, uint featureId = 0)
 			{
 			Type = type;
 			Position = position;
@@ -107,20 +107,20 @@ namespace TinyWalnutGames.MetVD.Graph
 		public int ProgressionTier;
 		public uint SpatialHash;
 
-		public ProgressionAnalysis (NodeId nodeId)
+		public ProgressionAnalysis(NodeId nodeId)
 			{
 			DistanceFromOrigin = math.length((float2)nodeId.Coordinates);
 			ProgressionTier = CalculateProgressionTier(DistanceFromOrigin);
 			SpatialHash = CalculateSpatialHash(nodeId);
 			}
 
-		private static int CalculateProgressionTier (float distance)
+		private static int CalculateProgressionTier(float distance)
 			{
 			// Progressive difficulty tiers based on distance
 			return math.min((int)(distance / 3.0f), 7); // 8 tiers (0-7)
 			}
 
-		private static uint CalculateSpatialHash (NodeId nodeId)
+		private static uint CalculateSpatialHash(NodeId nodeId)
 			{
 			return nodeId._value ^ ((uint)nodeId.Coordinates.x << 16) ^ ((uint)nodeId.Coordinates.y << 8) ^ nodeId.ParentId;
 			}
@@ -197,7 +197,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		};
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			// Use EntityQueryBuilder to avoid managed params array allocation
 			_roomsQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -211,7 +211,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		[BurstCompile]
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			// Get all rooms that need management data
 			using NativeArray<Entity> roomEntities = _roomsQuery.ToEntityArray(Allocator.Temp);
@@ -259,7 +259,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Initialize room generation request using existing enums and dynamic discovery
 		/// Properly utilizes nodeId for spatial-aware biome, polarity, and skill determination
 		/// </summary>
-		private static void InitializeRoomGenerationRequest (EntityManager entityManager, Entity roomEntity,
+		private static void InitializeRoomGenerationRequest(EntityManager entityManager, Entity roomEntity,
 														   RoomHierarchyData roomData, NodeId nodeId,
 														   ProgressionAnalysis progression,
 														   ref Unity.Mathematics.Random random)
@@ -299,7 +299,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Determine biome based on nodeId spatial coordinates and parent relationships
 		/// Uses Burst-compatible static arrays with spatial coherence logic
 		/// </summary>
-		private static BiomeType DetermineBiomeFromNodeId (NodeId nodeId)
+		private static BiomeType DetermineBiomeFromNodeId(NodeId nodeId)
 			{
 			// Use nodeId coordinates to create deterministic but varied biome regions
 			int2 coords = nodeId.Coordinates;
@@ -340,7 +340,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Determine polarity based on nodeId characteristics
 		/// Uses spatial coordinates and parent relationships for coherent polarity distribution
 		/// </summary>
-		private static Polarity DeterminePolarityFromNodeId (NodeId nodeId)
+		private static Polarity DeterminePolarityFromNodeId(NodeId nodeId)
 			{
 			// Use nodeId hash to determine polarity in a deterministic way
 			uint hash = (uint)(nodeId._value ^ (nodeId.Coordinates.x << 16) ^ (nodeId.Coordinates.y << 8));
@@ -367,7 +367,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Determine available skills based on nodeId position (simulating progression)
 		/// Uses distance from origin and parent hierarchy for skill complexity
 		/// </summary>
-		private static Ability DetermineAvailableSkillsFromNodeId (NodeId nodeId)
+		private static Ability DetermineAvailableSkillsFromNodeId(NodeId nodeId)
 			{
 			float distanceFromOrigin = math.sqrt(nodeId.Coordinates.x * nodeId.Coordinates.x + nodeId.Coordinates.y * nodeId.Coordinates.y);
 
@@ -470,7 +470,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Combine nodeId with random seed for deterministic but varied generation
 		/// </summary>
-		private static uint CombineNodeIdWithRandom (NodeId nodeId, uint randomSeed)
+		private static uint CombineNodeIdWithRandom(NodeId nodeId, uint randomSeed)
 			{
 			// Create a hash that combines nodeId properties with the random seed
 			// This ensures rooms at the same nodeId generate consistently, but with variation
@@ -480,7 +480,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Enhanced secret count determination with progression influence
 		/// </summary>
-		private static int DetermineSecretCount (RoomType roomType, ProgressionAnalysis progression, ref Unity.Mathematics.Random random)
+		private static int DetermineSecretCount(RoomType roomType, ProgressionAnalysis progression, ref Unity.Mathematics.Random random)
 			{
 			int baseCount = roomType switch
 				{
@@ -499,7 +499,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Enhanced room feature population with progression-aware content
 		/// </summary>
-		private static void PopulateRoomFeatures (DynamicBuffer<RoomFeatureElement> features,
+		private static void PopulateRoomFeatures(DynamicBuffer<RoomFeatureElement> features,
 												in RoomHierarchyData roomData,
 												ProgressionAnalysis progression,
 												ref Unity.Mathematics.Random random)
@@ -538,7 +538,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Add specialized components efficiently based on generator type and progression
 		/// </summary>
-		private static void AddSpecializedComponents (EntityManager entityManager, Entity roomEntity,
+		private static void AddSpecializedComponents(EntityManager entityManager, Entity roomEntity,
 													RoomGeneratorType generatorType, RoomHierarchyData roomData,
 													ProgressionAnalysis progression)
 			{
@@ -571,7 +571,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		// PROGRESSIVE ROOM FEATURE METHODS
 		// ========================================
 
-		private static void AddProgressiveBossRoomFeatures (DynamicBuffer<RoomFeatureElement> features,
+		private static void AddProgressiveBossRoomFeatures(DynamicBuffer<RoomFeatureElement> features,
 														  in RectInt bounds, ProgressionAnalysis progression,
 														  ref Unity.Mathematics.Random random)
 			{
@@ -591,7 +591,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void AddProgressiveTreasureRoomFeatures (DynamicBuffer<RoomFeatureElement> features,
+		private static void AddProgressiveTreasureRoomFeatures(DynamicBuffer<RoomFeatureElement> features,
 															 in RectInt bounds, ProgressionAnalysis progression,
 															 ref Unity.Mathematics.Random random)
 			{
@@ -608,7 +608,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void AddProgressiveNormalRoomFeatures (DynamicBuffer<RoomFeatureElement> features,
+		private static void AddProgressiveNormalRoomFeatures(DynamicBuffer<RoomFeatureElement> features,
 														   in RectInt bounds, int area,
 														   ProgressionAnalysis progression,
 														   ref Unity.Mathematics.Random random)
@@ -655,7 +655,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		// REMAINING ORIGINAL METHODS (unchanged for compatibility)
 		// ========================================
 
-		private static RoomGeneratorType DetermineGeneratorType (RoomType roomType, RectInt bounds)
+		private static RoomGeneratorType DetermineGeneratorType(RoomType roomType, RectInt bounds)
 			{
 			float aspectRatio = (float)bounds.width / bounds.height;
 
@@ -670,7 +670,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					};
 			}
 
-		private static float CalculateTraversalTime (in RectInt bounds, RoomType roomType)
+		private static float CalculateTraversalTime(in RectInt bounds, RoomType roomType)
 			{
 			int area = bounds.width * bounds.height;
 			float baseTime = math.sqrt(area) * 0.5f;
@@ -684,18 +684,18 @@ namespace TinyWalnutGames.MetVD.Graph
 					};
 			}
 
-		private static void CalculatePrimaryEntrance (in RectInt bounds, out int2 result)
+		private static void CalculatePrimaryEntrance(in RectInt bounds, out int2 result)
 			{
 			result = new int2(bounds.x + bounds.width / 2, bounds.y);
 			}
 
-		private static void AddSaveRoomFeatures (DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
+		private static void AddSaveRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
 			{
 			var savePos = new int2(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
 			features.Add(new RoomFeatureElement(RoomFeatureType.SaveStation, savePos, random.NextUInt()));
 			}
 
-		private static void AddShopRoomFeatures (DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
+		private static void AddShopRoomFeatures(DynamicBuffer<RoomFeatureElement> features, in RectInt bounds, ref Unity.Mathematics.Random random)
 			{
 			int itemCount = random.NextInt(2, 5);
 			for (int i = 0; i < itemCount; i++)

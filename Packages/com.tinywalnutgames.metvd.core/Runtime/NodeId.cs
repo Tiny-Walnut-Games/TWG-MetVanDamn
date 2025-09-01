@@ -32,7 +32,7 @@ namespace TinyWalnutGames.MetVD.Core
 		// Backward-compatible alias used by older tests (nodeId.value)
 		public uint Value { readonly get => _value; set => _value = value; }
 
-		public NodeId (uint value, byte level = 0, uint parentId = 0, int2 coordinates = default)
+		public NodeId(uint value, byte level = 0, uint parentId = 0, int2 coordinates = default)
 			{
 			_value = value;
 			Level = level;
@@ -40,12 +40,12 @@ namespace TinyWalnutGames.MetVD.Core
 			Coordinates = coordinates;
 			}
 
-		public override readonly string ToString ()
+		public override readonly string ToString()
 			{
 			return $"NodeId({_value}, L{Level}, Parent:{ParentId}, Pos:{Coordinates})";
 			}
 
-		public static implicit operator uint (NodeId nodeId) => nodeId._value;
-		public static implicit operator NodeId (uint value) => new(value);
+		public static implicit operator uint(NodeId nodeId) => nodeId._value;
+		public static implicit operator NodeId(uint value) => new(value);
 		}
 	}

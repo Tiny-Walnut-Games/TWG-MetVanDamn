@@ -50,7 +50,7 @@ namespace LivingDevAgent.Editor.Modules
 		[HideInInspector] public string [ ] billingCodes; // e.g., "BILL-123", "BILL-456"
 
 		// Create a new TaskData instance
-		public static TaskData CreateTask (string name, string description, string assignedUser, int priority)
+		public static TaskData CreateTask(string name, string description, string assignedUser, int priority)
 			{
 			TaskData newTask = CreateInstance<TaskData>();
 			newTask.TaskName = name; // Fixed: Use proper field name
@@ -85,7 +85,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		// Mark the task as completed
-		public void CompleteTask ()
+		public void CompleteTask()
 			{
 			if (!isCompleted && !isCanceled)
 				{
@@ -102,7 +102,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		// Cancel the task
-		public void CancelTask ()
+		public void CancelTask()
 			{
 			if (!isCompleted && !isCanceled)
 				{
@@ -118,7 +118,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		// Helper method to append a string to a string array
-		private string [ ] AppendToArray (string [ ] array, string newItem)
+		private string [ ] AppendToArray(string [ ] array, string newItem)
 			{
 			string [ ] newArray = new string [ array.Length + 1 ];
 			array.CopyTo(newArray, 0);

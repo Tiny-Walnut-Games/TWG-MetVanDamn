@@ -6,7 +6,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	{
 	public class BiomeFieldBaker : Baker<BiomeFieldAuthoring>
 		{
-		public override void Bake (BiomeFieldAuthoring authoring)
+		public override void Bake(BiomeFieldAuthoring authoring)
 			{
 			Entity entity = GetEntity(TransformUsageFlags.Dynamic);
 			AddComponent(entity, new BiomeFieldData

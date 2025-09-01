@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public float BaseTraversalCost;
 
-		public NavNode (uint nodeId, float3 worldPosition, BiomeType biomeType = BiomeType.Unknown,
+		public NavNode(uint nodeId, float3 worldPosition, BiomeType biomeType = BiomeType.Unknown,
 					  Polarity primaryPolarity = Polarity.None, float baseTraversalCost = 1.0f)
 			{
 			NodeId = nodeId;
@@ -60,7 +60,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Check if this node is compatible with agent capabilities
 		/// </summary>
-		public readonly bool IsCompatibleWith (AgentCapabilities capabilities)
+		public readonly bool IsCompatibleWith(AgentCapabilities capabilities)
 			{
 			if (!IsActive)
 				{
@@ -73,7 +73,7 @@ namespace TinyWalnutGames.MetVD.Core
 				: true;
 			}
 
-		public override readonly string ToString ()
+		public override readonly string ToString()
 			{
 			return $"NavNode({NodeId}, {BiomeType}, {PrimaryPolarity}, Active:{IsActive})";
 			}
@@ -140,7 +140,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public FixedString64Bytes Description;
 
-		public NavLink (uint fromNodeId, uint toNodeId, ConnectionType connectionType = ConnectionType.Bidirectional,
+		public NavLink(uint fromNodeId, uint toNodeId, ConnectionType connectionType = ConnectionType.Bidirectional,
 					  Polarity requiredPolarity = Polarity.None, Ability requiredAbilities = Ability.None,
 					  float baseCost = 1.0f, float polarityMismatchCostMultiplier = 5.0f,
 					  GateSoftness gateSoftness = GateSoftness.Hard, FixedString64Bytes description = default)
@@ -161,7 +161,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Check if this link can be traversed by the agent with given capabilities
 		/// </summary>
-		public readonly bool CanTraverseWith (AgentCapabilities capabilities, uint fromNodeId)
+		public readonly bool CanTraverseWith(AgentCapabilities capabilities, uint fromNodeId)
 			{
 			if (!IsActive)
 				{
@@ -207,7 +207,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Calculate the effective traversal cost for this link given agent capabilities
 		/// </summary>
-		public readonly float CalculateTraversalCost (AgentCapabilities capabilities)
+		public readonly float CalculateTraversalCost(AgentCapabilities capabilities)
 			{
 			if (!IsActive)
 				{
@@ -257,7 +257,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Calculate the effective traversal cost for this link with arc trajectory analysis
 		/// </summary>
-		public readonly float CalculateTraversalCost (AgentCapabilities capabilities, float3 fromPosition, float3 toPosition)
+		public readonly float CalculateTraversalCost(AgentCapabilities capabilities, float3 fromPosition, float3 toPosition)
 			{
 			float baseCost = CalculateTraversalCost(capabilities);
 			if (baseCost >= float.MaxValue)
@@ -278,7 +278,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Calculate movement efficiency multiplier based on available abilities
 		/// </summary>
-		private readonly float CalculateMovementEfficiencyMultiplier (Ability availableAbilities)
+		private readonly float CalculateMovementEfficiencyMultiplier(Ability availableAbilities)
 			{
 			float multiplier = 1.0f;
 
@@ -326,7 +326,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Check if this link requires jump-based movement
 		/// </summary>
-		private readonly bool HasJumpMovementRequirement ()
+		private readonly bool HasJumpMovementRequirement()
 			{
 			return (RequiredAbilities & (Ability.Jump | Ability.DoubleJump | Ability.WallJump | Ability.Dash |
 										Ability.ArcJump | Ability.ChargedJump | Ability.TeleportArc | Ability.Grapple)) != 0;
@@ -335,7 +335,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Calculate arc traversal cost based on trajectory physics
 		/// </summary>
-		private readonly float CalculateArcTraversalCost (float3 fromPos, float3 toPos, Ability availableAbilities)
+		private readonly float CalculateArcTraversalCost(float3 fromPos, float3 toPos, Ability availableAbilities)
 			{
 			float3 displacement = toPos - fromPos;
 			float horizontalDistance = math.length(displacement.xz);
@@ -437,7 +437,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Get the destination node when traversing from the given source
 		/// </summary>
-		public readonly uint GetDestination (uint sourceNodeId)
+		public readonly uint GetDestination(uint sourceNodeId)
 			{
 			if (ConnectionType == ConnectionType.Bidirectional)
 				{
@@ -447,7 +447,7 @@ namespace TinyWalnutGames.MetVD.Core
 			return sourceNodeId == FromNodeId ? ToNodeId : 0; // 0 indicates invalid traversal
 			}
 
-		public override readonly string ToString ()
+		public override readonly string ToString()
 			{
 			string direction = ConnectionType == ConnectionType.Bidirectional ? "<->" : "->";
 			return $"NavLink({FromNodeId} {direction} {ToNodeId}, {RequiredPolarity}, Cost:{BaseCost:F1})";
@@ -485,7 +485,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public bool CanShareDiscoveredPaths;
 
-		public AgentCapabilities (Polarity availablePolarity = Polarity.None,
+		public AgentCapabilities(Polarity availablePolarity = Polarity.None,
 							   Ability availableAbilities = Ability.None,
 							   float skillLevel = 0.0f,
 							   FixedString32Bytes agentType = default,
@@ -501,12 +501,12 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Check if this agent can pass a gate condition
 		/// </summary>
-		public readonly bool CanPassGate (GateCondition gate)
+		public readonly bool CanPassGate(GateCondition gate)
 			{
 			return gate.CanPass(AvailablePolarity, AvailableAbilities, SkillLevel);
 			}
 
-		public override readonly string ToString ()
+		public override readonly string ToString()
 			{
 			return $"AgentCapabilities({AvailablePolarity}, {AvailableAbilities}, Skill:{SkillLevel:F2})";
 			}
@@ -520,8 +520,8 @@ namespace TinyWalnutGames.MetVD.Core
 		{
 		public NavLink Value;
 
-		public static implicit operator NavLink (NavLinkBufferElement e) => e.Value;
-		public static implicit operator NavLinkBufferElement (NavLink e) => new() { Value = e };
+		public static implicit operator NavLink(NavLinkBufferElement e) => e.Value;
+		public static implicit operator NavLinkBufferElement(NavLink e) => new() { Value = e };
 		}
 
 	/// <summary>
@@ -555,7 +555,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public int UnreachableAreaCount;
 
-		public NavigationGraph (int nodeCount = 0, int linkCount = 0)
+		public NavigationGraph(int nodeCount = 0, int linkCount = 0)
 			{
 			NodeCount = nodeCount;
 			LinkCount = linkCount;
@@ -564,7 +564,7 @@ namespace TinyWalnutGames.MetVD.Core
 			UnreachableAreaCount = 0;
 			}
 
-		public override readonly string ToString ()
+		public override readonly string ToString()
 			{
 			return $"NavigationGraph({NodeCount} nodes, {LinkCount} links, Ready:{IsReady})";
 			}

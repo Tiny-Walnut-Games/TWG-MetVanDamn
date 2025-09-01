@@ -26,12 +26,12 @@ namespace TinyWalnutGames.MetVD.Samples
 		private World defaultWorld;
 		private bool createdFallbackWorld = false; // ✅ Track if we created a fallback world for cleanup
 
-		private void Start ()
+		private void Start()
 			{
 			SetupSmokeTestWorld();
 			}
 
-		private void Update ()
+		private void Update()
 			{
 			// Periodically re-draw bounds if debug visualization enabled (consumes field each frame)
 			if (enableDebugVisualization && Time.frameCount % 120 == 0)
@@ -41,7 +41,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			}
 
 #if UNITY_EDITOR
-		private void OnValidate ()
+		private void OnValidate()
 			{
 			// Respond immediately in editor when toggled so value is meaningfully used
 			if (Application.isPlaying == false && enableDebugVisualization)
@@ -51,7 +51,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			}
 #endif
 
-		private void SetupSmokeTestWorld ()
+		private void SetupSmokeTestWorld()
 			{
 			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - No fallback world creation in tests
 			// If we have an explicitly injected test world, use it directly
@@ -66,20 +66,20 @@ namespace TinyWalnutGames.MetVD.Samples
 				{
 				// Original logic for normal gameplay scenarios
 				defaultWorld = World.DefaultGameObjectInjectionWorld;
-				
+
 				if (defaultWorld == null)
 					{
 					if (logGenerationSteps)
 						{
 						Debug.LogWarning("⚠️ DefaultGameObjectInjectionWorld is null - creating fallback world for testing/standalone scenarios");
 						}
-					
+
 					// Create a fallback world if default injection world is not available (testing scenarios)
 					defaultWorld = new World("SmokeTest_FallbackWorld");
 					createdFallbackWorld = true; // Track for cleanup
 					}
 				}
-			
+
 			entityManager = defaultWorld.EntityManager;
 
 			// ✅ PHASE 1 VALIDATION: Log which world we're actually using
@@ -101,10 +101,10 @@ namespace TinyWalnutGames.MetVD.Samples
 			// ✅ PHASE 1 CONFIRMATION: Log entity counts in the world we used
 			if (logGenerationSteps)
 				{
-				using var seedQuery = entityManager.CreateEntityQuery(typeof(WorldSeed));
-				using var districtQuery = entityManager.CreateEntityQuery(typeof(NodeId));
-				using var polarityQuery = entityManager.CreateEntityQuery(typeof(PolarityFieldData));
-				
+				using EntityQuery seedQuery = entityManager.CreateEntityQuery(typeof(WorldSeed));
+				using EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(NodeId));
+				using EntityQuery polarityQuery = entityManager.CreateEntityQuery(typeof(PolarityFieldData));
+
 				Debug.Log($"✅ MetVanDAMN Smoke Test: World setup complete with seed {worldSeed}");
 				Debug.Log($"   World: {defaultWorld.Name}");
 				Debug.Log($"   World size: {worldSize.x}x{worldSize.y}");
@@ -114,7 +114,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void CreateWorldConfiguration ()
+		private void CreateWorldConfiguration()
 			{
 			Entity configEntity = entityManager.CreateEntity();
 			entityManager.SetName(configEntity, "WorldConfiguration");
@@ -135,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				});
 			}
 
-		private void CreateDistrictEntities ()
+		private void CreateDistrictEntities()
 			{
 			// Use targetSectorCount to determine how many districts to create
 			int actualDistrictCount = math.min(targetSectorCount, 24); // Reasonable upper limit
@@ -196,7 +196,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void CreateBiomeFieldEntities ()
+		private void CreateBiomeFieldEntities()
 			{
 			CreatePolarityField(Polarity.Sun, new float2(15, 15), "SunField");
 			CreatePolarityField(Polarity.Moon, new float2(-15, -15), "MoonField");
@@ -204,7 +204,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			CreatePolarityField(Polarity.Cold, new float2(-15, 15), "ColdField");
 			}
 
-		private void CreatePolarityField (Polarity polarity, float2 center, string name)
+		private void CreatePolarityField(Polarity polarity, float2 center, string name)
 			{
 			Entity fieldEntity = entityManager.CreateEntity();
 			entityManager.SetName(fieldEntity, name);
@@ -218,7 +218,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				});
 			}
 
-		private void DebugDrawBounds ()
+		private void DebugDrawBounds()
 			{
 			var color = new Color(0.2f, 0.9f, 0.4f, 0.6f);
 			var half = new float3(worldSize.x * 0.5f, 0, worldSize.y * 0.5f);
@@ -228,7 +228,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			Debug.DrawLine(new Vector3(-half.x, 0, half.z), new Vector3(-half.x, 0, -half.z), color, 1f);
 			}
 
-		private void OnDestroy ()
+		private void OnDestroy()
 			{
 			// ✅ FIX: Proper cleanup of fallback world to prevent memory leaks
 			if (createdFallbackWorld && defaultWorld != null && defaultWorld.IsCreated)
@@ -239,7 +239,7 @@ namespace TinyWalnutGames.MetVD.Samples
 					}
 				defaultWorld.Dispose();
 				}
-			
+
 			if (logGenerationSteps)
 				{
 				Debug.Log("🔚 MetVanDAMN Smoke Test: Scene cleanup complete");

@@ -44,13 +44,13 @@ namespace TinyWalnutGames.MetVD.Samples
 		private EntityManager _entityManager;
 		private Entity _demoRoomEntity;
 
-		private void Start ()
+		private void Start()
 			{
 			InitializeDemoWorld();
 			CreateDemoRoom();
 			}
 
-		private void OnDestroy ()
+		private void OnDestroy()
 			{
 			if (_demoWorld != null && _demoWorld.IsCreated)
 				{
@@ -61,7 +61,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Initialize the demo world with necessary systems
 		/// </summary>
-		private void InitializeDemoWorld ()
+		private void InitializeDemoWorld()
 			{
 			_demoWorld = new World("ProceduralRoomGenerationDemo");
 			_entityManager = _demoWorld.EntityManager;
@@ -80,7 +80,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Create a demo room using the procedural generation pipeline
 		/// </summary>
-		public void CreateDemoRoom ()
+		public void CreateDemoRoom()
 			{
 			if (_entityManager == null)
 				{
@@ -143,7 +143,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Determine the optimal generator based on the Best Fit Matrix
 		/// </summary>
-		private RoomGeneratorType DetermineOptimalGenerator (RoomType roomType, RectInt bounds, BiomeType biome)
+		private RoomGeneratorType DetermineOptimalGenerator(RoomType roomType, RectInt bounds, BiomeType biome)
 			{
 			float aspectRatio = (float)bounds.width / bounds.height;
 
@@ -164,7 +164,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Build skills mask from UI checkboxes
 		/// </summary>
-		private Ability BuildSkillsMask ()
+		private Ability BuildSkillsMask()
 			{
 			Ability skills = Ability.None;
 
@@ -204,7 +204,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Create biome data from biome type
 		/// </summary>
-		private Core.Biome CreateBiomeFromType (BiomeType biomeType)
+		private Core.Biome CreateBiomeFromType(BiomeType biomeType)
 			{
 			Polarity polarity = biomeType switch
 				{
@@ -223,7 +223,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Add components specific to the selected generator type
 		/// </summary>
-		private void AddGeneratorSpecificComponents (RoomGeneratorType generatorType)
+		private void AddGeneratorSpecificComponents(RoomGeneratorType generatorType)
 			{
 			switch (generatorType)
 				{
@@ -276,7 +276,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Create navigation data for the room
 		/// </summary>
-		private RoomNavigationData CreateNavigationData (RectInt bounds)
+		private RoomNavigationData CreateNavigationData(RectInt bounds)
 			{
 			var primaryEntrance = new int2(bounds.x + 1, bounds.y + 1);
 			bool isCriticalPath = roomType is RoomType.Boss or RoomType.Entrance or RoomType.Exit;
@@ -288,7 +288,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Calculate expected traversal time based on room size and type
 		/// </summary>
-		private float CalculateTraversalTime (RectInt bounds)
+		private float CalculateTraversalTime(RectInt bounds)
 			{
 			float baseTime = (bounds.width + bounds.height) * 0.5f;
 
@@ -304,7 +304,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Calculate number of secrets based on room type and settings
 		/// </summary>
-		private int CalculateSecretCount ()
+		private int CalculateSecretCount()
 			{
 			if (!enableSecrets)
 				{
@@ -324,12 +324,12 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Helper methods for biome classification
 		/// </summary>
-		private static bool IsSkyBiome (BiomeType biome)
+		private static bool IsSkyBiome(BiomeType biome)
 			{
 			return biome is BiomeType.SkyGardens or BiomeType.PlasmaFields;
 			}
 
-		private static bool IsTerrainBiome (BiomeType biome)
+		private static bool IsTerrainBiome(BiomeType biome)
 			{
 			return biome is BiomeType.SolarPlains or BiomeType.FrozenWastes;
 			}
@@ -338,7 +338,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// Manual trigger for regenerating the room (for testing)
 		/// </summary>
 		[ContextMenu("Regenerate Room")]
-		public void RegenerateRoom ()
+		public void RegenerateRoom()
 			{
 			generationSeed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
 			CreateDemoRoom();
@@ -348,7 +348,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// Demonstrate different generator types
 		/// </summary>
 		[ContextMenu("Demo All Generator Types")]
-		public void DemoAllGeneratorTypes ()
+		public void DemoAllGeneratorTypes()
 			{
 			RoomType originalType = roomType;
 			BiomeType originalBiome = targetBiome;
@@ -356,7 +356,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			StartCoroutine(DemoGeneratorSequence(originalType, originalBiome));
 			}
 
-		private System.Collections.IEnumerator DemoGeneratorSequence (RoomType originalType, BiomeType originalBiome)
+		private System.Collections.IEnumerator DemoGeneratorSequence(RoomType originalType, BiomeType originalBiome)
 			{
 			(RoomType, BiomeType, string) [ ] generatorTypes = new [ ]
 			{
@@ -386,7 +386,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Visualize jump arcs and room features in the scene view
 		/// </summary>
-		private void OnDrawGizmos ()
+		private void OnDrawGizmos()
 			{
 			if (!Application.isPlaying || _entityManager == null || !_entityManager.Exists(_demoRoomEntity))
 				{
@@ -406,14 +406,14 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void DrawRoomBounds ()
+		private void DrawRoomBounds()
 			{
 			Gizmos.color = Color.white;
 			var bounds = new Vector3(roomWidth, roomHeight, 1);
 			Gizmos.DrawWireCube(transform.position + bounds * 0.5f, bounds);
 			}
 
-		private void DrawJumpArcs ()
+		private void DrawJumpArcs()
 			{
 			if (!_entityManager.HasBuffer<JumpConnectionElement>(_demoRoomEntity))
 				{
@@ -434,7 +434,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void DrawSecretAreas ()
+		private void DrawSecretAreas()
 			{
 			if (!_entityManager.HasBuffer<RoomFeatureElement>(_demoRoomEntity))
 				{

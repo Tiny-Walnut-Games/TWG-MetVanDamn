@@ -17,7 +17,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public float TargetLoopDensity;
 		public int CriticalPathLength;
 
-		public SectorRefinementData (float targetLoopDensity = 0.3f)
+		public SectorRefinementData(float targetLoopDensity = 0.3f)
 			{
 			Phase = SectorRefinementPhase.Planning;
 			LoopCount = 0;
@@ -48,7 +48,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private BufferLookup<GateConditionBufferElement> gateBufferLookup;
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			wfcStateLookup = state.GetComponentLookup<WfcState>(true);
 			nodeIdLookup = state.GetComponentLookup<NodeId>(true);
@@ -58,7 +58,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		[BurstCompile]
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			wfcStateLookup.Update(ref state);
 			nodeIdLookup.Update(ref state);
@@ -93,7 +93,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public Random Random;
 		public float DeltaTime;
 
-		public void Execute ([ChunkIndexInQuery] int chunkIndex, Entity entity, ref SectorRefinementData refinementData)
+		public void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref SectorRefinementData refinementData)
 			{
 			// Blend chunk index into per-entity seed so parameter is meaningfully consumed
 			var random = new Random((uint)(entity.Index * 73856093 ^ chunkIndex * 19349663) + Random.state);
@@ -120,7 +120,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private void PlanRefinement (Entity entity, ref SectorRefinementData refinementData, ref Random random)
+		private void PlanRefinement(Entity entity, ref SectorRefinementData refinementData, ref Random random)
 			{
 			if (WfcStateLookup.HasComponent(entity))
 				{
@@ -137,7 +137,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			refinementData.Phase = SectorRefinementPhase.LoopCreation;
 			}
 
-		private void CreateLoops (Entity entity, ref SectorRefinementData refinementData, ref Random random)
+		private void CreateLoops(Entity entity, ref SectorRefinementData refinementData, ref Random random)
 			{
 			if (!ConnectionBufferLookup.HasBuffer(entity))
 				{
@@ -162,7 +162,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private readonly void CreateLoop (DynamicBuffer<ConnectionBufferElement> connections, ref SectorRefinementData refinementData, ref Random random, int loopIndex)
+		private readonly void CreateLoop(DynamicBuffer<ConnectionBufferElement> connections, ref SectorRefinementData refinementData, ref Random random, int loopIndex)
 			{
 			int pathSegment = refinementData.CriticalPathLength / math.max(1, (int)(1.0f / refinementData.TargetLoopDensity));
 			uint startNode = (uint)(loopIndex * pathSegment + 1);
@@ -175,7 +175,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private readonly Polarity DeterminePolarityForLoop (int loopIndex, ref Random random)
+		private readonly Polarity DeterminePolarityForLoop(int loopIndex, ref Random random)
 			{
 			// Introduce slight random rotation so ref random is used deterministically
 			int variant = (loopIndex + (int)(random.state & 0x3)) % 4;
@@ -188,7 +188,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					};
 			}
 
-		private void PlaceHardLocks (Entity entity, ref SectorRefinementData refinementData, ref Random random)
+		private void PlaceHardLocks(Entity entity, ref SectorRefinementData refinementData, ref Random random)
 			{
 			if (!GateBufferLookup.HasBuffer(entity))
 				{
@@ -226,7 +226,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			refinementData.Phase = SectorRefinementPhase.PathValidation;
 			}
 
-		private readonly void ValidatePaths (Entity entity, ref SectorRefinementData refinementData)
+		private readonly void ValidatePaths(Entity entity, ref SectorRefinementData refinementData)
 			{
 			// Entity index subtly influences thresholds to consume parameter
 			int loopThreshold = 5 + (entity.Index & 1); // 5 or 6
@@ -245,7 +245,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			refinementData.Phase = pathsValid ? SectorRefinementPhase.Completed : SectorRefinementPhase.Failed;
 			}
 
-		private readonly Polarity GetRandomPolarity (ref Random random, int lockIndex)
+		private readonly Polarity GetRandomPolarity(ref Random random, int lockIndex)
 			{
 			// Rotate polarity sequence using random low bits so both parameters influence outcome.
 			int offset = (int)(random.state & 0x7);
@@ -263,7 +263,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					};
 			}
 
-		private readonly Ability GetRandomAbility (ref Random random, int lockIndex)
+		private readonly Ability GetRandomAbility(ref Random random, int lockIndex)
 			{
 			int offset = (int)((random.state >> 3) & 0x7);
 			return ((lockIndex + offset) & 7) switch

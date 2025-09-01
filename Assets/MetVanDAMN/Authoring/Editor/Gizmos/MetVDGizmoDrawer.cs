@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private static readonly MetVDGizmoSettings _settings;
 		private const string SettingsAssetName = "MetVDGizmoSettings";
 
-		static MetVDGizmoDrawer ()
+		static MetVDGizmoDrawer()
 			{
 			// Auto-load settings (first asset found)
 			string [ ] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
@@ -21,7 +21,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SceneView.duringSceneGui += OnSceneGUI;
 			}
 
-		private static void OnSceneGUI (SceneView sv)
+		private static void OnSceneGUI(SceneView sv)
 			{
 			if (_settings == null)
 				{
@@ -34,7 +34,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void SnapAllDistrictsToGrid ()
+		private static void SnapAllDistrictsToGrid()
 			{
 			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			Undo.RecordObjects(districts, "Snap Districts To Grid");
@@ -56,7 +56,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorUtility.SetDirty(_settings);
 			}
 
-		private static Vector3 GridPositionFromAuthoring (DistrictAuthoring district)
+		private static Vector3 GridPositionFromAuthoring(DistrictAuthoring district)
 			{
 			if (_settings == null || !_settings.useGridCoordinatesForGizmos)
 				{
@@ -68,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		[DrawGizmo(GizmoType.NonSelected | GizmoType.Selected | GizmoType.Pickable)]
-		private static void DrawDistrictGizmo (DistrictAuthoring district, GizmoType type)
+		private static void DrawDistrictGizmo(DistrictAuthoring district, GizmoType type)
 			{
 			if (_settings == null)
 				{
@@ -108,7 +108,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		[DrawGizmo(GizmoType.NonSelected | GizmoType.Selected)]
-		private static void DrawConnectionGizmo (ConnectionAuthoring connection, GizmoType type)
+		private static void DrawConnectionGizmo(ConnectionAuthoring connection, GizmoType type)
 			{
 			if (_settings == null)
 				{
@@ -145,7 +145,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		[DrawGizmo(GizmoType.NonSelected | GizmoType.Selected)]
-		private static void DrawBiomeFieldGizmo (BiomeFieldAuthoring field, GizmoType type)
+		private static void DrawBiomeFieldGizmo(BiomeFieldAuthoring field, GizmoType type)
 			{
 			if (_settings == null)
 				{
@@ -166,7 +166,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void DrawArrow (Vector3 from, Vector3 to, Color c)
+		private static void DrawArrow(Vector3 from, Vector3 to, Color c)
 			{
 			Vector3 dir = (to - from);
 			float len = dir.magnitude;
@@ -187,7 +187,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			);
 			}
 
-		private static bool ShouldDraw ()
+		private static bool ShouldDraw()
 			{
 			bool playing = Application.isPlaying;
 			return (playing && _settings.drawInPlayMode) || (!playing && _settings.drawInEditMode);

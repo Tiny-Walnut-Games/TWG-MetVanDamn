@@ -31,7 +31,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		{
 		private EntityQuery _biomeNodeQuery;
 
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			// Query for nodes that can participate in transitions (have biome + node id + connections)
 			_biomeNodeQuery = GetEntityQuery(new EntityQueryDesc
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				});
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			// Build a lookup from NodeId._value -> Entity for neighbor resolution (one per frame)
 			NativeArray<Entity> nodeEntities = _biomeNodeQuery.ToEntityArray(Allocator.Temp);
@@ -130,7 +130,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			nodeMap.Dispose();
 			}
 
-		private static float CalculateTransitionStrength (float distance)
+		private static float CalculateTransitionStrength(float distance)
 			{
 			const float maxTransitionDistance = 3.0f;
 			return math.saturate(1.0f - (distance / maxTransitionDistance));
@@ -142,7 +142,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 	/// </summary>
 	public partial class BiomeTransitionMainThreadSystem : SystemBase
 		{
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			Entities
 				.WithStructuralChanges()
@@ -172,7 +172,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}).Run();
 			}
 
-		private void ApplyTransitionTiles (BiomeArtProfile artProfile, BiomeTransition transition, NodeId nodeId)
+		private void ApplyTransitionTiles(BiomeArtProfile artProfile, BiomeTransition transition, NodeId nodeId)
 			{
 			Grid grid = Object.FindFirstObjectByType<Grid>();
 			if (grid == null)

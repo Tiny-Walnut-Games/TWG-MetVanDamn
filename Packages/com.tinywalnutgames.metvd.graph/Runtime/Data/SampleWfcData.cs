@@ -15,7 +15,7 @@ namespace TinyWalnutGames.MetVD.Graph.Data
 		/// <summary>
 		/// Create basic tile prototypes for WFC testing
 		/// </summary>
-		public static NativeArray<WfcTilePrototype> CreateBasicTilePrototypes (Allocator allocator)
+		public static NativeArray<WfcTilePrototype> CreateBasicTilePrototypes(Allocator allocator)
 			{
 			var prototypes = new NativeArray<WfcTilePrototype>(4, allocator);
 
@@ -65,7 +65,7 @@ namespace TinyWalnutGames.MetVD.Graph.Data
 		/// <summary>
 		/// Create basic socket definitions for each tile type
 		/// </summary>
-		public static NativeArray<WfcSocket> CreateHubTileSockets (Allocator allocator)
+		public static NativeArray<WfcSocket> CreateHubTileSockets(Allocator allocator)
 			{
 			var sockets = new NativeArray<WfcSocket>(4, allocator);
 
@@ -78,7 +78,7 @@ namespace TinyWalnutGames.MetVD.Graph.Data
 			return sockets;
 			}
 
-		public static NativeArray<WfcSocket> CreateCorridorTileSockets (Allocator allocator)
+		public static NativeArray<WfcSocket> CreateCorridorTileSockets(Allocator allocator)
 			{
 			var sockets = new NativeArray<WfcSocket>(2, allocator);
 
@@ -89,7 +89,7 @@ namespace TinyWalnutGames.MetVD.Graph.Data
 			return sockets;
 			}
 
-		public static NativeArray<WfcSocket> CreateChamberTileSockets (Allocator allocator)
+		public static NativeArray<WfcSocket> CreateChamberTileSockets(Allocator allocator)
 			{
 			var sockets = new NativeArray<WfcSocket>(3, allocator);
 
@@ -101,7 +101,7 @@ namespace TinyWalnutGames.MetVD.Graph.Data
 			return sockets;
 			}
 
-		public static NativeArray<WfcSocket> CreateSpecialistTileSockets (Allocator allocator)
+		public static NativeArray<WfcSocket> CreateSpecialistTileSockets(Allocator allocator)
 			{
 			var sockets = new NativeArray<WfcSocket>(2, allocator);
 
@@ -115,7 +115,7 @@ namespace TinyWalnutGames.MetVD.Graph.Data
 		/// <summary>
 		/// Helper method to get socket definitions for a specific tile ID
 		/// </summary>
-		public static NativeArray<WfcSocket> GetSocketsForTile (uint tileId, Allocator allocator)
+		public static NativeArray<WfcSocket> GetSocketsForTile(uint tileId, Allocator allocator)
 			{
 			return tileId switch
 				{
@@ -131,7 +131,7 @@ namespace TinyWalnutGames.MetVD.Graph.Data
 		/// Create a complete tile set with all prototypes and their sockets
 		/// Returns number of tiles created for validation
 		/// </summary>
-		public static int InitializeSampleTileSet (EntityManager entityManager)
+		public static int InitializeSampleTileSet(EntityManager entityManager)
 			{
 			NativeArray<WfcTilePrototype> prototypes = CreateBasicTilePrototypes(Allocator.Temp);
 			int tilesCreated = 0;

@@ -24,7 +24,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		// View modes
 		private ViewMode _currentView = ViewMode.Timeline;
-		
+
 		// 🎯 CORE FEATURE: Kanban overlay toggle for hybrid views
 		// This actually works and provides meaningful visual enhancement
 		private readonly bool _showKanbanOverlay = true;
@@ -32,21 +32,21 @@ namespace LivingDevAgent.Editor.TaskMaster
 		// Task management  
 		private readonly List<TaskData> _allTasks = new();
 		private TaskData _selectedTask = null;
-		
+
 		// 🎯 LEARNING OPPORTUNITY: Drag and drop support for task management
 		// Basic implementation works, can be enhanced with visual feedback
 		private TaskData _draggedTask = null;
 
 		// UI state
 		private string _newTaskTitle = "";
-		
+
 		// 🎯 LEARNING OPPORTUNITY: Enhanced task creation with priority and deadline selection
 		// These work right now but can be enhanced with better UI controls
 		private readonly TaskPriority _newTaskPriority = TaskPriority.Medium;
 		private readonly DateTime _newTaskDeadline = DateTime.Now.AddDays(7);
 
 		// Zoom and navigation
-		private readonly float[] _zoomLevels = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f };
+		private readonly float [ ] _zoomLevels = { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f };
 		private int _currentZoomIndex = 2; // Start at 1.0f
 
 		[MenuItem("Tools/Living Dev Agent/TaskMaster", priority = 10)]
@@ -145,7 +145,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 				GUILayout.Space(10);
 
 				// Zoom controls
-				GUILayout.Label($"🔍 {_zoomLevels[_currentZoomIndex]:P0}", GUILayout.Width(50));
+				GUILayout.Label($"🔍 {_zoomLevels [ _currentZoomIndex ]:P0}", GUILayout.Width(50));
 				if (GUILayout.Button("-", EditorStyles.toolbarButton, GUILayout.Width(20)))
 					ZoomOut();
 				if (GUILayout.Button("+", EditorStyles.toolbarButton, GUILayout.Width(20)))
@@ -573,13 +573,13 @@ namespace LivingDevAgent.Editor.TaskMaster
 			// 🎯 CORE FEATURE: Complete emoji mapping system for rich UI feedback
 			return priority switch
 				{
-				TaskPriority.Critical => "🔴", // Red circle for critical
-				TaskPriority.High => "🟡",     // Yellow circle for high
-				TaskPriority.Medium => "🟢",   // Green circle for medium
-				TaskPriority.Low => "🔵",      // Blue circle for low
-				TaskPriority.Backlog => "⚪",  // White circle for backlog
-				_ => "📋"                      // Clipboard for unknown
-				};
+					TaskPriority.Critical => "🔴", // Red circle for critical
+					TaskPriority.High => "🟡",     // Yellow circle for high
+					TaskPriority.Medium => "🟢",   // Green circle for medium
+					TaskPriority.Low => "🔵",      // Blue circle for low
+					TaskPriority.Backlog => "⚪",  // White circle for backlog
+					_ => "📋"                      // Clipboard for unknown
+					};
 			}
 
 		private Color GetPriorityColor(TaskPriority priority)
@@ -587,13 +587,13 @@ namespace LivingDevAgent.Editor.TaskMaster
 			// 🎯 CORE FEATURE: Rich visual feedback system with full implementation
 			return priority switch
 				{
-				TaskPriority.Critical => new Color(0.9f, 0.2f, 0.2f, 1f), // Bright red
-				TaskPriority.High => new Color(1f, 0.6f, 0.1f, 1f),       // Orange
-				TaskPriority.Medium => new Color(0.2f, 0.7f, 0.3f, 1f),   // Green
-				TaskPriority.Low => new Color(0.3f, 0.5f, 0.9f, 1f),      // Blue
-				TaskPriority.Backlog => new Color(0.6f, 0.6f, 0.6f, 1f),  // Gray
-				_ => new Color(0.8f, 0.8f, 0.8f, 1f)                      // Light gray
-				};
+					TaskPriority.Critical => new Color(0.9f, 0.2f, 0.2f, 1f), // Bright red
+					TaskPriority.High => new Color(1f, 0.6f, 0.1f, 1f),       // Orange
+					TaskPriority.Medium => new Color(0.2f, 0.7f, 0.3f, 1f),   // Green
+					TaskPriority.Low => new Color(0.3f, 0.5f, 0.9f, 1f),      // Blue
+					TaskPriority.Backlog => new Color(0.6f, 0.6f, 0.6f, 1f),  // Gray
+					_ => new Color(0.8f, 0.8f, 0.8f, 1f)                      // Light gray
+					};
 			}
 
 		private Color GetTaskColor(TaskData task)
@@ -602,12 +602,12 @@ namespace LivingDevAgent.Editor.TaskMaster
 			TaskStatus status = GetTaskStatusFromTaskData(task);
 			Color baseColor = status switch
 				{
-				TaskStatus.ToDo => new Color(0.7f, 0.7f, 0.7f, 0.8f),      // Gray
-				TaskStatus.InProgress => new Color(0.2f, 0.8f, 1f, 0.8f),  // Cyan
-				TaskStatus.Blocked => new Color(1f, 0.3f, 0.3f, 0.8f),     // Red
-				TaskStatus.Done => new Color(0.2f, 1f, 0.2f, 0.8f),        // Green
-				_ => new Color(0.5f, 0.5f, 0.5f, 0.8f)                     // Default gray
-				};
+					TaskStatus.ToDo => new Color(0.7f, 0.7f, 0.7f, 0.8f),      // Gray
+					TaskStatus.InProgress => new Color(0.2f, 0.8f, 1f, 0.8f),  // Cyan
+					TaskStatus.Blocked => new Color(1f, 0.3f, 0.3f, 0.8f),     // Red
+					TaskStatus.Done => new Color(0.2f, 1f, 0.2f, 0.8f),        // Green
+					_ => new Color(0.5f, 0.5f, 0.5f, 0.8f)                     // Default gray
+					};
 
 			// Blend with priority color for richer visual feedback
 			Color priorityColor = GetPriorityColor(GetTaskPriorityFromLevel(task.priorityLevel));
@@ -620,7 +620,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 			_allTasks.Clear();
 
 			// 🔍 Look for TaskData assets in the project
-			string[] guids = AssetDatabase.FindAssets("t:TaskData");
+			string [ ] guids = AssetDatabase.FindAssets("t:TaskData");
 			Debug.Log($"🎯 TaskMaster: Found {guids.Length} TaskData assets");
 
 			foreach (string guid in guids)
@@ -760,26 +760,26 @@ namespace LivingDevAgent.Editor.TaskMaster
 			{
 			return priority switch
 				{
-				TaskPriority.Critical => 1,
-				TaskPriority.High => 2,
-				TaskPriority.Medium => 3,
-				TaskPriority.Low => 4,
-				TaskPriority.Backlog => 5,
-				_ => 3
-				};
+					TaskPriority.Critical => 1,
+					TaskPriority.High => 2,
+					TaskPriority.Medium => 3,
+					TaskPriority.Low => 4,
+					TaskPriority.Backlog => 5,
+					_ => 3
+					};
 			}
 
 		private TaskPriority GetTaskPriorityFromLevel(int priorityLevel)
 			{
 			return priorityLevel switch
 				{
-				1 => TaskPriority.Critical,
-				2 => TaskPriority.High,
-				3 => TaskPriority.Medium,
-				4 => TaskPriority.Low,
-				5 => TaskPriority.Backlog,
-				_ => TaskPriority.Medium
-				};
+					1 => TaskPriority.Critical,
+					2 => TaskPriority.High,
+					3 => TaskPriority.Medium,
+					4 => TaskPriority.Low,
+					5 => TaskPriority.Backlog,
+					_ => TaskPriority.Medium
+					};
 			}
 
 		private DateTime DrawDateTimePicker(string label, DateTime current)
@@ -870,7 +870,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 				{
 				// 🎯 LEARNING OPPORTUNITY: Visual drag feedback
 				DragAndDrop.PrepareStartDrag();
-				DragAndDrop.objectReferences = new UnityEngine.Object[] { }; // Empty but valid
+				DragAndDrop.objectReferences = new UnityEngine.Object [ ] { }; // Empty but valid
 				DragAndDrop.SetGenericData("TaskData", task);
 				DragAndDrop.StartDrag($"Moving: {task.TaskName}");
 				e.Use();
@@ -900,7 +900,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 					safeTitle = safeTitle.Replace(invalidChar, '_');
 					}
 				if (safeTitle.Length > 50)
-					safeTitle = safeTitle[..50];
+					safeTitle = safeTitle [ ..50 ];
 
 				string fileName = $"Task_{safeTitle}_{taskData.createdAt:yyyyMMdd_HHmmss}.asset";
 				string assetPath = $"{assetDir}/{fileName}";
@@ -931,7 +931,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 			if (_currentZoomIndex < _zoomLevels.Length - 1)
 				{
 				_currentZoomIndex++;
-				Debug.Log($"🔍 Zoomed in to {_zoomLevels[_currentZoomIndex]:P0}");
+				Debug.Log($"🔍 Zoomed in to {_zoomLevels [ _currentZoomIndex ]:P0}");
 				}
 			}
 
@@ -940,7 +940,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 			if (_currentZoomIndex > 0)
 				{
 				_currentZoomIndex--;
-				Debug.Log($"🔍 Zoomed out to {_zoomLevels[_currentZoomIndex]:P0}");
+				Debug.Log($"🔍 Zoomed out to {_zoomLevels [ _currentZoomIndex ]:P0}");
 				}
 			}
 
@@ -1127,12 +1127,12 @@ namespace LivingDevAgent.Editor.TaskMaster
 			using (new EditorGUILayout.VerticalScope("box"))
 				{
 				EditorGUILayout.LabelField($"📅 Timeline - {_currentScale} View", EditorStyles.boldLabel);
-				
+
 				// Draw time scale header
 				DrawTimeScaleHeader();
-				
+
 				GUILayout.Space(5);
-				
+
 				// Group tasks by status for timeline tracks
 				var todoTasks = _allTasks.Where(t => GetTaskStatusFromTaskData(t) == TaskStatus.ToDo).ToList();
 				var inProgressTasks = _allTasks.Where(t => GetTaskStatusFromTaskData(t) == TaskStatus.InProgress).ToList();
@@ -1153,11 +1153,11 @@ namespace LivingDevAgent.Editor.TaskMaster
 				{
 				// Calculate time range based on current scale and center
 				(DateTime startDate, DateTime endDate) = GetTimelineRange();
-				
+
 				EditorGUILayout.LabelField($"📅 {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd}", EditorStyles.centeredGreyMiniLabel);
-				
+
 				GUILayout.FlexibleSpace();
-				
+
 				if (GUILayout.Button("⬅️", EditorStyles.miniButtonLeft, GUILayout.Width(30)))
 					NavigateTimeline(-1);
 				if (GUILayout.Button("Today", EditorStyles.miniButtonMid, GUILayout.Width(50)))
@@ -1196,18 +1196,18 @@ namespace LivingDevAgent.Editor.TaskMaster
 							{
 							float xPos = (float)(taskDays / totalDays) * timelineRect.width;
 							var taskRect = new Rect(timelineRect.x + xPos, timelineRect.y + 5, 20, 20);
-							
+
 							// Draw task marker
 							Color taskColor = GetPriorityColor(GetTaskPriorityFromLevel(task.priorityLevel));
 							EditorGUI.DrawRect(taskRect, taskColor);
-							
+
 							// Task tooltip on hover
 							if (taskRect.Contains(Event.current.mousePosition))
 								{
-								GUI.Label(new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y - 20, 200, 20), 
+								GUI.Label(new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y - 20, 200, 20),
 									$"{task.TaskName} (P{task.priorityLevel})", EditorStyles.helpBox);
 								}
-							
+
 							// Click to select task
 							if (Event.current.type == EventType.MouseDown && taskRect.Contains(Event.current.mousePosition))
 								{
@@ -1235,7 +1235,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 								_selectedTask = task;
 							}
 						}
-						
+
 					if (tasks.Count > 3)
 						{
 						EditorGUILayout.LabelField($"... and {tasks.Count - 3} more", EditorStyles.centeredGreyMiniLabel);
@@ -1291,12 +1291,12 @@ namespace LivingDevAgent.Editor.TaskMaster
 			TaskStatus status = GetTaskStatusFromTaskData(task);
 			Color cardColor = status switch
 				{
-				TaskStatus.ToDo => new Color(0.8f, 0.8f, 0.8f, 0.3f),
-				TaskStatus.InProgress => new Color(0.2f, 0.8f, 1f, 0.3f),
-				TaskStatus.Blocked => new Color(1f, 0.3f, 0.3f, 0.3f),
-				TaskStatus.Done => new Color(0.2f, 1f, 0.2f, 0.3f),
-				_ => new Color(0.7f, 0.7f, 0.7f, 0.3f)
-				};
+					TaskStatus.ToDo => new Color(0.8f, 0.8f, 0.8f, 0.3f),
+					TaskStatus.InProgress => new Color(0.2f, 0.8f, 1f, 0.3f),
+					TaskStatus.Blocked => new Color(1f, 0.3f, 0.3f, 0.3f),
+					TaskStatus.Done => new Color(0.2f, 1f, 0.2f, 0.3f),
+					_ => new Color(0.7f, 0.7f, 0.7f, 0.3f)
+					};
 
 			// Create a simple colored texture
 			var texture = new Texture2D(1, 1);
@@ -1381,15 +1381,15 @@ namespace LivingDevAgent.Editor.TaskMaster
 			// 🎯 FIXED: Use async Task method properly
 			System.Threading.Tasks.Task.Run(async () =>
 				{
-				bool success = await GitHubIntegration.CreateGitHubIssue(task);
-				if (success)
-					{
-					UnityEngine.Debug.Log($"✅ Successfully created GitHub issue for '{task.TaskName}'");
-					}
-				else
-					{
-					UnityEngine.Debug.LogError($"❌ Failed to create GitHub issue for '{task.TaskName}'");
-					}
+					bool success = await GitHubIntegration.CreateGitHubIssue(task);
+					if (success)
+						{
+						UnityEngine.Debug.Log($"✅ Successfully created GitHub issue for '{task.TaskName}'");
+						}
+					else
+						{
+						UnityEngine.Debug.LogError($"❌ Failed to create GitHub issue for '{task.TaskName}'");
+						}
 				});
 
 			EditorUtility.DisplayDialog("GitHub Issue Creation",

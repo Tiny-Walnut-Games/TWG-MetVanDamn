@@ -54,9 +54,9 @@ namespace LivingDevAgent.Editor.Modules
 		private static bool _initializationError = false;
 		private static string _lastError = "";
 
-		public TaskMasterModule (TLDLScribeData data) : base(data) { }
+		public TaskMasterModule(TLDLScribeData data) : base(data) { }
 
-		public override void Initialize ()
+		public override void Initialize()
 			{
 			try
 				{
@@ -91,7 +91,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		public override void Dispose ()
+		public override void Dispose()
 			{
 			try
 				{
@@ -116,7 +116,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		// 🎯 FIXED: Scene View Overlay Rendering with proper event handling
-		private void OnSceneGUI (SceneView sceneView)
+		private void OnSceneGUI(SceneView sceneView)
 			{
 			if (!_sceneViewOverlayEnabled) return;
 
@@ -157,7 +157,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void DrawSceneViewTimerContent ()
+		private void DrawSceneViewTimerContent()
 			{
 			// 🎯 CRITICAL: Force immediate layout to prevent GUI ID conflicts
 			if (Event.current.type == EventType.Layout)
@@ -289,7 +289,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void HandlePanelDragging ()
+		private void HandlePanelDragging()
 			{
 			Event e = Event.current;
 
@@ -311,7 +311,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		// 🎯 SCRIBE WINDOW: Time-card management panel only
-		public void DrawPanel ()
+		public void DrawPanel()
 			{
 			// If module is disabled, take ZERO space in the GUI
 			if (!_moduleEnabled)
@@ -322,7 +322,7 @@ namespace LivingDevAgent.Editor.Modules
 			DrawPanel(new Rect(0, 0, 300, 400)); // Default size
 			}
 
-		public void DrawPanel (Rect rect)
+		public void DrawPanel(Rect rect)
 			{
 			// If module is disabled, take ZERO space in the GUI
 			if (!_moduleEnabled)
@@ -356,7 +356,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void DrawPanelContent ()
+		private void DrawPanelContent()
 			{
 			// Module enable/disable toggle at the top
 			using (new EditorGUILayout.HorizontalScope())
@@ -433,7 +433,7 @@ namespace LivingDevAgent.Editor.Modules
 			DrawTimeCardManagement();
 			}
 
-		private void DrawTimeCardManagement ()
+		private void DrawTimeCardManagement()
 			{
 			EditorGUILayout.LabelField("📊 Time-Card Management", EditorStyles.boldLabel);
 
@@ -473,7 +473,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void ClockIn ()
+		private void ClockIn()
 			{
 			string taskName = GetCurrentTaskName();
 			if (string.IsNullOrEmpty(taskName))
@@ -499,7 +499,7 @@ namespace LivingDevAgent.Editor.Modules
 			SceneView.RepaintAll(); // Update scene view overlay
 			}
 
-		private void ClockOut ()
+		private void ClockOut()
 			{
 			if (_activeTimeCard == null) return;
 
@@ -521,7 +521,7 @@ namespace LivingDevAgent.Editor.Modules
 			SceneView.RepaintAll(); // Update scene view overlay
 			}
 
-		private void SaveCurrentSession ()
+		private void SaveCurrentSession()
 			{
 			if (_activeTimeCard == null || !_isTimerRunning) return;
 
@@ -550,7 +550,7 @@ namespace LivingDevAgent.Editor.Modules
 			SetStatus($"💾 Session saved: {taskName}");
 			}
 
-		private void OnEditorUpdate ()
+		private void OnEditorUpdate()
 			{
 			// Background timer update - runs regardless of window focus
 			if (_isTimerRunning && _activeTimeCard != null)
@@ -568,7 +568,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void UpdateAccumulatedTime ()
+		private void UpdateAccumulatedTime()
 			{
 			if (_isTimerRunning)
 				{
@@ -579,14 +579,14 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string GetCurrentTaskName ()
+		private string GetCurrentTaskName()
 			{
 			return _showCustomTask
 				? string.IsNullOrEmpty(_customTaskName) ? "" : _customTaskName
 				: _availableTasks [ _selectedTaskIndex ];
 			}
 
-		private TimeCardData GetOrCreateTimeCard (string taskName)
+		private TimeCardData GetOrCreateTimeCard(string taskName)
 			{
 			// Look for existing time-card with matching task name
 			TimeCardData existing = _allTimeCards.FirstOrDefault(tc =>
@@ -614,7 +614,7 @@ namespace LivingDevAgent.Editor.Modules
 			return timeCard;
 			}
 
-		private void LoadTimeCards ()
+		private void LoadTimeCards()
 			{
 			_allTimeCards.Clear();
 
@@ -632,7 +632,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void RestoreActiveTimerState ()
+		private void RestoreActiveTimerState()
 			{
 			// Look for active time-card using proper getter
 			TimeCardData activeCard = _allTimeCards.FirstOrDefault(tc => tc.GetIsOngoing());
@@ -649,7 +649,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void DrawTimeCardEntry (TimeCardData timeCard)
+		private void DrawTimeCardEntry(TimeCardData timeCard)
 			{
 			using (new EditorGUILayout.HorizontalScope("box"))
 				{
@@ -686,7 +686,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void ImportTimeCardToTLDL (TimeCardData timeCard)
+		private void ImportTimeCardToTLDL(TimeCardData timeCard)
 			{
 			TaskData task = timeCard.GetTask();
 			string taskName = task != null ? task.TaskName : "Unknown Task";
@@ -709,7 +709,7 @@ namespace LivingDevAgent.Editor.Modules
 			SetStatus($"📝 Imported time-card to TLDL: {taskName}");
 			}
 
-		private void ShowTimeCardImportDialog ()
+		private void ShowTimeCardImportDialog()
 			{
 			if (_allTimeCards.Count == 0)
 				{
@@ -730,7 +730,7 @@ namespace LivingDevAgent.Editor.Modules
 			menu.ShowAsContext();
 			}
 
-		private void DeleteTimeCard (TimeCardData timeCard)
+		private void DeleteTimeCard(TimeCardData timeCard)
 			{
 			_allTimeCards.Remove(timeCard);
 			string assetPath = AssetDatabase.GetAssetPath(timeCard);
@@ -742,7 +742,7 @@ namespace LivingDevAgent.Editor.Modules
 			SetStatus($"🗑️ Deleted time-card: {taskName}");
 			}
 
-		private string FormatCurrentTime ()
+		private string FormatCurrentTime()
 			{
 			if (_isTimerRunning)
 				{
@@ -755,13 +755,13 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string FormatDuration (double seconds)
+		private string FormatDuration(double seconds)
 			{
 			var timeSpan = System.TimeSpan.FromSeconds(seconds);
 			return $"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
 			}
 
-		private string SanitizeFileName (string fileName)
+		private string SanitizeFileName(string fileName)
 			{
 			char [ ] invalids = System.IO.Path.GetInvalidFileNameChars();
 			return string.Join("_", fileName.Split(invalids, System.StringSplitOptions.RemoveEmptyEntries));

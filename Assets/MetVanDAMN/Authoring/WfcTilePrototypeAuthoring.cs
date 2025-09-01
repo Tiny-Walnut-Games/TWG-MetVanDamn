@@ -38,7 +38,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Tooltip("Socket definitions for this tile (up to 4 sockets for N/E/S/W)")]
 		public WfcSocketConfig [ ] sockets = new WfcSocketConfig [ 0 ];
 
-		private void OnValidate ()
+		private void OnValidate()
 			{
 			// Ensure tile ID is not zero
 			if (tileId == 0)
@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private void Reset ()
+		private void Reset()
 			{
 			// Provide sensible defaults when component is first added
 			tileId = (uint)(GetInstanceID() & 0x7FFFFFFF); // Unique but positive ID
@@ -107,7 +107,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// <summary>
 		/// Convert to runtime WfcSocket
 		/// </summary>
-		public readonly WfcSocket ToWfcSocket ()
+		public readonly WfcSocket ToWfcSocket()
 			{
 			return new WfcSocket(socketId, direction, requiredPolarity, isOpen);
 			}

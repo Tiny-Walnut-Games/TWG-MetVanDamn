@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Tests
 	public class PolaritySystemTests
 		{
 		[Test]
-		public void PolarityEnum_NoCollisions_ShouldHaveUniqueValues ()
+		public void PolarityEnum_NoCollisions_ShouldHaveUniqueValues()
 			{
 			// Tech occupies highest bit (0x80) by design.
 			Assert.AreEqual(0x80, (byte)Polarity.Tech, "Tech should be 1<<7 (0x80)");
@@ -25,7 +25,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void PolarityAny_ShouldOrAllPoles ()
+		public void PolarityAny_ShouldOrAllPoles()
 			{
 			// Test that Any equals OR of all poles (addresses blocker #2) 
 			Polarity expected = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold |
@@ -36,7 +36,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void PolarityBitmasks_DualPolarityGates_ShouldWorkCorrectly ()
+		public void PolarityBitmasks_DualPolarityGates_ShouldWorkCorrectly()
 			{
 			// Test dual-polarity combinations work as expected
 			Assert.AreEqual(Polarity.Sun | Polarity.Moon, Polarity.SunMoon);
@@ -46,7 +46,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void PolarityMatching_SingleVsDualPoles_ShouldMatchCorrectly ()
+		public void PolarityMatching_SingleVsDualPoles_ShouldMatchCorrectly()
 			{
 			// Test that single polarities match with dual-polarity combinations
 			Assert.IsTrue((Polarity.Sun & Polarity.SunMoon) != 0, "Sun should match SunMoon gate");
@@ -60,7 +60,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void PolarityNone_ShouldBeZero ()
+		public void PolarityNone_ShouldBeZero()
 			{
 			// Test that None polarity is properly zero
 			Assert.AreEqual(0, (byte)Polarity.None, "None should be zero value");

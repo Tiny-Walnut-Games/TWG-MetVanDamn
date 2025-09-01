@@ -77,11 +77,15 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\DistrictBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WfcTilePrototypeBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNAuthoringSampleCreator.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\SceneEventTrace.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BatchSpriteSlicer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\AuthoringValidator.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\ConsoleCommentaryWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\NavigationGraphGizmo.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\SubScenePropertyHelper.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileEditor.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\SectorRoomHierarchyWindow.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\SubSceneInternalScanner.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\BiomeFieldBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldBootstrapBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldConfigurationBaker.cs" />
@@ -91,22 +95,43 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapDemo.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVDWorldDebugWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileSamples.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\RitualLock.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\ProceduralLayoutPreview.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\GateConditionBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Sync\DistrictPlacementSyncSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Tests\RunFacultyToggleOnce.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapAuthoringInspector.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\PropDensityHeatmapGizmo.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\FacultySubSceneToggle.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNSceneBootstrap.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\ProceduralLayoutGizmoDrawer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\ConnectionBaker.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\NonBlockingDelay.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileInspector.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\PlayerExperienceAndEndToEndTests.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SubSceneConversionTests.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\UnityIntegrationAndPerformanceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\MetVanDAMN\Authoring\Editor\TinyWalnutGames.MetVD.Authoring.Editor.asmdef" />
+    <None Include="docs\TLDL-2025-01-15-ConsoleCommentary-CodeSnapshot-DebugRevolution.md" />
+    <None Include="template\.github\copilot-instructions.md" />
+    <None Include="template\.github\workflows\ci.yml" />
+    <None Include="template\.github\workflows\docs-validation.yml" />
+    <None Include="template\.github\workflows\security.yml" />
+    <None Include="template\CONTRIBUTING.md" />
+    <None Include="template\docs\BANNER.md" />
+    <None Include="template\docs\devtimetravel_snapshot.yaml" />
+    <None Include="template\docs\SPONSOR_BADGE_GUIDE.md" />
+    <None Include="template\docs\tldl_template.yaml" />
+    <None Include="template\docs\XP_SYSTEM_INTEGRATION_GUIDE.md" />
+    <None Include="template\LICENSE" />
+    <None Include="template\mcp-config.json" />
+    <None Include="template\PRIVACY_AND_TERMS.md" />
+    <None Include="template\README.md" />
+    <None Include="template\scripts\clone-and-clean.sh" />
+    <None Include="template\scripts\init_agent_context.sh" />
+    <None Include="template\scripts\init_living_dev_agent.sh" />
+    <None Include="template\SECURITY.md" />
+    <None Include="template\TLDL\entries\TLDL-2025-01-15-TemplateTransformation-DebugRevolution-Sanitization.md" />
+    <None Include="template\TWG-Copilot-Agent.yaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1287,6 +1312,30 @@
       <Project>{B929F59F-9716-BF18-93BC-E56A67BCECDE}</Project>
       <Name>TinyWalnutGames.MetVD.Utility</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="template\scripts\requirements.txt" />
+    <Content Include="template\src\AssetConverter\asset_converter.py" />
+    <Content Include="template\src\BuildManager\build_manager.py" />
+    <Content Include="template\src\CodeSnapshot\code_snapshot.py" />
+    <Content Include="template\src\ConsoleCommentary\console_commentary.py" />
+    <Content Include="template\src\DebugOverlayValidation\debug_overlay_validator.py" />
+    <Content Include="template\src\DeveloperExperience\cross_platform_integration.py" />
+    <Content Include="template\src\DeveloperExperience\dev_experience.py" />
+    <Content Include="template\src\DeveloperExperience\dev_integration.py" />
+    <Content Include="template\src\DeveloperExperience\hooks\git_commit_tracker.py" />
+    <Content Include="template\src\DeveloperExperience\hooks\team_xp_sync.py" />
+    <Content Include="template\src\DeveloperExperience\package_manager.py" />
+    <Content Include="template\src\DeveloperExperience\sponsor_badge_system.py" />
+    <Content Include="template\src\DeveloperExperience\team_gamification.py" />
+    <Content Include="template\src\DeveloperExperience\theme_engine.py" />
+    <Content Include="template\src\GridEditor\grid_editor.py" />
+    <Content Include="template\src\InteractionManager\interaction_manager.py" />
+    <Content Include="template\src\SymbolicLinter\symbolic_linter.py" />
+    <Content Include="template\src\SymbolicLinter\system_linter.py" />
+    <Content Include="template\src\SymbolicLinter\validate_docs.py" />
+    <Content Include="template\src\TaskMaster\taskmaster.py" />
+    <Content Include="template\src\TimeTracking\chronas.py" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

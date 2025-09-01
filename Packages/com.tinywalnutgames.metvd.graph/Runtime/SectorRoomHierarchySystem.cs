@@ -7,8 +7,8 @@ using UnityEngine;
 namespace TinyWalnutGames.MetVD.Graph
 	{
 	public static class HierarchyConstants { public const uint SectorIdMultiplier = 1000; public const uint RoomsPerSectorMultiplier = 100; }
-	public struct SectorHierarchyData : IComponentData { public int2 LocalGridSize; public int SectorCount; public bool IsSubdivided; public uint SectorSeed; public SectorHierarchyData (int2 localGridSize, int sectorCount, uint sectorSeed) { LocalGridSize = localGridSize; SectorCount = sectorCount; IsSubdivided = false; SectorSeed = sectorSeed; } }
-	public struct RoomHierarchyData : IComponentData { public RectInt Bounds; public RoomType Type; public bool IsLeafRoom; public RoomHierarchyData (RectInt bounds, RoomType type, bool isLeafRoom = false) { Bounds = bounds; Type = type; IsLeafRoom = isLeafRoom; } }
+	public struct SectorHierarchyData : IComponentData { public int2 LocalGridSize; public int SectorCount; public bool IsSubdivided; public uint SectorSeed; public SectorHierarchyData(int2 localGridSize, int sectorCount, uint sectorSeed) { LocalGridSize = localGridSize; SectorCount = sectorCount; IsSubdivided = false; SectorSeed = sectorSeed; } }
+	public struct RoomHierarchyData : IComponentData { public RectInt Bounds; public RoomType Type; public bool IsLeafRoom; public RoomHierarchyData(RectInt bounds, RoomType type, bool isLeafRoom = false) { Bounds = bounds; Type = type; IsLeafRoom = isLeafRoom; } }
 	public enum RoomType : byte { Normal, Entrance, Exit, Boss, Treasure, Shop, Save, Hub }
 
 	[UpdateInGroup(typeof(InitializationSystemGroup))]
@@ -16,7 +16,7 @@ namespace TinyWalnutGames.MetVD.Graph
 	public partial struct SectorRoomHierarchySystem : ISystem
 		{
 		private EntityQuery _districtsQuery; private EntityQuery _layoutDoneQuery;
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_districtsQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<NodeId, SectorHierarchyData>()
@@ -27,7 +27,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			state.RequireForUpdate(_districtsQuery);
 			state.RequireForUpdate(_layoutDoneQuery);
 			}
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			if (_layoutDoneQuery.IsEmptyIgnoreFilter)
 				{
@@ -46,7 +46,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 			}
-		private static void SubdivideDistrictIntoSectors (EntityManager entityManager, Entity districtEntity, NodeId districtNodeId, SectorHierarchyData sectorHierarchy)
+		private static void SubdivideDistrictIntoSectors(EntityManager entityManager, Entity districtEntity, NodeId districtNodeId, SectorHierarchyData sectorHierarchy)
 			{
 			var random = new Unity.Mathematics.Random(sectorHierarchy.SectorSeed);
 			int2 gridSize = sectorHierarchy.LocalGridSize; int totalCells = gridSize.x * gridSize.y; int actualSectorCount = math.min(sectorHierarchy.SectorCount, totalCells);
@@ -58,19 +58,19 @@ namespace TinyWalnutGames.MetVD.Graph
 				Entity sectorEntity = entityManager.CreateEntity();
 				var sectorNodeId = new NodeId((uint)(districtNodeId._value * HierarchyConstants.SectorIdMultiplier + sectorIndex), 1, districtNodeId._value, sectorLocalCoords);
 				entityManager.AddComponentData(sectorEntity, sectorNodeId);
-				
+
 				// Add SectorHierarchyData to the sector entity so it can be found by queries
 				entityManager.AddComponentData(sectorEntity, new SectorHierarchyData(
 					new int2(4, 4), // Local grid size for rooms within this sector
 					4, // Default room count per sector
 					random.NextUInt() // Unique seed for this sector's room generation
 				));
-				
+
 				CreateRoomsInSector(entityManager, sectorNodeId, ref random);
 				}
 			sectorHierarchy.IsSubdivided = true; entityManager.SetComponentData(districtEntity, sectorHierarchy);
 			}
-		private static void CreateRoomsInSector (EntityManager entityManager, NodeId sectorNodeId, ref Unity.Mathematics.Random random)
+		private static void CreateRoomsInSector(EntityManager entityManager, NodeId sectorNodeId, ref Unity.Mathematics.Random random)
 			{
 			var sectorBounds = new RectInt(0, 0, 8, 8);
 			var roomQueue = new NativeList<RectInt>(Allocator.Temp) { sectorBounds };
@@ -100,7 +100,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				{ CreateLeafRoom(entityManager, sectorNodeId, roomQueue [ 0 ], roomCounter, ref random); roomQueue.RemoveAt(0); roomCounter++; }
 			roomQueue.Dispose();
 			}
-		private static void CreateLeafRoom (EntityManager entityManager, NodeId sectorNodeId, RectInt bounds, int roomIndex, ref Unity.Mathematics.Random random)
+		private static void CreateLeafRoom(EntityManager entityManager, NodeId sectorNodeId, RectInt bounds, int roomIndex, ref Unity.Mathematics.Random random)
 			{
 			Entity roomEntity = entityManager.CreateEntity();
 			var roomNodeId = new NodeId((uint)(sectorNodeId._value * HierarchyConstants.RoomsPerSectorMultiplier + roomIndex), 2, sectorNodeId._value, new int2(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2));

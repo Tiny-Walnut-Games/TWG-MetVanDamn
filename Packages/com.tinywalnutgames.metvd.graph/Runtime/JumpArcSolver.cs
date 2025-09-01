@@ -17,7 +17,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Fixed: Use output parameter instead of return for Burst compatibility
 		/// </summary>
 		[BurstCompile]
-		public static void CalculateMinimumPlatformSpacing (in JumpArcPhysics physics, out int2 result)
+		public static void CalculateMinimumPlatformSpacing(in JumpArcPhysics physics, out int2 result)
 			{
 			// Calculate horizontal distance based on jump capabilities
 			int horizontalSpacing = (int)math.ceil(physics.JumpDistance * 0.8f); // 80% of max distance for safety
@@ -32,7 +32,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Check if a destination is reachable from a starting position
 		/// </summary>
 		[BurstCompile]
-		public static bool IsReachable (in int2 from, in int2 to, Ability availableAbilities, in JumpArcPhysics physics)
+		public static bool IsReachable(in int2 from, in int2 to, Ability availableAbilities, in JumpArcPhysics physics)
 			{
 			float distance = math.distance((float2)from, (float2)to);
 			int heightDiff = to.y - from.y;
@@ -82,7 +82,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// ✅ ACTUALLY FIXED: Use output parameter instead of return for Burst compatibility
 		/// </summary>
 		[BurstCompile]
-		public static void CalculateJumpArc (in int2 from, in int2 to, in JumpArcPhysics physics, out JumpArcData result)
+		public static void CalculateJumpArc(in int2 from, in int2 to, in JumpArcPhysics physics, out JumpArcData result)
 			{
 			var delta = (float2)(to - from);
 			float distance = math.length(delta);
@@ -116,7 +116,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// ✅ FIXED: Actually use the allocator for temporary pathfinding data structures
 		/// </summary>
 		[BurstCompile]
-		public static bool ValidateRoomReachability (in int2 entrance, in NativeArray<int2>.ReadOnly criticalAreas,
+		public static bool ValidateRoomReachability(in int2 entrance, in NativeArray<int2>.ReadOnly criticalAreas,
 												   Ability availableAbilities, in JumpArcPhysics physics,
 												   int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight,
 												   Allocator allocator)
@@ -215,7 +215,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Helper method to check room bounds without struct parameters
 		/// </summary>
 		[BurstCompile]
-		private static bool IsWithinRoomBounds (in int2 position, int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight)
+		private static bool IsWithinRoomBounds(in int2 position, int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight)
 			{
 			return position.x >= roomBoundsX && position.x < roomBoundsX + roomBoundsWidth &&
 				   position.y >= roomBoundsY && position.y < roomBoundsY + roomBoundsHeight;
@@ -226,7 +226,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// ✅ FIXED: Actually use allocator for temporary array
 		/// </summary>
 		[BurstCompile]
-		public static bool ValidateRoomReachability (in int2 entrance, in int2 criticalArea,
+		public static bool ValidateRoomReachability(in int2 entrance, in int2 criticalArea,
 												   Ability availableAbilities, in JumpArcPhysics physics,
 												   int roomBoundsX, int roomBoundsY, int roomBoundsWidth, int roomBoundsHeight,
 												   Allocator allocator)
@@ -255,7 +255,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Check if a position is reachable from another position (convenience alias for IsReachable)
 		/// </summary>
 		[BurstCompile]
-		public static bool IsPositionReachable (in int2 from, in int2 to, Ability availableAbilities, in JumpArcPhysics physics)
+		public static bool IsPositionReachable(in int2 from, in int2 to, Ability availableAbilities, in JumpArcPhysics physics)
 			{
 			return IsReachable(in from, in to, availableAbilities, in physics);
 			}
@@ -301,7 +301,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Coordinate-aware validation score based on spatial complexity
 		/// Uses start/end positions to determine arc feasibility and optimization potential
 		/// </summary>
-		public readonly float GetCoordinateAwareValidityScore ()
+		public readonly float GetCoordinateAwareValidityScore()
 			{
 			if (!IsValid)
 				{
@@ -330,7 +330,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Calculate coordinate pattern score for enhanced jump arc validation
 		/// Uses mathematical patterns to determine arc feasibility
 		/// </summary>
-		private readonly float CalculateCoordinatePatternScore (int2 start, int2 end)
+		private readonly float CalculateCoordinatePatternScore(int2 start, int2 end)
 			{
 			// Prime number influence (mathematically interesting coordinates)
 			bool startPrimeX = IsPrime(math.abs(start.x));
@@ -356,7 +356,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Helper method for prime number detection in coordinate analysis
 		/// </summary>
-		private static bool IsPrime (int number)
+		private static bool IsPrime(int number)
 			{
 			if (number < 2)
 				{

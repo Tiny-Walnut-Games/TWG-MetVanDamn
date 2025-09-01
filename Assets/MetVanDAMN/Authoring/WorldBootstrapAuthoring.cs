@@ -67,7 +67,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Tooltip("Log generation steps to console")]
 		public bool logGenerationSteps = true;
 
-		private void OnValidate ()
+		private void OnValidate()
 			{
 			// Ensure valid ranges
 			biomeCount.x = Mathf.Max(1, biomeCount.x);
@@ -86,7 +86,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			}
 
 #if UNITY_EDITOR
-		private void OnDrawGizmos ()
+		private void OnDrawGizmos()
 			{
 			if (enableDebugVisualization)
 				{
@@ -94,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private void DrawWorldBounds ()
+		private void DrawWorldBounds()
 			{
 			Gizmos.color = new Color(0.2f, 0.9f, 0.4f, 0.3f);
 			Vector3 center = transform.position;

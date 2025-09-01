@@ -23,7 +23,7 @@ namespace TinyWalnutGames.MetVD.Utility
 		private EntityQuery _query;
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_results = new NativeList<T>(Allocator.Persistent);
 			// Build query for all entities with T (read-only extraction)
@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Utility
 			}
 
 		[BurstCompile]
-		public void OnDestroy (ref SystemState state)
+		public void OnDestroy(ref SystemState state)
 			{
 			if (_results.IsCreated)
 				{
@@ -42,7 +42,7 @@ namespace TinyWalnutGames.MetVD.Utility
 			}
 
 		[BurstCompile]
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			_results.Clear();
 			// Extract components in a temp array then append (no safety handle issues)
@@ -57,12 +57,12 @@ namespace TinyWalnutGames.MetVD.Utility
 		/// <summary>
 		/// Returns a copy of the aggregated results for this frame.
 		/// </summary>
-		public NativeArray<T> GetResults (Allocator allocator)
+		public NativeArray<T> GetResults(Allocator allocator)
 			{
 			return new(_results.AsArray(), allocator);
 			}
 
-		public static int GetLastCount ()
+		public static int GetLastCount()
 			{
 			return AggregatorDiagnostics<T>.LastCount;
 			}

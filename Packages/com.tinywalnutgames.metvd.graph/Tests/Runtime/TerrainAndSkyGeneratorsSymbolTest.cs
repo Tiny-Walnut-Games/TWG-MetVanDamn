@@ -13,13 +13,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		private World testWorld;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			testWorld = new World("Test World");
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (testWorld?.IsCreated == true)
 				{
@@ -28,7 +28,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void StackedSegmentGenerator_CanBeCreated ()
+		public void StackedSegmentGenerator_CanBeCreated()
 			{
 			// Test that the StackedSegmentGenerator system can be created
 			// For ISystem (unmanaged) types, we test by getting the simulation group
@@ -41,7 +41,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void LinearBranchingCorridorGenerator_CanBeCreated ()
+		public void LinearBranchingCorridorGenerator_CanBeCreated()
 			{
 			// Test that the LinearBranchingCorridorGenerator system can be created
 			InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
@@ -49,7 +49,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void BiomeWeightedHeightmapGenerator_CanBeCreated ()
+		public void BiomeWeightedHeightmapGenerator_CanBeCreated()
 			{
 			// Test that the BiomeWeightedHeightmapGenerator system can be created
 			InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
@@ -57,7 +57,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void LayeredPlatformCloudGenerator_CanBeCreated ()
+		public void LayeredPlatformCloudGenerator_CanBeCreated()
 			{
 			// Test that the LayeredPlatformCloudGenerator system can be created
 			InitializationSystemGroup simGroup = testWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
@@ -65,7 +65,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void BeatType_Enum_CanBeUsed ()
+		public void BeatType_Enum_CanBeUsed()
 			{
 			// Test that BeatType enum can be used
 			BeatType challengeBeat = BeatType.Challenge;
@@ -78,7 +78,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void CloudMotionType_Enum_CanBeUsed ()
+		public void CloudMotionType_Enum_CanBeUsed()
 			{
 			// Test that CloudMotionType enum can be used
 			CloudMotionType gentle = CloudMotionType.Gentle;
@@ -93,7 +93,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void TypeConversionUtility_CanConvertTypes ()
+		public void TypeConversionUtility_CanConvertTypes()
 			{
 			// Test that TypeConversionUtility can convert between the deprecated and new enum types
 			// This validates the compatibility bridge works correctly during the transition period
@@ -111,7 +111,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void JumpArcSolver_CanCalculateMinimumSpacing ()
+		public void JumpArcSolver_CanCalculateMinimumSpacing()
 			{
 			// Test that JumpArcSolver can calculate minimum platform spacing
 			var physics = new JumpArcPhysics(3.0f, 4.0f, 1.5f, 1.0f, 2.0f, 6.0f);
@@ -122,7 +122,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void JumpArcSolver_CanCheckReachability ()
+		public void JumpArcSolver_CanCheckReachability()
 			{
 			// Test that JumpArcSolver can check if positions are reachable
 			var physics = new JumpArcPhysics(3.0f, 4.0f, 1.5f, 1.0f, 2.0f, 6.0f);
@@ -134,7 +134,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void JumpArcSolver_CanCalculateJumpArc ()
+		public void JumpArcSolver_CanCalculateJumpArc()
 			{
 			// Test that JumpArcSolver can calculate jump arc data
 			var physics = new JumpArcPhysics(3.0f, 4.0f, 1.5f, 1.0f, 2.0f, 6.0f);

@@ -11,7 +11,7 @@ namespace LivingDevAgent.Editor.Modules
 	public static class MenuRefreshForcer
 		{
 		[MenuItem("Tiny Walnut Games/🔄 Force Menu Refresh")]
-		public static void ForceMenuRefresh ()
+		public static void ForceMenuRefresh()
 			{
 			Debug.Log("🔄 Forcing Unity menu cache refresh...");
 
@@ -38,7 +38,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		[MenuItem("Tiny Walnut Games/🔄 Force Script Recompilation")]
-		public static void ForceScriptRecompilation ()
+		public static void ForceScriptRecompilation()
 			{
 			Debug.Log("🧙‍♂️ Forcing Unity script recompilation...");
 
@@ -60,7 +60,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		[MenuItem("Tiny Walnut Games/🔄 Nuclear Menu + Script Refresh")]
-		public static void NuclearMenuRefresh ()
+		public static void NuclearMenuRefresh()
 			{
 			Debug.Log("💥 NUCLEAR REFRESH: Forcing both menu refresh AND script recompilation...");
 
@@ -84,7 +84,7 @@ namespace LivingDevAgent.Editor.Modules
 			Debug.Log("💥 Nuclear refresh engaged! Maximum menu cache destruction activated...");
 			}
 
-		private static void OnProjectChanged ()
+		private static void OnProjectChanged()
 			{
 			// This callback ensures that the menu is refreshed after the project window changes
 			EditorApplication.delayCall += RefreshAllEditorWindows;
@@ -95,7 +95,7 @@ namespace LivingDevAgent.Editor.Modules
 			Debug.Log("🔄 Project change detected - refreshing menus...");
 			}
 
-		private static void RefreshAllEditorWindows ()
+		private static void RefreshAllEditorWindows()
 			{
 			// Comprehensive editor refresh
 			EditorApplication.RepaintHierarchyWindow();
@@ -108,7 +108,7 @@ namespace LivingDevAgent.Editor.Modules
 			Debug.Log("🔄 All editor windows refreshed!");
 			}
 
-		private static void ForceRecompilationByTouchingScript ()
+		private static void ForceRecompilationByTouchingScript()
 			{
 			// Modern approach: Create a temporary script file that Unity will compile
 			// This forces Unity to recompile and refresh menus without using deprecated APIs

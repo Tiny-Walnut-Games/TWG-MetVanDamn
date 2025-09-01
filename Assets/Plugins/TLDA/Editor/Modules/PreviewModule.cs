@@ -13,9 +13,9 @@ namespace LivingDevAgent.Editor.Modules
 	/// </summary>
 	public class PreviewModule : ScribeModuleBase
 		{
-		public PreviewModule (TLDLScribeData data) : base(data) { }
+		public PreviewModule(TLDLScribeData data) : base(data) { }
 
-		public void DrawContent (Rect windowPosition)
+		public void DrawContent(Rect windowPosition)
 			{
 			// Always render from raw if available, otherwise show placeholder
 			string md = !string.IsNullOrEmpty(_data.RawContent) ? _data.RawContent : GetPlaceholderMarkdown();
@@ -49,7 +49,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void DrawPreviewInfo ()
+		private void DrawPreviewInfo()
 			{
 			using (new EditorGUILayout.HorizontalScope())
 				{
@@ -73,7 +73,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void RenderMarkdown (string md)
+		private void RenderMarkdown(string md)
 			{
 			if (string.IsNullOrEmpty(md))
 				{
@@ -163,7 +163,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void RenderImagePlaceholder (string refPath, string alt)
+		private void RenderImagePlaceholder(string refPath, string alt)
 			{
 			// For now, just show a placeholder - full image rendering could be added later
 			using (new EditorGUILayout.HorizontalScope("box"))
@@ -174,7 +174,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string ApplyInlineFormatting (string input)
+		private string ApplyInlineFormatting(string input)
 			{
 			if (string.IsNullOrEmpty(input))
 				return string.Empty;
@@ -200,7 +200,7 @@ namespace LivingDevAgent.Editor.Modules
 			return s;
 			}
 
-		private string GetPlaceholderMarkdown ()
+		private string GetPlaceholderMarkdown()
 			{
 			return @"# 🎭 Welcome to The Scribe!
 

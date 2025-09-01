@@ -6,7 +6,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	{
 	public class GateConditionBaker : Baker<GateConditionAuthoring>
 		{
-		public override void Bake (GateConditionAuthoring authoring)
+		public override void Bake(GateConditionAuthoring authoring)
 			{
 			UnityEngine.GameObject targetGo = authoring.target != null ? authoring.target.gameObject : authoring.gameObject;
 			Entity targetEntity = GetEntity(targetGo, TransformUsageFlags.Dynamic);
@@ -23,7 +23,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static bool ContainsGate (DynamicBuffer<GateConditionBufferElement> buffer, GateCondition g)
+		private static bool ContainsGate(DynamicBuffer<GateConditionBufferElement> buffer, GateCondition g)
 			{
 			for (int i = 0; i < buffer.Length; i++)
 				{

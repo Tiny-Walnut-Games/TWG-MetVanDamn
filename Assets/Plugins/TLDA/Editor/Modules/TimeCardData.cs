@@ -27,82 +27,82 @@ namespace LivingDevAgent.Editor.Modules
 		private float DurationInMinutes => (float)(endTime - startTime).TotalMinutes;
 		private float DurationInSeconds => (float)(endTime - startTime).TotalSeconds;
 		private bool IsOngoing => endTime == default;
-		
+
 		// 🎯 CORE FEATURE: Completion tracking separate from ongoing status
 		// Used for time tracking analytics and task completion reporting
 		private bool IsCompleted => endTime != default && taskName != null;
-		
+
 		// 🎯 FIXED: Initialize lastModified and update it when timecard changes
 		private DateTime lastModified = DateTime.Now;
-		
+
 		// This information is then used to generate a report for the task,
 		// using a private string to hold the parsed collection of data from this time card.
 		// This can be requested by Taskmaster, or other API, via public method(s) for reporting purposes.
 		private string reportData;
 
-		public TaskData GetTask ()
+		public TaskData GetTask()
 			{
 			return taskName;
 			}
 
-		public int GetSessionCount ()
+		public int GetSessionCount()
 			{
 			return Sessions;
 			}
 
-		public DateTime GetStartTime ()
+		public DateTime GetStartTime()
 			{
 			return startTime;
 			}
 
-		public DateTime GetEndTime ()
+		public DateTime GetEndTime()
 			{
 			return endTime;
 			}
 
-		public float GetDurationInHours ()
+		public float GetDurationInHours()
 			{
 			return DurationInHours;
 			}
 
-		public float GetDurationInMinutes ()
+		public float GetDurationInMinutes()
 			{
 			return DurationInMinutes;
 			}
 
-		public float GetDurationInSeconds ()
+		public float GetDurationInSeconds()
 			{
 			return DurationInSeconds;
 			}
 
-		public bool GetIsOngoing ()
+		public bool GetIsOngoing()
 			{
 			return IsOngoing;
 			}
 
-		public bool GetIsCompleted ()
+		public bool GetIsCompleted()
 			{
 			return IsCompleted;
 			}
 
-		public void StartTimeCard (TaskData associatedTask)
+		public void StartTimeCard(TaskData associatedTask)
 			{
 			taskName = associatedTask;
 			startTime = DateTime.Now;
 			endTime = default;
 			reportData = string.Empty;
-			
+
 			// 🎯 FIXED: Update lastModified when starting timecard
 			lastModified = DateTime.Now;
 			}
 
-		public void EndTimeCard ()
+		public void EndTimeCard()
 			{
 			if (IsOngoing)
 				{
 				endTime = DateTime.Now;
 				GenerateReportData();
-				
+
 				// 🎯 FIXED: Update lastModified when ending timecard
 				lastModified = DateTime.Now;
 				}
@@ -112,7 +112,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void GenerateReportData ()
+		private void GenerateReportData()
 			{
 			reportData = $"Task: {taskName.name}\n" +
 						 $"Start Time: {startTime}\n" +
@@ -120,7 +120,7 @@ namespace LivingDevAgent.Editor.Modules
 						 $"Duration: {DurationInHours:F2} hours ({DurationInMinutes:F2} minutes, {DurationInSeconds:F2} seconds)";
 			}
 
-		public string GetReportData ()
+		public string GetReportData()
 			{
 			if (string.IsNullOrEmpty(reportData))
 				{
@@ -129,21 +129,21 @@ namespace LivingDevAgent.Editor.Modules
 			return reportData;
 			}
 
-		internal DateTime GetLastModified ()
+		internal DateTime GetLastModified()
 			{
 			return lastModified;
 			}
 
-        public void IncrementSessionCount()
-        {
-            Sessions++;
-			
+		public void IncrementSessionCount()
+			{
+			Sessions++;
+
 			// 🎯 FIXED: Update lastModified when incrementing sessions
 			lastModified = DateTime.Now;
-        }
+			}
 
-        // 💡 Expansion Opportunity 💡 - @jmeyer1980
-        // Additional properties and methods can be added as needed to manage time cards.
-        // Like deletion, pausing, resuming, etc.
-    }
+		// 💡 Expansion Opportunity 💡 - @jmeyer1980
+		// Additional properties and methods can be added as needed to manage time cards.
+		// Like deletion, pausing, resuming, etc.
+		}
 	}

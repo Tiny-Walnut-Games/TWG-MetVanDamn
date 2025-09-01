@@ -175,7 +175,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public float CoordinateInfluenceStrength;
 
-		public Biome (BiomeType type, Polarity primaryPolarity, float polarityStrength = 1.0f,
+		public Biome(BiomeType type, Polarity primaryPolarity, float polarityStrength = 1.0f,
 					Polarity secondaryPolarity = Polarity.None, float difficultyModifier = 1.0f,
 					BiomeComplexityTier complexityTier = BiomeComplexityTier.Moderate,
 					BiomeRarity rarity = BiomeRarity.Common, float coordinateInfluence = 0.7f)
@@ -193,7 +193,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Check if this biome is compatible with a given polarity
 		/// </summary>
-		public readonly bool IsCompatibleWith (Polarity requiredPolarity)
+		public readonly bool IsCompatibleWith(Polarity requiredPolarity)
 			{
 			return requiredPolarity is not Polarity.Any and not Polarity.None
 				? (PrimaryPolarity & requiredPolarity) != 0 ||
@@ -205,7 +205,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Calculate polarity resonance strength between two biomes
 		/// Uses mathematical harmony principles for smooth transitions
 		/// </summary>
-		public readonly float CalculatePolarityResonance (Biome otherBiome)
+		public readonly float CalculatePolarityResonance(Biome otherBiome)
 			{
 			// Base resonance from shared polarities
 			float primaryResonance = CalculatePolarityOverlap(PrimaryPolarity, otherBiome.PrimaryPolarity);
@@ -226,7 +226,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Get the spatial complexity factor for coordinate-aware systems
 		/// Integrates complexity tier, rarity, and coordinate influence for material generation
 		/// </summary>
-		public readonly float GetSpatialComplexityFactor (int2 worldCoordinates)
+		public readonly float GetSpatialComplexityFactor(int2 worldCoordinates)
 			{
 			// Base complexity from tier
 			float tierComplexity = ((int)ComplexityTier + 1) * 0.2f; // 0.2 to 1.0
@@ -250,7 +250,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Calculate whether this biome should use enhanced coordinate warping for materials
 		/// Based on complexity tier and biome type characteristics
 		/// </summary>
-		public readonly bool ShouldUseCoordinateWarping ()
+		public readonly bool ShouldUseCoordinateWarping()
 			{
 			// Transcendent biomes always use warping
 			if (ComplexityTier == BiomeComplexityTier.Transcendent)
@@ -280,7 +280,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Get the base material animation speed for this biome type
 		/// Integrates with BiomeCheckerMaterialOverride polarity animation system
 		/// </summary>
-		public readonly float GetBaseMaterialAnimationSpeed ()
+		public readonly float GetBaseMaterialAnimationSpeed()
 			{
 			// Base speed from polarity - dual polarities create more dynamic animations
 			float polaritySpeed = (PrimaryPolarity != Polarity.None ? 0.5f : 0.0f) +
@@ -311,7 +311,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Calculate mathematical pattern influence based on coordinate relationships
 		/// Used for sophisticated spatial material behavior
 		/// </summary>
-		private readonly float CalculateCoordinatePatternFactor (int2 coordinates)
+		private readonly float CalculateCoordinatePatternFactor(int2 coordinates)
 			{
 			// Prime number influence - creates irregular but pleasing patterns
 			float primeInfluence = (IsPrime(math.abs(coordinates.x)) ? 0.3f : 0.0f) +
@@ -334,7 +334,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Calculate polarity overlap for resonance calculations
 		/// </summary>
-		private readonly float CalculatePolarityOverlap (Polarity polarity1, Polarity polarity2)
+		private readonly float CalculatePolarityOverlap(Polarity polarity1, Polarity polarity2)
 			{
 			if (polarity1 == Polarity.None || polarity2 == Polarity.None)
 				{
@@ -350,7 +350,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Mathematical beauty: Golden spiral influence calculation
 		/// </summary>
-		private readonly float CalculateGoldenSpiralInfluence (int2 coordinates)
+		private readonly float CalculateGoldenSpiralInfluence(int2 coordinates)
 			{
 			float distance = math.length(coordinates);
 			if (distance < 0.1f)
@@ -369,7 +369,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Calculate symmetry influence for balanced patterns
 		/// </summary>
-		private readonly float CalculateSymmetryInfluence (int2 coordinates)
+		private readonly float CalculateSymmetryInfluence(int2 coordinates)
 			{
 			float symmetryScore = 0.0f;
 
@@ -402,7 +402,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Calculate Fibonacci sequence influence for organic patterns
 		/// </summary>
-		private readonly float CalculateFibonacciInfluence (int2 coordinates)
+		private readonly float CalculateFibonacciInfluence(int2 coordinates)
 			{
 			int distanceSum = math.abs(coordinates.x) + math.abs(coordinates.y);
 
@@ -425,7 +425,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Check if a number is prime (mathematical beauty helper)
 		/// </summary>
-		private readonly bool IsPrime (int number)
+		private readonly bool IsPrime(int number)
 			{
 			if (number < 2)
 				{
@@ -452,7 +452,7 @@ namespace TinyWalnutGames.MetVD.Core
 			return true;
 			}
 
-		public override readonly string ToString ()
+		public override readonly string ToString()
 			{
 			return $"Biome({Type}, {PrimaryPolarity}, Strength:{PolarityStrength:F2}, Tier:{ComplexityTier}, Rarity:{Rarity})";
 			}
@@ -468,7 +468,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Calculate the effective spawn probability for a biome at given coordinates
 		/// Integrates rarity with distance scaling for natural biome distribution
 		/// </summary>
-		public static float CalculateSpawnProbability (this Biome biome, int2 worldCoordinates, float baseSpawnRate = 1.0f)
+		public static float CalculateSpawnProbability(this Biome biome, int2 worldCoordinates, float baseSpawnRate = 1.0f)
 			{
 			float distanceFromOrigin = math.length(worldCoordinates);
 			float normalizedDistance = distanceFromOrigin / 25.0f; // Normalize to reasonable world scale
@@ -492,7 +492,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Returns settings optimized for this biome's characteristics
 		/// </summary>
 		public static (float coordinateInfluence, float distanceScaling, float animationSpeed, bool enableWarping, float complexityMultiplier)
-			GetMaterialComplexitySettings (this Biome biome, int2 worldCoordinates)
+			GetMaterialComplexitySettings(this Biome biome, int2 worldCoordinates)
 			{
 			float coordinateInfluence = biome.CoordinateInfluenceStrength;
 			float distanceScaling = 1.0f + ((int)biome.Rarity * 0.2f); // Rarer biomes scale more with distance
@@ -507,7 +507,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Calculate the transition strength between two biomes for smooth boundaries
 		/// Used by biome field systems for gradient calculations
 		/// </summary>
-		public static float CalculateTransitionStrength (this Biome fromBiome, Biome toBiome, float distance, float maxTransitionDistance = 5.0f)
+		public static float CalculateTransitionStrength(this Biome fromBiome, Biome toBiome, float distance, float maxTransitionDistance = 5.0f)
 			{
 			// Base transition from polarity resonance
 			float polarityTransition = fromBiome.CalculatePolarityResonance(toBiome);

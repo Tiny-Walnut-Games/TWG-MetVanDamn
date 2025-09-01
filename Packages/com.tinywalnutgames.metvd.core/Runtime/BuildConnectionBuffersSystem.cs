@@ -13,14 +13,14 @@ namespace TinyWalnutGames.MetVD.Core
 		private EntityQuery _edgeQuery;
 		private EntityQuery _doneQuery;
 
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_edgeQuery = state.GetEntityQuery(ComponentType.ReadOnly<ConnectionEdge>());
 			_doneQuery = state.GetEntityQuery(ComponentType.ReadOnly<ConnectionGraphBuiltTag>());
 			state.RequireForUpdate(_edgeQuery);
 			}
 
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			if (_edgeQuery.IsEmpty || !_doneQuery.IsEmptyIgnoreFilter)
 				{
@@ -79,7 +79,7 @@ namespace TinyWalnutGames.MetVD.Core
 			em.AddComponent<ConnectionGraphBuiltTag>(tagEntity);
 			}
 
-		private static bool Contains (DynamicBuffer<ConnectionBufferElement> buf, in Connection c)
+		private static bool Contains(DynamicBuffer<ConnectionBufferElement> buf, in Connection c)
 			{
 			for (int i = 0; i < buf.Length; i++)
 				{

@@ -15,20 +15,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		private EntityManager entityManager;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			this.testWorld = new World("World Bootstrap Test World");
 			this.entityManager = this.testWorld.EntityManager;
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			this.testWorld?.Dispose();
 			}
 
 		[Test]
-		public void WorldBootstrapConfiguration_CanBeCreated ()
+		public void WorldBootstrapConfiguration_CanBeCreated()
 			{
 			var biomeSettings = new TinyWalnutGames.MetVD.Core.BiomeGenerationSettings(
 				biomeCountRange: new int2(3, 6),
@@ -68,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WorldBootstrapConfiguration_CanBeAddedToEntity ()
+		public void WorldBootstrapConfiguration_CanBeAddedToEntity()
 			{
 			Entity entity = this.entityManager.CreateEntity();
 			var biomeSettings = new TinyWalnutGames.MetVD.Core.BiomeGenerationSettings(
@@ -113,7 +113,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WorldBootstrapTags_CanBeAddedToEntity ()
+		public void WorldBootstrapTags_CanBeAddedToEntity()
 			{
 			Entity entity = this.entityManager.CreateEntity();
 
@@ -135,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WorldBootstrapSystem_RequiresCorrectComponents ()
+		public void WorldBootstrapSystem_RequiresCorrectComponents()
 			{
 			// This test validates that the system setup would work correctly
 			// without running the actual system update (which requires Unity runtime)
@@ -183,7 +183,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WorldConfiguration_IsCompatibleWithBootstrap ()
+		public void WorldConfiguration_IsCompatibleWithBootstrap()
 			{
 			// Test that WorldBootstrapConfiguration can coexist with WorldConfiguration
 			Entity entity = this.entityManager.CreateEntity();

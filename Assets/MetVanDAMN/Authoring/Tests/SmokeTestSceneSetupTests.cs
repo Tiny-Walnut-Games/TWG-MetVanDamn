@@ -24,7 +24,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		private SmokeTestSceneSetup smokeTestComponent;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			this.testWorld = new World("SmokeTest World");
 			this.entityManager = this.testWorld.EntityManager;
@@ -35,7 +35,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (this.testGameObject != null)
 				{
@@ -49,7 +49,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SmokeTestSceneSetup_DefaultConfiguration_IsValid ()
+		public void SmokeTestSceneSetup_DefaultConfiguration_IsValid()
 			{
 			// Test that default configuration values are sensible
 			Assert.AreEqual(42u, this.GetPrivateField<uint>("worldSeed"));
@@ -61,7 +61,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SmokeTestSceneSetup_WorldConfiguration_CreatesCorrectEntities ()
+		public void SmokeTestSceneSetup_WorldConfiguration_CreatesCorrectEntities()
 			{
 			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - Set DefaultGameObjectInjectionWorld to our test world
 			World originalWorld = World.DefaultGameObjectInjectionWorld;
@@ -104,7 +104,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SmokeTestSceneSetup_DistrictCreation_RespectsTargetSectorCount ()
+		public void SmokeTestSceneSetup_DistrictCreation_RespectsTargetSectorCount()
 			{
 			// Setup
 			this.SetPrivateField("defaultWorld", this.testWorld);
@@ -141,7 +141,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SmokeTestSceneSetup_BiomeFieldCreation_CreatesAllPolarityFields ()
+		public void SmokeTestSceneSetup_BiomeFieldCreation_CreatesAllPolarityFields()
 			{
 			// Setup
 			this.SetPrivateField("defaultWorld", this.testWorld);
@@ -177,7 +177,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SmokeTestSceneSetup_DistrictGridPlacement_FollowsExpectedPattern ()
+		public void SmokeTestSceneSetup_DistrictGridPlacement_FollowsExpectedPattern()
 			{
 			// Setup for 9 districts (8 + hub)
 			this.SetPrivateField("defaultWorld", this.testWorld);
@@ -213,7 +213,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SmokeTestSceneSetup_ComponentConfiguration_HasRequiredECSComponents ()
+		public void SmokeTestSceneSetup_ComponentConfiguration_HasRequiredECSComponents()
 			{
 			// Setup
 			this.SetPrivateField("defaultWorld", this.testWorld);
@@ -243,7 +243,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[UnityTest]
-		public IEnumerator SmokeTestSceneSetup_DebugVisualization_DrawsBoundsCorrectly ()
+		public IEnumerator SmokeTestSceneSetup_DebugVisualization_DrawsBoundsCorrectly()
 			{
 			// Setup debug visualization
 			this.SetPrivateField("enableDebugVisualization", true);
@@ -265,7 +265,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SmokeTestSceneSetup_ExtremeTargetSectorCount_HandlesGracefully ()
+		public void SmokeTestSceneSetup_ExtremeTargetSectorCount_HandlesGracefully()
 			{
 			// Test edge cases for targetSectorCount
 			this.SetPrivateField("defaultWorld", this.testWorld);
@@ -291,7 +291,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SmokeTestSceneSetup_PolarityFieldPositioning_MatchesExpectedLayout ()
+		public void SmokeTestSceneSetup_PolarityFieldPositioning_MatchesExpectedLayout()
 			{
 			// Setup
 			this.SetPrivateField("defaultWorld", this.testWorld);
@@ -320,7 +320,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		// Helper methods for reflection-based testing
-		private T GetPrivateField<T> (string fieldName)
+		private T GetPrivateField<T>(string fieldName)
 			{
 			System.Reflection.FieldInfo field = typeof(SmokeTestSceneSetup).GetField(fieldName,
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -328,7 +328,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			return (T)field.GetValue(this.smokeTestComponent);
 			}
 
-		private void SetPrivateField (string fieldName, object value)
+		private void SetPrivateField(string fieldName, object value)
 			{
 			System.Reflection.FieldInfo field = typeof(SmokeTestSceneSetup).GetField(fieldName,
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -336,7 +336,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			field.SetValue(this.smokeTestComponent, value);
 			}
 
-		private void InvokePrivateMethod (string methodName)
+		private void InvokePrivateMethod(string methodName)
 			{
 			System.Reflection.MethodInfo method = typeof(SmokeTestSceneSetup).GetMethod(methodName,
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);

@@ -6,7 +6,7 @@ namespace TinyWalnutGames.MetVD.Tests
 	public class GateConditionTests
 		{
 		[Test]
-		public void Polarity_AllSinglePairs_FormExpectedDualMask ()
+		public void Polarity_AllSinglePairs_FormExpectedDualMask()
 			{
 			Polarity [ ] singles = new [ ] { Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold, Polarity.Earth, Polarity.Wind, Polarity.Life, Polarity.Tech };
 			for (int i = 0; i < singles.Length; i++)
@@ -25,7 +25,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void CanPass_ActiveHardGate_RequiresAll ()
+		public void CanPass_ActiveHardGate_RequiresAll()
 			{
 			var gate = new GateCondition(Polarity.SunMoon, Ability.Jump | Ability.Dash, GateSoftness.Hard, 0.0f, "Hard SunMoon Gate");
 			// Missing Moon bit => fail
@@ -37,7 +37,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void CanPass_InactiveOrUnlocked_AlwaysTrue ()
+		public void CanPass_InactiveOrUnlocked_AlwaysTrue()
 			{
 			var gate = new GateCondition(Polarity.Heat, Ability.Bomb, GateSoftness.Hard, 0.0f, "Inactive") { IsActive = false };
 			Assert.IsTrue(gate.CanPass(Polarity.None, Ability.None));
@@ -46,7 +46,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void CanPass_SoftGate_BypassesWithSkill ()
+		public void CanPass_SoftGate_BypassesWithSkill()
 			{
 			var gate = new GateCondition(Polarity.Cold, Ability.None, GateSoftness.VeryDifficult, 0.5f, "Skill Bypass");
 			Assert.IsFalse(gate.CanPass(Polarity.None, Ability.None, 0.4f));
@@ -55,7 +55,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void CanPass_TrivialGate_EasyBypass ()
+		public void CanPass_TrivialGate_EasyBypass()
 			{
 			var gate = new GateCondition(Polarity.Heat, Ability.None, GateSoftness.Trivial, 0.2f, "Trivial");
 			Assert.IsFalse(gate.CanPass(Polarity.None, Ability.None, 0.1f));
@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void GetMissingRequirements_ReturnsExpectedMasks ()
+		public void GetMissingRequirements_ReturnsExpectedMasks()
 			{
 			var gate = new GateCondition(Polarity.HeatCold, Ability.Jump | Ability.Dash, GateSoftness.Hard, 0f, "Req Mask");
 			(Polarity missPol, Ability missAb) = gate.GetMissingRequirements(Polarity.Heat, Ability.Jump);
@@ -76,7 +76,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void AnyPolarityRequirement_PassesWithAny ()
+		public void AnyPolarityRequirement_PassesWithAny()
 			{
 			var gate = new GateCondition(Polarity.Any, Ability.None, GateSoftness.Hard, 0f, "Any Gate");
 			Assert.IsTrue(gate.CanPass(Polarity.Sun, Ability.None));

@@ -21,7 +21,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		private EntityQuery _roomsWithNavigationQuery;
 
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			_roomsWithNavigationQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<NodeId, RoomHierarchyData, RoomTemplate, ProceduralRoomGenerated>()
@@ -30,7 +30,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			RequireForUpdate(_roomsWithNavigationQuery);
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			using NativeArray<Entity> roomEntities = _roomsWithNavigationQuery.ToEntityArray(Allocator.Temp);
 			using NativeArray<NodeId> nodeIds = _roomsWithNavigationQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
@@ -60,7 +60,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void GenerateCinemachineZone (EntityManager entityManager, Entity roomEntity,
+		private static void GenerateCinemachineZone(EntityManager entityManager, Entity roomEntity,
 												   RoomHierarchyData hierarchy, RoomTemplate template,
 												   NodeId nodeId, ref ProceduralRoomGenerated genStatus)
 			{
@@ -94,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			CreateCameraZoneGameObjectData(entityManager, roomEntity, zoneData, nodeId);
 			}
 
-		private static CinemachineCameraPreset CreateBiomeSpecificCameraPreset (BiomeAffinity biome, RoomType roomType, RoomGeneratorType generatorType)
+		private static CinemachineCameraPreset CreateBiomeSpecificCameraPreset(BiomeAffinity biome, RoomType roomType, RoomGeneratorType generatorType)
 			{
 			var preset = new CinemachineCameraPreset
 				{
@@ -206,13 +206,13 @@ namespace TinyWalnutGames.MetVD.Graph
 			return preset;
 			}
 
-		private static float3 CalculateCameraPosition (RectInt bounds, CinemachineCameraPreset preset)
+		private static float3 CalculateCameraPosition(RectInt bounds, CinemachineCameraPreset preset)
 			{
 			var roomCenter = new float3(bounds.x + bounds.width * 0.5f, bounds.y + bounds.height * 0.5f, 0);
 			return roomCenter + preset.Offset;
 			}
 
-		private static BoundingBox CalculateConfinerBounds (RectInt bounds, CinemachineCameraPreset preset)
+		private static BoundingBox CalculateConfinerBounds(RectInt bounds, CinemachineCameraPreset preset)
 			{
 			const float padding = 2f;
 			var min = new float3(bounds.x - padding, bounds.y - padding, preset.Offset.z - 5f);
@@ -220,7 +220,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			return new BoundingBox { Min = min, Max = max };
 			}
 
-		private static float CalculateBlendTime (RoomType roomType, RoomGeneratorType generatorType)
+		private static float CalculateBlendTime(RoomType roomType, RoomGeneratorType generatorType)
 			{
 			return roomType switch
 				{
@@ -236,7 +236,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					};
 			}
 
-		private static int CalculateCameraPriority (RoomType roomType)
+		private static int CalculateCameraPriority(RoomType roomType)
 			{
 			return roomType switch
 				{
@@ -249,7 +249,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					};
 			}
 
-		private static void CreateCameraZoneGameObjectData (EntityManager entityManager, Entity roomEntity,
+		private static void CreateCameraZoneGameObjectData(EntityManager entityManager, Entity roomEntity,
 														   CinemachineZoneData zoneData, NodeId nodeId)
 			{
 			// Provide enriched metadata so a later hybrid bridge can spawn & configure the actual Cinemachine Virtual Camera.

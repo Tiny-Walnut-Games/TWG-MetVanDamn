@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Menu item to create a navigation graph gizmo in the scene
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Create Navigation Graph Gizmo")]
-		public static void CreateNavigationGraphGizmo ()
+		public static void CreateNavigationGraphGizmo()
 			{
 			var gizmoGO = new GameObject("NavigationGraphGizmo");
 			gizmoGO.AddComponent<NavigationGraphGizmo>();
@@ -77,7 +77,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Menu item to toggle navigation graph visualization for all gizmos in scene
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Toggle Navigation Graph Visualization")]
-		public static void ToggleNavigationGraphVisualization ()
+		public static void ToggleNavigationGraphVisualization()
 			{
 			NavigationGraphGizmo [ ] gizmos = FindObjectsByType<NavigationGraphGizmo>(FindObjectsSortMode.None);
 			bool newState = gizmos.Length == 0 || !gizmos [ 0 ].showNavigationGraph;
@@ -94,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Menu item to validate navigation connectivity and show results
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Validate Navigation Connectivity")]
-		public static void ValidateNavigationConnectivity ()
+		public static void ValidateNavigationConnectivity()
 			{
 			World world = World.DefaultGameObjectInjectionWorld;
 			if (world == null || !world.IsCreated)
@@ -140,7 +140,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void Start ()
+		private void Start()
 			{
 			_currentColors = colorScheme == NavigationColorScheme.Default ? DefaultColors : HighContrastColors;
 			_world = World.DefaultGameObjectInjectionWorld;
@@ -150,7 +150,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void OnDrawGizmos ()
+		private void OnDrawGizmos()
 			{
 			if (!showNavigationGraph || _world == null || !_world.IsCreated)
 				{
@@ -160,7 +160,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			DrawNavigationGraph();
 			}
 
-		private void OnDrawGizmosSelected ()
+		private void OnDrawGizmosSelected()
 			{
 			if (!showNavigationGraph || _world == null || !_world.IsCreated)
 				{
@@ -171,7 +171,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			DrawDetailedInformation();
 			}
 
-		private void DrawNavigationGraph ()
+		private void DrawNavigationGraph()
 			{
 			EntityQuery navGraphQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
 			if (navGraphQuery.IsEmpty)
@@ -201,7 +201,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void DrawNavigationNodes (AgentCapabilities caps)
+		private void DrawNavigationNodes(AgentCapabilities caps)
 			{
 			EntityQuery q = _entityManager.CreateEntityQuery(
 				ComponentType.ReadOnly<NavNode>(),
@@ -239,7 +239,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void DrawNavigationLinks (AgentCapabilities caps)
+		private void DrawNavigationLinks(AgentCapabilities caps)
 			{
 			EntityQuery linkQ = _entityManager.CreateEntityQuery(
 				ComponentType.ReadOnly<NavNode>(),
@@ -261,7 +261,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void DrawNavigationLink (NavNode source, NavLink link, AgentCapabilities caps)
+		private void DrawNavigationLink(NavNode source, NavLink link, AgentCapabilities caps)
 			{
 			Entity targetEntity = FindEntityByNodeId(link.ToNodeId);
 			if (targetEntity == Entity.Null || !_entityManager.HasComponent<NavNode>(targetEntity))
@@ -316,7 +316,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void DrawHighlightedPathFallback (uint fromId, uint toId, AgentCapabilities caps)
+		private void DrawHighlightedPathFallback(uint fromId, uint toId, AgentCapabilities caps)
 			{
 			// Fallback simple straight line highlight with capability-based visualization
 			Entity fromE = FindEntityByNodeId(fromId);
@@ -350,7 +350,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Handles.Label(mid, $"(Preview Path) {fromId}->{toId} [{capabilityText}]", EditorStyles.boldLabel);
 			}
 
-		private void DrawDetailedInformation ()
+		private void DrawDetailedInformation()
 			{
 			EntityQuery navGraphQuery = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
 			if (navGraphQuery.IsEmpty)
@@ -378,7 +378,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Handles.EndGUI();
 			}
 
-		private void DrawArrowLine (float3 s, float3 e, float size)
+		private void DrawArrowLine(float3 s, float3 e, float size)
 			{
 			Gizmos.DrawLine(s, e);
 
@@ -391,7 +391,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Gizmos.DrawLine(e, h2);
 			}
 
-		private Entity FindEntityByNodeId (uint nodeId)
+		private Entity FindEntityByNodeId(uint nodeId)
 			{
 			EntityQuery q = _entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
 			using NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
@@ -408,7 +408,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return Entity.Null;
 			}
 
-		private AgentCapabilities GetTestAgentCapabilities ()
+		private AgentCapabilities GetTestAgentCapabilities()
 			{
 			return testAgentProfile switch
 				{
@@ -421,7 +421,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					};
 			}
 
-		private GUIStyle GetLabelStyle (bool r)
+		private GUIStyle GetLabelStyle(bool r)
 			{
 			var s = new GUIStyle(EditorStyles.label);
 			s.normal.textColor = r ? Color.green : Color.red;
@@ -429,7 +429,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return s;
 			}
 
-		private GUIStyle GetLinkLabelStyle (bool t)
+		private GUIStyle GetLinkLabelStyle(bool t)
 			{
 			var s = new GUIStyle(EditorStyles.miniLabel);
 			s.normal.textColor = t ? Color.blue : Color.red;
@@ -437,7 +437,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return s;
 			}
 
-		private Color GetPathColorByCapabilities (AgentCapabilities caps)
+		private Color GetPathColorByCapabilities(AgentCapabilities caps)
 			{
 			// Determine path color based on agent movement capabilities
 			if ((caps.AvailableAbilities & Ability.Jump) != 0)
@@ -458,7 +458,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return _currentColors [ 6 ]; // Default path color for basic agents
 			}
 
-		private PathVisualizationStyle GetPathStyleByCapabilities (AgentCapabilities caps)
+		private PathVisualizationStyle GetPathStyleByCapabilities(AgentCapabilities caps)
 			{
 			// Complex movement capabilities get dashed lines to show they can take alternative routes
 			return (caps.AvailableAbilities & (Ability.WallJump | Ability.Grapple)) != 0
@@ -466,7 +466,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				: PathVisualizationStyle.Solid;
 			}
 
-		private string GetCapabilityDisplayText (AgentCapabilities caps)
+		private string GetCapabilityDisplayText(AgentCapabilities caps)
 			{
 			// Build a short text description of agent capabilities
 			var abilities = new System.Collections.Generic.List<string>();
@@ -499,7 +499,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return abilities.Count > 0 ? string.Join(",", abilities) : "Basic";
 			}
 
-		private void DrawDashedLine (Vector3 start, Vector3 end)
+		private void DrawDashedLine(Vector3 start, Vector3 end)
 			{
 			// Draw a dashed line for complex movement paths
 			Vector3 direction = (end - start).normalized;

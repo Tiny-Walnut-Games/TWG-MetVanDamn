@@ -19,14 +19,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		private EntityManager _entityManager;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			_world = new World("Test World");
 			_entityManager = _world.EntityManager;
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (_world?.IsCreated == true)
 				{
@@ -35,7 +35,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void ProceduralRoomGenerator_CreatesRoomTemplate_WithCorrectCapabilityTags ()
+		public void ProceduralRoomGenerator_CreatesRoomTemplate_WithCorrectCapabilityTags()
 			{
 			// Arrange
 			Entity roomEntity = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 10, 8));
@@ -65,7 +65,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void NavigationGenerator_CreatesMovementConnections_WithCorrectAbilityTags ()
+		public void NavigationGenerator_CreatesMovementConnections_WithCorrectAbilityTags()
 			{
 			// Arrange
 			Entity roomEntity = CreateTestRoomWithTemplate();
@@ -103,7 +103,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void CinemachineZoneGenerator_CreatesBiomeSpecificCameraSettings ()
+		public void CinemachineZoneGenerator_CreatesBiomeSpecificCameraSettings()
 			{
 			// Arrange
 			Entity roomEntity = CreateTestRoomWithTemplate();
@@ -140,7 +140,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void JumpArcSolver_ValidatesReachability_WithDifferentMovementTypes ()
+		public void JumpArcSolver_ValidatesReachability_WithDifferentMovementTypes()
 			{
 			// 🧙‍♂️ SACRED FIX: Initialize physics with proper values instead of all zeros!
 			var physics = new JumpArcPhysics(
@@ -151,29 +151,29 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				wallHeight: 3.0f,  // Wall jump capability
 				dash: 8.0f         // Dash distance for enhanced movement
 			);
-			
+
 			var startPos = new int2(0, 0);
 			var targetPos = new int2(3, 2);
 			Ability basicMovement = Ability.Jump;
 			Ability advancedMovement = Ability.Jump | Ability.DoubleJump | Ability.Dash;
-			
+
 			bool reachableBasic = JumpArcSolver.IsPositionReachable(startPos, targetPos, basicMovement, physics);
 			bool reachableAdvanced = JumpArcSolver.IsPositionReachable(startPos, targetPos, advancedMovement, physics);
-			
+
 			Assert.IsTrue(reachableAdvanced, "Advanced movement must reach the target.");
-			
+
 			if (!reachableBasic)
 				{
 				TestContext.WriteLine("Target only reachable with advanced movement (expected for harder arcs).");
 				}
-				
+
 			var dashTarget = new int2(5, 0);
 			bool reachableWithDash = JumpArcSolver.IsPositionReachable(startPos, dashTarget, Ability.Dash, physics);
 			Assert.IsTrue(reachableWithDash, "Dash should reach horizontal targets within range.");
 			}
 
 		[Test]
-		public void MovementCapabilityTags_DetermineCorrectSkillRequirements ()
+		public void MovementCapabilityTags_DetermineCorrectSkillRequirements()
 			{
 			var movementTags = new MovementCapabilityTags(Ability.Dash | Ability.WallJump, Ability.DoubleJump, BiomeAffinity.Mountain, 0.8f);
 			Assert.AreEqual(Ability.Dash | Ability.WallJump, movementTags.RequiredSkills);
@@ -183,7 +183,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void RoomTemplate_InitializesWithCorrectDefaults ()
+		public void RoomTemplate_InitializesWithCorrectDefaults()
 			{
 			var capabilityTags = new MovementCapabilityTags(Ability.Jump, Ability.None, BiomeAffinity.Forest, 0.5f);
 			var minSize = new int2(4, 4);
@@ -197,7 +197,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void CompleteGenerationPipeline_ProcessesRoomCorrectly ()
+		public void CompleteGenerationPipeline_ProcessesRoomCorrectly()
 			{
 			Entity roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
 			CreateWorldConfiguration();
@@ -226,7 +226,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			Assert.IsTrue(_entityManager.HasComponent<CinemachineGameObjectReference>(roomEntity));
 			}
 
-		private Entity CreateTestRoom (RoomType roomType, RectInt bounds)
+		private Entity CreateTestRoom(RoomType roomType, RectInt bounds)
 			{
 			Entity roomEntity = _entityManager.CreateEntity();
 			var nodeId = new NodeId(12345u, 2, 1000u, new int2(bounds.x, bounds.y));
@@ -237,7 +237,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			return roomEntity;
 			}
 
-		private Entity CreateTestRoomWithTemplate ()
+		private Entity CreateTestRoomWithTemplate()
 			{
 			Entity roomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 8, 6));
 			var capabilityTags = new MovementCapabilityTags(Ability.Jump, Ability.DoubleJump, BiomeAffinity.Forest, 0.5f);
@@ -247,7 +247,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			return roomEntity;
 			}
 
-		private Entity CreateWorldConfiguration ()
+		private Entity CreateWorldConfiguration()
 			{
 			Entity configEntity = _entityManager.CreateEntity();
 			var worldConfig = new WorldConfiguration { Seed = 12345, WorldSize = new int2(50, 50), TargetSectors = 8, RandomizationMode = RandomizationMode.Partial };

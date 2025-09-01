@@ -14,15 +14,15 @@ namespace LivingDevAgent.Editor.Modules
 		public bool ShouldSwitchToEditor { get; private set; } = false;
 		public bool ShouldSwitchToPreview { get; private set; } = false;
 
-		public FormModule (TLDLScribeData data) : base(data) { }
+		public FormModule(TLDLScribeData data) : base(data) { }
 
-		public void ResetSwitchFlags ()
+		public void ResetSwitchFlags()
 			{
 			ShouldSwitchToEditor = false;
 			ShouldSwitchToPreview = false;
 			}
 
-		public void DrawToolbar ()
+		public void DrawToolbar()
 			{
 			// 🕐 Time Tracking Controls (Prime Position!)
 			if (_data.IsTimerActive)
@@ -73,7 +73,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		public void DrawContent (Rect windowPosition)
+		public void DrawContent(Rect windowPosition)
 			{
 			float viewportHeight = Mathf.Max(140f, windowPosition.height - 220f);
 			_data.FormScroll = EditorGUILayout.BeginScrollView(_data.FormScroll, GUILayout.Height(viewportHeight), GUILayout.ExpandHeight(true));
@@ -91,7 +91,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndScrollView();
 			}
 
-		private void DrawHeaderSection ()
+		private void DrawHeaderSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("📋 Header", EditorStyles.boldLabel);
@@ -113,7 +113,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawSectionsToggles ()
+		private void DrawSectionsToggles()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🗂️ Sections", EditorStyles.boldLabel);
@@ -134,7 +134,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		// 🎯 NEW: Complete section editors for all toggles
-		private void DrawSectionEditors ()
+		private void DrawSectionEditors()
 			{
 			if (_data.IncludeDiscoveries)
 				{
@@ -192,7 +192,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void DrawDiscoveriesSection ()
+		private void DrawDiscoveriesSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🔍 Discoveries", EditorStyles.boldLabel);
@@ -203,7 +203,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawActionsSection ()
+		private void DrawActionsSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("⚡ Actions Taken", EditorStyles.boldLabel);
@@ -214,7 +214,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawTechnicalDetailsSection ()
+		private void DrawTechnicalDetailsSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🔧 Technical Details", EditorStyles.boldLabel);
@@ -225,7 +225,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawTerminalProofSection ()
+		private void DrawTerminalProofSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("💻 Terminal Proof", EditorStyles.boldLabel);
@@ -236,7 +236,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawDependenciesSection ()
+		private void DrawDependenciesSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("📦 Dependencies", EditorStyles.boldLabel);
@@ -247,7 +247,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawLessonsSection ()
+		private void DrawLessonsSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🎓 Lessons Learned", EditorStyles.boldLabel);
@@ -258,7 +258,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawNextStepsSection ()
+		private void DrawNextStepsSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🚀 Next Steps", EditorStyles.boldLabel);
@@ -269,7 +269,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawReferencesSection ()
+		private void DrawReferencesSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🔗 References", EditorStyles.boldLabel);
@@ -280,7 +280,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawDevTimeTravelSection ()
+		private void DrawDevTimeTravelSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("⏰ DevTimeTravel", EditorStyles.boldLabel);
@@ -291,7 +291,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawImagesSection ()
+		private void DrawImagesSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("🖼️ Images", EditorStyles.boldLabel);
@@ -304,7 +304,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawMetadataSection ()
+		private void DrawMetadataSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 			GUILayout.Label("📊 Metadata", EditorStyles.boldLabel);
@@ -327,7 +327,7 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		// 🕐 NEW: Time Tracking UI Section
-		private void DrawTimeTrackingSection ()
+		private void DrawTimeTrackingSection()
 			{
 			EditorGUILayout.BeginVertical("box");
 
@@ -403,7 +403,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void ClockIn ()
+		private void ClockIn()
 			{
 			_data.IsTimerActive = true;
 			_data.SessionStartTime = System.DateTime.Now;
@@ -414,7 +414,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorApplication.update += UpdateTimer;
 			}
 
-		private void ClockOut ()
+		private void ClockOut()
 			{
 			if (!_data.IsTimerActive) return;
 
@@ -434,7 +434,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorApplication.update -= UpdateTimer;
 			}
 
-		private void PauseWithNote ()
+		private void PauseWithNote()
 			{
 			string note = EditorUtility.DisplayDialogComplex(
 				"Pause Session",
@@ -459,7 +459,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void ShowSessionHistory ()
+		private void ShowSessionHistory()
 			{
 			var content = new System.Text.StringBuilder();
 			content.AppendLine("📊 Time Tracking History");
@@ -475,7 +475,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorUtility.DisplayDialog("Time Tracking History", content.ToString(), "Close");
 			}
 
-		private void UpdateTimer ()
+		private void UpdateTimer()
 			{
 			if (!_data.IsTimerActive)
 				{
@@ -490,7 +490,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void DrawAutoSyncControls ()
+		private void DrawAutoSyncControls()
 			{
 			EditorGUILayout.BeginVertical("box");
 			EditorGUILayout.LabelField("🔄 Form → Editor Sync", EditorStyles.boldLabel);
@@ -549,12 +549,12 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private bool WarnOverwriteRawIfDirty ()
+		private bool WarnOverwriteRawIfDirty()
 			{
 			return !_data.RawDirty || EditorUtility.DisplayDialog("Overwrite Raw Editor?", "You have unsaved manual edits in the raw editor. Overwrite with regenerated content?", "Overwrite", "Cancel");
 			}
 
-		private string BuildMarkdown ()
+		private string BuildMarkdown()
 			{
 			// 🎯 ENHANCED: Complete markdown builder with all sections
 			var sb = new System.Text.StringBuilder();
@@ -720,7 +720,7 @@ namespace LivingDevAgent.Editor.Modules
 			return sb.ToString();
 			}
 
-		private string BuildFormSnapshot ()
+		private string BuildFormSnapshot()
 			{
 			// Enhanced snapshot for auto-sync detection
 			var sb = new System.Text.StringBuilder();
@@ -746,7 +746,7 @@ namespace LivingDevAgent.Editor.Modules
 			return sb.ToString();
 			}
 
-		private void TryCreateTLDL ()
+		private void TryCreateTLDL()
 			{
 			try
 				{
@@ -779,13 +779,13 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string GetApplication ()
+		private string GetApplication()
 			{
 			// Fix: Return string instead of Application type - this appears to be expecting a path
 			return Application.dataPath;
 			}
 
-		private string ResolveActiveFolder (string applicationPath)
+		private string ResolveActiveFolder(string applicationPath)
 			{
 			return !string.IsNullOrEmpty(_data.ActiveDirPath)
 				? _data.ActiveDirPath
@@ -794,7 +794,7 @@ namespace LivingDevAgent.Editor.Modules
 				: System.IO.Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
 			}
 
-		private string MakeProjectRelative (string absPath)
+		private string MakeProjectRelative(string absPath)
 			{
 			string projectRoot = System.IO.Directory.GetParent(Application.dataPath)!.FullName.Replace('\\', '/');
 			string norm = absPath.Replace('\\', '/');

@@ -22,7 +22,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private static readonly string [ ] SampleSubScenes = { "SampleGeneration", "SampleBiomes" };
 
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Sample Creation/Create Authoring Sample Scene")]
-		public static void CreateAuthoringSampleScene ()
+		public static void CreateAuthoringSampleScene()
 			{
 			// 🔥 PHASE 1: Create new scene and basic components
 			Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -54,7 +54,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// 🧙‍♂️ ULTRA TIMING MAGIC: Enhanced beyond MetVanDAMNSceneBootstrap.cs
 		/// Creates SubScenes with MAXIMUM Unity asset database synchronization
 		/// </summary>
-		private static void CreateSampleSubScenesWithTiming (string mainScenePath)
+		private static void CreateSampleSubScenesWithTiming(string mainScenePath)
 			{
 			EnsureFolder(SubScenesFolder);
 
@@ -196,7 +196,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Creates SubScene file with ENHANCED GUID validation
 		/// </summary>
-		private static bool SafeEnsureSubScene (string scenePath, string sceneName)
+		private static bool SafeEnsureSubScene(string scenePath, string sceneName)
 			{
 			if (File.Exists(scenePath))
 				{
@@ -265,7 +265,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Adds sample content to SubScenes for demonstration
 		/// 🧙‍♂️ ENHANCED: Now coordinate-aware with spatial intelligence
 		/// </summary>
-		private static void AddSampleSubSceneContent (string sceneName)
+		private static void AddSampleSubSceneContent(string sceneName)
 			{
 			// 🎯 COORDINATE-AWARE ENHANCEMENT: Position content based on scene purpose
 			Vector3 basePosition = sceneName switch
@@ -336,7 +336,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Creates SubScene GameObject with component but NO scene reference assigned yet
 		/// </summary>
-		private static void CreateSubSceneGameObject (string subName, Transform parent)
+		private static void CreateSubSceneGameObject(string subName, Transform parent)
 			{
 			var go = new GameObject(subName);
 			go.transform.SetParent(parent, false);
@@ -354,7 +354,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Assigns SceneAsset reference to existing SubScene GameObject with ENHANCED validation
 		/// </summary>
-		private static void AssignSubSceneReferenceWithValidation (string subName)
+		private static void AssignSubSceneReferenceWithValidation(string subName)
 			{
 			string scenePath = Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/");
 
@@ -425,7 +425,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// ⚠ Intention ⚠ Legacy method for compatibility
 		/// - @jmeyer1980: I kept this for compatibility but it is currently unused
 		/// </summary>
-		private static void AssignSubSceneReference (string subName)
+		private static void AssignSubSceneReference(string subName)
 			{
 			AssignSubSceneReferenceWithValidation(subName);
 			}
@@ -541,7 +541,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         }
 #endif
 
-		private static void CreateWorldConfiguration ()
+		private static void CreateWorldConfiguration()
 			{
 			var worldConfigGO = new GameObject("WorldConfiguration");
 			WorldConfigurationAuthoring worldConfig = worldConfigGO.AddComponent<WorldConfigurationAuthoring>();
@@ -569,7 +569,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log("Created WorldConfiguration");
 			}
 
-		private static void CreateSampleDistricts ()
+		private static void CreateSampleDistricts()
 			{
 			var districtsParent = new GameObject("Districts");
 
@@ -602,7 +602,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Creates district visual with ENHANCED coordinate-aware styling
 		/// 🧙‍♂️ SPATIAL INTELLIGENCE: Visual feedback based on grid position
 		/// </summary>
-		private static void CreateDistrictVisual (GameObject parent, int x, int z)
+		private static void CreateDistrictVisual(GameObject parent, int x, int z)
 			{
 			var visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			visual.name = "Visual";
@@ -643,7 +643,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			textMesh.anchor = TextAnchor.MiddleCenter;
 			}
 
-		private static void CreateSampleConnections ()
+		private static void CreateSampleConnections()
 			{
 			var connectionsParent = new GameObject("Connections");
 
@@ -690,7 +690,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log("Created connections between adjacent districts");
 			}
 
-		private static void CreateConnectionVisual (GameObject parent, Vector3 from, Vector3 to)
+		private static void CreateConnectionVisual(GameObject parent, Vector3 from, Vector3 to)
 			{
 			var visual = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
 			visual.name = "Visual";
@@ -712,7 +712,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				};
 			}
 
-		private static void CreateSampleBiomeFields ()
+		private static void CreateSampleBiomeFields()
 			{
 			var biomeFieldsParent = new GameObject("BiomeFields");
 
@@ -746,7 +746,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log("Created 4 sample biome fields");
 			}
 
-		private static void CreateBiomeFieldVisual (GameObject parent, BiomeType biomeType, float strength)
+		private static void CreateBiomeFieldVisual(GameObject parent, BiomeType biomeType, float strength)
 			{
 			var visual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 			visual.name = "Visual";
@@ -782,7 +782,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			renderer.material.renderQueue = 3000;
 			}
 
-		private static void CreateWfcTilePrototypeLibrary ()
+		private static void CreateWfcTilePrototypeLibrary()
 			{
 			var wfcLibraryParent = new GameObject("WfcTilePrototypeLibrary");
 			wfcLibraryParent.transform.position = new Vector3(10, 0, 0); // Offset from main scene
@@ -846,7 +846,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Creates WFC tile visual with ENHANCED biome-aware spatial intelligence
 		/// 🧙‍♂️ COORDINATE-AWARE: Visual feedback for tile properties and spatial relationships
 		/// </summary>
-		private static void CreateWfcTileVisual (GameObject parent, string typeName, BiomeType biomeType)
+		private static void CreateWfcTileVisual(GameObject parent, string typeName, BiomeType biomeType)
 			{
 			// 🎯 ENHANCED TYPE-AWARE PRIMITIVE SELECTION
 			GameObject visual = typeName switch
@@ -913,7 +913,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			labelMesh.anchor = TextAnchor.MiddleCenter;
 			}
 
-		private static void CreateSampleCamera ()
+		private static void CreateSampleCamera()
 			{
 			var cameraGO = new GameObject("Sample Camera");
 			cameraGO.transform.position = new Vector3(0, 8, -8);
@@ -930,7 +930,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log("Created sample camera");
 			}
 
-		private static void CreateLighting ()
+		private static void CreateLighting()
 			{
 			// Create directional light
 			var lightGO = new GameObject("Directional Light");
@@ -953,7 +953,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Ensures folder exists in the AssetDatabase
 		/// </summary>
-		private static void EnsureFolder (string path)
+		private static void EnsureFolder(string path)
 			{
 			if (AssetDatabase.IsValidFolder(path))
 				{

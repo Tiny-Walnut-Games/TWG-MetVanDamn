@@ -71,17 +71,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Sector Room Hierarchy")]
-		public static void ShowWindow ()
+		public static void ShowWindow()
 			{
 			GetWindow<SectorRoomHierarchyWindow>("Sector/Room Hierarchy");
 			}
 
-		private void OnEnable ()
+		private void OnEnable()
 			{
 			RefreshHierarchyData();
 			}
 
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			EditorGUILayout.Space(5);
 
@@ -110,7 +110,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			DrawFooterStats();
 			}
 
-		private void DrawHeaderControls ()
+		private void DrawHeaderControls()
 			{
 			EditorGUILayout.BeginHorizontal();
 
@@ -226,7 +226,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.EndHorizontal();
 			}
 
-		private void DrawEmptyState ()
+		private void DrawEmptyState()
 			{
 			EditorGUILayout.BeginVertical(GUI.skin.box);
 
@@ -255,7 +255,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.EndVertical();
 			}
 
-		private void DrawHierarchy ()
+		private void DrawHierarchy()
 			{
 			IEnumerable<DistrictHierarchy> filteredHierarchies = GetFilteredHierarchies();
 
@@ -265,7 +265,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void DrawDistrictHierarchy (DistrictHierarchy hierarchy)
+		private void DrawDistrictHierarchy(DistrictHierarchy hierarchy)
 			{
 			EditorGUILayout.BeginVertical(GUI.skin.box);
 
@@ -327,7 +327,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.Space(2);
 			}
 
-		private void DrawConnectionInfo (ConnectionInfo connection)
+		private void DrawConnectionInfo(ConnectionInfo connection)
 			{
 			EditorGUILayout.BeginHorizontal();
 
@@ -350,7 +350,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.EndHorizontal();
 			}
 
-		private void DrawSectorInfo (SectorInfo sector)
+		private void DrawSectorInfo(SectorInfo sector)
 			{
 			EditorGUILayout.BeginHorizontal();
 
@@ -379,7 +379,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void DrawRoomInfo (RoomInfo room)
+		private void DrawRoomInfo(RoomInfo room)
 			{
 			EditorGUILayout.BeginHorizontal();
 
@@ -395,7 +395,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.EndHorizontal();
 			}
 
-		private void DrawFooterStats ()
+		private void DrawFooterStats()
 			{
 			EditorGUILayout.BeginHorizontal(GUI.skin.box);
 
@@ -418,7 +418,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.EndHorizontal();
 			}
 
-		private void RefreshHierarchyData ()
+		private void RefreshHierarchyData()
 			{
 			districtHierarchies.Clear();
 			connectionMap.Clear();
@@ -477,7 +477,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			districtHierarchies.Sort((a, b) => a.district.nodeId.CompareTo(b.district.nodeId));
 			}
 
-		private DistrictHierarchy BuildDistrictHierarchy (DistrictAuthoring district, ConnectionAuthoring [ ] connections, GateConditionAuthoring [ ] gates, BiomeFieldAuthoring [ ] biomes)
+		private DistrictHierarchy BuildDistrictHierarchy(DistrictAuthoring district, ConnectionAuthoring [ ] connections, GateConditionAuthoring [ ] gates, BiomeFieldAuthoring [ ] biomes)
 			{
 			var hierarchy = new DistrictHierarchy { district = district };
 
@@ -538,7 +538,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return hierarchy;
 			}
 
-		private SectorInfo GenerateSectorInfo (int sectorId, Vector3 districtPosition, int totalSectors)
+		private SectorInfo GenerateSectorInfo(int sectorId, Vector3 districtPosition, int totalSectors)
 			{
 			var sector = new SectorInfo
 				{
@@ -564,7 +564,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return sector;
 			}
 
-		private Vector3 CalculateSectorPosition (Vector3 districtPosition, int sectorId, int totalSectors)
+		private Vector3 CalculateSectorPosition(Vector3 districtPosition, int sectorId, int totalSectors)
 			{
 			if (totalSectors == 1)
 				{
@@ -581,13 +581,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			);
 			}
 
-		private string GenerateRoomType ()
+		private string GenerateRoomType()
 			{
 			string [ ] roomTypes = { "Standard", "Challenge", "Treasure", "Boss", "Hub", "Secret" };
 			return roomTypes [ Random.Range(0, roomTypes.Length) ];
 			}
 
-		private List<string> GenerateRoomConnections (int roomId, int totalRooms)
+		private List<string> GenerateRoomConnections(int roomId, int totalRooms)
 			{
 			var connections = new List<string>();
 
@@ -606,7 +606,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return connections.Distinct().ToList();
 			}
 
-		private string DetermineConnectionType (ConnectionAuthoring connection)
+		private string DetermineConnectionType(ConnectionAuthoring connection)
 			{
 			// Analyze connection to determine type based on properties and polarity requirements
 			string baseType = connection.type switch
@@ -640,7 +640,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return baseType;
 			}
 
-		private float CalculateConnectivity (uint nodeId)
+		private float CalculateConnectivity(uint nodeId)
 			{
 			if (!connectionMap.ContainsKey(nodeId))
 				{
@@ -682,7 +682,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Selects all visible objects in the hierarchy based on current filters
 		/// </summary>
-		private void SelectAllVisibleObjects ()
+		private void SelectAllVisibleObjects()
 			{
 			var objectsToSelect = new List<Object>();
 
@@ -717,7 +717,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Gets filtered hierarchies based on current search and biome filters
 		/// </summary>
-		private IEnumerable<DistrictHierarchy> GetFilteredHierarchies ()
+		private IEnumerable<DistrictHierarchy> GetFilteredHierarchies()
 			{
 			return districtHierarchies.Where(h =>
 																					 {
@@ -747,7 +747,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Clears all selections and highlights
 		/// </summary>
-		private void ClearSelection ()
+		private void ClearSelection()
 			{
 			selectedNodeIds.Clear();
 			highlightedObjects.Clear();
@@ -758,7 +758,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Enhanced click-to-select functionality with multi-select support
 		/// Currently integrated for future SceneView/OnGUI integration
 		/// </summary>
-		public void HandleObjectSelection (Object targetObject, Event currentEvent)
+		public void HandleObjectSelection(Object targetObject, Event currentEvent)
 			{
 			if (enableClickToSelect && targetObject != null && currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
 				{

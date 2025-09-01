@@ -24,7 +24,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		private SmokeTestSceneSetup sceneSetup;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			// Create a clean test world for integration testing
 			this.testWorld = new World("Integration Test World");
@@ -39,7 +39,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (this.sceneSetupObject != null)
 				{
@@ -53,13 +53,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[UnityTest]
-		public IEnumerator SceneSetup_FullWorkflow_CreatesValidWorld ()
+		public IEnumerator SceneSetup_FullWorkflow_CreatesValidWorld()
 			{
 			// ✅ FIX: Configure test world injection before starting
 			this.SetField("defaultWorld", this.testWorld);
 			this.SetField("entityManager", this.entityManager);
 			this.SetField("createdFallbackWorld", false); // Prevent fallback world creation
-			
+
 			// Configure scene setup with test parameters
 			this.SetField("worldSeed", 12345u);
 			this.SetField("worldSize", new int2(30, 30));
@@ -86,7 +86,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SceneSetup_WorldConfiguration_IntegratesWithECSSystems ()
+		public void SceneSetup_WorldConfiguration_IntegratesWithECSSystems()
 			{
 			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - Set DefaultGameObjectInjectionWorld to our test world
 			World originalWorld = World.DefaultGameObjectInjectionWorld;
@@ -132,7 +132,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SceneSetup_DistrictHierarchy_SupportsNestedSectorGeneration ()
+		public void SceneSetup_DistrictHierarchy_SupportsNestedSectorGeneration()
 			{
 			// Test that district setup supports the expected hierarchical structure
 			this.SetField("defaultWorld", this.testWorld);
@@ -161,7 +161,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SceneSetup_PolarityFieldLayout_SupportsComplexBiomeGeneration ()
+		public void SceneSetup_PolarityFieldLayout_SupportsComplexBiomeGeneration()
 			{
 			// Test that polarity field layout supports complex biome interactions
 			this.SetField("defaultWorld", this.testWorld);
@@ -203,7 +203,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SceneSetup_ConfigurationConsistency_MaintainsDataIntegrity ()
+		public void SceneSetup_ConfigurationConsistency_MaintainsDataIntegrity()
 			{
 			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - Set DefaultGameObjectInjectionWorld to our test world
 			World originalWorld = World.DefaultGameObjectInjectionWorld;
@@ -258,11 +258,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				}
 			}
 
-		private void VerifyWorldConfiguration ()
+		private void VerifyWorldConfiguration()
 			{
 			// ✅ FIX: Use the correct entity manager that has the entities
 			EntityManager em = this.entityManager;
-			
+
 			using EntityQuery query = em.CreateEntityQuery(typeof(WorldSeed), typeof(WorldBounds), typeof(WorldGenerationConfig));
 			Assert.AreEqual(1, query.CalculateEntityCount(), "Should have exactly one world configuration entity");
 
@@ -279,7 +279,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Assert.AreEqual(24, config.MaxDistrictCount); // targetSectorCount * 4
 			}
 
-		private void VerifyDistrictConfiguration ()
+		private void VerifyDistrictConfiguration()
 			{
 			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(NodeId), typeof(WfcState));
 			int districtCount = query.CalculateEntityCount();
@@ -301,7 +301,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Assert.IsTrue(foundHub, "Hub district should exist at origin");
 			}
 
-		private void VerifyBiomeFieldConfiguration ()
+		private void VerifyBiomeFieldConfiguration()
 			{
 			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(PolarityFieldData));
 			Assert.AreEqual(4, query.CalculateEntityCount(), "Should create 4 polarity fields");
@@ -319,20 +319,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				"All expected polarity fields should be created");
 			}
 
-		private void OverrideWorldInjection ()
+		private void OverrideWorldInjection()
 			{
 			// For integration testing, we want the scene setup to use our test world
 			// This is handled in individual tests by setting the private fields
 			}
 
-		private void SetField (string fieldName, object value)
+		private void SetField(string fieldName, object value)
 			{
 			FieldInfo field = typeof(SmokeTestSceneSetup).GetField(fieldName,
 				BindingFlags.NonPublic | BindingFlags.Instance);
 			field?.SetValue(this.sceneSetup, value);
 			}
 
-		private void InvokeMethod (string methodName)
+		private void InvokeMethod(string methodName)
 			{
 			MethodInfo method = typeof(SmokeTestSceneSetup).GetMethod(methodName,
 				BindingFlags.NonPublic | BindingFlags.Instance);

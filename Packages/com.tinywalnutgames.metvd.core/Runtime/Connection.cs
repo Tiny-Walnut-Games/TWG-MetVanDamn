@@ -58,7 +58,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public bool IsDiscovered;
 
-		public Connection (uint fromNodeId, uint toNodeId, ConnectionType type = ConnectionType.Bidirectional,
+		public Connection(uint fromNodeId, uint toNodeId, ConnectionType type = ConnectionType.Bidirectional,
 						 Polarity requiredPolarity = Polarity.None, float traversalCost = 1.0f)
 			{
 			FromNodeId = fromNodeId;
@@ -73,7 +73,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Check if this connection can be traversed from the given node
 		/// </summary>
-		public readonly bool CanTraverseFrom (uint nodeId, Polarity availablePolarity)
+		public readonly bool CanTraverseFrom(uint nodeId, Polarity availablePolarity)
 			{
 			if (!IsActive)
 				{
@@ -99,7 +99,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Get the destination node when traversing from the given source
 		/// </summary>
-		public readonly uint GetDestination (uint sourceNodeId)
+		public readonly uint GetDestination(uint sourceNodeId)
 			{
 			if (Type == ConnectionType.Bidirectional)
 				{
@@ -109,7 +109,7 @@ namespace TinyWalnutGames.MetVD.Core
 			return sourceNodeId == FromNodeId ? ToNodeId : 0; // 0 indicates invalid traversal
 			}
 
-		public override readonly string ToString ()
+		public override readonly string ToString()
 			{
 			string direction = Type == ConnectionType.Bidirectional ? "<->" : "->";
 			return $"Connection({FromNodeId} {direction} {ToNodeId}, {Type}, {RequiredPolarity})";
@@ -124,7 +124,7 @@ namespace TinyWalnutGames.MetVD.Core
 		{
 		public Connection Value;
 
-		public static implicit operator Connection (ConnectionBufferElement e) => e.Value;
-		public static implicit operator ConnectionBufferElement (Connection e) => new() { Value = e };
+		public static implicit operator Connection(ConnectionBufferElement e) => e.Value;
+		public static implicit operator ConnectionBufferElement(Connection e) => new() { Value = e };
 		}
 	}

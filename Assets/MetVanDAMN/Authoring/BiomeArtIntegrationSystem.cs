@@ -46,7 +46,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			Critical = 3
 			}
 
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			biomeLookup = state.GetComponentLookup<CoreBiome>(true);
 			artProfileLookup = state.GetComponentLookup<BiomeArtProfileReference>();
@@ -72,7 +72,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			state.RequireForUpdate<BiomeArtProfileReference>();
 			}
 
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			biomeLookup.Update(ref state);
 			artProfileLookup.Update(ref state);
@@ -138,7 +138,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
 
 		// [BurstCompile] - REMOVED: Job accesses Unity managed objects via ProfileRef.Value
-		public void Execute (Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
+		public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
 			{
 			if (!artProfileLookup.TryGetComponent(entity, out BiomeArtProfileReference artProfileRef) || !artProfileRef.ProfileRef.IsValid())
 				{
@@ -170,7 +170,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			optimizationTag.useClusteredPlacement = profile.propSettings.strategy == PropPlacementStrategy.Clustered;
 			}
 
-		private static float CalculateComplexityScore (PropPlacementSettings settings)
+		private static float CalculateComplexityScore(PropPlacementSettings settings)
 			{
 			float score = 1f;
 
@@ -240,7 +240,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return score;
 			}
 
-		private static BiomeArtIntegrationSystem.BiomeArtPriority DeterminePriority (float estimatedPropCount, float complexityScore)
+		private static BiomeArtIntegrationSystem.BiomeArtPriority DeterminePriority(float estimatedPropCount, float complexityScore)
 			{
 			float totalComplexity = estimatedPropCount * complexityScore;
 
@@ -267,7 +267,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
 
 		[BurstCompile]
-		public void Execute (Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
+		public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
 			{
 			if (!nodeIdLookup.TryGetComponent(entity, out NodeId nodeId))
 				{
@@ -290,7 +290,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private static float CalculateSpatialCoherence (int2 coordinates)
+		private static float CalculateSpatialCoherence(int2 coordinates)
 			{
 			// Advanced spatial coherence calculation using multi-layer analysis
 			// Analyzes neighboring biome patterns and connectivity metrics
@@ -321,7 +321,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return math.clamp(coherence, 0f, 1f);
 			}
 
-		private static float AnalyzeNeighborhoodConnectivity (int2 coordinates)
+		private static float AnalyzeNeighborhoodConnectivity(int2 coordinates)
 			{
 			// Advanced neighborhood connectivity using simplified analysis
 			// Simplified version to avoid managed types in Burst jobs
@@ -395,7 +395,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return math.clamp(connectivity, 0.2f, 1.5f); // Allow some boost for excellent connectivity
 			}
 
-		private static float DetermineBiomeConnectionStrength (int2 position, int2 center)
+		private static float DetermineBiomeConnectionStrength(int2 position, int2 center)
 			{
 			// Multi-layer biome analysis for connection type determination
 			float biomeCoherence = math.unlerp(-1f, 1f, math.sin(position.x * 0.7f + position.y * 0.9f));
@@ -408,7 +408,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return math.clamp(combinedScore, 0f, 1f);
 			}
 
-		private static float AnalyzeSpatialClustering (int2 coordinates)
+		private static float AnalyzeSpatialClustering(int2 coordinates)
 			{
 			// Advanced clustering analysis using spatial patterns
 			float clusterScore = 0f;
@@ -444,7 +444,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return clusterScore;
 			}
 
-		private static float CalculateClusteringCoefficient (NativeArray<float> connectivityData)
+		private static float CalculateClusteringCoefficient(NativeArray<float> connectivityData)
 			{
 			// Enhanced clustering coefficient calculation for spatial coherence analysis
 			// Used by AnalyzeNeighborhoodConnectivity to provide advanced spatial intelligence
@@ -476,7 +476,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return math.clamp(enhancedCoefficient, 0f, 1f);
 			}
 
-		private static float CalculatePathConnectivity (int2 coordinates)
+		private static float CalculatePathConnectivity(int2 coordinates)
 			{
 			// Simplified path connectivity using direct distance calculations
 			float pathScore = 0f;
@@ -500,7 +500,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return pathCount > 0 ? pathScore / pathCount : 0.5f;
 			}
 
-		private static float CalculateBetweennessCentrality (int2 center)
+		private static float CalculateBetweennessCentrality(int2 center)
 			{
 			// Simplified centrality calculation based on position characteristics
 			float centralityScore = 0.5f; // Default centrality
@@ -520,7 +520,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return math.clamp(centralityScore, 0.2f, 1f);
 			}
 
-		private static float CalculateSymmetryBonus (int2 coordinates)
+		private static float CalculateSymmetryBonus(int2 coordinates)
 			{
 			// Fixed: Use stack-allocated fixed array instead of managed array for Burst compatibility
 			float symmetryScore = 0f;
@@ -558,7 +558,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return comparisons > 0 ? symmetryScore / comparisons : 0f;
 			}
 
-		private static float CalculatePositionAccessibility (int2 position, int2 center)
+		private static float CalculatePositionAccessibility(int2 position, int2 center)
 			{
 			// Calculate both distance types for different accessibility aspects
 			float euclideanDistance = math.length(position - center);
@@ -595,7 +595,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 	/// </summary>
 	public partial class BiomeArtMainThreadSystem : SystemBase
 		{
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			// Get EntityCommandBuffer for structural changes
 			BeginInitializationEntityCommandBufferSystem.Singleton ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
@@ -646,7 +646,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Integrates coordinate-aware generation and meaningful spatial distribution
 		/// Uses simplified prop placement algorithm for immediate compilation success
 		/// </summary>
-		private void PlaceBiomeProps (BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId, Grid grid)
+		private void PlaceBiomeProps(BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId, Grid grid)
 			{
 			if (artProfile.propSettings?.propPrefabs == null || artProfile.propSettings.propPrefabs.Length == 0)
 				{
@@ -728,7 +728,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private Grid CreateBiomeSpecificTilemap (ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+		private Grid CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
 			{
 			// Get appropriate layer configuration based on projection type
 			string [ ] layerNames = GetLayerNamesForProjection(projectionType);
@@ -781,7 +781,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return createdGrid;
 			}
 
-		private string [ ] GetLayerNamesForProjection (ProjectionType projectionType)
+		private string [ ] GetLayerNamesForProjection(ProjectionType projectionType)
 			{
 			// Define layer configurations directly instead of using Editor-only enums
 			return projectionType switch
@@ -794,7 +794,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					};
 			}
 
-		private void InvokeProjectionCreation (ProjectionType projectionType)
+		private void InvokeProjectionCreation(ProjectionType projectionType)
 			{
 			// Create grid directly using Unity API instead of Editor-only TwoDimensionalGridSetup
 			GameObject gridGO;
@@ -840,7 +840,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private void CreateTilemapLayer (Transform parent, string layerName, int zDepth)
+		private void CreateTilemapLayer(Transform parent, string layerName, int zDepth)
 			{
 			var layerGO = new GameObject(layerName, typeof(Tilemap), typeof(TilemapRenderer));
 			layerGO.transform.SetParent(parent);
@@ -855,7 +855,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			renderer.sortingOrder = 0;
 			}
 
-		private void ApplyBiomeTilesToLayers (BiomeArtProfile artProfile, string [ ] layerNames, Grid grid)
+		private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string [ ] layerNames, Grid grid)
 			{
 			if (grid == null)
 				{
@@ -883,7 +883,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private void ApplyTileToLayer (Tilemap tilemap, TilemapRenderer renderer, string layerName, BiomeArtProfile artProfile)
+		private void ApplyTileToLayer(Tilemap tilemap, TilemapRenderer renderer, string layerName, BiomeArtProfile artProfile)
 			{
 			TileBase tileToApply = null;
 
@@ -925,7 +925,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Never edits Unity's internal materials - creates new instances for safe debugging
 		/// Now used by ApplyBiomeTilesToLayers for comprehensive layer-by-layer debugging
 		/// </summary>
-		private void ApplyCheckerOverrideIfEnabled (Tilemap tilemap, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+		private void ApplyCheckerOverrideIfEnabled(Tilemap tilemap, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
 			{
 			if (artProfile.checkerSettings?.enableCheckerOverride != true || tilemap == null)
 				{
@@ -945,7 +945,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Provides grid-wide coordinate-aware debugging visualization
 		/// Uses meaningful coordinate influence for each tilemap layer
 		/// </summary>
-		private void ApplyCheckerOverrideToGrid (Grid grid, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+		private void ApplyCheckerOverrideToGrid(Grid grid, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
 			{
 			if (grid == null || artProfile.checkerSettings?.enableCheckerOverride != true)
 				{
@@ -975,7 +975,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Adjusts complexity settings based on tilemap layer characteristics
 		/// Different layers get different coordinate influence for meaningful visual hierarchy
 		/// </summary>
-		private BiomeCheckerMaterialOverride.CheckerComplexitySettings AdjustComplexitySettingsForLayer (
+		private BiomeCheckerMaterialOverride.CheckerComplexitySettings AdjustComplexitySettingsForLayer(
 			BiomeCheckerMaterialOverride.CheckerComplexitySettings baseSettings, string layerName)
 			{
 			BiomeCheckerMaterialOverride.CheckerComplexitySettings adjusted = baseSettings;
@@ -1068,7 +1068,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Uses world coordinates to influence checker pattern complexity and animation
 		/// Never edits Unity's internal materials - always creates new instances
 		/// </summary>
-		public static Material GetOrCreateBiomeCheckerMaterial (BiomeType biome, NodeId nodeId, CheckerComplexitySettings complexitySettings)
+		public static Material GetOrCreateBiomeCheckerMaterial(BiomeType biome, NodeId nodeId, CheckerComplexitySettings complexitySettings)
 			{
 			// Create unique cache key that includes coordinate complexity
 			int coordinateHash = GetCoordinateComplexityHash(nodeId.Coordinates, complexitySettings);
@@ -1118,7 +1118,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Creates a checkered texture that adapts to world coordinates and biome complexity
 		/// Pattern size, rotation, and animation all respond to spatial position
 		/// </summary>
-		private static Texture2D CreateCoordinateAwareCheckerTexture (BiomeType biome, NodeId nodeId, CheckerComplexitySettings settings)
+		private static Texture2D CreateCoordinateAwareCheckerTexture(BiomeType biome, NodeId nodeId, CheckerComplexitySettings settings)
 			{
 			// Calculate coordinate-based complexity factors
 			int2 coords = nodeId.Coordinates;
@@ -1162,7 +1162,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates checker size based on world coordinates and complexity settings
 		/// Farther from origin = smaller checkers (more detail for complex areas)
 		/// </summary>
-		private static int CalculateCoordinateBasedCheckerSize (int2 coordinates, CheckerComplexitySettings settings)
+		private static int CalculateCoordinateBasedCheckerSize(int2 coordinates, CheckerComplexitySettings settings)
 			{
 			float distanceFromOrigin = math.length(coordinates);
 			float distanceComplexity = math.clamp(distanceFromOrigin * settings.distanceScalingFactor / 20f, 0.5f, 2.0f);
@@ -1185,7 +1185,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Generates checker pattern influenced by world coordinates and biome characteristics
 		/// Includes coordinate warping, complexity tiers, and spatial variation
 		/// </summary>
-		private static void GenerateCoordinateInfluencedCheckerPattern (Texture2D texture, Color primaryColor,
+		private static void GenerateCoordinateInfluencedCheckerPattern(Texture2D texture, Color primaryColor,
 			Color secondaryColor, int checkerSize, int2 worldCoords, CheckerComplexitySettings settings)
 			{
 			int width = texture.width;
@@ -1229,7 +1229,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates coordinate influence factor for pattern modification
 		/// Uses distance and coordinate patterns to create spatial variety
 		/// </summary>
-		private static float CalculateCoordinateInfluence (int2 coordinates, CheckerComplexitySettings settings)
+		private static float CalculateCoordinateInfluence(int2 coordinates, CheckerComplexitySettings settings)
 			{
 			float distanceFromOrigin = math.length(coordinates);
 			float normalizedDistance = math.clamp(distanceFromOrigin / 15f, 0f, 1f);
@@ -1250,7 +1250,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates pattern influence based on coordinate mathematical relationships
 		/// Creates deterministic but varied patterns across the world
 		/// </summary>
-		private static float CalculateCoordinatePatternInfluence (int2 coordinates)
+		private static float CalculateCoordinatePatternInfluence(int2 coordinates)
 			{
 			// Multiple mathematical patterns to create rich spatial variation
 			float primePattern = CalculatePrimeNumberInfluence(coordinates);
@@ -1271,7 +1271,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates influence based on proximity to prime number coordinates
 		/// Creates irregular but mathematically pleasing patterns
 		/// </summary>
-		private static float CalculatePrimeNumberInfluence (int2 coordinates)
+		private static float CalculatePrimeNumberInfluence(int2 coordinates)
 			{
 			bool xIsPrime = IsPrime(math.abs(coordinates.x));
 			bool yIsPrime = IsPrime(math.abs(coordinates.y));
@@ -1294,7 +1294,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates influence based on Fibonacci sequence relationships
 		/// Creates organic growth patterns reminiscent of natural structures
 		/// </summary>
-		private static float CalculateFibonacciInfluence (int2 coordinates)
+		private static float CalculateFibonacciInfluence(int2 coordinates)
 			{
 			int distanceSum = math.abs(coordinates.x) + math.abs(coordinates.y);
 
@@ -1311,7 +1311,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates influence based on coordinate symmetry patterns
 		/// Creates balanced, aesthetically pleasing arrangements
 		/// </summary>
-		private static float CalculateSymmetryInfluence (int2 coordinates)
+		private static float CalculateSymmetryInfluence(int2 coordinates)
 			{
 			float symmetryScore = 0f;
 
@@ -1345,7 +1345,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates influence based on spiral patterns radiating from origin
 		/// Creates dynamic, flowing patterns that guide visual flow
 		/// </summary>
-		private static float CalculateSpiralInfluence (int2 coordinates)
+		private static float CalculateSpiralInfluence(int2 coordinates)
 			{
 			float distance = math.length(coordinates);
 			if (distance < 0.1f)
@@ -1376,7 +1376,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Helper function to check if a number is prime
 		/// Used for creating irregular but mathematically interesting patterns
 		/// </summary>
-		private static bool IsPrime (int number)
+		private static bool IsPrime(int number)
 			{
 			if (number < 2)
 				{
@@ -1407,7 +1407,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates how close a number is to the nearest Fibonacci number
 		/// Returns 1.0 for exact matches, decreasing with distance
 		/// </summary>
-		private static float CalculateFibonacciCloseness (int number)
+		private static float CalculateFibonacciCloseness(int number)
 			{
 			// Generate Fibonacci sequence up to reasonable limit
 			int [ ] fibonacci = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597 };
@@ -1433,7 +1433,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates Fibonacci spiral influence for organic pattern generation
 		/// Approximates the golden spiral found in nature
 		/// </summary>
-		private static float CalculateFibonacciSpiralInfluence (int2 coordinates)
+		private static float CalculateFibonacciSpiralInfluence(int2 coordinates)
 			{
 			float distance = math.length(coordinates);
 			if (distance < 0.1f)
@@ -1457,7 +1457,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates coordinate-influenced checker pattern with mathematical enhancement
 		/// Includes warping, rotation, and complexity adjustments based on world position
 		/// </summary>
-		private static bool CalculateCoordinateInfluencedChecker (int x, int y, int checkerSize,
+		private static bool CalculateCoordinateInfluencedChecker(int x, int y, int checkerSize,
 			int2 worldCoords, float coordinateInfluence)
 			{
 			// Base checker calculation
@@ -1483,7 +1483,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Applies complexity-based color variation to create rich visual depth
 		/// Uses coordinate position and complexity settings to modify base colors
 		/// </summary>
-		private static Color ApplyComplexityColorVariation (Color baseColor, int pixelX, int pixelY,
+		private static Color ApplyComplexityColorVariation(Color baseColor, int pixelX, int pixelY,
 			int2 worldCoords, CheckerComplexitySettings settings)
 			{
 			if (settings.complexityTierMultiplier < 0.5f)
@@ -1512,7 +1512,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Gets biome color with coordinate-based influence for spatial variety
 		/// Distance and coordinate patterns affect color intensity and hue
 		/// </summary>
-		private static Color GetBiomeColorWithCoordinateInfluence (BiomeType biome, NodeId nodeId,
+		private static Color GetBiomeColorWithCoordinateInfluence(BiomeType biome, NodeId nodeId,
 			CheckerComplexitySettings complexitySettings)
 			{
 			Color baseColor = GetBaseBiomeColor(biome);
@@ -1547,7 +1547,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Gets secondary color for checker pattern with coordinate-aware variation
 		/// Creates harmonious color relationships while maintaining spatial identity
 		/// </summary>
-		private static Color GetSecondaryBiomeColor (BiomeType biome, Color primaryColor, int2 coordinates,
+		private static Color GetSecondaryBiomeColor(BiomeType biome, Color primaryColor, int2 coordinates,
 			CheckerComplexitySettings settings)
 			{
 			Color.RGBToHSV(primaryColor, out float h, out float s, out float v);
@@ -1573,7 +1573,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Gets base biome color without coordinate modifications
 		/// Maintains consistent biome identity across all coordinate variations
 		/// </summary>
-		private static Color GetBaseBiomeColor (BiomeType biome)
+		private static Color GetBaseBiomeColor(BiomeType biome)
 			{
 			return biome switch
 				{
@@ -1611,7 +1611,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Gets secondary hue shift for biome-specific checker pattern
 		/// Creates harmonious color relationships while maintaining spatial identity
 		/// </summary>
-		private static float GetBiomeSecondaryHueShift (BiomeType biome)
+		private static float GetBiomeSecondaryHueShift(BiomeType biome)
 			{
 			return biome switch
 				{
@@ -1649,7 +1649,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Updates existing material with coordinate-based complexity parameters
 		/// Allows materials to adapt to changing coordinate contexts without recreation
 		/// </summary>
-		private static void UpdateMaterialWithCoordinateComplexity (Material material, NodeId nodeId,
+		private static void UpdateMaterialWithCoordinateComplexity(Material material, NodeId nodeId,
 			CheckerComplexitySettings settings)
 			{
 			if (material == null)
@@ -1688,7 +1688,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Applies coordinate-based material properties for enhanced visual feedback
 		/// Sets shader properties that respond to world position and complexity
 		/// </summary>
-		private static void ApplyCoordinateBasedMaterialProperties (Material material, NodeId nodeId,
+		private static void ApplyCoordinateBasedMaterialProperties(Material material, NodeId nodeId,
 			CheckerComplexitySettings settings)
 			{
 			if (material == null)
@@ -1743,7 +1743,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Extracts biome type from material name for property calculations
 		/// Enables biome-specific material behavior based on naming conventions
 		/// </summary>
-		private static BiomeType GetBiomeTypeFromMaterialName (string materialName)
+		private static BiomeType GetBiomeTypeFromMaterialName(string materialName)
 			{
 			if (string.IsNullOrEmpty(materialName))
 				{
@@ -1759,7 +1759,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Custom hash code combination for .NET Framework 4.7.1 compatibility
 		/// Replaces System.HashCode.Combine which is not available in older framework versions
 		/// </summary>
-		private static int CombineHashCodes (params object [ ] values)
+		private static int CombineHashCodes(params object [ ] values)
 			{
 			unchecked
 				{
@@ -1779,7 +1779,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Gets coordinate complexity hash for material caching
 		/// Creates deterministic hash values for efficient material reuse
 		/// </summary>
-		private static int GetCoordinateComplexityHash (int2 coordinates, CheckerComplexitySettings settings)
+		private static int GetCoordinateComplexityHash(int2 coordinates, CheckerComplexitySettings settings)
 			{
 			// Create hash that includes coordinate influence on material properties
 			float coordinateInfluence = CalculateCoordinateInfluence(coordinates, settings);
@@ -1795,7 +1795,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Never edits Unity's internal materials - always creates new instances
 		/// Integrates with existing BiomeArtIntegrationSystem workflow
 		/// </summary>
-		public static void ApplyCheckerOverrideToTilemap (Tilemap tilemap, BiomeType biome, NodeId nodeId,
+		public static void ApplyCheckerOverrideToTilemap(Tilemap tilemap, BiomeType biome, NodeId nodeId,
 			CheckerComplexitySettings? customSettings = null)
 			{
 			if (tilemap == null)
@@ -1825,7 +1825,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Creates default complexity settings with balanced coordinate influence
 		/// Provides sensible defaults for coordinate-aware checkered material generation
 		/// </summary>
-		public static CheckerComplexitySettings CreateDefaultComplexitySettings ()
+		public static CheckerComplexitySettings CreateDefaultComplexitySettings()
 			{
 			return new CheckerComplexitySettings
 				{
@@ -1841,7 +1841,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Calculates coordinate-based sorting order for proper layer management
 		/// Ensures distant/complex areas render appropriately relative to simple areas
 		/// </summary>
-		private static int CalculateCoordinateBasedSortingOrder (int2 coordinates)
+		private static int CalculateCoordinateBasedSortingOrder(int2 coordinates)
 			{
 			// Base sorting order influenced by coordinate position
 			float distanceFromOrigin = math.length(coordinates);
@@ -1857,7 +1857,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Cleans up cached materials and textures to prevent memory leaks
 		/// Call during application shutdown or when switching scenes
 		/// </summary>
-		public static void CleanupCachedResources ()
+		public static void CleanupCachedResources()
 			{
 			// Clean up cached materials
 			foreach (Material material in _cachedBiomeMaterials.Values)

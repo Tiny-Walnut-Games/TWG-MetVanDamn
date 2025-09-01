@@ -19,7 +19,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		private SimulationSystemGroup _simGroup;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			this._testWorld = new World("WfcDeterminismTestWorld");
 			this._entityManager = this._testWorld.EntityManager;
@@ -32,7 +32,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (this._testWorld.IsCreated)
 				{
@@ -41,7 +41,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WfcGeneration_WithSameSeed_ProducesSameResults ()
+		public void WfcGeneration_WithSameSeed_ProducesSameResults()
 			{
 			// Test that WFC generation is deterministic with the same seed
 			const uint testSeed = 42;
@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WfcGeneration_WithDifferentSeeds_ProducesDifferentResults ()
+		public void WfcGeneration_WithDifferentSeeds_ProducesDifferentResults()
 			{
 			// Test that different seeds produce different but valid results
 			const uint seed1 = 123;
@@ -93,7 +93,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WfcGeneration_WithSameWorldConfig_IsReproducible ()
+		public void WfcGeneration_WithSameWorldConfig_IsReproducible()
 			{
 			// Test full world generation reproducibility
 			const uint worldSeed = 789;
@@ -109,7 +109,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WfcConstraintValidation_IsConsistent ()
+		public void WfcConstraintValidation_IsConsistent()
 			{
 			// Test that constraint validation produces consistent results
 			Entity testEntity = this.CreateTestEntityWithWfcState();
@@ -142,7 +142,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 						 "Validation should show consistent patterns, not pure randomness");
 			}
 
-		private WfcGenerationResults RunWfcGenerationWithSeed (uint seed)
+		private WfcGenerationResults RunWfcGenerationWithSeed(uint seed)
 			{
 			// Clear any existing entities
 			this._entityManager.DestroyEntity(this._entityManager.UniversalQuery);
@@ -182,7 +182,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			return results;
 			}
 
-		private void CreateTestWorld (uint seed)
+		private void CreateTestWorld(uint seed)
 			{
 			// Create world configuration
 			Entity configEntity = this._entityManager.CreateEntity();
@@ -203,7 +203,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				}
 			}
 
-		private WorldGenerationConfig CreateTestWorldConfig (uint seed, int targetSectors)
+		private WorldGenerationConfig CreateTestWorldConfig(uint seed, int targetSectors)
 			{
 			return new WorldGenerationConfig
 				{
@@ -214,7 +214,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				};
 			}
 
-		private uint GenerateWorldAndComputeHash (WorldGenerationConfig config)
+		private uint GenerateWorldAndComputeHash(WorldGenerationConfig config)
 			{
 			// Clear existing entities
 			this._entityManager.DestroyEntity(this._entityManager.UniversalQuery);
@@ -256,7 +256,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			return hash;
 			}
 
-		private Entity CreateTestEntityWithWfcState ()
+		private Entity CreateTestEntityWithWfcState()
 			{
 			Entity entity = this._entityManager.CreateEntity();
 			this._entityManager.AddComponentData(entity, new WfcState(WfcGenerationState.InProgress));
@@ -264,7 +264,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			return entity;
 			}
 
-		private bool ValidateTestConstraints (Entity entity, NodeId nodeId, ref Unity.Mathematics.Random random)
+		private bool ValidateTestConstraints(Entity entity, NodeId nodeId, ref Unity.Mathematics.Random random)
 			{
 			// We first need to assign a temporary entity to simulate the job context?
 			if (!this._entityManager.HasComponent<WfcState>(entity))
@@ -301,7 +301,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			public int completedCount;
 			public NativeArray<uint> tileAssignments;
 
-			public void Dispose ()
+			public void Dispose()
 				{
 				if (this.tileAssignments.IsCreated)
 					{

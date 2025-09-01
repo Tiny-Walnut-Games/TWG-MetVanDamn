@@ -74,7 +74,7 @@ namespace TinyWalnutGames.Tools.Editor
 		/// Original path: "Tools/Batch Sprite Slicer" - Modified to prevent duplicate menu warnings
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/Tools/Batch Sprite Slicer")] // Sacred Symbol Preservation: Unique path prevents menu conflicts
-		public static void OpenWindow ()
+		public static void OpenWindow()
 			{
 			GetWindow<BatchSpriteSlicer>("Batch Sprite Slicer"); // Opens the window with a title
 			}
@@ -83,7 +83,7 @@ namespace TinyWalnutGames.Tools.Editor
 		/// Called when the window is drawn in the Unity Editor.
 		/// 🔥 LIBERATED: No more conditional compilation madness!
 		/// </summary>
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			GUILayout.Label("Batch Sprite Slicer", EditorStyles.boldLabel);
 			EditorGUILayout.HelpBox(
@@ -227,7 +227,7 @@ namespace TinyWalnutGames.Tools.Editor
 		/// Copies the sprite rectangles and custom physics outlines from the selected texture(s) in the project.
 		/// 🔥 LIBERATED: No more creepy death skull guardians needed!
 		/// </summary>
-		private void CopySlicesFromSelected ()
+		private void CopySlicesFromSelected()
 			{
 			Object [ ] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
 			if (selectedTextures.Length == 0)
@@ -285,7 +285,7 @@ namespace TinyWalnutGames.Tools.Editor
 		/// Pastes the copied sprite rectangles and custom physics outlines to the selected texture(s) in the project.
 		/// 🔥 LIBERATED: Freedom from conditional compilation chains!
 		/// </summary>
-		private void PasteSlicesToSelected ()
+		private void PasteSlicesToSelected()
 			{
 			if (copiedRects == null || copiedRects.Count == 0)
 				{
@@ -405,7 +405,7 @@ namespace TinyWalnutGames.Tools.Editor
 		/// Adjusts the pivot of all selected sprite slices to the specified pivot alignment.
 		/// 🔥 LIBERATED: Clean code, no more conditional chaos!
 		/// </summary>
-		private void AdjustPivotOfSelectedSlices ()
+		private void AdjustPivotOfSelectedSlices()
 			{
 			Object [ ] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
 
@@ -453,7 +453,7 @@ namespace TinyWalnutGames.Tools.Editor
 		/// Slices the selected textures into multiple sprites based on the specified cell size or grid settings.
 		/// 🔥 LIBERATED: Pure, clean sprite slicing power!
 		/// </summary>
-		private void SliceSelectedSprites ()
+		private void SliceSelectedSprites()
 			{
 			Object [ ] selectedTextures = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
 
@@ -604,7 +604,7 @@ namespace TinyWalnutGames.Tools.Editor
 		/// Gets the pivot vector for the specified sprite alignment.
 		/// 🔥 LIBERATED: Pure utility function, no protection needed!
 		/// </summary>
-		private Vector2 GetPivotForAlignment (SpriteAlignment alignment)
+		private Vector2 GetPivotForAlignment(SpriteAlignment alignment)
 			{
 			return alignment switch
 				{

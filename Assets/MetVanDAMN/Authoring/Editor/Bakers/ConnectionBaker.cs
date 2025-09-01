@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	/// </summary>
 	public class ConnectionBaker : Baker<ConnectionAuthoring>
 		{
-		public override void Bake (ConnectionAuthoring authoring)
+		public override void Bake(ConnectionAuthoring authoring)
 			{
 			if (authoring.from == null || authoring.to == null || authoring.from == authoring.to)
 				{

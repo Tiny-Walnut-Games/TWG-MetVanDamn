@@ -14,20 +14,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		private EntityManager entityManager;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			this.testWorld = new World("Test World");
 			this.entityManager = this.testWorld.EntityManager;
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			this.testWorld?.Dispose();
 			}
 
 		[Test]
-		public void BiomeArtProfile_CanBeCreated ()
+		public void BiomeArtProfile_CanBeCreated()
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			// Initialize nested settings (was previously flat fields like propSpawnChance)
@@ -41,7 +41,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void BiomeArtProfileReference_CanBeAddedToEntity ()
+		public void BiomeArtProfileReference_CanBeAddedToEntity()
 			{
 			Entity entity = this.entityManager.CreateEntity();
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void BiomeTransition_ComponentDataWorks ()
+		public void BiomeTransition_ComponentDataWorks()
 			{
 			Entity entity = this.entityManager.CreateEntity();
 
@@ -88,7 +88,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void ProjectionType_EnumValuesAreCorrect ()
+		public void ProjectionType_EnumValuesAreCorrect()
 			{
 			Assert.AreEqual(0, (int)ProjectionType.Platformer);
 			Assert.AreEqual(1, (int)ProjectionType.TopDown);
@@ -97,7 +97,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void BiomeArtProfile_DefaultLayersConfiguration ()
+		public void BiomeArtProfile_DefaultLayersConfiguration()
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			profile.propSettings = new PropPlacementSettings();
@@ -108,7 +108,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void BiomeArtProfile_AllowedPropLayersCanBeModified ()
+		public void BiomeArtProfile_AllowedPropLayersCanBeModified()
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			profile.propSettings = new PropPlacementSettings();

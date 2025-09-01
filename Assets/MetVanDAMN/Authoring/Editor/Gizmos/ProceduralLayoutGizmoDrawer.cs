@@ -28,14 +28,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private static double _lastEcsSampleTime;
 		private const double EcsSampleInterval = 0.25; // seconds
 
-		static ProceduralLayoutGizmoDrawer ()
+		static ProceduralLayoutGizmoDrawer()
 			{
 			LoadSettings();
 			SceneView.duringSceneGui += OnSceneGUI;
 			EditorApplication.update += SampleHierarchyEcsData;
 			}
 
-		private static void LoadSettings ()
+		private static void LoadSettings()
 			{
 			string [ ] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
 			if (guids.Length > 0)
@@ -44,7 +44,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void OnSceneGUI (SceneView _) // underscore to indicate unused parameter
+		private static void OnSceneGUI(SceneView _) // underscore to indicate unused parameter
 			{
 			if (_settings == null)
 				{
@@ -58,7 +58,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			DrawProceduralLayoutGizmos();
 			}
 
-		private static void DrawDebugControls ()
+		private static void DrawDebugControls()
 			{
 			Handles.BeginGUI();
 			GUILayout.BeginArea(new Rect(10, 10, 270, 260));
@@ -85,7 +85,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Handles.EndGUI();
 			}
 
-		private static void DrawProceduralLayoutGizmos ()
+		private static void DrawProceduralLayoutGizmos()
 			{
 			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			WorldConfigurationAuthoring worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
@@ -108,7 +108,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void DrawRandomizationModeInfo (WorldConfigurationAuthoring worldConfig)
+		private static void DrawRandomizationModeInfo(WorldConfigurationAuthoring worldConfig)
 			{
 			SceneView sceneView = SceneView.currentDrawingSceneView;
 			if (sceneView == null)
@@ -127,7 +127,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Handles.Label(anchor, $"Randomization Mode: {worldConfig.randomizationMode}\nSeed: {worldConfig.seed}\nWorld Size: {worldConfig.worldSize}");
 			}
 
-		private static void DrawDistrictGizmos (DistrictAuthoring district)
+		private static void DrawDistrictGizmos(DistrictAuthoring district)
 			{
 			Vector3 position = GetGizmoPosition(district);
 			bool isUnplaced = district.gridCoordinates.x == 0 && district.gridCoordinates.y == 0;
@@ -146,7 +146,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void DrawUnplacedDistrictGizmo (Vector3 position, DistrictAuthoring district)
+		private static void DrawUnplacedDistrictGizmo(Vector3 position, DistrictAuthoring district)
 			{
 			Handles.color = new Color(0.5f, 0.5f, 0.5f, 0.3f);
 			Handles.DrawWireCube(position, Vector3.one * 2f);
@@ -154,7 +154,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Handles.Label(position + Vector3.up * 1.5f, $"UNPLACED\nNode: {district.nodeId}\nLevel: {district.level}");
 			}
 
-		private static void DrawPlacedDistrictGizmo (Vector3 position, DistrictAuthoring district)
+		private static void DrawPlacedDistrictGizmo(Vector3 position, DistrictAuthoring district)
 			{
 			Color biomeColor = _settings != null ? _settings.placedDistrictColor : Color.cyan;
 			Handles.color = new Color(biomeColor.r, biomeColor.g, biomeColor.b, 0.3f);
@@ -165,7 +165,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Handles.Label(position + Vector3.up * 2f, label);
 			}
 
-		private static void DrawDistrictBounds (Vector3 position, Vector3 size, Color biomeColor)
+		private static void DrawDistrictBounds(Vector3 position, Vector3 size, Color biomeColor)
 			{
 			var corners = new Vector3 [ 4 ];
 			corners [ 0 ] = position + new Vector3(-size.x / 2, 0, -size.z / 2);
@@ -181,14 +181,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Handles.DrawLine(corners [ 3 ], corners [ 0 ]);
 			}
 
-		private static void DrawBiomeRadiusGizmo (Vector3 position, DistrictAuthoring _)
+		private static void DrawBiomeRadiusGizmo(Vector3 position, DistrictAuthoring _)
 			{
 			Color biomeColor = GetBiomeColor(BiomeType.HubArea);
 			Handles.color = new Color(biomeColor.r, biomeColor.g, biomeColor.b, 0.1f);
 			Handles.DrawWireDisc(position, Vector3.up, _settings != null ? _settings.biomeRadius : 5f);
 			}
 
-		private static void DrawConnectionGizmos ()
+		private static void DrawConnectionGizmos()
 			{
 			ConnectionAuthoring [ ] connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
 			foreach (ConnectionAuthoring connection in connections)
@@ -202,7 +202,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void DrawConnectionArrow (Vector3 from, Vector3 to, ConnectionAuthoring connection)
+		private static void DrawConnectionArrow(Vector3 from, Vector3 to, ConnectionAuthoring connection)
 			{
 			Color connectionColor = connection.type == ConnectionType.OneWay ? _settings.oneWayColor : _settings.connectionColor;
 			Handles.color = connectionColor;
@@ -223,7 +223,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void DrawSectorsAndRooms ()
+		private static void DrawSectorsAndRooms()
 			{
 			if (!_showSectors && !_showRooms)
 				{
@@ -255,7 +255,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void SampleHierarchyEcsData ()
+		private static void SampleHierarchyEcsData()
 			{
 			if (!Application.isPlaying)
 				{
@@ -297,7 +297,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			catch { /* swallow sampling errors safely */ }
 			}
 
-		private static Vector3 GetGizmoPosition (DistrictAuthoring district)
+		private static Vector3 GetGizmoPosition(DistrictAuthoring district)
 			{
 			return _settings != null && _settings.useGridCoordinatesForGizmos
 				? new Vector3(
@@ -308,7 +308,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				: district.transform.position;
 			}
 
-		private static Color GetBiomeColor (BiomeType biomeType)
+		private static Color GetBiomeColor(BiomeType biomeType)
 			{
 			// 🔥 FIXED: Complete color mapping for all 27 biome types in Gizmo system
 			return biomeType switch
@@ -369,7 +369,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					};
 			}
 
-		private static void PreviewProceduralLayout ()
+		private static void PreviewProceduralLayout()
 			{
 			WorldConfigurationAuthoring worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
 			if (worldConfig == null)
@@ -411,7 +411,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SceneView.RepaintAll();
 			}
 
-		private static void GeneratePositionsPreview (int2 [ ] positions, int2 worldSize, DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
+		private static void GeneratePositionsPreview(int2 [ ] positions, int2 worldSize, DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
 			{
 			if (strategy == DistrictPlacementStrategy.PoissonDisc)
 				{
@@ -458,7 +458,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void FrameAllDistricts ()
+		private static void FrameAllDistricts()
 			{
 			SceneView sceneView = SceneView.lastActiveSceneView;
 			if (sceneView == null)

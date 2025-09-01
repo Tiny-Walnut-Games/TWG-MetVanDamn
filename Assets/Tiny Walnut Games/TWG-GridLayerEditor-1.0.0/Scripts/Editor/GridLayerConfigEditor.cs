@@ -15,7 +15,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// 🔥 UPDATED: Made menu path unique to prevent conflicts
 		/// </summary>
 		[MenuItem("Assets/Create/Tiny Walnut Games/Grid Layer Editor/Grid Layer Config", priority = 1)]
-		public static void CreateGridLayerConfig ()
+		public static void CreateGridLayerConfig()
 			{
 			// Get the path of the selected object in the Project window
 			string path = AssetDatabase.GetAssetPath(Selection.activeObject);
@@ -72,7 +72,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <summary>
 		/// 🔥 DUPLICATE DETECTION SPELL: Check if a GridLayerConfig already exists in the specified directory
 		/// </summary>
-		private static bool HasExistingGridLayerConfigInDirectory (string directoryPath)
+		private static bool HasExistingGridLayerConfigInDirectory(string directoryPath)
 			{
 			if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
 				{
@@ -109,7 +109,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// 🔥 UPDATED: Made validation path unique to match the menu item
 		/// </summary>
 		[MenuItem("Assets/Create/Tiny Walnut Games/Grid Layer Editor/Grid Layer Config", true, priority = 1)]
-		public static bool ValidateCreateGridLayerConfig ()
+		public static bool ValidateCreateGridLayerConfig()
 			{
 			// Menu item is always available, but we could add conditions here:
 			// - Check if GridLayerEditor package is properly installed

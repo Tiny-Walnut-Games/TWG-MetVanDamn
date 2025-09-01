@@ -8,7 +8,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	{
 	public class WorldBootstrapBaker : Baker<WorldBootstrapAuthoring>
 		{
-		public override void Bake (WorldBootstrapAuthoring authoring)
+		public override void Bake(WorldBootstrapAuthoring authoring)
 			{
 			Entity entity = GetEntity(TransformUsageFlags.None);
 			// Map authoring ranges to *Range fields

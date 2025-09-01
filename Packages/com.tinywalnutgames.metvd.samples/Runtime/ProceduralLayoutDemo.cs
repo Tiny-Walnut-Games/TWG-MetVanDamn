@@ -32,7 +32,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		private bool _demoStarted = false;
 		private int _currentStage = 0;
 
-		private void Start ()
+		private void Start()
 			{
 			World world = World.DefaultGameObjectInjectionWorld;
 			if (world == null)
@@ -49,7 +49,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void Update ()
+		private void Update()
 			{
 			if (!enableAutoDemo || !_demoStarted)
 				{
@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			}
 
 		[ContextMenu("Start Procedural Layout Demo")]
-		public void StartDemo ()
+		public void StartDemo()
 			{
 			Debug.Log("🧠 Starting Procedural World Layout Demo");
 
@@ -85,7 +85,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			}
 
 		[ContextMenu("Check Current Demo Status")]
-		public void CheckDemoProgress ()
+		public void CheckDemoProgress()
 			{
 			if (_entityManager == null)
 				{
@@ -119,7 +119,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void CheckDistrictLayoutStage ()
+		private void CheckDistrictLayoutStage()
 			{
 			using EntityQuery layoutDoneQuery = _entityManager.CreateEntityQuery(typeof(DistrictLayoutDoneTag));
 
@@ -141,7 +141,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void CheckConnectionBuildingStage ()
+		private void CheckConnectionBuildingStage()
 			{
 			using EntityQuery layoutDoneQuery = _entityManager.CreateEntityQuery(typeof(DistrictLayoutDoneTag));
 
@@ -165,7 +165,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void CheckRuleRandomizationStage ()
+		private void CheckRuleRandomizationStage()
 			{
 			using EntityQuery rulesDoneQuery = _entityManager.CreateEntityQuery(typeof(RuleRandomizationDoneTag));
 			using EntityQuery ruleSetQuery = _entityManager.CreateEntityQuery(typeof(WorldRuleSet));
@@ -191,7 +191,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void CheckHierarchyStage ()
+		private void CheckHierarchyStage()
 			{
 			using EntityQuery sectorQuery = _entityManager.CreateEntityQuery(typeof(SectorHierarchyData));
 			using EntityQuery roomQuery = _entityManager.CreateEntityQuery(typeof(RoomHierarchyData));
@@ -214,7 +214,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void CheckWfcIntegrationStage ()
+		private void CheckWfcIntegrationStage()
 			{
 			using EntityQuery wfcQuery = _entityManager.CreateEntityQuery(typeof(WfcState));
 
@@ -253,7 +253,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void CreateWorldConfiguration ()
+		private void CreateWorldConfiguration()
 			{
 			Entity worldConfigEntity = _entityManager.CreateEntity();
 			_entityManager.AddComponentData(worldConfigEntity, new WorldConfiguration
@@ -265,7 +265,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				});
 			}
 
-		private void CreateUnplacedDistricts ()
+		private void CreateUnplacedDistricts()
 			{
 			for (int i = 0; i < districtCount; i++)
 				{
@@ -291,7 +291,7 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 			}
 
-		private void LogDistrictPositions ()
+		private void LogDistrictPositions()
 			{
 			using EntityQuery nodeQuery = _entityManager.CreateEntityQuery(typeof(NodeId));
 			Unity.Collections.NativeArray<NodeId> nodeIds = nodeQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);
@@ -308,7 +308,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			nodeIds.Dispose();
 			}
 
-		private void LogConnectionGraph ()
+		private void LogConnectionGraph()
 			{
 			using EntityQuery connectionQuery = _entityManager.CreateEntityQuery(typeof(ConnectionBufferElement));
 			Unity.Collections.NativeArray<Entity> entities = connectionQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
@@ -332,7 +332,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			entities.Dispose();
 			}
 
-		private void ClearDemoEntities ()
+		private void ClearDemoEntities()
 			{
 			// Clear existing demo entities to start fresh
 			using EntityQuery allEntitiesQuery = _entityManager.CreateEntityQuery(typeof(Entity));
@@ -353,7 +353,7 @@ namespace TinyWalnutGames.MetVD.Samples
 			allEntities.Dispose();
 			}
 
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			if (!enableAutoDemo)
 				{

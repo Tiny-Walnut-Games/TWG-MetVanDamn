@@ -16,7 +16,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		private EntityQuery _roomsWithContentQuery;
 
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			// Rooms that have content generated but no navigation generated
 			_roomsWithContentQuery = GetEntityQuery(
@@ -30,7 +30,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			RequireForUpdate(_roomsWithContentQuery);
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			using NativeArray<Entity> roomEntities = _roomsWithContentQuery.ToEntityArray(Allocator.Temp);
 			using NativeArray<NodeId> nodeIds = _roomsWithContentQuery.ToComponentDataArray<NodeId>(Allocator.Temp);
@@ -60,7 +60,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void GenerateRoomNavigation (EntityManager entityManager, Entity roomEntity,
+		private static void GenerateRoomNavigation(EntityManager entityManager, Entity roomEntity,
 												  RoomHierarchyData hierarchy, RoomTemplate template,
 												  NodeId nodeId, ref ProceduralRoomGenerated genStatus)
 			{
@@ -92,7 +92,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			tilemap.Dispose();
 			}
 
-		private static JumpArcPhysics GeneratePhysicsForRoom (RoomTemplate template, ref Unity.Mathematics.Random random)
+		private static JumpArcPhysics GeneratePhysicsForRoom(RoomTemplate template, ref Unity.Mathematics.Random random)
 			{
 			// Base physics - could be read from configuration or determined by room type
 			var physics = new JumpArcPhysics();
@@ -142,7 +142,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			return physics;
 			}
 
-		private static NativeArray<TileType> SimulateRoomTilemap (RectInt bounds, RoomTemplate template, ref Unity.Mathematics.Random random)
+		private static NativeArray<TileType> SimulateRoomTilemap(RectInt bounds, RoomTemplate template, ref Unity.Mathematics.Random random)
 			{
 			// Generate procedural tilemap layout based on room template configuration
 			// This creates the complete room structure for navigation analysis
@@ -180,7 +180,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			return tilemap;
 			}
 
-		private static void ApplyEmptyAboveTraversableRule (RectInt bounds, NativeArray<TileType> tilemap,
+		private static void ApplyEmptyAboveTraversableRule(RectInt bounds, NativeArray<TileType> tilemap,
 														  DynamicBuffer<RoomNavigationElement> navBuffer)
 			{
 			// Rule: If an empty tile is directly above a walkable/climbable/stickable tile, mark it navigable
@@ -210,7 +210,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void CalculateJumpVectorConnections (RectInt bounds, NativeArray<TileType> tilemap,
+		private static void CalculateJumpVectorConnections(RectInt bounds, NativeArray<TileType> tilemap,
 														  JumpArcPhysics physics, Ability requiredSkills,
 														  DynamicBuffer<RoomNavigationElement> navBuffer)
 			{
@@ -237,7 +237,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void AddJumpConnections (int2 fromPos, RectInt bounds, NativeArray<TileType> tilemap,
+		private static void AddJumpConnections(int2 fromPos, RectInt bounds, NativeArray<TileType> tilemap,
 											 JumpArcPhysics physics, Ability requiredSkills,
 											 DynamicBuffer<RoomNavigationElement> navBuffer)
 			{
@@ -288,7 +288,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void AddDashConnections (int2 fromPos, RectInt bounds, NativeArray<TileType> tilemap,
+		private static void AddDashConnections(int2 fromPos, RectInt bounds, NativeArray<TileType> tilemap,
 											 JumpArcPhysics physics, Ability requiredSkills,
 											 DynamicBuffer<RoomNavigationElement> navBuffer)
 			{
@@ -324,7 +324,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void AddWallJumpConnections (int2 fromPos, RectInt bounds, NativeArray<TileType> tilemap,
+		private static void AddWallJumpConnections(int2 fromPos, RectInt bounds, NativeArray<TileType> tilemap,
 												 JumpArcPhysics physics, Ability requiredSkills,
 												 DynamicBuffer<RoomNavigationElement> navBuffer)
 			{
@@ -367,7 +367,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void AddSecretRouteConnections (RectInt bounds, NativeArray<TileType> tilemap,
+		private static void AddSecretRouteConnections(RectInt bounds, NativeArray<TileType> tilemap,
 													 JumpArcPhysics physics, Ability optionalSkills,
 													 DynamicBuffer<RoomNavigationElement> navBuffer,
 													 ref Unity.Mathematics.Random random)
@@ -393,12 +393,12 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static bool IsTraversable (TileType tile)
+		private static bool IsTraversable(TileType tile)
 			{
 			return tile is TileType.Platform or TileType.Climbable;
 			}
 
-		private static bool IsWall (int2 position, RectInt bounds, NativeArray<TileType> tilemap)
+		private static bool IsWall(int2 position, RectInt bounds, NativeArray<TileType> tilemap)
 			{
 			if (!IsWithinBounds(position, bounds))
 				{
@@ -409,7 +409,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			return tilemap [ index ] == TileType.Solid;
 			}
 
-		private static bool IsWithinBounds (int2 position, RectInt bounds)
+		private static bool IsWithinBounds(int2 position, RectInt bounds)
 			{
 			return position.x >= 0 && position.x < bounds.width &&
 				   position.y >= 0 && position.y < bounds.height;
@@ -418,7 +418,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Generate tilemap configuration based on room template type
 		/// </summary>
-		private static TilemapConfig GetTilemapGenerationConfig (RoomTemplate template)
+		private static TilemapConfig GetTilemapGenerationConfig(RoomTemplate template)
 			{
 			bool vertical = template.GeneratorType == RoomGeneratorType.VerticalSegment;
 			return new TilemapConfig

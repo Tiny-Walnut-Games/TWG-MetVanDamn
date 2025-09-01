@@ -22,7 +22,7 @@ namespace TinyWalnutGames.MetVD.Biome
 		private BufferLookup<ConnectionBufferElement> connectionBufferLookup;
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			biomeLookup = state.GetComponentLookup<Core.Biome>();
 			nodeIdLookup = state.GetComponentLookup<NodeId>(true);
@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Biome
 			}
 
 		[BurstCompile]
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			biomeLookup.Update(ref state);
 			nodeIdLookup.Update(ref state);
@@ -72,7 +72,7 @@ namespace TinyWalnutGames.MetVD.Biome
 		public Random Random;
 		public float DeltaTime;
 
-		public readonly void Execute ([ChunkIndexInQuery] int chunkIndex, Entity entity, ref Core.Biome biome, in NodeId nodeId)
+		public readonly void Execute([ChunkIndexInQuery] int chunkIndex, Entity entity, ref Core.Biome biome, in NodeId nodeId)
 			{
 			// Use chunkIndex / entity to seed jitter for consistent variety
 			var random = new Random((Random.state + (uint)(chunkIndex * 961748927)) ^ (uint)entity.Index);
@@ -107,7 +107,7 @@ namespace TinyWalnutGames.MetVD.Biome
 			UpdateDifficultyModifier(ref biome, DeltaTime);
 			}
 
-		private readonly BiomeType AssignBiomeType (NodeId nodeId, Polarity primaryPolarity, ref Random random)
+		private readonly BiomeType AssignBiomeType(NodeId nodeId, Polarity primaryPolarity, ref Random random)
 			{
 			// Add small random offset to diversify boundary decisions
 			int yBias = (int)(random.state & 1);
@@ -146,7 +146,7 @@ namespace TinyWalnutGames.MetVD.Biome
 			return nodeId.Level == 0 ? BiomeType.HubArea : BiomeType.TransitionZone;
 			}
 
-		private readonly float CalculatePolarityStrength (Entity entity, NodeId nodeId, Core.Biome biome, ref Random random)
+		private readonly float CalculatePolarityStrength(Entity entity, NodeId nodeId, Core.Biome biome, ref Random random)
 			{
 			// Base strength from biome type
 			float baseStrength = GetBasePolarityStrength(biome.Type);
@@ -169,7 +169,7 @@ namespace TinyWalnutGames.MetVD.Biome
 			return math.clamp(baseStrength * positionModifier * levelModifier * randomVariation * indexJitter, 0.1f, 1.0f);
 			}
 
-		private readonly float GetBasePolarityStrength (BiomeType biomeType)
+		private readonly float GetBasePolarityStrength(BiomeType biomeType)
 			{
 			return biomeType switch
 				{
@@ -227,7 +227,7 @@ namespace TinyWalnutGames.MetVD.Biome
 					};
 			}
 
-		private readonly Polarity GetComplementaryPolarity (Polarity primaryPolarity)
+		private readonly Polarity GetComplementaryPolarity(Polarity primaryPolarity)
 			{
 			return primaryPolarity switch
 				{
@@ -249,7 +249,7 @@ namespace TinyWalnutGames.MetVD.Biome
 					};
 			}
 
-		private readonly void UpdateDifficultyModifier (ref Core.Biome biome, float deltaTime)
+		private readonly void UpdateDifficultyModifier(ref Core.Biome biome, float deltaTime)
 			{
 			float baseModifier = 1.0f;
 
@@ -312,13 +312,13 @@ namespace TinyWalnutGames.MetVD.Biome
 		private ComponentLookup<Core.Biome> biomeLookup;
 		private ComponentLookup<NodeId> nodeIdLookup;
 
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			biomeLookup = GetComponentLookup<Core.Biome>(true);
 			nodeIdLookup = GetComponentLookup<NodeId>(true);
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			biomeLookup.Update(ref CheckedStateRef);
 			nodeIdLookup.Update(ref CheckedStateRef);
@@ -346,7 +346,7 @@ namespace TinyWalnutGames.MetVD.Biome
 		[ReadOnly] public ComponentLookup<Core.Biome> BiomeLookup;
 		[ReadOnly] public ComponentLookup<NodeId> NodeIdLookup;
 
-		public readonly void Execute (Entity entity, ref DynamicBuffer<BiomeValidationRecord> validationBuffer, in Core.Biome biome, in NodeId nodeId)
+		public readonly void Execute(Entity entity, ref DynamicBuffer<BiomeValidationRecord> validationBuffer, in Core.Biome biome, in NodeId nodeId)
 			{
 			// Ensure buffer exists (IJobEntity injection will add via Execute signature if declared) but guard anyway
 			if (!validationBuffer.IsCreated)
@@ -359,7 +359,7 @@ namespace TinyWalnutGames.MetVD.Biome
 			ValidateDifficultyProgression(validationBuffer, biome, nodeId, entity.Index);
 			}
 
-		private static void ValidatePolarityCoherence (DynamicBuffer<BiomeValidationRecord> buffer, in Core.Biome biome, in NodeId nodeId, int index)
+		private static void ValidatePolarityCoherence(DynamicBuffer<BiomeValidationRecord> buffer, in Core.Biome biome, in NodeId nodeId, int index)
 			{
 			bool isValid = true;
 			if (biome.PrimaryPolarity == Polarity.None && biome.SecondaryPolarity != Polarity.None)
@@ -399,7 +399,7 @@ namespace TinyWalnutGames.MetVD.Biome
 				}
 			}
 
-		private static void ValidateBiomeTypeAssignment (DynamicBuffer<BiomeValidationRecord> buffer, in Core.Biome biome, in NodeId nodeId, int index)
+		private static void ValidateBiomeTypeAssignment(DynamicBuffer<BiomeValidationRecord> buffer, in Core.Biome biome, in NodeId nodeId, int index)
 			{
 			bool validAssignment = biome.Type switch
 				{
@@ -454,7 +454,7 @@ namespace TinyWalnutGames.MetVD.Biome
 			}
 
 		// Helper method for compatibility scoring - demonstrates meaningful use of validation data
-		private static float CalculateBiomePolarityCompatibility (BiomeType biomeType, Polarity polarity)
+		private static float CalculateBiomePolarityCompatibility(BiomeType biomeType, Polarity polarity)
 			{
 			// Simple compatibility scoring for demonstration - could be expanded into full system
 			return biomeType switch
@@ -490,7 +490,7 @@ namespace TinyWalnutGames.MetVD.Biome
 					};
 			}
 
-		private static void ValidateDifficultyProgression (DynamicBuffer<BiomeValidationRecord> buffer, in Core.Biome biome, in NodeId nodeId, int index)
+		private static void ValidateDifficultyProgression(DynamicBuffer<BiomeValidationRecord> buffer, in Core.Biome biome, in NodeId nodeId, int index)
 			{
 			// Simple heuristic: higher levels should generally have higher difficulty
 			bool isProgressionValid = true;
@@ -527,7 +527,7 @@ namespace TinyWalnutGames.MetVD.Biome
 		{
 		private EntityQuery _missingBufferQuery;
 
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			_missingBufferQuery = GetEntityQuery(new EntityQueryDesc
 				{
@@ -536,7 +536,7 @@ namespace TinyWalnutGames.MetVD.Biome
 				});
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			if (_missingBufferQuery.IsEmptyIgnoreFilter)
 				{
@@ -546,13 +546,13 @@ namespace TinyWalnutGames.MetVD.Biome
 			NativeArray<Entity> entities = _missingBufferQuery.ToEntityArray(Allocator.Temp);
 			var ecb = new EntityCommandBuffer(Allocator.Temp);
 			int buffersCreated = 0; // Track buffer creation for system health monitoring
-			
+
 			for (int i = 0; i < entities.Length; i++)
 				{
 				// Capture buffer creation result for validation system performance analytics
-				DynamicBuffer<BiomeValidationRecord> validationBuffer = ecb.AddBuffer<BiomeValidationRecord>(entities[i]);
+				DynamicBuffer<BiomeValidationRecord> validationBuffer = ecb.AddBuffer<BiomeValidationRecord>(entities [ i ]);
 				buffersCreated++;
-				
+
 				// Use the buffer reference for intelligent initialization
 				// Pre-populate with initial validation state to bootstrap analytics
 				if (validationBuffer.IsCreated)
@@ -561,7 +561,7 @@ namespace TinyWalnutGames.MetVD.Biome
 					// This provides immediate analytical value from the buffer creation
 					validationBuffer.Add(new BiomeValidationRecord
 						{
-						NodeId = entities[i].Index,
+						NodeId = entities [ i ].Index,
 						BufferIndex = i,
 						Distance = 0.0f, // Will be calculated during first validation pass
 						BiomeType = BiomeType.Unknown, // Initial state
@@ -571,11 +571,11 @@ namespace TinyWalnutGames.MetVD.Biome
 						});
 					}
 				}
-			
+
 			ecb.Playback(EntityManager);
 			ecb.Dispose();
 			entities.Dispose();
-			
+
 			// Use buffer creation statistics for intelligent system health monitoring
 			if (buffersCreated > 0)
 				{
@@ -589,7 +589,7 @@ namespace TinyWalnutGames.MetVD.Biome
 					{
 					Debug.Log($"BiomeValidation: Initialized {buffersCreated} validation buffers for biome coherence tracking");
 					}
-				
+
 				// This buffer creation count could drive future optimization decisions
 				// such as validation frequency adjustment or buffer pooling strategies
 				}

@@ -22,7 +22,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _completeQuery;
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_bootstrapQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WorldBootstrapConfiguration>()
@@ -41,7 +41,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		[BurstCompile]
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			// Skip if bootstrap is already complete
 			if (!_completeQuery.IsEmptyIgnoreFilter)
@@ -85,7 +85,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			//#endif
 			}
 
-		private static void GenerateWorldHierarchy (ref SystemState state, WorldBootstrapConfiguration config)
+		private static void GenerateWorldHierarchy(ref SystemState state, WorldBootstrapConfiguration config)
 			{
 			// Use seed or generate random one
 			uint actualSeed = config.Seed == 0 ? (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000 + 1) : (uint)config.Seed;
@@ -109,7 +109,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			// once the DistrictLayoutSystem places the districts we just created
 			}
 
-		private static void GenerateBiomeFields (ref SystemState state, WorldBootstrapConfiguration config, ref Random random)
+		private static void GenerateBiomeFields(ref SystemState state, WorldBootstrapConfiguration config, ref Random random)
 			{
 			int biomeCount = random.NextInt(config.BiomeSettings.BiomeCountRange.x, config.BiomeSettings.BiomeCountRange.y + 1);
 
@@ -152,7 +152,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void GenerateDistricts (ref SystemState state, WorldBootstrapConfiguration config, ref Random random)
+		private static void GenerateDistricts(ref SystemState state, WorldBootstrapConfiguration config, ref Random random)
 			{
 			int districtCount = random.NextInt(config.DistrictSettings.DistrictCountRange.x, config.DistrictSettings.DistrictCountRange.y + 1);
 
@@ -171,7 +171,7 @@ namespace TinyWalnutGames.MetVD.Graph
 #endif
 			}
 
-		private static void GenerateBiomeTypes (NativeArray<BiomeType> biomeTypes, ref Random random)
+		private static void GenerateBiomeTypes(NativeArray<BiomeType> biomeTypes, ref Random random)
 			{
 			// Available biome types (excluding Unknown)
 			var availableTypes = new NativeArray<BiomeType>(6, Allocator.Temp);
@@ -205,7 +205,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void GenerateBiomePositions (NativeArray<float2> positions, int2 worldSize, ref Random random)
+		private static void GenerateBiomePositions(NativeArray<float2> positions, int2 worldSize, ref Random random)
 			{
 			float minDistance = math.min(worldSize.x, worldSize.y) * 0.3f;
 			int maxAttempts = 30;
@@ -251,7 +251,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void CreateBiomeFieldEntity (ref SystemState state, BiomeType biomeType, float2 position,
+		private static void CreateBiomeFieldEntity(ref SystemState state, BiomeType biomeType, float2 position,
 												 WorldBootstrapConfiguration config, ref Random random)
 			{
 			Entity entity = state.EntityManager.CreateEntity();
@@ -281,7 +281,7 @@ namespace TinyWalnutGames.MetVD.Graph
 #endif
 			}
 
-		private static BiomeType DetermineSecondaryBiome (BiomeType primaryBiome, ref Random random)
+		private static BiomeType DetermineSecondaryBiome(BiomeType primaryBiome, ref Random random)
 			{
 			// 30% chance of having a secondary biome for transition zones
 			if (random.NextFloat() > 0.3f)
@@ -302,7 +302,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					};
 			}
 
-		private static (Polarity primary, Polarity secondary) GetBiomePolarities (BiomeType primaryBiome, BiomeType secondaryBiome)
+		private static (Polarity primary, Polarity secondary) GetBiomePolarities(BiomeType primaryBiome, BiomeType secondaryBiome)
 			{
 			Polarity primary = primaryBiome switch
 				{
@@ -320,7 +320,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			return (primary, secondary);
 			}
 
-		private static float CalculateBiomeDifficulty (BiomeType biomeType, ref Random random)
+		private static float CalculateBiomeDifficulty(BiomeType biomeType, ref Random random)
 			{
 			float baseDifficulty = biomeType switch
 				{
@@ -340,7 +340,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			return math.clamp(baseDifficulty + random.NextFloat(-0.2f, 0.2f), 0.1f, 2.0f);
 			}
 
-		private static float CalculateBiomeInfluenceRadius (BiomeType biomeType, int2 worldSize)
+		private static float CalculateBiomeInfluenceRadius(BiomeType biomeType, int2 worldSize)
 			{
 			float baseRadius = math.min(worldSize.x, worldSize.y) * 0.4f;
 
@@ -357,7 +357,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			return baseRadius * multiplier;
 			}
 
-		private static void PopulateBiomeInfluences (DynamicBuffer<BiomeInfluence> buffer,
+		private static void PopulateBiomeInfluences(DynamicBuffer<BiomeInfluence> buffer,
 												  BiomeType primaryBiome, BiomeType secondaryBiome,
 												  float strength, float gradient)
 			{
@@ -381,7 +381,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void CreateDistrictEntity (ref SystemState state, uint nodeId,
+		private static void CreateDistrictEntity(ref SystemState state, uint nodeId,
 											   WorldBootstrapConfiguration config, ref Random random)
 			{
 			Entity entity = state.EntityManager.CreateEntity();
@@ -408,24 +408,24 @@ namespace TinyWalnutGames.MetVD.Graph
 			state.EntityManager.AddBuffer<GateConditionBufferElement>(entity);
 			}
 
-		private static int CalculateGeneratedBiomes (WorldBootstrapConfiguration config)
+		private static int CalculateGeneratedBiomes(WorldBootstrapConfiguration config)
 			{
 			return (config.BiomeSettings.BiomeCountRange.x + config.BiomeSettings.BiomeCountRange.y) / 2;
 			}
 
-		private static int CalculateGeneratedDistricts (WorldBootstrapConfiguration config)
+		private static int CalculateGeneratedDistricts(WorldBootstrapConfiguration config)
 			{
 			return (config.DistrictSettings.DistrictCountRange.x + config.DistrictSettings.DistrictCountRange.y) / 2;
 			}
 
-		private static int CalculateGeneratedSectors (WorldBootstrapConfiguration config)
+		private static int CalculateGeneratedSectors(WorldBootstrapConfiguration config)
 			{
 			int avgDistricts = CalculateGeneratedDistricts(config);
 			int avgSectorsPerDistrict = (config.SectorSettings.SectorsPerDistrictRange.x + config.SectorSettings.SectorsPerDistrictRange.y) / 2;
 			return avgDistricts * avgSectorsPerDistrict;
 			}
 
-		private static int CalculateGeneratedRooms (WorldBootstrapConfiguration config)
+		private static int CalculateGeneratedRooms(WorldBootstrapConfiguration config)
 			{
 			int avgSectors = CalculateGeneratedSectors(config);
 			int avgRoomsPerSector = (config.RoomSettings.RoomsPerSectorRange.x + config.RoomSettings.RoomsPerSectorRange.y) / 2;

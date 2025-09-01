@@ -10,12 +10,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private Vector2 _scroll;
 
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/World Debugger")]
-		public static void ShowWindow ()
+		public static void ShowWindow()
 			{
 			GetWindow<MetVDWorldDebugWindow>("MetVanDAMN World Debugger");
 			}
 
-		private void OnEnable ()
+		private void OnEnable()
 			{
 			if (_settings == null)
 				{
@@ -27,7 +27,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			EditorGUILayout.LabelField("MetVanDAMN World Debug", EditorStyles.boldLabel);
 			_settings = (MetVDGizmoSettings)EditorGUILayout.ObjectField("Gizmo Settings", _settings, typeof(MetVDGizmoSettings), false);

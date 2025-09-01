@@ -14,7 +14,7 @@ namespace TinyWalnutGames.MetVD.Core
 		public int2 BiomeCountRange;  // x = min, y = max
 		public float BiomeWeight;
 
-		public BiomeGenerationSettings (int2 biomeCountRange, float biomeWeight)
+		public BiomeGenerationSettings(int2 biomeCountRange, float biomeWeight)
 			{
 			BiomeCountRange = biomeCountRange;
 			BiomeWeight = biomeWeight;
@@ -27,7 +27,7 @@ namespace TinyWalnutGames.MetVD.Core
 		public float DistrictMinDistance;
 		public float DistrictWeight;
 
-		public DistrictGenerationSettings (int2 districtCountRange, float districtMinDistance, float districtWeight)
+		public DistrictGenerationSettings(int2 districtCountRange, float districtMinDistance, float districtWeight)
 			{
 			DistrictCountRange = districtCountRange;
 			DistrictMinDistance = districtMinDistance;
@@ -40,7 +40,7 @@ namespace TinyWalnutGames.MetVD.Core
 		public int2 SectorsPerDistrictRange;  // x = min, y = max
 		public int2 SectorGridSize;
 
-		public SectorGenerationSettings (int2 sectorsPerDistrictRange, int2 sectorGridSize)
+		public SectorGenerationSettings(int2 sectorsPerDistrictRange, int2 sectorGridSize)
 			{
 			SectorsPerDistrictRange = sectorsPerDistrictRange;
 			SectorGridSize = sectorGridSize;
@@ -52,7 +52,7 @@ namespace TinyWalnutGames.MetVD.Core
 		public int2 RoomsPerSectorRange;  // x = min, y = max
 		public float TargetLoopDensity;
 
-		public RoomGenerationSettings (int2 roomsPerSectorRange, float targetLoopDensity)
+		public RoomGenerationSettings(int2 roomsPerSectorRange, float targetLoopDensity)
 			{
 			RoomsPerSectorRange = roomsPerSectorRange;
 			TargetLoopDensity = targetLoopDensity;
@@ -76,7 +76,7 @@ namespace TinyWalnutGames.MetVD.Core
 		public bool EnableDebugVisualization;
 		public bool LogGenerationSteps;
 
-		public WorldBootstrapConfiguration (
+		public WorldBootstrapConfiguration(
 			int seed,
 			int2 worldSize,
 			RandomizationMode randomizationMode,
@@ -114,7 +114,7 @@ namespace TinyWalnutGames.MetVD.Core
 		public int SectorsGenerated;
 		public int RoomsGenerated;
 
-		public WorldBootstrapCompleteTag (int biomes, int districts, int sectors, int rooms)
+		public WorldBootstrapCompleteTag(int biomes, int districts, int sectors, int rooms)
 			{
 			BiomesGenerated = biomes;
 			DistrictsGenerated = districts;

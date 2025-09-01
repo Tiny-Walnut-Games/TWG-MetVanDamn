@@ -18,7 +18,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public int ConnectionCount;
 
-		public DistrictLayoutDoneTag (int districtCount = 0, int connectionCount = 0)
+		public DistrictLayoutDoneTag(int districtCount = 0, int connectionCount = 0)
 			{
 			DistrictCount = districtCount;
 			ConnectionCount = connectionCount;

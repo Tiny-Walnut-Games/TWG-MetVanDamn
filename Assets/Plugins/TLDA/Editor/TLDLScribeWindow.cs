@@ -45,37 +45,37 @@ namespace LivingDevAgent.Editor
 		private bool _stylesInitialized = false;
 
 		[MenuItem("Tools/Living Dev Agent/The Scribe", priority = 20)]
-		public static void OpenScribe ()
+		public static void OpenScribe()
 			{
 			OpenWindow("📜 The Scribe");
 			}
 
 		[MenuItem("Tools/Living Dev Agent/TLDL Wizard (Deprecated)")]
-		public static void OpenDeprecated ()
+		public static void OpenDeprecated()
 			{
 			OpenWindow("📜 The Scribe (Legacy)");
 			}
 
 		// Back-compat: keep old entry point name but route to Scribe
-		public static void ShowWindow ()
+		public static void ShowWindow()
 			{
 			OpenWindow("📜 The Scribe");
 			}
 
-		private static void OpenWindow (string title)
+		private static void OpenWindow(string title)
 			{
 			TLDLScribeWindow wnd = GetWindow<TLDLScribeWindow>(true, title, true);
 			wnd.minSize = new Vector2(900, 600);
 			wnd.Show();
 			}
 
-		private void OnEnable ()
+		private void OnEnable()
 			{
 			InitializeModules();
 			InitializeStyles();
 			}
 
-		private void InitializeModules ()
+		private void InitializeModules()
 			{
 			// Create the dashboard modules - pure documentation focus
 			_templateModule = new TemplateModule(_data);
@@ -100,7 +100,7 @@ namespace LivingDevAgent.Editor
 			_previewModule.Initialize();
 			}
 
-		private void InitializeStyles ()
+		private void InitializeStyles()
 			{
 			if (_stylesInitialized) return; //⚠ False Flag ⚠-  @jmeyer1980 - IL for legibility
 
@@ -120,7 +120,7 @@ namespace LivingDevAgent.Editor
 			_stylesInitialized = true;
 			}
 
-		private Texture2D CreateNavBackgroundTexture ()
+		private Texture2D CreateNavBackgroundTexture()
 			{
 			var texture = new Texture2D(8, 1);
 			Color bgColor = EditorGUIUtility.isProSkin
@@ -141,7 +141,7 @@ namespace LivingDevAgent.Editor
 			return texture;
 			}
 
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			// ⚠ nitpick ⚠ - @jmeyer1980 - IL for legibility
 			if (!_stylesInitialized) InitializeStyles();
@@ -165,7 +165,7 @@ namespace LivingDevAgent.Editor
 				}
 			}
 
-		private void DrawTopToolbar ()
+		private void DrawTopToolbar()
 			{
 			using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
 				{
@@ -201,7 +201,7 @@ namespace LivingDevAgent.Editor
 				}
 			}
 
-		private void DrawNavigatorPanel (float width)
+		private void DrawNavigatorPanel(float width)
 			{
 			// Enhanced navigator panel with visual styling and left border
 			using (new EditorGUILayout.VerticalScope(_navBackgroundStyle, GUILayout.MaxWidth(width), GUILayout.MinWidth(width)))
@@ -210,7 +210,7 @@ namespace LivingDevAgent.Editor
 				}
 			}
 
-		private void DrawMainContent ()
+		private void DrawMainContent()
 			{
 			using (new EditorGUILayout.VerticalScope())
 				{
@@ -262,7 +262,7 @@ namespace LivingDevAgent.Editor
 				}
 			}
 
-		private void HandleFormModuleSwitching ()
+		private void HandleFormModuleSwitching()
 			{
 			// Handle tab switching from form module
 			if (_formModule.ShouldSwitchToEditor)
@@ -280,13 +280,13 @@ namespace LivingDevAgent.Editor
 		/// <summary>
 		/// Public API for modules to update status line with emoji support
 		/// </summary>
-		public void SetStatusLine (string status)
+		public void SetStatusLine(string status)
 			{
 			_statusLine = status;
 			Repaint();
 			}
 
-		private void OnDestroy ()
+		private void OnDestroy()
 			{
 			// Cleanup module resources
 			_navigatorModule?.Dispose();
@@ -296,7 +296,7 @@ namespace LivingDevAgent.Editor
 			_previewModule?.Dispose();
 			}
 
-		private void OnDisable ()
+		private void OnDisable()
 			{
 			// Additional cleanup if needed
 			_templateModule?.Dispose();

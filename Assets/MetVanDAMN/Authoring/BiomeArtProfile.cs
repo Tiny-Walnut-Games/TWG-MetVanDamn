@@ -135,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Converts these settings to the runtime complexity settings structure
 		/// Enables seamless integration with the BiomeCheckerMaterialOverride system
 		/// </summary>
-		public BiomeCheckerMaterialOverride.CheckerComplexitySettings ToComplexitySettings ()
+		public BiomeCheckerMaterialOverride.CheckerComplexitySettings ToComplexitySettings()
 			{
 			return new BiomeCheckerMaterialOverride.CheckerComplexitySettings
 				{
@@ -151,7 +151,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Creates default settings optimized for biome debugging and visualization
 		/// Provides balanced coordinate-awareness without overwhelming visual complexity
 		/// </summary>
-		public static CheckeredMaterialSettings CreateDebugOptimized ()
+		public static CheckeredMaterialSettings CreateDebugOptimized()
 			{
 			return new CheckeredMaterialSettings
 				{
@@ -173,7 +173,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Creates settings optimized for performance with minimal coordinate influence
 		/// Suitable for runtime use where visual fidelity is less critical than performance
 		/// </summary>
-		public static CheckeredMaterialSettings CreatePerformanceOptimized ()
+		public static CheckeredMaterialSettings CreatePerformanceOptimized()
 			{
 			return new CheckeredMaterialSettings
 				{
@@ -312,7 +312,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Applies checkered material override to the specified tilemap if enabled
 		/// Integrates seamlessly with the BiomeCheckerMaterialOverride system
 		/// </summary>
-		public void ApplyCheckerOverrideIfEnabled (Tilemap tilemap, Core.BiomeType biome,
+		public void ApplyCheckerOverrideIfEnabled(Tilemap tilemap, Core.BiomeType biome,
 			Core.NodeId nodeId)
 			{
 			if (checkerSettings?.enableCheckerOverride == true && tilemap != null)

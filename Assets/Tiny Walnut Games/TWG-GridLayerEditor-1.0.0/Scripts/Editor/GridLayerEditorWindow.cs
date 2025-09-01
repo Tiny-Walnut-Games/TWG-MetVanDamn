@@ -75,7 +75,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Allows tests to set the config.
 		/// </summary>
 		/// <param name="config">The GridLayerConfig to set.</param>
-		public void SetConfig (GridLayerConfig config)
+		public void SetConfig(GridLayerConfig config)
 			{
 			_config = config;
 			}
@@ -84,7 +84,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Allows tests to get the config.
 		/// </summary>
 		/// <returns>The current GridLayerConfig.</returns>
-		public GridLayerConfig GetConfig ()
+		public GridLayerConfig GetConfig()
 			{
 			return _config;
 			}
@@ -92,7 +92,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <summary>
 		/// Applies a platformer preset to the config.
 		/// </summary>
-		public void ApplyPlatformerPreset ()
+		public void ApplyPlatformerPreset()
 			{
 			if (_config == null)
 				{
@@ -107,7 +107,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// </summary>
 		/// <param name="layerName">The name of the layer to toggle.</param>
 		/// <param name="enabled">Whether the layer should be enabled or disabled.</param>
-		public void ToggleLayer (string layerName, bool enabled)
+		public void ToggleLayer(string layerName, bool enabled)
 			{
 			if (_config == null)
 				{
@@ -134,7 +134,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <summary>
 		/// Calls TwoDimensionalGridSetup.CreateCustomGrid with the current config's layer names.
 		/// </summary>
-		public void CreateGridWithLayers ()
+		public void CreateGridWithLayers()
 			{
 			if (_config == null || _config.layerNames == null)
 				{
@@ -148,7 +148,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Opens the grid layer editor window from the Unity menu.
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/Grid Layer Editor/Edit Grid Layers")]
-		public static void ShowWindow ()
+		public static void ShowWindow()
 			{
 			GetWindow<GridLayerEditorWindow>("Edit Grid Layers");
 			}
@@ -157,7 +157,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Toggle menu item to enable/disable Grid Layer Editor for MVD workflow
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/Grid Layer Editor/Enable Grid Layer Editor")]
-		public static void ToggleGridLayerEditor ()
+		public static void ToggleGridLayerEditor()
 			{
 			bool isEnabled = Menu.GetChecked("Tiny Walnut Games/Grid Layer Editor/Enable Grid Layer Editor");
 			Menu.SetChecked("Tiny Walnut Games/Grid Layer Editor/Enable Grid Layer Editor", !isEnabled);
@@ -173,7 +173,7 @@ namespace TinyWalnutGames.GridLayerEditor
 			}
 
 		[MenuItem("Tiny Walnut Games/Grid Layer Editor/Enable Grid Layer Editor", true)]
-		public static bool ToggleGridLayerEditor_Validate ()
+		public static bool ToggleGridLayerEditor_Validate()
 			{
 			// This controls the checkbox state in the menu
 			return true;
@@ -182,7 +182,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <summary>
 		/// Called when the editor window is enabled.
 		/// </summary>
-		private void OnEnable ()
+		private void OnEnable()
 			{
 			// Get all Unity layers
 			unityLayers = GetAllUnityLayerNames();
@@ -202,7 +202,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Retrieves all Unity layer names.
 		/// </summary>
 		/// <returns>Array of Unity layer names.</returns>
-		private string [ ] GetAllUnityLayerNames ()
+		private string [ ] GetAllUnityLayerNames()
 			{
 			var layers = new List<string>();
 			for (int i = 0; i < 32; i++)
@@ -219,7 +219,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <summary>
 		/// Draws the editor window GUI for editing grid layer configurations.
 		/// </summary>
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			// Field to assign or create a GridLayerConfig asset
 			config = (GridLayerConfig)EditorGUILayout.ObjectField("Config Asset", config, typeof(GridLayerConfig), false);
@@ -318,7 +318,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Sets the recommended layers in the config and updates the UI.
 		/// </summary>
 		/// <param name="recommended">Array of recommended layer names.</param>
-		private void SetRecommendedLayers (string [ ] recommended)
+		private void SetRecommendedLayers(string [ ] recommended)
 			{
 			for (int i = 0; i < unityLayers.Length; i++)
 				{

@@ -7,7 +7,7 @@ namespace LivingDevAgent.Editor
 	{
 	internal static class ScribeUtils
 		{
-		public static string SanitizeTitle (string input)
+		public static string SanitizeTitle(string input)
 			{
 			if (string.IsNullOrWhiteSpace(input))
 				{
@@ -17,7 +17,7 @@ namespace LivingDevAgent.Editor
 			string safe = Regex.Replace(input.Trim(), "[^A-Za-z0-9_-]+", "");
 			return string.IsNullOrEmpty(safe) ? "Entry" : safe;
 			}
-		public static string Bulletize (string lines)
+		public static string Bulletize(string lines)
 			{
 			if (string.IsNullOrEmpty(lines))
 				{
@@ -39,7 +39,7 @@ namespace LivingDevAgent.Editor
 				}
 			return sb.ToString().TrimEnd();
 			}
-		public static string Checklist (string lines)
+		public static string Checklist(string lines)
 			{
 			if (string.IsNullOrEmpty(lines))
 				{
@@ -61,7 +61,7 @@ namespace LivingDevAgent.Editor
 				}
 			return sb.ToString().TrimEnd();
 			}
-		public static string FormatTags (string csv)
+		public static string FormatTags(string csv)
 			{
 			if (string.IsNullOrWhiteSpace(csv))
 				{

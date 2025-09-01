@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		{
 		// Helper curve builders (Unity does not expose AnimationCurve.EaseIn / EaseOut factory methods natively)
 		// These approximate ease shapes using two keyframes with adjusted tangents.
-		private static AnimationCurve EaseOutCurve (float x0, float y0, float x1, float y1)
+		private static AnimationCurve EaseOutCurve(float x0, float y0, float x1, float y1)
 			{
 			var k0 = new Keyframe(x0, y0, 0f, 0f);          // Flat tangent at start (quick rise after)
 			var k1 = new Keyframe(x1, y1, 0f, 0f);          // Flat tangent at end to slow into value
@@ -20,7 +20,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return new AnimationCurve(k0, k1);
 			}
 
-		private static AnimationCurve EaseInCurve (float x0, float y0, float x1, float y1)
+		private static AnimationCurve EaseInCurve(float x0, float y0, float x1, float y1)
 			{
 			var k0 = new Keyframe(x0, y0, 0f, 0f);          // Flat at start (slow start)
 			var k1 = new Keyframe(x1, y1, 0f, 0f);          // Flat at end optional
@@ -34,7 +34,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Creates a sample forest biome with clustered vegetation placement
 		/// Demonstrates B+ level clustering and natural distribution
 		/// </summary>
-		public static BiomeArtProfile CreateForestBiomeSample ()
+		public static BiomeArtProfile CreateForestBiomeSample()
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			profile.biomeName = "Dense Forest";
@@ -94,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Creates a sample desert biome with sparse oasis-style placement
 		/// Demonstrates A-level radial distribution and terrain awareness
 		/// </summary>
-		public static BiomeArtProfile CreateDesertBiomeSample ()
+		public static BiomeArtProfile CreateDesertBiomeSample()
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			profile.biomeName = "Arid Desert";
@@ -152,7 +152,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Creates a sample mountain biome with terrain-aware placement
 		/// Demonstrates A-level terrain analysis and elevation-based distribution
 		/// </summary>
-		public static BiomeArtProfile CreateMountainBiomeSample ()
+		public static BiomeArtProfile CreateMountainBiomeSample()
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			profile.biomeName = "Rocky Mountains";
@@ -210,7 +210,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Creates a sample coastal biome with linear shoreline placement
 		/// Demonstrates B+ level linear distribution and water awareness
 		/// </summary>
-		public static BiomeArtProfile CreateCoastalBiomeSample ()
+		public static BiomeArtProfile CreateCoastalBiomeSample()
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			profile.biomeName = "Coastal Shores";
@@ -267,7 +267,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// Creates a sample urban biome with sparse strategic placement
 		/// Demonstrates A-level sparse distribution for important landmarks
 		/// </summary>
-		public static BiomeArtProfile CreateUrbanBiomeSample ()
+		public static BiomeArtProfile CreateUrbanBiomeSample()
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			profile.biomeName = "Urban District";

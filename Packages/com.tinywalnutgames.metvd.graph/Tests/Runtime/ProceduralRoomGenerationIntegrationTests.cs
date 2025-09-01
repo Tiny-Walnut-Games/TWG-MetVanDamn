@@ -17,14 +17,14 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		private EntityManager _entityManager;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			_testWorld = new World("IntegrationTestWorld");
 			_entityManager = _testWorld.EntityManager;
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (_testWorld != null && _testWorld.IsCreated)
 				{
@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void BossRoom_SkillChallenge_GeneratesCorrectly ()
+		public void BossRoom_SkillChallenge_GeneratesCorrectly()
 			{
 			// Arrange - Create a boss room with advanced skills
 			Entity roomEntity = CreateTestRoom(
@@ -56,7 +56,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void TreasureRoom_JumpTesting_ValidatesPhysics ()
+		public void TreasureRoom_JumpTesting_ValidatesPhysics()
 			{
 			// Arrange - Create a treasure room for jump testing
 			Entity roomEntity = CreateTestRoom(
@@ -78,7 +78,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void SkyBiome_CloudPlatforms_GeneratesMotion ()
+		public void SkyBiome_CloudPlatforms_GeneratesMotion()
 			{
 			// Arrange - Create a room in sky biome
 			Entity roomEntity = CreateTestRoom(
@@ -99,7 +99,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void HorizontalRoom_CorridorFlow_GeneratesRhythm ()
+		public void HorizontalRoom_CorridorFlow_GeneratesRhythm()
 			{
 			// Arrange - Create a wide horizontal room
 			Entity roomEntity = CreateTestRoom(
@@ -118,7 +118,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void VerticalRoom_StackedSegments_EnsuresConnectivity ()
+		public void VerticalRoom_StackedSegments_EnsuresConnectivity()
 			{
 			// Arrange - Create a tall vertical room
 			Entity roomEntity = CreateTestRoom(
@@ -137,7 +137,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void SecretAreas_WithBombSkill_GeneratesDestructibleWalls ()
+		public void SecretAreas_WithBombSkill_GeneratesDestructibleWalls()
 			{
 			// Arrange - Create a room with bomb skill for secret access
 			Entity roomEntity = CreateTestRoom(
@@ -157,7 +157,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void SaveRoom_SafeArea_UsesWeightedGeneration ()
+		public void SaveRoom_SafeArea_UsesWeightedGeneration()
 			{
 			// Arrange - Create a save room (should be safe)
 			Entity roomEntity = CreateTestRoom(
@@ -177,7 +177,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void BiomePolarity_MatchesRoomContent ()
+		public void BiomePolarity_MatchesRoomContent()
 			{
 			// Arrange - Create rooms in different biomes
 			Entity fireRoomEntity = CreateTestRoom(RoomType.Normal, new RectInt(0, 0, 12, 12), BiomeType.VolcanicCore, Ability.Jump);
@@ -198,7 +198,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void Pipeline_SixSteps_CompletesCorrectly ()
+		public void Pipeline_SixSteps_CompletesCorrectly()
 			{
 			// Arrange
 			Entity roomEntity = CreateTestRoom(
@@ -227,7 +227,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void JumpArcSolver_ValidatesRoomConnectivity ()
+		public void JumpArcSolver_ValidatesRoomConnectivity()
 			{
 			// validate room bounds
 			RectInt roomBounds = new(0, 0, 16, 16);
@@ -281,7 +281,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void DifferentGenerators_ProduceUniqueContent ()
+		public void DifferentGenerators_ProduceUniqueContent()
 			{
 			// Arrange - Create rooms with different generator types
 			Entity patternRoom = CreateTestRoom(RoomType.Boss, new RectInt(0, 0, 16, 16), BiomeType.VolcanicCore, Ability.Dash);
@@ -307,7 +307,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		/// <summary>
 		/// Helper method to create a test room with all necessary components
 		/// </summary>
-		private Entity CreateTestRoom (RoomType roomType, RectInt bounds, BiomeType biomeType, Ability availableSkills)
+		private Entity CreateTestRoom(RoomType roomType, RectInt bounds, BiomeType biomeType, Ability availableSkills)
 			{
 			Entity roomEntity = _entityManager.CreateEntity();
 
@@ -333,13 +333,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				availableSkills,
 				12345
 			);
-			
+
 			// Fix the Orientation Confusion Curse: Set LayoutType based on actual room dimensions
 			float aspectRatio = (float)bounds.width / bounds.height;
-			generationRequest.LayoutType = aspectRatio < 0.67f ? RoomLayoutType.Vertical : 
-										   aspectRatio > 1.5f ? RoomLayoutType.Horizontal : 
+			generationRequest.LayoutType = aspectRatio < 0.67f ? RoomLayoutType.Vertical :
+										   aspectRatio > 1.5f ? RoomLayoutType.Horizontal :
 										   RoomLayoutType.Mixed;
-			
+
 			_entityManager.AddComponentData(roomEntity, generationRequest);
 
 			// Add room management components
@@ -353,7 +353,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			return roomEntity;
 			}
 
-		private void AddSpecializedComponents (Entity entity, RoomGeneratorType generatorType, Ability availableSkills)
+		private void AddSpecializedComponents(Entity entity, RoomGeneratorType generatorType, Ability availableSkills)
 			{
 			switch (generatorType)
 				{
@@ -375,17 +375,17 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				case RoomGeneratorType.WeightedTilePrefab:
 					Ability secretSkill = (availableSkills & Ability.Bomb) != 0 ? Ability.Bomb : Ability.None;
 					bool hasBombSkill = (availableSkills & Ability.Bomb) != 0;
-					
+
 					// Create secret config with proper destructible walls support for bomb skills
 					var secretConfig = new SecretAreaConfig(0.15f, new int2(2, 2), new int2(4, 4),
 						secretSkill, true, true);
-					
+
 					// Enable destructible walls when bomb skill is available - this is the missing boom-boom magic!
 					if (hasBombSkill)
-					{
+						{
 						secretConfig.UseDestructibleWalls = true;
-					}
-					
+						}
+
 					_entityManager.AddComponentData(entity, secretConfig);
 					break;
 				case RoomGeneratorType.VerticalSegment:
@@ -409,7 +409,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				}
 			}
 
-		private static RoomGeneratorType DetermineGeneratorType (RoomType roomType, RectInt bounds, BiomeType biomeType)
+		private static RoomGeneratorType DetermineGeneratorType(RoomType roomType, RectInt bounds, BiomeType biomeType)
 			{
 			float aspectRatio = (float)bounds.width / bounds.height;
 
@@ -426,7 +426,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 					};
 			}
 
-		private static Polarity GetPolarityForBiome (BiomeType biome)
+		private static Polarity GetPolarityForBiome(BiomeType biome)
 			{
 			return biome switch
 				{
@@ -440,17 +440,17 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 					};
 			}
 
-		private static bool IsSkyBiome (BiomeType biome)
+		private static bool IsSkyBiome(BiomeType biome)
 			{
 			return biome is BiomeType.SkyGardens or BiomeType.PlasmaFields;
 			}
 
-		private static bool IsTerrainBiome (BiomeType biome)
+		private static bool IsTerrainBiome(BiomeType biome)
 			{
 			return biome is BiomeType.SolarPlains or BiomeType.FrozenWastes;
 			}
 
-		private static int CalculateSecrets (RoomType roomType)
+		private static int CalculateSecrets(RoomType roomType)
 			{
 			return roomType switch
 				{
@@ -461,7 +461,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 					};
 			}
 
-		private static RoomNavigationData CreateNavData (RectInt bounds, RoomType roomType)
+		private static RoomNavigationData CreateNavData(RectInt bounds, RoomType roomType)
 			{
 			var entrance = new int2(bounds.x + 1, bounds.y + 1);
 			bool isCritical = roomType is RoomType.Boss or RoomType.Entrance;

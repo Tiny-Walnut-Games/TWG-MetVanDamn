@@ -9,7 +9,7 @@ namespace TinyWalnutGames.MetVD.Graph
 	{
 	internal static partial class ProceduralRoomGeneratorSystemHelpers
 		{
-		private static RoomTemplate CreateRoomTemplate (RoomGeneratorType generatorType, RoomHierarchyData hierarchy, BiomeAffinity biome, ref Unity.Mathematics.Random random)
+		private static RoomTemplate CreateRoomTemplate(RoomGeneratorType generatorType, RoomHierarchyData hierarchy, BiomeAffinity biome, ref Unity.Mathematics.Random random)
 			{
 			float biomeSizeModifier = biome switch
 				{
@@ -42,7 +42,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			bool needsJumpValidation = generatorType is RoomGeneratorType.PatternDrivenModular or RoomGeneratorType.ParametricChallenge;
 			return new RoomTemplate(generatorType, movementTags, minSize, maxSize, secretPercent, needsJumpValidation, random.NextUInt());
 			}
-		private static BiomeAffinity DetermineBiomeAffinity (NodeId nodeId, ref Unity.Mathematics.Random random)
+		private static BiomeAffinity DetermineBiomeAffinity(NodeId nodeId, ref Unity.Mathematics.Random random)
 			{
 			int2 coords = nodeId.Coordinates;
 			if (coords.y > 50)
@@ -61,11 +61,11 @@ namespace TinyWalnutGames.MetVD.Graph
 				? BiomeAffinity.Mountain
 				: random.NextFloat() > 0.7f ? (BiomeAffinity)random.NextInt(1, 5) : BiomeAffinity.Forest;
 			}
-		private static bool DetermineLayoutOrientation (RoomHierarchyData hierarchy, BiomeAffinity biome, ref Unity.Mathematics.Random random)
+		private static bool DetermineLayoutOrientation(RoomHierarchyData hierarchy, BiomeAffinity biome, ref Unity.Mathematics.Random random)
 			{
-			RectInt bounds = hierarchy.Bounds; 
+			RectInt bounds = hierarchy.Bounds;
 			bool isVertical = bounds.height > bounds.width;
-			
+
 			return biome switch
 				{
 					BiomeAffinity.Sky => true, // Sky biomes always prefer vertical layouts
@@ -80,12 +80,12 @@ namespace TinyWalnutGames.MetVD.Graph
 					_ => isVertical || random.NextFloat() > 0.5f // Default fallback
 					};
 			}
-		private static MovementCapabilityTags GenerateMovementCapabilities (RoomGeneratorType generatorType, RoomType roomType, ref Unity.Mathematics.Random random)
+		private static MovementCapabilityTags GenerateMovementCapabilities(RoomGeneratorType generatorType, RoomType roomType, ref Unity.Mathematics.Random random)
 			{
 			Ability required = Ability.Jump; // Initialize required
 			Ability optional = Ability.None; // Initialize optional
 			float difficulty = 0.5f; // Initialize difficulty
-			
+
 			switch (generatorType)
 				{
 				case RoomGeneratorType.PatternDrivenModular:
@@ -96,13 +96,13 @@ namespace TinyWalnutGames.MetVD.Graph
 					break;
 				case RoomGeneratorType.ParametricChallenge:
 					required = random.NextFloat() > 0.5f ? Ability.Jump : Ability.DoubleJump;
-					optional = Ability.WallJump; 
-					difficulty = random.NextFloat(0.4f, 0.8f); 
+					optional = Ability.WallJump;
+					difficulty = random.NextFloat(0.4f, 0.8f);
 					break;
 				case RoomGeneratorType.SkyBiomePlatform:
 					required = random.NextFloat() > 0.7f ? Ability.DoubleJump : Ability.Jump;
-					optional = Ability.GlideSpeed | Ability.Dash; 
-					difficulty = random.NextFloat(0.5f, 0.8f); 
+					optional = Ability.GlideSpeed | Ability.Dash;
+					difficulty = random.NextFloat(0.5f, 0.8f);
 					break;
 				case RoomGeneratorType.WeightedTilePrefab:
 					required = Ability.Jump;
@@ -124,14 +124,14 @@ namespace TinyWalnutGames.MetVD.Graph
 				case RoomGeneratorType.StackedSegment:
 				case RoomGeneratorType.LayeredPlatformCloud:
 				case RoomGeneratorType.BiomeWeightedHeightmap:
-					required = Ability.Jump; 
-					optional = random.NextFloat() > 0.6f ? Ability.DoubleJump : Ability.None; 
-					difficulty = random.NextFloat(0.2f, 0.6f); 
+					required = Ability.Jump;
+					optional = random.NextFloat() > 0.6f ? Ability.DoubleJump : Ability.None;
+					difficulty = random.NextFloat(0.2f, 0.6f);
 					break;
 				default:
-					required = Ability.Jump; 
-					optional = random.NextFloat() > 0.6f ? Ability.DoubleJump : Ability.None; 
-					difficulty = random.NextFloat(0.2f, 0.6f); 
+					required = Ability.Jump;
+					optional = random.NextFloat() > 0.6f ? Ability.DoubleJump : Ability.None;
+					difficulty = random.NextFloat(0.2f, 0.6f);
 					break;
 				}
 			if (roomType == RoomType.Boss)
@@ -152,7 +152,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			{
 			private EntityQuery _roomsToGenerateQuery;
 			private EntityQuery _worldConfigQuery;
-			
+
 			public void OnCreate(ref SystemState state)
 				{
 				_roomsToGenerateQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -164,7 +164,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					.Build(ref state);
 				state.RequireForUpdate(_roomsToGenerateQuery);
 				}
-				
+
 			public void OnUpdate(ref SystemState state)
 				{
 				if (_roomsToGenerateQuery.IsEmpty) return;
@@ -176,9 +176,9 @@ namespace TinyWalnutGames.MetVD.Graph
 				using NativeArray<RoomHierarchyData> roomData = _roomsToGenerateQuery.ToComponentDataArray<RoomHierarchyData>(Allocator.Temp);
 				for (int i = 0; i < roomEntities.Length; i++)
 					{
-					Entity roomEntity = roomEntities[i];
-					NodeId nodeId = nodeIds[i];
-					RoomHierarchyData hierarchy = roomData[i];
+					Entity roomEntity = roomEntities [ i ];
+					NodeId nodeId = nodeIds [ i ];
+					RoomHierarchyData hierarchy = roomData [ i ];
 					uint roomSeed = GenerateRoomSeed(worldConfig.Seed, nodeId);
 					var random = new Unity.Mathematics.Random(roomSeed == 0 ? 1u : roomSeed);
 					BiomeAffinity biomeAffinity = DetermineBiomeAffinity(nodeId, ref random);
@@ -193,22 +193,22 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			// Shared static logic -------------------------------------------------
-			private static uint GenerateRoomSeed (int worldSeed, NodeId nodeId)
+			private static uint GenerateRoomSeed(int worldSeed, NodeId nodeId)
 				{
 				var hash = new Unity.Mathematics.Random((uint)(worldSeed == 0 ? 1 : worldSeed));
 				hash.NextUInt();
 				return hash.NextUInt() ^ nodeId._value ^ ((uint)nodeId.Coordinates.x << 16) ^ ((uint)nodeId.Coordinates.y << 8);
 				}
-				
-			private static RoomGeneratorType SelectRoomGenerator (RoomType roomType, BiomeAffinity biome, bool isVertical, ref Unity.Mathematics.Random random)
+
+			private static RoomGeneratorType SelectRoomGenerator(RoomType roomType, BiomeAffinity biome, bool isVertical, ref Unity.Mathematics.Random random)
 				{
 				switch (roomType)
 					{
-					case RoomType.Boss: 
+					case RoomType.Boss:
 						return RoomGeneratorType.PatternDrivenModular;
-					case RoomType.Treasure: 
+					case RoomType.Treasure:
 						return random.NextFloat() > 0.6f ? RoomGeneratorType.ParametricChallenge : RoomGeneratorType.PatternDrivenModular;
-					case RoomType.Hub: 
+					case RoomType.Hub:
 						return RoomGeneratorType.WeightedTilePrefab;
 					case RoomType.Normal:
 					case RoomType.Entrance:

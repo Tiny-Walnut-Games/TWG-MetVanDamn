@@ -13,9 +13,9 @@ namespace LivingDevAgent.Editor.Modules
 	/// </summary>
 	public class EditorModule : ScribeModuleBase
 		{
-		public EditorModule (TLDLScribeData data) : base(data) { }
+		public EditorModule(TLDLScribeData data) : base(data) { }
 
-		public void DrawToolbar ()
+		public void DrawToolbar()
 			{
 			// File operations
 			if (GUILayout.Button("📂 Load…", EditorStyles.toolbarButton, GUILayout.Width(70)))
@@ -37,7 +37,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		public void DrawContent (Rect windowPosition)
+		public void DrawContent(Rect windowPosition)
 			{
 			using (new EditorGUILayout.VerticalScope())
 				{
@@ -80,7 +80,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void HandleCursorTracking ()
+		private void HandleCursorTracking()
 			{
 			if (GUI.GetNameOfFocusedControl() == _data.RawEditorControlName)
 				{
@@ -107,7 +107,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void DrawBottomControls ()
+		private void DrawBottomControls()
 			{
 			using (new EditorGUILayout.HorizontalScope())
 				{
@@ -149,7 +149,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void LoadFileDialog ()
+		private void LoadFileDialog()
 			{
 			string dir = ResolveActiveFolder();
 			string picked = EditorUtility.OpenFilePanelWithFilters(
@@ -163,7 +163,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void LoadFile (string absPath)
+		private void LoadFile(string absPath)
 			{
 			try
 				{
@@ -181,7 +181,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void SaveRaw ()
+		private void SaveRaw()
 			{
 			if (!string.IsNullOrEmpty(_data.CurrentFilePath))
 				{
@@ -202,7 +202,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void SaveRawAs ()
+		private void SaveRawAs()
 			{
 			string dir = ResolveActiveFolder();
 			string suggested = $"TLDL-{DateTime.UtcNow:yyyy-MM-dd}-Entry.md";
@@ -223,7 +223,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void AddImageAndInsertAtCursor ()
+		private void AddImageAndInsertAtCursor()
 			{
 			string startDir = EnsureImagesDirectory();
 			string picked = EditorUtility.OpenFilePanelWithFilters("Add Image", startDir, new [ ] { "Images", "png,jpg,jpeg,gif", "All", "*.*" });
@@ -264,7 +264,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void InsertImageMarkdownAtCursor (string relPath)
+		private void InsertImageMarkdownAtCursor(string relPath)
 			{
 			string insert = $"![image]({relPath})";
 
@@ -308,7 +308,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorApplication.delayCall += () => GUI.FocusControl(_data.RawEditorControlName);
 			}
 
-		private string EnsureImagesDirectory ()
+		private string EnsureImagesDirectory()
 			{
 			string baseDir = string.IsNullOrEmpty(_data.CurrentFilePath) ? ResolveActiveFolder() : Path.GetDirectoryName(_data.CurrentFilePath);
 			if (string.IsNullOrEmpty(baseDir))
@@ -321,7 +321,7 @@ namespace LivingDevAgent.Editor.Modules
 			return imagesDir;
 			}
 
-		private void ParseBasicMetadata (string md)
+		private void ParseBasicMetadata(string md)
 			{
 			if (string.IsNullOrEmpty(md)) return;
 
@@ -351,14 +351,14 @@ namespace LivingDevAgent.Editor.Modules
 			catch { }
 			}
 
-		private string ResolveActiveFolder ()
+		private string ResolveActiveFolder()
 			{
 			return !string.IsNullOrEmpty(_data.ActiveDirPath)
 				? _data.ActiveDirPath
 				: !string.IsNullOrEmpty(_data.RootPath) ? _data.RootPath : Path.Combine(Application.dataPath, "Plugins/TLDA/docs");
 			}
 
-		private string MakeProjectRelative (string absPath)
+		private string MakeProjectRelative(string absPath)
 			{
 			string projectRoot = Directory.GetParent(Application.dataPath)!.FullName.Replace('\\', '/');
 			string norm = absPath.Replace('\\', '/');

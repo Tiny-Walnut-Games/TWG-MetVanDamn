@@ -19,7 +19,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private bool _loggedFallback;
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_unplacedQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<NodeId, WfcState>()
@@ -35,7 +35,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		[BurstCompile]
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
 				{
@@ -143,7 +143,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 			}
 
-		private static void GenerateDistrictPositions (NativeArray<int2> positions, int2 worldSize, DistrictPlacementStrategy strategy, ref Random random)
+		private static void GenerateDistrictPositions(NativeArray<int2> positions, int2 worldSize, DistrictPlacementStrategy strategy, ref Random random)
 			{
 			switch (strategy)
 				{
@@ -153,7 +153,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					break;
 				}
 			}
-		private static void GeneratePoissonDiscPositions (NativeArray<int2> positions, int2 worldSize, ref Random random)
+		private static void GeneratePoissonDiscPositions(NativeArray<int2> positions, int2 worldSize, ref Random random)
 			{
 			float minDistance = math.min(worldSize.x, worldSize.y) * 0.2f;
 			int maxAttempts = 30;
@@ -182,7 +182,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 			}
-		private static void GenerateJitteredGridPositions (NativeArray<int2> positions, int2 worldSize, ref Random random)
+		private static void GenerateJitteredGridPositions(NativeArray<int2> positions, int2 worldSize, ref Random random)
 			{
 			int gridDim = (int)math.ceil(math.sqrt(positions.Length));
 			float2 cellSize = new float2(worldSize) / gridDim;

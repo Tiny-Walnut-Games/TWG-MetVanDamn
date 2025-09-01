@@ -30,7 +30,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public bool IsOpen;
 
-		public WfcSocket (uint socketId, byte direction, Polarity requiredPolarity = Polarity.None, bool isOpen = true)
+		public WfcSocket(uint socketId, byte direction, Polarity requiredPolarity = Polarity.None, bool isOpen = true)
 			{
 			SocketId = socketId;
 			Direction = (byte)(direction % 4);
@@ -41,7 +41,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Check if this socket is compatible with another socket
 		/// </summary>
-		public readonly bool IsCompatibleWith (WfcSocket other)
+		public readonly bool IsCompatibleWith(WfcSocket other)
 			{
 			if (!IsOpen || !other.IsOpen)
 				{
@@ -71,8 +71,8 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		public WfcSocket Value;
 
-		public static implicit operator WfcSocket (WfcSocketBufferElement e) => e.Value;
-		public static implicit operator WfcSocketBufferElement (WfcSocket e) => new() { Value = e };
+		public static implicit operator WfcSocket(WfcSocketBufferElement e) => e.Value;
+		public static implicit operator WfcSocketBufferElement(WfcSocket e) => new() { Value = e };
 		}
 
 	/// <summary>
@@ -110,7 +110,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public byte MaxConnections;
 
-		public WfcTilePrototype (uint tileId, float weight = 1.0f, BiomeType biomeType = BiomeType.Unknown,
+		public WfcTilePrototype(uint tileId, float weight = 1.0f, BiomeType biomeType = BiomeType.Unknown,
 							   Polarity primaryPolarity = Polarity.None, byte minConnections = 1, byte maxConnections = 4)
 			{
 			TileId = tileId;
@@ -153,7 +153,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public uint AssignedTileId;
 
-		public WfcState (WfcGenerationState state = WfcGenerationState.Initialized)
+		public WfcState(WfcGenerationState state = WfcGenerationState.Initialized)
 			{
 			State = state;
 			Iteration = 0;
@@ -184,7 +184,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public uint TileId;
 		public float Weight;
 
-		public WfcCandidateBufferElement (uint tileId, float weight = 1.0f)
+		public WfcCandidateBufferElement(uint tileId, float weight = 1.0f)
 			{
 			TileId = tileId;
 			Weight = weight;

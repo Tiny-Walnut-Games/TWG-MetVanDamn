@@ -32,14 +32,14 @@ namespace LivingDevAgent.Editor.TaskMaster
         };
 
 		[MenuItem("Tools/Living Dev Agent/TaskMaster/GitHub Integration", priority = 15)]
-		public static void ShowGitHubIntegrationWindow ()
+		public static void ShowGitHubIntegrationWindow()
 			{
 			GitHubIntegrationWindow window = EditorWindow.GetWindow<GitHubIntegrationWindow>("🐙 GitHub Integration");
 			window.minSize = new Vector2(400, 300);
 			window.Show();
 			}
 
-		public static async Task<bool> CreateGitHubIssue (TaskData task)
+		public static async Task<bool> CreateGitHubIssue(TaskData task)
 			{
 			if (!IsConfigured())
 				{
@@ -68,7 +68,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 			return false;
 			}
 
-		private static string CreateIssueFromTask (TaskData task)
+		private static string CreateIssueFromTask(TaskData task)
 			{
 			string assignee = GetGitHubUsername(task.assignedTo);
 			string [ ] labels = GetLabelsFromTask(task);
@@ -101,7 +101,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 			return JsonUtility.ToJson(issueData);
 			}
 
-		private static string GetGitHubUsername (string taskAssignee)
+		private static string GetGitHubUsername(string taskAssignee)
 			{
 			if (_usernameMapping.TryGetValue(taskAssignee, out string githubUsername))
 				{
@@ -112,7 +112,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 			return taskAssignee?.StartsWith("@") == true ? taskAssignee [ 1.. ] : taskAssignee;
 			}
 
-		private static string [ ] GetLabelsFromTask (TaskData task)
+		private static string [ ] GetLabelsFromTask(TaskData task)
 			{
 			var labels = new List<string>
 			{
@@ -129,7 +129,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 			return labels.ToArray();
 			}
 
-		private static async Task<string> PostToGitHubAPI (string endpoint, string jsonData)
+		private static async Task<string> PostToGitHubAPI(string endpoint, string jsonData)
 			{
 			using var client = new HttpClient();
 			client.DefaultRequestHeaders.Add("Authorization", $"token {_githubToken}");
@@ -149,14 +149,14 @@ namespace LivingDevAgent.Editor.TaskMaster
 				}
 			}
 
-		public static bool IsConfigured ()
+		public static bool IsConfigured()
 			{
 			return !string.IsNullOrEmpty(_githubToken) &&
 				   !string.IsNullOrEmpty(_repositoryOwner) &&
 				   !string.IsNullOrEmpty(_repositoryName);
 			}
 
-		public static void SetConfiguration (string token, string owner, string repo)
+		public static void SetConfiguration(string token, string owner, string repo)
 			{
 			_githubToken = token;
 			_repositoryOwner = owner;
@@ -176,11 +176,11 @@ namespace LivingDevAgent.Editor.TaskMaster
 		private string _repositoryName = "";
 		private Vector2 _scrollPosition = Vector2.zero; // 🎯 FIXED: Initialize scroll position
 
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			using var scroll = new EditorGUILayout.ScrollViewScope(_scrollPosition);
 			_scrollPosition = scroll.scrollPosition; // 🎯 FIXED: Update scroll position
-			
+
 			GUILayout.Label("🐙 GitHub Integration Setup", EditorStyles.boldLabel);
 
 			EditorGUILayout.Space();
@@ -241,7 +241,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 				MessageType.None);
 			}
 
-		private void SaveConfiguration ()
+		private void SaveConfiguration()
 			{
 			if (string.IsNullOrEmpty(_githubToken) ||
 				string.IsNullOrEmpty(_repositoryOwner) ||
@@ -258,7 +258,7 @@ namespace LivingDevAgent.Editor.TaskMaster
 				$"GitHub integration configured for {_repositoryOwner}/{_repositoryName}", "OK");
 			}
 
-		private void TestConnection ()
+		private void TestConnection()
 			{
 			if (!GitHubIntegration.IsConfigured())
 				{

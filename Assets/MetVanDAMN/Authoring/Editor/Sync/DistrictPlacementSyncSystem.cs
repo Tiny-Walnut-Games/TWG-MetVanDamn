@@ -14,13 +14,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	public partial class DistrictPlacementSyncSystem : SystemBase
 		{
 		private EntityQuery _districtQuery;
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			_districtQuery = GetEntityQuery(ComponentType.ReadOnly<NodeId>(), ComponentType.ReadOnly<DistrictAuthoring>());
 			RequireForUpdate(_districtQuery);
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			ComponentTypeHandle<NodeId> nodeIdHandle = GetComponentTypeHandle<NodeId>(true); // not used directly but keeps pattern
 			Unity.Collections.NativeArray<NodeId> nodeIds = _districtQuery.ToComponentDataArray<NodeId>(Unity.Collections.Allocator.Temp);

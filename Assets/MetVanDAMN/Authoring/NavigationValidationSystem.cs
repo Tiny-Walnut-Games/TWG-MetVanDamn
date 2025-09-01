@@ -15,7 +15,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private EntityQuery _navNodeQuery;
 		private EntityQuery _navigationGraphQuery;
 
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			_navNodeQuery = GetEntityQuery(
 				ComponentType.ReadOnly<NavNode>(),
@@ -30,7 +30,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			RequireForUpdate(_navigationGraphQuery);
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			NavigationGraph navGraph = SystemAPI.GetSingleton<NavigationGraph>();
 			if (!navGraph.IsReady)
@@ -51,7 +51,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private int PerformReachabilityAnalysis ()
+		private int PerformReachabilityAnalysis()
 			{
 			int unreachableCount = 0;
 
@@ -79,7 +79,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return unreachableCount;
 			}
 
-		private NativeArray<AgentCapabilities> GetTestCapabilityProfiles ()
+		private NativeArray<AgentCapabilities> GetTestCapabilityProfiles()
 			{
 			var profiles = new NativeArray<AgentCapabilities>(5, Allocator.Temp);
 
@@ -101,7 +101,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return profiles;
 			}
 
-		private NativeArray<bool> AnalyzeReachability (AgentCapabilities capabilities)
+		private NativeArray<bool> AnalyzeReachability(AgentCapabilities capabilities)
 			{
 			// Collect all navigation nodes
 			var nodeIds = new NativeList<uint>(256, Allocator.Temp);
@@ -138,7 +138,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return reachability;
 			}
 
-		private NativeHashSet<uint> FloodFillReachability (uint startNodeId, AgentCapabilities capabilities)
+		private NativeHashSet<uint> FloodFillReachability(uint startNodeId, AgentCapabilities capabilities)
 			{
 			var reachableNodes = new NativeHashSet<uint>(1000, Allocator.Temp);
 			var queue = new NativeQueue<uint>(Allocator.Temp);
@@ -181,7 +181,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return reachableNodes;
 			}
 
-		private Entity FindEntityByNodeId (uint nodeId)
+		private Entity FindEntityByNodeId(uint nodeId)
 			{
 			Entity foundEntity = Entity.Null;
 
@@ -211,7 +211,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		public NativeList<uint> UnreachableNodeIds;
 		public NativeList<NavigationIssue> Issues;
 
-		public NavigationValidationReport (int totalNodes, int totalLinks, Allocator allocator = Allocator.Temp)
+		public NavigationValidationReport(int totalNodes, int totalLinks, Allocator allocator = Allocator.Temp)
 			{
 			TotalNodes = totalNodes;
 			TotalLinks = totalLinks;
@@ -222,7 +222,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			Issues = new NativeList<NavigationIssue>(32, allocator);
 			}
 
-		public void Dispose ()
+		public void Dispose()
 			{
 			if (UnreachableNodeIds.IsCreated)
 				{
@@ -248,7 +248,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		public Ability RequiredAbilities;
 		public FixedString128Bytes Description;
 
-		public NavigationIssue (NavigationIssueType type, uint nodeId, FixedString128Bytes description,
+		public NavigationIssue(NavigationIssueType type, uint nodeId, FixedString128Bytes description,
 							  uint relatedNodeId = 0, Polarity requiredPolarity = Polarity.None,
 							  Ability requiredAbilities = Ability.None)
 			{
@@ -285,7 +285,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Generate comprehensive navigation validation report
 		/// Called by AuthoringValidator to check navigation connectivity
 		/// </summary>
-		public static NavigationValidationReport GenerateValidationReport (World world)
+		public static NavigationValidationReport GenerateValidationReport(World world)
 			{
 			EntityManager em = world.EntityManager;
 			EntityQuery navGraphQuery = em.CreateEntityQuery(ComponentType.ReadOnly<NavigationGraph>());
@@ -362,7 +362,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Performs reachability analysis from a starting node with given agent capabilities
 		/// Returns a set of reachable node IDs
 		/// </summary>
-		private static NativeHashSet<uint> PerformReachabilityAnalysis (World world, AgentCapabilities capabilities, NativeArray<Entity> allNodes)
+		private static NativeHashSet<uint> PerformReachabilityAnalysis(World world, AgentCapabilities capabilities, NativeArray<Entity> allNodes)
 			{
 			var reachableNodes = new NativeHashSet<uint>(allNodes.Length, Allocator.Temp);
 			EntityManager entityManager = world.EntityManager;
@@ -434,7 +434,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// <summary>
 		/// Helper method to find entity by node ID
 		/// </summary>
-		private static Entity FindEntityByNodeId (World world, uint nodeId)
+		private static Entity FindEntityByNodeId(World world, uint nodeId)
 			{
 			EntityManager entityManager = world.EntityManager;
 			EntityQuery nodeQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
@@ -457,7 +457,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// <summary>
 		/// Get predefined test capability profiles for validation
 		/// </summary>
-		private static NativeArray<AgentCapabilities> GetTestCapabilityProfiles ()
+		private static NativeArray<AgentCapabilities> GetTestCapabilityProfiles()
 			{
 			var profiles = new NativeArray<AgentCapabilities>(5, Allocator.Temp);
 
@@ -483,7 +483,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Check if a specific path is possible with given capabilities
 		/// Useful for editor validation and debugging
 		/// </summary>
-		public static bool IsPathPossible (World world, uint fromNodeId, uint toNodeId, AgentCapabilities capabilities)
+		public static bool IsPathPossible(World world, uint fromNodeId, uint toNodeId, AgentCapabilities capabilities)
 			{
 			if (world == null)
 				{
@@ -586,7 +586,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Generate quick-fix suggestions for navigation issues
 		/// Integrates with AuthoringValidator auto-fix functionality
 		/// </summary>
-		public static NativeList<NavigationQuickFix> GenerateQuickFixSuggestions (NavigationValidationReport report)
+		public static NativeList<NavigationQuickFix> GenerateQuickFixSuggestions(NavigationValidationReport report)
 			{
 			var fixes = new NativeList<NavigationQuickFix>(16, Allocator.Temp);
 

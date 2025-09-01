@@ -20,7 +20,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _districtsQuery;
 
 		// Removed BurstCompile from OnCreate (BC1028: managed array allocation inside Burst)
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_layoutDoneQuery = state.GetEntityQuery(ComponentType.ReadWrite<DistrictLayoutDoneTag>());
 			_districtsQuery = state.GetEntityQuery(
@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		[BurstCompile]
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			// Check if we need to build connections
 			NativeArray<DistrictLayoutDoneTag> layoutDoneArray = _layoutDoneQuery.ToComponentDataArray<DistrictLayoutDoneTag>(Allocator.Temp);
@@ -109,7 +109,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Build connection graph using K-nearest neighbors plus random long edges
 		/// </summary>
-		private static int BuildConnectionGraph (
+		private static int BuildConnectionGraph(
 			EntityManager entityManager,
 			NativeArray<Entity> districtEntities,
 			NativeArray<int2> districtPositions,
@@ -237,7 +237,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Simple bubble sort for distance entries (suitable for small arrays)
 		/// </summary>
-		private static void SortDistanceEntries (NativeArray<DistanceEntry> distances)
+		private static void SortDistanceEntries(NativeArray<DistanceEntry> distances)
 			{
 			for (int i = 0; i < distances.Length - 1; i++)
 				{

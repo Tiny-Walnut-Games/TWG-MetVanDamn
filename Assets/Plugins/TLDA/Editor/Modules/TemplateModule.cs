@@ -15,14 +15,14 @@ namespace LivingDevAgent.Editor.Modules
 	/// </summary>
 	public class TemplateModule : ScribeModuleBase
 		{
-		public TemplateModule (TLDLScribeData data) : base(data) { }
+		public TemplateModule(TLDLScribeData data) : base(data) { }
 
-		public override void Initialize ()
+		public override void Initialize()
 			{
 			EnsureTemplatesLoaded();
 			}
 
-		public void DrawToolbar ()
+		public void DrawToolbar()
 			{
 			// 🎭 Template emoji with proper rendering
 			var templateIcon = new GUIContent("🎭 Templates", "Choose a quest archetype to begin your documentation adventure");
@@ -39,7 +39,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		public void DrawContent ()
+		public void DrawContent()
 			{
 			EditorGUILayout.BeginVertical("box");
 
@@ -89,7 +89,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.EndVertical();
 			}
 
-		private void ShowTemplateQuickMenu ()
+		private void ShowTemplateQuickMenu()
 			{
 			if (_data.Templates == null || _data.Templates.Count == 0)
 				{
@@ -111,7 +111,7 @@ namespace LivingDevAgent.Editor.Modules
 			menu.ShowAsContext();
 			}
 
-		private void LoadTemplateToEditor ()
+		private void LoadTemplateToEditor()
 			{
 			if (_data.Templates == null || _data.SelectedTemplateIndex >= _data.Templates.Count)
 				{
@@ -124,7 +124,7 @@ namespace LivingDevAgent.Editor.Modules
 			SetStatus($"📖 Loaded template: {_data.Templates [ _data.SelectedTemplateIndex ].Key}");
 			}
 
-		private void CreateIssueFromSelectedTemplate ()
+		private void CreateIssueFromSelectedTemplate()
 			{
 			if (_data.Templates == null || _data.SelectedTemplateIndex >= _data.Templates.Count)
 				{
@@ -135,14 +135,14 @@ namespace LivingDevAgent.Editor.Modules
 			CreateIssueFromTemplate(_data.Templates [ _data.SelectedTemplateIndex ]);
 			}
 
-		private void RefreshTemplates ()
+		private void RefreshTemplates()
 			{
 			_data.Templates = null;
 			EnsureTemplatesLoaded();
 			SetStatus($"🔄 Templates refreshed - found {_data.Templates?.Count ?? 0} templates");
 			}
 
-		private void EnsureTemplatesLoaded ()
+		private void EnsureTemplatesLoaded()
 			{
 			if (_data.Templates != null) return;
 
@@ -217,7 +217,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private void CreateIssueFromTemplate (TemplateInfo info)
+		private void CreateIssueFromTemplate(TemplateInfo info)
 			{
 			try
 				{
@@ -266,7 +266,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string LoadTemplateMarkdown (TemplateInfo info)
+		private string LoadTemplateMarkdown(TemplateInfo info)
 			{
 			try
 				{
@@ -314,17 +314,17 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string GetProjectRoot ()
+		private string GetProjectRoot()
 			{
 			return Directory.GetParent(Application.dataPath)!.FullName;
 			}
 
-		private string GetIssuesDirectory ()
+		private string GetIssuesDirectory()
 			{
 			return Path.Combine(GetProjectRoot(), "TLDL", "issues");
 			}
 
-		private void EnsureIssuesReadme (string issuesDir)
+		private void EnsureIssuesReadme(string issuesDir)
 			{
 			try
 				{
@@ -348,19 +348,19 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string GetCreatedTs ()
+		private string GetCreatedTs()
 			{
 			return DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss 'UTC'");
 			}
 
-		private string MakeProjectRelative (string absPath)
+		private string MakeProjectRelative(string absPath)
 			{
 			string projectRoot = Directory.GetParent(Application.dataPath)!.FullName.Replace('\\', '/');
 			string norm = absPath.Replace('\\', '/');
 			return norm.StartsWith(projectRoot) ? norm [ (projectRoot.Length + 1).. ] : absPath;
 			}
 
-		private void PostWriteImport (string absPath)
+		private void PostWriteImport(string absPath)
 			{
 			if (string.IsNullOrEmpty(absPath)) return;
 
@@ -371,7 +371,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string MakeUnityPath (string absPath)
+		private string MakeUnityPath(string absPath)
 			{
 			string norm = absPath.Replace('\\', '/');
 			string dataPath = Application.dataPath.Replace('\\', '/');

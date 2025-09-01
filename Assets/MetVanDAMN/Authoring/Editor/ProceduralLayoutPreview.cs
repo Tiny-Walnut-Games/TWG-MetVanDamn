@@ -16,7 +16,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	public class ProceduralLayoutPreview : EditorWindow
 		{
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/World Layout Preview")]
-		public static void ShowWindow ()
+		public static void ShowWindow()
 			{
 			GetWindow<ProceduralLayoutPreview>("Layout Preview");
 			}
@@ -28,7 +28,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private RandomizationMode _previewMode = RandomizationMode.Partial;
 		private uint _previewSeed = 12345;
 
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			GUILayout.Label("Procedural Layout Preview", EditorStyles.boldLabel);
 
@@ -97,7 +97,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				MessageType.Info);
 			}
 
-		private void PreviewLayoutAlgorithm ()
+		private void PreviewLayoutAlgorithm()
 			{
 			Debug.Log($"🔮 Previewing Layout Algorithm");
 			Debug.Log($"   Districts: {_previewDistrictCount}");
@@ -135,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			PreviewRuleRandomization(ref random);
 			}
 
-		private void GeneratePreviewPoissonDisc (int2 [ ] positions, int2 worldSize, ref Unity.Mathematics.Random random)
+		private void GeneratePreviewPoissonDisc(int2 [ ] positions, int2 worldSize, ref Unity.Mathematics.Random random)
 			{
 			float minDistance = math.min(worldSize.x, worldSize.y) * 0.2f;
 			int maxAttempts = 30;
@@ -181,7 +181,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void GeneratePreviewJitteredGrid (int2 [ ] positions, int2 worldSize, ref Unity.Mathematics.Random random)
+		private void GeneratePreviewJitteredGrid(int2 [ ] positions, int2 worldSize, ref Unity.Mathematics.Random random)
 			{
 			int gridDim = (int)math.ceil(math.sqrt(positions.Length));
 			float2 cellSize = new float2(worldSize) / gridDim;
@@ -206,7 +206,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void PreviewRuleRandomization (ref Unity.Mathematics.Random random)
+		private void PreviewRuleRandomization(ref Unity.Mathematics.Random random)
 			{
 			Debug.Log($"🎲 Rule Randomization Preview (Mode: {_previewMode})");
 
@@ -234,7 +234,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private Polarity GenerateRandomPolarities (ref Unity.Mathematics.Random random, bool allowMore)
+		private Polarity GenerateRandomPolarities(ref Unity.Mathematics.Random random, bool allowMore)
 			{
 			Polarity [ ] availablePolarities = new [ ]
 			{
@@ -254,7 +254,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return result;
 			}
 
-		private uint GenerateRandomUpgrades (ref Unity.Mathematics.Random random)
+		private uint GenerateRandomUpgrades(ref Unity.Mathematics.Random random)
 			{
 			uint upgrades = 1u; // Always include Jump (bit 0)
 
@@ -269,7 +269,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return upgrades;
 			}
 
-		private void GeneratePreviewDistricts ()
+		private void GeneratePreviewDistricts()
 			{
 			// Create actual district authoring objects in the scene for preview
 			Debug.Log("🏗️ Generate Preview Districts - Creating scene objects");
@@ -336,7 +336,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log($"🎯 Generated {districtPositions.Count} preview districts");
 			}
 
-		private void ClearExistingPreviewDistricts ()
+		private void ClearExistingPreviewDistricts()
 			{
 			// Find and remove existing preview district objects
 			GameObject [ ] existingPreviews = GameObject.FindGameObjectsWithTag("Untagged")
@@ -349,7 +349,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private List<Vector3> CalculateDistrictPositions ()
+		private List<Vector3> CalculateDistrictPositions()
 			{
 			var positions = new List<Vector3>();
 			var random = new Unity.Mathematics.Random(_previewSeed);
@@ -404,19 +404,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return positions;
 			}
 
-		private DistrictType GetRandomDistrictType ()
+		private DistrictType GetRandomDistrictType()
 			{
 			System.Array values = System.Enum.GetValues(typeof(DistrictType));
 			return (DistrictType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
 			}
 
-		private BiomeType GetRandomBiomeType ()
+		private BiomeType GetRandomBiomeType()
 			{
 			System.Array values = System.Enum.GetValues(typeof(BiomeType));
 			return (BiomeType)values.GetValue(UnityEngine.Random.Range(0, values.Length));
 			}
 
-		private Material CreatePreviewMaterial (BiomeType biomeType)
+		private Material CreatePreviewMaterial(BiomeType biomeType)
 			{
 			var material = new Material(Shader.Find("Standard"));
 
@@ -442,7 +442,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return material;
 			}
 
-		private void ApplyPreviewSettingsToScene ()
+		private void ApplyPreviewSettingsToScene()
 			{
 			if (_worldConfig != null)
 				{
@@ -455,7 +455,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void ShowDistrictInfo ()
+		private void ShowDistrictInfo()
 			{
 			Debug.Log($"📋 District Information ({_districts.Length} districts):");
 

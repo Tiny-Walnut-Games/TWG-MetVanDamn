@@ -43,7 +43,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public BiomeAffinity BiomeType;    // Primary biome this room fits
 		public float DifficultyRating;     // 0.0 (trivial) to 1.0 (expert)
 
-		public MovementCapabilityTags (Ability required, Ability optional = Ability.None,
+		public MovementCapabilityTags(Ability required, Ability optional = Ability.None,
 									 BiomeAffinity biome = BiomeAffinity.Any, float difficulty = 0.5f)
 			{
 			RequiredSkills = required;
@@ -76,7 +76,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		public BiomeAffinity Affinity;
 
-		public BiomeAffinityComponent (BiomeAffinity affinity)
+		public BiomeAffinityComponent(BiomeAffinity affinity)
 			{
 			Affinity = affinity;
 			}
@@ -96,7 +96,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public bool RequiresJumpValidation; // Whether to run jump arc solver
 		public uint TemplateId;             // Unique identifier for this template
 
-		public RoomTemplate (RoomGeneratorType type, MovementCapabilityTags tags,
+		public RoomTemplate(RoomGeneratorType type, MovementCapabilityTags tags,
 						   int2 minSize, int2 maxSize, float secretPercent = 0.1f,
 						   bool jumpValidation = true, uint templateId = 0)
 			{
@@ -122,7 +122,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public uint GenerationSeed;        // Seed used for this room's generation
 		public float GenerationTime;       // Time taken for generation (profiling)
 
-		public ProceduralRoomGenerated (uint seed)
+		public ProceduralRoomGenerated(uint seed)
 			{
 			ContentGenerated = false;
 			NavigationGenerated = false;
@@ -144,7 +144,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public float TraversalCost;        // Cost/difficulty of this connection
 		public bool IsSecret;               // Whether this is a secret/alternate route
 
-		public RoomNavigationElement (int2 from, int2 to, Ability movement = Ability.Jump,
+		public RoomNavigationElement(int2 from, int2 to, Ability movement = Ability.Jump,
 								   float cost = 1.0f, bool secret = false)
 			{
 			FromPosition = from;
@@ -169,7 +169,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public float DashDistance;         // Horizontal dash distance
 		public float GlideSpeed;           // Glide/fall speed reduction
 
-		public JumpArcPhysics (float height = 3.0f, float distance = 4.0f, float doubleBonus = 1.5f,
+		public JumpArcPhysics(float height = 3.0f, float distance = 4.0f, float doubleBonus = 1.5f,
 							 float gravity = 1.0f, float wallHeight = 2.0f, float dash = 6.0f)
 			{
 			JumpHeight = height;
@@ -190,7 +190,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public Ability RequiredSkills;
 		public Ability OptionalSkills;
 
-		public SkillTag (Ability required, Ability optional = Ability.None)
+		public SkillTag(Ability required, Ability optional = Ability.None)
 			{
 			RequiredSkills = required;
 			OptionalSkills = optional;
@@ -207,7 +207,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public uint Seed;
 		public Ability RequiredAbility;
 
-		public RoomPatternElement (int2 position, RoomFeatureType featureType, uint seed, Ability requiredAbility = Ability.None)
+		public RoomPatternElement(int2 position, RoomFeatureType featureType, uint seed, Ability requiredAbility = Ability.None)
 			{
 			Position = position;
 			FeatureType = featureType;
@@ -225,7 +225,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public int2 Position;
 		public float Weight;
 
-		public RoomModuleElement (Entity modulePrefab, int2 position, float weight = 1.0f)
+		public RoomModuleElement(Entity modulePrefab, int2 position, float weight = 1.0f)
 			{
 			ModulePrefab = modulePrefab;
 			Position = position;
@@ -251,7 +251,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public int CurrentStep; // 1..6 pipeline
 		public RoomLayoutType LayoutType;
 
-		public RoomGenerationRequest (RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed)
+		public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed)
 			{
 			GeneratorType = generatorType;
 			RoomEntity = roomEntity;
@@ -267,7 +267,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			LayoutType = RoomLayoutType.Horizontal;
 			}
 
-		public RoomGenerationRequest (RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed, Ability availableSkills)
+		public RoomGenerationRequest(RoomGeneratorType generatorType, Entity roomEntity, int2 bounds, uint seed, Ability availableSkills)
 			{
 			GeneratorType = generatorType;
 			RoomEntity = roomEntity;
@@ -284,7 +284,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// Alternative constructor matching the calling pattern in RoomManagementSystem.cs
-		public RoomGenerationRequest (RoomGeneratorType generatorType, BiomeType targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
+		public RoomGenerationRequest(RoomGeneratorType generatorType, BiomeType targetBiome, Polarity targetPolarity, Ability availableSkills, uint seed)
 			{
 			GeneratorType = generatorType;
 			RoomEntity = Entity.Null; // Will be set by caller
@@ -300,7 +300,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			LayoutType = RoomLayoutType.Horizontal;
 			}
 
-		private static BiomeAffinity ConvertBiomeTypeToAffinity (BiomeType biomeType)
+		private static BiomeAffinity ConvertBiomeTypeToAffinity(BiomeType biomeType)
 			{
 			return biomeType switch
 				{
@@ -376,7 +376,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public readonly float DashDistance => HasGlide ? 6.0f : 4.0f; // compatibility shim
 		public readonly float WallJumpHeight => HasWallJump ? JumpHeight * 0.8f : 0.0f; // compatibility shim
 
-		public JumpPhysicsData (float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
+		public JumpPhysicsData(float height = 3.0f, float distance = 4.0f, float gravity = 1.0f)
 			{
 			JumpHeight = height;
 			JumpDistance = distance;
@@ -387,7 +387,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			HasGlide = false;
 			}
 
-		public JumpPhysicsData (float height, float distance, float gravity, float maxFallSpeed, bool doubleJump, bool wallJump, bool glide)
+		public JumpPhysicsData(float height, float distance, float gravity, float maxFallSpeed, bool doubleJump, bool wallJump, bool glide)
 			{
 			JumpHeight = height;
 			JumpDistance = distance;
@@ -416,7 +416,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public bool UseDestructibleWalls;
 		public readonly Ability SecretSkillRequirement => RequiredSkillForAccess; // test compatibility
 
-		public SecretAreaConfig (float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
+		public SecretAreaConfig(float probability = 0.3f, int maxSecrets = 2, Ability requiredSkill = Ability.None)
 			{
 			SecretProbability = probability;
 			MaxSecretsPerRoom = maxSecrets;
@@ -430,7 +430,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			UseDestructibleWalls = false;
 			}
 
-		public SecretAreaConfig (float probability, int2 minSize, int2 maxSize, Ability requiredSkill, bool allowStacked, bool requireHidden)
+		public SecretAreaConfig(float probability, int2 minSize, int2 maxSize, Ability requiredSkill, bool allowStacked, bool requireHidden)
 			{
 			SecretProbability = probability;
 			MaxSecretsPerRoom = 2;
@@ -454,7 +454,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public float MaxJumpDistance;
 		public float MinJumpHeight;
 
-		public JumpArcValidation (bool isValid = true, float maxDistance = 8.0f, float minHeight = 2.0f)
+		public JumpArcValidation(bool isValid = true, float maxDistance = 8.0f, float minHeight = 2.0f)
 			{
 			IsValid = isValid;
 			MaxJumpDistance = maxDistance;
@@ -475,7 +475,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public readonly int2 FromPosition => StartPosition; // compatibility
 		public readonly int2 ToPosition => EndPosition; // compatibility
 
-		public JumpConnectionElement (int2 start, int2 end, Ability requiredAbility = Ability.None)
+		public JumpConnectionElement(int2 start, int2 end, Ability requiredAbility = Ability.None)
 			{
 			StartPosition = start;
 			EndPosition = end;
@@ -484,7 +484,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			Velocity = 0f;
 			}
 
-		public JumpConnectionElement (int2 start, int2 end, float angle, float velocity)
+		public JumpConnectionElement(int2 start, int2 end, float angle, float velocity)
 			{
 			StartPosition = start;
 			EndPosition = end;
@@ -493,7 +493,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			Velocity = velocity;
 			}
 
-		public JumpConnectionElement (int2 start, int2 end, Ability requiredAbility, float angle)
+		public JumpConnectionElement(int2 start, int2 end, Ability requiredAbility, float angle)
 			{
 			StartPosition = start;
 			EndPosition = end;

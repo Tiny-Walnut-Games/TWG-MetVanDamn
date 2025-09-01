@@ -23,11 +23,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _roomGenerationQuery; // 🔥 CREATE QUERY IN ONCREATE
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
-			
+
 			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
 			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
 				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
@@ -35,7 +35,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			_jumpPhysicsLookup.Update(ref state);
 			_featureBufferLookup.Update(ref state);
@@ -82,7 +82,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			[ReadOnly] public ComponentLookup<NodeId> NodeIds;
 			public Unity.Mathematics.Random BaseRandom;
 
-			public void Execute ()
+			public void Execute()
 				{
 				for (int i = 0; i < Entities.Length; i++)
 					{
@@ -131,7 +131,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			// Add meaningful coordinate-based complexity calculation
-			private static float CalculateCoordinateBasedComplexity (NodeId nodeId)
+			private static float CalculateCoordinateBasedComplexity(NodeId nodeId)
 				{
 				int2 coords = nodeId.Coordinates;
 				float distance = math.length(coords);
@@ -142,7 +142,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return distanceComplexity * parityVariation;
 				}
 
-			private static void GenerateVerticalSegment (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateVerticalSegment(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 											   int segmentY, int segmentHeight, int segmentIndex, float jumpHeight, uint seed, ref Unity.Mathematics.Random random, float coordinateComplexity)
 				{
 				// Use coordinate complexity to influence platform count and arrangement
@@ -188,7 +188,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void AddVerticalChallenge (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void AddVerticalChallenge(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 										int segmentY, int segmentHeight, ref Unity.Mathematics.Random random, uint seed)
 				{
 				int challengeType = random.NextInt(0, 3);
@@ -225,7 +225,7 @@ namespace TinyWalnutGames.MetVD.Graph
 							int switchY = segmentY + 1;
 							features.Add(new RoomFeatureElement
 								{
-							 Type = RoomFeatureType.Switch,
+								Type = RoomFeatureType.Switch,
 								Position = new int2(switchX, switchY),
 								FeatureId = seed + 30000
 								});
@@ -236,7 +236,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void EnsureVerticalConnectivity (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void EnsureVerticalConnectivity(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 												  int segmentCount, int segmentHeight, float jumpHeight)
 				{
 				// Add connectivity platforms between segments if gaps are too large
@@ -279,11 +279,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _roomGenerationQuery; // 🔥 ADD PRE-CREATED QUERY
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
 			_secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
-			
+
 			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
 			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
 				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
@@ -291,7 +291,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			_featureBufferLookup.Update(ref state);
 			_secretConfigLookup.Update(ref state);
@@ -333,7 +333,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			[ReadOnly] public ComponentLookup<NodeId> NodeIds;
 			public Unity.Mathematics.Random BaseRandom;
 
-			public void Execute ()
+			public void Execute()
 				{
 				for (int i = 0; i < Entities.Length; i++)
 					{
@@ -383,7 +383,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			// Add meaningful rhythm complexity calculation based on coordinates
-			private static float CalculateRhythmComplexity (NodeId nodeId)
+			private static float CalculateRhythmComplexity(NodeId nodeId)
 				{
 				int2 coords = nodeId.Coordinates;
 				float distance = math.length(coords);
@@ -394,7 +394,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return baseComplexity * rhythmVariation;
 				}
 
-			private static BeatType DetermineBeatType (int beatIndex, int totalBeats, float rhythmComplexity)
+			private static BeatType DetermineBeatType(int beatIndex, int totalBeats, float rhythmComplexity)
 				{
 				// 🧮 COORDINATE-AWARE - Uses rhythm complexity for spatial beat pattern intelligence
 				// Burst-compatible enum-based corridor classification instead of managed strings
@@ -485,7 +485,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return basePattern;
 				}
 
-			private static void GenerateBeat (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 								int beatX, int beatWidth, BeatType beatType, int beatIndex, uint seed, ref Unity.Mathematics.Random random)
 				{
 				switch (beatType)
@@ -504,7 +504,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void GenerateChallengeBeat (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateChallengeBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 											 int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed, int beatIndex)
 				{
 				// Use beat index to influence obstacle patterns and difficulty scaling
@@ -540,13 +540,13 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				features.Add(new RoomFeatureElement
 					{
-				 Type = RoomFeatureType.Platform,
+					Type = RoomFeatureType.Platform,
 					Position = platformPos,
 					FeatureId = (uint)(seed + 10 + beatIndex * 1000)
 					});
 				}
 
-			private static void GenerateRestBeat (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateRestBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 									int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed, int beatIndex)
 				{
 				// Use beat index to influence rest quality - later beats get better recovery opportunities
@@ -581,13 +581,13 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				features.Add(new RoomFeatureElement
 					{
-				 Type = RoomFeatureType.Platform,
+					Type = RoomFeatureType.Platform,
 					Position = platformPos,
 					FeatureId = (uint)(seed + 110 + beatIndex * 1000)
 					});
 				}
 
-			private static void GenerateSecretBeat (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateSecretBeat(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 									  int beatX, int beatWidth, ref Unity.Mathematics.Random random, uint seed, int beatIndex)
 				{
 				// Use beat index to influence secret complexity and placement strategy
@@ -632,7 +632,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						{
 						features.Add(new RoomFeatureElement
 							{
-						 Type = RoomFeatureType.Obstacle,
+							Type = RoomFeatureType.Obstacle,
 							Position = wallPos,
 							FeatureId = (uint)(seed + 210 + beatIndex * 1000 + c)
 							});
@@ -640,7 +640,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void GenerateBranchingPaths (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateBranchingPaths(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 										  SecretAreaConfig secretConfig, uint seed, ref Unity.Mathematics.Random random, float rhythmComplexity)
 				{
 				// Create upper and lower alternate routes - influenced by rhythm complexity
@@ -681,7 +681,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						{
 						features.Add(new RoomFeatureElement
 							{
-						 Type = RoomFeatureType.Platform,
+							Type = RoomFeatureType.Platform,
 							Position = new int2(x, upperY),
 							FeatureId = (uint)(seed + 1000 + x)
 							});
@@ -702,7 +702,7 @@ namespace TinyWalnutGames.MetVD.Graph
 							{
 							features.Add(new RoomFeatureElement
 								{
-							 Type = RoomFeatureType.PowerUp, // Rare treasures in extreme areas
+								Type = RoomFeatureType.PowerUp, // Rare treasures in extreme areas
 								Position = new int2(x + 1, upperY + 2),
 								FeatureId = (uint)(seed + 1800 + x)
 								});
@@ -790,11 +790,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _roomGenerationQuery; // 🔥 ADD PRE-CREATED QUERY
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_biomeLookup = state.GetComponentLookup<Core.Biome>(true);
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
-			
+
 			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
 			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
 				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
@@ -802,7 +802,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			_biomeLookup.Update(ref state);
 			_featureBufferLookup.Update(ref state);
@@ -837,7 +837,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			[ReadOnly] public ComponentLookup<RoomHierarchyData> RoomData;
 			[ReadOnly] public ComponentLookup<NodeId> NodeIds;
 
-			public void Execute ()
+			public void Execute()
 				{
 				for (int i = 0; i < Entities.Length; i++)
 					{
@@ -867,7 +867,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void GenerateBiomeHeightmap (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateBiomeHeightmap(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 											  Core.Biome biome, uint seed)
 				{
 				var random = new Unity.Mathematics.Random(seed);
@@ -906,7 +906,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static float GetBiomeNoiseScale (BiomeType biome)
+			private static float GetBiomeNoiseScale(BiomeType biome)
 				{
 				return biome switch
 					{
@@ -918,7 +918,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						};
 				}
 
-			private static float GetBiomeHeightVariation (BiomeType biome)
+			private static float GetBiomeHeightVariation(BiomeType biome)
 				{
 				return biome switch
 					{
@@ -930,7 +930,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						};
 				}
 
-			private static bool ShouldAddBiomeFeature (int x, Core.Biome biome, uint seed, ref Unity.Mathematics.Random random)
+			private static bool ShouldAddBiomeFeature(int x, Core.Biome biome, uint seed, ref Unity.Mathematics.Random random)
 				{
 				float featureChance = biome.Type switch
 					{
@@ -948,7 +948,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return random.NextFloat() < adjustedChance;
 				}
 
-			private static RoomFeatureType GetBiomeSpecificFeature (BiomeType biome)
+			private static RoomFeatureType GetBiomeSpecificFeature(BiomeType biome)
 				{
 				return biome switch
 					{
@@ -977,11 +977,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _roomGenerationQuery; // 🔥 ADD PRE-CREATED QUERY
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
 			_biomeLookup = state.GetComponentLookup<Core.Biome>(true);
-			
+
 			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
 			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
 				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
@@ -989,7 +989,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			_featureBufferLookup.Update(ref state);
 			_biomeLookup.Update(ref state);
@@ -1024,7 +1024,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			[ReadOnly] public ComponentLookup<RoomHierarchyData> RoomData;
 			[ReadOnly] public ComponentLookup<NodeId> NodeIds;
 
-			public void Execute ()
+			public void Execute()
 				{
 				for (int i = 0; i < Entities.Length; i++)
 					{
@@ -1069,7 +1069,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			// Add meaningful sky complexity calculation based on coordinates
-			private static float CalculateSkyComplexity (NodeId nodeId)
+			private static float CalculateSkyComplexity(NodeId nodeId)
 				{
 				int2 coords = nodeId.Coordinates;
 				int altitude = coords.y; // Y coordinate represents altitude in sky biomes
@@ -1083,7 +1083,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return altitudeComplexity * distanceVariation;
 				}
 
-			private static void GenerateCloudLayer (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateCloudLayer(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 										  int layerY, int layerIndex, Core.Biome biome, uint seed, ref Unity.Mathematics.Random random, float skyComplexity)
 				{
 				// Use sky complexity to influence cloud density and arrangement patterns
@@ -1098,7 +1098,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 					features.Add(new RoomFeatureElement
 						{
-					 Type = RoomFeatureType.Platform,
+						Type = RoomFeatureType.Platform,
 						Position = new int2(cloudX, cloudY),
 						FeatureId = (uint)(seed + layerIndex * 1000 + cloud * 100)
 						});
@@ -1113,7 +1113,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void GenerateFloatingIslands (DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
+			private static void GenerateFloatingIslands(DynamicBuffer<RoomFeatureElement> features, RectInt bounds,
 											   Core.Biome biome, uint seed, ref Unity.Mathematics.Random random, float skyComplexity)
 				{
 				// Use sky complexity to determine island density and size
@@ -1150,7 +1150,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static CloudMotionType GetCloudMotionType (BiomeType biome, Polarity polarity)
+			private static CloudMotionType GetCloudMotionType(BiomeType biome, Polarity polarity)
 				{
 				return biome switch
 					{
@@ -1166,7 +1166,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						};
 				}
 
-			private static void AddCloudMotionFeature (DynamicBuffer<RoomFeatureElement> features, int cloudX, int cloudY,
+			private static void AddCloudMotionFeature(DynamicBuffer<RoomFeatureElement> features, int cloudX, int cloudY,
 											 CloudMotionType motionType, uint seed, int layerIndex, int cloudIndex)
 				{
 				RoomFeatureType motionFeatureType = motionType switch
@@ -1184,7 +1184,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					});
 				}
 
-			private static void AddIslandFeatures (DynamicBuffer<RoomFeatureElement> features, int centerX, int centerY,
+			private static void AddIslandFeatures(DynamicBuffer<RoomFeatureElement> features, int centerX, int centerY,
 										 Core.Biome biome, ref Unity.Mathematics.Random random, uint seed, int islandIndex, float skyComplexity)
 				{
 				RoomFeatureType featureType = biome.Type switch
@@ -1214,7 +1214,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						{
 						features.Add(new RoomFeatureElement
 							{
-						 Type = RoomFeatureType.Secret, // Bonus secret in complex areas
+							Type = RoomFeatureType.Secret, // Bonus secret in complex areas
 							Position = new int2(centerX + 1, centerY + 1),
 							FeatureId = (uint)(seed + 6000 + islandIndex * 100 + 50)
 							});
@@ -1244,7 +1244,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// Convert RoomFeatureType to RoomFeatureObjectType (DEPRECATED - compatibility shim)
 		/// </summary>
 		[System.Obsolete("Use RoomFeatureType directly instead")]
-		public static RoomFeatureObjectType ConvertToObjectType (RoomFeatureType featureType)
+		public static RoomFeatureObjectType ConvertToObjectType(RoomFeatureType featureType)
 			{
 			return featureType switch
 				{
@@ -1262,7 +1262,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Compatibility shim - Use RoomFeatureType directly for new code
 		/// </summary>
-		public static RoomFeatureType NormalizeFeatureType (RoomFeatureType featureType)
+		public static RoomFeatureType NormalizeFeatureType(RoomFeatureType featureType)
 			{
 			return featureType; // Pass-through for compatibility
 			}

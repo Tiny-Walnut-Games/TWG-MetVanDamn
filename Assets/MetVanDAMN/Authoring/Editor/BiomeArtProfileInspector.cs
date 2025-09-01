@@ -13,42 +13,42 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private const string SAVE_PATH = "Assets/MetVanDAMN/SampleProfiles/";
 
 		[MenuItem(MENU_BASE + "Forest Biome (Clustered)", false, 1)]
-		public static void CreateForestBiomeSample ()
+		public static void CreateForestBiomeSample()
 			{
 			BiomeArtProfile profile = BiomeArtProfileSamples.CreateForestBiomeSample();
 			SaveProfileAsset(profile, "ForestBiome_ClusteredSample");
 			}
 
 		[MenuItem(MENU_BASE + "Desert Biome (Radial)", false, 2)]
-		public static void CreateDesertBiomeSample ()
+		public static void CreateDesertBiomeSample()
 			{
 			BiomeArtProfile profile = BiomeArtProfileSamples.CreateDesertBiomeSample();
 			SaveProfileAsset(profile, "DesertBiome_RadialSample");
 			}
 
 		[MenuItem(MENU_BASE + "Mountain Biome (Terrain-Aware)", false, 3)]
-		public static void CreateMountainBiomeSample ()
+		public static void CreateMountainBiomeSample()
 			{
 			BiomeArtProfile profile = BiomeArtProfileSamples.CreateMountainBiomeSample();
 			SaveProfileAsset(profile, "MountainBiome_TerrainSample");
 			}
 
 		[MenuItem(MENU_BASE + "Coastal Biome (Linear)", false, 4)]
-		public static void CreateCoastalBiomeSample ()
+		public static void CreateCoastalBiomeSample()
 			{
 			BiomeArtProfile profile = BiomeArtProfileSamples.CreateCoastalBiomeSample();
 			SaveProfileAsset(profile, "CoastalBiome_LinearSample");
 			}
 
 		[MenuItem(MENU_BASE + "Urban Biome (Sparse)", false, 5)]
-		public static void CreateUrbanBiomeSample ()
+		public static void CreateUrbanBiomeSample()
 			{
 			BiomeArtProfile profile = BiomeArtProfileSamples.CreateUrbanBiomeSample();
 			SaveProfileAsset(profile, "UrbanBiome_SparseSample");
 			}
 
 		[MenuItem(MENU_BASE + "Create All Sample Profiles", false, 20)]
-		public static void CreateAllSampleProfiles ()
+		public static void CreateAllSampleProfiles()
 			{
 			// Ensure the sample profiles directory exists
 			if (!AssetDatabase.IsValidFolder(SAVE_PATH.TrimEnd('/')))
@@ -75,7 +75,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				"OK");
 			}
 
-		private static void SaveProfileAsset (BiomeArtProfile profile, string fileName)
+		private static void SaveProfileAsset(BiomeArtProfile profile, string fileName)
 			{
 			// Ensure the directory exists
 			if (!AssetDatabase.IsValidFolder(SAVE_PATH.TrimEnd('/')))
@@ -121,7 +121,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private bool showAdvancedSettings = true;
 		private bool showPreviewStats = true;
 
-		public override void OnInspectorGUI ()
+		public override void OnInspectorGUI()
 			{
 			profile = (BiomeArtProfile)target;
 
@@ -161,7 +161,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			DrawQuickActions();
 			}
 
-		private void DrawAdvancedSettings ()
+		private void DrawAdvancedSettings()
 			{
 			EditorGUI.indentLevel++;
 
@@ -212,7 +212,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUI.indentLevel--;
 			}
 
-		private void DrawPreviewStats ()
+		private void DrawPreviewStats()
 			{
 			EditorGUI.indentLevel++;
 
@@ -251,7 +251,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUI.indentLevel--;
 			}
 
-		private void DrawQuickActions ()
+		private void DrawQuickActions()
 			{
 			EditorGUILayout.LabelField("Quick Actions", EditorStyles.boldLabel);
 
@@ -275,7 +275,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.EndHorizontal();
 			}
 
-		private string GetStrategyDescription (PropPlacementStrategy strategy)
+		private string GetStrategyDescription(PropPlacementStrategy strategy)
 			{
 			return strategy switch
 				{
@@ -289,7 +289,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					};
 			}
 
-		private string CalculateQualityRating (PropPlacementSettings settings)
+		private string CalculateQualityRating(PropPlacementSettings settings)
 			{
 			int score = 0;
 
@@ -349,7 +349,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					};
 			}
 
-		private void ValidateProfile ()
+		private void ValidateProfile()
 			{
 			var issues = new System.Collections.Generic.List<string>();
 
@@ -393,7 +393,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void ResetToDefaults ()
+		private void ResetToDefaults()
 			{
 			profile.propSettings = new PropPlacementSettings
 				{

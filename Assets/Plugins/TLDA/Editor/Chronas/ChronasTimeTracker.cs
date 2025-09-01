@@ -5,14 +5,14 @@ using UnityEditor;
 using UnityEngine;
 
 namespace LivingDevAgent.Editor.Chronas
-{
-    /// <summary>
-    /// ⏳ Chronas - The Time Sovereign
-    /// FOCUS-IMMUNE background time tracking with scene view overlay
-    /// Continues tracking regardless of Unity focus state
-    /// Designed for single-monitor workflows and TaskMaster integration
-    /// </summary>
-    [ExecuteInEditMode]
+	{
+	/// <summary>
+	/// ⏳ Chronas - The Time Sovereign
+	/// FOCUS-IMMUNE background time tracking with scene view overlay
+	/// Continues tracking regardless of Unity focus state
+	/// Designed for single-monitor workflows and TaskMaster integration
+	/// </summary>
+	[ExecuteInEditMode]
 	public class ChronasTimeTracker : EditorWindow
 		{
 		// Scene view overlay state
@@ -55,7 +55,7 @@ namespace LivingDevAgent.Editor.Chronas
 		private static readonly string _timeCardDirectory = "Assets/TLDA/Chronas/TimeCards/";
 
 		// 🔒 SECURITY VALIDATION METHODS
-		private static bool ValidateTaskName (string taskName)
+		private static bool ValidateTaskName(string taskName)
 			{
 			if (string.IsNullOrWhiteSpace(taskName))
 				return false;
@@ -66,7 +66,7 @@ namespace LivingDevAgent.Editor.Chronas
 			return true;
 			}
 
-		private static bool ValidateTimerSession ()
+		private static bool ValidateTimerSession()
 			{
 			lock (_timerLock)
 				{
@@ -79,7 +79,7 @@ namespace LivingDevAgent.Editor.Chronas
 				// Check for runaway sessions
 				System.DateTime currentTime = System.DateTime.Now;
 				System.TimeSpan sessionDuration = currentTime - _systemTimeStart;
-				
+
 				if (sessionDuration > _maxSessionDuration)
 					{
 					Debug.LogWarning($"⚠️ Chronas: Session exceeded maximum duration ({_maxSessionDuration.TotalHours:F1}h). Auto-stopping for security.");
@@ -90,18 +90,18 @@ namespace LivingDevAgent.Editor.Chronas
 				// Update validation timestamp
 				System.DateTime previousValidationTime = _lastValidationTime;
 				_lastValidationTime = currentTime;
-				
+
 				// 🔒 DEBUG: Log validation success (only every 30 seconds to avoid spam)
 				if ((currentTime - previousValidationTime).TotalSeconds > 30)
 					{
 					Debug.Log($"🔒 Chronas: Timer validation passed - Running for {sessionDuration:hh\\:mm\\:ss}, Task: '{_currentTaskName}'");
 					}
-				
+
 				return true;
 				}
 			}
 
-		private static void ForceStopTrackingUnsafe ()
+		private static void ForceStopTrackingUnsafe()
 			{
 			// Called within lock, no additional locking needed
 			Debug.LogWarning($"🔒 Chronas: Force-stopping timer session for '{_currentTaskName}' after {FormatDuration(_accumulatedTime)}");
@@ -110,7 +110,7 @@ namespace LivingDevAgent.Editor.Chronas
 			_accumulatedTime = 0.0;
 			_systemTimeStart = System.DateTime.MinValue;
 			}
-		public static void ShowWindow ()
+		public static void ShowWindow()
 			{
 			// Ensure focus-immune timer is initialized
 			EnsureStaticTimerInitialized();
@@ -122,7 +122,7 @@ namespace LivingDevAgent.Editor.Chronas
 
 		// 🎯 FOCUS-IMMUNE: Static initialization method
 		[InitializeOnLoadMethod]
-		private static void InitializeChronasStatic ()
+		private static void InitializeChronasStatic()
 			{
 			// Initialize timer system that survives focus loss
 			EnsureStaticTimerInitialized();
@@ -131,7 +131,7 @@ namespace LivingDevAgent.Editor.Chronas
 			EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
 			}
 
-		private static void EnsureStaticTimerInitialized ()
+		private static void EnsureStaticTimerInitialized()
 			{
 			if (_staticTimerInitialized) return;
 
@@ -155,7 +155,7 @@ namespace LivingDevAgent.Editor.Chronas
 			Debug.Log("⏳ Chronas: Focus-immune timer system initialized");
 			}
 
-		private static void OnPlayModeStateChanged (PlayModeStateChange state)
+		private static void OnPlayModeStateChanged(PlayModeStateChange state)
 			{
 			// Preserve timer state through play mode changes
 			if (state == PlayModeStateChange.ExitingEditMode && _isTracking)
@@ -168,13 +168,13 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private void OnEnable ()
+		private void OnEnable()
 			{
 			// Window-specific initialization only
 			EnsureStaticTimerInitialized();
 			}
 
-		private void OnDisable ()
+		private void OnDisable()
 			{
 			// 🎯 FOCUS-IMMUNE: DO NOT unsubscribe from updates!
 			// Static timer continues running regardless of window state
@@ -182,12 +182,12 @@ namespace LivingDevAgent.Editor.Chronas
 			bool _ = _staticTimerInitialized;
 			}
 
-		private void OnGUI ()
+		private void OnGUI()
 			{
 			DrawChronasControls();
 			}
 
-		private void DrawChronasControls ()
+		private void DrawChronasControls()
 			{
 			GUILayout.Label("⏳ Chronas Time Tracker", EditorStyles.boldLabel);
 
@@ -283,7 +283,7 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static void OnSceneViewGUI (SceneView sceneView)
+		private static void OnSceneViewGUI(SceneView sceneView)
 			{
 			if (!_overlayEnabled) return;
 
@@ -312,19 +312,19 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static void DrawSceneOverlayContent ()
+		private static void DrawSceneOverlayContent()
 			{
 			// Timer display with focus-immune indicator
 			using (new GUILayout.HorizontalScope())
 				{
 				double currentSessionTime = GetCurrentSessionTime();
 				string timeText = FormatDuration(currentSessionTime);
-				
+
 				// 🔒 ENHANCED DEBUG: Detailed status information to help diagnose false timer logging
 				string statusIcon = _isTracking ? "🟢" : "🔴";
 				string statusText = _isTracking ? "RUNNING" : "STOPPED";
 				string debugText = $"{statusIcon} {timeText} ({statusText})";
-				
+
 				var timerStyle = new GUIStyle(EditorStyles.boldLabel)
 					{
 					normal = { textColor = _isTracking ? Color.green : Color.gray },
@@ -445,7 +445,7 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static void HandleOverlayDragging ()
+		private static void HandleOverlayDragging()
 			{
 			Event e = Event.current;
 
@@ -467,7 +467,7 @@ namespace LivingDevAgent.Editor.Chronas
 			}
 
 		// 🔒 SECURITY: Thread-safe editor update method with validation
-		private static void OnStaticEditorUpdate ()
+		private static void OnStaticEditorUpdate()
 			{
 			// Validate session security first
 			if (!ValidateTimerSession())
@@ -488,14 +488,14 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static void StartTracking ()
+		private static void StartTracking()
 			{
 			string taskName = GetCurrentTaskName();
-			
+
 			// 🔒 SECURITY: Validate task name
 			if (!ValidateTaskName(taskName))
 				{
-				EditorUtility.DisplayDialog("Invalid Task Name", 
+				EditorUtility.DisplayDialog("Invalid Task Name",
 					"Task name is invalid. Please ensure it's not empty, under 100 characters, and doesn't contain path separators.", "OK");
 				Debug.LogWarning($"🔒 Chronas: Start tracking failed - invalid task name: '{taskName}'");
 				return;
@@ -505,7 +505,7 @@ namespace LivingDevAgent.Editor.Chronas
 				{
 				if (_isTracking)
 					{
-					EditorUtility.DisplayDialog("Timer Already Running", 
+					EditorUtility.DisplayDialog("Timer Already Running",
 						$"Timer is already running for '{_currentTaskName}'. Stop the current session before starting a new one.", "OK");
 					Debug.LogWarning($"🔒 Chronas: Start tracking failed - timer already running for '{_currentTaskName}'");
 					return;
@@ -523,7 +523,7 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static void StopTracking ()
+		private static void StopTracking()
 			{
 			lock (_timerLock)
 				{
@@ -554,7 +554,7 @@ namespace LivingDevAgent.Editor.Chronas
 			}
 
 		// 🔒 SECURITY: Thread-safe helper methods (called within lock)
-		private static void UpdateAccumulatedTimeUnsafe ()
+		private static void UpdateAccumulatedTimeUnsafe()
 			{
 			if (_isTracking)
 				{
@@ -565,7 +565,7 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static void SaveCurrentSessionUnsafe ()
+		private static void SaveCurrentSessionUnsafe()
 			{
 			if (!_isTracking)
 				return;
@@ -581,7 +581,7 @@ namespace LivingDevAgent.Editor.Chronas
 			Debug.Log($"🔒 Chronas: Auto-saved session for '{_currentTaskName}'");
 			}
 
-		private static void SaveTimeCardUnsafe ()
+		private static void SaveTimeCardUnsafe()
 			{
 			// Validate data before saving
 			if (string.IsNullOrWhiteSpace(_currentTaskName) || _accumulatedTime <= 0)
@@ -602,7 +602,7 @@ namespace LivingDevAgent.Editor.Chronas
 			// 🔒 SECURITY: Sanitize filename to prevent path traversal
 			string sanitizedTaskName = SanitizeFileName(_currentTaskName);
 			if (sanitizedTaskName.Length > 50) // Prevent excessively long filenames
-				sanitizedTaskName = sanitizedTaskName[ ..50 ];
+				sanitizedTaskName = sanitizedTaskName [ ..50 ];
 
 			string fileName = $"ChronasCard_{sanitizedTaskName}_{System.DateTime.Now:yyyyMMdd_HHmmss}.asset";
 			string assetPath = System.IO.Path.Combine(_timeCardDirectory, fileName);
@@ -625,7 +625,7 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static double GetCurrentSessionTime ()
+		private static double GetCurrentSessionTime()
 			{
 			lock (_timerLock)
 				{
@@ -634,7 +634,7 @@ namespace LivingDevAgent.Editor.Chronas
 					// 🔒 DEBUG: Not tracking
 					return 0.0;
 					}
-				
+
 				// 🔒 SECURITY: Validate timer state before returning time
 				if (!ValidateTimerSession())
 					{
@@ -642,34 +642,34 @@ namespace LivingDevAgent.Editor.Chronas
 					Debug.LogWarning("🔒 Chronas: GetCurrentSessionTime - validation failed, timer stopped");
 					return 0.0;
 					}
-					
+
 				double currentTime = EditorApplication.timeSinceStartup;
 				double sessionTime = currentTime - _sessionStartTime;
 				double totalTime = _accumulatedTime + sessionTime;
-				
+
 				// 🔒 DEBUG: Log current time calculation (only occasionally to avoid spam)
 				if (UnityEngine.Random.value < 0.01f) // ~1% chance
 					{
 					Debug.Log($"🔒 Chronas: Time calc - Current: {currentTime:F2}, Start: {_sessionStartTime:F2}, Session: {sessionTime:F2}, Accumulated: {_accumulatedTime:F2}, Total: {totalTime:F2}");
 					}
-				
+
 				return totalTime;
 				}
 			}
 
-		private static string GetCurrentTaskName ()
+		private static string GetCurrentTaskName()
 			{
 			string taskName = _quickTasks [ _selectedTaskIndex ] == "🎯 Custom..."
 				? string.IsNullOrEmpty(_customTaskName) ? "" : _customTaskName
 				: _quickTasks [ _selectedTaskIndex ];
-				
+
 			// 🔒 DEBUG: Log task name selection
-			Debug.Log($"🔒 Chronas: GetCurrentTaskName - Selected index: {_selectedTaskIndex}, Task: '{_quickTasks[_selectedTaskIndex]}', Custom: '{_customTaskName}', Result: '{taskName}'");
-			
+			Debug.Log($"🔒 Chronas: GetCurrentTaskName - Selected index: {_selectedTaskIndex}, Task: '{_quickTasks [ _selectedTaskIndex ]}', Custom: '{_customTaskName}', Result: '{taskName}'");
+
 			return taskName;
 			}
 
-		private static void LoadTimeCards ()
+		private static void LoadTimeCards()
 			{
 			_timeCards.Clear();
 			// ⚠ Intention ⚠ - @jmeyer1980 - IL for legibility
@@ -687,7 +687,7 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private void DrawTimeCardEntry (ChronasTimeCard timeCard)
+		private void DrawTimeCardEntry(ChronasTimeCard timeCard)
 			{
 			using (new EditorGUILayout.HorizontalScope("box"))
 				{
@@ -704,7 +704,7 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private void DeleteTimeCard (ChronasTimeCard timeCard)
+		private void DeleteTimeCard(ChronasTimeCard timeCard)
 			{
 			// Find and delete the corresponding asset
 			string [ ] guids = AssetDatabase.FindAssets("t:ChronasTimeCardAsset", new [ ] { _timeCardDirectory });
@@ -725,7 +725,7 @@ namespace LivingDevAgent.Editor.Chronas
 			AssetDatabase.Refresh();
 			}
 
-		private void ExportToTaskMaster ()
+		private void ExportToTaskMaster()
 			{
 			Debug.Log("⏳ → 🎯 Exporting Chronas time cards to TaskMaster...");
 
@@ -751,7 +751,7 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private void PerformTaskMasterExport ()
+		private void PerformTaskMasterExport()
 			{
 			try
 				{
@@ -793,13 +793,13 @@ namespace LivingDevAgent.Editor.Chronas
 				}
 			}
 
-		private static string FormatDuration (double seconds)
+		private static string FormatDuration(double seconds)
 			{
 			var timeSpan = System.TimeSpan.FromSeconds(seconds);
 			return $"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}";
 			}
 
-		private static string SanitizeFileName (string fileName)
+		private static string SanitizeFileName(string fileName)
 			{
 			char [ ] invalids = System.IO.Path.GetInvalidFileNameChars();
 			return string.Join("_", fileName.Split(invalids, System.StringSplitOptions.RemoveEmptyEntries));

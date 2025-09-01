@@ -11,7 +11,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	[CustomEditor(typeof(BiomeArtProfile))]
 	public class BiomeArtProfileEditor : UnityEditor.Editor
 		{
-		public override void OnInspectorGUI ()
+		public override void OnInspectorGUI()
 			{
 			var profile = (BiomeArtProfile)target;
 
@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.EndHorizontal();
 			}
 
-		private void AutoConfigureDefaultLayers (BiomeArtProfile profile)
+		private void AutoConfigureDefaultLayers(BiomeArtProfile profile)
 			{
 			Undo.RecordObject(profile, "Auto-Configure Layers");
 			profile.propSettings ??= new PropPlacementSettings();
@@ -77,7 +77,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorUtility.SetDirty(profile);
 			}
 
-		private void CreateTestTilemap (BiomeArtProfile profile)
+		private void CreateTestTilemap(BiomeArtProfile profile)
 			{
 			GameObject testGrid = new($"Test {profile.biomeName} Grid");
 			testGrid.AddComponent<Grid>();
@@ -114,24 +114,24 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	public static class BiomeArtProfileMenus
 		{
 		[MenuItem("Assets/Create/MetVanDAMN/Sample Biome Profiles/Solar Plains Profile")]
-		public static void CreateSolarPlainsProfile ()
+		public static void CreateSolarPlainsProfile()
 			{
 			CreateSampleProfile("SolarPlainsProfile", "Solar Plains", new Color(1f, 0.9f, 0.3f));
 			}
 
 		[MenuItem("Assets/Create/MetVanDAMN/Sample Biome Profiles/Crystal Caverns Profile")]
-		public static void CreateCrystalCavernsProfile ()
+		public static void CreateCrystalCavernsProfile()
 			{
 			CreateSampleProfile("CrystalCavernsProfile", "Crystal Caverns", new Color(0.7f, 0.9f, 1f));
 			}
 
 		[MenuItem("Assets/Create/MetVanDAMN/Sample Biome Profiles/Shadow Realms Profile")]
-		public static void CreateShadowRealmsProfile ()
+		public static void CreateShadowRealmsProfile()
 			{
 			CreateSampleProfile("ShadowRealmsProfile", "Shadow Realms", new Color(0.3f, 0.2f, 0.4f));
 			}
 
-		private static void CreateSampleProfile (string fileName, string biomeName, Color debugColor)
+		private static void CreateSampleProfile(string fileName, string biomeName, Color debugColor)
 			{
 			BiomeArtProfile profile = ScriptableObject.CreateInstance<BiomeArtProfile>();
 			profile.biomeName = biomeName;

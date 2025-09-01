@@ -21,7 +21,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		public Polarity requiredPolarity = Polarity.None;
 		[Min(0.1f)] public float traversalCost = 1f;
 
-		private void OnValidate ()
+		private void OnValidate()
 			{
 			if (from == to && from != null)
 				{

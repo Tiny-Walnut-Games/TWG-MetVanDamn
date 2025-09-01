@@ -24,7 +24,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private int _previewRooms = 0;
 		private uint _lastPreviewSeed = 0;
 
-		public override void OnInspectorGUI ()
+		public override void OnInspectorGUI()
 			{
 			var bootstrap = (WorldBootstrapAuthoring)target;
 
@@ -83,7 +83,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void DrawWorldConfiguration (WorldBootstrapAuthoring bootstrap)
+		private void DrawWorldConfiguration(WorldBootstrapAuthoring bootstrap)
 			{
 			EditorGUILayout.LabelField("World Configuration", EditorStyles.boldLabel);
 
@@ -95,7 +95,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				new GUIContent("Randomization Mode", "Rule randomization mode"), bootstrap.randomizationMode);
 			}
 
-		private void DrawGenerationRanges (WorldBootstrapAuthoring bootstrap)
+		private void DrawGenerationRanges(WorldBootstrapAuthoring bootstrap)
 			{
 			// Biomes
 			EditorGUILayout.LabelField("Biomes", EditorStyles.miniBoldLabel);
@@ -127,20 +127,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			bootstrap.targetLoopDensity = EditorGUILayout.Slider("Loop Density", bootstrap.targetLoopDensity, 0.1f, 1.0f);
 			}
 
-		private void DrawDebugOptions (WorldBootstrapAuthoring bootstrap)
+		private void DrawDebugOptions(WorldBootstrapAuthoring bootstrap)
 			{
 			bootstrap.enableDebugVisualization = EditorGUILayout.Toggle("Enable Debug Visualization", bootstrap.enableDebugVisualization);
 			bootstrap.logGenerationSteps = EditorGUILayout.Toggle("Log Generation Steps", bootstrap.logGenerationSteps);
 			}
 
-		private void DrawAdvancedOptions (WorldBootstrapAuthoring bootstrap)
+		private void DrawAdvancedOptions(WorldBootstrapAuthoring bootstrap)
 			{
 			EditorGUILayout.HelpBox("Advanced options for fine-tuning generation behavior", MessageType.None);
 			// TODO: Add SLIGHTLY more advanced options here - intentionally limited to allow customization without overwhelming
 			bootstrap.districtPlacementAttempts = EditorGUILayout.IntField(new GUIContent("District Placement Attempts", "Max attempts to place each district"), bootstrap.districtPlacementAttempts);
 			}
 
-		private void DrawPreviewSection (WorldBootstrapAuthoring bootstrap)
+		private void DrawPreviewSection(WorldBootstrapAuthoring bootstrap)
 			{
 			EditorGUILayout.LabelField("Preview", EditorStyles.boldLabel);
 
@@ -182,7 +182,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				MessageType.Info);
 			}
 
-		private void PreviewGeneration (WorldBootstrapAuthoring bootstrap)
+		private void PreviewGeneration(WorldBootstrapAuthoring bootstrap)
 			{
 			// Calculate preview results based on configuration
 			uint seed = bootstrap.seed == 0 ? (uint)UnityEngine.Random.Range(1, int.MaxValue) : (uint)bootstrap.seed;
@@ -224,7 +224,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void OnSceneGUI ()
+		private void OnSceneGUI()
 			{
 			var bootstrap = (WorldBootstrapAuthoring)target;
 

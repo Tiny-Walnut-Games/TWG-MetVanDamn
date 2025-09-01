@@ -7,7 +7,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	{
 	public class DistrictBaker : Baker<DistrictAuthoring>
 		{
-		public override void Bake (DistrictAuthoring authoring)
+		public override void Bake(DistrictAuthoring authoring)
 			{
 			Entity entity = GetEntity(TransformUsageFlags.Dynamic);
 			AddComponent(entity, new NodeId(authoring.nodeId, authoring.level, authoring.parentId, authoring.gridCoordinates));

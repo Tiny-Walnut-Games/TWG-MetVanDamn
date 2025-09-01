@@ -21,7 +21,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		// 🔥 ACTUAL ECB SYSTEM REFERENCE - NOT JUST COMMENTS
 		private EndInitializationEntityCommandBufferSystem _endInitEcbSystem;
 
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			// 🔥 GET THE ECB SYSTEM REFERENCE FOR REAL
 			_endInitEcbSystem = World.GetOrCreateSystemManaged<EndInitializationEntityCommandBufferSystem>();
@@ -52,7 +52,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			RequireForUpdate(_districtQuery);
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			// 🔥 CREATE ACTUAL ECB INSTANCE - NOT JUST COMMENTS
 			EntityCommandBuffer ecb = _endInitEcbSystem.CreateCommandBuffer();
@@ -98,7 +98,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// <summary>
 		/// 🔥 ACTUAL ECB IMPLEMENTATION - NO MORE FAKE TODO COMMENTS
 		/// </summary>
-		private int BuildNavigationNodesWithActualECB (EntityCommandBuffer ecb)
+		private int BuildNavigationNodesWithActualECB(EntityCommandBuffer ecb)
 			{
 			int nodeCount = 0;
 
@@ -142,7 +142,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// <summary>
 		/// Build navigation links - this doesn't need ECB since we're only modifying existing buffers
 		/// </summary>
-		private int BuildNavigationLinks ()
+		private int BuildNavigationLinks()
 			{
 			int linkCount = 0;
 
@@ -196,7 +196,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return linkCount;
 			}
 
-		private Entity FindEntityByNodeId (uint nodeId)
+		private Entity FindEntityByNodeId(uint nodeId)
 			{
 			Entity foundEntity = Entity.Null;
 
@@ -211,7 +211,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return foundEntity;
 			}
 
-		private GateConditionCollection CollectGateConditions (Entity sourceEntity, Entity destEntity)
+		private GateConditionCollection CollectGateConditions(Entity sourceEntity, Entity destEntity)
 			{
 			var gateConditions = new GateConditionCollection();
 
@@ -238,7 +238,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return gateConditions;
 			}
 
-		private static NavLink CreateNavLinkFromConnection (Connection connection, GateConditionCollection gates)
+		private static NavLink CreateNavLinkFromConnection(Connection connection, GateConditionCollection gates)
 			{
 			// Determine combined requirements from all gate conditions
 			Polarity combinedPolarity = Polarity.None;
@@ -299,7 +299,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			public int Count { get; private set; }
 
-			public void Add (GateCondition gate)
+			public void Add(GateCondition gate)
 				{
 				switch (Count)
 					{

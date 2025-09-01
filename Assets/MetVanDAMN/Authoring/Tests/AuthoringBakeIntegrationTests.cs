@@ -34,14 +34,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			this._testWorld = new World("AuthoringBakeTestWorld");
 			this._entityManager = this._testWorld.EntityManager;
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (this._testWorld.IsCreated)
 				{
@@ -50,7 +50,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		// Factory helpers ----------------------------------------------------
-		private static DistrictAuthoring CreateTestDistrict (string name, NodeId nodeId)
+		private static DistrictAuthoring CreateTestDistrict(string name, NodeId nodeId)
 			{
 			var go = new GameObject(name);
 			DistrictAuthoring da = go.AddComponent<DistrictAuthoring>();
@@ -60,7 +60,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			da.gridCoordinates = nodeId.Coordinates;
 			return da;
 			}
-		private static ConnectionAuthoring CreateTestConnection (string name, NodeId from, NodeId to)
+		private static ConnectionAuthoring CreateTestConnection(string name, NodeId from, NodeId to)
 			{
 			var go = new GameObject(name);
 			ConnectionAuthoring ca = go.AddComponent<ConnectionAuthoring>();
@@ -69,7 +69,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			ca.type = ConnectionType.Bidirectional;
 			return ca;
 			}
-		private static BiomeFieldAuthoring CreateTestBiome (string name, NodeId nodeId, BiomeType biome)
+		private static BiomeFieldAuthoring CreateTestBiome(string name, NodeId nodeId, BiomeType biome)
 			{
 			var go = new GameObject(name);
 			BiomeFieldAuthoring bf = go.AddComponent<BiomeFieldAuthoring>();
@@ -81,7 +81,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		// Baking simulation (authoring -> ECS) --------------------------------
-		private static void BakeGameObjects (World world, params GameObject [ ] gameObjects)
+		private static void BakeGameObjects(World world, params GameObject [ ] gameObjects)
 			{
 			EntityManager em = world.EntityManager;
 			foreach (GameObject go in gameObjects)
@@ -160,7 +160,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				}
 			}
 
-		private static void CleanupGameObjects (params GameObject [ ] gameObjects)
+		private static void CleanupGameObjects(params GameObject [ ] gameObjects)
 			{
 			foreach (GameObject go in gameObjects)
 				{
@@ -177,7 +177,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 		// Existing tests follow ------------------------------------------------
 		[Test]
-		public void WfcTilePrototypeBaking_CreatesCorrectComponents ()
+		public void WfcTilePrototypeBaking_CreatesCorrectComponents()
 			{
 			// Test the WfcTilePrototypeAuthoring -> ECS baking pipeline
 			Entity tileEntity = this._entityManager.CreateEntity();
@@ -210,7 +210,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void DistrictBaking_CreatesAllRequiredComponents ()
+		public void DistrictBaking_CreatesAllRequiredComponents()
 			{
 			Entity districtEntity = this._entityManager.CreateEntity();
 			this._entityManager.AddComponentData(districtEntity, new NodeId(
@@ -240,7 +240,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void ConnectionBaking_CreatesConnectionEdgeComponents ()
+		public void ConnectionBaking_CreatesConnectionEdgeComponents()
 			{
 			// Test ConnectionAuthoring -> ECS baking
 			Entity connectionEntity = this._entityManager.CreateEntity();
@@ -270,7 +270,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void GateConditionBaking_CreatesBufferElements ()
+		public void GateConditionBaking_CreatesBufferElements()
 			{
 			// Test GateConditionAuthoring -> ECS baking
 			Entity districtEntity = this._entityManager.CreateEntity();
@@ -296,7 +296,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WorldGenerationConfig_IntegratesWithPipeline ()
+		public void WorldGenerationConfig_IntegratesWithPipeline()
 			{
 			// Test that the WorldGenerationConfig from SmokeTestSceneSetup integrates properly
 			Entity configEntity = this._entityManager.CreateEntity();
@@ -328,7 +328,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void WfcSocketCompatibility_ValidatesCorrectly ()
+		public void WfcSocketCompatibility_ValidatesCorrectly()
 			{
 			// Test WFC socket compatibility logic as implemented in WfcComponents
 			var socketA = new WfcSocket(1, 0, Polarity.Sun, true);     // North-facing, Sun polarity
@@ -354,7 +354,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void SampleWfcData_CreatesValidTileSet ()
+		public void SampleWfcData_CreatesValidTileSet()
 			{
 			// Test the sample WFC data creation
 			int tilesCreated = TinyWalnutGames.MetVD.Graph.Data.SampleWfcData.InitializeSampleTileSet(this._entityManager);
@@ -391,7 +391,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void TestInvalidDataValidationFailures ()
+		public void TestInvalidDataValidationFailures()
 			{
 			// Negative cases - invalid data should fail validation appropriately
 			using var world = new World("TestWorld");
@@ -431,7 +431,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void TestCrossComponentRelationshipFailures ()
+		public void TestCrossComponentRelationshipFailures()
 			{
 			// Test cross-component relationship failures (gate ↔ connection ↔ district mismatches)
 			using var world = new World("TestWorld");
@@ -476,7 +476,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void TestBiomeArtProfileValidationFailures ()
+		public void TestBiomeArtProfileValidationFailures()
 			{
 			// Test biome with invalid or missing art profile
 			using var world = new World("TestWorld");
@@ -512,7 +512,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		[Test]
-		public void TestComplexRelationshipIntegrity ()
+		public void TestComplexRelationshipIntegrity()
 			{
 			// Test complex scenario with multiple interrelated components
 			using var world = new World("TestWorld");

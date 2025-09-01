@@ -17,20 +17,20 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		private EntityManager _entityManager;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			_testWorld = new World("TestWorld");
 			_entityManager = _testWorld.EntityManager;
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			_testWorld?.Dispose();
 			}
 
 		[Test]
-		public void DistrictLayoutSystem_RespectsTargetSectors ()
+		public void DistrictLayoutSystem_RespectsTargetSectors()
 			{
 			// Create world configuration with specific TargetSectors
 			Entity configEntity = _entityManager.CreateEntity();
@@ -63,7 +63,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void SectorHierarchyData_CreatesProperlyStructuredSectors ()
+		public void SectorHierarchyData_CreatesProperlyStructuredSectors()
 			{
 			// Test the sector hierarchy constants and data structures
 			var sectorData = new SectorHierarchyData(new int2(6, 6), 4, 12345u);
@@ -79,7 +79,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void RoomHierarchyData_SupportsDifferentRoomTypes ()
+		public void RoomHierarchyData_SupportsDifferentRoomTypes()
 			{
 			var bounds = new RectInt(0, 0, 8, 6);
 
@@ -98,7 +98,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void RoomManagement_CreatesProperFeatures ()
+		public void RoomManagement_CreatesProperFeatures()
 			{
 			// Create a room entity with hierarchy data
 			Entity roomEntity = _entityManager.CreateEntity();
@@ -126,7 +126,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void HierarchicalNodeIds_CreateUniqueIds ()
+		public void HierarchicalNodeIds_CreateUniqueIds()
 			{
 			// Test hierarchical ID generation
 			uint districtId = 1;
@@ -143,7 +143,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void RoomFeatures_SupportDifferentTypes ()
+		public void RoomFeatures_SupportDifferentTypes()
 			{
 			// Test room feature types
 			var enemyFeature = new RoomFeatureElement(RoomFeatureType.Enemy, new int2(5, 3), 123);
@@ -164,7 +164,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void WorldConfiguration_TargetSectorsNowUsed ()
+		public void WorldConfiguration_TargetSectorsNowUsed()
 			{
 			// Verify that TargetSectors is now a meaningful parameter
 			var config1 = new WorldConfiguration

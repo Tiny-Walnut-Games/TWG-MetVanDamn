@@ -16,7 +16,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		private InitializationSystemGroup _initGroup;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			_testWorld = new World("TestWorld");
 			_entityManager = _testWorld.EntityManager;
@@ -36,7 +36,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (_testWorld != null && _testWorld.IsCreated)
 				{
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void DistrictLayoutSystem_WithUnplacedDistricts_ShouldAssignCoordinates ()
+		public void DistrictLayoutSystem_WithUnplacedDistricts_ShouldAssignCoordinates()
 			{
 			// Arrange
 			Entity worldConfig = _entityManager.CreateEntity();
@@ -83,7 +83,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void SectorRoomHierarchySystem_GeneratesSectorsAndRooms ()
+		public void SectorRoomHierarchySystem_GeneratesSectorsAndRooms()
 			{
 			// Arrange world + districts (TargetSectors influences sectors per district)
 			Entity worldConfig = _entityManager.CreateEntity();
@@ -94,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				TargetSectors = 6,
 				RandomizationMode = RandomizationMode.None
 				});
-			
+
 			// Create districts with proper SectorHierarchyData components (required by SectorRoomHierarchySystem)
 			for (uint i = 0; i < 3; i++)
 				{
@@ -146,7 +146,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void RuleRandomizationSystem_WithPartialMode_ShouldRandomizeBiomes ()
+		public void RuleRandomizationSystem_WithPartialMode_ShouldRandomizeBiomes()
 			{
 			// Arrange
 			Entity worldConfig = _entityManager.CreateEntity();
@@ -186,7 +186,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void RuleRandomizationSystem_WithFullMode_ShouldRandomizeEverything ()
+		public void RuleRandomizationSystem_WithFullMode_ShouldRandomizeEverything()
 			{
 			// Arrange
 			Entity worldConfig = _entityManager.CreateEntity();
@@ -227,7 +227,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 
 		[Test]
-		public void RuleRandomizationSystem_WithNoneMode_ShouldUseCuratedRules ()
+		public void RuleRandomizationSystem_WithNoneMode_ShouldUseCuratedRules()
 			{
 			// Arrange
 			Entity worldConfig = _entityManager.CreateEntity();

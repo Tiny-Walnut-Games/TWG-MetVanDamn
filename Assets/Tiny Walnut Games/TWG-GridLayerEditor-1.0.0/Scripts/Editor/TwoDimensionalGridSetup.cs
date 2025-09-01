@@ -42,7 +42,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Creates a side-scrolling grid in the scene with platformer layers.
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/Grid Layer Editor/Create Side-Scrolling Grid")]
-		public static void CreateSideScrollingGrid ()
+		public static void CreateSideScrollingGrid()
 			{
 			// Check if Grid Layer Editor is enabled
 			if (!IsGridLayerEditorEnabled())
@@ -69,7 +69,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Appears when right-clicking in the hierarchy window.
 		/// </summary>
 		[MenuItem("GameObject/Tiny Walnut Games/Grid Layer Editor/Create Side-Scrolling Grid", false, 10)]
-		private static void ContextCreateSideScrollingGrid (MenuCommand menuCommand)
+		private static void ContextCreateSideScrollingGrid(MenuCommand menuCommand)
 			{
 			if (menuCommand == null)
 				{
@@ -106,7 +106,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Attempts to load a GridLayerConfig asset and returns its layerNames if available.
 		/// Otherwise, returns the provided defaultLayers.
 		/// </summary>
-		private static string [ ] GetCustomOrDefaultLayers (string [ ] topDownDefaultLayers)
+		private static string [ ] GetCustomOrDefaultLayers(string [ ] topDownDefaultLayers)
 			{
 			GridLayerConfig config = AssetDatabase.LoadAssetAtPath<GridLayerConfig>("Assets/GridLayerConfig.asset");
 			// Platformer default layers
@@ -131,7 +131,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Creates a default top-down grid in the scene.
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/Grid Layer Editor/Create Default Top-Down Grid")]
-		public static void CreateDefaultTopDownGrid ()
+		public static void CreateDefaultTopDownGrid()
 			{
 			// Check if Grid Layer Editor is enabled
 			if (!IsGridLayerEditorEnabled())
@@ -158,7 +158,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Appears when right-clicking in the hierarchy window.
 		/// </summary>
 		[MenuItem("GameObject/Tiny Walnut Games/Grid Layer Editor/Create Default Top-Down Grid", false, 10)]
-		private static void ContextCreateDefaultTopDownGrid (MenuCommand menuCommand)
+		private static void ContextCreateDefaultTopDownGrid(MenuCommand menuCommand)
 			{
 			if (menuCommand == null)
 				{
@@ -209,7 +209,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Creates an isometric top-down grid in the scene.
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/Grid Layer Editor/Create Isometric Top-Down Grid")]
-		public static void CreateIsometricTopDownGrid ()
+		public static void CreateIsometricTopDownGrid()
 			{
 			// Check if Grid Layer Editor is enabled
 			if (!IsGridLayerEditorEnabled())
@@ -235,7 +235,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Context menu for creating an Isometric Top-Down Grid from the hierarchy.
 		/// </summary>
 		[MenuItem("GameObject/Tiny Walnut Games/Grid Layer Editor/Create Isometric Top-Down Grid", false, 10)]
-		private static void ContextCreateIsometricTopDownGrid (MenuCommand menuCommand)
+		private static void ContextCreateIsometricTopDownGrid(MenuCommand menuCommand)
 			{
 			if (menuCommand == null)
 				{
@@ -255,7 +255,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Creates a hexagonal top-down grid in the scene.
 		/// </summary>
 		[MenuItem("Tiny Walnut Games/Grid Layer Editor/Create Hexagonal Top-Down Grid")]
-		public static void CreateHexTopDownGrid ()
+		public static void CreateHexTopDownGrid()
 			{
 			// Check if Grid Layer Editor is enabled
 			if (!IsGridLayerEditorEnabled())
@@ -281,7 +281,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Context menu for creating a Hexagonal Top-Down Grid from the hierarchy.
 		/// </summary>
 		[MenuItem("GameObject/Tiny Walnut Games/Grid Layer Editor/Create Hexagonal Top-Down Grid", false, 10)]
-		private static void ContextCreateHexTopDownGrid (MenuCommand menuCommand)
+		private static void ContextCreateHexTopDownGrid(MenuCommand menuCommand)
 			{
 			if (menuCommand == null)
 				{
@@ -301,7 +301,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// Creates a grid in the scene using a custom array of layer names.
 		/// </summary>
 		/// <param name="layerNames">Array of layer names to use for tilemap creation.</param>
-		public static void CreateCustomGrid (string [ ] layerNames)
+		public static void CreateCustomGrid(string [ ] layerNames)
 			{
 			if (CreateCustomGridAction != null)
 				{
@@ -326,7 +326,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <param name="parent">Parent transform for the new GameObject.</param>
 		/// <param name="layerName">Name of the layer for the GameObject.</param>
 		/// <param name="zDepth">Z-depth used for positioning.</param>
-		private static void CreateTilemapLayer (Transform parent, string layerName, int zDepth)
+		private static void CreateTilemapLayer(Transform parent, string layerName, int zDepth)
 			{
 			var tmGO = new GameObject(layerName, typeof(Tilemap), typeof(TilemapRenderer));
 			tmGO.transform.SetParent(parent, worldPositionStays: false);
@@ -357,7 +357,7 @@ namespace TinyWalnutGames.GridLayerEditor
 		/// <summary>
 		/// Checks if Grid Layer Editor is enabled via menu toggle
 		/// </summary>
-		private static bool IsGridLayerEditorEnabled ()
+		private static bool IsGridLayerEditorEnabled()
 			{
 			return Menu.GetChecked("Tiny Walnut Games/Grid Layer Editor/Enable Grid Layer Editor");
 			}

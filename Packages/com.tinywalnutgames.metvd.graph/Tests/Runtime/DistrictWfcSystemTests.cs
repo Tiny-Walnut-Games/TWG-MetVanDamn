@@ -12,7 +12,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		private SimulationSystemGroup _simGroup;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			_world = new World("DistrictWfcTestWorld");
 			_simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
@@ -22,7 +22,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (_world.IsCreated)
 				{
@@ -30,7 +30,7 @@ namespace TinyWalnutGames.MetVD.Tests
 				}
 			}
 
-		private Entity CreateBaseEntity (WfcGenerationState initial, bool withBuffer = true, int iteration = 0)
+		private Entity CreateBaseEntity(WfcGenerationState initial, bool withBuffer = true, int iteration = 0)
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void Initialization_AddsCandidates_SetsInProgress ()
+		public void Initialization_AddsCandidates_SetsInProgress()
 			{
 			Entity e = CreateBaseEntity(WfcGenerationState.Initialized, withBuffer: true);
 			_simGroup.Update();
@@ -58,7 +58,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void Progression_IncrementsIteration_EntropyReflectsCandidateCount ()
+		public void Progression_IncrementsIteration_EntropyReflectsCandidateCount()
 			{
 			Entity e = CreateBaseEntity(WfcGenerationState.Initialized, withBuffer: true);
 			_simGroup.Update(); // initialization
@@ -69,7 +69,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void SingleCandidate_CollapsesToCompleted ()
+		public void SingleCandidate_CollapsesToCompleted()
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true, iteration: 5);
@@ -83,7 +83,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void EmptyCandidateBuffer_SetsContradiction ()
+		public void EmptyCandidateBuffer_SetsContradiction()
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true);
@@ -95,7 +95,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void MissingCandidateBuffer_MarksFailed ()
+		public void MissingCandidateBuffer_MarksFailed()
 			{
 			Entity e = CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: false);
 			_simGroup.Update();
@@ -104,7 +104,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void OverIterationThreshold_TriggersRandomCollapse ()
+		public void OverIterationThreshold_TriggersRandomCollapse()
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = CreateBaseEntity(WfcGenerationState.InProgress, withBuffer: true, iteration: 101);

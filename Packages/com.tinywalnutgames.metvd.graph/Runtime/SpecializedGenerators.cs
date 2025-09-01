@@ -39,11 +39,11 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _roomGenerationQuery; // 🔥 CREATE QUERY IN ONCREATE
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_skillTagLookup = state.GetComponentLookup<SkillTag>(true);
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>(); // 🔥 USE EXISTING TYPE
-			
+
 			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
 			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
 				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
@@ -51,7 +51,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			_skillTagLookup.Update(ref state);
 			_featureBufferLookup.Update(ref state); // 🔥 USE EXISTING TYPE
@@ -93,7 +93,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			[ReadOnly] public ComponentLookup<NodeId> NodeIds;
 			public Unity.Mathematics.Random BaseRandom;
 
-			public void Execute ()
+			public void Execute()
 				{
 				int processedPatternCount = 0;
 				int skillGateGenerationCount = 0;
@@ -153,7 +153,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void GenerateDashFeatures (DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
+			private static void GenerateDashFeatures(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
 				{
 				int baseGapCount = math.max(1, bounds.width / 8);
 				int gapCount = (int)(baseGapCount * coordinateInfluence);
@@ -184,7 +184,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void GenerateWallJumpFeatures (DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
+			private static void GenerateWallJumpFeatures(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
 				{
 				int baseShaftCount = math.max(1, bounds.height / 8);
 				int shaftCount = (int)(baseShaftCount * coordinateInfluence);
@@ -209,7 +209,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static void GenerateGrappleFeatures (DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
+			private static void GenerateGrappleFeatures(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
 				{
 				int basePointCount = math.max(1, (bounds.width * bounds.height) / 32);
 				int pointCount = (int)(basePointCount * coordinateInfluence);
@@ -241,7 +241,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static int GenerateSkillGates (DynamicBuffer<RoomFeatureElement> features, RectInt bounds, Ability availableSkills, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
+			private static int GenerateSkillGates(DynamicBuffer<RoomFeatureElement> features, RectInt bounds, Ability availableSkills, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
 				{
 				int skillGatesAdded = 0;
 
@@ -291,7 +291,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return skillGatesAdded;
 				}
 
-			private static float CalculateCoordinateInfluence (NodeId nodeId, RoomHierarchyData roomData)
+			private static float CalculateCoordinateInfluence(NodeId nodeId, RoomHierarchyData roomData)
 				{
 				int2 coords = nodeId.Coordinates;
 				float distance = math.length(coords);
@@ -327,12 +327,12 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _roomGenerationQuery; // 🔥 CREATE QUERY IN ONCREATE
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
 			_validationLookup = state.GetComponentLookup<JumpArcValidation>();
 			_jumpConnectionLookup = state.GetBufferLookup<JumpConnectionElement>();
-			
+
 			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
 			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
 				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
@@ -340,7 +340,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			_jumpPhysicsLookup.Update(ref state);
 			_validationLookup.Update(ref state);
@@ -378,7 +378,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			[ReadOnly] public ComponentLookup<RoomHierarchyData> RoomData;
 			[ReadOnly] public ComponentLookup<NodeId> NodeIds;
 
-			public void Execute ()
+			public void Execute()
 				{
 				int processedRoomCount = 0;
 
@@ -452,7 +452,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static float CalculateChallengeComplexity (NodeId nodeId, RoomHierarchyData roomData)
+			private static float CalculateChallengeComplexity(NodeId nodeId, RoomHierarchyData roomData)
 				{
 				int2 coords = nodeId.Coordinates;
 				float distance = math.length(coords);
@@ -488,12 +488,12 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _roomGenerationQuery; // 🔥 CREATE QUERY IN ONCREATE
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
 			_biomeAffinityLookup = state.GetComponentLookup<BiomeAffinityComponent>(true);
 			_moduleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
-			
+
 			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
 			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
 				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId, RoomFeatureElement>()
@@ -501,7 +501,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			_secretConfigLookup.Update(ref state);
 			_biomeAffinityLookup.Update(ref state);
@@ -549,7 +549,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			public BufferLookup<RoomFeatureElement> FeatureBuffers;
 			public Unity.Mathematics.Random BaseRandom;
 
-			public void Execute ()
+			public void Execute()
 				{
 				int processedRoomCount = 0;
 
@@ -598,7 +598,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				}
 
-			private static float CalculateSpatialVariation (NodeId nodeId, RoomHierarchyData roomData)
+			private static float CalculateSpatialVariation(NodeId nodeId, RoomHierarchyData roomData)
 				{
 				int2 coords = nodeId.Coordinates;
 				float distance = math.length(coords);
@@ -617,7 +617,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return distanceVariation * roomTypeVariation;
 				}
 
-			private static RoomFeatureType SelectWeightedFeatureType (float weight, RoomType roomType)
+			private static RoomFeatureType SelectWeightedFeatureType(float weight, RoomType roomType)
 				{
 				float adjustedWeight = weight;
 

@@ -34,7 +34,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 	/// </summary>
 	public class BiomeArtProfileBaker : Baker<BiomeArtProfileAuthoring>
 		{
-		public override void Bake (BiomeArtProfileAuthoring authoring)
+		public override void Bake(BiomeArtProfileAuthoring authoring)
 			{
 			Entity entity = GetEntity(TransformUsageFlags.None);
 
@@ -71,7 +71,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private BiomeType InferBiomeTypeFromProfileName (string profileName)
+		private BiomeType InferBiomeTypeFromProfileName(string profileName)
 			{
 			if (string.IsNullOrEmpty(profileName))
 				{

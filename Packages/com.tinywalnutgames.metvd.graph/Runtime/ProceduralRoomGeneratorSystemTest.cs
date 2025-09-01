@@ -10,12 +10,12 @@ namespace TinyWalnutGames.MetVD.Graph
 	[DisableAutoCreation]
 	public partial class ProceduralRoomGeneratorSystemTest : SystemBase
 		{
-		protected override void OnCreate ()
+		protected override void OnCreate()
 			{
 			// Nothing needed for setup
 			}
 
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			// Drive the unmanaged system through SimulationSystemGroup
 			SimulationSystemGroup simGroup = World.GetOrCreateSystemManaged<SimulationSystemGroup>();

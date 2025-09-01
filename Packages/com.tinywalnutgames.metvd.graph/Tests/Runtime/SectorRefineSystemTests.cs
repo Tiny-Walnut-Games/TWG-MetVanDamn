@@ -11,7 +11,7 @@ namespace TinyWalnutGames.MetVD.Tests
 	[UpdateInGroup(typeof(SimulationSystemGroup))]
 	internal partial class SectorRefineTestDriverSystem : SystemBase
 		{
-		protected override void OnUpdate ()
+		protected override void OnUpdate()
 			{
 			ComponentLookup<WfcState> wfcStateLookup = GetComponentLookup<WfcState>(true);
 			ComponentLookup<NodeId> nodeIdLookup = GetComponentLookup<NodeId>(true);
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		private SimulationSystemGroup _simGroup;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			_world = new World("SectorRefineTestWorld");
 			_simGroup = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
@@ -55,7 +55,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (_world != null && _world.IsCreated)
 				{
@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void PlanningPhase_Completes_WhenWfcCompleted ()
+		public void PlanningPhase_Completes_WhenWfcCompleted()
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
@@ -81,7 +81,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void LoopCreation_PhaseAdvances_WhenTargetLoopsAlreadyReached ()
+		public void LoopCreation_PhaseAdvances_WhenTargetLoopsAlreadyReached()
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
@@ -100,7 +100,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void LockPlacement_AddsHardLocks_AndAdvancesToPathValidation ()
+		public void LockPlacement_AddsHardLocks_AndAdvancesToPathValidation()
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
@@ -120,7 +120,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void PathValidation_Completes_WhenLoopsAndLocksPresent ()
+		public void PathValidation_Completes_WhenLoopsAndLocksPresent()
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
@@ -139,7 +139,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void PathValidation_Fails_WhenNoLoopsOrLocks ()
+		public void PathValidation_Fails_WhenNoLoopsOrLocks()
 			{
 			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();

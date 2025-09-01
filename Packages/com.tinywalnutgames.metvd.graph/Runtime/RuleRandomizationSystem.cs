@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// </summary>
 		public uint RuleSeed;
 
-		public WorldRuleSet (Polarity biomePolarityMask, uint availableUpgradesMask, bool upgradesRandomized, uint ruleSeed)
+		public WorldRuleSet(Polarity biomePolarityMask, uint availableUpgradesMask, bool upgradesRandomized, uint ruleSeed)
 			{
 			BiomePolarityMask = biomePolarityMask;
 			AvailableUpgradesMask = availableUpgradesMask;
@@ -50,7 +50,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public RandomizationMode Mode;
 		public uint GeneratedRuleCount;
 
-		public RuleRandomizationDoneTag (RandomizationMode mode, uint ruleCount = 0)
+		public RuleRandomizationDoneTag(RandomizationMode mode, uint ruleCount = 0)
 			{
 			Mode = mode;
 			GeneratedRuleCount = ruleCount;
@@ -70,7 +70,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private EntityQuery _rulesDoneQuery;
 
 		[BurstCompile]
-		public void OnCreate (ref SystemState state)
+		public void OnCreate(ref SystemState state)
 			{
 			_worldConfigQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WorldConfiguration>()
@@ -87,7 +87,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		[BurstCompile]
-		public void OnUpdate (ref SystemState state)
+		public void OnUpdate(ref SystemState state)
 			{
 			// Skip if rules already generated
 			if (!_rulesDoneQuery.IsEmptyIgnoreFilter)
@@ -120,7 +120,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Generate world rules based on randomization mode
 		/// </summary>
-		private static WorldRuleSet GenerateWorldRules (RandomizationMode mode, int districtCount, ref Random random)
+		private static WorldRuleSet GenerateWorldRules(RandomizationMode mode, int districtCount, ref Random random)
 			{
 			return mode switch
 				{
@@ -134,7 +134,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Apply curated rules with no randomization
 		/// </summary>
-		private static WorldRuleSet ApplyCuratedRules (ref Random random)
+		private static WorldRuleSet ApplyCuratedRules(ref Random random)
 			{
 			// Use balanced curated polarity distribution
 			Polarity curatedPolarity = Polarity.Sun | Polarity.Moon | Polarity.Heat | Polarity.Cold;
@@ -150,7 +150,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 
 		// Helper to pick one polarity by index (avoids managed arrays)
-		private static Polarity PickPolarity (int index)
+		private static Polarity PickPolarity(int index)
 			{
 			return index switch
 				{
@@ -168,7 +168,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Apply partial randomization - randomize biome polarities, keep upgrades fixed
 		/// </summary>
-		private static WorldRuleSet ApplyPartialRandomization (ref Random random)
+		private static WorldRuleSet ApplyPartialRandomization(ref Random random)
 			{
 			// Randomize biome polarities but ensure at least 2 are present
 			Polarity randomizedPolarity = Polarity.None;
@@ -194,7 +194,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		/// <summary>
 		/// Apply full randomization - randomize everything with reachability guards
 		/// </summary>
-		private static WorldRuleSet ApplyFullRandomization (int districtCount, ref Random random)
+		private static WorldRuleSet ApplyFullRandomization(int districtCount, ref Random random)
 			{
 			// Randomize biome polarities
 			Polarity randomizedPolarity = Polarity.None;

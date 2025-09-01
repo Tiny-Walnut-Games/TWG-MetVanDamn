@@ -23,7 +23,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Range(0.1f, 1f)] public float targetLoopDensity = 0.3f;
 		[Tooltip("Initial WFC state")] public WfcGenerationState initialWfcState = WfcGenerationState.Initialized;
 
-		private void OnValidate ()
+		private void OnValidate()
 			{
 			if (nodeId == 0)
 				{

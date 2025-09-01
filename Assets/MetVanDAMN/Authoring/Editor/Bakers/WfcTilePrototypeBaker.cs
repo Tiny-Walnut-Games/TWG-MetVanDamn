@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	/// </summary>
 	public class WfcTilePrototypeBaker : Baker<WfcTilePrototypeAuthoring>
 		{
-		public override void Bake (WfcTilePrototypeAuthoring authoring)
+		public override void Bake(WfcTilePrototypeAuthoring authoring)
 			{
 			Entity entity = GetEntity(TransformUsageFlags.None);
 

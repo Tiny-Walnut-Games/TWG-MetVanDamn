@@ -19,14 +19,14 @@ namespace TinyWalnutGames.MetVD.Tests
 		private EntityManager _entityManager;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			this._testWorld = new World("TestWorld");
 			this._entityManager = this._testWorld.EntityManager;
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (this._testWorld.IsCreated)
 				{
@@ -35,7 +35,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavNode_BasicCreation_IsValid ()
+		public void NavNode_BasicCreation_IsValid()
 			{
 			// Arrange
 			uint nodeId = 1;
@@ -56,7 +56,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_BasicCreation_IsValid ()
+		public void NavLink_BasicCreation_IsValid()
 			{
 			// Arrange
 			uint fromNode = 1;
@@ -76,7 +76,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void AgentCapabilities_CanPassGate_WithMatchingPolarity_ReturnsTrue ()
+		public void AgentCapabilities_CanPassGate_WithMatchingPolarity_ReturnsTrue()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.Sun, Ability.Jump, 0.8f);
@@ -90,7 +90,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void AgentCapabilities_CanPassGate_WithMismatchedPolarity_ReturnsFalse ()
+		public void AgentCapabilities_CanPassGate_WithMismatchedPolarity_ReturnsFalse()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.Sun, Ability.Jump, 0.8f);
@@ -104,7 +104,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void AgentCapabilities_CanPassSoftGate_WithHighSkill_ReturnsTrue ()
+		public void AgentCapabilities_CanPassSoftGate_WithHighSkill_ReturnsTrue()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.None, Ability.None, 1.0f); // High skill
@@ -118,7 +118,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CanTraverseWith_MatchingCapabilities_ReturnsTrue ()
+		public void NavLink_CanTraverseWith_MatchingCapabilities_ReturnsTrue()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.Heat, Ability.HeatResistance, 0.5f);
@@ -132,7 +132,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CanTraverseWith_MismatchedPolarity_ReturnsFalse ()
+		public void NavLink_CanTraverseWith_MismatchedPolarity_ReturnsFalse()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.Sun, Ability.None, 0.5f);
@@ -146,7 +146,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CanTraverseWith_SoftGate_ReturnsTrue ()
+		public void NavLink_CanTraverseWith_SoftGate_ReturnsTrue()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.Sun, Ability.None, 0.5f);
@@ -160,7 +160,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateTraversalCost_WithPolarityMismatch_IncreasesBaseCost ()
+		public void NavLink_CalculateTraversalCost_WithPolarityMismatch_IncreasesBaseCost()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.Sun, Ability.None, 0.5f);
@@ -174,7 +174,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_GetDestination_Bidirectional_ReturnsCorrectDestination ()
+		public void NavLink_GetDestination_Bidirectional_ReturnsCorrectDestination()
 			{
 			// Arrange
 			var navLink = new NavLink(1, 2, ConnectionType.Bidirectional);
@@ -189,7 +189,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_GetDestination_OneWay_ReturnsCorrectDestination ()
+		public void NavLink_GetDestination_OneWay_ReturnsCorrectDestination()
 			{
 			// Arrange
 			var navLink = new NavLink(1, 2, ConnectionType.OneWay);
@@ -204,7 +204,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationGraph_BasicCreation_IsValid ()
+		public void NavigationGraph_BasicCreation_IsValid()
 			{
 			// Arrange & Act
 			var navGraph = new NavigationGraph(10, 15);
@@ -217,7 +217,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void AINavigationState_BasicCreation_IsValid ()
+		public void AINavigationState_BasicCreation_IsValid()
 			{
 			// Arrange
 			uint currentNode = 1;
@@ -235,7 +235,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationGraphBuildSystem_Creation_DoesNotThrow ()
+		public void NavigationGraphBuildSystem_Creation_DoesNotThrow()
 			{
 			// Arrange & Act & Assert
 			Assert.DoesNotThrow(() =>
@@ -246,7 +246,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void AINavigationSystem_Creation_DoesNotThrow ()
+		public void AINavigationSystem_Creation_DoesNotThrow()
 			{
 			// Arrange & Act & Assert
 			Assert.DoesNotThrow(() =>
@@ -257,7 +257,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationValidationSystem_Creation_DoesNotThrow ()
+		public void NavigationValidationSystem_Creation_DoesNotThrow()
 			{
 			// Arrange & Act & Assert
 			Assert.DoesNotThrow(() =>
@@ -268,7 +268,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationValidationReport_Creation_IsValid ()
+		public void NavigationValidationReport_Creation_IsValid()
 			{
 			// Arrange & Act
 			var report = new NavigationValidationReport(10, 15, Allocator.Temp);
@@ -290,7 +290,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationIssue_Creation_IsValid ()
+		public void NavigationIssue_Creation_IsValid()
 			{
 			// Arrange
 			NavigationIssueType issueType = NavigationIssueType.UnreachableNode;
@@ -307,7 +307,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationQuickFix_Creation_IsValid ()
+		public void NavigationQuickFix_Creation_IsValid()
 			{
 			// Arrange & Act
 			var quickFix = new NavigationQuickFix
@@ -324,7 +324,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationValidationUtility_GenerateValidationReport_DoesNotThrow ()
+		public void NavigationValidationUtility_GenerateValidationReport_DoesNotThrow()
 			{
 			// Arrange & Act & Assert
 			Assert.DoesNotThrow(() =>
@@ -335,7 +335,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult ()
+		public void NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult()
 			{
 			// Arrange
 			uint fromNode = 1;
@@ -350,7 +350,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavigationValidationUtility_GenerateQuickFixSuggestions_DoesNotThrow ()
+		public void NavigationValidationUtility_GenerateQuickFixSuggestions_DoesNotThrow()
 			{
 			// Arrange
 			var report = new NavigationValidationReport(5, 8, Allocator.Temp);
@@ -374,7 +374,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		/// Integration test: Create full navigation graph with nodes, links, and agents
 		/// </summary>
 		[Test]
-		public void NavigationIntegrationTest_FullScenario_WorksCorrectly ()
+		public void NavigationIntegrationTest_FullScenario_WorksCorrectly()
 			{
 			// Arrange: Create navigation nodes
 			Entity node1Entity = this._entityManager.CreateEntity();
@@ -417,7 +417,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		/// Negative test: Agent without required polarity cannot traverse hard gate
 		/// </summary>
 		[Test]
-		public void NavigationNegativeTest_AgentCannotTraverseHardGate ()
+		public void NavigationNegativeTest_AgentCannotTraverseHardGate()
 			{
 			// Arrange: Agent with Sun polarity trying to traverse Moon-only gate
 			var capabilities = new AgentCapabilities(Polarity.Sun, Ability.None, 0.0f);
@@ -434,7 +434,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		/// Cross-component relationship test: Complex gate and connection scenarios
 		/// </summary>
 		[Test]
-		public void NavigationComplexTest_MultipleGateConditions ()
+		public void NavigationComplexTest_MultipleGateConditions()
 			{
 			// Arrange: Multiple overlapping gate conditions
 			var capabilities = new AgentCapabilities(Polarity.Sun | Polarity.Heat, Ability.Jump | Ability.HeatResistance, 0.9f);
@@ -459,7 +459,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		// ============================================================================
 
 		[Test]
-		public void ArcJump_Ability_IsCorrectlyDefined ()
+		public void ArcJump_Ability_IsCorrectlyDefined()
 			{
 			// Arrange & Act
 			Ability arcJumpAbility = Ability.ArcJump;
@@ -478,7 +478,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_WithBasicJump_ReturnsCorrectCost ()
+		public void NavLink_CalculateArcTraversalCost_WithBasicJump_ReturnsCorrectCost()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.None, Ability.Jump, 0.5f);
@@ -495,7 +495,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_WithDoubleJump_HandlesHigherJumps ()
+		public void NavLink_CalculateArcTraversalCost_WithDoubleJump_HandlesHigherJumps()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.None, Ability.DoubleJump, 0.5f);
@@ -512,7 +512,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_WithArcJump_ProvidesBetterControl ()
+		public void NavLink_CalculateArcTraversalCost_WithArcJump_ProvidesBetterControl()
 			{
 			// Arrange
 			var basicCapabilities = new AgentCapabilities(Polarity.None, Ability.Jump, 0.5f);
@@ -530,7 +530,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_WithChargedJump_HandlesVariableHeight ()
+		public void NavLink_CalculateArcTraversalCost_WithChargedJump_HandlesVariableHeight()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.None, Ability.ChargedJump, 0.5f);
@@ -547,7 +547,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_WithTeleportArc_HandlesLongDistances ()
+		public void NavLink_CalculateArcTraversalCost_WithTeleportArc_HandlesLongDistances()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.None, Ability.TeleportArc, 0.5f);
@@ -564,7 +564,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_WithGrapple_HandlesArcTrajectory ()
+		public void NavLink_CalculateArcTraversalCost_WithGrapple_HandlesArcTrajectory()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.None, Ability.Grapple, 0.5f);
@@ -581,7 +581,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_ImpossibleJump_ReturnsHighCost ()
+		public void NavLink_CalculateArcTraversalCost_ImpossibleJump_ReturnsHighCost()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.None, Ability.Jump, 0.5f);
@@ -597,7 +597,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_DownwardMovement_LowerCost ()
+		public void NavLink_CalculateArcTraversalCost_DownwardMovement_LowerCost()
 			{
 			// Arrange
 			var capabilities = new AgentCapabilities(Polarity.None, Ability.Jump, 0.5f);
@@ -614,7 +614,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void NavLink_CalculateArcTraversalCost_WithGlideSpeed_ReducesFallCost ()
+		public void NavLink_CalculateArcTraversalCost_WithGlideSpeed_ReducesFallCost()
 			{
 			// Arrange
 			var basicCapabilities = new AgentCapabilities(Polarity.None, Ability.Jump, 0.5f);
@@ -632,7 +632,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void MovementEfficiencyMultiplier_ArcJumpWithBasicJump_ProvidesBonus ()
+		public void MovementEfficiencyMultiplier_ArcJumpWithBasicJump_ProvidesBonus()
 			{
 			// Arrange
 			var basicCapabilities = new AgentCapabilities(Polarity.None, Ability.Jump, 0.5f);
@@ -648,7 +648,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void MovementEfficiencyMultiplier_AllArcMovementAbilities_StacksBonuses ()
+		public void MovementEfficiencyMultiplier_AllArcMovementAbilities_StacksBonuses()
 			{
 			// Arrange
 			var basicCapabilities = new AgentCapabilities(Polarity.None, Ability.Grapple, 0.5f);
@@ -664,7 +664,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void AINavigationSystem_CalculateMovementHeuristic_AccountsForVerticalMovement ()
+		public void AINavigationSystem_CalculateMovementHeuristic_AccountsForVerticalMovement()
 			{
 			// This tests the enhanced heuristic calculation indirectly
 			// by verifying it produces different costs for horizontal vs vertical movement
@@ -681,7 +681,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void JumpArcPhysics_CalculatesReasonableCosts ()
+		public void JumpArcPhysics_CalculatesReasonableCosts()
 			{
 			// Test that arc calculations produce reasonable cost ranges
 

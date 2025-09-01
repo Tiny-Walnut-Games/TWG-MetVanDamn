@@ -13,7 +13,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Example: Character navigating a dungeon room (Level 4)
 		/// </summary>
-		public static void CreateDungeonRoom (EntityManager entityManager)
+		public static void CreateDungeonRoom(EntityManager entityManager)
 			{
 			Entity roomEntity = entityManager.CreateEntity();
 
@@ -43,7 +43,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Example: Solar system navigation (Level 3) - same abstractions!
 		/// </summary>
-		public static void CreateSolarSystem (EntityManager entityManager)
+		public static void CreateSolarSystem(EntityManager entityManager)
 			{
 			Entity systemEntity = entityManager.CreateEntity();
 
@@ -73,7 +73,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Example: Universal pathfinding works at any scale
 		/// </summary>
-		public static bool CanTraverse (NodeId from, NodeId to, Connection connection,
+		public static bool CanTraverse(NodeId from, NodeId to, Connection connection,
 									 Polarity availablePolarity, Ability availableAbilities)
 			{
 			// Same logic works for character movement OR spacecraft navigation
@@ -93,7 +93,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Example: Scale-aware physics calculations
 		/// </summary>
-		public static float CalculateTraversalTime (Connection connection, byte nodeLevel)
+		public static float CalculateTraversalTime(Connection connection, byte nodeLevel)
 			{
 			// Base traversal cost from connection
 			float baseCost = connection.TraversalCost;

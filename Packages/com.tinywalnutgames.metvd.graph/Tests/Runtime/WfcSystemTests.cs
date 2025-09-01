@@ -16,7 +16,7 @@ namespace TinyWalnutGames.MetVD.Tests
 		private SimulationSystemGroup simGroup;
 
 		[SetUp]
-		public void SetUp ()
+		public void SetUp()
 			{
 			testWorld = new World("TestWorld");
 			// Use Simulation group to drive updates; systems may be registered by bootstrap in play mode
@@ -24,7 +24,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[TearDown]
-		public void TearDown ()
+		public void TearDown()
 			{
 			if (testWorld != null && testWorld.IsCreated)
 				{
@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void WfcSystem_ThreadSafety_ShouldUseParallelRandomArray ()
+		public void WfcSystem_ThreadSafety_ShouldUseParallelRandomArray()
 			{
 			// This test verifies that WFC system uses NativeArray<Random> for thread safety
 			// (addresses blocker #3 - Random in parallel jobs)
@@ -50,7 +50,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void WfcConstraintPropagation_SocketCompatibility_ShouldValidateCorrectly ()
+		public void WfcConstraintPropagation_SocketCompatibility_ShouldValidateCorrectly()
 			{
 			// Test socket compatibility checking (implementation gap)
 			var socketA = new WfcSocket(1, 0, Polarity.Sun, true);
@@ -65,7 +65,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[Test]
-		public void WfcBiomeValidation_PolarityConstraints_ShouldEnforceCoherence ()
+		public void WfcBiomeValidation_PolarityConstraints_ShouldEnforceCoherence()
 			{
 			// Test biome polarity constraints in WFC
 			var sunBiome = new Biome(BiomeType.SolarPlains, Polarity.Sun, 1.0f);
@@ -83,7 +83,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			}
 
 		[UnityTest]
-		public IEnumerator WfcGenerationStress_MultipleFrames_ShouldCompleteWithoutErrors ()
+		public IEnumerator WfcGenerationStress_MultipleFrames_ShouldCompleteWithoutErrors()
 			{
 			// Stress test for WFC generation over multiple frames
 			for (int frame = 0; frame < 10; frame++)
