@@ -23,14 +23,14 @@ namespace LivingDevAgent.Editor.Modules
 		[HideInInspector] public int Sessions { get; set; } // Number of sessions logged for this time card
 		private DateTime startTime;
 		private DateTime endTime;
-		private float DurationInHours => (float)(this.endTime - this.startTime).TotalHours;
-		private float DurationInMinutes => (float)(this.endTime - this.startTime).TotalMinutes;
-		private float DurationInSeconds => (float)(this.endTime - this.startTime).TotalSeconds;
-		private bool IsOngoing => this.endTime == default;
+		private float DurationInHours => (float)(endTime - startTime).TotalHours;
+		private float DurationInMinutes => (float)(endTime - startTime).TotalMinutes;
+		private float DurationInSeconds => (float)(endTime - startTime).TotalSeconds;
+		private bool IsOngoing => endTime == default;
 		
 		// 🎯 CORE FEATURE: Completion tracking separate from ongoing status
 		// Used for time tracking analytics and task completion reporting
-		private bool IsCompleted => this.endTime != default && this.taskName != null;
+		private bool IsCompleted => endTime != default && taskName != null;
 		
 		// 🎯 FIXED: Initialize lastModified and update it when timecard changes
 		private DateTime lastModified = DateTime.Now;
@@ -42,69 +42,69 @@ namespace LivingDevAgent.Editor.Modules
 
 		public TaskData GetTask ()
 			{
-			return this.taskName;
+			return taskName;
 			}
 
 		public int GetSessionCount ()
 			{
-			return this.Sessions;
+			return Sessions;
 			}
 
 		public DateTime GetStartTime ()
 			{
-			return this.startTime;
+			return startTime;
 			}
 
 		public DateTime GetEndTime ()
 			{
-			return this.endTime;
+			return endTime;
 			}
 
 		public float GetDurationInHours ()
 			{
-			return this.DurationInHours;
+			return DurationInHours;
 			}
 
 		public float GetDurationInMinutes ()
 			{
-			return this.DurationInMinutes;
+			return DurationInMinutes;
 			}
 
 		public float GetDurationInSeconds ()
 			{
-			return this.DurationInSeconds;
+			return DurationInSeconds;
 			}
 
 		public bool GetIsOngoing ()
 			{
-			return this.IsOngoing;
+			return IsOngoing;
 			}
 
 		public bool GetIsCompleted ()
 			{
-			return this.IsCompleted;
+			return IsCompleted;
 			}
 
 		public void StartTimeCard (TaskData associatedTask)
 			{
-			this.taskName = associatedTask;
-			this.startTime = DateTime.Now;
-			this.endTime = default;
-			this.reportData = string.Empty;
+			taskName = associatedTask;
+			startTime = DateTime.Now;
+			endTime = default;
+			reportData = string.Empty;
 			
 			// 🎯 FIXED: Update lastModified when starting timecard
-			this.lastModified = DateTime.Now;
+			lastModified = DateTime.Now;
 			}
 
 		public void EndTimeCard ()
 			{
-			if (this.IsOngoing)
+			if (IsOngoing)
 				{
-				this.endTime = DateTime.Now;
-				this.GenerateReportData();
+				endTime = DateTime.Now;
+				GenerateReportData();
 				
 				// 🎯 FIXED: Update lastModified when ending timecard
-				this.lastModified = DateTime.Now;
+				lastModified = DateTime.Now;
 				}
 			else
 				{
@@ -114,32 +114,32 @@ namespace LivingDevAgent.Editor.Modules
 
 		private void GenerateReportData ()
 			{
-			this.reportData = $"Task: {this.taskName.name}\n" +
-						 $"Start Time: {this.startTime}\n" +
-						 $"End Time: {this.endTime}\n" +
-						 $"Duration: {this.DurationInHours:F2} hours ({this.DurationInMinutes:F2} minutes, {this.DurationInSeconds:F2} seconds)";
+			reportData = $"Task: {taskName.name}\n" +
+						 $"Start Time: {startTime}\n" +
+						 $"End Time: {endTime}\n" +
+						 $"Duration: {DurationInHours:F2} hours ({DurationInMinutes:F2} minutes, {DurationInSeconds:F2} seconds)";
 			}
 
 		public string GetReportData ()
 			{
-			if (string.IsNullOrEmpty(this.reportData))
+			if (string.IsNullOrEmpty(reportData))
 				{
 				Debug.LogWarning("TimeCardData: Report data is empty. Ensure the time card has been ended.");
 				}
-			return this.reportData;
+			return reportData;
 			}
 
 		internal DateTime GetLastModified ()
 			{
-			return this.lastModified;
+			return lastModified;
 			}
 
         public void IncrementSessionCount()
         {
-            this.Sessions++;
+            Sessions++;
 			
 			// 🎯 FIXED: Update lastModified when incrementing sessions
-			this.lastModified = DateTime.Now;
+			lastModified = DateTime.Now;
         }
 
         // 💡 Expansion Opportunity 💡 - @jmeyer1980

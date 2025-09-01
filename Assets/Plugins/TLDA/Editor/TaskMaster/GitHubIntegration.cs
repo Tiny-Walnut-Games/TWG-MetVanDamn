@@ -178,8 +178,8 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		private void OnGUI ()
 			{
-			using var scroll = new EditorGUILayout.ScrollViewScope(this._scrollPosition);
-			this._scrollPosition = scroll.scrollPosition; // 🎯 FIXED: Update scroll position
+			using var scroll = new EditorGUILayout.ScrollViewScope(_scrollPosition);
+			_scrollPosition = scroll.scrollPosition; // 🎯 FIXED: Update scroll position
 			
 			GUILayout.Label("🐙 GitHub Integration Setup", EditorStyles.boldLabel);
 
@@ -194,16 +194,16 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 			// GitHub token field (masked)
 			GUILayout.Label("GitHub Personal Access Token:");
-			this._githubToken = EditorGUILayout.PasswordField(this._githubToken);
+			_githubToken = EditorGUILayout.PasswordField(_githubToken);
 
 			EditorGUILayout.Space();
 
 			// Repository details
 			GUILayout.Label("Repository Owner (username or org):");
-			this._repositoryOwner = EditorGUILayout.TextField(this._repositoryOwner);
+			_repositoryOwner = EditorGUILayout.TextField(_repositoryOwner);
 
 			GUILayout.Label("Repository Name:");
-			this._repositoryName = EditorGUILayout.TextField(this._repositoryName);
+			_repositoryName = EditorGUILayout.TextField(_repositoryName);
 
 			EditorGUILayout.Space();
 
@@ -219,12 +219,12 @@ namespace LivingDevAgent.Editor.TaskMaster
 				{
 				if (GUILayout.Button("💾 Save Configuration"))
 					{
-					this.SaveConfiguration();
+					SaveConfiguration();
 					}
 
 				if (GUILayout.Button("🧪 Test Connection"))
 					{
-					this.TestConnection();
+					TestConnection();
 					}
 				}
 
@@ -243,19 +243,19 @@ namespace LivingDevAgent.Editor.TaskMaster
 
 		private void SaveConfiguration ()
 			{
-			if (string.IsNullOrEmpty(this._githubToken) ||
-				string.IsNullOrEmpty(this._repositoryOwner) ||
-				string.IsNullOrEmpty(this._repositoryName))
+			if (string.IsNullOrEmpty(_githubToken) ||
+				string.IsNullOrEmpty(_repositoryOwner) ||
+				string.IsNullOrEmpty(_repositoryName))
 				{
 				EditorUtility.DisplayDialog("Invalid Configuration",
 					"Please fill in all fields before saving.", "OK");
 				return;
 				}
 
-			GitHubIntegration.SetConfiguration(this._githubToken, this._repositoryOwner, this._repositoryName);
+			GitHubIntegration.SetConfiguration(_githubToken, _repositoryOwner, _repositoryName);
 
 			EditorUtility.DisplayDialog("Configuration Saved",
-				$"GitHub integration configured for {this._repositoryOwner}/{this._repositoryName}", "OK");
+				$"GitHub integration configured for {_repositoryOwner}/{_repositoryName}", "OK");
 			}
 
 		private void TestConnection ()

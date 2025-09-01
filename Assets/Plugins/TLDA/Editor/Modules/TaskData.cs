@@ -87,13 +87,13 @@ namespace LivingDevAgent.Editor.Modules
 		// Mark the task as completed
 		public void CompleteTask ()
 			{
-			if (!this.isCompleted && !this.isCanceled)
+			if (!isCompleted && !isCanceled)
 				{
-				this.isCompleted = true;
-				this.isFinished = true;
-				this.completedAt = System.DateTime.Now;
-				this.timeCard.EndTimeCard();
-				this.history = this.AppendToArray(this.history, $"Task completed at {this.completedAt}");
+				isCompleted = true;
+				isFinished = true;
+				completedAt = System.DateTime.Now;
+				timeCard.EndTimeCard();
+				history = AppendToArray(history, $"Task completed at {completedAt}");
 				}
 			else
 				{
@@ -104,12 +104,12 @@ namespace LivingDevAgent.Editor.Modules
 		// Cancel the task
 		public void CancelTask ()
 			{
-			if (!this.isCompleted && !this.isCanceled)
+			if (!isCompleted && !isCanceled)
 				{
-				this.isCanceled = true;
-				this.isFinished = true;
-				this.canceledAt = System.DateTime.Now;
-				this.history = this.AppendToArray(this.history, $"Task canceled at {this.canceledAt}");
+				isCanceled = true;
+				isFinished = true;
+				canceledAt = System.DateTime.Now;
+				history = AppendToArray(history, $"Task canceled at {canceledAt}");
 				}
 			else
 				{

@@ -61,13 +61,13 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TaskData.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TemplateModule.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\ScribeModuleBase.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TaskData.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Chronas\ChronasTimeTracker.cs" />
-    <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TimeCardData.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\TaskMaster\GitHubIntegration.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\NavigatorModule.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TimeCardData.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\ScribeUtils.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\MenuRefreshForcer.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\EditorModule.cs" />
@@ -1200,7 +1200,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets\Plugins\TLDA\Editor\Helpers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

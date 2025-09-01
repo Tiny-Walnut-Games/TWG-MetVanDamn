@@ -61,32 +61,32 @@ namespace LivingDevAgent.Editor.Modules
 			try
 				{
 				// Ensure time-card directory exists
-				if (!System.IO.Directory.Exists(this._timeCardDirectory))
+				if (!System.IO.Directory.Exists(_timeCardDirectory))
 					{
-					System.IO.Directory.CreateDirectory(this._timeCardDirectory);
+					System.IO.Directory.CreateDirectory(_timeCardDirectory);
 					AssetDatabase.Refresh();
 					}
 
 				// Load existing time-cards
-				this.LoadTimeCards();
+				LoadTimeCards();
 
 				// Restore active timer state if exists
-				this.RestoreActiveTimerState();
+				RestoreActiveTimerState();
 
 				// Subscribe to editor updates for background tracking
-				EditorApplication.update += this.OnEditorUpdate;
+				EditorApplication.update += OnEditorUpdate;
 
 				// 🎯 ALWAYS register scene view overlay (independent of module state)
-				SceneView.duringSceneGui += this.OnSceneGUI;
+				SceneView.duringSceneGui += OnSceneGUI;
 
 				_initializationError = false;
-				this.SetStatus("⏰ TaskMaster initialized successfully");
+				SetStatus("⏰ TaskMaster initialized successfully");
 				}
 			catch (System.Exception ex)
 				{
 				_initializationError = true;
 				_lastError = ex.Message;
-				this.SetStatus($"❌ TaskMaster initialization failed: {ex.Message}");
+				SetStatus($"❌ TaskMaster initialization failed: {ex.Message}");
 				Debug.LogError($"TaskMaster initialization error: {ex}");
 				}
 			}
@@ -96,18 +96,18 @@ namespace LivingDevAgent.Editor.Modules
 			try
 				{
 				// Save any active session before disposing
-				if (this._isTimerRunning && this._activeTimeCard != null)
+				if (_isTimerRunning && _activeTimeCard != null)
 					{
-					this.SaveCurrentSession();
+					SaveCurrentSession();
 					}
 
 				// Unsubscribe from updates
-				EditorApplication.update -= this.OnEditorUpdate;
+				EditorApplication.update -= OnEditorUpdate;
 
 				// 🎯 ALWAYS unregister scene view overlay
-				SceneView.duringSceneGui -= this.OnSceneGUI;
+				SceneView.duringSceneGui -= OnSceneGUI;
 
-				this.SetStatus("⏰ TaskMaster disposed cleanly");
+				SetStatus("⏰ TaskMaster disposed cleanly");
 				}
 			catch (System.Exception ex)
 				{
@@ -127,7 +127,7 @@ namespace LivingDevAgent.Editor.Modules
 			GUI.Box(_overlayRect, "", EditorStyles.helpBox);
 
 			// Make panel draggable
-			this.HandlePanelDragging();
+			HandlePanelDragging();
 
 			// 🎯 CRITICAL FIX: Ensure proper GUI event handling
 			Event currentEvent = Event.current;
@@ -138,7 +138,7 @@ namespace LivingDevAgent.Editor.Modules
 
 			try
 				{
-				this.DrawSceneViewTimerContent();
+				DrawSceneViewTimerContent();
 				}
 			catch (System.Exception ex)
 				{
@@ -151,7 +151,7 @@ namespace LivingDevAgent.Editor.Modules
 			Handles.EndGUI();
 
 			// Force repaint if timer is running for live updates
-			if (this._isTimerRunning)
+			if (_isTimerRunning)
 				{
 				sceneView.Repaint();
 				}
@@ -168,10 +168,10 @@ namespace LivingDevAgent.Editor.Modules
 			// Header with timer display
 			using (new GUILayout.HorizontalScope())
 				{
-				string timerText = this.FormatCurrentTime();
+				string timerText = FormatCurrentTime();
 				GUIStyle timerStyle = new(EditorStyles.boldLabel)
 					{
-					normal = { textColor = this._isTimerRunning ? Color.green : Color.gray },
+					normal = { textColor = _isTimerRunning ? Color.green : Color.gray },
 					fontSize = 14
 					};
 
@@ -189,9 +189,9 @@ namespace LivingDevAgent.Editor.Modules
 				}
 
 			// Current task display
-			if (this._isTimerRunning && this._activeTimeCard != null)
+			if (_isTimerRunning && _activeTimeCard != null)
 				{
-				TaskData task = this._activeTimeCard.GetTask();
+				TaskData task = _activeTimeCard.GetTask();
 				string taskDisplay = task != null ? task.TaskName : "Unnamed Task";
 				GUILayout.Label($"📋 {taskDisplay}", EditorStyles.miniLabel);
 				}
@@ -199,23 +199,23 @@ namespace LivingDevAgent.Editor.Modules
 			// Task selection dropdown with proper event handling
 			GUILayout.Space(2);
 			EditorGUI.BeginChangeCheck();
-			int newTaskIndex = EditorGUILayout.Popup(this._selectedTaskIndex, this._availableTasks.ToArray(), EditorStyles.popup);
+			int newTaskIndex = EditorGUILayout.Popup(_selectedTaskIndex, _availableTasks.ToArray(), EditorStyles.popup);
 			if (EditorGUI.EndChangeCheck())
 				{
-				this._selectedTaskIndex = newTaskIndex;
-				this._showCustomTask = (this._availableTasks [ this._selectedTaskIndex ] == "🎯 Custom Task...");
+				_selectedTaskIndex = newTaskIndex;
+				_showCustomTask = (_availableTasks [ _selectedTaskIndex ] == "🎯 Custom Task...");
 				Event.current.Use(); // Consume the event
 				SceneView.RepaintAll();
 				}
 
 			// Custom task field with proper event handling
-			if (this._showCustomTask)
+			if (_showCustomTask)
 				{
 				EditorGUI.BeginChangeCheck();
-				string newCustomTaskName = EditorGUILayout.TextField(this._customTaskName, EditorStyles.textField);
+				string newCustomTaskName = EditorGUILayout.TextField(_customTaskName, EditorStyles.textField);
 				if (EditorGUI.EndChangeCheck())
 					{
-					this._customTaskName = newCustomTaskName;
+					_customTaskName = newCustomTaskName;
 					Event.current.Use(); // Consume the event
 					}
 				}
@@ -225,8 +225,8 @@ namespace LivingDevAgent.Editor.Modules
 			// Clock In/Out controls with proper event handling
 			using (new GUILayout.HorizontalScope())
 				{
-				string buttonText = this._isTimerRunning ? "⏸️ Clock Out" : "▶️ Clock In";
-				Color buttonColor = this._isTimerRunning ? Color.red : Color.green;
+				string buttonText = _isTimerRunning ? "⏸️ Clock Out" : "▶️ Clock In";
+				Color buttonColor = _isTimerRunning ? Color.red : Color.green;
 
 				Color originalColor = GUI.backgroundColor;
 				GUI.backgroundColor = buttonColor;
@@ -235,13 +235,13 @@ namespace LivingDevAgent.Editor.Modules
 					{
 					try
 						{
-						if (this._isTimerRunning)
+						if (_isTimerRunning)
 							{
-							this.ClockOut();
+							ClockOut();
 							}
 						else
 							{
-							this.ClockIn();
+							ClockIn();
 							}
 						Event.current.Use(); // Consume the event
 						SceneView.RepaintAll();
@@ -255,13 +255,13 @@ namespace LivingDevAgent.Editor.Modules
 				GUI.backgroundColor = originalColor;
 
 				// Quick save button with proper event handling
-				using (new EditorGUI.DisabledScope(!this._isTimerRunning))
+				using (new EditorGUI.DisabledScope(!_isTimerRunning))
 					{
 					if (GUILayout.Button("💾", EditorStyles.miniButton, GUILayout.Width(25)))
 						{
 						try
 							{
-							this.SaveCurrentSession();
+							SaveCurrentSession();
 							Event.current.Use(); // Consume the event
 							SceneView.RepaintAll();
 							}
@@ -319,7 +319,7 @@ namespace LivingDevAgent.Editor.Modules
 				return; // Component is "off" - no GUI space consumed
 				}
 
-			this.DrawPanel(new Rect(0, 0, 300, 400)); // Default size
+			DrawPanel(new Rect(0, 0, 300, 400)); // Default size
 			}
 
 		public void DrawPanel (Rect rect)
@@ -338,7 +338,7 @@ namespace LivingDevAgent.Editor.Modules
 					EditorGUILayout.HelpBox($"⚠️ TaskMaster Error: {_lastError}", MessageType.Error);
 					if (GUILayout.Button("🔄 Retry Initialization"))
 						{
-						this.Initialize(); // Attempt to reinitialize
+						Initialize(); // Attempt to reinitialize
 						}
 					}
 				return;
@@ -352,7 +352,7 @@ namespace LivingDevAgent.Editor.Modules
 
 				// Create a scroll view within the allocated space
 				using var scrollScope = new EditorGUILayout.ScrollViewScope(Vector2.zero, GUILayout.Height(rect.height));
-				this.DrawPanelContent();
+				DrawPanelContent();
 				}
 			}
 
@@ -371,11 +371,11 @@ namespace LivingDevAgent.Editor.Modules
 					_moduleEnabled = newModuleEnabled;
 					if (!_moduleEnabled)
 						{
-						this.SetStatus("⏰ TaskMaster module disabled (taking zero GUI space)");
+						SetStatus("⏰ TaskMaster module disabled (taking zero GUI space)");
 						}
 					else
 						{
-						this.SetStatus("⏰ TaskMaster module enabled");
+						SetStatus("⏰ TaskMaster module enabled");
 						}
 					}
 				}
@@ -413,13 +413,13 @@ namespace LivingDevAgent.Editor.Modules
 				{
 				EditorGUILayout.LabelField("Current Session", EditorStyles.boldLabel);
 
-				if (this._isTimerRunning && this._activeTimeCard != null)
+				if (_isTimerRunning && _activeTimeCard != null)
 					{
-					TaskData task = this._activeTimeCard.GetTask();
+					TaskData task = _activeTimeCard.GetTask();
 					string taskName = task != null ? task.TaskName : "Unnamed Task";
 					EditorGUILayout.LabelField($"Task: {taskName}");
-					EditorGUILayout.LabelField($"Time: {this.FormatCurrentTime()}");
-					EditorGUILayout.LabelField($"Started: {this._activeTimeCard.GetStartTime():HH:mm:ss}");
+					EditorGUILayout.LabelField($"Time: {FormatCurrentTime()}");
+					EditorGUILayout.LabelField($"Started: {_activeTimeCard.GetStartTime():HH:mm:ss}");
 					}
 				else
 					{
@@ -430,7 +430,7 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.Space();
 
 			// Time-card management
-			this.DrawTimeCardManagement();
+			DrawTimeCardManagement();
 			}
 
 		private void DrawTimeCardManagement ()
@@ -438,12 +438,12 @@ namespace LivingDevAgent.Editor.Modules
 			EditorGUILayout.LabelField("📊 Time-Card Management", EditorStyles.boldLabel);
 
 			// Time-card list
-			if (this._allTimeCards.Count > 0)
+			if (_allTimeCards.Count > 0)
 				{
 				using var scroll = new EditorGUILayout.ScrollViewScope(Vector2.zero, GUILayout.Height(150));
-				foreach (TimeCardData timeCard in this._allTimeCards.OrderByDescending(tc => tc.GetLastModified()))
+				foreach (TimeCardData timeCard in _allTimeCards.OrderByDescending(tc => tc.GetLastModified()))
 					{
-					this.DrawTimeCardEntry(timeCard);
+					DrawTimeCardEntry(timeCard);
 					}
 				}
 			else
@@ -458,24 +458,24 @@ namespace LivingDevAgent.Editor.Modules
 				{
 				if (GUILayout.Button("🔄 Refresh Time-Cards"))
 					{
-					this.LoadTimeCards();
+					LoadTimeCards();
 					}
 
 				if (GUILayout.Button("📂 Open Time-Card Folder"))
 					{
-					EditorUtility.RevealInFinder(this._timeCardDirectory);
+					EditorUtility.RevealInFinder(_timeCardDirectory);
 					}
 
 				if (GUILayout.Button("📋 Import to TLDL"))
 					{
-					this.ShowTimeCardImportDialog();
+					ShowTimeCardImportDialog();
 					}
 				}
 			}
 
 		private void ClockIn ()
 			{
-			string taskName = this.GetCurrentTaskName();
+			string taskName = GetCurrentTaskName();
 			if (string.IsNullOrEmpty(taskName))
 				{
 				EditorUtility.DisplayDialog("No Task Selected", "Please select or enter a task name before clocking in.", "OK");
@@ -483,84 +483,84 @@ namespace LivingDevAgent.Editor.Modules
 				}
 
 			// Create or resume time-card
-			this._activeTimeCard = this.GetOrCreateTimeCard(taskName);
-			this._isTimerRunning = true;
-			this._sessionStartTime = EditorApplication.timeSinceStartup;
-			this._accumulatedTime = 0.0;
+			_activeTimeCard = GetOrCreateTimeCard(taskName);
+			_isTimerRunning = true;
+			_sessionStartTime = EditorApplication.timeSinceStartup;
+			_accumulatedTime = 0.0;
 
 			// Create TaskData for this session
 			var taskData = TaskData.CreateTask(taskName, $"Work session on {taskName}", "@copilot", 1);
 
 			// Start the time-card with proper API
-			this._activeTimeCard.StartTimeCard(taskData);
-			EditorUtility.SetDirty(this._activeTimeCard);
+			_activeTimeCard.StartTimeCard(taskData);
+			EditorUtility.SetDirty(_activeTimeCard);
 
-			this.SetStatus($"⏰ Clocked in: {taskName}");
+			SetStatus($"⏰ Clocked in: {taskName}");
 			SceneView.RepaintAll(); // Update scene view overlay
 			}
 
 		private void ClockOut ()
 			{
-			if (this._activeTimeCard == null) return;
+			if (_activeTimeCard == null) return;
 
 			// Calculate final session time
-			this.UpdateAccumulatedTime();
+			UpdateAccumulatedTime();
 
 			// End the time-card session properly
-			this._activeTimeCard.EndTimeCard();
-			EditorUtility.SetDirty(this._activeTimeCard);
+			_activeTimeCard.EndTimeCard();
+			EditorUtility.SetDirty(_activeTimeCard);
 			AssetDatabase.SaveAssets();
 
-			TaskData task = this._activeTimeCard.GetTask();
+			TaskData task = _activeTimeCard.GetTask();
 			string taskName = task != null ? task.TaskName : "Unknown Task";
 
-			this.SetStatus($"⏰ Clocked out: {this.FormatDuration(this._accumulatedTime)} on {taskName}");
+			SetStatus($"⏰ Clocked out: {FormatDuration(_accumulatedTime)} on {taskName}");
 
-			this._isTimerRunning = false;
-			this._activeTimeCard = null;
+			_isTimerRunning = false;
+			_activeTimeCard = null;
 			SceneView.RepaintAll(); // Update scene view overlay
 			}
 
 		private void SaveCurrentSession ()
 			{
-			if (this._activeTimeCard == null || !this._isTimerRunning) return;
+			if (_activeTimeCard == null || !_isTimerRunning) return;
 
-			this.UpdateAccumulatedTime();
+			UpdateAccumulatedTime();
 
 			// For now, we'll end the current session and start a new one
 			// This preserves the session as a complete record
-			this._activeTimeCard.EndTimeCard();
+			_activeTimeCard.EndTimeCard();
 
 			// Create a new session for continued work
-			TaskData task = this._activeTimeCard.GetTask();
+			TaskData task = _activeTimeCard.GetTask();
 			if (task != null)
 				{
 				var newTaskData = TaskData.CreateTask(task.TaskName, $"Continued work on {task.TaskName}", "@copilot", 1);
-				this._activeTimeCard.StartTimeCard(newTaskData);
+				_activeTimeCard.StartTimeCard(newTaskData);
 				}
 
-			EditorUtility.SetDirty(this._activeTimeCard);
+			EditorUtility.SetDirty(_activeTimeCard);
 			AssetDatabase.SaveAssets();
 
 			// Reset for new session
-			this._sessionStartTime = EditorApplication.timeSinceStartup;
-			this._accumulatedTime = 0.0;
+			_sessionStartTime = EditorApplication.timeSinceStartup;
+			_accumulatedTime = 0.0;
 
 			string taskName = task != null ? task.TaskName : "Unknown Task";
-			this.SetStatus($"💾 Session saved: {taskName}");
+			SetStatus($"💾 Session saved: {taskName}");
 			}
 
 		private void OnEditorUpdate ()
 			{
 			// Background timer update - runs regardless of window focus
-			if (this._isTimerRunning && this._activeTimeCard != null)
+			if (_isTimerRunning && _activeTimeCard != null)
 				{
-				this.UpdateAccumulatedTime();
+				UpdateAccumulatedTime();
 
 				// Periodic save every 5 minutes for safety
-				if (this._accumulatedTime > 0 && (this._accumulatedTime % 300) < 1.0) // Every 5 minutes
+				if (_accumulatedTime > 0 && (_accumulatedTime % 300) < 1.0) // Every 5 minutes
 					{
-					EditorUtility.SetDirty(this._activeTimeCard);
+					EditorUtility.SetDirty(_activeTimeCard);
 					}
 
 				// Repaint scene views to update timer display
@@ -570,26 +570,26 @@ namespace LivingDevAgent.Editor.Modules
 
 		private void UpdateAccumulatedTime ()
 			{
-			if (this._isTimerRunning)
+			if (_isTimerRunning)
 				{
 				double currentTime = EditorApplication.timeSinceStartup;
-				double sessionTime = currentTime - this._sessionStartTime;
-				this._accumulatedTime += sessionTime;
-				this._sessionStartTime = currentTime;
+				double sessionTime = currentTime - _sessionStartTime;
+				_accumulatedTime += sessionTime;
+				_sessionStartTime = currentTime;
 				}
 			}
 
 		private string GetCurrentTaskName ()
 			{
-			return this._showCustomTask
-				? string.IsNullOrEmpty(this._customTaskName) ? "" : this._customTaskName
-				: this._availableTasks [ this._selectedTaskIndex ];
+			return _showCustomTask
+				? string.IsNullOrEmpty(_customTaskName) ? "" : _customTaskName
+				: _availableTasks [ _selectedTaskIndex ];
 			}
 
 		private TimeCardData GetOrCreateTimeCard (string taskName)
 			{
 			// Look for existing time-card with matching task name
-			TimeCardData existing = this._allTimeCards.FirstOrDefault(tc =>
+			TimeCardData existing = _allTimeCards.FirstOrDefault(tc =>
 			{
 				TaskData task = tc.GetTask();
 				return task != null && task.TaskName == taskName;
@@ -603,31 +603,31 @@ namespace LivingDevAgent.Editor.Modules
 			// Create new time-card ScriptableObject
 			TimeCardData timeCard = ScriptableObject.CreateInstance<TimeCardData>();
 
-			string fileName = $"TimeCard_{this.SanitizeFileName(taskName)}_{System.DateTime.Now:yyyyMMdd_HHmmss}.asset";
-			string assetPath = System.IO.Path.Combine(this._timeCardDirectory, fileName);
+			string fileName = $"TimeCard_{SanitizeFileName(taskName)}_{System.DateTime.Now:yyyyMMdd_HHmmss}.asset";
+			string assetPath = System.IO.Path.Combine(_timeCardDirectory, fileName);
 
 			AssetDatabase.CreateAsset(timeCard, assetPath);
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
 
-			this._allTimeCards.Add(timeCard);
+			_allTimeCards.Add(timeCard);
 			return timeCard;
 			}
 
 		private void LoadTimeCards ()
 			{
-			this._allTimeCards.Clear();
+			_allTimeCards.Clear();
 
-			if (!System.IO.Directory.Exists(this._timeCardDirectory)) return;
+			if (!System.IO.Directory.Exists(_timeCardDirectory)) return;
 
-			string [ ] guids = AssetDatabase.FindAssets("t:TimeCardData", new [ ] { this._timeCardDirectory });
+			string [ ] guids = AssetDatabase.FindAssets("t:TimeCardData", new [ ] { _timeCardDirectory });
 			foreach (string guid in guids)
 				{
 				string assetPath = AssetDatabase.GUIDToAssetPath(guid);
 				TimeCardData timeCard = AssetDatabase.LoadAssetAtPath<TimeCardData>(assetPath);
 				if (timeCard != null)
 					{
-					this._allTimeCards.Add(timeCard);
+					_allTimeCards.Add(timeCard);
 					}
 				}
 			}
@@ -635,17 +635,17 @@ namespace LivingDevAgent.Editor.Modules
 		private void RestoreActiveTimerState ()
 			{
 			// Look for active time-card using proper getter
-			TimeCardData activeCard = this._allTimeCards.FirstOrDefault(tc => tc.GetIsOngoing());
+			TimeCardData activeCard = _allTimeCards.FirstOrDefault(tc => tc.GetIsOngoing());
 			if (activeCard != null)
 				{
-				this._activeTimeCard = activeCard;
-				this._isTimerRunning = true;
-				this._sessionStartTime = EditorApplication.timeSinceStartup; // Reset to current time
-				this._accumulatedTime = 0.0; // Start fresh session
+				_activeTimeCard = activeCard;
+				_isTimerRunning = true;
+				_sessionStartTime = EditorApplication.timeSinceStartup; // Reset to current time
+				_accumulatedTime = 0.0; // Start fresh session
 
 				TaskData task = activeCard.GetTask();
 				string taskName = task != null ? task.TaskName : "Unknown Task";
-				this.SetStatus($"⏰ Restored active timer: {taskName}");
+				SetStatus($"⏰ Restored active timer: {taskName}");
 				}
 			}
 
@@ -672,7 +672,7 @@ namespace LivingDevAgent.Editor.Modules
 
 				if (GUILayout.Button("📝", EditorStyles.miniButton, GUILayout.Width(25)))
 					{
-					this.ImportTimeCardToTLDL(timeCard);
+					ImportTimeCardToTLDL(timeCard);
 					}
 
 				if (GUILayout.Button("🗑️", EditorStyles.miniButton, GUILayout.Width(25)))
@@ -680,7 +680,7 @@ namespace LivingDevAgent.Editor.Modules
 					if (EditorUtility.DisplayDialog("Delete Time-Card",
 						$"Delete time-card for '{taskName}'?", "Delete", "Cancel"))
 						{
-						this.DeleteTimeCard(timeCard);
+						DeleteTimeCard(timeCard);
 						}
 					}
 				}
@@ -703,51 +703,51 @@ namespace LivingDevAgent.Editor.Modules
 				timeSummary += $"- Details:\n{reportData}\n";
 				}
 
-			this._data.TechnicalDetails += timeSummary;
-			this._data.IncludeTechnicalDetails = true;
+			_data.TechnicalDetails += timeSummary;
+			_data.IncludeTechnicalDetails = true;
 
-			this.SetStatus($"📝 Imported time-card to TLDL: {taskName}");
+			SetStatus($"📝 Imported time-card to TLDL: {taskName}");
 			}
 
 		private void ShowTimeCardImportDialog ()
 			{
-			if (this._allTimeCards.Count == 0)
+			if (_allTimeCards.Count == 0)
 				{
 				EditorUtility.DisplayDialog("No Time-Cards", "No time-cards available to import.", "OK");
 				return;
 				}
 
 			var menu = new GenericMenu();
-			foreach (TimeCardData timeCard in this._allTimeCards)
+			foreach (TimeCardData timeCard in _allTimeCards)
 				{
 				TaskData task = timeCard.GetTask();
 				string taskName = task != null ? task.TaskName : "Unknown Task";
 				string duration = $"{timeCard.GetDurationInHours():F2}h";
 
 				menu.AddItem(new GUIContent($"{taskName} ({duration})"),
-						   false, () => this.ImportTimeCardToTLDL(timeCard));
+						   false, () => ImportTimeCardToTLDL(timeCard));
 				}
 			menu.ShowAsContext();
 			}
 
 		private void DeleteTimeCard (TimeCardData timeCard)
 			{
-			this._allTimeCards.Remove(timeCard);
+			_allTimeCards.Remove(timeCard);
 			string assetPath = AssetDatabase.GetAssetPath(timeCard);
 			AssetDatabase.DeleteAsset(assetPath);
 			AssetDatabase.Refresh();
 
 			TaskData task = timeCard.GetTask();
 			string taskName = task != null ? task.TaskName : "Unknown Task";
-			this.SetStatus($"🗑️ Deleted time-card: {taskName}");
+			SetStatus($"🗑️ Deleted time-card: {taskName}");
 			}
 
 		private string FormatCurrentTime ()
 			{
-			if (this._isTimerRunning)
+			if (_isTimerRunning)
 				{
-				this.UpdateAccumulatedTime();
-				return this.FormatDuration(this._accumulatedTime);
+				UpdateAccumulatedTime();
+				return FormatDuration(_accumulatedTime);
 				}
 			else
 				{

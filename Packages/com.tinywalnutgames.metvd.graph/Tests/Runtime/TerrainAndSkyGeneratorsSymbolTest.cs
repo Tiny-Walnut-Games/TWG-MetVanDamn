@@ -95,7 +95,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		[Test]
 		public void TypeConversionUtility_CanConvertTypes ()
 			{
-			// Test that TypeConversionUtility can convert between types
+			// Test that TypeConversionUtility can convert between the deprecated and new enum types
+			// This validates the compatibility bridge works correctly during the transition period
 			RoomFeatureType platformType = RoomFeatureType.Platform;
 			RoomFeatureType obstacleType = RoomFeatureType.Obstacle;
 
@@ -104,8 +105,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			RoomFeatureObjectType convertedObstacle = TypeConversionUtility.ConvertToObjectType(obstacleType);
 #pragma warning restore CS0618 // Type or member is obsolete
 
-			Assert.AreEqual(RoomFeatureType.Platform, convertedPlatform);
-			Assert.AreEqual(RoomFeatureType.Obstacle, convertedObstacle);
+			// Validate that the conversion utility correctly maps between enum types
+			Assert.AreEqual(RoomFeatureObjectType.Platform, convertedPlatform);
+			Assert.AreEqual(RoomFeatureObjectType.Obstacle, convertedObstacle);
 			}
 
 		[Test]
