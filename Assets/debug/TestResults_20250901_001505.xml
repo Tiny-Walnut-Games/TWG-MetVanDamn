@@ -1,0 +1,970 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="101" result="Failed(Child)" total="101" passed="85" failed="16" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="1.6306243">
+  <test-suite type="TestSuite" id="1221" name="TWG-MetVanDamn" fullname="TWG-MetVanDamn" runstate="Runnable" testcasecount="101" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="1.630624" total="101" passed="85" failed="16" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1196" name="TinyWalnutGames.MetVD.Authoring.Tests.dll" fullname="E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/ScriptAssemblies/TinyWalnutGames.MetVD.Authoring.Tests.dll" runstate="Runnable" testcasecount="94" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="1.553624" total="94" passed="79" failed="15" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="62752" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1197" name="TinyWalnutGames" fullname="TinyWalnutGames" runstate="Runnable" testcasecount="94" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="1.548757" total="94" passed="79" failed="15" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1198" name="MetVD" fullname="TinyWalnutGames.MetVD" runstate="Runnable" testcasecount="94" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="1.543981" total="94" passed="79" failed="15" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1201" name="Authoring" fullname="TinyWalnutGames.MetVD.Authoring" runstate="Runnable" testcasecount="45" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.616357" total="45" passed="34" failed="11" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestSuite" id="1202" name="Tests" fullname="TinyWalnutGames.MetVD.Authoring.Tests" runstate="Runnable" testcasecount="45" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.612598" total="45" passed="34" failed="11" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-suite type="TestFixture" id="1104" name="AuthoringBakeIntegrationTests" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.319515" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1107" name="ConnectionBaking_CreatesConnectionEdgeComponents" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.ConnectionBaking_CreatesConnectionEdgeComponents" methodname="ConnectionBaking_CreatesConnectionEdgeComponents" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="389279974" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.241357" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1106" name="DistrictBaking_CreatesAllRequiredComponents" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.DistrictBaking_CreatesAllRequiredComponents" methodname="DistrictBaking_CreatesAllRequiredComponents" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="849888587" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.009366" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1108" name="GateConditionBaking_CreatesBufferElements" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.GateConditionBaking_CreatesBufferElements" methodname="GateConditionBaking_CreatesBufferElements" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="2013859185" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.003625" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1111" name="SampleWfcData_CreatesValidTileSet" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.SampleWfcData_CreatesValidTileSet" methodname="SampleWfcData_CreatesValidTileSet" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="1628340284" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.012236" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1114" name="TestBiomeArtProfileValidationFailures" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.TestBiomeArtProfileValidationFailures" methodname="TestBiomeArtProfileValidationFailures" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="1199343708" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.007503" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1115" name="TestComplexRelationshipIntegrity" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.TestComplexRelationshipIntegrity" methodname="TestComplexRelationshipIntegrity" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="248630511" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.010639" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1113" name="TestCrossComponentRelationshipFailures" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.TestCrossComponentRelationshipFailures" methodname="TestCrossComponentRelationshipFailures" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="1143196071" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002427" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1112" name="TestInvalidDataValidationFailures" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.TestInvalidDataValidationFailures" methodname="TestInvalidDataValidationFailures" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="1420769623" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.004268" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1110" name="WfcSocketCompatibility_ValidatesCorrectly" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.WfcSocketCompatibility_ValidatesCorrectly" methodname="WfcSocketCompatibility_ValidatesCorrectly" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="1793147535" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001187" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1105" name="WfcTilePrototypeBaking_CreatesCorrectComponents" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.WfcTilePrototypeBaking_CreatesCorrectComponents" methodname="WfcTilePrototypeBaking_CreatesCorrectComponents" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="366326375" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001701" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1109" name="WorldGenerationConfig_IntegratesWithPipeline" fullname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests.WorldGenerationConfig_IntegratesWithPipeline" methodname="WorldGenerationConfig_IntegratesWithPipeline" classname="TinyWalnutGames.MetVD.Authoring.Tests.AuthoringBakeIntegrationTests" runstate="Runnable" seed="825807313" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.003096" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1116" name="BiomeArtIntegrationSystemTests" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.045538" total="5" passed="0" failed="5" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <failure>
+                  <message><![CDATA[One or more child tests had errors]]></message>
+                </failure>
+                <test-case id="1117" name="BiomeArtIntegrationSystem_CreatesCorrectTilemaps_ForAllProjectionTypes" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.BiomeArtIntegrationSystem_CreatesCorrectTilemaps_ForAllProjectionTypes" methodname="BiomeArtIntegrationSystem_CreatesCorrectTilemaps_ForAllProjectionTypes" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests" runstate="Runnable" seed="1868073389" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.029942" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.InvalidOperationException : GetSingleton<Unity.Entities.BeginInitializationEntityCommandBufferSystem+Singleton>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()]]></message>
+                    <stack-trace><![CDATA[  at Unity.Entities.EntityQueryImpl.GetSingleton[T] () [0x0023c] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:1471 
+  at Unity.Entities.EntityQuery.GetSingleton[T] () [0x00000] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:2743 
+  at TinyWalnutGames.MetVD.Authoring.BiomeArtMainThreadSystem.OnUpdate () [0x00000] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs:601 
+  at Unity.Entities.SystemBase.Update () [0x0005e] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SystemBase.cs:418 
+  at TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.BiomeArtIntegrationSystem_CreatesCorrectTilemaps_ForAllProjectionTypes () [0x00023] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs:57 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1118" name="BiomeArtMainThreadSystem_GeneratesValidGrids_WithCorrectLayerStructure" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.BiomeArtMainThreadSystem_GeneratesValidGrids_WithCorrectLayerStructure" methodname="BiomeArtMainThreadSystem_GeneratesValidGrids_WithCorrectLayerStructure" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests" runstate="Runnable" seed="1786304803" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001287" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.InvalidOperationException : GetSingleton<Unity.Entities.BeginInitializationEntityCommandBufferSystem+Singleton>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()]]></message>
+                    <stack-trace><![CDATA[  at Unity.Entities.EntityQueryImpl.GetSingleton[T] () [0x0023c] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:1471 
+  at Unity.Entities.EntityQuery.GetSingleton[T] () [0x00000] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:2743 
+  at TinyWalnutGames.MetVD.Authoring.BiomeArtMainThreadSystem.OnUpdate () [0x00000] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs:601 
+  at Unity.Entities.SystemBase.Update () [0x0005e] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SystemBase.cs:418 
+  at TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.BiomeArtMainThreadSystem_GeneratesValidGrids_WithCorrectLayerStructure () [0x00009] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs:76 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1121" name="BiomeTransitions_BlendSmoothly_AtBiomeBoundaries" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.BiomeTransitions_BlendSmoothly_AtBiomeBoundaries" methodname="BiomeTransitions_BlendSmoothly_AtBiomeBoundaries" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests" runstate="Runnable" seed="715676874" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001855" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.InvalidOperationException : GetSingleton<Unity.Entities.BeginInitializationEntityCommandBufferSystem+Singleton>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()]]></message>
+                    <stack-trace><![CDATA[  at Unity.Entities.EntityQueryImpl.GetSingleton[T] () [0x0023c] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:1471 
+  at Unity.Entities.EntityQuery.GetSingleton[T] () [0x00000] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:2743 
+  at TinyWalnutGames.MetVD.Authoring.BiomeArtMainThreadSystem.OnUpdate () [0x00000] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs:601 
+  at Unity.Entities.SystemBase.Update () [0x0005e] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SystemBase.cs:418 
+  at TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.BiomeTransitions_BlendSmoothly_AtBiomeBoundaries () [0x00059] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs:153 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1120" name="CheckeredMaterialOverride_GeneratesCoordinateAware_Patterns" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.CheckeredMaterialOverride_GeneratesCoordinateAware_Patterns" methodname="CheckeredMaterialOverride_GeneratesCoordinateAware_Patterns" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests" runstate="Runnable" seed="862634029" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002060" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.InvalidOperationException : GetSingleton<Unity.Entities.BeginInitializationEntityCommandBufferSystem+Singleton>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()]]></message>
+                    <stack-trace><![CDATA[  at Unity.Entities.EntityQueryImpl.GetSingleton[T] () [0x0023c] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:1471 
+  at Unity.Entities.EntityQuery.GetSingleton[T] () [0x00000] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:2743 
+  at TinyWalnutGames.MetVD.Authoring.BiomeArtMainThreadSystem.OnUpdate () [0x00000] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs:601 
+  at Unity.Entities.SystemBase.Update () [0x0005e] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SystemBase.cs:418 
+  at TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.CheckeredMaterialOverride_GeneratesCoordinateAware_Patterns () [0x00007] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs:119 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1119" name="PropPlacement_RespectsAdvancedStrategies_AndAvoidanceRules" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.PropPlacement_RespectsAdvancedStrategies_AndAvoidanceRules" methodname="PropPlacement_RespectsAdvancedStrategies_AndAvoidanceRules" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests" runstate="Runnable" seed="1111234080" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001499" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.InvalidOperationException : GetSingleton<Unity.Entities.BeginInitializationEntityCommandBufferSystem+Singleton>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()]]></message>
+                    <stack-trace><![CDATA[  at Unity.Entities.EntityQueryImpl.GetSingleton[T] () [0x0023c] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:1471 
+  at Unity.Entities.EntityQuery.GetSingleton[T] () [0x00000] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\Iterators\EntityQuery.cs:2743 
+  at TinyWalnutGames.MetVD.Authoring.BiomeArtMainThreadSystem.OnUpdate () [0x00000] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs:601 
+  at Unity.Entities.SystemBase.Update () [0x0005e] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SystemBase.cs:418 
+  at TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtIntegrationSystemTests.PropPlacement_RespectsAdvancedStrategies_AndAvoidanceRules () [0x00007] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs:96 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1122" name="BiomeArtProfileTests" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.017456" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1128" name="BiomeArtProfile_AllowedPropLayersCanBeModified" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests.BiomeArtProfile_AllowedPropLayersCanBeModified" methodname="BiomeArtProfile_AllowedPropLayersCanBeModified" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests" runstate="Runnable" seed="451813505" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002326" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1123" name="BiomeArtProfile_CanBeCreated" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests.BiomeArtProfile_CanBeCreated" methodname="BiomeArtProfile_CanBeCreated" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests" runstate="Runnable" seed="1130436413" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002846" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1127" name="BiomeArtProfile_DefaultLayersConfiguration" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests.BiomeArtProfile_DefaultLayersConfiguration" methodname="BiomeArtProfile_DefaultLayersConfiguration" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests" runstate="Runnable" seed="522148749" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002451" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1124" name="BiomeArtProfileReference_CanBeAddedToEntity" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests.BiomeArtProfileReference_CanBeAddedToEntity" methodname="BiomeArtProfileReference_CanBeAddedToEntity" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests" runstate="Runnable" seed="1519431277" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001328" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1125" name="BiomeTransition_ComponentDataWorks" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests.BiomeTransition_ComponentDataWorks" methodname="BiomeTransition_ComponentDataWorks" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests" runstate="Runnable" seed="1320939003" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001327" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1126" name="ProjectionType_EnumValuesAreCorrect" fullname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests.ProjectionType_EnumValuesAreCorrect" methodname="ProjectionType_EnumValuesAreCorrect" classname="TinyWalnutGames.MetVD.Authoring.Tests.BiomeArtProfileTests" runstate="Runnable" seed="1274524963" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.000788" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1129" name="SceneSetupIntegrationTests" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests" classname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.048486" total="5" passed="2" failed="3" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <failure>
+                  <message><![CDATA[One or more child tests had errors]]></message>
+                </failure>
+                <test-case id="1134" name="SceneSetup_ConfigurationConsistency_MaintainsDataIntegrity" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.SceneSetup_ConfigurationConsistency_MaintainsDataIntegrity" methodname="SceneSetup_ConfigurationConsistency_MaintainsDataIntegrity" classname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests" runstate="Runnable" seed="810160671" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.006970" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  ----> System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                    <stack-trace><![CDATA[  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00083] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+  at TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.InvokeMethod (System.String methodName) [0x00012] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs:314 
+  at TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.SceneSetup_ConfigurationConsistency_MaintainsDataIntegrity () [0x00085] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs:209 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+--NullReferenceException
+  at TinyWalnutGames.MetVD.Samples.SmokeTestSceneSetup.SetupSmokeTestWorld () [0x0000b] in .\Packages\com.tinywalnutgames.metvd.samples\Runtime\SmokeTestSceneSetup.cs:56 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1132" name="SceneSetup_DistrictHierarchy_SupportsNestedSectorGeneration" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.SceneSetup_DistrictHierarchy_SupportsNestedSectorGeneration" methodname="SceneSetup_DistrictHierarchy_SupportsNestedSectorGeneration" classname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests" runstate="Runnable" seed="201601403" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.007253" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Created 8 districts based on targetSectorCount (9)
+]]></output>
+                </test-case>
+                <test-case id="1130" name="SceneSetup_FullWorkflow_CreatesValidWorld" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.SceneSetup_FullWorkflow_CreatesValidWorld" methodname="SceneSetup_FullWorkflow_CreatesValidWorld" classname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests" runstate="Runnable" seed="1131267393" result="Failed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.021292" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[  Should have exactly one world configuration entity
+  Expected: 1
+  But was:  0
+]]></message>
+                    <stack-trace><![CDATA[at TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.VerifyWorldConfiguration () [0x00054] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs:242
+at TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests+<SceneSetup_FullWorkflow_CreatesValidWorld>d__6.MoveNext () [0x000c8] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs:72
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@a6f5be5f149c\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1133" name="SceneSetup_PolarityFieldLayout_SupportsComplexBiomeGeneration" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.SceneSetup_PolarityFieldLayout_SupportsComplexBiomeGeneration" methodname="SceneSetup_PolarityFieldLayout_SupportsComplexBiomeGeneration" classname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests" runstate="Runnable" seed="161829925" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.004841" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1131" name="SceneSetup_WorldConfiguration_IntegratesWithECSSystems" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.SceneSetup_WorldConfiguration_IntegratesWithECSSystems" methodname="SceneSetup_WorldConfiguration_IntegratesWithECSSystems" classname="TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests" runstate="Runnable" seed="1591719086" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002030" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  ----> System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                    <stack-trace><![CDATA[  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00083] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+  at TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.InvokeMethod (System.String methodName) [0x00012] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs:314 
+  at TinyWalnutGames.MetVD.Authoring.Tests.SceneSetupIntegrationTests.SceneSetup_WorldConfiguration_IntegratesWithECSSystems () [0x00027] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs:92 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+--NullReferenceException
+  at TinyWalnutGames.MetVD.Samples.SmokeTestSceneSetup.SetupSmokeTestWorld () [0x0000b] in .\Packages\com.tinywalnutgames.metvd.samples\Runtime\SmokeTestSceneSetup.cs:56 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1135" name="SmokeTestSceneSetupTests" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" testcasecount="9" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.110627" total="9" passed="8" failed="1" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <failure>
+                  <message><![CDATA[One or more child tests had errors]]></message>
+                </failure>
+                <test-case id="1139" name="SmokeTestSceneSetup_BiomeFieldCreation_CreatesAllPolarityFields" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_BiomeFieldCreation_CreatesAllPolarityFields" methodname="SmokeTestSceneSetup_BiomeFieldCreation_CreatesAllPolarityFields" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="746811783" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.003770" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1141" name="SmokeTestSceneSetup_ComponentConfiguration_HasRequiredECSComponents" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_ComponentConfiguration_HasRequiredECSComponents" methodname="SmokeTestSceneSetup_ComponentConfiguration_HasRequiredECSComponents" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="1583747893" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002888" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Created 5 districts based on targetSectorCount (5)
+]]></output>
+                </test-case>
+                <test-case id="1142" name="SmokeTestSceneSetup_DebugVisualization_DrawsBoundsCorrectly" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_DebugVisualization_DrawsBoundsCorrectly" methodname="SmokeTestSceneSetup_DebugVisualization_DrawsBoundsCorrectly" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="1406526937" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.013060" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1136" name="SmokeTestSceneSetup_DefaultConfiguration_IsValid" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_DefaultConfiguration_IsValid" methodname="SmokeTestSceneSetup_DefaultConfiguration_IsValid" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="258462447" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001467" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1138" name="SmokeTestSceneSetup_DistrictCreation_RespectsTargetSectorCount" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_DistrictCreation_RespectsTargetSectorCount" methodname="SmokeTestSceneSetup_DistrictCreation_RespectsTargetSectorCount" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="565699571" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.067367" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Created 8 districts based on targetSectorCount (8)
+]]></output>
+                </test-case>
+                <test-case id="1140" name="SmokeTestSceneSetup_DistrictGridPlacement_FollowsExpectedPattern" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_DistrictGridPlacement_FollowsExpectedPattern" methodname="SmokeTestSceneSetup_DistrictGridPlacement_FollowsExpectedPattern" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="1080020474" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.006538" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Created 8 districts based on targetSectorCount (8)
+]]></output>
+                </test-case>
+                <test-case id="1143" name="SmokeTestSceneSetup_ExtremeTargetSectorCount_HandlesGracefully" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_ExtremeTargetSectorCount_HandlesGracefully" methodname="SmokeTestSceneSetup_ExtremeTargetSectorCount_HandlesGracefully" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="386979331" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.004200" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Created 24 districts based on targetSectorCount (100)
+Created 0 districts based on targetSectorCount (0)
+]]></output>
+                </test-case>
+                <test-case id="1144" name="SmokeTestSceneSetup_PolarityFieldPositioning_MatchesExpectedLayout" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_PolarityFieldPositioning_MatchesExpectedLayout" methodname="SmokeTestSceneSetup_PolarityFieldPositioning_MatchesExpectedLayout" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="561690901" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.003589" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1137" name="SmokeTestSceneSetup_WorldConfiguration_CreatesCorrectEntities" fullname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_WorldConfiguration_CreatesCorrectEntities" methodname="SmokeTestSceneSetup_WorldConfiguration_CreatesCorrectEntities" classname="TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests" runstate="Runnable" seed="522060385" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001516" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  ----> System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                    <stack-trace><![CDATA[  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00083] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+  at TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.InvokePrivateMethod (System.String methodName) [0x0002d] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SmokeTestSceneSetupTests.cs:333 
+  at TinyWalnutGames.MetVD.Authoring.Tests.SmokeTestSceneSetupTests.SmokeTestSceneSetup_WorldConfiguration_CreatesCorrectEntities () [0x00027] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SmokeTestSceneSetupTests.cs:71 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 
+--NullReferenceException
+  at TinyWalnutGames.MetVD.Samples.SmokeTestSceneSetup.SetupSmokeTestWorld () [0x0000b] in .\Packages\com.tinywalnutgames.metvd.samples\Runtime\SmokeTestSceneSetup.cs:56 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1145" name="WfcDeterminismTests" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests" classname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.049686" total="4" passed="2" failed="2" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <failure>
+                  <message><![CDATA[One or more child tests had errors]]></message>
+                </failure>
+                <test-case id="1149" name="WfcConstraintValidation_IsConsistent" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests.WfcConstraintValidation_IsConsistent" methodname="WfcConstraintValidation_IsConsistent" classname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests" runstate="Runnable" seed="139683654" result="Failed" label="Error" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.012340" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[System.ArgumentException : A component with type:TinyWalnutGames.MetVD.Core.NodeId has not been added to the entity. Entities Journaling may be able to help determine more information. Please enable Entities Journaling for a more helpful error message.]]></message>
+                    <stack-trace><![CDATA[  at Unity.Entities.EntityComponentStore.AssertEntityHasComponent (Unity.Entities.Entity entity, Unity.Entities.ComponentType componentType) [0x00026] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\EntityComponentStoreDebug.cs:342 
+  at Unity.Entities.EntityComponentStore.AssertEntityHasComponent (Unity.Entities.Entity entity, Unity.Entities.TypeIndex componentTypeIndex) [0x00000] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\EntityComponentStoreDebug.cs:364 
+  at Unity.Entities.EntityDataAccess.SetComponentData[T] (Unity.Entities.Entity entity, T componentData, Unity.Entities.SystemHandle& originSystem) [0x00006] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\EntityDataAccess.cs:1281 
+  at Unity.Entities.EntityManager.SetComponentData[T] (Unity.Entities.Entity entity, T componentData) [0x00006] in .\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\EntityManager.cs:469 
+  at TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests.WfcConstraintValidation_IsConsistent () [0x00018] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\WfcDeterminismTests.cs:117 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <6460d52f11fa4eaeabfca1cf2e9eca8f>:0 ]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1147" name="WfcGeneration_WithDifferentSeeds_ProducesDifferentResults" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests.WfcGeneration_WithDifferentSeeds_ProducesDifferentResults" methodname="WfcGeneration_WithDifferentSeeds_ProducesDifferentResults" classname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests" runstate="Runnable" seed="762878306" result="Failed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.018179" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[  Different seeds should produce different results
+  Expected: True
+  But was:  False
+]]></message>
+                    <stack-trace><![CDATA[at TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests.WfcGeneration_WithDifferentSeeds_ProducesDifferentResults () [0x00073] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\WfcDeterminismTests.cs:89
+]]></stack-trace>
+                  </failure>
+                  <output><![CDATA['TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+]]></output>
+                </test-case>
+                <test-case id="1146" name="WfcGeneration_WithSameSeed_ProducesSameResults" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests.WfcGeneration_WithSameSeed_ProducesSameResults" methodname="WfcGeneration_WithSameSeed_ProducesSameResults" classname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests" runstate="Runnable" seed="1646961875" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.003390" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA['TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+]]></output>
+                </test-case>
+                <test-case id="1148" name="WfcGeneration_WithSameWorldConfig_IsReproducible" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests.WfcGeneration_WithSameWorldConfig_IsReproducible" methodname="WfcGeneration_WithSameWorldConfig_IsReproducible" classname="TinyWalnutGames.MetVD.Authoring.Tests.WfcDeterminismTests" runstate="Runnable" seed="60069799" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.003392" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA['TinyWalnutGames.MetVD.Graph.DistrictWfcSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+]]></output>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1150" name="WorldBootstrapTests" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests" classname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.015258" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1152" name="WorldBootstrapConfiguration_CanBeAddedToEntity" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests.WorldBootstrapConfiguration_CanBeAddedToEntity" methodname="WorldBootstrapConfiguration_CanBeAddedToEntity" classname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests" runstate="Runnable" seed="1398731936" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002265" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1151" name="WorldBootstrapConfiguration_CanBeCreated" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests.WorldBootstrapConfiguration_CanBeCreated" methodname="WorldBootstrapConfiguration_CanBeCreated" classname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests" runstate="Runnable" seed="1969707039" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.000956" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1154" name="WorldBootstrapSystem_RequiresCorrectComponents" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests.WorldBootstrapSystem_RequiresCorrectComponents" methodname="WorldBootstrapSystem_RequiresCorrectComponents" classname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests" runstate="Runnable" seed="660710144" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001415" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1153" name="WorldBootstrapTags_CanBeAddedToEntity" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests.WorldBootstrapTags_CanBeAddedToEntity" methodname="WorldBootstrapTags_CanBeAddedToEntity" classname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests" runstate="Runnable" seed="1727633418" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.002549" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1155" name="WorldConfiguration_IsCompatibleWithBootstrap" fullname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests.WorldConfiguration_IsCompatibleWithBootstrap" methodname="WorldConfiguration_IsCompatibleWithBootstrap" classname="TinyWalnutGames.MetVD.Authoring.Tests.WorldBootstrapTests" runstate="Runnable" seed="1108576081" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001849" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+          <test-suite type="TestSuite" id="1199" name="Graph" fullname="TinyWalnutGames.MetVD.Graph" runstate="Runnable" testcasecount="10" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="0.842888" total="10" passed="9" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestSuite" id="1200" name="Tests" fullname="TinyWalnutGames.MetVD.Graph.Tests" runstate="Runnable" testcasecount="10" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="0.839218" total="10" passed="9" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-suite type="TestFixture" id="1092" name="PlayerExperienceAndEndToEndTests" fullname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests" classname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.053323" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1097" name="AccessibilityValidation_EnsuresInclusivePlayerExperience" fullname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests.AccessibilityValidation_EnsuresInclusivePlayerExperience" methodname="AccessibilityValidation_EnsuresInclusivePlayerExperience" classname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests" runstate="Runnable" seed="550871224" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.008238" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Accessibility validation ensures inclusive player experience
+All room types meet accessibility requirements for diverse players
+]]></output>
+                </test-case>
+                <test-case id="1094" name="EndToEndWorldGeneration_ProducesPlayableWorld_WithValidProgression" fullname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests.EndToEndWorldGeneration_ProducesPlayableWorld_WithValidProgression" methodname="EndToEndWorldGeneration_ProducesPlayableWorld_WithValidProgression" classname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests" runstate="Runnable" seed="401008363" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.033837" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Complete world setup ready: Config entity created, 0 rooms, 0 gates
+End-to-end pipeline successfully prepares for playable world
+]]></output>
+                </test-case>
+                <test-case id="1096" name="ErrorHandling_RecoverGracefully_FromCorruptedData" fullname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests.ErrorHandling_RecoverGracefully_FromCorruptedData" methodname="ErrorHandling_RecoverGracefully_FromCorruptedData" classname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests" runstate="Runnable" seed="1066123970" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001541" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Error handling successfully recovers from corrupted data
+System sanitizes invalid values instead of crashing
+]]></output>
+                </test-case>
+                <test-case id="1093" name="PlayerProgression_UnlocksIntendedAreas_AfterSkillAcquisition" fullname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests.PlayerProgression_UnlocksIntendedAreas_AfterSkillAcquisition" methodname="PlayerProgression_UnlocksIntendedAreas_AfterSkillAcquisition" classname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests" runstate="Runnable" seed="1131224001" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.003545" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Player progression correctly unlocks new areas
+Initial skills: Jump -> Upgraded skills: Jump, DoubleJump
+Area accessibility: False -> True
+]]></output>
+                </test-case>
+                <test-case id="1095" name="SaveLoadSystem_PreservesWorldState_AcrossSessionSimulation" fullname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests.SaveLoadSystem_PreservesWorldState_AcrossSessionSimulation" methodname="SaveLoadSystem_PreservesWorldState_AcrossSessionSimulation" classname="TinyWalnutGames.MetVD.Graph.Tests.PlayerExperienceAndEndToEndTests" runstate="Runnable" seed="313979167" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.001937" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Save/Load system successfully preserves world state
+Preserved world: Seed 99999, Size int2(20, 20)
+]]></output>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1098" name="UnityIntegrationAndPerformanceTests" fullname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests" classname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="0.782486" total="5" passed="4" failed="1" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <failure>
+                  <message><![CDATA[One or more child tests had errors]]></message>
+                </failure>
+                <test-case id="1102" name="HighPropDensity_MaintainsPerformance_WithoutFrameDrops" fullname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests.HighPropDensity_MaintainsPerformance_WithoutFrameDrops" methodname="HighPropDensity_MaintainsPerformance_WithoutFrameDrops" classname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests" runstate="Runnable" seed="1848267301" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.008655" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Created 100 props in 6ms
+Performance: 16666.7 props/second
+]]></output>
+                </test-case>
+                <test-case id="1099" name="JumpArcSolver_IntegratesWithActualUnityPhysics_InRealScene" fullname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests.JumpArcSolver_IntegratesWithActualUnityPhysics_InRealScene" methodname="JumpArcSolver_IntegratesWithActualUnityPhysics_InRealScene" classname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests" runstate="Runnable" seed="2104834501" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:04Z" duration="0.003591" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Jump arc solver calculations align with Unity physics setup
+Target (4,2) reachable with double jump: True
+]]></output>
+                </test-case>
+                <test-case id="1103" name="MemoryUsage_StaysWithinBudget_ForLargeOperations" fullname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests.MemoryUsage_StaysWithinBudget_ForLargeOperations" methodname="MemoryUsage_StaysWithinBudget_ForLargeOperations" classname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests" runstate="Runnable" seed="1649440557" result="Passed" start-time="2025-09-01 04:12:04Z" end-time="2025-09-01 04:12:05Z" duration="0.725326" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Memory usage increased by -1428KB for 1000 entities
+Memory efficiency: -1462.3 bytes per entity
+]]></output>
+                </test-case>
+                <test-case id="1100" name="TilemapGeneration_CreatesValidColliders_ForPhysicsInteraction" fullname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests.TilemapGeneration_CreatesValidColliders_ForPhysicsInteraction" methodname="TilemapGeneration_CreatesValidColliders_ForPhysicsInteraction" classname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests" runstate="Runnable" seed="1029584444" result="Failed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.019775" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[  All 4 tiles should be placed
+  Expected: 4
+  But was:  1
+]]></message>
+                    <stack-trace><![CDATA[at TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests.TilemapGeneration_CreatesValidColliders_ForPhysicsInteraction () [0x000e6] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\UnityIntegrationAndPerformanceTests.cs:126
+]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1101" name="WorldGeneration_CompletesWithinTimeLimit_ForMediumWorld" fullname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests.WorldGeneration_CompletesWithinTimeLimit_ForMediumWorld" methodname="WorldGeneration_CompletesWithinTimeLimit_ForMediumWorld" classname="TinyWalnutGames.MetVD.Graph.Tests.UnityIntegrationAndPerformanceTests" runstate="Runnable" seed="740813716" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.019836" asserts="0">
+                  <properties>
+                    <property name="_JOINTYPE" value="UnityCombinatorial" />
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[✅ Medium world (25x25) generated in 5ms
+Performance target: <15s for medium world generation
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+          <test-suite type="TestSuite" id="1203" name="Tests" fullname="TinyWalnutGames.MetVD.Tests" runstate="Runnable" testcasecount="39" result="Failed" site="Child" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.079938" total="39" passed="36" failed="3" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1156" name="AINavigationTests" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" testcasecount="39" result="Failed" site="Child" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.076060" total="39" passed="36" failed="3" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1159" name="AgentCapabilities_CanPassGate_WithMatchingPolarity_ReturnsTrue" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.AgentCapabilities_CanPassGate_WithMatchingPolarity_ReturnsTrue" methodname="AgentCapabilities_CanPassGate_WithMatchingPolarity_ReturnsTrue" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1635565246" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.001235" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1160" name="AgentCapabilities_CanPassGate_WithMismatchedPolarity_ReturnsFalse" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.AgentCapabilities_CanPassGate_WithMismatchedPolarity_ReturnsFalse" methodname="AgentCapabilities_CanPassGate_WithMismatchedPolarity_ReturnsFalse" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="2147410692" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000695" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1161" name="AgentCapabilities_CanPassSoftGate_WithHighSkill_ReturnsTrue" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.AgentCapabilities_CanPassSoftGate_WithHighSkill_ReturnsTrue" methodname="AgentCapabilities_CanPassSoftGate_WithHighSkill_ReturnsTrue" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="2013600553" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000920" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1169" name="AINavigationState_BasicCreation_IsValid" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.AINavigationState_BasicCreation_IsValid" methodname="AINavigationState_BasicCreation_IsValid" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1135532383" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000932" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1194" name="AINavigationSystem_CalculateMovementHeuristic_AccountsForVerticalMovement" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.AINavigationSystem_CalculateMovementHeuristic_AccountsForVerticalMovement" methodname="AINavigationSystem_CalculateMovementHeuristic_AccountsForVerticalMovement" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1242206360" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.006576" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1171" name="AINavigationSystem_Creation_DoesNotThrow" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.AINavigationSystem_Creation_DoesNotThrow" methodname="AINavigationSystem_Creation_DoesNotThrow" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1703376534" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.001714" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1182" name="ArcJump_Ability_IsCorrectlyDefined" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.ArcJump_Ability_IsCorrectlyDefined" methodname="ArcJump_Ability_IsCorrectlyDefined" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="2139134587" result="Failed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000996" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at TinyWalnutGames.MetVD.Tests.AINavigationTests.ArcJump_Ability_IsCorrectlyDefined () [0x00065] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\AINavigationTests.cs:477
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1195" name="JumpArcPhysics_CalculatesReasonableCosts" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.JumpArcPhysics_CalculatesReasonableCosts" methodname="JumpArcPhysics_CalculatesReasonableCosts" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1246327023" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.002068" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1193" name="MovementEfficiencyMultiplier_AllArcMovementAbilities_StacksBonuses" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.MovementEfficiencyMultiplier_AllArcMovementAbilities_StacksBonuses" methodname="MovementEfficiencyMultiplier_AllArcMovementAbilities_StacksBonuses" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1606062435" result="Failed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000892" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: less than 1.0f
+  But was:  5.0f
+]]></message>
+                  <stack-trace><![CDATA[at TinyWalnutGames.MetVD.Tests.AINavigationTests.MovementEfficiencyMultiplier_AllArcMovementAbilities_StacksBonuses () [0x00070] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\AINavigationTests.cs:663
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1192" name="MovementEfficiencyMultiplier_ArcJumpWithBasicJump_ProvidesBonus" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.MovementEfficiencyMultiplier_ArcJumpWithBasicJump_ProvidesBonus" methodname="MovementEfficiencyMultiplier_ArcJumpWithBasicJump_ProvidesBonus" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1385655198" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000877" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1181" name="NavigationComplexTest_MultipleGateConditions" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationComplexTest_MultipleGateConditions" methodname="NavigationComplexTest_MultipleGateConditions" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="352147177" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000831" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1168" name="NavigationGraph_BasicCreation_IsValid" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationGraph_BasicCreation_IsValid" methodname="NavigationGraph_BasicCreation_IsValid" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="55926902" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000715" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1170" name="NavigationGraphBuildSystem_Creation_DoesNotThrow" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationGraphBuildSystem_Creation_DoesNotThrow" methodname="NavigationGraphBuildSystem_Creation_DoesNotThrow" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="593208129" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.009638" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1179" name="NavigationIntegrationTest_FullScenario_WorksCorrectly" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationIntegrationTest_FullScenario_WorksCorrectly" methodname="NavigationIntegrationTest_FullScenario_WorksCorrectly" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="603291114" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.006144" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1174" name="NavigationIssue_Creation_IsValid" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationIssue_Creation_IsValid" methodname="NavigationIssue_Creation_IsValid" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="864145215" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000935" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1180" name="NavigationNegativeTest_AgentCannotTraverseHardGate" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationNegativeTest_AgentCannotTraverseHardGate" methodname="NavigationNegativeTest_AgentCannotTraverseHardGate" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="621788819" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000663" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1175" name="NavigationQuickFix_Creation_IsValid" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationQuickFix_Creation_IsValid" methodname="NavigationQuickFix_Creation_IsValid" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1670703847" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000705" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1173" name="NavigationValidationReport_Creation_IsValid" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationValidationReport_Creation_IsValid" methodname="NavigationValidationReport_Creation_IsValid" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="2128948155" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.004508" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1172" name="NavigationValidationSystem_Creation_DoesNotThrow" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationValidationSystem_Creation_DoesNotThrow" methodname="NavigationValidationSystem_Creation_DoesNotThrow" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="72743461" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.002339" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1178" name="NavigationValidationUtility_GenerateQuickFixSuggestions_DoesNotThrow" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationValidationUtility_GenerateQuickFixSuggestions_DoesNotThrow" methodname="NavigationValidationUtility_GenerateQuickFixSuggestions_DoesNotThrow" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1205109352" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.003244" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1176" name="NavigationValidationUtility_GenerateValidationReport_DoesNotThrow" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationValidationUtility_GenerateValidationReport_DoesNotThrow" methodname="NavigationValidationUtility_GenerateValidationReport_DoesNotThrow" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="32720820" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.002515" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1177" name="NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult" methodname="NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1893950506" result="Failed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.002189" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult () [0x0002a] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\AINavigationTests.cs:349
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1158" name="NavLink_BasicCreation_IsValid" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_BasicCreation_IsValid" methodname="NavLink_BasicCreation_IsValid" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="862911834" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000758" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1190" name="NavLink_CalculateArcTraversalCost_DownwardMovement_LowerCost" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_DownwardMovement_LowerCost" methodname="NavLink_CalculateArcTraversalCost_DownwardMovement_LowerCost" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1119174598" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000702" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1189" name="NavLink_CalculateArcTraversalCost_ImpossibleJump_ReturnsHighCost" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_ImpossibleJump_ReturnsHighCost" methodname="NavLink_CalculateArcTraversalCost_ImpossibleJump_ReturnsHighCost" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="160354758" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000726" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1185" name="NavLink_CalculateArcTraversalCost_WithArcJump_ProvidesBetterControl" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_WithArcJump_ProvidesBetterControl" methodname="NavLink_CalculateArcTraversalCost_WithArcJump_ProvidesBetterControl" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="2121592313" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000740" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1183" name="NavLink_CalculateArcTraversalCost_WithBasicJump_ReturnsCorrectCost" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_WithBasicJump_ReturnsCorrectCost" methodname="NavLink_CalculateArcTraversalCost_WithBasicJump_ReturnsCorrectCost" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="595897430" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000678" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1186" name="NavLink_CalculateArcTraversalCost_WithChargedJump_HandlesVariableHeight" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_WithChargedJump_HandlesVariableHeight" methodname="NavLink_CalculateArcTraversalCost_WithChargedJump_HandlesVariableHeight" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="896711380" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000687" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1184" name="NavLink_CalculateArcTraversalCost_WithDoubleJump_HandlesHigherJumps" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_WithDoubleJump_HandlesHigherJumps" methodname="NavLink_CalculateArcTraversalCost_WithDoubleJump_HandlesHigherJumps" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="940119737" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000703" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1191" name="NavLink_CalculateArcTraversalCost_WithGlideSpeed_ReducesFallCost" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_WithGlideSpeed_ReducesFallCost" methodname="NavLink_CalculateArcTraversalCost_WithGlideSpeed_ReducesFallCost" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1338317009" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000725" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1188" name="NavLink_CalculateArcTraversalCost_WithGrapple_HandlesArcTrajectory" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_WithGrapple_HandlesArcTrajectory" methodname="NavLink_CalculateArcTraversalCost_WithGrapple_HandlesArcTrajectory" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="2116409428" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000682" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1187" name="NavLink_CalculateArcTraversalCost_WithTeleportArc_HandlesLongDistances" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateArcTraversalCost_WithTeleportArc_HandlesLongDistances" methodname="NavLink_CalculateArcTraversalCost_WithTeleportArc_HandlesLongDistances" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="406989924" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000677" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1165" name="NavLink_CalculateTraversalCost_WithPolarityMismatch_IncreasesBaseCost" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CalculateTraversalCost_WithPolarityMismatch_IncreasesBaseCost" methodname="NavLink_CalculateTraversalCost_WithPolarityMismatch_IncreasesBaseCost" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="641639759" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000679" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1162" name="NavLink_CanTraverseWith_MatchingCapabilities_ReturnsTrue" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CanTraverseWith_MatchingCapabilities_ReturnsTrue" methodname="NavLink_CanTraverseWith_MatchingCapabilities_ReturnsTrue" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1990215646" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000814" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1163" name="NavLink_CanTraverseWith_MismatchedPolarity_ReturnsFalse" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CanTraverseWith_MismatchedPolarity_ReturnsFalse" methodname="NavLink_CanTraverseWith_MismatchedPolarity_ReturnsFalse" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="2096246177" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000653" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1164" name="NavLink_CanTraverseWith_SoftGate_ReturnsTrue" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_CanTraverseWith_SoftGate_ReturnsTrue" methodname="NavLink_CanTraverseWith_SoftGate_ReturnsTrue" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1645704236" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000708" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1166" name="NavLink_GetDestination_Bidirectional_ReturnsCorrectDestination" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_GetDestination_Bidirectional_ReturnsCorrectDestination" methodname="NavLink_GetDestination_Bidirectional_ReturnsCorrectDestination" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="2024132320" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000737" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1167" name="NavLink_GetDestination_OneWay_ReturnsCorrectDestination" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavLink_GetDestination_OneWay_ReturnsCorrectDestination" methodname="NavLink_GetDestination_OneWay_ReturnsCorrectDestination" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="1891104541" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.000654" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1157" name="NavNode_BasicCreation_IsValid" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavNode_BasicCreation_IsValid" methodname="NavNode_BasicCreation_IsValid" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="440265761" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.001017" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1212" name="TinyWalnutGames.Tools.Editor.Tests.dll" fullname="E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/ScriptAssemblies/TinyWalnutGames.Tools.Editor.Tests.dll" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.062976" total="7" passed="6" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="62752" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1213" name="TinyWalnutGames" fullname="TinyWalnutGames" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.059739" total="7" passed="6" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1214" name="Tools" fullname="TinyWalnutGames.Tools" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.056772" total="7" passed="6" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1215" name="Editor" fullname="TinyWalnutGames.Tools.Editor" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.053688" total="7" passed="6" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestSuite" id="1216" name="Tests" fullname="TinyWalnutGames.Tools.Editor.Tests" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.050889" total="7" passed="6" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-suite type="TestFixture" id="1204" name="BiomeRegionExtractorTests" fullname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" classname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" runstate="Runnable" testcasecount="7" result="Failed" site="Child" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.047809" total="7" passed="6" failed="1" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <failure>
+                  <message><![CDATA[One or more child tests had errors]]></message>
+                </failure>
+                <test-case id="1206" name="BiomeMapping_DataStructure_WorksCorrectly" fullname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests.BiomeMapping_DataStructure_WorksCorrectly" methodname="BiomeMapping_DataStructure_WorksCorrectly" classname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" runstate="Runnable" seed="1146703655" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.006495" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1207" name="BiomeMetadata_Serialization_WorksCorrectly" fullname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests.BiomeMetadata_Serialization_WorksCorrectly" methodname="BiomeMetadata_Serialization_WorksCorrectly" classname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" runstate="Runnable" seed="1655229359" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.007680" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1205" name="BiomeRegionExtractor_CanBeCreated" fullname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests.BiomeRegionExtractor_CanBeCreated" methodname="BiomeRegionExtractor_CanBeCreated" classname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" runstate="Runnable" seed="347289529" result="Failed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.007716" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[  Expected: No Exception to be thrown
+  But was:  <System.NullReferenceException: Object reference not set to an instance of an object
+  at UnityEditor.EditorWindow.Close () [0x0006c] in <e926e9c7db684472928e12ac2693beec>:0 
+  at TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests+<>c.<BiomeRegionExtractor_CanBeCreated>b__5_0 () [0x0000b] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\Tools\Editor\Tests\BiomeRegionExtractorTests.cs:68 
+  at NUnit.Framework.Constraints.ThrowsConstraint+VoidInvocationDescriptor.Invoke () [0x00000] in <f577cd9686154d6ab10efd7e65e64366>:0 
+  at NUnit.Framework.Constraints.ThrowsConstraint+ExceptionInterceptor.Intercept (System.Object invocation) [0x00041] in <f577cd9686154d6ab10efd7e65e64366>:0 >
+]]></message>
+                    <stack-trace><![CDATA[at TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests.BiomeRegionExtractor_CanBeCreated () [0x00000] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\Tools\Editor\Tests\BiomeRegionExtractorTests.cs:64
+]]></stack-trace>
+                  </failure>
+                </test-case>
+                <test-case id="1210" name="CellSizeValidation_DetectsInvalidValues" fullname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests.CellSizeValidation_DetectsInvalidValues" methodname="CellSizeValidation_DetectsInvalidValues" classname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" runstate="Runnable" seed="340858219" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.005382" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1208" name="ColorComparison_WithTolerance_WorksCorrectly" fullname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests.ColorComparison_WithTolerance_WorksCorrectly" methodname="ColorComparison_WithTolerance_WorksCorrectly" classname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" runstate="Runnable" seed="2074978274" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.005221" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1209" name="FileNamingPattern_Replacement_WorksCorrectly" fullname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests.FileNamingPattern_Replacement_WorksCorrectly" methodname="FileNamingPattern_Replacement_WorksCorrectly" classname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" runstate="Runnable" seed="1994685154" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.005119" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1211" name="GridDimensions_CalculatedCorrectly" fullname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests.GridDimensions_CalculatedCorrectly" methodname="GridDimensions_CalculatedCorrectly" classname="TinyWalnutGames.Tools.Editor.Tests.BiomeRegionExtractorTests" runstate="Runnable" seed="1331205983" result="Passed" start-time="2025-09-01 04:12:05Z" end-time="2025-09-01 04:12:05Z" duration="0.005084" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Saving results to: C:/Users/Jerry/AppData/LocalLow/DefaultCompany/TWG-MetVanDamn\TestResults.xml
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
