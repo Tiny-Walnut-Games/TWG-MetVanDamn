@@ -63,19 +63,21 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 		private static bool DetermineLayoutOrientation (RoomHierarchyData hierarchy, BiomeAffinity biome, ref Unity.Mathematics.Random random)
 			{
-			RectInt bounds = hierarchy.Bounds; bool isVertical = bounds.height > bounds.width;
+			RectInt bounds = hierarchy.Bounds; 
+			bool isVertical = bounds.height > bounds.width;
+			
 			return biome switch
 				{
-					BiomeAffinity.Sky => true,
-					BiomeAffinity.Underground => random.NextFloat() > 0.6f,
-					BiomeAffinity.Mountain => random.NextFloat() > 0.3f,
-					BiomeAffinity.Any => throw new System.NotImplementedException(),
-					BiomeAffinity.Forest => throw new System.NotImplementedException(),
-					BiomeAffinity.Desert => throw new System.NotImplementedException(),
-					BiomeAffinity.Ocean => throw new System.NotImplementedException(),
-					BiomeAffinity.TechZone => throw new System.NotImplementedException(),
-					BiomeAffinity.Volcanic => throw new System.NotImplementedException(),
-					_ => isVertical || random.NextFloat() > 0.5f
+					BiomeAffinity.Sky => true, // Sky biomes always prefer vertical layouts
+					BiomeAffinity.Underground => random.NextFloat() > 0.6f, // Underground prefers horizontal but can be vertical
+					BiomeAffinity.Mountain => random.NextFloat() > 0.3f, // Mountain biomes favor vertical layouts
+					BiomeAffinity.Forest => isVertical || random.NextFloat() > 0.4f, // Forest adapts to room shape with bias toward vertical
+					BiomeAffinity.Desert => random.NextFloat() > 0.7f, // Desert strongly prefers horizontal layouts
+					BiomeAffinity.Ocean => random.NextFloat() > 0.8f, // Ocean heavily favors horizontal movement
+					BiomeAffinity.TechZone => random.NextFloat() > 0.5f, // TechZone is neutral orientation
+					BiomeAffinity.Volcanic => random.NextFloat() > 0.6f, // Volcanic prefers horizontal escape routes
+					BiomeAffinity.Any => isVertical || random.NextFloat() > 0.5f, // Fallback to room shape with random variation
+					_ => isVertical || random.NextFloat() > 0.5f // Default fallback
 					};
 			}
 		private static MovementCapabilityTags GenerateMovementCapabilities (RoomGeneratorType generatorType, RoomType roomType, ref Unity.Mathematics.Random random)

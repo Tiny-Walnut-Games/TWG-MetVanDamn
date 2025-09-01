@@ -63,33 +63,44 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_WorldConfiguration_CreatesCorrectEntities ()
 			{
-			// Override the default world to use our test world
-			this.SetPrivateField("defaultWorld", this.testWorld);
-			this.SetPrivateField("entityManager", this.entityManager);
+			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - Set DefaultGameObjectInjectionWorld to our test world
+			World originalWorld = World.DefaultGameObjectInjectionWorld;
+			World.DefaultGameObjectInjectionWorld = this.testWorld;
 
-			// Invoke the private SetupSmokeTestWorld method
-			this.InvokePrivateMethod("SetupSmokeTestWorld");
+			try
+				{
+				// Enable logging to see world usage
+				this.SetPrivateField("logGenerationSteps", true);
 
-			// Verify world configuration entities were created
-			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(WorldSeed));
-			Assert.AreEqual(1, query.CalculateEntityCount(), "Should create exactly one WorldSeed entity");
+				// Invoke the private SetupSmokeTestWorld method
+				this.InvokePrivateMethod("SetupSmokeTestWorld");
 
-			Entity configEntity = query.GetSingletonEntity();
-			WorldSeed seed = this.entityManager.GetComponentData<WorldSeed>(configEntity);
-			Assert.AreEqual(42u, seed.Value);
+				// Verify world configuration entities were created
+				using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(WorldSeed));
+				Assert.AreEqual(1, query.CalculateEntityCount(), "Should create exactly one WorldSeed entity");
 
-			// Verify WorldBounds component
-			Assert.IsTrue(this.entityManager.HasComponent<WorldBounds>(configEntity));
-			WorldBounds bounds = this.entityManager.GetComponentData<WorldBounds>(configEntity);
-			Assert.AreEqual(new int2(-25, -25), bounds.Min);
-			Assert.AreEqual(new int2(25, 25), bounds.Max);
+				Entity configEntity = query.GetSingletonEntity();
+				WorldSeed seed = this.entityManager.GetComponentData<WorldSeed>(configEntity);
+				Assert.AreEqual(42u, seed.Value);
 
-			// Verify WorldGenerationConfig component
-			Assert.IsTrue(this.entityManager.HasComponent<WorldGenerationConfig>(configEntity));
-			WorldGenerationConfig genConfig = this.entityManager.GetComponentData<WorldGenerationConfig>(configEntity);
-			Assert.AreEqual(5, genConfig.TargetSectorCount);
-			Assert.AreEqual(20, genConfig.MaxDistrictCount); // targetSectorCount * 4
-			Assert.AreEqual(10.0f, genConfig.BiomeTransitionRadius, 0.001f);
+				// Verify WorldBounds component
+				Assert.IsTrue(this.entityManager.HasComponent<WorldBounds>(configEntity));
+				WorldBounds bounds = this.entityManager.GetComponentData<WorldBounds>(configEntity);
+				Assert.AreEqual(new int2(-25, -25), bounds.Min);
+				Assert.AreEqual(new int2(25, 25), bounds.Max);
+
+				// Verify WorldGenerationConfig component
+				Assert.IsTrue(this.entityManager.HasComponent<WorldGenerationConfig>(configEntity));
+				WorldGenerationConfig genConfig = this.entityManager.GetComponentData<WorldGenerationConfig>(configEntity);
+				Assert.AreEqual(5, genConfig.TargetSectorCount);
+				Assert.AreEqual(20, genConfig.MaxDistrictCount); // targetSectorCount * 4
+				Assert.AreEqual(10.0f, genConfig.BiomeTransitionRadius, 0.001f);
+				}
+			finally
+				{
+				// ✅ RESTORE ORIGINAL WORLD - Clean up injection
+				World.DefaultGameObjectInjectionWorld = originalWorld;
+				}
 			}
 
 		[Test]

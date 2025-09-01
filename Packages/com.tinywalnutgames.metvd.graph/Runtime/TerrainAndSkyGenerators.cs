@@ -20,12 +20,18 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		private ComponentLookup<JumpPhysicsData> _jumpPhysicsLookup;
 		private BufferLookup<RoomFeatureElement> _featureBufferLookup;
+		private EntityQuery _roomGenerationQuery; // 🔥 CREATE QUERY IN ONCREATE
 
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
 			_jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
+			
+			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
+			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
+				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+				.Build(ref state);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
@@ -34,14 +40,18 @@ namespace TinyWalnutGames.MetVD.Graph
 			_jumpPhysicsLookup.Update(ref state);
 			_featureBufferLookup.Update(ref state);
 
-			var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
+			// 🛠️ SEED FIX: Ensure we always have a non-zero seed for Unity.Mathematics.Random
+			uint timeBasedSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000);
+			uint safeSeed = timeBasedSeed == 0 ? 1 : timeBasedSeed; // Ensure non-zero seed
+			var random = new Unity.Mathematics.Random(safeSeed);
 
 			// Gather entities for job processing
-			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
-				.Build(ref state);
+			//EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
+			//	.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+			//	.Build(ref state);
 
-			NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+			//NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+			NativeArray<Entity> entities = _roomGenerationQuery.ToEntityArray(Allocator.Temp); // Use pre-created query
 			ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
 			ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
 			ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
@@ -215,7 +225,7 @@ namespace TinyWalnutGames.MetVD.Graph
 							int switchY = segmentY + 1;
 							features.Add(new RoomFeatureElement
 								{
-								Type = RoomFeatureType.Switch,
+							 Type = RoomFeatureType.Switch,
 								Position = new int2(switchX, switchY),
 								FeatureId = seed + 30000
 								});
@@ -266,12 +276,18 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		private BufferLookup<RoomFeatureElement> _featureBufferLookup;
 		private ComponentLookup<SecretAreaConfig> _secretConfigLookup;
+		private EntityQuery _roomGenerationQuery; // 🔥 ADD PRE-CREATED QUERY
 
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
 			_secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
+			
+			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
+			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
+				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+				.Build(ref state);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
@@ -280,14 +296,13 @@ namespace TinyWalnutGames.MetVD.Graph
 			_featureBufferLookup.Update(ref state);
 			_secretConfigLookup.Update(ref state);
 
-			var random = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
+			// 🛠️ SEED FIX: Ensure we always have a non-zero seed for Unity.Mathematics.Random
+			uint timeBasedSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000);
+			uint safeSeed = timeBasedSeed == 0 ? 1 : timeBasedSeed; // Ensure non-zero seed
+			var random = new Unity.Mathematics.Random(safeSeed);
 
-			// Gather entities for job processing
-			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
-				.Build(ref state);
-
-			NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+			// 🔥 FIX: Use pre-created query instead of creating new one
+			NativeArray<Entity> entities = _roomGenerationQuery.ToEntityArray(Allocator.Temp);
 			ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
 			ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
 			ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
@@ -525,7 +540,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				features.Add(new RoomFeatureElement
 					{
-					Type = RoomFeatureType.Platform,
+				 Type = RoomFeatureType.Platform,
 					Position = platformPos,
 					FeatureId = (uint)(seed + 10 + beatIndex * 1000)
 					});
@@ -566,7 +581,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				features.Add(new RoomFeatureElement
 					{
-					Type = RoomFeatureType.Platform,
+				 Type = RoomFeatureType.Platform,
 					Position = platformPos,
 					FeatureId = (uint)(seed + 110 + beatIndex * 1000)
 					});
@@ -617,7 +632,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						{
 						features.Add(new RoomFeatureElement
 							{
-							Type = RoomFeatureType.Obstacle,
+						 Type = RoomFeatureType.Obstacle,
 							Position = wallPos,
 							FeatureId = (uint)(seed + 210 + beatIndex * 1000 + c)
 							});
@@ -666,7 +681,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						{
 						features.Add(new RoomFeatureElement
 							{
-							Type = RoomFeatureType.Platform,
+						 Type = RoomFeatureType.Platform,
 							Position = new int2(x, upperY),
 							FeatureId = (uint)(seed + 1000 + x)
 							});
@@ -687,7 +702,7 @@ namespace TinyWalnutGames.MetVD.Graph
 							{
 							features.Add(new RoomFeatureElement
 								{
-								Type = RoomFeatureType.PowerUp, // Rare treasures in extreme areas
+							 Type = RoomFeatureType.PowerUp, // Rare treasures in extreme areas
 								Position = new int2(x + 1, upperY + 2),
 								FeatureId = (uint)(seed + 1800 + x)
 								});
@@ -772,12 +787,18 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		private ComponentLookup<Core.Biome> _biomeLookup;
 		private BufferLookup<RoomFeatureElement> _featureBufferLookup;
+		private EntityQuery _roomGenerationQuery; // 🔥 ADD PRE-CREATED QUERY
 
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
 			_biomeLookup = state.GetComponentLookup<Core.Biome>(true);
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
+			
+			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
+			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
+				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+				.Build(ref state);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
@@ -786,12 +807,8 @@ namespace TinyWalnutGames.MetVD.Graph
 			_biomeLookup.Update(ref state);
 			_featureBufferLookup.Update(ref state);
 
-			// Gather entities for job processing
-			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
-				.Build(ref state);
-
-			NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+			// 🔥 FIX: Use pre-created query instead of creating new one
+			NativeArray<Entity> entities = _roomGenerationQuery.ToEntityArray(Allocator.Temp);
 			ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
 			ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
 			ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
@@ -957,12 +974,18 @@ namespace TinyWalnutGames.MetVD.Graph
 		{
 		private BufferLookup<RoomFeatureElement> _featureBufferLookup;
 		private ComponentLookup<Core.Biome> _biomeLookup;
+		private EntityQuery _roomGenerationQuery; // 🔥 ADD PRE-CREATED QUERY
 
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
 			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>();
 			_biomeLookup = state.GetComponentLookup<Core.Biome>(true);
+			
+			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
+			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
+				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+				.Build(ref state);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
@@ -971,12 +994,8 @@ namespace TinyWalnutGames.MetVD.Graph
 			_featureBufferLookup.Update(ref state);
 			_biomeLookup.Update(ref state);
 
-			// Gather entities for job processing
-			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
-				.Build(ref state);
-
-			NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+			// 🔥 FIX: Use pre-created query instead of creating new one
+			NativeArray<Entity> entities = _roomGenerationQuery.ToEntityArray(Allocator.Temp);
 			ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
 			ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
 			ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
@@ -1079,7 +1098,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 					features.Add(new RoomFeatureElement
 						{
-						Type = RoomFeatureType.Platform,
+					 Type = RoomFeatureType.Platform,
 						Position = new int2(cloudX, cloudY),
 						FeatureId = (uint)(seed + layerIndex * 1000 + cloud * 100)
 						});
@@ -1195,7 +1214,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						{
 						features.Add(new RoomFeatureElement
 							{
-							Type = RoomFeatureType.Secret, // Bonus secret in complex areas
+						 Type = RoomFeatureType.Secret, // Bonus secret in complex areas
 							Position = new int2(centerX + 1, centerY + 1),
 							FeatureId = (uint)(seed + 6000 + islandIndex * 100 + 50)
 							});

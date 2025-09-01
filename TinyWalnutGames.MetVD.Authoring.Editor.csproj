@@ -102,6 +102,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileInspector.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\PlayerExperienceAndEndToEndTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SubSceneConversionTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\UnityIntegrationAndPerformanceTests.cs" />
   </ItemGroup>
   <ItemGroup>

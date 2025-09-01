@@ -55,6 +55,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[UnityTest]
 		public IEnumerator SceneSetup_FullWorkflow_CreatesValidWorld ()
 			{
+			// ✅ FIX: Configure test world injection before starting
+			this.SetField("defaultWorld", this.testWorld);
+			this.SetField("entityManager", this.entityManager);
+			this.SetField("createdFallbackWorld", false); // Prevent fallback world creation
+			
 			// Configure scene setup with test parameters
 			this.SetField("worldSeed", 12345u);
 			this.SetField("worldSize", new int2(30, 30));
@@ -83,39 +88,47 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SceneSetup_WorldConfiguration_IntegratesWithECSSystems ()
 			{
-			// Test that the world configuration created by scene setup
-			// is compatible with ECS systems that might process it
+			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - Set DefaultGameObjectInjectionWorld to our test world
+			World originalWorld = World.DefaultGameObjectInjectionWorld;
+			World.DefaultGameObjectInjectionWorld = this.testWorld;
 
-			// Setup the scene manually (avoiding Start() dependency)
-			this.SetField("defaultWorld", this.testWorld);
-			this.SetField("entityManager", this.entityManager);
-			this.InvokeMethod("SetupSmokeTestWorld");
-
-			// Verify systems can query the created entities
-			using EntityQuery seedQuery = this.entityManager.CreateEntityQuery(typeof(WorldSeed));
-			using EntityQuery boundsQuery = this.entityManager.CreateEntityQuery(typeof(WorldBounds));
-			using EntityQuery configQuery = this.entityManager.CreateEntityQuery(typeof(WorldGenerationConfig));
-			using EntityQuery nodeQuery = this.entityManager.CreateEntityQuery(typeof(NodeId));
-			using EntityQuery polarityQuery = this.entityManager.CreateEntityQuery(typeof(PolarityFieldData));
-
-			Assert.AreEqual(1, seedQuery.CalculateEntityCount(), "WorldSeed singleton should exist");
-			Assert.AreEqual(1, boundsQuery.CalculateEntityCount(), "WorldBounds singleton should exist");
-			Assert.AreEqual(1, configQuery.CalculateEntityCount(), "WorldGenerationConfig singleton should exist");
-			Assert.Greater(nodeQuery.CalculateEntityCount(), 0, "Districts should have NodeId components");
-			Assert.AreEqual(4, polarityQuery.CalculateEntityCount(), "Four polarity fields should exist");
-
-			// Test that entities have the expected component combinations
-			NativeArray<Entity> nodeEntities = nodeQuery.ToEntityArray(Allocator.Temp);
-			foreach (Entity entity in nodeEntities)
+			try
 				{
-				Assert.IsTrue(this.entityManager.HasComponent<WfcState>(entity),
-					"All district entities should have WfcState for WFC processing");
-				Assert.IsTrue(this.entityManager.HasBuffer<WfcCandidateBufferElement>(entity),
-					"All district entities should have WfcCandidateBuffer for constraint solving");
-				Assert.IsTrue(this.entityManager.HasBuffer<ConnectionBufferElement>(entity),
-					"All district entities should have ConnectionBuffer for navigation");
+				// Setup the scene - should now use our test world directly 
+				this.SetField("logGenerationSteps", true); // Enable logging to see world usage
+				this.InvokeMethod("SetupSmokeTestWorld");
+
+				// Verify systems can query the created entities in the SAME world
+				using EntityQuery seedQuery = this.entityManager.CreateEntityQuery(typeof(WorldSeed));
+				using EntityQuery boundsQuery = this.entityManager.CreateEntityQuery(typeof(WorldBounds));
+				using EntityQuery configQuery = this.entityManager.CreateEntityQuery(typeof(WorldGenerationConfig));
+				using EntityQuery nodeQuery = this.entityManager.CreateEntityQuery(typeof(NodeId));
+				using EntityQuery polarityQuery = this.entityManager.CreateEntityQuery(typeof(PolarityFieldData));
+
+				Assert.AreEqual(1, seedQuery.CalculateEntityCount(), "WorldSeed singleton should exist");
+				Assert.AreEqual(1, boundsQuery.CalculateEntityCount(), "WorldBounds singleton should exist");
+				Assert.AreEqual(1, configQuery.CalculateEntityCount(), "WorldGenerationConfig singleton should exist");
+				Assert.Greater(nodeQuery.CalculateEntityCount(), 0, "Districts should have NodeId components");
+				Assert.AreEqual(4, polarityQuery.CalculateEntityCount(), "Four polarity fields should exist");
+
+				// Test that entities have the expected component combinations
+				NativeArray<Entity> nodeEntities = nodeQuery.ToEntityArray(Allocator.Temp);
+				foreach (Entity entity in nodeEntities)
+					{
+					Assert.IsTrue(this.entityManager.HasComponent<WfcState>(entity),
+						"All district entities should have WfcState for WFC processing");
+					Assert.IsTrue(this.entityManager.HasBuffer<WfcCandidateBufferElement>(entity),
+						"All district entities should have WfcCandidateBuffer for constraint solving");
+					Assert.IsTrue(this.entityManager.HasBuffer<ConnectionBufferElement>(entity),
+						"All district entities should have ConnectionBuffer for navigation");
+					}
+				nodeEntities.Dispose();
 				}
-			nodeEntities.Dispose();
+			finally
+				{
+				// ✅ RESTORE ORIGINAL WORLD - Clean up injection
+				World.DefaultGameObjectInjectionWorld = originalWorld;
+				}
 			}
 
 		[Test]
@@ -192,60 +205,72 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SceneSetup_ConfigurationConsistency_MaintainsDataIntegrity ()
 			{
-			// Test that all configuration values remain consistent across setup
-			this.SetField("defaultWorld", this.testWorld);
-			this.SetField("entityManager", this.entityManager);
+			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - Set DefaultGameObjectInjectionWorld to our test world
+			World originalWorld = World.DefaultGameObjectInjectionWorld;
+			World.DefaultGameObjectInjectionWorld = this.testWorld;
 
-			uint testSeed = 98765u;
-			int2 testWorldSize = new(60, 40);
-			int testSectorCount = 12;
-			float testTransitionRadius = 25.0f;
-
-			this.SetField("worldSeed", testSeed);
-			this.SetField("worldSize", testWorldSize);
-			this.SetField("targetSectorCount", testSectorCount);
-			this.SetField("biomeTransitionRadius", testTransitionRadius);
-
-			this.InvokeMethod("SetupSmokeTestWorld");
-
-			// Verify WorldSeed matches
-			using EntityQuery seedQuery = this.entityManager.CreateEntityQuery(typeof(WorldSeed));
-			WorldSeed worldSeed = seedQuery.GetSingleton<WorldSeed>();
-			Assert.AreEqual(testSeed, worldSeed.Value, "WorldSeed should match configured value");
-
-			// Verify WorldBounds matches
-			using EntityQuery boundsQuery = this.entityManager.CreateEntityQuery(typeof(WorldBounds));
-			WorldBounds worldBounds = boundsQuery.GetSingleton<WorldBounds>();
-			Assert.AreEqual(new int2(-30, -20), worldBounds.Min, "WorldBounds min should be half world size negative");
-			Assert.AreEqual(new int2(30, 20), worldBounds.Max, "WorldBounds max should be half world size positive");
-
-			// Verify WorldGenerationConfig matches
-			using EntityQuery configQuery = this.entityManager.CreateEntityQuery(typeof(WorldGenerationConfig));
-			WorldGenerationConfig genConfig = configQuery.GetSingleton<WorldGenerationConfig>();
-			Assert.AreEqual(testSectorCount, genConfig.TargetSectorCount, "Generation config should match target sector count");
-			Assert.AreEqual(testTransitionRadius, genConfig.BiomeTransitionRadius, 0.001f, "Biome transition radius should match");
-
-			// Verify polarity field radius matches
-			using EntityQuery polarityQuery = this.entityManager.CreateEntityQuery(typeof(PolarityFieldData));
-			NativeArray<Entity> polarityEntities = polarityQuery.ToEntityArray(Allocator.Temp);
-			foreach (Entity entity in polarityEntities)
+			try
 				{
-				PolarityFieldData data = this.entityManager.GetComponentData<PolarityFieldData>(entity);
-				Assert.AreEqual(testTransitionRadius, data.Radius, 0.001f, "Polarity field radius should match transition radius");
+				uint testSeed = 98765u;
+				int2 testWorldSize = new(60, 40);
+				int testSectorCount = 12;
+				float testTransitionRadius = 25.0f;
+
+				this.SetField("worldSeed", testSeed);
+				this.SetField("worldSize", testWorldSize);
+				this.SetField("targetSectorCount", testSectorCount);
+				this.SetField("biomeTransitionRadius", testTransitionRadius);
+				this.SetField("logGenerationSteps", true); // Enable logging to see world usage
+
+				this.InvokeMethod("SetupSmokeTestWorld");
+
+				// Verify WorldSeed matches
+				using EntityQuery seedQuery = this.entityManager.CreateEntityQuery(typeof(WorldSeed));
+				WorldSeed worldSeed = seedQuery.GetSingleton<WorldSeed>();
+				Assert.AreEqual(testSeed, worldSeed.Value, "WorldSeed should match configured value");
+
+				// Verify WorldBounds matches
+				using EntityQuery boundsQuery = this.entityManager.CreateEntityQuery(typeof(WorldBounds));
+				WorldBounds worldBounds = boundsQuery.GetSingleton<WorldBounds>();
+				Assert.AreEqual(new int2(-30, -20), worldBounds.Min, "WorldBounds min should be half world size negative");
+				Assert.AreEqual(new int2(30, 20), worldBounds.Max, "WorldBounds max should be half world size positive");
+
+				// Verify WorldGenerationConfig matches
+				using EntityQuery configQuery = this.entityManager.CreateEntityQuery(typeof(WorldGenerationConfig));
+				WorldGenerationConfig genConfig = configQuery.GetSingleton<WorldGenerationConfig>();
+				Assert.AreEqual(testSectorCount, genConfig.TargetSectorCount, "Generation config should match target sector count");
+				Assert.AreEqual(testTransitionRadius, genConfig.BiomeTransitionRadius, 0.001f, "Biome transition radius should match");
+
+				// Verify polarity field radius matches
+				using EntityQuery polarityQuery = this.entityManager.CreateEntityQuery(typeof(PolarityFieldData));
+				NativeArray<Entity> polarityEntities = polarityQuery.ToEntityArray(Allocator.Temp);
+				foreach (Entity entity in polarityEntities)
+					{
+					PolarityFieldData data = this.entityManager.GetComponentData<PolarityFieldData>(entity);
+					Assert.AreEqual(testTransitionRadius, data.Radius, 0.001f, "Polarity field radius should match transition radius");
+					}
+				polarityEntities.Dispose();
 				}
-			polarityEntities.Dispose();
+			finally
+				{
+				// ✅ RESTORE ORIGINAL WORLD - Clean up injection
+				World.DefaultGameObjectInjectionWorld = originalWorld;
+				}
 			}
 
 		private void VerifyWorldConfiguration ()
 			{
-			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(WorldSeed), typeof(WorldBounds), typeof(WorldGenerationConfig));
+			// ✅ FIX: Use the correct entity manager that has the entities
+			EntityManager em = this.entityManager;
+			
+			using EntityQuery query = em.CreateEntityQuery(typeof(WorldSeed), typeof(WorldBounds), typeof(WorldGenerationConfig));
 			Assert.AreEqual(1, query.CalculateEntityCount(), "Should have exactly one world configuration entity");
 
 			Entity configEntity = query.GetSingletonEntity();
 
-			WorldSeed seed = this.entityManager.GetComponentData<WorldSeed>(configEntity);
-			WorldBounds bounds = this.entityManager.GetComponentData<WorldBounds>(configEntity);
-			WorldGenerationConfig config = this.entityManager.GetComponentData<WorldGenerationConfig>(configEntity);
+			WorldSeed seed = em.GetComponentData<WorldSeed>(configEntity);
+			WorldBounds bounds = em.GetComponentData<WorldBounds>(configEntity);
+			WorldGenerationConfig config = em.GetComponentData<WorldGenerationConfig>(configEntity);
 
 			Assert.AreEqual(12345u, seed.Value);
 			Assert.AreEqual(new int2(-15, -15), bounds.Min);

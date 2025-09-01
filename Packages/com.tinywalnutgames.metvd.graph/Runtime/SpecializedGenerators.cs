@@ -35,32 +35,34 @@ namespace TinyWalnutGames.MetVD.Graph
 	public partial struct PatternDrivenModularGenerator : ISystem
 		{
 		private ComponentLookup<SkillTag> _skillTagLookup;
-		private BufferLookup<RoomPatternElement> _patternBufferLookup;
-		private BufferLookup<RoomModuleElement> _moduleBufferLookup;
+		private BufferLookup<RoomFeatureElement> _featureBufferLookup; // 🔥 USE EXISTING TYPE
+		private EntityQuery _roomGenerationQuery; // 🔥 CREATE QUERY IN ONCREATE
 
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
 			{
 			_skillTagLookup = state.GetComponentLookup<SkillTag>(true);
-			_patternBufferLookup = state.GetBufferLookup<RoomPatternElement>();
-			_moduleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
+			_featureBufferLookup = state.GetBufferLookup<RoomFeatureElement>(); // 🔥 USE EXISTING TYPE
+			
+			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
+			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
+				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+				.Build(ref state);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
 		public void OnUpdate (ref SystemState state)
 			{
 			_skillTagLookup.Update(ref state);
-			_patternBufferLookup.Update(ref state);
-			_moduleBufferLookup.Update(ref state);
+			_featureBufferLookup.Update(ref state); // 🔥 USE EXISTING TYPE
 
-			var baseRandom = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
+			// 🛠️ SEED FIX: Ensure we always have a non-zero seed for Unity.Mathematics.Random
+			uint timeBasedSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000);
+			uint safeSeed = timeBasedSeed == 0 ? 1 : timeBasedSeed; // Ensure non-zero seed
+			var baseRandom = new Unity.Mathematics.Random(safeSeed);
 
-			// Gather entities for job processing
-			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
-				.Build(ref state);
-
-			NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+			// 🔥 FIX: Use pre-created query instead of creating new one
+			NativeArray<Entity> entities = _roomGenerationQuery.ToEntityArray(Allocator.Temp);
 			ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
 			ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
 			ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
@@ -68,8 +70,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			var patternJob = new PatternGenerationJob
 				{
 				SkillTagLookup = _skillTagLookup,
-				PatternBufferLookup = _patternBufferLookup,
-				ModuleBufferLookup = _moduleBufferLookup,
+				FeatureBufferLookup = _featureBufferLookup, // 🔥 USE EXISTING TYPE
 				Entities = entities,
 				Requests = requests,
 				RoomData = roomData,
@@ -85,8 +86,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private struct PatternGenerationJob : IJob
 			{
 			[ReadOnly] public ComponentLookup<SkillTag> SkillTagLookup;
-			public BufferLookup<RoomPatternElement> PatternBufferLookup;
-			[ReadOnly] public BufferLookup<RoomModuleElement> ModuleBufferLookup;
+			public BufferLookup<RoomFeatureElement> FeatureBufferLookup; // 🔥 USE EXISTING TYPE
 			[ReadOnly] public NativeArray<Entity> Entities;
 			public ComponentLookup<RoomGenerationRequest> Requests;
 			[ReadOnly] public ComponentLookup<RoomHierarchyData> RoomData;
@@ -108,52 +108,52 @@ namespace TinyWalnutGames.MetVD.Graph
 						continue;
 						}
 
-					if (!PatternBufferLookup.HasBuffer(entity))
+					if (!FeatureBufferLookup.HasBuffer(entity))
 						{
 						continue;
 						}
 
-					DynamicBuffer<RoomPatternElement> patterns = PatternBufferLookup [ entity ];
+					DynamicBuffer<RoomFeatureElement> features = FeatureBufferLookup [ entity ]; // 🔥 USE EXISTING TYPE
 					RefRO<RoomHierarchyData> roomDataRO = RoomData.GetRefRO(entity);
 					RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
 					RectInt bounds = roomDataRO.ValueRO.Bounds;
 
-					// Clear existing patterns
-					patterns.Clear();
+					// Clear existing features
+					features.Clear();
 
 					var entityRandom = new Unity.Mathematics.Random(BaseRandom.state + (uint)entity.Index);
 
 					// Use nodeId coordinates for coordinate-aware pattern generation
 					float coordinateInfluence = CalculateCoordinateInfluence(nodeId.ValueRO, roomDataRO.ValueRO);
 
-					// Generate skill-specific patterns based on available abilities
+					// Generate skill-specific features based on available abilities
 					if ((request.ValueRO.AvailableSkills & Ability.Dash) != 0)
 						{
-						GenerateDashGaps(patterns, bounds, request.ValueRO.GenerationSeed, ref entityRandom, coordinateInfluence);
+						GenerateDashFeatures(features, bounds, request.ValueRO.GenerationSeed, ref entityRandom, coordinateInfluence);
 						processedPatternCount++;
 						}
 
 					if ((request.ValueRO.AvailableSkills & Ability.WallJump) != 0)
 						{
-						GenerateWallClimbShafts(patterns, bounds, request.ValueRO.GenerationSeed, ref entityRandom, coordinateInfluence);
+						GenerateWallJumpFeatures(features, bounds, request.ValueRO.GenerationSeed, ref entityRandom, coordinateInfluence);
 						processedPatternCount++;
 						}
 
 					if ((request.ValueRO.AvailableSkills & Ability.Grapple) != 0)
 						{
-						GenerateGrapplePoints(patterns, bounds, request.ValueRO.GenerationSeed, ref entityRandom, coordinateInfluence);
+						GenerateGrappleFeatures(features, bounds, request.ValueRO.GenerationSeed, ref entityRandom, coordinateInfluence);
 						processedPatternCount++;
 						}
 
 					// Add skill gates that require unlocked abilities
-					int skillGatesAdded = GenerateSkillGates(patterns, bounds, request.ValueRO.AvailableSkills, request.ValueRO.GenerationSeed, ref entityRandom, coordinateInfluence);
+					int skillGatesAdded = GenerateSkillGates(features, bounds, request.ValueRO.AvailableSkills, request.ValueRO.GenerationSeed, ref entityRandom, coordinateInfluence);
 					skillGateGenerationCount += skillGatesAdded;
 
 					request.ValueRW.IsComplete = true;
 					}
 				}
 
-			private static void GenerateDashGaps (DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
+			private static void GenerateDashFeatures (DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
 				{
 				int baseGapCount = math.max(1, bounds.width / 8);
 				int gapCount = (int)(baseGapCount * coordinateInfluence);
@@ -168,12 +168,23 @@ namespace TinyWalnutGames.MetVD.Graph
 					int baseGapWidth = random.NextInt(3, 5);
 					int gapWidth = (int)(baseGapWidth * math.clamp(coordinateInfluence, 0.8f, 1.5f));
 
-					patterns.Add(new RoomPatternElement(gapStart, RoomFeatureType.Platform, (uint)(seed + i * 10), Ability.Dash));
-					patterns.Add(new RoomPatternElement(new int2(gapStart.x + gapWidth, gapStart.y), RoomFeatureType.Platform, (uint)(seed + i * 10 + 1), Ability.Dash));
+					// Create platforms with dash-friendly gaps
+					features.Add(new RoomFeatureElement
+						{
+						Type = RoomFeatureType.Platform,
+						Position = gapStart,
+						FeatureId = (uint)(seed + i * 10)
+						});
+					features.Add(new RoomFeatureElement
+						{
+						Type = RoomFeatureType.Platform,
+						Position = new int2(gapStart.x + gapWidth, gapStart.y),
+						FeatureId = (uint)(seed + i * 10 + 1)
+						});
 					}
 				}
 
-			private static void GenerateWallClimbShafts (DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
+			private static void GenerateWallJumpFeatures (DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
 				{
 				int baseShaftCount = math.max(1, bounds.height / 8);
 				int shaftCount = (int)(baseShaftCount * coordinateInfluence);
@@ -185,14 +196,20 @@ namespace TinyWalnutGames.MetVD.Graph
 					int baseShaftHeight = random.NextInt(4, bounds.height - shaftBottom + bounds.y);
 					int shaftHeight = (int)(baseShaftHeight * math.clamp(coordinateInfluence, 0.7f, 1.8f));
 
+					// Create vertical walls for wall jumping
 					for (int y = shaftBottom; y < shaftBottom + shaftHeight; y += 2)
 						{
-						patterns.Add(new RoomPatternElement(new int2(shaftX, y), RoomFeatureType.Obstacle, (uint)(seed + i * 20), Ability.WallJump));
+						features.Add(new RoomFeatureElement
+							{
+							Type = RoomFeatureType.Obstacle,
+							Position = new int2(shaftX, y),
+							FeatureId = (uint)(seed + i * 20 + y)
+							});
 						}
 					}
 				}
 
-			private static void GenerateGrapplePoints (DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
+			private static void GenerateGrappleFeatures (DynamicBuffer<RoomFeatureElement> features, RectInt bounds, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
 				{
 				int basePointCount = math.max(1, (bounds.width * bounds.height) / 32);
 				int pointCount = (int)(basePointCount * coordinateInfluence);
@@ -204,37 +221,70 @@ namespace TinyWalnutGames.MetVD.Graph
 						random.NextInt(bounds.y + bounds.height / 2, bounds.y + bounds.height - 1)
 					);
 
-					patterns.Add(new RoomPatternElement(grapplePoint, RoomFeatureType.Platform, (uint)(seed + i * 30), Ability.Grapple));
+					features.Add(new RoomFeatureElement
+						{
+						Type = RoomFeatureType.GrapplePoint,
+						Position = grapplePoint,
+						FeatureId = (uint)(seed + i * 30)
+						});
 
+					// Add obstacles below grapple points for challenge
 					if (grapplePoint.y > bounds.y + 2 && random.NextFloat() < coordinateInfluence * 0.4f)
 						{
-						patterns.Add(new RoomPatternElement(new int2(grapplePoint.x, grapplePoint.y - 2), RoomFeatureType.Obstacle, (uint)(seed + i * 30 + 1)));
+						features.Add(new RoomFeatureElement
+							{
+							Type = RoomFeatureType.Obstacle,
+							Position = new int2(grapplePoint.x, grapplePoint.y - 2),
+							FeatureId = (uint)(seed + i * 30 + 1)
+							});
 						}
 					}
 				}
 
-			private static int GenerateSkillGates (DynamicBuffer<RoomPatternElement> patterns, RectInt bounds, Ability availableSkills, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
+			private static int GenerateSkillGates (DynamicBuffer<RoomFeatureElement> features, RectInt bounds, Ability availableSkills, uint seed, ref Unity.Mathematics.Random random, float coordinateInfluence)
 				{
 				int skillGatesAdded = 0;
 
+				// Create combination skill challenges
 				if ((availableSkills & (Ability.Dash | Ability.WallJump)) == (Ability.Dash | Ability.WallJump))
 					{
 					int centerX = bounds.x + bounds.width / 2;
 					int centerY = bounds.y + bounds.height / 2;
 					int challengeSpacing = (int)(3 * math.clamp(coordinateInfluence, 0.8f, 1.5f));
 
-					patterns.Add(new RoomPatternElement(new int2(centerX - challengeSpacing, centerY), RoomFeatureType.Platform, seed + 100, Ability.Dash));
-					patterns.Add(new RoomPatternElement(new int2(centerX, centerY + 2), RoomFeatureType.Obstacle, seed + 101, Ability.WallJump));
-					patterns.Add(new RoomPatternElement(new int2(centerX + challengeSpacing, centerY), RoomFeatureType.Platform, seed + 102, Ability.Dash));
+					features.Add(new RoomFeatureElement
+						{
+						Type = RoomFeatureType.Platform,
+						Position = new int2(centerX - challengeSpacing, centerY),
+						FeatureId = seed + 100
+						});
+					features.Add(new RoomFeatureElement
+						{
+						Type = RoomFeatureType.Obstacle,
+						Position = new int2(centerX, centerY + 2),
+						FeatureId = seed + 101
+						});
+					features.Add(new RoomFeatureElement
+						{
+						Type = RoomFeatureType.Platform,
+						Position = new int2(centerX + challengeSpacing, centerY),
+						FeatureId = seed + 102
+						});
 					skillGatesAdded += 3;
 					}
 
+				// Create grapple-specific challenges in complex areas
 				if (coordinateInfluence > 1.3f && (availableSkills & Ability.Grapple) != 0)
 					{
 					int challengeX = bounds.x + random.NextInt(bounds.width / 4, (bounds.width * 3) / 4);
 					int challengeY = bounds.y + bounds.height - 2;
 
-					patterns.Add(new RoomPatternElement(new int2(challengeX, challengeY), RoomFeatureType.Platform, seed + 200, Ability.Grapple));
+					features.Add(new RoomFeatureElement
+						{
+						Type = RoomFeatureType.GrapplePoint,
+						Position = new int2(challengeX, challengeY),
+						FeatureId = seed + 200
+						});
 					skillGatesAdded++;
 					}
 
@@ -274,6 +324,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private ComponentLookup<JumpPhysicsData> _jumpPhysicsLookup;
 		private ComponentLookup<JumpArcValidation> _validationLookup;
 		private BufferLookup<JumpConnectionElement> _jumpConnectionLookup;
+		private EntityQuery _roomGenerationQuery; // 🔥 CREATE QUERY IN ONCREATE
 
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
@@ -281,6 +332,11 @@ namespace TinyWalnutGames.MetVD.Graph
 			_jumpPhysicsLookup = state.GetComponentLookup<JumpPhysicsData>(true);
 			_validationLookup = state.GetComponentLookup<JumpArcValidation>();
 			_jumpConnectionLookup = state.GetBufferLookup<JumpConnectionElement>();
+			
+			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
+			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
+				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
+				.Build(ref state);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
@@ -290,12 +346,8 @@ namespace TinyWalnutGames.MetVD.Graph
 			_validationLookup.Update(ref state);
 			_jumpConnectionLookup.Update(ref state);
 
-			// Gather entities for job processing
-			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId>()
-				.Build(ref state);
-
-			NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+			// 🔥 FIX: Use pre-created query instead of creating new one
+			NativeArray<Entity> entities = _roomGenerationQuery.ToEntityArray(Allocator.Temp);
 			ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
 			ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
 			ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
@@ -433,6 +485,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		private ComponentLookup<SecretAreaConfig> _secretConfigLookup;
 		private ComponentLookup<BiomeAffinityComponent> _biomeAffinityLookup;
 		private BufferLookup<RoomModuleElement> _moduleBufferLookup;
+		private EntityQuery _roomGenerationQuery; // 🔥 CREATE QUERY IN ONCREATE
 
 		[BurstCompile]
 		public void OnCreate (ref SystemState state)
@@ -440,6 +493,11 @@ namespace TinyWalnutGames.MetVD.Graph
 			_secretConfigLookup = state.GetComponentLookup<SecretAreaConfig>(true);
 			_biomeAffinityLookup = state.GetComponentLookup<BiomeAffinityComponent>(true);
 			_moduleBufferLookup = state.GetBufferLookup<RoomModuleElement>(true);
+			
+			// 🔥 FIX: Create query in OnCreate instead of OnUpdate
+			_roomGenerationQuery = new EntityQueryBuilder(Allocator.Persistent)
+				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId, RoomFeatureElement>()
+				.Build(ref state);
 			}
 
 		// NOTE: Cannot use [BurstCompile] on OnUpdate due to ref SystemState parameter
@@ -449,14 +507,13 @@ namespace TinyWalnutGames.MetVD.Graph
 			_biomeAffinityLookup.Update(ref state);
 			_moduleBufferLookup.Update(ref state);
 
-			var baseRandom = new Unity.Mathematics.Random((uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000));
+			// 🛠️ SEED FIX: Ensure we always have a non-zero seed for Unity.Mathematics.Random
+			uint timeBasedSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 1000);
+			uint safeSeed = timeBasedSeed == 0 ? 1 : timeBasedSeed; // Ensure non-zero seed
+			var baseRandom = new Unity.Mathematics.Random(safeSeed);
 
-			// Gather entities for job processing
-			EntityQuery query = new EntityQueryBuilder(Allocator.Temp)
-				.WithAll<RoomGenerationRequest, RoomHierarchyData, NodeId, RoomFeatureElement>()
-				.Build(ref state);
-
-			NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+			// 🔥 FIX: Use pre-created query instead of creating new one
+			NativeArray<Entity> entities = _roomGenerationQuery.ToEntityArray(Allocator.Temp);
 			ComponentLookup<RoomGenerationRequest> requests = state.GetComponentLookup<RoomGenerationRequest>(false);
 			ComponentLookup<RoomHierarchyData> roomData = state.GetComponentLookup<RoomHierarchyData>(true);
 			ComponentLookup<NodeId> nodeIds = state.GetComponentLookup<NodeId>(true);
@@ -600,3 +657,4 @@ namespace TinyWalnutGames.MetVD.Graph
 			}
 		}
 	}
+

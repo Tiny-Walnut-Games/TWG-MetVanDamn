@@ -43,6 +43,9 @@ namespace TinyWalnutGames.MetVD.Graph
 			float deltaTime = state.WorldUnmanaged.Time.DeltaTime;
 			uint baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 911.0);
 
+			// 🔥 FIX: Complete any pending jobs that might be using these lookups
+			state.Dependency.Complete();
+
 			// Gather all entities with WfcState and NodeId into a NativeArray
 			EntityQuery wfcQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WfcState, NodeId>()
@@ -63,8 +66,13 @@ namespace TinyWalnutGames.MetVD.Graph
 				NodeIds = nodeIds
 				};
 
-			wfcJob.Execute();
+			// 🔥 FIX: Schedule the job properly with dependency tracking
+			JobHandle jobHandle = wfcJob.Schedule(state.Dependency);
+			state.Dependency = jobHandle;
 
+			// Complete the job immediately to ensure synchronization
+			state.Dependency.Complete();
+			
 			entities.Dispose();
 			}
 

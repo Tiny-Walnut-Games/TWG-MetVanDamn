@@ -76,6 +76,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\AuthoringBakeIntegrationTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SubSceneConversionTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtProfileTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WorldBootstrapTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SmokeTestSceneSetupTests.cs" />
@@ -1150,6 +1151,10 @@
     </Reference>
     <Reference Include="Unity.Transforms">
       <HintPath>Library\ScriptAssemblies\Unity.Transforms.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Scenes">
+      <HintPath>Library\ScriptAssemblies\Unity.Scenes.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

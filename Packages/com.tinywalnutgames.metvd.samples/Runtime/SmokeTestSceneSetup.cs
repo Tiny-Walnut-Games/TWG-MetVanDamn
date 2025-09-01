@@ -24,6 +24,7 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private EntityManager entityManager;
 		private World defaultWorld;
+		private bool createdFallbackWorld = false; // ✅ Track if we created a fallback world for cleanup
 
 		private void Start ()
 			{
@@ -52,11 +53,39 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void SetupSmokeTestWorld ()
 			{
-			defaultWorld = World.DefaultGameObjectInjectionWorld;
+			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - No fallback world creation in tests
+			// If we have an explicitly injected test world, use it directly
+			if (defaultWorld != null && defaultWorld.IsCreated)
+				{
+				if (logGenerationSteps)
+					{
+					Debug.Log($"🎯 Using explicitly injected world: {defaultWorld.Name}");
+					}
+				}
+			else
+				{
+				// Original logic for normal gameplay scenarios
+				defaultWorld = World.DefaultGameObjectInjectionWorld;
+				
+				if (defaultWorld == null)
+					{
+					if (logGenerationSteps)
+						{
+						Debug.LogWarning("⚠️ DefaultGameObjectInjectionWorld is null - creating fallback world for testing/standalone scenarios");
+						}
+					
+					// Create a fallback world if default injection world is not available (testing scenarios)
+					defaultWorld = new World("SmokeTest_FallbackWorld");
+					createdFallbackWorld = true; // Track for cleanup
+					}
+				}
+			
 			entityManager = defaultWorld.EntityManager;
 
+			// ✅ PHASE 1 VALIDATION: Log which world we're actually using
 			if (logGenerationSteps)
 				{
+				Debug.Log($"🧬 Entity creation will use world: {defaultWorld.Name} (IsCreated: {defaultWorld.IsCreated})");
 				Debug.Log("🚀 MetVanDAMN Smoke Test: Starting world generation...");
 				}
 
@@ -69,11 +98,18 @@ namespace TinyWalnutGames.MetVD.Samples
 				DebugDrawBounds();
 				}
 
+			// ✅ PHASE 1 CONFIRMATION: Log entity counts in the world we used
 			if (logGenerationSteps)
 				{
+				using var seedQuery = entityManager.CreateEntityQuery(typeof(WorldSeed));
+				using var districtQuery = entityManager.CreateEntityQuery(typeof(NodeId));
+				using var polarityQuery = entityManager.CreateEntityQuery(typeof(PolarityFieldData));
+				
 				Debug.Log($"✅ MetVanDAMN Smoke Test: World setup complete with seed {worldSeed}");
+				Debug.Log($"   World: {defaultWorld.Name}");
 				Debug.Log($"   World size: {worldSize.x}x{worldSize.y}");
 				Debug.Log($"   Target sectors: {targetSectorCount}");
+				Debug.Log($"   Entities created: {seedQuery.CalculateEntityCount()} seeds, {districtQuery.CalculateEntityCount()} districts, {polarityQuery.CalculateEntityCount()} polarity fields");
 				Debug.Log("   Systems will begin generation on next frame.");
 				}
 			}
@@ -194,6 +230,16 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void OnDestroy ()
 			{
+			// ✅ FIX: Proper cleanup of fallback world to prevent memory leaks
+			if (createdFallbackWorld && defaultWorld != null && defaultWorld.IsCreated)
+				{
+				if (logGenerationSteps)
+					{
+					Debug.Log("🧹 Disposing fallback world created for testing/standalone scenario");
+					}
+				defaultWorld.Dispose();
+				}
+			
 			if (logGenerationSteps)
 				{
 				Debug.Log("🔚 MetVanDAMN Smoke Test: Scene cleanup complete");
