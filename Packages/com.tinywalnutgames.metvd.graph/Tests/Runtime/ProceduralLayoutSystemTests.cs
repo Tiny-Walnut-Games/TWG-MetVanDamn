@@ -94,12 +94,24 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				TargetSectors = 6,
 				RandomizationMode = RandomizationMode.None
 				});
+			
+			// Create districts with proper SectorHierarchyData components (required by SectorRoomHierarchySystem)
 			for (uint i = 0; i < 3; i++)
 				{
 				Entity d = _entityManager.CreateEntity();
 				_entityManager.AddComponentData(d, new NodeId(i + 1, 0, 0, int2.zero));
 				_entityManager.AddComponentData(d, new WfcState());
+				// Add the missing SectorHierarchyData component that DistrictLayoutSystem would normally add
+				_entityManager.AddComponentData(d, new SectorHierarchyData(
+					new int2(6, 6), // Local grid size for sectors
+					math.max(1, 6 / 3), // Sectors per district (TargetSectors / district count)
+					(uint)(2222 + i) // Sector seed based on world seed + district index
+				));
 				}
+
+			// Add the DistrictLayoutDoneTag that triggers SectorRoomHierarchySystem
+			Entity layoutDone = _entityManager.CreateEntity();
+			_entityManager.AddComponentData(layoutDone, new DistrictLayoutDoneTag(3, 0));
 
 			// Act (single update should: place districts -> add DistrictLayoutDoneTag -> subdivide into sectors + rooms)
 			_initGroup.Update();

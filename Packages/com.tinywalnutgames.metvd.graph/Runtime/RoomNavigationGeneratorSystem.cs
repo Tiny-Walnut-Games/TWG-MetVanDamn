@@ -395,7 +395,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 		private static bool IsTraversable (TileType tile)
 			{
-			return tile == TileType.Platform || tile == TileType.Climbable;
+			return tile is TileType.Platform or TileType.Climbable;
 			}
 
 		private static bool IsWall (int2 position, RectInt bounds, NativeArray<TileType> tilemap)

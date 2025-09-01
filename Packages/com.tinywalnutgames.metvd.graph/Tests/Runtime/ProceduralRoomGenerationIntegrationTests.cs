@@ -325,7 +325,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			// Determine generator type
 			RoomGeneratorType generatorType = DetermineGeneratorType(roomType, bounds, biomeType);
 
-			// Create room generation request
+			// Create room generation request with proper layout type based on room dimensions
 			var generationRequest = new RoomGenerationRequest(
 				generatorType,
 				biomeType,
@@ -333,6 +333,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				availableSkills,
 				12345
 			);
+			
+			// Fix the Orientation Confusion Curse: Set LayoutType based on actual room dimensions
+			float aspectRatio = (float)bounds.width / bounds.height;
+			generationRequest.LayoutType = aspectRatio < 0.67f ? RoomLayoutType.Vertical : 
+										   aspectRatio > 1.5f ? RoomLayoutType.Horizontal : 
+										   RoomLayoutType.Mixed;
+			
 			_entityManager.AddComponentData(roomEntity, generationRequest);
 
 			// Add room management components
@@ -367,8 +374,18 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
 				case RoomGeneratorType.WeightedTilePrefab:
 					Ability secretSkill = (availableSkills & Ability.Bomb) != 0 ? Ability.Bomb : Ability.None;
+					bool hasBombSkill = (availableSkills & Ability.Bomb) != 0;
+					
+					// Create secret config with proper destructible walls support for bomb skills
 					var secretConfig = new SecretAreaConfig(0.15f, new int2(2, 2), new int2(4, 4),
 						secretSkill, true, true);
+					
+					// Enable destructible walls when bomb skill is available - this is the missing boom-boom magic!
+					if (hasBombSkill)
+					{
+						secretConfig.UseDestructibleWalls = true;
+					}
+					
 					_entityManager.AddComponentData(entity, secretConfig);
 					break;
 				case RoomGeneratorType.VerticalSegment:
@@ -425,12 +442,12 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
 		private static bool IsSkyBiome (BiomeType biome)
 			{
-			return biome == BiomeType.SkyGardens || biome == BiomeType.PlasmaFields;
+			return biome is BiomeType.SkyGardens or BiomeType.PlasmaFields;
 			}
 
 		private static bool IsTerrainBiome (BiomeType biome)
 			{
-			return biome == BiomeType.SolarPlains || biome == BiomeType.FrozenWastes;
+			return biome is BiomeType.SolarPlains or BiomeType.FrozenWastes;
 			}
 
 		private static int CalculateSecrets (RoomType roomType)
@@ -447,7 +464,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		private static RoomNavigationData CreateNavData (RectInt bounds, RoomType roomType)
 			{
 			var entrance = new int2(bounds.x + 1, bounds.y + 1);
-			bool isCritical = roomType == RoomType.Boss || roomType == RoomType.Entrance;
+			bool isCritical = roomType is RoomType.Boss or RoomType.Entrance;
 			float traversalTime = (bounds.width + bounds.height) * 0.5f;
 			return new RoomNavigationData(entrance, isCritical, traversalTime);
 			}

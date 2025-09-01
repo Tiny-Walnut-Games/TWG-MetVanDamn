@@ -404,7 +404,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					{
 					case CorridorLength.Long:
 						// Long corridors: gentle intro, intense middle, easier ending
-						if (progressionFactor < 0.2f || progressionFactor > 0.8f)
+						if (progressionFactor is < 0.2f or > 0.8f)
 							{
 							// Early and late beats favor rest for pacing
 							if (basePattern == BeatType.Challenge && rhythmComplexity < 1.2f)
@@ -412,7 +412,7 @@ namespace TinyWalnutGames.MetVD.Graph
 								return BeatType.Rest;
 								}
 							}
-						else if (progressionFactor >= 0.3f && progressionFactor <= 0.7f)
+						else if (progressionFactor is >= 0.3f and <= 0.7f)
 							{
 							// Middle section gets more challenging
 							if (basePattern == BeatType.Rest && rhythmComplexity > 1.0f)

@@ -68,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Check if agent can handle this node's polarity environment
-			return PrimaryPolarity != Polarity.None && PrimaryPolarity != Polarity.Any
+			return PrimaryPolarity is not Polarity.None and not Polarity.Any
 				? (capabilities.AvailablePolarity & PrimaryPolarity) != 0
 				: true;
 			}
@@ -182,7 +182,7 @@ namespace TinyWalnutGames.MetVD.Core
 			if (GateSoftness == GateSoftness.Hard)
 				{
 				// Check polarity requirements
-				if (RequiredPolarity != Polarity.None && RequiredPolarity != Polarity.Any)
+				if (RequiredPolarity is not Polarity.None and not Polarity.Any)
 					{
 					if ((capabilities.AvailablePolarity & RequiredPolarity) == 0)
 						{
@@ -217,7 +217,7 @@ namespace TinyWalnutGames.MetVD.Core
 			float effectiveCost = BaseCost;
 
 			// Apply polarity mismatch penalty for soft gates
-			if (RequiredPolarity != Polarity.None && RequiredPolarity != Polarity.Any)
+			if (RequiredPolarity is not Polarity.None and not Polarity.Any)
 				{
 				if ((capabilities.AvailablePolarity & RequiredPolarity) == 0)
 					{

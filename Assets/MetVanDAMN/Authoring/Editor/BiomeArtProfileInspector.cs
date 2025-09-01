@@ -298,7 +298,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				score += 2;
 				}
-			else if (settings.strategy == PropPlacementStrategy.Clustered || settings.strategy == PropPlacementStrategy.Radial)
+			else if (settings.strategy is PropPlacementStrategy.Clustered or PropPlacementStrategy.Radial)
 				{
 				score += 1;
 				}

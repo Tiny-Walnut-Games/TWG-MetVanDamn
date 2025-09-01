@@ -539,8 +539,8 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			private static bool IsHostileBiome (BiomeType biome)
 				{
-				return biome == BiomeType.ShadowRealms || biome == BiomeType.VolcanicCore ||
-					   biome == BiomeType.VoidChambers || biome == BiomeType.DeepUnderwater;
+				return biome is BiomeType.ShadowRealms or BiomeType.VolcanicCore or
+					   BiomeType.VoidChambers or BiomeType.DeepUnderwater;
 				}
 
 			private static bool IsSkyBiome (BiomeType biome)

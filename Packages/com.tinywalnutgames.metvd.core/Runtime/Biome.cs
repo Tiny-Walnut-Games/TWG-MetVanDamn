@@ -195,7 +195,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public readonly bool IsCompatibleWith (Polarity requiredPolarity)
 			{
-			return requiredPolarity != Polarity.Any && requiredPolarity != Polarity.None
+			return requiredPolarity is not Polarity.Any and not Polarity.None
 				? (PrimaryPolarity & requiredPolarity) != 0 ||
 					   (SecondaryPolarity & requiredPolarity) != 0
 				: true;

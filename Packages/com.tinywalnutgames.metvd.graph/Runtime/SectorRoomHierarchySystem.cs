@@ -58,6 +58,14 @@ namespace TinyWalnutGames.MetVD.Graph
 				Entity sectorEntity = entityManager.CreateEntity();
 				var sectorNodeId = new NodeId((uint)(districtNodeId._value * HierarchyConstants.SectorIdMultiplier + sectorIndex), 1, districtNodeId._value, sectorLocalCoords);
 				entityManager.AddComponentData(sectorEntity, sectorNodeId);
+				
+				// Add SectorHierarchyData to the sector entity so it can be found by queries
+				entityManager.AddComponentData(sectorEntity, new SectorHierarchyData(
+					new int2(4, 4), // Local grid size for rooms within this sector
+					4, // Default room count per sector
+					random.NextUInt() // Unique seed for this sector's room generation
+				));
+				
 				CreateRoomsInSector(entityManager, sectorNodeId, ref random);
 				}
 			sectorHierarchy.IsSubdivided = true; entityManager.SetComponentData(districtEntity, sectorHierarchy);

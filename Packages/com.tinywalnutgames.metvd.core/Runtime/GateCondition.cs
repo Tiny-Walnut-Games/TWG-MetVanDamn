@@ -201,7 +201,7 @@ namespace TinyWalnutGames.MetVD.Core
 			Polarity missingPolarity = Polarity.None;
 			Ability missingAbilities = Ability.None;
 
-			if (RequiredPolarity != Polarity.None && RequiredPolarity != Polarity.Any)
+			if (RequiredPolarity is not Polarity.None and not Polarity.Any)
 				{
 				// Reflect the same ALL vs ANY rule for Hard vs soft when reporting missing bits.
 				if (Softness == GateSoftness.Hard)

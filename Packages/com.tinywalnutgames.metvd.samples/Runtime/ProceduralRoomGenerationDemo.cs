@@ -279,7 +279,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		private RoomNavigationData CreateNavigationData (RectInt bounds)
 			{
 			var primaryEntrance = new int2(bounds.x + 1, bounds.y + 1);
-			bool isCriticalPath = roomType == RoomType.Boss || roomType == RoomType.Entrance || roomType == RoomType.Exit;
+			bool isCriticalPath = roomType is RoomType.Boss or RoomType.Entrance or RoomType.Exit;
 			float traversalTime = CalculateTraversalTime(bounds);
 
 			return new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime);
@@ -326,12 +326,12 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// </summary>
 		private static bool IsSkyBiome (BiomeType biome)
 			{
-			return biome == BiomeType.SkyGardens || biome == BiomeType.PlasmaFields;
+			return biome is BiomeType.SkyGardens or BiomeType.PlasmaFields;
 			}
 
 		private static bool IsTerrainBiome (BiomeType biome)
 			{
-			return biome == BiomeType.SolarPlains || biome == BiomeType.FrozenWastes;
+			return biome is BiomeType.SolarPlains or BiomeType.FrozenWastes;
 			}
 
 		/// <summary>

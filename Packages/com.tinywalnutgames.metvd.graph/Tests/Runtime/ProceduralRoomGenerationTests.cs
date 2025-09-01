@@ -142,21 +142,34 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		[Test]
 		public void JumpArcSolver_ValidatesReachability_WithDifferentMovementTypes ()
 			{
-			var physics = new JumpArcPhysics();
+			// 🧙‍♂️ SACRED FIX: Initialize physics with proper values instead of all zeros!
+			var physics = new JumpArcPhysics(
+				height: 4.0f,      // Allow 4-unit jumps
+				distance: 6.0f,    // Allow 6-unit horizontal distance  
+				doubleBonus: 1.5f, // 50% bonus for double jump
+				gravity: 1.0f,     // Standard gravity
+				wallHeight: 3.0f,  // Wall jump capability
+				dash: 8.0f         // Dash distance for enhanced movement
+			);
+			
 			var startPos = new int2(0, 0);
 			var targetPos = new int2(3, 2);
 			Ability basicMovement = Ability.Jump;
 			Ability advancedMovement = Ability.Jump | Ability.DoubleJump | Ability.Dash;
-			bool reachableBasic = JumpArcSolver.IsPositionReachable(startPos, targetPos, basicMovement, physics); // TODO: Find a use for this variable
+			
+			bool reachableBasic = JumpArcSolver.IsPositionReachable(startPos, targetPos, basicMovement, physics);
 			bool reachableAdvanced = JumpArcSolver.IsPositionReachable(startPos, targetPos, advancedMovement, physics);
+			
 			Assert.IsTrue(reachableAdvanced, "Advanced movement must reach the target.");
+			
 			if (!reachableBasic)
 				{
 				TestContext.WriteLine("Target only reachable with advanced movement (expected for harder arcs).");
 				}
+				
 			var dashTarget = new int2(5, 0);
 			bool reachableWithDash = JumpArcSolver.IsPositionReachable(startPos, dashTarget, Ability.Dash, physics);
-			Assert.IsTrue(reachableWithDash);
+			Assert.IsTrue(reachableWithDash, "Dash should reach horizontal targets within range.");
 			}
 
 		[Test]
@@ -243,3 +256,4 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			}
 		}
 	}
+

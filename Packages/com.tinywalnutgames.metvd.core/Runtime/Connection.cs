@@ -91,7 +91,7 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Check polarity requirements
-			return RequiredPolarity == Polarity.None || RequiredPolarity == Polarity.Any
+			return RequiredPolarity is Polarity.None or Polarity.Any
 				? true
 				: (availablePolarity & RequiredPolarity) != 0;
 			}
