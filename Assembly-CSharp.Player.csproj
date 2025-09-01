@@ -77,16 +77,39 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\debug\logs-2025-08-28-2348.txt" />
+    <None Include="Assets\debug\TestResults_20250831_130030.xml" />
+    <None Include="Assets\debug\TestResults_20250901_002445.xml" />
+    <None Include="Assets\debug\logs-2025-08-31-1301.txt" />
     <None Include="Assets\debug\logs-2025-08-28-0744.txt" />
     <None Include="Assets\debug\logs-2025-08-26-1546.txt" />
+    <None Include="Assets\debug\TestResults_20250831_225302.xml" />
+    <None Include="Assets\debug\TestResults_20250831_201358.xml" />
     <None Include="Assets\debug\logs-2025-08-28-1700.txt" />
+    <None Include="Assets\debug\TestResults_20250901_011736.xml" />
+    <None Include="Assets\debug\TestResults_20250901_010736.xml" />
+    <None Include="Assets\debug\Chronos Security Hardening Required.txt" />
+    <None Include="Assets\debug\TestResults_20250831_130101.xml" />
     <None Include="Assets\debug\logs-2025-08-28-1005.txt" />
     <None Include="Assets\debug\logs-2025-08-29-0314.txt" />
+    <None Include="Assets\debug\TestResults_20250831_231011.xml" />
+    <None Include="Assets\debug\TestResults_20250901_001505.xml" />
+    <None Include="Assets\debug\TestResults_20250831_195010.xml" />
     <None Include="Assets\Tiny Walnut Games\MetVanDAMN\Docs\TestResults.xml" />
+    <None Include="Assets\debug\TestResults_20250901_012357.xml" />
+    <None Include="Assets\debug\TestResults_20250831_194728.xml" />
     <None Include="Assets\debug\DockerUnity.txt" />
     <None Include="Assets\samvieten\Documentation\SAMVIETEN ASSETPACKS LICENSE.txt" />
+    <None Include="Assets\debug\TestResults_20250831_231005.xml" />
+    <None Include="Assets\debug\unity-console-logs-2025-09-01-115200.txt" />
+    <None Include="Assets\debug\logs-2025-08-31-1300.txt" />
+    <None Include="Assets\debug\TestResults_20250901_005428.xml" />
+    <None Include="Assets\debug\TestResults_20250831_222602.xml" />
+    <None Include="Assets\debug\TestResults_20250901_003716.xml" />
+    <None Include="Assets\debug\TestResults_20250831_223309.xml" />
+    <None Include="Assets\debug\TestResults_20250831_230351.xml" />
     <None Include="Assets\debug\logs-2025-08-28-0617.txt" />
     <None Include="Assets\debug\logs-2025-08-28-1905.txt" />
+    <None Include="Assets\debug\TestResults_20250831_222529.xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1111,6 +1134,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.Player.csproj">
+      <Project>{CEA6D694-310C-7178-1416-063BEF5B24F9}</Project>
+      <Name>Assembly-CSharp-firstpass.Player</Name>
+    </ProjectReference>
     <ProjectReference Include="TinyWalnutGames.MetVD.Authoring.Player.csproj">
       <Project>{5F36E609-03BE-4B55-CCA4-0E09CE7A9564}</Project>
       <Name>TinyWalnutGames.MetVD.Authoring.Player</Name>

@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{397C87E1-4EB2-32A2-9277-5DFF2A09CB9B}</ProjectGuid>
+    <ProjectGuid>{31FF6201-9FC4-18C5-B7D7-D48004932EB3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-CSharp-firstpass</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -50,7 +50,7 @@
     <UnityProjectGenerator>Package</UnityProjectGenerator>
     <UnityProjectGeneratorVersion>2.0.23</UnityProjectGeneratorVersion>
     <UnityProjectGeneratorStyle>Legacy</UnityProjectGeneratorStyle>
-    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityProjectType>GamePlugins:3</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>6000.2.0f1</UnityVersion>
   </PropertyGroup>
@@ -73,43 +73,10 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\__TempMenuRefreshTrigger.cs" />
+    <Compile Include="Assets\Plugins\DeveloperExperience\UnityXPIntegration.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\debug\logs-2025-08-28-2348.txt" />
-    <None Include="Assets\debug\TestResults_20250831_130030.xml" />
-    <None Include="Assets\debug\TestResults_20250901_002445.xml" />
-    <None Include="Assets\debug\logs-2025-08-31-1301.txt" />
-    <None Include="Assets\debug\logs-2025-08-28-0744.txt" />
-    <None Include="Assets\debug\logs-2025-08-26-1546.txt" />
-    <None Include="Assets\debug\TestResults_20250831_225302.xml" />
-    <None Include="Assets\debug\TestResults_20250831_201358.xml" />
-    <None Include="Assets\debug\logs-2025-08-28-1700.txt" />
-    <None Include="Assets\debug\TestResults_20250901_011736.xml" />
-    <None Include="Assets\debug\TestResults_20250901_010736.xml" />
-    <None Include="Assets\debug\Chronos Security Hardening Required.txt" />
-    <None Include="Assets\debug\TestResults_20250831_130101.xml" />
-    <None Include="Assets\debug\logs-2025-08-28-1005.txt" />
-    <None Include="Assets\debug\logs-2025-08-29-0314.txt" />
-    <None Include="Assets\debug\TestResults_20250831_231011.xml" />
-    <None Include="Assets\debug\TestResults_20250901_001505.xml" />
-    <None Include="Assets\debug\TestResults_20250831_195010.xml" />
-    <None Include="Assets\Tiny Walnut Games\MetVanDAMN\Docs\TestResults.xml" />
-    <None Include="Assets\debug\TestResults_20250901_012357.xml" />
-    <None Include="Assets\debug\TestResults_20250831_194728.xml" />
-    <None Include="Assets\debug\DockerUnity.txt" />
-    <None Include="Assets\samvieten\Documentation\SAMVIETEN ASSETPACKS LICENSE.txt" />
-    <None Include="Assets\debug\TestResults_20250831_231005.xml" />
-    <None Include="Assets\debug\unity-console-logs-2025-09-01-115200.txt" />
-    <None Include="Assets\debug\logs-2025-08-31-1300.txt" />
-    <None Include="Assets\debug\TestResults_20250901_005428.xml" />
-    <None Include="Assets\debug\TestResults_20250831_222602.xml" />
-    <None Include="Assets\debug\TestResults_20250901_003716.xml" />
-    <None Include="Assets\debug\TestResults_20250831_223309.xml" />
-    <None Include="Assets\debug\TestResults_20250831_230351.xml" />
-    <None Include="Assets\debug\logs-2025-08-28-0617.txt" />
-    <None Include="Assets\debug\logs-2025-08-28-1905.txt" />
-    <None Include="Assets\debug\TestResults_20250831_222529.xml" />
+    <None Include="Assets\Plugins\TLDA\docs\MetVanDamnLogs.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1574,10 +1541,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{31FF6201-9FC4-18C5-B7D7-D48004932EB3}</Project>
-      <Name>Assembly-CSharp-firstpass</Name>
-    </ProjectReference>
     <ProjectReference Include="TinyWalnutGames.GridLayerEditor.csproj">
       <Project>{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}</Project>
       <Name>TinyWalnutGames.GridLayerEditor</Name>
