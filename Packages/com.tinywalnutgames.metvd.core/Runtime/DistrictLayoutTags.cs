@@ -14,7 +14,7 @@ namespace TinyWalnutGames.MetVD.Core
 		public int DistrictCount;
 
 		/// <summary>
-		/// Number of connections generated between districts
+		/// Number of connections generated between districts 
 		/// </summary>
 		public int ConnectionCount;
 
