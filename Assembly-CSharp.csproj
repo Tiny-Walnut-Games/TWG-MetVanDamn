@@ -64,6 +64,7 @@
     <Compile Include="Assets\debug\MetVanDAMNQuickStart.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\debug\TestResults_20250908_193833.xml" />
     <None Include="Assets\debug\Chronos Security Hardening Required.txt" />
     <None Include="Assets\Tiny Walnut Games\MetVanDAMN\Docs\TestResults.xml" />
     <None Include="Assets\debug\DockerUnity.txt" />

@@ -1,0 +1,56 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.yaml": "yaml",
+			"*.yml": "yaml",
+			"agent-profile.yaml": "yaml",
+			"TWG-Copilot-Agent.yaml": "yaml",
+			"devtimetravel_snapshot.yaml": "yaml",
+			"tldl_template.yaml": "yaml",
+			"*.cs": "csharp",
+			"*.asmdef": "json"
+		},
+		"github.copilot.enable": {
+			"*": true,
+			"yaml": true,
+			"python": true,
+			"csharp": true,
+			"markdown": true
+		},
+		"github.copilot.advanced": {
+			"inlineSuggestCount": 5,
+			"listCount": 10,
+			"includeContext": "all",
+			"debug.useNodeWithAhk": false,
+			"debug.filterLogCategories": []
+		},
+		"csharp.format.enable": true,
+		"omnisharp.enableEditorConfigSupport": true,
+		"omnisharp.useModernNet": true,
+		"dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+		"dotnet.defaultSolution": "TWG-MetVanDamn.sln",
+		"dotnet.backgroundAnalysis.analyzerDiagnosticsScope": "fullSolution",
+		"dotnet.backgroundAnalysis.compilerDiagnosticsScope": "fullSolution",
+		"problems.decorations.enabled": true,
+		"problems.showCurrentInStatus": true,
+		"problems.sortOrder": "severity",
+		"git.confirmSync": false,
+		"workbench.commandPalette.preserveInput": true,
+		"workbench.editor.enablePreview": false,
+		"workbench.editor.revealIfOpen": true,
+		"workbench.editor.tabSizing": "shrink",
+		"terminal.integrated.defaultProfile.windows": "PowerShell",
+		"terminal.integrated.cursorStyle": "line",
+		"debug.allowBreakpointsEverywhere": true,
+		"debug.inlineValues": "on",
+		"debug.showInStatusBar": "always",
+		"extensions.showRecommendationsOnlyOnDemand": false,
+		"extensions.ignoreRecommendations": false,
+		"terminal.integrated.enableVisualBell": false
+	}
+}

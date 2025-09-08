@@ -23,6 +23,7 @@ namespace TinyWalnutGames.MetVD.Graph
 		public EntityQuery _layoutDoneQuery; // optional
 		public EntityQuery _wfcQuery;
 		public EntityQuery _worldSeedQuery;
+		public EntityQuery _tilePrototypeQuery;
 		public ComponentLookup<WfcState> wfcStatesLookup;
 		public ComponentLookup<NodeId> nodeIdsLookup;
 
@@ -47,6 +48,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			_worldSeedQuery = new EntityQueryBuilder(Allocator.Temp)
 				.WithAll<WorldSeed>()
+				.Build(ref state);
+
+			_tilePrototypeQuery = new EntityQueryBuilder(Allocator.Temp)
+				.WithAll<WfcTilePrototype>()
 				.Build(ref state);
 
 			// Create and cache component lookups in OnCreate; update them each frame in OnUpdate
@@ -88,6 +93,9 @@ namespace TinyWalnutGames.MetVD.Graph
 			// Gather all entities with WfcState and NodeId into a NativeArray (use TempJob for scheduled job)
 			NativeArray<Entity> entities = _wfcQuery.ToEntityArray(Allocator.TempJob);
 
+			// Get tile prototypes for WFC initialization
+			NativeArray<WfcTilePrototype> tilePrototypes = _tilePrototypeQuery.ToComponentDataArray<WfcTilePrototype>(Allocator.TempJob);
+
 			// Ensure deterministic processing order by sorting entities by NodeId._value (stable across runs)
 			if (entities.Length > 1)
 			{
@@ -124,7 +132,8 @@ namespace TinyWalnutGames.MetVD.Graph
 				BaseSeed = baseSeed,
 				Entities = entities,
 				WfcStates = wfcStates,
-				NodeIds = nodeIds
+				NodeIds = nodeIds,
+				TilePrototypes = tilePrototypes
 				};
 
 			// 🔥 FIX: Schedule the job properly with dependency tracking
@@ -134,6 +143,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			// Complete the job immediately to ensure synchronization and dispose TempJob memory
 			state.Dependency.Complete();
 			entities.Dispose();
+			tilePrototypes.Dispose();
 			}
 
 		private struct WfcProcessingJob : IJob
@@ -145,6 +155,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			[ReadOnly] public NativeArray<Entity> Entities;
 			public ComponentLookup<WfcState> WfcStates;
 			[ReadOnly] public ComponentLookup<NodeId> NodeIds;
+			[ReadOnly] public NativeArray<WfcTilePrototype> TilePrototypes;
 
 			public void Execute()
 				{
@@ -288,41 +299,63 @@ namespace TinyWalnutGames.MetVD.Graph
 				DynamicBuffer<WfcCandidateBufferElement> candidates = CandidateBufferLookup [ entity ];
 				candidates.Clear();
 
-				// Fix: Explicit conversion from int2 to float2 for Burst compatibility
-				var coords = (float2)nodeId.Coordinates;
-				float distance = math.length(coords) * 0.02f;
-				float centralBias = math.saturate(1f - distance);
-				float entityVariance = 0.9f + ((entity.Index & 7) * 0.02f);
+				// Use actual tile prototypes if available, fallback to hardcoded values
+				if (TilePrototypes.Length > 0)
+					{
+					// Calculate position-based bias factors
+					var coords = (float2)nodeId.Coordinates;
+					float distance = math.length(coords) * 0.02f;
+					float centralBias = math.saturate(1f - distance);
+					float entityVariance = 0.9f + ((entity.Index & 7) * 0.02f);
+					float basePerturb = HashToUnit(BaseSeed, nodeId, entity.Index) * 0.3f + 0.85f;
 
-				// Deterministic float derived from BaseSeed + node identity to amplify seed effect
-				float basePerturb = HashToUnit(BaseSeed, nodeId, entity.Index) * 0.3f + 0.85f; // range [0.85,1.15)
+					// Add candidates from actual tile prototypes
+					for (int i = 0; i < TilePrototypes.Length; i++)
+						{
+						var prototype = TilePrototypes[i];
+						
+						// Calculate weight based on tile properties and position
+						float baseWeight = prototype.Weight;
+						float positionBias = math.lerp(0.6f, 1.2f, centralBias) * entityVariance * basePerturb;
+						float weight = baseWeight * positionBias * random.NextFloat(0.95f, 1.05f);
 
-				float v1 = math.lerp(0.6f, 1.2f, centralBias) * entityVariance * basePerturb * random.NextFloat(0.95f, 1.05f);
-				float v2 = math.lerp(1.0f, 0.7f, centralBias) * entityVariance * basePerturb * random.NextFloat(0.95f, 1.05f);
-				float v3 = (0.4f + random.NextFloat(0.0f, 0.3f)) * entityVariance * (basePerturb + 0.05f) * random.NextFloat(0.95f, 1.1f);
-				float v4 = (0.2f + distance * 0.5f) * entityVariance * (basePerturb - 0.03f) * random.NextFloat(0.95f, 1.12f);
+						candidates.Add(new WfcCandidateBufferElement(prototype.TileId, weight));
+						}
+					}
+				else
+					{
+					// Fallback to hardcoded candidates if no prototypes are available
+					var coords = (float2)nodeId.Coordinates;
+					float distance = math.length(coords) * 0.02f;
+					float centralBias = math.saturate(1f - distance);
+					float entityVariance = 0.9f + ((entity.Index & 7) * 0.02f);
+					float basePerturb = HashToUnit(BaseSeed, nodeId, entity.Index) * 0.3f + 0.85f;
 
-				candidates.Add(new WfcCandidateBufferElement(1, v1));
-				candidates.Add(new WfcCandidateBufferElement(2, v2));
-				candidates.Add(new WfcCandidateBufferElement(3, v3));
-				candidates.Add(new WfcCandidateBufferElement(4, v4));
+					float v1 = math.lerp(0.6f, 1.2f, centralBias) * entityVariance * basePerturb * random.NextFloat(0.95f, 1.05f);
+					float v2 = math.lerp(1.0f, 0.7f, centralBias) * entityVariance * basePerturb * random.NextFloat(0.95f, 1.05f);
+					float v3 = (0.4f + random.NextFloat(0.0f, 0.3f)) * entityVariance * (basePerturb + 0.05f) * random.NextFloat(0.95f, 1.1f);
+					float v4 = (0.2f + distance * 0.5f) * entityVariance * (basePerturb - 0.03f) * random.NextFloat(0.95f, 1.12f);
+
+					candidates.Add(new WfcCandidateBufferElement(1, v1));
+					candidates.Add(new WfcCandidateBufferElement(2, v2));
+					candidates.Add(new WfcCandidateBufferElement(3, v3));
+					candidates.Add(new WfcCandidateBufferElement(4, v4));
+					}
 
 				// Deterministic seed-dependent shuffle
- 				for (int a = 0; a < candidates.Length; a++)
- 					{
- 					int b = random.NextInt(0, candidates.Length);
- 					(candidates[a], candidates[b]) = (candidates[b], candidates[a]);
- 					}
+				for (int a = 0; a < candidates.Length; a++)
+					{
+					int b = random.NextInt(0, candidates.Length);
+					(candidates[a], candidates[b]) = (candidates[b], candidates[a]);
+					}
 
-				// Apply a stronger deterministic per-tile bias derived from BaseSeed/node/entity to ensure
-				// different BaseSeed values materially change candidate weight ordering.
+				// Apply deterministic per-tile bias for seed sensitivity
 				for (int t = 0; t < candidates.Length; t++)
 					{
 					uint tileId = candidates[t].TileId;
 					uint tileSeed = MakeEntitySeed(BaseSeed ^ (tileId * 59789u), nodeId, (int)nodeId._value, (uint)tileId);
 					float tileBias = ((tileSeed & 0x00FFFFFFu) / 16777216.0f) - 0.5f; // [-0.5,0.5)
 					var c = candidates[t];
-					// amplify bias but keep weights positive
 					float factor = 1.0f + tileBias * 0.6f; 
 					c.Weight = math.max(0.01f, c.Weight * factor);
 					candidates[t] = c;
