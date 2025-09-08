@@ -103,7 +103,7 @@ jobs:
           echo "📊 Bandit scan completed"
 
       - name: 🟢 Install Node.js
-        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398 # v4
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v4
         with:
           node-version: "20"
 

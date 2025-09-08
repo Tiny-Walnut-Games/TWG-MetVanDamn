@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node and Python
-        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398 # v4
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v4
         with: { node-version: 18 }
       - uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
         with: { python-version: '3.11' }
