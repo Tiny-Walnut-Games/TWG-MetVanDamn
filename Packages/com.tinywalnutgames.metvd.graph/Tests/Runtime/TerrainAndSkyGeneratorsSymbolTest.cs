@@ -101,13 +101,13 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			RoomFeatureType obstacleType = RoomFeatureType.Obstacle;
 
 #pragma warning disable CS0618 // Type or member is obsolete
-			RoomFeatureObjectType convertedPlatform = TypeConversionUtility.ConvertToObjectType(platformType);
-			RoomFeatureObjectType convertedObstacle = TypeConversionUtility.ConvertToObjectType(obstacleType);
+			RoomFeatureType convertedPlatform = platformType;
+			RoomFeatureType convertedObstacle = obstacleType;
 #pragma warning restore CS0618 // Type or member is obsolete
 
 			// Validate that the conversion utility correctly maps between enum types
-			Assert.AreEqual(RoomFeatureObjectType.Platform, convertedPlatform);
-			Assert.AreEqual(RoomFeatureObjectType.Obstacle, convertedObstacle);
+			Assert.AreEqual(RoomFeatureType.Platform, convertedPlatform);
+			Assert.AreEqual(RoomFeatureType.Obstacle, convertedObstacle);
 			}
 
 		[Test]

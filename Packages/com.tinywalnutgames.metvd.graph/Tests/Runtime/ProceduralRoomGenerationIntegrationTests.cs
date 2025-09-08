@@ -90,7 +90,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
 			// Act
 			RoomGenerationRequest request = _entityManager.GetComponentData<RoomGenerationRequest>(roomEntity);
-			Biome biome = _entityManager.GetComponentData<Biome>(roomEntity);
+			TinyWalnutGames.MetVD.Core.Biome biome = _entityManager.GetComponentData<TinyWalnutGames.MetVD.Core.Biome>(roomEntity);
 
 			// Assert - Sky biomes should use layered platform generation
 			Assert.AreEqual(RoomGeneratorType.LayeredPlatformCloud, request.GeneratorType);
@@ -187,8 +187,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			RoomGenerationRequest fireRequest = _entityManager.GetComponentData<RoomGenerationRequest>(fireRoomEntity);
 			RoomGenerationRequest iceRequest = _entityManager.GetComponentData<RoomGenerationRequest>(iceRoomEntity);
 
-			Biome fireBiome = _entityManager.GetComponentData<Biome>(fireRoomEntity);
-			Biome iceBiome = _entityManager.GetComponentData<Biome>(iceRoomEntity);
+			TinyWalnutGames.MetVD.Core.Biome fireBiome = _entityManager.GetComponentData<TinyWalnutGames.MetVD.Core.Biome>(fireRoomEntity);
+			TinyWalnutGames.MetVD.Core.Biome iceBiome = _entityManager.GetComponentData<TinyWalnutGames.MetVD.Core.Biome>(iceRoomEntity);
 
 			// Assert - Biome polarities should match room requests
 			Assert.AreEqual(Polarity.Heat, fireRequest.TargetPolarity);
@@ -235,16 +235,16 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
 			// Arrange - Create platforms for connectivity test
 			var platformsFloat = new NativeArray<float2>(4, Allocator.Temp);
-			platformsFloat [ 0 ] = new float2(0, 0);
-			platformsFloat [ 1 ] = new float2(4, 2);
-			platformsFloat [ 2 ] = new float2(8, 1);
-			platformsFloat [ 3 ] = new float2(12, 3);
+			platformsFloat[0] = new float2(0, 0);
+			platformsFloat[1] = new float2(4, 2);
+			platformsFloat[2] = new float2(8, 1);
+			platformsFloat[3] = new float2(12, 3);
 
 			// Convert float2 platforms to int2 as required by the API
 			var platforms = new NativeArray<int2>(platformsFloat.Length, Allocator.Temp);
 			for (int i = 0; i < platformsFloat.Length; i++)
 				{
-				platforms [ i ] = new int2((int)platformsFloat [ i ].x, (int)platformsFloat [ i ].y);
+				platforms[i] = new int2((int)platformsFloat[i].x, (int)platformsFloat[i].y);
 				}
 
 			var obstacles = new NativeArray<int2>(0, Allocator.Temp); // No obstacles
@@ -319,7 +319,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
 			// Add biome data
 			Polarity polarity = GetPolarityForBiome(biomeType);
-			var biome = new Biome(biomeType, polarity, 1.0f, Polarity.None, 1.0f);
+			var biome = new TinyWalnutGames.MetVD.Core.Biome(biomeType, polarity, 1.0f, Polarity.None, 1.0f);
 			_entityManager.AddComponentData(roomEntity, biome);
 
 			// Determine generator type

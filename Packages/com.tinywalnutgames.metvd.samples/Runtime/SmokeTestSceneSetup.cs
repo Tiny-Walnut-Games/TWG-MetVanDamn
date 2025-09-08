@@ -1,5 +1,6 @@
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
+using TinyWalnutGames.MetVD.Shared; // ✅ ADD: Use shared namespace for WorldSeed and related components
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -13,22 +14,43 @@ namespace TinyWalnutGames.MetVD.Samples
 	public class SmokeTestSceneSetup : MonoBehaviour
 		{
 		[Header("World Generation Parameters")]
-		[SerializeField] private readonly uint worldSeed = 42;
+		[SerializeField] private uint worldSeed = 42;
 		[SerializeField] private int2 worldSize = new(50, 50);
-		[SerializeField] private readonly int targetSectorCount = 5;
-		[SerializeField] private readonly float biomeTransitionRadius = 10.0f;
+		[SerializeField] private int targetSectorCount = 5;
+		[SerializeField] private float biomeTransitionRadius = 10.0f;
 
 		[Header("Debug Visualization")]
-		[SerializeField] private readonly bool enableDebugVisualization = true;
-		[SerializeField] private readonly bool logGenerationSteps = true;
+		[SerializeField] private bool enableDebugVisualization = false;
+		[SerializeField] private bool logGenerationSteps = true;
 
-		private EntityManager entityManager;
-		private World defaultWorld;
-		private bool createdFallbackWorld = false; // ✅ Track if we created a fallback world for cleanup
+		// Make these settable for tests/integration
+		public EntityManager EntityManager { get; private set; }
+		public World DefaultWorld { get; private set; }
+		[SerializeField] private bool createdFallbackWorld = false; // ✅ Track if we created a fallback world for cleanup
 
+		private bool _hasSetup = false;
+
+		private void Awake()
+			{
+			UnityEngine.Debug.Log("🌐 MetVanDAMN Smoke Test: Awake - initializing world setup");
+			UnityEngine.Debug.Log($"🌐 _hasSetup = {_hasSetup}, DefaultWorld = {(DefaultWorld?.Name ?? "null")}");
+			}
 		private void Start()
 			{
-			SetupSmokeTestWorld();
+			UnityEngine.Debug.Log("🌐 MetVanDAMN Smoke Test: Start - initializing world setup");
+			UnityEngine.Debug.Log($"🌐 _hasSetup = {_hasSetup}, DefaultWorld = {(DefaultWorld?.Name ?? "null")}");
+			// Only run setup if not already forced by test
+			if (!_hasSetup)
+				{
+				UnityEngine.Debug.Log("🌐 MetVanDAMN Smoke Test: Calling SetupSmokeTestWorld from Start");
+				SetupSmokeTestWorld();
+				}
+			else
+				{
+				UnityEngine.Debug.Log("🌐 MetVanDAMN Smoke Test: Skipping SetupSmokeTestWorld - already setup");
+				}
+
+			UnityEngine.Debug.Log("🌐 MetVanDAMN Smoke Test: End of Start. SetupSmokeTestWorld should have been called.");
 			}
 
 		private void Update()
@@ -51,23 +73,34 @@ namespace TinyWalnutGames.MetVD.Samples
 			}
 #endif
 
+		/// <summary>
+		/// Forcibly set the world and run setup. Use in tests/integration to guarantee correct world.
+		/// </summary>
+		public void ForceSetup(World world)
+		{
+			DefaultWorld = world;
+			EntityManager = world.EntityManager;
+			_hasSetup = true;
+			SetupSmokeTestWorld();
+		}
+
 		private void SetupSmokeTestWorld()
 			{
 			// ✅ PHASE 1: EXPLICIT WORLD INJECTION - No fallback world creation in tests
 			// If we have an explicitly injected test world, use it directly
-			if (defaultWorld != null && defaultWorld.IsCreated)
+			if (DefaultWorld != null && DefaultWorld.IsCreated)
 				{
 				if (logGenerationSteps)
 					{
-					Debug.Log($"🎯 Using explicitly injected world: {defaultWorld.Name}");
+					Debug.Log($"🎯 Using explicitly injected world: {DefaultWorld.Name}");
 					}
 				}
 			else
 				{
 				// Original logic for normal gameplay scenarios
-				defaultWorld = World.DefaultGameObjectInjectionWorld;
+				DefaultWorld = World.DefaultGameObjectInjectionWorld;
 
-				if (defaultWorld == null)
+				if (DefaultWorld == null)
 					{
 					if (logGenerationSteps)
 						{
@@ -75,17 +108,17 @@ namespace TinyWalnutGames.MetVD.Samples
 						}
 
 					// Create a fallback world if default injection world is not available (testing scenarios)
-					defaultWorld = new World("SmokeTest_FallbackWorld");
+					DefaultWorld = new World("SmokeTest_FallbackWorld");
 					createdFallbackWorld = true; // Track for cleanup
 					}
 				}
 
-			entityManager = defaultWorld.EntityManager;
+			EntityManager = DefaultWorld.EntityManager;
 
 			// ✅ PHASE 1 VALIDATION: Log which world we're actually using
 			if (logGenerationSteps)
 				{
-				Debug.Log($"🧬 Entity creation will use world: {defaultWorld.Name} (IsCreated: {defaultWorld.IsCreated})");
+				Debug.Log($"🧬 Entity creation will use world: {DefaultWorld.Name} (IsCreated: {DefaultWorld.IsCreated})");
 				Debug.Log("🚀 MetVanDAMN Smoke Test: Starting world generation...");
 				}
 
@@ -101,12 +134,12 @@ namespace TinyWalnutGames.MetVD.Samples
 			// ✅ PHASE 1 CONFIRMATION: Log entity counts in the world we used
 			if (logGenerationSteps)
 				{
-				using EntityQuery seedQuery = entityManager.CreateEntityQuery(typeof(WorldSeed));
-				using EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(NodeId));
-				using EntityQuery polarityQuery = entityManager.CreateEntityQuery(typeof(PolarityFieldData));
+				using EntityQuery seedQuery = EntityManager.CreateEntityQuery(typeof(WorldSeed));
+				using EntityQuery districtQuery = EntityManager.CreateEntityQuery(typeof(NodeId));
+				using EntityQuery polarityQuery = EntityManager.CreateEntityQuery(typeof(PolarityFieldData));
 
 				Debug.Log($"✅ MetVanDAMN Smoke Test: World setup complete with seed {worldSeed}");
-				Debug.Log($"   World: {defaultWorld.Name}");
+				Debug.Log($"   World: {DefaultWorld.Name}");
 				Debug.Log($"   World size: {worldSize.x}x{worldSize.y}");
 				Debug.Log($"   Target sectors: {targetSectorCount}");
 				Debug.Log($"   Entities created: {seedQuery.CalculateEntityCount()} seeds, {districtQuery.CalculateEntityCount()} districts, {polarityQuery.CalculateEntityCount()} polarity fields");
@@ -116,19 +149,21 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void CreateWorldConfiguration()
 			{
-			Entity configEntity = entityManager.CreateEntity();
-			entityManager.SetName(configEntity, "WorldConfiguration");
+			Entity configEntity = EntityManager.CreateEntity();
+			EntityManager.SetName(configEntity, "WorldConfiguration");
 
-			entityManager.AddComponentData(configEntity, new WorldSeed { Value = worldSeed });
-			entityManager.AddComponentData(configEntity, new WorldBounds
+			// ✅ FIX: Use shared WorldSeed component
+			EntityManager.AddComponentData(configEntity, new WorldSeed { Value = worldSeed });
+			EntityManager.AddComponentData(configEntity, new WorldBounds
 				{
 				Min = new int2(-worldSize.x / 2, -worldSize.y / 2),
 				Max = new int2(worldSize.x / 2, worldSize.y / 2)
 				});
 
-			// Integrate targetSectorCount with generation pipeline
-			entityManager.AddComponentData(configEntity, new WorldGenerationConfig
+			// ✅ FIX: Use shared WorldGenerationConfig component
+			EntityManager.AddComponentData(configEntity, new WorldGenerationConfig
 				{
+				WorldSeed = worldSeed, // Add explicit seed to config too
 				TargetSectorCount = targetSectorCount,
 				MaxDistrictCount = targetSectorCount * 4, // Allow room for subdivision
 				BiomeTransitionRadius = biomeTransitionRadius
@@ -141,10 +176,10 @@ namespace TinyWalnutGames.MetVD.Samples
 			int actualDistrictCount = math.min(targetSectorCount, 24); // Reasonable upper limit
 			int gridSize = (int)math.ceil(math.sqrt(actualDistrictCount));
 
-			Entity hubEntity = entityManager.CreateEntity();
-			entityManager.SetName(hubEntity, "HubDistrict");
+			Entity hubEntity = EntityManager.CreateEntity();
+			EntityManager.SetName(hubEntity, "HubDistrict");
 
-			entityManager.AddComponentData(hubEntity, new NodeId
+			EntityManager.AddComponentData(hubEntity, new NodeId
 				{
 				Coordinates = int2.zero,
 				Level = 0,
@@ -152,9 +187,9 @@ namespace TinyWalnutGames.MetVD.Samples
 				ParentId = 0
 				});
 
-			entityManager.AddComponentData(hubEntity, new WfcState());
-			entityManager.AddBuffer<WfcCandidateBufferElement>(hubEntity);
-			entityManager.AddBuffer<ConnectionBufferElement>(hubEntity);
+			EntityManager.AddComponentData(hubEntity, new WfcState());
+			EntityManager.AddBuffer<WfcCandidateBufferElement>(hubEntity);
+			EntityManager.AddBuffer<ConnectionBufferElement>(hubEntity);
 
 			int districtId = 1;
 			int districtsCreated = 0;
@@ -169,10 +204,10 @@ namespace TinyWalnutGames.MetVD.Samples
 						continue; // Skip hub position
 						}
 
-					Entity districtEntity = entityManager.CreateEntity();
-					entityManager.SetName(districtEntity, $"District_{x}_{y}");
+					Entity districtEntity = EntityManager.CreateEntity();
+					EntityManager.SetName(districtEntity, $"District_{x}_{y}");
 
-					entityManager.AddComponentData(districtEntity, new NodeId
+					EntityManager.AddComponentData(districtEntity, new NodeId
 						{
 						Coordinates = new int2(x * 10, y * 10),
 						Level = (byte)(math.abs(x) + math.abs(y)),
@@ -180,11 +215,11 @@ namespace TinyWalnutGames.MetVD.Samples
 						ParentId = 0
 						});
 
-					entityManager.AddComponentData(districtEntity, new WfcState());
-					entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);
-					entityManager.AddBuffer<ConnectionBufferElement>(districtEntity);
-					entityManager.AddComponentData(districtEntity, new SectorRefinementData(0.3f));
-					entityManager.AddBuffer<GateConditionBufferElement>(districtEntity);
+					EntityManager.AddComponentData(districtEntity, new WfcState());
+					EntityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);
+					EntityManager.AddBuffer<ConnectionBufferElement>(districtEntity);
+					EntityManager.AddComponentData(districtEntity, new SectorRefinementData(0.3f));
+					EntityManager.AddBuffer<GateConditionBufferElement>(districtEntity);
 
 					districtsCreated++;
 					}
@@ -206,10 +241,10 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void CreatePolarityField(Polarity polarity, float2 center, string name)
 			{
-			Entity fieldEntity = entityManager.CreateEntity();
-			entityManager.SetName(fieldEntity, name);
+			Entity fieldEntity = EntityManager.CreateEntity();
+			EntityManager.SetName(fieldEntity, name);
 
-			entityManager.AddComponentData(fieldEntity, new PolarityFieldData
+			EntityManager.AddComponentData(fieldEntity, new PolarityFieldData
 				{
 				Polarity = polarity,
 				Center = center,
@@ -231,13 +266,13 @@ namespace TinyWalnutGames.MetVD.Samples
 		private void OnDestroy()
 			{
 			// ✅ FIX: Proper cleanup of fallback world to prevent memory leaks
-			if (createdFallbackWorld && defaultWorld != null && defaultWorld.IsCreated)
+			if (createdFallbackWorld && DefaultWorld != null && DefaultWorld.IsCreated)
 				{
 				if (logGenerationSteps)
 					{
 					Debug.Log("🧹 Disposing fallback world created for testing/standalone scenario");
 					}
-				defaultWorld.Dispose();
+				DefaultWorld.Dispose();
 				}
 
 			if (logGenerationSteps)
@@ -247,33 +282,19 @@ namespace TinyWalnutGames.MetVD.Samples
 			}
 		}
 
-	public struct WorldSeed : IComponentData
-		{
-		public uint Value;
-		}
+	// ✅ REMOVE: Duplicate WorldSeed definition - using the shared one instead
+	// ✅ REMOVE: Duplicate WorldBounds definition - using the shared one instead  
+	// ✅ REMOVE: Duplicate WorldGenerationConfig definition - using the shared one instead
 
-	public struct WorldBounds : IComponentData
-		{
-		public int2 Min;
-		public int2 Max;
-		}
-
+	/// <summary>
+	/// Local polarity field data component for biome field creation
+	/// (This stays here as it's specific to the scene setup demo)
+	/// </summary>
 	public struct PolarityFieldData : IComponentData
 		{
 		public Polarity Polarity;
 		public float2 Center;
 		public float Radius;
 		public float Strength;
-		}
-
-	/// <summary>
-	/// World generation configuration that integrates targetSectorCount with the generation pipeline
-	/// </summary>
-	public struct WorldGenerationConfig : IComponentData
-		{
-		public int TargetSectorCount;
-		public int MaxDistrictCount;
-		public float BiomeTransitionRadius;
-		public uint WorldSeed;
 		}
 	}

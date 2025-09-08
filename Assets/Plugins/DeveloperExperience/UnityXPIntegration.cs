@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.Diagnostics;
@@ -141,7 +142,7 @@ namespace DeveloperExperience
         {
             try
             {
-                ProcessStartInfo startInfo = new ProcessStartInfo
+                var startInfo = new ProcessStartInfo
                 {
                     FileName = "python3",
                     Arguments = $"\"{scriptPath}\" {arguments}",
@@ -151,7 +152,7 @@ namespace DeveloperExperience
                     CreateNoWindow = true
                 };
                 
-                Process process = Process.Start(startInfo);
+                var process = Process.Start(startInfo);
                 string output = process.StandardOutput.ReadToEnd();
                 string error = process.StandardError.ReadToEnd();
                 
@@ -222,7 +223,7 @@ namespace DeveloperExperience
         {
             try
             {
-                ProcessStartInfo startInfo = new ProcessStartInfo
+                var startInfo = new ProcessStartInfo
                 {
                     FileName = "python3",
                     Arguments = $"\"{scriptPath}\" {arguments}",
@@ -239,3 +240,4 @@ namespace DeveloperExperience
         }
     }
 }
+#endif

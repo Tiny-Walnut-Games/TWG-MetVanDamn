@@ -1,5 +1,7 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Authoring.Editor
 	{
@@ -121,6 +123,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private bool showAdvancedSettings = true;
 		private bool showPreviewStats = true;
 
+		// Transition preview state
+		private bool showTransitionPreview = true;
+		private BiomeType previewTargetBiome = BiomeType.SolarPlains;
+
 		public override void OnInspectorGUI()
 			{
 			profile = (BiomeArtProfile)target;
@@ -159,7 +165,22 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Quick actions
 			EditorGUILayout.Space();
 			DrawQuickActions();
-			}
+
+			// Transition preview (designer-friendly)
+			DrawTransitionPreview();
+			
+			EditorGUILayout.Space();
+			EditorGUILayout.BeginHorizontal();
+			if (GUILayout.Button("Apply Live Preview"))
+				{
+				ApplyLivePreviewToScene();
+				}
+			if (GUILayout.Button("Clear Live Preview"))
+				{
+				ClearLivePreviewFromScene();
+				}
+			EditorGUILayout.EndHorizontal();
+ 			}
 
 		private void DrawAdvancedSettings()
 			{
@@ -275,61 +296,119 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.EndHorizontal();
 			}
 
+		private void DrawTransitionPreview()
+			{
+			if (profile == null) return;
+
+			showTransitionPreview = EditorGUILayout.Foldout(showTransitionPreview, "Transition Preview", true);
+			if (!showTransitionPreview) return;
+
+			EditorGUI.indentLevel++;
+
+			// Choose preview target biome (to simulate ToBiome)
+			previewTargetBiome = (BiomeType)EditorGUILayout.EnumPopup("Preview To Biome", previewTargetBiome);
+
+			// Colors for preview
+			Color colorA = profile.debugColor;
+			Color colorB = GetDefaultBiomeColor(previewTargetBiome);
+
+			// Draw gradient bar
+			Rect rect = GUILayoutUtility.GetRect(200, 24);
+			int steps = 100;
+			float deadzone = Mathf.Clamp(profile.transitionDeadzone, 0f, 0.5f);
+			float lower = 0.5f - deadzone;
+			float upper = 0.5f + deadzone;
+
+			for (int i = 0; i < steps; i++)
+				{
+				float t = (float)i / (steps - 1);
+				var c = Color.Lerp(colorA, colorB, Mathf.Clamp01((t * 0.5f) + (profile.transitionDeadzone * 0.5f)));
+				var r = new Rect(rect.x + (rect.width * i / (float)steps), rect.y, rect.width / (float)steps, rect.height);
+				EditorGUI.DrawRect(r, c);
+				}
+
+			// Overlay markers for lower/upper
+			float lx = rect.x + rect.width * lower;
+			float ux = rect.x + rect.width * upper;
+			EditorGUI.DrawRect(new Rect(lx - 1, rect.y, 2, rect.height), Color.black);
+			EditorGUI.DrawRect(new Rect(ux - 1, rect.y, 2, rect.height), Color.black);
+
+			EditorGUILayout.LabelField($"Deadzone: {profile.transitionDeadzone:F2}  (lower: {lower:F2}, upper: {upper:F2})");
+
+			EditorGUI.indentLevel--;
+			}
+
+		// Simple default color mapping for preview purpose
+		private Color GetDefaultBiomeColor(BiomeType type)
+			{
+			switch (type)
+				{
+				case BiomeType.SolarPlains: return new Color(1f, 0.8f, 0.2f, 1f);
+				case BiomeType.VolcanicCore: return new Color(1f, 0.3f, 0.1f, 1f);
+				case BiomeType.CrystalCaverns: return new Color(0.8f, 0.4f, 1f, 1f);
+				case BiomeType.SkyGardens: return new Color(0.4f, 0.8f, 0.6f, 1f);
+				case BiomeType.Forest: return new Color(0.2f, 0.6f, 0.2f, 1f);
+				case BiomeType.Ocean: return new Color(0.2f, 0.5f, 0.8f, 1f);
+				default: return Color.gray;
+				}
+			}
+
 		private string GetStrategyDescription(PropPlacementStrategy strategy)
 			{
 			return strategy switch
 				{
-					PropPlacementStrategy.Random => "Random scatter distribution. Good for general decoration and ambient props.",
-					PropPlacementStrategy.Clustered => "Natural clustering behavior. Excellent for vegetation, rocks, and organic features.",
-					PropPlacementStrategy.Sparse => "High-quality selective placement. Perfect for landmarks, special items, and focal points.",
-					PropPlacementStrategy.Linear => "Edge-following placement. Ideal for fences, paths, shorelines, and boundaries.",
-					PropPlacementStrategy.Radial => "Center-outward distribution. Great for settlements, clearings, and oasis effects.",
-					PropPlacementStrategy.Terrain => "Terrain-aware intelligent placement. Best for realistic environmental distribution.",
-					_ => "Unknown strategy"
-					};
+				PropPlacementStrategy.Random => "Random scatter distribution. Good for general decoration and ambient props.",
+				PropPlacementStrategy.Clustered => "Natural clustering behavior. Excellent for vegetation, rocks, and organic features.",
+				PropPlacementStrategy.Sparse => "High-quality selective placement. Perfect for landmarks, special items, and focal points.",
+				PropPlacementStrategy.Linear => "Edge-following placement. Ideal for fences, paths, shorelines, and boundaries.",
+				PropPlacementStrategy.Radial => "Center-outward distribution. Great for settlements, clearings, and oasis effects.",
+				PropPlacementStrategy.Terrain => "Terrain-aware intelligent placement. Best for realistic environmental distribution.",
+				_ => "Unknown strategy"
+				};
 			}
 
 		private string CalculateQualityRating(PropPlacementSettings settings)
 			{
 			int score = 0;
 
-			// Strategy sophistication (0-2 points)
 			if (settings.strategy == PropPlacementStrategy.Terrain)
 				{
 				score += 2;
 				}
-			else if (settings.strategy is PropPlacementStrategy.Clustered or PropPlacementStrategy.Radial)
+			else if (settings.strategy == PropPlacementStrategy.Clustered || settings.strategy == PropPlacementStrategy.Radial)
 				{
 				score += 1;
 				}
 
-			// Density curve usage (0-1 points)
 			if (settings.densityCurve != null && settings.densityCurve.keys.Length > 2)
 				{
 				score += 1;
 				}
 
-			// Avoidance sophistication (0-2 points)
-			if (settings.avoidance.avoidOvercrowding && settings.avoidance.avoidTransitions)
+			if (settings.avoidance != null)
 				{
-				score += 2;
-				}
-			else if (settings.avoidance.avoidOvercrowding || settings.avoidance.avoidTransitions)
-				{
-				score += 1;
-				}
-
-			// Variation features (0-2 points)
-			if (settings.variation.randomRotation && settings.variation.positionJitter > 0)
-				{
-				score += 2;
-				}
-			else if (settings.variation.randomRotation || settings.variation.positionJitter > 0)
-				{
-				score += 1;
+				if (settings.avoidance.avoidOvercrowding && settings.avoidance.avoidTransitions)
+					{
+					score += 2;
+					}
+				else if (settings.avoidance.avoidOvercrowding || settings.avoidance.avoidTransitions)
+					{
+					score += 1;
+					}
 				}
 
-			// Performance considerations (0-1 points)
+			if (settings.variation != null)
+				{
+				if (settings.variation.randomRotation && settings.variation.positionJitter > 0)
+					{
+					score += 2;
+					}
+				else if (settings.variation.randomRotation || settings.variation.positionJitter > 0)
+					{
+					score += 1;
+					}
+				}
+
 			if (settings.useSpatialOptimization && settings.maxPropsPerBiome < 200)
 				{
 				score += 1;
@@ -337,16 +416,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			return score switch
 				{
-					8 => "A+ (Exceptional)",
-					7 => "A (Excellent)",
-					6 => "A- (Very Good)",
-					5 => "B+ (Good)",
-					4 => "B (Above Average)",
-					3 => "B- (Average)",
-					2 => "C+ (Below Average)",
-					1 => "C (Standard)",
-					_ => "C- (Limited)"
-					};
+				8 => "A+ (Exceptional)",
+				7 => "A (Excellent)",
+				6 => "A- (Very Good)",
+				5 => "B+ (Good)",
+				4 => "B (Above Average)",
+				3 => "B- (Average)",
+				2 => "C+ (Below Average)",
+				1 => "C (Standard)",
+				_ => "C- (Limited)"
+				};
 			}
 
 		private void ValidateProfile()
@@ -369,7 +448,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					issues.Add("No prop prefabs assigned");
 					}
 
-				if (profile.propSettings.allowedPropLayers.Count == 0)
+				if (profile.propSettings.allowedPropLayers == null || profile.propSettings.allowedPropLayers.Count == 0)
 					{
 					issues.Add("No allowed prop layers specified");
 					}
@@ -382,14 +461,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			if (issues.Count == 0)
 				{
-				EditorUtility.DisplayDialog("Validation Passed",
-					"BiomeArtProfile validation completed successfully. No issues found.", "OK");
+				EditorUtility.DisplayDialog("Validation Passed", "BiomeArtProfile validation completed successfully. No issues found.", "OK");
 				}
 			else
 				{
 				string issueList = string.Join("\n• ", issues);
-				EditorUtility.DisplayDialog("Validation Issues",
-					$"The following issues were found:\n• {issueList}", "OK");
+				EditorUtility.DisplayDialog("Validation Issues", $"The following issues were found:\n• {issueList}", "OK");
 				}
 			}
 
@@ -409,6 +486,95 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				};
 
 			EditorUtility.SetDirty(profile);
+			}
+
+		// Live scene preview helpers (editor-only)
+		private const string PreviewGONamePrefix = "BiomeTransitionPreview_";
+
+		private void ApplyLivePreviewToScene()
+			{
+			if (profile == null) return;
+
+			string goName = PreviewGONamePrefix + profile.name;
+			var previewRoot = GameObject.Find(goName);
+			if (previewRoot == null)
+				{
+				previewRoot = new GameObject(goName);
+				previewRoot.hideFlags = HideFlags.DontSave;
+				}
+
+			if (!previewRoot.TryGetComponent<Grid>(out Grid grid))
+			{
+				grid = previewRoot.AddComponent<Grid>();
+			}
+
+			Tilemap tilemap = previewRoot.GetComponentInChildren<Tilemap>();
+			if (tilemap == null)
+				{
+				var tmGO = new GameObject("Tilemap", typeof(Tilemap), typeof(TilemapRenderer));
+				tmGO.transform.SetParent(previewRoot.transform, false);
+				tilemap = tmGO.GetComponent<Tilemap>();
+				}
+
+			// Prepare colors
+			Color colorA = profile.debugColor;
+			Color colorB = GetDefaultBiomeColor(previewTargetBiome);
+
+			int radius = 8;
+			float deadzone = Mathf.Clamp(profile.transitionDeadzone, 0f, 0.5f);
+			float lower = 0.5f - deadzone;
+			float upper = 0.5f + deadzone;
+
+			// Choose a tile instance to paint if needed
+			TileBase paintTile = profile.transitionFromTile ?? profile.floorTile;
+			Tile tempTile = null;
+			if (paintTile == null)
+				{
+				tempTile = ScriptableObject.CreateInstance<Tile>();
+				paintTile = tempTile;
+				}
+
+			// Clear previous
+			tilemap.ClearAllTiles();
+
+			for (int x = -radius; x <= radius; x++)
+				{
+				float t = (x + radius) / (float)(radius * 2);
+				Color c;
+				if (t <= lower) c = colorA;
+				else if (t >= upper) c = colorB;
+				else
+					{
+					float local = Mathf.InverseLerp(lower, upper, t);
+					c = Color.Lerp(colorA, colorB, local);
+					}
+
+				var cell = new Vector3Int(x, 0, 0);
+				tilemap.SetTile(cell, paintTile);
+				tilemap.SetColor(cell, c);
+				}
+
+			// Focus scene view on preview
+			if (UnityEditor.SceneView.lastActiveSceneView != null)
+				UnityEditor.SceneView.lastActiveSceneView.FrameSelected();
+
+			// Cleanup temporary tile instance to avoid memory leak on domain reload
+			if (tempTile != null)
+				{
+				tempTile.hideFlags = HideFlags.DontSave;
+				}
+			}
+
+		private void ClearLivePreviewFromScene()
+			{
+			if (profile == null) return;
+			string goName = PreviewGONamePrefix + profile.name;
+			var previewRoot = GameObject.Find(goName);
+			if (previewRoot != null)
+				{
+				// DestroyImmediate is safe in editor context
+				UnityEngine.Object.DestroyImmediate(previewRoot);
+				}
 			}
 		}
 	}

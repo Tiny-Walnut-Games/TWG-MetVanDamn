@@ -68,8 +68,8 @@ namespace TinyWalnutGames.MetVD.Tests
 		public void WfcBiomeValidation_PolarityConstraints_ShouldEnforceCoherence()
 			{
 			// Test biome polarity constraints in WFC
-			var sunBiome = new Biome(BiomeType.SolarPlains, Polarity.Sun, 1.0f);
-			var moonBiome = new Biome(BiomeType.ShadowRealms, Polarity.Moon, 1.0f);
+			var sunBiome = new TinyWalnutGames.MetVD.Core.Biome(BiomeType.SolarPlains, Polarity.Sun, 1.0f);
+			var moonBiome = new TinyWalnutGames.MetVD.Core.Biome(BiomeType.ShadowRealms, Polarity.Moon, 1.0f);
 
 			// Same polarity biomes should be compatible with themselves
 			Assert.IsTrue(sunBiome.IsCompatibleWith(Polarity.Sun), "Sun biome should be compatible with Sun polarity");

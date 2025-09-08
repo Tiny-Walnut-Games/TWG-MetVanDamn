@@ -4,6 +4,7 @@ using System.Reflection;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Samples;
+using TinyWalnutGames.MetVD.Shared;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -33,9 +34,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			// Create scene setup component
 			this.sceneSetupObject = new GameObject("SceneSetup");
 			this.sceneSetup = this.sceneSetupObject.AddComponent<SmokeTestSceneSetup>();
-
-			// Override the default world injection to use our test world
-			this.OverrideWorldInjection();
 			}
 
 		[TearDown]
@@ -55,10 +53,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[UnityTest]
 		public IEnumerator SceneSetup_FullWorkflow_CreatesValidWorld()
 			{
-			// ✅ FIX: Configure test world injection before starting
-			this.SetField("defaultWorld", this.testWorld);
-			this.SetField("entityManager", this.entityManager);
-			this.SetField("createdFallbackWorld", false); // Prevent fallback world creation
+			// ✅ FIX: Use ForceSetup() to properly initialize the component
+			this.sceneSetup.ForceSetup(this.testWorld);
 
 			// Configure scene setup with test parameters
 			this.SetField("worldSeed", 12345u);
@@ -67,11 +63,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			this.SetField("enableDebugVisualization", false); // Disable for clean testing
 			this.SetField("logGenerationSteps", true);
 
-			// Start the scene setup process
-			this.sceneSetup.enabled = true;
+			// ✅ FIX: Call SetupSmokeTestWorld directly since we already used ForceSetup
+			this.InvokeMethod("SetupSmokeTestWorld");
 
-			yield return null; // Wait for Start() to be called
-			yield return null; // Wait one more frame for potential system updates
+			yield return null; // Wait one frame
 
 			// Verify world configuration was created
 			this.VerifyWorldConfiguration();
@@ -79,7 +74,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			// Verify districts were created
 			this.VerifyDistrictConfiguration();
 
-			// Verify biome fields were created  
+			// Verify biome fields were created
 			this.VerifyBiomeFieldConfiguration();
 
 			yield return null;
@@ -94,7 +89,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			try
 				{
-				// Setup the scene - should now use our test world directly 
+				// Setup the scene - should now use our test world directly
 				this.SetField("logGenerationSteps", true); // Enable logging to see world usage
 				this.InvokeMethod("SetupSmokeTestWorld");
 
@@ -134,9 +129,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SceneSetup_DistrictHierarchy_SupportsNestedSectorGeneration()
 			{
-			// Test that district setup supports the expected hierarchical structure
-			this.SetField("defaultWorld", this.testWorld);
-			this.SetField("entityManager", this.entityManager);
+			// ✅ FIX: Use ForceSetup() to properly initialize the component
+			this.sceneSetup.ForceSetup(this.testWorld);
 			this.SetField("targetSectorCount", 9); // 3x3 grid for predictable testing
 
 			this.InvokeMethod("CreateDistrictEntities");
@@ -163,9 +157,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SceneSetup_PolarityFieldLayout_SupportsComplexBiomeGeneration()
 			{
-			// Test that polarity field layout supports complex biome interactions
-			this.SetField("defaultWorld", this.testWorld);
-			this.SetField("entityManager", this.entityManager);
+			// ✅ FIX: Use ForceSetup() to properly initialize the component
+			this.sceneSetup.ForceSetup(this.testWorld);
 			this.SetField("biomeTransitionRadius", 20.0f);
 
 			this.InvokeMethod("CreateBiomeFieldEntities");
@@ -315,14 +308,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				}
 			entities.Dispose();
 
-			Assert.IsTrue(foundPolarities.SetEquals(new [ ] { Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold }),
+			Assert.IsTrue(foundPolarities.SetEquals(new[] { Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold }),
 				"All expected polarity fields should be created");
-			}
-
-		private void OverrideWorldInjection()
-			{
-			// For integration testing, we want the scene setup to use our test world
-			// This is handled in individual tests by setting the private fields
 			}
 
 		private void SetField(string fieldName, object value)

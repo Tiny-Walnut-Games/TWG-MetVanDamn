@@ -23,4 +23,32 @@ namespace TinyWalnutGames.MetVD.Shared
 		public int TargetSectors;
 		public RandomizationMode RandomizationMode;
 		}
+
+	/// <summary>
+	/// Simple component to carry an explicit world seed (tests and authoring use this)
+	/// </summary>
+	public struct WorldSeed : IComponentData
+		{
+		public uint Value;
+		}
+
+	/// <summary>
+	/// World bounds component used by scene setup and tests
+	/// </summary>
+	public struct WorldBounds : IComponentData
+		{
+		public int2 Min;
+		public int2 Max;
+		}
+
+	/// <summary>
+	/// Lightweight generation configuration used by authoring and tests
+	/// </summary>
+	public struct WorldGenerationConfig : IComponentData
+		{
+		public uint WorldSeed;
+		public int TargetSectorCount;
+		public int MaxDistrictCount;
+		public float BiomeTransitionRadius;
+		}
 	}

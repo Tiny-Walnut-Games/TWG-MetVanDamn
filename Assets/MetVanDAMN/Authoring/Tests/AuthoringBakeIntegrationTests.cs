@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
+using TinyWalnutGames.MetVD.Shared;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -81,7 +82,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			}
 
 		// Baking simulation (authoring -> ECS) --------------------------------
-		private static void BakeGameObjects(World world, params GameObject [ ] gameObjects)
+		private static void BakeGameObjects(World world, params GameObject[] gameObjects)
 			{
 			EntityManager em = world.EntityManager;
 			foreach (GameObject go in gameObjects)
@@ -160,7 +161,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				}
 			}
 
-		private static void CleanupGameObjects(params GameObject [ ] gameObjects)
+		private static void CleanupGameObjects(params GameObject[] gameObjects)
 			{
 			foreach (GameObject go in gameObjects)
 				{
@@ -203,10 +204,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Assert.AreEqual(4, prototype.MaxConnections);
 			DynamicBuffer<WfcSocketBufferElement> sockets = this._entityManager.GetBuffer<WfcSocketBufferElement>(tileEntity);
 			Assert.AreEqual(2, sockets.Length);
-			Assert.AreEqual(1u, sockets [ 0 ].Value.SocketId);
-			Assert.AreEqual(0, sockets [ 0 ].Value.Direction);
-			Assert.AreEqual(Polarity.Sun, sockets [ 0 ].Value.RequiredPolarity);
-			Assert.IsTrue(sockets [ 0 ].Value.IsOpen);
+			Assert.AreEqual(1u, sockets[0].Value.SocketId);
+			Assert.AreEqual(0, sockets[0].Value.Direction);
+			Assert.AreEqual(Polarity.Sun, sockets[0].Value.RequiredPolarity);
+			Assert.IsTrue(sockets[0].Value.IsOpen);
 			}
 
 		[Test]
@@ -287,7 +288,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			gateBuffer.Add(gateCondition);
 
 			Assert.AreEqual(1, gateBuffer.Length);
-			GateCondition gate = gateBuffer [ 0 ].Value;
+			GateCondition gate = gateBuffer[0].Value;
 			Assert.AreEqual(Polarity.Heat, gate.RequiredPolarity);
 			Assert.AreEqual(Ability.Flight, gate.RequiredAbilities);
 			Assert.AreEqual(GateSoftness.Easy, gate.Softness);
@@ -302,22 +303,22 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Entity configEntity = this._entityManager.CreateEntity();
 
 			// Simulate the integrated world configuration
-			this._entityManager.AddComponentData(configEntity, new TinyWalnutGames.MetVD.Samples.WorldSeed { Value = 12345 });
-			this._entityManager.AddComponentData(configEntity, new TinyWalnutGames.MetVD.Samples.WorldBounds
+			this._entityManager.AddComponentData(configEntity, new WorldSeed { Value = 12345 });
+			this._entityManager.AddComponentData(configEntity, new WorldBounds
 				{
 				Min = new int2(-25, -25),
 				Max = new int2(25, 25)
 				});
-			this._entityManager.AddComponentData(configEntity, new TinyWalnutGames.MetVD.Samples.WorldGenerationConfig
+			this._entityManager.AddComponentData(configEntity, new WorldGenerationConfig
 				{
 				TargetSectorCount = 8,
 				MaxDistrictCount = 32,
 				BiomeTransitionRadius = 15.0f
 				});
 
-			Samples.WorldSeed seed = this._entityManager.GetComponentData<TinyWalnutGames.MetVD.Samples.WorldSeed>(configEntity);
-			Samples.WorldBounds bounds = this._entityManager.GetComponentData<TinyWalnutGames.MetVD.Samples.WorldBounds>(configEntity);
-			Samples.WorldGenerationConfig genConfig = this._entityManager.GetComponentData<TinyWalnutGames.MetVD.Samples.WorldGenerationConfig>(configEntity);
+			WorldSeed seed = this._entityManager.GetComponentData<WorldSeed>(configEntity);
+			WorldBounds bounds = this._entityManager.GetComponentData<WorldBounds>(configEntity);
+			WorldGenerationConfig genConfig = this._entityManager.GetComponentData<WorldGenerationConfig>(configEntity);
 
 			Assert.AreEqual(12345u, seed.Value);
 			Assert.AreEqual(new int2(-25, -25), bounds.Min);
@@ -372,9 +373,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			bool foundHub = false;
 			for (int i = 0; i < prototypes.Length; i++)
 				{
-				if (prototypes [ i ].TileId == 1)
+				if (prototypes[i].TileId == 1)
 					{
-					hubTile = prototypes [ i ];
+					hubTile = prototypes[i];
 					foundHub = true;
 					break;
 					}
@@ -419,8 +420,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			NativeArray<ConnectionData> connections = connectionQuery.ToComponentDataArray<ConnectionData>(Allocator.Temp);
 
 			Assert.AreEqual(1, connections.Length, "Invalid connection should still be baked");
-			Assert.AreEqual(888u, connections [ 0 ].sourceNode._value);
-			Assert.AreEqual(777u, connections [ 0 ].targetNode._value);
+			Assert.AreEqual(888u, connections[0].sourceNode._value);
+			Assert.AreEqual(777u, connections[0].targetNode._value);
 
 			districts.Dispose();
 			connections.Dispose();
@@ -445,7 +446,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			var gateGO = new GameObject("InvalidGate");
 			GateConditionAuthoring gate = gateGO.AddComponent<GateConditionAuthoring>();
 			gate.connectionId = new NodeId { _value = 500 }; // References non-existent connection
-			gate.gateConditions = new GateCondition [ ]
+			gate.gateConditions = new GateCondition[]
 			{
 				new() {
 					requiredConnectionId = new NodeId { _value = 999 }, // Also invalid
@@ -465,7 +466,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Assert.AreEqual(1, gateQuery.CalculateEntityCount());
 
 			NativeArray<GateData> gateData = gateQuery.ToComponentDataArray<GateData>(Allocator.Temp);
-			Assert.AreEqual(500u, gateData [ 0 ].connectionId._value, "Gate should reference invalid connection ID");
+			Assert.AreEqual(500u, gateData[0].connectionId._value, "Gate should reference invalid connection ID");
 
 			gateData.Dispose();
 			districtQuery.Dispose();
@@ -499,7 +500,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			BakeGameObjects(world, biomeGO, invalidProfileBiomeGO);
 
 			EntityQuery biomeQuery = world.EntityManager.CreateEntityQuery(typeof(TinyWalnutGames.MetVD.Core.Biome));
-			NativeArray<Biome> biomes = biomeQuery.ToComponentDataArray<TinyWalnutGames.MetVD.Core.Biome>(Allocator.Temp);
+			NativeArray<TinyWalnutGames.MetVD.Core.Biome> biomes = biomeQuery.ToComponentDataArray<TinyWalnutGames.MetVD.Core.Biome>(Allocator.Temp);
 
 			// Biomes should still be created even with invalid profiles
 			Assert.AreEqual(2, biomes.Length, "Invalid biomes should still be baked");
@@ -535,7 +536,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			var circularGateGO = new GameObject("CircularGate");
 			GateConditionAuthoring circularGate = circularGateGO.AddComponent<GateConditionAuthoring>();
 			circularGate.connectionId = new NodeId { _value = 401 };
-			circularGate.gateConditions = new GateCondition [ ]
+			circularGate.gateConditions = new GateCondition[]
 			{
 				new() {
 					requiredConnectionId = new NodeId { _value = 401 }, // Self-reference!
@@ -581,7 +582,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Assert.IsTrue(foundAB && foundBA, "Bidirectional connections should exist");
 
 			// Check circular gate reference
-			Assert.AreEqual(401u, gates [ 0 ].connectionId._value, "Gate should have correct connection ID");
+			Assert.AreEqual(401u, gates[0].connectionId._value, "Gate should have correct connection ID");
 
 			connections.Dispose();
 			gates.Dispose();

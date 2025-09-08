@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
+using TinyWalnutGames.MetVD.Shared;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -19,8 +20,11 @@ namespace TinyWalnutGames.MetVD.Tests
 			SystemHandle systemHandle = _world.GetOrCreateSystem(typeof(DistrictWfcSystem));
 			_simGroup.AddSystemToUpdateList(systemHandle);
 			_simGroup.SortSystems();
-			}
 
+			// Add WorldSeed component that DistrictWfcSystem requires for deterministic behavior
+			Entity worldSeedEntity = _world.EntityManager.CreateEntity();
+			_world.EntityManager.AddComponentData(worldSeedEntity, new WorldSeed { Value = 42u });
+			}
 		[TearDown]
 		public void TearDown()
 			{
@@ -35,7 +39,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			EntityManager em = _world.EntityManager;
 			Entity e = em.CreateEntity();
 			em.AddComponentData(e, new WfcState(initial) { Iteration = iteration });
-			em.AddComponentData(e, new NodeId { _value = 0, Coordinates = int2.zero, Level = 0, ParentId = 0 });
+			em.AddComponentData(e, new NodeId(value: 0, level: 0, parentId: 0, coordinates: int2.zero));
 			if (withBuffer)
 				{
 				em.AddBuffer<WfcCandidateBufferElement>(e);
@@ -43,18 +47,49 @@ namespace TinyWalnutGames.MetVD.Tests
 
 			return e;
 			}
-
 		[Test]
 		public void Initialization_AddsCandidates_SetsInProgress()
 			{
+			// Enable debug output to see what's happening
+			DistrictWfcSystem.DebugWfc = true;
+
 			Entity e = CreateBaseEntity(WfcGenerationState.Initialized, withBuffer: true);
-			_simGroup.Update();
+
+			// Debug: Check initial state
 			EntityManager em = _world.EntityManager;
+			WfcState initialState = em.GetComponentData<WfcState>(e);
+			DynamicBuffer<WfcCandidateBufferElement> initialBuffer = em.GetBuffer<WfcCandidateBufferElement>(e);
+			NodeId nodeId = em.GetComponentData<NodeId>(e);
+
+			UnityEngine.Debug.Log($"[TEST] BEFORE Update: Entity={e.Index}, State={initialState.State}, BufferLength={initialBuffer.Length}, NodeId={nodeId._value}");
+
+			// Check if system can find our entity
+			using var testQuery = em.CreateEntityQuery(typeof(WfcState), typeof(NodeId));
+			UnityEngine.Debug.Log($"[TEST] Entities matching WfcState+NodeId: {testQuery.CalculateEntityCount()}");
+
+			using var seedQuery = em.CreateEntityQuery(typeof(WorldSeed));
+			UnityEngine.Debug.Log($"[TEST] WorldSeed entities: {seedQuery.CalculateEntityCount()}");
+
+			_simGroup.Update();
+
+			// Debug: Check final state
 			WfcState state = em.GetComponentData<WfcState>(e);
 			DynamicBuffer<WfcCandidateBufferElement> candidates = em.GetBuffer<WfcCandidateBufferElement>(e);
-			Assert.AreEqual(WfcGenerationState.InProgress, state.State);
-			Assert.AreEqual(4, candidates.Length);
-			Assert.AreEqual(4, state.Entropy);
+
+			UnityEngine.Debug.Log($"[TEST] AFTER Update: State={state.State}, BufferLength={candidates.Length}, Entropy={state.Entropy}");
+
+			// Log buffer contents if any
+			if (candidates.Length > 0)
+				{
+				for (int i = 0; i < candidates.Length; i++)
+					{
+					UnityEngine.Debug.Log($"[TEST] Candidate {i}: TileId={candidates[i].TileId}, Weight={candidates[i].Weight}");
+					}
+				}
+
+			Assert.AreEqual(WfcGenerationState.InProgress, state.State, $"Expected InProgress, got {state.State}");
+			Assert.AreEqual(4, candidates.Length, $"Expected 4 candidates, got {candidates.Length}");
+			Assert.AreEqual(4, state.Entropy, $"Expected entropy 4, got {state.Entropy}");
 			}
 
 		[Test]

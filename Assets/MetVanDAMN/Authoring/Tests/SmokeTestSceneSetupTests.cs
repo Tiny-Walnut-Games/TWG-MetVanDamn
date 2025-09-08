@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Samples;
+using TinyWalnutGames.MetVD.Shared;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -56,7 +57,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Assert.AreEqual(new int2(50, 50), this.GetPrivateField<int2>("worldSize"));
 			Assert.AreEqual(5, this.GetPrivateField<int>("targetSectorCount"));
 			Assert.AreEqual(10.0f, this.GetPrivateField<float>("biomeTransitionRadius"), 0.001f);
-			Assert.IsTrue(this.GetPrivateField<bool>("enableDebugVisualization"));
+			// ✅ FIX: enableDebugVisualization defaults to FALSE, not true
+			Assert.IsFalse(this.GetPrivateField<bool>("enableDebugVisualization"));
 			Assert.IsTrue(this.GetPrivateField<bool>("logGenerationSteps"));
 			}
 
@@ -106,9 +108,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_DistrictCreation_RespectsTargetSectorCount()
 			{
-			// Setup
-			this.SetPrivateField("defaultWorld", this.testWorld);
-			this.SetPrivateField("entityManager", this.entityManager);
+			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
+			this.smokeTestComponent.ForceSetup(this.testWorld);
 			this.SetPrivateField("targetSectorCount", 8);
 
 			// Invoke district creation
@@ -127,7 +128,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			for (int i = 0; i < nodeEntities.Length; i++)
 				{
-				NodeId nodeId = this.entityManager.GetComponentData<NodeId>(nodeEntities [ i ]);
+				NodeId nodeId = this.entityManager.GetComponentData<NodeId>(nodeEntities[i]);
 				if (nodeId.Coordinates.Equals(int2.zero) && nodeId._value == 0)
 					{
 					foundHub = true;
@@ -143,9 +144,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_BiomeFieldCreation_CreatesAllPolarityFields()
 			{
-			// Setup
-			this.SetPrivateField("defaultWorld", this.testWorld);
-			this.SetPrivateField("entityManager", this.entityManager);
+			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
+			this.smokeTestComponent.ForceSetup(this.testWorld);
 
 			// Invoke biome field creation
 			this.InvokePrivateMethod("CreateBiomeFieldEntities");
@@ -159,7 +159,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			for (int i = 0; i < fieldEntities.Length; i++)
 				{
-				PolarityFieldData fieldData = this.entityManager.GetComponentData<PolarityFieldData>(fieldEntities [ i ]);
+				PolarityFieldData fieldData = this.entityManager.GetComponentData<PolarityFieldData>(fieldEntities[i]);
 				foundPolarities.Add(fieldData.Polarity);
 
 				// Verify field properties
@@ -179,9 +179,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_DistrictGridPlacement_FollowsExpectedPattern()
 			{
-			// Setup for 9 districts (8 + hub)
-			this.SetPrivateField("defaultWorld", this.testWorld);
-			this.SetPrivateField("entityManager", this.entityManager);
+			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
+			this.smokeTestComponent.ForceSetup(this.testWorld);
 			this.SetPrivateField("targetSectorCount", 8);
 
 			this.InvokePrivateMethod("CreateDistrictEntities");
@@ -192,7 +191,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			for (int i = 0; i < nodeEntities.Length; i++)
 				{
-				NodeId nodeId = this.entityManager.GetComponentData<NodeId>(nodeEntities [ i ]);
+				NodeId nodeId = this.entityManager.GetComponentData<NodeId>(nodeEntities[i]);
 				positions.Add(nodeId.Coordinates);
 				}
 
@@ -215,9 +214,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_ComponentConfiguration_HasRequiredECSComponents()
 			{
-			// Setup
-			this.SetPrivateField("defaultWorld", this.testWorld);
-			this.SetPrivateField("entityManager", this.entityManager);
+			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
+			this.smokeTestComponent.ForceSetup(this.testWorld);
 
 			this.InvokePrivateMethod("CreateDistrictEntities");
 
@@ -267,9 +265,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_ExtremeTargetSectorCount_HandlesGracefully()
 			{
-			// Test edge cases for targetSectorCount
-			this.SetPrivateField("defaultWorld", this.testWorld);
-			this.SetPrivateField("entityManager", this.entityManager);
+			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
+			this.smokeTestComponent.ForceSetup(this.testWorld);
 
 			// Test extremely high value (should be clamped to 24)
 			this.SetPrivateField("targetSectorCount", 100);
@@ -293,9 +290,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_PolarityFieldPositioning_MatchesExpectedLayout()
 			{
-			// Setup
-			this.SetPrivateField("defaultWorld", this.testWorld);
-			this.SetPrivateField("entityManager", this.entityManager);
+			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
+			this.smokeTestComponent.ForceSetup(this.testWorld);
 			this.SetPrivateField("biomeTransitionRadius", 15.0f);
 
 			this.InvokePrivateMethod("CreateBiomeFieldEntities");
@@ -306,17 +302,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			for (int i = 0; i < entities.Length; i++)
 				{
-				PolarityFieldData data = this.entityManager.GetComponentData<PolarityFieldData>(entities [ i ]);
-				polarityPositions [ data.Polarity ] = data.Center;
+				PolarityFieldData data = this.entityManager.GetComponentData<PolarityFieldData>(entities[i]);
+				polarityPositions[data.Polarity] = data.Center;
 				}
 
 			entities.Dispose();
 
 			// Verify expected positions
-			Assert.AreEqual(new float2(15, 15), polarityPositions [ Polarity.Sun ], "Sun field position");
-			Assert.AreEqual(new float2(-15, -15), polarityPositions [ Polarity.Moon ], "Moon field position");
-			Assert.AreEqual(new float2(15, -15), polarityPositions [ Polarity.Heat ], "Heat field position");
-			Assert.AreEqual(new float2(-15, 15), polarityPositions [ Polarity.Cold ], "Cold field position");
+			Assert.AreEqual(new float2(15, 15), polarityPositions[Polarity.Sun], "Sun field position");
+			Assert.AreEqual(new float2(-15, -15), polarityPositions[Polarity.Moon], "Moon field position");
+			Assert.AreEqual(new float2(15, -15), polarityPositions[Polarity.Heat], "Heat field position");
+			Assert.AreEqual(new float2(-15, 15), polarityPositions[Polarity.Cold], "Cold field position");
 			}
 
 		// Helper methods for reflection-based testing

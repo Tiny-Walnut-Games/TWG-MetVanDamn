@@ -255,6 +255,24 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Tooltip("Optional tiles for biome-to-biome transitions.")]
 		public TileBase [ ] transitionTiles;
 
+		[Header("Explicit Transition Mapping")]
+		[Tooltip("Optional explicit tile to use as the source (From) transition tile. If null, floorTile is used as fallback.")]
+		public TileBase transitionFromTile;
+
+		[Tooltip("Optional explicit tile for the first blend band (BlendA).")]
+		public TileBase transitionBlendA;
+
+		[Tooltip("Optional explicit tile for the second blend band (BlendB).")]
+		public TileBase transitionBlendB;
+
+		[Tooltip("Optional explicit tile to use as the destination (To) transition tile. If null, last entry of transitionTiles or floorTile is used.")]
+		public TileBase transitionToTile;
+
+		[Header("Transition Settings")]
+		[Range(0f, 0.5f), Tooltip("Half-width of the central blend band as a normalized value (0..0.5).\n" +
+		    "Lower values make a sharp cut between biomes; higher values broaden the blended area.")]
+		public float transitionDeadzone = 0.1f;
+
 		[Header("Props")]
 		[Tooltip("Advanced prop placement configuration for this biome.")]
 		public PropPlacementSettings propSettings;

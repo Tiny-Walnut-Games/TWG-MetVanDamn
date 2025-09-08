@@ -73,43 +73,17 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\__TempMenuRefreshTrigger.cs" />
+    <Compile Include="Assets\debug\TestLifecycleDebug.cs" />
+    <Compile Include="Assets\debug\MetVanDAMNQuickStart.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\debug\logs-2025-08-28-2348.txt" />
-    <None Include="Assets\debug\TestResults_20250831_130030.xml" />
-    <None Include="Assets\debug\TestResults_20250901_002445.xml" />
-    <None Include="Assets\debug\logs-2025-08-31-1301.txt" />
-    <None Include="Assets\debug\logs-2025-08-28-0744.txt" />
-    <None Include="Assets\debug\logs-2025-08-26-1546.txt" />
-    <None Include="Assets\debug\TestResults_20250831_225302.xml" />
-    <None Include="Assets\debug\TestResults_20250831_201358.xml" />
-    <None Include="Assets\debug\logs-2025-08-28-1700.txt" />
-    <None Include="Assets\debug\TestResults_20250901_011736.xml" />
-    <None Include="Assets\debug\TestResults_20250901_010736.xml" />
     <None Include="Assets\debug\Chronos Security Hardening Required.txt" />
-    <None Include="Assets\debug\TestResults_20250831_130101.xml" />
-    <None Include="Assets\debug\logs-2025-08-28-1005.txt" />
-    <None Include="Assets\debug\logs-2025-08-29-0314.txt" />
-    <None Include="Assets\debug\TestResults_20250831_231011.xml" />
-    <None Include="Assets\debug\TestResults_20250901_001505.xml" />
-    <None Include="Assets\debug\TestResults_20250831_195010.xml" />
     <None Include="Assets\Tiny Walnut Games\MetVanDAMN\Docs\TestResults.xml" />
-    <None Include="Assets\debug\TestResults_20250901_012357.xml" />
-    <None Include="Assets\debug\TestResults_20250831_194728.xml" />
     <None Include="Assets\debug\DockerUnity.txt" />
     <None Include="Assets\samvieten\Documentation\SAMVIETEN ASSETPACKS LICENSE.txt" />
-    <None Include="Assets\debug\TestResults_20250831_231005.xml" />
-    <None Include="Assets\debug\unity-console-logs-2025-09-01-115200.txt" />
-    <None Include="Assets\debug\logs-2025-08-31-1300.txt" />
-    <None Include="Assets\debug\TestResults_20250901_005428.xml" />
-    <None Include="Assets\debug\TestResults_20250831_222602.xml" />
-    <None Include="Assets\debug\TestResults_20250901_003716.xml" />
-    <None Include="Assets\debug\TestResults_20250831_223309.xml" />
-    <None Include="Assets\debug\TestResults_20250831_230351.xml" />
-    <None Include="Assets\debug\logs-2025-08-28-0617.txt" />
-    <None Include="Assets\debug\logs-2025-08-28-1905.txt" />
-    <None Include="Assets\debug\TestResults_20250831_222529.xml" />
+    <None Include="Assets\debug\TestResults_20250908_153812.xml" />
+    <None Include="Assets\debug\TestResults_20250908_152729.xml" />
+    <None Include="Assets\debug\TestResults_20250908_160527.xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -52,6 +52,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				TargetSectors = authoring.sectorsPerDistrict.y * authoring.districtCount.y,
 				RandomizationMode = authoring.randomizationMode
 				});
+			// Add WorldSeed for determinism (required by DistrictWfcSystem)
+			AddComponent(entity, new WorldSeed { Value = (uint)authoring.seed });
 			}
 		}
 	}
