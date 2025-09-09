@@ -184,7 +184,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 					if (DebugWfc)
 						{
-						Debug.Log($"[DistrictWfcSystem] Entity {entity.Index} NodeId {nodeIdRO._value} State: {wfcState.ValueRO.State}");
+						Debug.Log($"[DistrictWfcSystem] Entity {entity.Index} NodeId {nodeIdRO._value} State: {wfcState.ValueRO.State}, AssignedTileId: {wfcState.ValueRO.AssignedTileId}");
 						}
 
 					switch (wfcState.ValueRO.State)
@@ -312,7 +312,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				if (TilePrototypes.Length > 0)
 					{
 					if (DebugWfc)
-						Debug.Log($"[DistrictWfcSystem] InitializeCandidates: Using {TilePrototypes.Length} tile prototypes");
+						Debug.Log($"[DistrictWfcSystem] InitializeCandidates: Using {TilePrototypes.Length} tile prototypes for Entity {entity.Index}");
 					// Calculate position-based bias factors
 					var coords = (float2)nodeId.Coordinates;
 					float distance = math.length(coords) * 0.02f;
