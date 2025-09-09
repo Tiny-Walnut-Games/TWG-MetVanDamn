@@ -7,12 +7,34 @@ This document establishes the **Sacred Code Classification System** to prevent *
 
 ---
 
+## 🧪 **TESTING PROTOCOL PRESERVATION**
+
+### **🚀 Unity 6000.2.0f1 Sacred Test Command**
+**Comment Pattern**: `// 🧪 SACRED TEST COMMAND - Unity 6000.2.0f1 PowerShell Incantation`
+```powershell
+& "C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Unity.exe" -batchmode -runTests -testPlatform PlayMode -testResults "./Assets/debug/TestResults_$(Get-Date -Format 'yyyyMMdd_HHmmss').xml" -testFilter TestNameHere -logFile "./Assets/debug/unity_powershell_test_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+```
+
+**Sacred Testing Elements:**
+- **Ampersand Operator (`&`)**: Required for PowerShell execution of paths with spaces
+- **Dynamic Timestamps**: `$(Get-Date -Format 'yyyyMMdd_HHmmss')` for unique file naming and debugging archaeology
+- **Dual Output**: Both `-testResults` (XML) and `-logFile` (detailed Unity logs) for comprehensive debugging
+- **Surgical Filtering**: `-testFilter` parameter for targeted test execution during debugging dungeon crawls
+
+**Testing Workflow Integration:**
+- Use for debugging specific AI navigation pathfinding issues
+- Generate timestamped artifacts for debugging session archaeology
+- Combine with debug logging in NavigationValidationSystem for comprehensive test intelligence
+- Essential for Johnny Turbo demo preparation and cheek-preservation protocols
+
+---
+
 ## ?? **THE CLASSIFICATION TAXONOMY**
 
 ### **??? PROTECTED CORE (Sacred & Untouchable)**
 **Comment Pattern**: `// ??? CORE ALGORITHM - Modification requires architectural review`
 - **Core ECS Systems** - World generation pipeline foundations
-- **Mathematical Algorithms** - Prime number detection, Fibonacci spirals, golden ratio calculations  
+- **Mathematical Algorithms** - Prime number detection, Fibonacci spirals, golden ratio calculations
 - **Burst-Compiled Jobs** - Performance-critical spatial analysis
 - **Blittable Data Structures** - ECS component definitions
 - **Coordinate Transform Logic** - Spatial relationship calculations
@@ -20,7 +42,7 @@ This document establishes the **Sacred Code Classification System** to prevent *
 ### **?? INTENDED EXPANSION ZONES (Sacred Extension Points)**
 **Comment Pattern**: `// ?Intended use!? [Purpose] - Expand as needed for your project`
 - **Constraint Validation Logic** - Game-specific rule implementations
-- **Prop Placement Strategies** - Art-specific placement algorithms  
+- **Prop Placement Strategies** - Art-specific placement algorithms
 - **Biome Art Profiles** - Visual content and material configurations
 - **Navigation Quick Fixes** - Project-specific pathfinding solutions
 - **Test Harness Examples** - Simplified validation for testing purposes
@@ -52,7 +74,7 @@ Based on [Restoring the Artifacts.md](./Restoring%20the%20Artifacts.md) findings
    - **Rationale**: Explicitly marked for user enhancement
    - **Protection Level**: Encourage modification with guidance
 
-2. **`DistrictWfcJob`** - WFC Implementation Stub  
+2. **`DistrictWfcJob`** - WFC Implementation Stub
    - **Classification**: ?? ENHANCEMENT CANDIDATE
    - **Rationale**: Core algorithm foundation, needs completion not replacement
    - **Protection Level**: Structured enhancement only
@@ -69,7 +91,7 @@ Based on [Restoring the Artifacts.md](./Restoring%20the%20Artifacts.md) findings
    - **Protection Level**: Algorithmic review required for changes
 
 5. **Grid Layer Creation Systems**
-   - **Classification**: ?? ENHANCEMENT CANDIDATE  
+   - **Classification**: ?? ENHANCEMENT CANDIDATE
    - **Rationale**: Integration opportunity, not replacement
    - **Protection Level**: Structured enhancement with Grid Layer Editor
 
@@ -134,7 +156,7 @@ Based on [Restoring the Artifacts.md](./Restoring%20the%20Artifacts.md) findings
 3. **Document protection rationale** for each classification
 4. **Identify expansion invitation opportunities**
 
-### **Phase 2: Comment Pattern Application (Week 2)**  
+### **Phase 2: Comment Pattern Application (Week 2)**
 1. **Apply Sacred Comment Patterns** to all classified code
 2. **Create expansion guidance** for INTENDED zones
 3. **Document enhancement pathways** for READY candidates
@@ -261,7 +283,7 @@ Based on [Restoring the Artifacts.md](./Restoring%20the%20Artifacts.md) findings
 **By implementing this Sacred Code Classification Protocol, we solemnly swear:**
 
 1. **To preserve the algorithmic beauty** of mathematical core systems
-2. **To encourage fearless expansion** in designated extension zones  
+2. **To encourage fearless expansion** in designated extension zones
 3. **To guide enhancement** of simplified implementations toward coordinate-aware excellence
 4. **To document our intentions** clearly for future algorithm archaeologists
 5. **To never delete Sacred Symbols** without first giving them chance to serve the greater spatial good
@@ -270,8 +292,8 @@ Based on [Restoring the Artifacts.md](./Restoring%20the%20Artifacts.md) findings
 
 ---
 
-**Signed by the Order of Sacred Symbol Preservation**  
-**Sealed with the Checkered Pattern of Coordinate Intelligence**  
-**Blessed by the Mathematical Gods of Spatial Beauty** 
+**Signed by the Order of Sacred Symbol Preservation**
+**Sealed with the Checkered Pattern of Coordinate Intelligence**
+**Blessed by the Mathematical Gods of Spatial Beauty**
 
 *"Perfect is the enemy of extensible - but core algorithms are the enemy of chaos!"* ???

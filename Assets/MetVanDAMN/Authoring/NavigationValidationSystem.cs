@@ -1,6 +1,7 @@
 using TinyWalnutGames.MetVD.Core;
 using Unity.Collections;
 using Unity.Entities;
+using NavLinkBufferElement = TinyWalnutGames.MetVD.Core.NavLinkBufferElement;
 
 namespace TinyWalnutGames.MetVD.Authoring
 	{
@@ -60,13 +61,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			for (int profileIndex = 0; profileIndex < testCapabilities.Length; profileIndex++)
 				{
-				AgentCapabilities capabilities = testCapabilities [ profileIndex ];
+				AgentCapabilities capabilities = testCapabilities[profileIndex];
 				NativeArray<bool> reachabilityResults = AnalyzeReachability(capabilities);
 
 				// Count unreachable nodes for this capability profile
 				for (int i = 0; i < reachabilityResults.Length; i++)
 					{
-					if (!reachabilityResults [ i ])
+					if (!reachabilityResults[i])
 						{
 						unreachableCount++;
 						}
@@ -84,19 +85,19 @@ namespace TinyWalnutGames.MetVD.Authoring
 			var profiles = new NativeArray<AgentCapabilities>(5, Allocator.Temp);
 
 			// Basic agent - no special abilities
-			profiles [ 0 ] = new AgentCapabilities(Polarity.None, Ability.None, 0.0f, "BasicAgent");
+			profiles[0] = new AgentCapabilities(Polarity.None, Ability.None, 0.0f, "BasicAgent");
 
 			// Movement specialist
-			profiles [ 1 ] = new AgentCapabilities(Polarity.None, Ability.AllMovement, 0.8f, "MovementAgent");
+			profiles[1] = new AgentCapabilities(Polarity.None, Ability.AllMovement, 0.8f, "MovementAgent");
 
-			// Environmental specialist  
-			profiles [ 2 ] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f, "EnvironmentalAgent");
+			// Environmental specialist
+			profiles[2] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f, "EnvironmentalAgent");
 
 			// Polarity master
-			profiles [ 3 ] = new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1.0f, "PolarityAgent");
+			profiles[3] = new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1.0f, "PolarityAgent");
 
 			// Master agent - all abilities
-			profiles [ 4 ] = new AgentCapabilities(Polarity.Any, Ability.Everything, 1.0f, "MasterAgent");
+			profiles[4] = new AgentCapabilities(Polarity.Any, Ability.Everything, 1.0f, "MasterAgent");
 
 			return profiles;
 			}
@@ -123,13 +124,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 
 			// Start from first node and see what we can reach
-			uint startNodeId = nodeIds [ 0 ];
+			uint startNodeId = nodeIds[0];
 			NativeHashSet<uint> reachableNodes = FloodFillReachability(startNodeId, capabilities);
 
 			// Mark reachable nodes
 			for (int i = 0; i < nodeIds.Length; i++)
 				{
-				reachability [ i ] = reachableNodes.Contains(nodeIds [ i ]);
+				reachability[i] = reachableNodes.Contains(nodeIds[i]);
 				}
 
 			nodeIds.Dispose();
@@ -160,7 +161,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 				for (int i = 0; i < linkBuffer.Length; i++)
 					{
-					NavLink link = linkBuffer [ i ].Value;
+					NavLink link = linkBuffer[i].Value;
 					uint neighborId = link.GetDestination(currentNodeId);
 
 					if (neighborId == 0 || reachableNodes.Contains(neighborId))
@@ -312,13 +313,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			for (int profileIndex = 0; profileIndex < testCapabilities.Length; profileIndex++)
 				{
-				AgentCapabilities capabilities = testCapabilities [ profileIndex ];
+				AgentCapabilities capabilities = testCapabilities[profileIndex];
 				NativeHashSet<uint> reachableFromStart = PerformReachabilityAnalysis(world, capabilities, allNodes);
 
 				// Mark unreachable nodes for this capability profile
 				for (int nodeIndex = 0; nodeIndex < allNodes.Length; nodeIndex++)
 					{
-					Entity nodeEntity = allNodes [ nodeIndex ];
+					Entity nodeEntity = allNodes[nodeIndex];
 					if (em.HasComponent<NavNode>(nodeEntity))
 						{
 						NavNode navNode = em.GetComponentData<NavNode>(nodeEntity);
@@ -378,9 +379,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			for (int i = 0; i < allNodes.Length; i++)
 				{
-				if (entityManager.HasComponent<NavNode>(allNodes [ i ]))
+				if (entityManager.HasComponent<NavNode>(allNodes[i]))
 					{
-					startEntity = allNodes [ i ];
+					startEntity = allNodes[i];
 					startNodeId = entityManager.GetComponentData<NavNode>(startEntity).NodeId;
 					break;
 					}
@@ -410,7 +411,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 				for (int i = 0; i < linkBuffer.Length; i++)
 					{
-					NavLink link = linkBuffer [ i ].Value;
+					NavLink link = linkBuffer[i].Value;
 					uint neighborId = link.GetDestination(currentNodeId);
 
 					if (neighborId == 0 || reachableNodes.Contains(neighborId))
@@ -433,25 +434,30 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		/// <summary>
 		/// Helper method to find entity by node ID
+		/// Fixed to use more reliable entity lookup approach
 		/// </summary>
 		private static Entity FindEntityByNodeId(World world, uint nodeId)
 			{
 			EntityManager entityManager = world.EntityManager;
 			EntityQuery nodeQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
-			NativeArray<Entity> entities = nodeQuery.ToEntityArray(Allocator.Temp);
 
-			foreach (Entity entity in entities)
+			// Use direct iteration instead of ToEntityArray to avoid potential issues
+			Entity foundEntity = Entity.Null;
+
+			using (var entities = nodeQuery.ToEntityArray(Allocator.Temp))
 				{
-				NodeId id = entityManager.GetComponentData<NodeId>(entity);
-				if (id._value == nodeId)
+				for (int i = 0; i < entities.Length; i++)
 					{
-					entities.Dispose();
-					return entity;
+					NodeId id = entityManager.GetComponentData<NodeId>(entities[i]);
+					if (id._value == nodeId)
+						{
+						foundEntity = entities[i];
+						break;
+						}
 					}
 				}
 
-			entities.Dispose();
-			return Entity.Null;
+			return foundEntity;
 			}
 
 		/// <summary>
@@ -462,19 +468,19 @@ namespace TinyWalnutGames.MetVD.Authoring
 			var profiles = new NativeArray<AgentCapabilities>(5, Allocator.Temp);
 
 			// Basic agent - no special abilities
-			profiles [ 0 ] = new AgentCapabilities(Polarity.None, Ability.None, 0.0f, "BasicAgent");
+			profiles[0] = new AgentCapabilities(Polarity.None, Ability.None, 0.0f, "BasicAgent");
 
 			// Movement specialist
-			profiles [ 1 ] = new AgentCapabilities(Polarity.None, Ability.AllMovement, 0.8f, "MovementAgent");
+			profiles[1] = new AgentCapabilities(Polarity.None, Ability.AllMovement, 0.8f, "MovementAgent");
 
-			// Environmental specialist  
-			profiles [ 2 ] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f, "EnvironmentalAgent");
+			// Environmental specialist
+			profiles[2] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f, "EnvironmentalAgent");
 
 			// Polarity master
-			profiles [ 3 ] = new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1.0f, "PolarityAgent");
+			profiles[3] = new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1.0f, "PolarityAgent");
 
 			// Master agent - all abilities
-			profiles [ 4 ] = new AgentCapabilities(Polarity.Any, Ability.Everything, 1.0f, "MasterAgent");
+			profiles[4] = new AgentCapabilities(Polarity.Any, Ability.Everything, 1.0f, "MasterAgent");
 
 			return profiles;
 			}
@@ -509,7 +515,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				return false;
 				}
 
-			// Find destination entity  
+			// Find destination entity
 			Entity destinationEntity = FindEntityByNodeId(world, toNodeId);
 			if (destinationEntity == Entity.Null)
 				{
@@ -547,7 +553,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 					for (int i = 0; i < linkBuffer.Length; i++)
 						{
-						NavLink link = linkBuffer [ i ].Value;
+						NavLink link = linkBuffer[i].Value;
 						uint neighborId = link.GetDestination(currentNodeId);
 
 						if (neighborId == 0 || reachableNodes.Contains(neighborId))
@@ -593,7 +599,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Generate suggestions based on issues found
 			for (int i = 0; i < report.Issues.Length; i++)
 				{
-				NavigationIssue issue = report.Issues [ i ];
+				NavigationIssue issue = report.Issues[i];
 				if (issue.Type == NavigationIssueType.UnreachableNode)
 					{
 					fixes.Add(new NavigationQuickFix

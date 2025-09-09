@@ -25,7 +25,7 @@ namespace TinyWalnutGames.MetVD.Core
 		ChargedJump = 1 << 6,  // Variable jump height/distance
 		TeleportArc = 1 << 7,  // Short-range teleportation with arc visualization
 
-		// Environmental abilities  
+		// Environmental abilities
 		Swim = 1 << 8,
 		Climb = 1 << 9,
 		HeatResistance = 1 << 10,
@@ -64,7 +64,7 @@ namespace TinyWalnutGames.MetVD.Core
 
 		// Special combined abilities
 		AllMovement = Jump | DoubleJump | WallJump | Dash | GlideSpeed | ArcJump | ChargedJump | TeleportArc,
-		AllArcMovement = ArcJump | ChargedJump | TeleportArc,
+		AllArcMovement = ArcJump | ChargedJump | TeleportArc | Grapple,  // Include grapple due to arc trajectory
 		AllEnvironmental = Swim | Climb | HeatResistance | ColdResistance | PressureResistance,
 		AllTools = Bomb | Grapple | Drill | Scan | Hack,
 		AllPolarity = SunAccess | MoonAccess | HeatAccess | ColdAccess | EarthAccess | WindAccess | LifeAccess | TechAccess,

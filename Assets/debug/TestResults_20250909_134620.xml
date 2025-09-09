@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Failed(Child)" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-09-09 17:47:02Z" end-time="2025-09-09 17:47:02Z" duration="0.5240094">
+  <test-suite type="TestSuite" id="1000" name="TWG-MetVanDamn" fullname="TWG-MetVanDamn" runstate="Runnable" testcasecount="109" result="Failed" site="Child" start-time="2025-09-09 17:47:02Z" end-time="2025-09-09 17:47:02Z" duration="0.524009" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1116" name="TinyWalnutGames.MetVD.Authoring.Tests.dll" fullname="E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/ScriptAssemblies/TinyWalnutGames.MetVD.Authoring.Tests.dll" runstate="Runnable" testcasecount="102" result="Failed" site="Child" start-time="2025-09-09 17:47:02Z" end-time="2025-09-09 17:47:02Z" duration="0.507506" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="27596" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1117" name="TinyWalnutGames" fullname="TinyWalnutGames" runstate="Runnable" testcasecount="102" result="Failed" site="Child" start-time="2025-09-09 17:47:02Z" end-time="2025-09-09 17:47:02Z" duration="0.502639" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1118" name="MetVD" fullname="TinyWalnutGames.MetVD" runstate="Runnable" testcasecount="102" result="Failed" site="Child" start-time="2025-09-09 17:47:02Z" end-time="2025-09-09 17:47:02Z" duration="0.498083" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1123" name="Tests" fullname="TinyWalnutGames.MetVD.Tests" runstate="Runnable" testcasecount="40" result="Failed" site="Child" start-time="2025-09-09 17:47:02Z" end-time="2025-09-09 17:47:02Z" duration="0.493740" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1075" name="AINavigationTests" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" testcasecount="40" result="Failed" site="Child" start-time="2025-09-09 17:47:02Z" end-time="2025-09-09 17:47:02Z" duration="0.491095" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1096" name="NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult" fullname="TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult" methodname="NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult" classname="TinyWalnutGames.MetVD.Tests.AINavigationTests" runstate="Runnable" seed="73081697" result="Failed" start-time="2025-09-09 17:47:02Z" end-time="2025-09-09 17:47:02Z" duration="0.460522" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at TinyWalnutGames.MetVD.Tests.AINavigationTests.NavigationValidationUtility_IsPathPossible_ReturnsExpectedResult () [0x00cfc] in E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\AINavigationTests.cs:646
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[🔍 Test Setup:
+  From Node: 1 (Entity: Entity(0:1))
+  To Node: 2 (Entity: Entity(1:1))
+  Agent Capabilities: Polarity=Sun, Abilities=Jump, Skill=0.5
+  NavLink: From=1 To=2, Connection=Bidirectional, RequiredPolarity=Sun, RequiredAbilities=Jump
+  Link Buffer1 Count: 1, Link Buffer2 Count: 1
+  Total entities with NodeId: 2
+    Entity 0: NodeId=1, HasLinkBuffer=True
+    Entity 1: NodeId=2, HasLinkBuffer=True
+  Can traverse link with capabilities: True
+  GetDestination(1) = 2
+  GetDestination(2) = 1
+🔍 Manual Pathfinding Test:
+  Starting from node 1
+  Processing node 1
+    Found entity for node 1: Entity(0:1)
+    Link buffer has 1 links
+      Link 0: From=1 To=2, GetDestination(1) = 2
+        Can traverse to 2: True
+        ✅ Added node 2 to queue
+  Processing node 2
+  ✅ Found destination node 2!
+🔍 Real IsPathPossible Analysis:
+  Calling IsPathPossible(1, 2, capabilities)
+🔍 Manual IsPathPossible Recreation with Tracing:
+  World: True
+  EntityManager: True
+  FromNode == ToNode: False
+  Total entities with NodeId: 2
+    Checking entity Entity(0:1) with NodeId 1
+    ✅ Found source entity Entity(0:1) for node 1
+  ✅ Source entity found: Entity(0:1)
+    ✅ Found destination entity Entity(1:1) for node 2
+  ✅ Destination entity found: Entity(1:1)
+  Starting flood fill from node 1
+    Processing node 1
+      Found entity for node 1: Entity(0:1)
+      Link buffer has 1 links
+        Link 0: From=1, To=2, GetDestination(1)=2
+          Can traverse to 2: True
+          ✅ Added neighbor 2 to queue
+    Processing node 2
+    ✅ Reached destination node 2!
+🎯 Manual IsPathPossible Result: True
+🎯 Real IsPathPossible Result: False
+🔄 Testing reversed parameters:
+  IsPathPossible(2, 1) = False
+Saving results to: C:/Users/Jerry/AppData/LocalLow/DefaultCompany/TWG-MetVanDamn\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

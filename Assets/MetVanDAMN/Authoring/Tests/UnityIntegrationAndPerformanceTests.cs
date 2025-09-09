@@ -107,7 +107,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			testTile.sprite = CreateTestSprite();
 
 			// Act - Place tiles and verify collider generation
-			var positions = new Vector3Int [ ]
+			var positions = new Vector3Int[]
 			{
 				new(0, 0, 0),
 				new(1, 0, 0),
@@ -115,7 +115,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 				new(0, 1, 0)
 			};
 
-			var tiles = new TileBase [ ] { testTile, testTile, testTile, testTile };
+			var tiles = new TileBase[] { testTile, testTile, testTile, testTile };
 			tilemap.SetTiles(positions, tiles);
 
 			// Force collider update
@@ -238,12 +238,12 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
 			for (int i = 0; i < entityCount; i++)
 				{
-				entities [ i ] = _entityManager.CreateEntity();
+				entities[i] = _entityManager.CreateEntity();
 
 				// Add various components to simulate real world generation
-				_entityManager.AddComponentData(entities [ i ], new NodeId((uint)i, 0, 1000, new int2(i % 32, i / 32)));
-				_entityManager.AddComponentData(entities [ i ], new Core.Biome(BiomeType.SolarPlains, Polarity.Sun, 1f, Polarity.None, 1f));
-				_entityManager.AddBuffer<RoomNavigationElement>(entities [ i ]);
+				_entityManager.AddComponentData(entities[i], new NodeId((uint)i, 0, 1000, new int2(i % 32, i / 32)));
+				_entityManager.AddComponentData(entities[i], new Core.Biome(BiomeType.SolarPlains, Polarity.Sun, 1f, Polarity.None, 1f));
+				_entityManager.AddBuffer<RoomNavigationElement>(entities[i]);
 				}
 
 			// Force memory measurement
@@ -271,10 +271,10 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 		private Sprite CreateTestSprite()
 			{
 			var texture = new Texture2D(32, 32);
-			var pixels = new Color32 [ 32 * 32 ];
+			var pixels = new Color32[32 * 32];
 			for (int i = 0; i < pixels.Length; i++)
 				{
-				pixels [ i ] = Color.white;
+				pixels[i] = Color.white;
 				}
 			texture.SetPixels32(pixels);
 			texture.Apply();

@@ -36,10 +36,20 @@ Always reference these instructions first and fallback to search or bash command
 ### Required Validation Steps
 - **ALWAYS run before making changes**:
   - TLDL validation: ~60ms execution time
-  - Debug overlay validation: ~56ms execution time  
+  - Debug overlay validation: ~56ms execution time
   - Symbolic linting: ~68ms execution time (may show expected parse errors)
 - **ALWAYS set timeouts to 300+ seconds** for any validation commands to account for system variations
 - **NEVER CANCEL any validation or linting commands** - they complete quickly but may appear to hang briefly
+
+### Unity Test Execution (Sacred PowerShell Incantation)
+- **Unity 6000.2.0f1 Specific Test Command**:
+  ```powershell
+  & "C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Unity.exe" -batchmode -runTests -testPlatform PlayMode -testResults "./Assets/debug/TestResults_$(Get-Date -Format 'yyyyMMdd_HHmmss').xml" -testFilter TestNameHere -logFile "./Assets/debug/unity_powershell_test_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+  ```
+- **Critical PowerShell Syntax**: Use `&` operator for executable paths with spaces
+- **Dynamic Timestamps**: `$(Get-Date -Format 'yyyyMMdd_HHmmss')` for unique file naming
+- **Test Filtering**: `-testFilter` parameter for running specific tests
+- **Always specify both**: `-testResults` for XML output and `-logFile` for detailed Unity logs
 
 ### Expected Validation Results
 - **TLDL validation**: Should PASS with potential warnings about entry ID format
@@ -124,7 +134,7 @@ living-dev-agent/
 
 ### Key Configuration Files
 - **TWG-Copilot-Agent.yaml**: Copilot behavior and integration settings
-- **mcp-config.json**: Model Context Protocol server configuration  
+- **mcp-config.json**: Model Context Protocol server configuration
 - **docs/devtimetravel_snapshot.yaml**: Development context capture settings
 - **docs/tldl_template.yaml**: Template for TLDL entries
 
@@ -177,7 +187,7 @@ The **PRIMARY ENTRY POINT** for MetVanDAMN validation and development:
 1. **Add SmokeTestSceneSetup component** to any GameObject in your scene
 2. **Configure parameters** in inspector:
    - `worldSeed`: 42 (or any uint for reproducible worlds)
-   - `worldSize`: (50, 50) (reasonable for testing)  
+   - `worldSize`: (50, 50) (reasonable for testing)
    - `targetSectorCount`: 5 (districts to generate)
    - `biomeTransitionRadius`: 10.0f (polarity field size)
    - `enableDebugVisualization`: true (see world bounds)
@@ -192,7 +202,7 @@ The **PRIMARY ENTRY POINT** for MetVanDAMN validation and development:
 #### 🛠️ What the Scene Setup Creates:
 - **WorldConfiguration entities**: WorldSeed, WorldBounds, WorldGenerationConfig
 - **District entities** (hub + configured count): Each has NodeId, WfcState, buffers for WFC and connections
-- **Biome field entities**: 4 polarity fields (Sun/Moon/Heat/Cold) positioned for interesting interactions  
+- **Biome field entities**: 4 polarity fields (Sun/Moon/Heat/Cold) positioned for interesting interactions
 - **ECS integration**: All entities have proper components for systems to process
 
 #### 🧪 Comprehensive Test Coverage:
@@ -202,15 +212,15 @@ The scene setup workflow has **22 dedicated tests** covering:
 - **Validation coverage**: World config consistency, district grid placement, polarity field layout
 
 #### 🚨 Common Scene Setup Issues & Solutions:
-1. **"No world entities created"**: 
+1. **"No world entities created"**:
    - Verify SmokeTestSceneSetup component is active and enabled
    - Check console for generation logs - should see "Starting world generation..."
-   
+
 2. **"Districts not visible in Entity Debugger"**:
    - Open Window > Entities > Entity Debugger
    - Look for entities named "HubDistrict", "District_X_Y"
    - Verify they have NodeId and WfcState components
-   
+
 3. **"Systems not processing entities"**:
    - Scene setup creates data, systems process it on subsequent frames
    - Check that World.DefaultGameObjectInjectionWorld exists

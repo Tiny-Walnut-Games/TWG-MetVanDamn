@@ -342,11 +342,107 @@ namespace TinyWalnutGames.MetVD.Tests
 			uint toNode = 2;
 			var capabilities = new AgentCapabilities(Polarity.Sun, Ability.Jump, 0.5f);
 
+			// Create test navigation nodes with proper NavNode and NavLinkBufferElement components
+			Entity nodeEntity1 = this._entityManager.CreateEntity();
+			this._entityManager.AddComponentData(nodeEntity1, new NavNode(fromNode, new float3(0, 0, 0), BiomeType.SolarPlains, Polarity.Sun));
+			this._entityManager.AddComponentData(nodeEntity1, new NodeId { _value = fromNode });
+			this._entityManager.AddBuffer<NavLinkBufferElement>(nodeEntity1);
+
+			Entity nodeEntity2 = this._entityManager.CreateEntity();
+			this._entityManager.AddComponentData(nodeEntity2, new NavNode(toNode, new float3(10, 0, 0), BiomeType.SolarPlains, Polarity.Sun));
+			this._entityManager.AddComponentData(nodeEntity2, new NodeId { _value = toNode });
+			this._entityManager.AddBuffer<NavLinkBufferElement>(nodeEntity2);
+
+			// Create navigation link between the nodes so pathfinding can succeed
+			DynamicBuffer<NavLinkBufferElement> linkBuffer1 = this._entityManager.GetBuffer<NavLinkBufferElement>(nodeEntity1);
+			var navLink = new NavLink(fromNode, toNode, ConnectionType.Bidirectional, Polarity.Sun, Ability.Jump);
+			linkBuffer1.Add(navLink);
+
+			// For bidirectional links, add to both nodes' buffers
+			DynamicBuffer<NavLinkBufferElement> linkBuffer2 = this._entityManager.GetBuffer<NavLinkBufferElement>(nodeEntity2);
+			linkBuffer2.Add(navLink);
+
 			// Act
 			bool isPossible = NavigationValidationUtility.IsPathPossible(this._testWorld, fromNode, toNode, capabilities);
 
 			// Assert
-			Assert.IsTrue(isPossible); // Current implementation returns true
+			Assert.IsTrue(isPossible); // Should return true when nodes exist and are connected
+			}
+
+		[Test]
+		public void NavigationValidationUtility_FindEntityByNodeId_ComparisonTest()
+			{
+			// Arrange: Create test entities with NodeId components
+			uint testNodeId1 = 100;
+			uint testNodeId2 = 200;
+
+			Entity entity1 = this._entityManager.CreateEntity();
+			this._entityManager.AddComponentData(entity1, new NodeId { _value = testNodeId1 });
+
+			Entity entity2 = this._entityManager.CreateEntity();
+			this._entityManager.AddComponentData(entity2, new NodeId { _value = testNodeId2 });
+
+			// Method 1: Our working approach (manual test code style)
+			Entity foundEntity1_Manual = Entity.Null;
+			EntityQuery manualQuery = this._entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+			var manualEntities = manualQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+
+			foreach (Entity entity in manualEntities)
+				{
+				NodeId id = this._entityManager.GetComponentData<NodeId>(entity);
+				if (id._value == testNodeId1)
+					{
+					foundEntity1_Manual = entity;
+					break;
+					}
+				}
+			manualEntities.Dispose();
+
+			// Method 2: NavigationValidationUtility approach (potentially broken)
+			// We can't call the private method directly, so let's recreate its exact logic
+			Entity foundEntity1_Utility = Entity.Null;
+			EntityQuery utilityQuery = this._entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
+			NativeArray<Entity> utilityEntities = utilityQuery.ToEntityArray(Allocator.Temp);
+
+			foreach (Entity entity in utilityEntities)
+				{
+				NodeId id = this._entityManager.GetComponentData<NodeId>(entity);
+				if (id._value == testNodeId1)
+					{
+					foundEntity1_Utility = entity;
+					break;
+					}
+				}
+
+			utilityEntities.Dispose();
+
+			// Method 3: Test calling IsPathPossible to see if it finds the entities
+			// Add NavNode and NavLinkBufferElement components to make entities valid for pathfinding
+			this._entityManager.AddComponentData(entity1, new NavNode(testNodeId1, new float3(0, 0, 0), BiomeType.SolarPlains, Polarity.Sun));
+			this._entityManager.AddBuffer<NavLinkBufferElement>(entity1);
+
+			this._entityManager.AddComponentData(entity2, new NavNode(testNodeId2, new float3(10, 0, 0), BiomeType.SolarPlains, Polarity.Sun));
+			this._entityManager.AddBuffer<NavLinkBufferElement>(entity2);
+
+			// Add a link between them
+			DynamicBuffer<NavLinkBufferElement> linkBuffer = this._entityManager.GetBuffer<NavLinkBufferElement>(entity1);
+			var navLink = new NavLink(testNodeId1, testNodeId2, ConnectionType.Bidirectional, Polarity.Sun, Ability.Jump);
+			linkBuffer.Add(navLink);
+
+			DynamicBuffer<NavLinkBufferElement> linkBuffer2 = this._entityManager.GetBuffer<NavLinkBufferElement>(entity2);
+			linkBuffer2.Add(navLink);
+
+			var capabilities = new AgentCapabilities(Polarity.Sun, Ability.Jump, 0.5f);
+
+			bool pathPossible = NavigationValidationUtility.IsPathPossible(this._testWorld, testNodeId1, testNodeId2, capabilities);
+
+			// Assert: Both methods should find the same entities
+			Assert.AreEqual(entity1, foundEntity1_Manual, "Manual approach should find entity1");
+			Assert.AreEqual(entity1, foundEntity1_Utility, "Utility approach should find entity1 (this might be where the bug is!)");
+			Assert.AreEqual(foundEntity1_Manual, foundEntity1_Utility, "Both approaches should find the same entity");
+
+			// If entity lookup works, pathfinding should work too
+			Assert.IsTrue(pathPossible, "Path should be possible if entity lookup works correctly");
 			}
 
 		[Test]

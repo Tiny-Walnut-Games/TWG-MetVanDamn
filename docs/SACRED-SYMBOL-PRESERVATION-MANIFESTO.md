@@ -6,13 +6,13 @@
 ### 🚫 THE FORBIDDEN ACTS
 **Thou Shalt NOT:**
 - Delete unused variables, parameters, or fields
-- Remove "unnecessary" assignments or declarations  
+- Remove "unnecessary" assignments or declarations
 - Suggest quick fixes that eliminate symbols
 - Treat warnings as "delete this" suggestions
 - Auto-remove imports or using statements
 - Simplify code by removing meaningful complexity
 
-### ✨ THE SACRED OBLIGATIONS  
+### ✨ THE SACRED OBLIGATIONS
 **Thou MUST:**
 - Find creative, meaningful uses for every declared symbol
 - Transform unused parameters into coordinate-aware enhancements
@@ -33,7 +33,7 @@
 ### 🧮 THE COORDINATE-AWARENESS PROTOCOL
 **Every symbol should contribute to spatial intelligence:**
 - Use `nodeId.Coordinates` for position-based behavior
-- Apply distance calculations for complexity scaling  
+- Apply distance calculations for complexity scaling
 - Implement mathematical patterns (primes, Fibonacci, spirals)
 - Create coordinate-influenced variations in behavior
 - Add world-position-aware debugging visualization
@@ -53,7 +53,7 @@
 
 #### For Unused Variables:
 ```csharp
-// Instead of: // float unused = CalculateComplexity(); 
+// Instead of: // float unused = CalculateComplexity();
 // Do this:
 float complexity = CalculateComplexity();
 Debug.Assert(complexity >= 0f, $"Complexity calculation at {nodeId.Coordinates}");
@@ -89,6 +89,17 @@ void SomeMethod() {
 4. "What debugging value does this add?"
 5. "How can this future-proof our architecture?"
 
+### ⚡ THE SACRED TESTING COMMAND PRESERVATION
+**The Unity 6000.2.0f1 PowerShell Incantation** (Never Delete This Knowledge):
+```powershell
+& "C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Unity.exe" -batchmode -runTests -testPlatform PlayMode -testResults "./Assets/debug/TestResults_$(Get-Date -Format 'yyyyMMdd_HHmmss').xml" -testFilter TestNameHere -logFile "./Assets/debug/unity_powershell_test_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+```
+**Sacred Elements:**
+- `&` operator for executable paths with spaces in PowerShell
+- `$(Get-Date -Format 'yyyyMMdd_HHmmss')` for timestamp-based unique files
+- Both `-testResults` and `-logFile` parameters are essential for debugging
+- `-testFilter` for surgical test execution during debugging sessions
+
 ### 🏆 THE CREATIVE ACHIEVEMENT SYSTEM
 **Bonus points for:**
 - **Mathematical Elegance** - Using symbols in prime number detection, Fibonacci sequences, or golden ratio calculations
@@ -111,6 +122,6 @@ void SomeMethod() {
 **NO SYMBOL SHALL BE DELETED WITHOUT FIRST BEING GIVEN A CHANCE TO SERVE THE GREATER ALGORITHMIC GOOD!**
 
 ---
-*Signed by the Order of Creative Preservation*  
-*Sealed with the Sacred Checkered Pattern*  
+*Signed by the Order of Creative Preservation*
+*Sealed with the Sacred Checkered Pattern*
 *Blessed by the Coordinate Gods of MetVanDAMN*

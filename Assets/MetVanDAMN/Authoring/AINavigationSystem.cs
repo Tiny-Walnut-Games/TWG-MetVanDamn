@@ -2,6 +2,7 @@ using TinyWalnutGames.MetVD.Core;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using NavLinkBufferElement = TinyWalnutGames.MetVD.Core.NavLinkBufferElement;
 
 namespace TinyWalnutGames.MetVD.Authoring
 	{
@@ -96,17 +97,6 @@ namespace TinyWalnutGames.MetVD.Authoring
 		}
 
 	/// <summary>
-	/// Buffer element for navigation links
-	/// </summary>
-	public struct NavLinkBufferElement : IBufferElementData
-		{
-		public NavLink Value;
-
-		public static implicit operator NavLink(NavLinkBufferElement e) => e.Value;
-		public static implicit operator NavLinkBufferElement(NavLink e) => new() { Value = e };
-		}
-
-	/// <summary>
 	/// System responsible for AI navigation and pathfinding with polarity constraints
 	/// Handles both hard blocking and soft cost-based gate handling
 	/// </summary>
@@ -179,9 +169,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 							{
 							pathBuffer.Add(new PathNodeBufferElement
 								{
-								NodeId = pathfindingResult.Path [ i ],
+								NodeId = pathfindingResult.Path[i],
 								TraversalCost = i < pathfindingResult.PathLength - 1 ?
-											   pathfindingResult.PathCosts [ i ] : 0.0f
+											   pathfindingResult.PathCosts[i] : 0.0f
 								});
 							}
 						}
@@ -228,8 +218,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				// Initialize starting node
 				openSet.Add(startNodeId);
-				gScore [ startNodeId ] = 0.0f;
-				fScore [ startNodeId ] = CalculateHeuristicCostEstimate(startNodeId, targetNodeId);
+				gScore[startNodeId] = 0.0f;
+				fScore[startNodeId] = CalculateHeuristicCostEstimate(startNodeId, targetNodeId);
 
 				while (openSet.Length > 0)
 					{
@@ -254,7 +244,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					DynamicBuffer<NavLinkBufferElement> linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(currentEntity);
 					for (int i = 0; i < linkBuffer.Length; i++)
 						{
-						NavLink link = linkBuffer [ i ].Value;
+						NavLink link = linkBuffer[i].Value;
 						uint neighborId = link.GetDestination(currentNodeId);
 
 						if (neighborId == 0 || visited.Contains(neighborId))
@@ -268,20 +258,20 @@ namespace TinyWalnutGames.MetVD.Authoring
 							}
 
 						float traversalCost = CalculateArcAwareTraversalCostValue(link, capabilities, currentNodeId, neighborId);
-						float tentativeGScore = gScore [ currentNodeId ] + traversalCost;
+						float tentativeGScore = gScore[currentNodeId] + traversalCost;
 
 						if (!openSet.Contains(neighborId))
 							{
 							openSet.Add(neighborId);
 							}
-						else if (gScore.ContainsKey(neighborId) && tentativeGScore >= gScore [ neighborId ])
+						else if (gScore.ContainsKey(neighborId) && tentativeGScore >= gScore[neighborId])
 							{
 							continue;
 							}
 
-						cameFrom [ neighborId ] = currentNodeId;
-						gScore [ neighborId ] = tentativeGScore;
-						fScore [ neighborId ] = tentativeGScore + CalculateHeuristicCostEstimate(neighborId, targetNodeId);
+						cameFrom[neighborId] = currentNodeId;
+						gScore[neighborId] = tentativeGScore;
+						fScore[neighborId] = tentativeGScore + CalculateHeuristicCostEstimate(neighborId, targetNodeId);
 						}
 					}
 
@@ -301,13 +291,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		private uint GetLowestFScoreNodeValue(NativeList<uint> openSet, NativeHashMap<uint, float> fScore)
 			{
-			uint bestNodeId = openSet [ 0 ];
-			float bestScore = fScore.ContainsKey(bestNodeId) ? fScore [ bestNodeId ] : float.MaxValue;
+			uint bestNodeId = openSet[0];
+			float bestScore = fScore.ContainsKey(bestNodeId) ? fScore[bestNodeId] : float.MaxValue;
 
 			for (int i = 1; i < openSet.Length; i++)
 				{
-				uint nodeId = openSet [ i ];
-				float score = fScore.ContainsKey(nodeId) ? fScore [ nodeId ] : float.MaxValue;
+				uint nodeId = openSet[i];
+				float score = fScore.ContainsKey(nodeId) ? fScore[nodeId] : float.MaxValue;
 				if (score < bestScore)
 					{
 					bestScore = score;
@@ -458,8 +448,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			while (nodeId != startNodeId && cameFrom.ContainsKey(nodeId))
 				{
 				path.Add(nodeId);
-				pathCosts.Add(gScore.ContainsKey(nodeId) ? gScore [ nodeId ] : 1.0f);
-				nodeId = cameFrom [ nodeId ];
+				pathCosts.Add(gScore.ContainsKey(nodeId) ? gScore[nodeId] : 1.0f);
+				nodeId = cameFrom[nodeId];
 				}
 			path.Add(startNodeId); // Add start node
 			pathCosts.Add(0.0f);
@@ -470,11 +460,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			for (int i = 0; i < path.Length; i++)
 				{
-				finalPath [ i ] = path [ path.Length - 1 - i ];
-				finalCosts [ i ] = pathCosts [ path.Length - 1 - i ];
+				finalPath[i] = path[path.Length - 1 - i];
+				finalCosts[i] = pathCosts[path.Length - 1 - i];
 				}
 
-			float totalCost = gScore.ContainsKey(currentNodeId) ? gScore [ currentNodeId ] : 0.0f;
+			float totalCost = gScore.ContainsKey(currentNodeId) ? gScore[currentNodeId] : 0.0f;
 
 			path.Dispose();
 			pathCosts.Dispose();

@@ -1,13 +1,13 @@
 {
   "version": "1.0",
-  "last_updated": "2025-09-01T15:05:01.741410",
+  "last_updated": "2025-09-09T14:07:45.213398",
   "profiles": {
     "Jerry": {
       "developer_name": "Jerry",
-      "total_xp": 1349,
-      "level": 2,
-      "title": "⚙️ Junior Engineer",
-      "copilot_coins": 290,
+      "total_xp": 1589,
+      "level": 3,
+      "title": "🔧 Master Mechanic",
+      "copilot_coins": 362,
       "contributions": [
         {
           "contribution_id": "fb3c87f5",
@@ -126,6 +126,74 @@
             "gears_crafted": 10,
             "steam_pressure": "excellent"
           }
+        },
+        {
+          "contribution_id": "9fabef4a",
+          "developer_name": "Jerry",
+          "contribution_type": "test_coverage",
+          "quality_level": "good",
+          "description": "Unity play mode testing",
+          "files_affected": [],
+          "timestamp": "2025-09-09T13:29:27.246779",
+          "base_xp": 60,
+          "quality_multiplier": 1.0,
+          "total_xp": 60,
+          "coins_earned": 18,
+          "metrics": {
+            "play_mode_test": 1,
+            "platform": "windows"
+          }
+        },
+        {
+          "contribution_id": "8595318f",
+          "developer_name": "Jerry",
+          "contribution_type": "test_coverage",
+          "quality_level": "good",
+          "description": "Unity play mode testing",
+          "files_affected": [],
+          "timestamp": "2025-09-09T13:31:43.152387",
+          "base_xp": 60,
+          "quality_multiplier": 1.0,
+          "total_xp": 60,
+          "coins_earned": 18,
+          "metrics": {
+            "play_mode_test": 1,
+            "platform": "windows"
+          }
+        },
+        {
+          "contribution_id": "262bad9a",
+          "developer_name": "Jerry",
+          "contribution_type": "test_coverage",
+          "quality_level": "good",
+          "description": "Unity play mode testing",
+          "files_affected": [],
+          "timestamp": "2025-09-09T14:06:35.877038",
+          "base_xp": 60,
+          "quality_multiplier": 1.0,
+          "total_xp": 60,
+          "coins_earned": 18,
+          "metrics": {
+            "play_mode_test": 1,
+            "platform": "windows"
+          }
+        },
+        {
+          "contribution_id": "45c8a0c3",
+          "developer_name": "Jerry",
+          "contribution_type": "test_coverage",
+          "quality_level": "good",
+          "description": "Unity play mode testing",
+          "files_affected": [],
+          "timestamp": "2025-09-09T14:07:45.213129",
+          "base_xp": 60,
+          "quality_multiplier": 1.0,
+          "total_xp": 60,
+          "coins_earned": 18,
+          "metrics": {
+            "play_mode_test": 1,
+            "platform": "windows"
+          }
         }
       ],
       "achievements": [
@@ -218,13 +286,53 @@
           "date_earned": "2025-09-01T15:05:01.741239",
           "contribution_id": "9c682e80",
           "faculty_signature": "⏰ Temporal Flow Master"
+        },
+        {
+          "achievement_id": "consistent_contributor",
+          "name": "Consistent Contributor",
+          "description": "Made 5+ contributions in one week",
+          "emoji": "🎯",
+          "badge_color": "orange",
+          "date_earned": "2025-09-09T13:29:27.247019",
+          "contribution_id": "9fabef4a",
+          "faculty_signature": "⏰ Temporal Flow Master"
+        },
+        {
+          "achievement_id": "consistent_contributor",
+          "name": "Consistent Contributor",
+          "description": "Made 5+ contributions in one week",
+          "emoji": "🎯",
+          "badge_color": "orange",
+          "date_earned": "2025-09-09T13:31:43.152590",
+          "contribution_id": "8595318f",
+          "faculty_signature": "⏰ Temporal Flow Master"
+        },
+        {
+          "achievement_id": "consistent_contributor",
+          "name": "Consistent Contributor",
+          "description": "Made 5+ contributions in one week",
+          "emoji": "🎯",
+          "badge_color": "orange",
+          "date_earned": "2025-09-09T14:06:35.877333",
+          "contribution_id": "262bad9a",
+          "faculty_signature": "⏰ Temporal Flow Master"
+        },
+        {
+          "achievement_id": "consistent_contributor",
+          "name": "Consistent Contributor",
+          "description": "Made 5+ contributions in one week",
+          "emoji": "🎯",
+          "badge_color": "orange",
+          "date_earned": "2025-09-09T14:07:45.213331",
+          "contribution_id": "45c8a0c3",
+          "faculty_signature": "⏰ Temporal Flow Master"
         }
       ],
       "faculty_badges": [
         "📝 Console Commentary Sage"
       ],
       "created_date": "2025-09-01T14:44:06.160974",
-      "last_active": "2025-09-01T15:05:01.741041"
+      "last_active": "2025-09-09T14:07:45.213147"
     }
   }
 }
