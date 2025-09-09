@@ -18,7 +18,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
 				}
-			SceneView.duringSceneGui += OnSceneGUI;
+			// SceneView.duringSceneGui += OnSceneGUI;
 			}
 
 		public static void SnapAllDistrictsToGrid()
