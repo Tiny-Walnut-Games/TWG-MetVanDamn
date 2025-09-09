@@ -57,7 +57,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Query for tile prototypes to verify they exist
             EntityQuery prototypeQuery = this._entityManager.CreateEntityQuery(ComponentType.ReadOnly<WfcTilePrototype>());
             NativeArray<WfcTilePrototype> prototypes = prototypeQuery.ToComponentDataArray<WfcTilePrototype>(Allocator.Temp);
-            
+
             UnityEngine.Debug.Log($"🔍 Found {prototypes.Length} tile prototypes in system:");
             for (int i = 0; i < prototypes.Length; i++)
                 {
@@ -78,11 +78,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             for (int frame = 0; frame < 10; frame++)
                 {
                 UnityEngine.Debug.Log($"🔍 === FRAME {frame} ===");
-                
+
                 // Check state before update
                 var stateBefore = this._entityManager.GetComponentData<WfcState>(districtEntity);
                 UnityEngine.Debug.Log($"🔍 Before: State={stateBefore.State}, TileId={stateBefore.AssignedTileId}, Entropy={stateBefore.Entropy}");
-                
+
                 // Check candidates buffer
                 var candidatesBuffer = this._entityManager.GetBuffer<WfcCandidateBufferElement>(districtEntity);
                 UnityEngine.Debug.Log($"🔍 Candidates buffer length: {candidatesBuffer.Length}");
@@ -93,12 +93,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
                 // Update system
                 this._simGroup.Update();
-                
+
                 // Check state after update
                 var stateAfter = this._entityManager.GetComponentData<WfcState>(districtEntity);
                 UnityEngine.Debug.Log($"🔍 After: State={stateAfter.State}, TileId={stateAfter.AssignedTileId}, Entropy={stateAfter.Entropy}");
-                
-                if (stateAfter.State == WfcGenerationState.Completed || 
+
+                if (stateAfter.State == WfcGenerationState.Completed ||
                     stateAfter.State == WfcGenerationState.Failed ||
                     stateAfter.State == WfcGenerationState.Contradiction)
                     {
@@ -109,7 +109,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
             var finalState = this._entityManager.GetComponentData<WfcState>(districtEntity);
             UnityEngine.Debug.Log($"🔍 FINAL RESULT: State={finalState.State}, AssignedTileId={finalState.AssignedTileId}");
-            
+
             // This test is for debugging, so we'll always pass but log everything
             Assert.IsTrue(true, "Debug test completed - check logs for details");
             }

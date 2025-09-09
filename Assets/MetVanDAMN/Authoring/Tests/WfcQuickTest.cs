@@ -79,7 +79,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             for (int frame = 0; frame < 25; frame++)
                 {
                 this._simGroup.Update();
-                
+
                 // Check for early completion
                 EntityQuery frameQuery = this._entityManager.CreateEntityQuery(ComponentType.ReadOnly<WfcState>());
                 NativeArray<WfcState> frameStates = frameQuery.ToComponentDataArray<WfcState>(Allocator.Temp);
@@ -94,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                     }
                 frameStates.Dispose();
                 frameQuery.Dispose();
-                
+
                 if (allDone)
                     {
                     UnityEngine.Debug.Log($"🔍 WFC completed early at frame {frame}");
