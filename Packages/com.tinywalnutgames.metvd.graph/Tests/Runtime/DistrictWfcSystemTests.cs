@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
+using TinyWalnutGames.MetVD.Graph.Data;
 using TinyWalnutGames.MetVD.Shared;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -24,6 +25,11 @@ namespace TinyWalnutGames.MetVD.Tests
 			// Add WorldSeed component that DistrictWfcSystem requires for deterministic behavior
 			Entity worldSeedEntity = _world.EntityManager.CreateEntity();
 			_world.EntityManager.AddComponentData(worldSeedEntity, new WorldSeed { Value = 42u });
+
+			// 🎯 FIX: Initialize tile prototypes that the WFC system needs
+			// This was missing from the original tests, causing all zero tile assignments
+			int tilesCreated = SampleWfcData.InitializeSampleTileSet(_world.EntityManager);
+			Assert.Greater(tilesCreated, 0, "SetUp should create tile prototypes for WFC system");
 			}
 		[TearDown]
 		public void TearDown()

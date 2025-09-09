@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
+using TinyWalnutGames.MetVD.Graph.Data;
 using TinyWalnutGames.MetVD.Samples;
 using TinyWalnutGames.MetVD.Shared;
 using Unity.Collections;
@@ -31,6 +32,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			SystemHandle systemHandle = this._testWorld.GetOrCreateSystem(typeof(DistrictWfcSystem));
 			this._simGroup.AddSystemToUpdateList(systemHandle);
 			this._simGroup.SortSystems();
+
+			// 🎯 FIX: Initialize tile prototypes that the WFC system needs
+			// This was missing from the original tests, causing all zero tile assignments
+			int tilesCreated = SampleWfcData.InitializeSampleTileSet(this._entityManager);
+			Assert.Greater(tilesCreated, 0, "SetUp should create tile prototypes for WFC system");
 			}
 
 		[TearDown]
