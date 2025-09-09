@@ -57,7 +57,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			// Create and cache component lookups in OnCreate; update them each frame in OnUpdate
 			wfcStatesLookup = state.GetComponentLookup<WfcState>(false);
 			nodeIdsLookup = state.GetComponentLookup<NodeId>(true);
- 			}
+			}
 
 		// Replace the body of WfcProcessingJob.Execute() to avoid using SystemAPI.Query inside the job.
 		// Instead, pass in a NativeArray of entities to process, and use Component/BufferLookups.
@@ -73,19 +73,19 @@ namespace TinyWalnutGames.MetVD.Graph
 			// Prefer explicit WorldSeed component if available (tests set this), otherwise fall back to time-based seed
 			uint baseSeed = 0u;
 			if (_worldSeedQuery.IsEmptyIgnoreFilter == false)
-			{
+				{
 				Entity seedEntity = _worldSeedQuery.GetSingletonEntity();
 				var ws = state.EntityManager.GetComponentData<WorldSeed>(seedEntity);
 				baseSeed = ws.Value;
-			}
+				}
 			else
-			{
+				{
 				baseSeed = (uint)(state.WorldUnmanaged.Time.ElapsedTime * 911.0);
 				if (DebugWfc)
-				{
+					{
 					Debug.LogWarning($"[DistrictWfcSystem] WARNING: No WorldSeed found, using fallback seed {baseSeed} (non-deterministic). This will break determinism tests.");
+					}
 				}
-			}
 
 			// 🔥 FIX: Complete any pending jobs that might be using these lookups
 			state.Dependency.Complete();
@@ -96,29 +96,38 @@ namespace TinyWalnutGames.MetVD.Graph
 			// Get tile prototypes for WFC initialization
 			NativeArray<WfcTilePrototype> tilePrototypes = _tilePrototypeQuery.ToComponentDataArray<WfcTilePrototype>(Allocator.TempJob);
 
+			if (DebugWfc)
+				{
+				Debug.Log($"[DistrictWfcSystem] OnUpdate: Found {tilePrototypes.Length} tile prototypes, processing {entities.Length} WFC entities");
+				for (int i = 0; i < tilePrototypes.Length && i < 5; i++)
+					{
+					Debug.Log($"  Prototype {i}: TileId={tilePrototypes[i].TileId}, Weight={tilePrototypes[i].Weight}");
+					}
+				}
+
 			// Ensure deterministic processing order by sorting entities by NodeId._value (stable across runs)
 			if (entities.Length > 1)
-			{
+				{
 				// Simple selection sort - number of districts is small in tests
 				for (int a = 0; a < entities.Length - 1; a++)
-				{
+					{
 					int min = a;
 					uint minKey = state.EntityManager.GetComponentData<NodeId>(entities[min])._value;
 					for (int b = a + 1; b < entities.Length; b++)
-					{
+						{
 						uint key = state.EntityManager.GetComponentData<NodeId>(entities[b])._value;
 						if (key < minKey)
-						{
+							{
 							min = b;
 							minKey = key;
+							}
+						}
+					if (min != a)
+						{
+						(entities[a], entities[min]) = (entities[min], entities[a]);
 						}
 					}
-					if (min != a)
-					{
-						(entities[a], entities[min]) = (entities[min], entities[a]);
-					}
 				}
-			}
 
 			// use cached lookups
 			var wfcStates = wfcStatesLookup;
@@ -161,7 +170,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				{
 				for (int i = 0; i < Entities.Length; i++)
 					{
-					Entity entity = Entities [ i ];
+					Entity entity = Entities[i];
 					RefRW<WfcState> wfcState = WfcStates.GetRefRW(entity);
 					RefRO<NodeId> nodeId = NodeIds.GetRefRO(entity);
 
@@ -174,9 +183,9 @@ namespace TinyWalnutGames.MetVD.Graph
 					var entityRandom = new Unity.Mathematics.Random(entitySeed == 0 ? 1u : entitySeed);
 
 					if (DebugWfc)
-					{
+						{
 						Debug.Log($"[DistrictWfcSystem] Entity {entity.Index} NodeId {nodeIdRO._value} State: {wfcState.ValueRO.State}");
-					}
+						}
 
 					switch (wfcState.ValueRO.State)
 						{
@@ -211,22 +220,22 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 
 				InitializeCandidates(entity, random, nodeId);
-				wfcState.ValueRW.Entropy = CandidateBufferLookup [ entity ].Length;
+				wfcState.ValueRW.Entropy = CandidateBufferLookup[entity].Length;
 				// Always set to InProgress after initializing candidates; collapse handled in InProgress phase
 				wfcState.ValueRW.State = WfcGenerationState.InProgress;
 
 				if (DebugWfc)
-				{
+					{
 					var cands = CandidateBufferLookup[entity];
 					// Manual string construction to avoid LINQ/Join issues in test runners
 					System.Text.StringBuilder sb = new System.Text.StringBuilder();
 					for (int i = 0; i < cands.Length; i++)
-					{
+						{
 						sb.Append(cands[i].TileId);
 						if (i < cands.Length - 1) sb.Append(",");
-					}
+						}
 					Debug.Log($"[DistrictWfcSystem] Entity {entity.Index} NodeId {nodeId._value} Initialized Candidates: {cands.Length} [" + sb.ToString() + "]");
-				}
+					}
 				}
 
 			private void ProcessInProgress(Entity entity, RefRW<WfcState> wfcState, in NodeId nodeId, Unity.Mathematics.Random random)
@@ -239,7 +248,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					return;
 					}
 
-				DynamicBuffer<WfcCandidateBufferElement> candidates = CandidateBufferLookup [ entity ];
+				DynamicBuffer<WfcCandidateBufferElement> candidates = CandidateBufferLookup[entity];
 				if (candidates.Length == 0)
 					{
 					wfcState.ValueRW.State = WfcGenerationState.Contradiction;
@@ -250,7 +259,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				if (candidates.Length == 1)
 					{
-					wfcState.ValueRW.AssignedTileId = candidates [ 0 ].TileId;
+					wfcState.ValueRW.AssignedTileId = candidates[0].TileId;
 					wfcState.ValueRW.IsCollapsed = true;
 					wfcState.ValueRW.State = WfcGenerationState.Completed;
 					if (DebugWfc)
@@ -264,9 +273,9 @@ namespace TinyWalnutGames.MetVD.Graph
 				wfcState.ValueRW.Entropy = candidates.Length;
 
 				if (DebugWfc)
-				{
+					{
 					Debug.Log($"[DistrictWfcSystem] Entity {entity.Index} NodeId {nodeId._value} InProgress: Candidates after propagation: {candidates.Length} [" + GetCandidateListString(candidates) + "]");
-				}
+					}
 
 				// Force collapse after many iterations
 				if (wfcState.ValueRO.Iteration > 100 && candidates.Length > 1)
@@ -296,12 +305,14 @@ namespace TinyWalnutGames.MetVD.Graph
 					return;
 					}
 
-				DynamicBuffer<WfcCandidateBufferElement> candidates = CandidateBufferLookup [ entity ];
+				DynamicBuffer<WfcCandidateBufferElement> candidates = CandidateBufferLookup[entity];
 				candidates.Clear();
 
 				// Use actual tile prototypes if available, fallback to hardcoded values
 				if (TilePrototypes.Length > 0)
 					{
+					if (DebugWfc)
+						Debug.Log($"[DistrictWfcSystem] InitializeCandidates: Using {TilePrototypes.Length} tile prototypes");
 					// Calculate position-based bias factors
 					var coords = (float2)nodeId.Coordinates;
 					float distance = math.length(coords) * 0.02f;
@@ -313,7 +324,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					for (int i = 0; i < TilePrototypes.Length; i++)
 						{
 						var prototype = TilePrototypes[i];
-						
+
 						// Calculate weight based on tile properties and position
 						float baseWeight = prototype.Weight;
 						float positionBias = math.lerp(0.6f, 1.2f, centralBias) * entityVariance * basePerturb;
@@ -324,6 +335,8 @@ namespace TinyWalnutGames.MetVD.Graph
 					}
 				else
 					{
+					if (DebugWfc)
+						Debug.Log($"[DistrictWfcSystem] InitializeCandidates: No tile prototypes found, using fallback hardcoded values");
 					// Fallback to hardcoded candidates if no prototypes are available
 					var coords = (float2)nodeId.Coordinates;
 					float distance = math.length(coords) * 0.02f;
@@ -356,7 +369,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					uint tileSeed = MakeEntitySeed(BaseSeed ^ (tileId * 59789u), nodeId, (int)nodeId._value, (uint)tileId);
 					float tileBias = ((tileSeed & 0x00FFFFFFu) / 16777216.0f) - 0.5f; // [-0.5,0.5)
 					var c = candidates[t];
-					float factor = 1.0f + tileBias * 0.6f; 
+					float factor = 1.0f + tileBias * 0.6f;
 					c.Weight = math.max(0.01f, c.Weight * factor);
 					candidates[t] = c;
 					}
@@ -368,7 +381,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				for (int i = candidates.Length - 1; i >= 0; i--)
 					{
-					WfcCandidateBufferElement candidate = candidates [ i ];
+					WfcCandidateBufferElement candidate = candidates[i];
 					bool isValid = ValidateBiomeCompatibility(candidate.TileId, nodeId, random)
 								   & ValidatePolarityCompatibility(candidate.TileId, nodeId, random)
 								   & ValidateSocketConstraints(entity, candidate.TileId, nodeId, random);
@@ -394,7 +407,7 @@ namespace TinyWalnutGames.MetVD.Graph
 						}
 
 					candidate.Weight *= random.NextFloat(0.95f, 1.05f);
-					candidates [ i ] = candidate;
+					candidates[i] = candidate;
 					}
 				}
 
@@ -424,16 +437,16 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			private readonly uint CollapseRandomly(DynamicBuffer<WfcCandidateBufferElement> candidates, in NodeId nodeId, int entityIndex, uint baseSeed)
- 				{
- 				if (candidates.Length == 0)
- 					{
- 					return 0;
- 					}
- 
+				{
+				if (candidates.Length == 0)
+					{
+					return 0;
+					}
+
 				float totalWeight = 0f;
 				for (int i = 0; i < candidates.Length; i++)
 					{
-					totalWeight += candidates [ i ].Weight;
+					totalWeight += candidates[i].Weight;
 					}
 
 				if (totalWeight <= 0f)
@@ -446,17 +459,17 @@ namespace TinyWalnutGames.MetVD.Graph
 				uint h = MakeEntitySeed(baseSeed ^ (uint)entityIndex, nodeId, entityIndex, (uint)candidates.Length);
 				float frac = (h & 0x00FFFFFFu) / 16777216.0f;
 				float pick = frac * totalWeight;
- 				float accum = 0f;
- 				for (int i = 0; i < candidates.Length; i++)
- 					{
- 					accum += candidates [ i ].Weight;
- 					if (pick <= accum)
- 						{
- 						return candidates [ i ].TileId;
- 						}
- 					}
- 				return candidates [ ^1 ].TileId;
- 				}
+				float accum = 0f;
+				for (int i = 0; i < candidates.Length; i++)
+					{
+					accum += candidates[i].Weight;
+					if (pick <= accum)
+						{
+						return candidates[i].TileId;
+						}
+					}
+				return candidates[^1].TileId;
+				}
 
 			[System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 			private static uint MakeEntitySeed(uint baseSeed, in NodeId nodeId, int entityIndex, uint globalRandomState)

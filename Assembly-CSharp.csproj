@@ -69,6 +69,7 @@
     <None Include="Assets\Tiny Walnut Games\MetVanDAMN\Docs\TestResults.xml" />
     <None Include="Assets\debug\DockerUnity.txt" />
     <None Include="Assets\samvieten\Documentation\SAMVIETEN ASSETPACKS LICENSE.txt" />
+    <None Include="Assets\debug\TestResults_20250908_195338.xml" />
     <None Include="Assets\debug\TestResults_20250908_153812.xml" />
     <None Include="Assets\debug\TestResults_20250908_152729.xml" />
     <None Include="Assets\debug\TestResults_20250908_160527.xml" />
