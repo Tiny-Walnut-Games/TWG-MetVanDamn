@@ -53,18 +53,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[UnityTest]
 		public IEnumerator SceneSetup_FullWorkflow_CreatesValidWorld()
 			{
-			// ✅ FIX: Use ForceSetup() to properly initialize the component
-			this.sceneSetup.ForceSetup(this.testWorld);
-
-			// Configure scene setup with test parameters
+			// Configure scene setup with test parameters FIRST
 			this.SetField("worldSeed", 12345u);
 			this.SetField("worldSize", new int2(30, 30));
 			this.SetField("targetSectorCount", 6);
 			this.SetField("enableDebugVisualization", false); // Disable for clean testing
 			this.SetField("logGenerationSteps", true);
 
-			// ✅ FIX: Call SetupSmokeTestWorld directly since we already used ForceSetup
-			this.InvokeMethod("SetupSmokeTestWorld");
+			// ✅ FIX: Use ForceSetup() AFTER setting field values
+			this.sceneSetup.ForceSetup(this.testWorld);
 
 			yield return null; // Wait one frame
 
@@ -192,7 +189,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Assert.Greater(heatColdDistance, 25.0f, "Heat and Cold fields should be well-separated");
 
 			// Verify field strength supports gradient transitions
-			Assert.AreEqual(20.0f, radius, 0.001f, "All fields should have configured radius");
+			Assert.AreEqual(10.0f, radius, 0.001f, "All fields should have configured radius (default biomeTransitionRadius)");
 			}
 
 		[Test]

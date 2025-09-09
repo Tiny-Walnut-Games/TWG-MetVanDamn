@@ -108,8 +108,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_DistrictCreation_RespectsTargetSectorCount()
 			{
-			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
-			this.smokeTestComponent.ForceSetup(this.testWorld);
+			// ✅ FIX: Use SetupTestContext() instead of ForceSetup() to avoid double entity creation
+			this.smokeTestComponent.SetupTestContext(this.testWorld);
 			this.SetPrivateField("targetSectorCount", 8);
 
 			// Invoke district creation
@@ -144,8 +144,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_BiomeFieldCreation_CreatesAllPolarityFields()
 			{
-			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
-			this.smokeTestComponent.ForceSetup(this.testWorld);
+			// ✅ FIX: Use SetupTestContext() instead of ForceSetup() to avoid double entity creation
+			this.smokeTestComponent.SetupTestContext(this.testWorld);
 
 			// Invoke biome field creation
 			this.InvokePrivateMethod("CreateBiomeFieldEntities");
@@ -214,8 +214,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_ComponentConfiguration_HasRequiredECSComponents()
 			{
-			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
-			this.smokeTestComponent.ForceSetup(this.testWorld);
+			// ✅ FIX: Use SetupTestContext() instead of ForceSetup() to avoid double entity creation
+			this.smokeTestComponent.SetupTestContext(this.testWorld);
 
 			this.InvokePrivateMethod("CreateDistrictEntities");
 
@@ -265,8 +265,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		[Test]
 		public void SmokeTestSceneSetup_ExtremeTargetSectorCount_HandlesGracefully()
 			{
-			// ✅ FIX: Use ForceSetup() instead of trying to set non-existent private fields
-			this.smokeTestComponent.ForceSetup(this.testWorld);
+			// ✅ FIX: Use SetupTestContext() instead of ForceSetup() to avoid double entity creation
+			this.smokeTestComponent.SetupTestContext(this.testWorld);
 
 			// Test extremely high value (should be clamped to 24)
 			this.SetPrivateField("targetSectorCount", 100);

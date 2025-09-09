@@ -77,12 +77,23 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// Forcibly set the world and run setup. Use in tests/integration to guarantee correct world.
 		/// </summary>
 		public void ForceSetup(World world)
-		{
+			{
 			DefaultWorld = world;
 			EntityManager = world.EntityManager;
 			_hasSetup = true;
 			SetupSmokeTestWorld();
-		}
+			}
+
+		/// <summary>
+		/// Set up world context for tests without running full setup. Allows individual method testing.
+		/// </summary>
+		public void SetupTestContext(World world)
+			{
+			DefaultWorld = world;
+			EntityManager = world.EntityManager;
+			_hasSetup = true;
+			// Don't call SetupSmokeTestWorld() - let tests call individual methods
+			}
 
 		private void SetupSmokeTestWorld()
 			{
@@ -125,6 +136,12 @@ namespace TinyWalnutGames.MetVD.Samples
 			CreateWorldConfiguration();
 			CreateDistrictEntities();
 			CreateBiomeFieldEntities();
+
+			// ✅ NEW: Create visual representations after entities are created
+			if (Application.isPlaying)
+				{
+				CreateVisualRepresentations();
+				}
 
 			if (enableDebugVisualization)
 				{
@@ -253,6 +270,98 @@ namespace TinyWalnutGames.MetVD.Samples
 				});
 			}
 
+		/// <summary>
+		/// Creates visual GameObjects to represent the ECS entities in the scene
+		/// This bridges the gap between ECS data and visible scene objects
+		/// </summary>
+		private void CreateVisualRepresentations()
+			{
+			if (logGenerationSteps)
+				{
+				Debug.Log("🎨 Creating visual representations for districts and polarity fields...");
+				}
+
+			CreateDistrictVisuals();
+			CreatePolarityFieldVisuals();
+
+			if (logGenerationSteps)
+				{
+				Debug.Log("✨ Visual representations created successfully!");
+				}
+			}
+
+		private void CreateDistrictVisuals()
+			{
+			using EntityQuery districtQuery = EntityManager.CreateEntityQuery(typeof(NodeId));
+			var entities = districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+
+			foreach (Entity entity in entities)
+				{
+				NodeId nodeId = EntityManager.GetComponentData<NodeId>(entity);
+				string entityName = EntityManager.GetName(entity);
+
+				// Create a visual cube for each district
+				GameObject districtVisual = GameObject.CreatePrimitive(PrimitiveType.Cube);
+				districtVisual.name = $"Visual_{entityName}";
+				districtVisual.transform.position = new Vector3(nodeId.Coordinates.x, 1, nodeId.Coordinates.y);
+				districtVisual.transform.localScale = Vector3.one * 2f;
+
+				// Color based on whether it's the hub or regular district
+				Renderer renderer = districtVisual.GetComponent<Renderer>();
+				if (entityName.Contains("Hub"))
+					{
+					renderer.material.color = Color.yellow; // Hub = yellow
+					districtVisual.transform.localScale = Vector3.one * 3f; // Larger for hub
+					}
+				else
+					{
+					renderer.material.color = Color.cyan; // Districts = cyan
+					}
+
+				// Parent to this component's GameObject for organization
+				districtVisual.transform.SetParent(transform);
+				}
+
+			entities.Dispose();
+			}
+
+		private void CreatePolarityFieldVisuals()
+			{
+			using EntityQuery polarityQuery = EntityManager.CreateEntityQuery(typeof(PolarityFieldData));
+			var entities = polarityQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+
+			foreach (Entity entity in entities)
+				{
+				PolarityFieldData fieldData = EntityManager.GetComponentData<PolarityFieldData>(entity);
+				string entityName = EntityManager.GetName(entity);
+
+				// Create a visual sphere for each polarity field
+				GameObject fieldVisual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				fieldVisual.name = $"Visual_{entityName}";
+				fieldVisual.transform.position = new Vector3(fieldData.Center.x, 0.5f, fieldData.Center.y);
+				fieldVisual.transform.localScale = Vector3.one * (fieldData.Radius / 5f); // Scale based on radius
+
+				// Color based on polarity type
+				Renderer renderer = fieldVisual.GetComponent<Renderer>();
+				renderer.material.color = fieldData.Polarity switch
+					{
+						Polarity.Sun => Color.yellow,
+						Polarity.Moon => new Color(0.7f, 0.7f, 1f), // Light blue
+						Polarity.Heat => Color.red,
+						Polarity.Cold => Color.blue,
+						_ => Color.white
+						};
+
+				// Make it semi-transparent to show field nature
+				renderer.material.color = new Color(renderer.material.color.r, renderer.material.color.g, renderer.material.color.b, 0.6f);
+
+				// Parent to this component's GameObject for organization
+				fieldVisual.transform.SetParent(transform);
+				}
+
+			entities.Dispose();
+			}
+
 		private void DebugDrawBounds()
 			{
 			var color = new Color(0.2f, 0.9f, 0.4f, 0.6f);
@@ -283,7 +392,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		}
 
 	// ✅ REMOVE: Duplicate WorldSeed definition - using the shared one instead
-	// ✅ REMOVE: Duplicate WorldBounds definition - using the shared one instead  
+	// ✅ REMOVE: Duplicate WorldBounds definition - using the shared one instead
 	// ✅ REMOVE: Duplicate WorldGenerationConfig definition - using the shared one instead
 
 	/// <summary>
