@@ -48,6 +48,7 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Tiny Walnut Games\TWG-GridLayerEditor-1.0.0\Scripts\Editor\LayerManager.cs" />
     <Compile Include="Assets\Tiny Walnut Games\TWG-GridLayerEditor-1.0.0\Scripts\Editor\GridLayerConfigEditor.cs" />
     <Compile Include="Assets\Tiny Walnut Games\TWG-GridLayerEditor-1.0.0\Scripts\Editor\GridLayerConfig.cs" />
     <Compile Include="Assets\Tiny Walnut Games\TWG-GridLayerEditor-1.0.0\Scripts\Editor\TwoDimensionalGridSetup.cs" />

@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 #if UNITY_2021_3_OR_NEWER
 #endif
 
-#if METVD_FULL_DOTS // #1 
+#if METVD_FULL_DOTS // #1
 using TinyWalnutGames.MetVD.Samples; // SmokeTestSceneSetup
 using Unity.Scenes;                  // SubScene
 using TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport; // Faculty-grade ritual utilities
@@ -20,7 +20,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	public static class MetVanDAMNSceneBootstrap
 		{
 		private const string RootSceneName = "MetVanDAMN_Baseline";
-		private static readonly string [ ] SubSceneNames = { "WorldGen_Terrain", "WorldGen_Dungeon", "NPC_Interactions", "UI_HUD" };
+		private static readonly string[] SubSceneNames = { "WorldGen_Terrain", "WorldGen_Dungeon", "NPC_Interactions", "UI_HUD" };
 		private const string ScenesRootFolder = "Assets/Scenes";
 		private const string SubScenesFolder = "Assets/Scenes/SubScenes";
 		private static bool _fallbackTriggeredThisRun = false; // track if fallback unloaded baseline
@@ -343,10 +343,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void CreateBootstrapMono()
         {
             GameObject go = new("Bootstrap");
-            
+
             // 🔥 ENHANCED: Try multiple bootstrap types with better error handling
             bool bootstrapCreated = false;
-            
+
             // Try WorldBootstrapAuthoring first
             Type worldBootstrapType = FindTypeAnywhere("TinyWalnutGames.MetVD.Authoring.WorldBootstrapAuthoring");
             if (worldBootstrapType != null)
@@ -381,14 +381,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                         if (x != null) x.intValue = 2;
                         if (y != null) y.intValue = 5;
                     }
-                    
+
                     // 🔥 ENHANCED: Try to enable debug settings
                     SerializedProperty debugVisProp = so.FindProperty("enableDebugVisualization");
                     if (debugVisProp != null) debugVisProp.boolValue = true;
-                    
+
                     SerializedProperty logStepsProp = so.FindProperty("logGenerationSteps");
                     if (logStepsProp != null) logStepsProp.boolValue = true;
-                    
+
                     so.ApplyModifiedPropertiesWithoutUndo();
                     bootstrapCreated = true;
                     Debug.Log("✅ Created Bootstrap with WorldBootstrapAuthoring component");
@@ -425,14 +425,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                         if (sectorsProp != null) sectorsProp.intValue = 5;
                         SerializedProperty radiusProp = so.FindProperty("biomeTransitionRadius");
                         if (radiusProp != null) radiusProp.floatValue = 10f;
-                        
+
                         // 🔥 ENHANCED: Enable debug settings
                         SerializedProperty debugVisProp = so.FindProperty("enableDebugVisualization");
                         if (debugVisProp != null) debugVisProp.boolValue = true;
-                        
+
                         SerializedProperty logStepsProp = so.FindProperty("logGenerationSteps");
                         if (logStepsProp != null) logStepsProp.boolValue = true;
-                        
+
                         so.ApplyModifiedPropertiesWithoutUndo();
                         bootstrapCreated = true;
                         Debug.Log("✅ Created Bootstrap with SmokeTestSceneSetup component");
@@ -444,7 +444,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     }
                 }
             }
-            
+
             // 🔥 FALLBACK: Create a simple marker if nothing else worked
             if (!bootstrapCreated)
             {
@@ -454,12 +454,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 instructionText.fontSize = 8;
                 instructionText.color = Color.red;
                 instructionText.anchor = TextAnchor.MiddleCenter;
-                
+
                 Debug.LogWarning("⚠️ Neither WorldBootstrapAuthoring nor SmokeTestSceneSetup type found.");
                 Debug.LogWarning("📝 Created placeholder Bootstrap with instructions for manual setup.");
                 Debug.LogWarning("💡 Manual setup: Add SmokeTestSceneSetup component with Seed=42, WorldSize=(50,50), TargetSectors=5");
             }
-            
+
             // 🧙‍♂️ FINAL INSTRUCTION
             if (bootstrapCreated)
             {
@@ -686,14 +686,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return;
 				}
 
-			string [ ] segments = path.Split('/');
-			string current = segments [ 0 ];
+			string[] segments = path.Split('/');
+			string current = segments[0];
 			for (int i = 1; i < segments.Length; i++)
 				{
-				string next = current + "/" + segments [ i ];
+				string next = current + "/" + segments[i];
 				if (!AssetDatabase.IsValidFolder(next))
 					{
-					AssetDatabase.CreateFolder(current, segments [ i ]);
+					AssetDatabase.CreateFolder(current, segments[i]);
 					}
 				current = next;
 				}
@@ -729,7 +729,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 go = new GameObject(subName);
             }
             go.transform.SetParent(parent, false);
-            
+
             if (subSceneType != null)
             {
                 Component existing = go.GetComponent(subSceneType);
@@ -874,35 +874,35 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				//     {
 				//         // 🔥 FALLBACK: Try to assign GUID directly to the property
 				//         Debug.Log($"🔄 Attempting direct GUID assignment for {subName}");
-				//         
+				//
 				//         // Use reflection to access Unity's internal GUID structure
 				//         System.Type guidType = sceneGuidProp.managedReferenceValue?.GetType();
 				//         if (guidType != null)
 				//         {
 				//             var guidInstance = System.Activator.CreateInstance(guidType);
-				//             
+				//
 				//             // Try to set the GUID value using reflection
 				//             var valueField = guidType.GetField("Value");
 				//             if (valueField != null)
 				//             {
 				//                 var unityGuid = new System.Guid(guid);
 				//                 byte[] guidBytes = unityGuid.ToByteArray();
-				//                 
+				//
 
 				//                 // Create the Unity GUID structure
 				//                 object guidValue = System.Activator.CreateInstance(valueField.FieldType);
 				//                 var guidValueType = valueField.FieldType;
-				//                 
+				//
 
 				//                 guidValueType.GetField("x")?.SetValue(guidValue, x);
 				//                 guidValueType.GetField("y")?.SetValue(guidValue, y);
 				//                 guidValueType.GetField("z")?.SetValue(guidValue, z);
 				//                 guidValueType.GetField("w")?.SetValue(guidValue, w);
-				//                 
+				//
 
 				//                 valueField.SetValue(guidInstance, guidValue);
 				//                 sceneGuidProp.managedReferenceValue = guidInstance;
-				//                 
+				//
 
 				//                 Debug.Log($"✅ Set _SceneGUID via reflection for {subName}");
 				//             }
@@ -938,7 +938,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					return false;
 					}
 
-				// 🧙‍♂️ FINAL VALIDATION: Verify the assignment worked  
+				// 🧙‍♂️ FINAL VALIDATION: Verify the assignment worked
 				SerializedObject validation = new(subSceneComp);
 				SerializedProperty validateScene = validation.FindProperty("_SceneAsset");
 				if (validateScene == null) validateScene = validation.FindProperty("m_SceneAsset");
@@ -989,10 +989,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			try
 				{
 				SerializedObject so = new(existing);
-				
+
 				SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
 				if (sceneProp != null) sceneProp.objectReferenceValue = sceneAsset;
-				
+
 				// Enhanced GUID assignment for reflection mode
 				SerializedProperty sceneGuidProp = so.FindProperty("_SceneGUID");
 				if (sceneGuidProp != null)
@@ -1002,39 +1002,39 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						{
 						var unityGuid = new System.Guid(guid);
 						byte[] guidBytes = unityGuid.ToByteArray();
-						
+
 						uint x = System.BitConverter.ToUInt32(guidBytes, 0);
 						uint y = System.BitConverter.ToUInt32(guidBytes, 4);
 						uint z = System.BitConverter.ToUInt32(guidBytes, 8);
 						uint w = System.BitConverter.ToUInt32(guidBytes, 12);
-						
+
 						SerializedProperty xProp = guidValueProp.FindPropertyRelative("x");
 						SerializedProperty yProp = guidValueProp.FindPropertyRelative("y");
 						SerializedProperty zProp = guidValueProp.FindPropertyRelative("z");
 						SerializedProperty wProp = guidValueProp.FindPropertyRelative("w");
-				
+
 						if (xProp != null) xProp.uintValue = x;
 						if (yProp != null) yProp.uintValue = y;
 						if (zProp != null) zProp.uintValue = z;
 						if (wProp != null) wProp.uintValue = w;
-						
+
 						Debug.Log($"✅ Set _SceneGUID via reflection for {subName}");
 						}
 					}
-				
+
 				SerializedProperty autoLoadProp = so.FindProperty("m_AutoLoadScene");
 				if (autoLoadProp != null) autoLoadProp.boolValue = true;
-				
+
 				EditorUtility.SetDirty(existing);
 				EditorUtility.SetDirty(go);
-				
+
 				bool applied = so.ApplyModifiedProperties();
 				if (!applied)
 					{
 					Debug.LogWarning($"⚠️ Failed to apply SerializedObject changes for {subName} (reflection mode)");
 					return false;
 					}
-				
+
 				Debug.Log($"✅ SubScene reference assignment completed (reflection mode): '{subName}' -> {scenePath}");
 				return true;
 				}
@@ -1056,7 +1056,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// Find all SubScene components in the current scene
 #if METVD_FULL_DOTS // #8
-			SubScene [ ] allSubScenes = UnityEngine.Object.FindObjectsByType<Unity.Scenes.SubScene>(FindObjectsSortMode.None);
+			SubScene[] allSubScenes = UnityEngine.Object.FindObjectsByType<Unity.Scenes.SubScene>(FindObjectsSortMode.None);
 
 			foreach (SubScene subScene in allSubScenes)
 				{
@@ -1071,7 +1071,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					}
 
 				// Try to find matching scene file based on GameObject name
-				string [ ] potentialPaths = new string [ ]
+				string[] potentialPaths = new string[]
 				{
 					$"Assets/Scenes/SubScenes/{objectName}.unity",
 					$"Assets/Scenes/{objectName}.unity",
@@ -1099,7 +1099,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 					// Try to find the correct property name
 					SerializedProperty sceneProp = null;
-					string [ ] propertyNames = { "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
+					string[] propertyNames = { "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
 
 					foreach (string propName in propertyNames)
 						{
@@ -1138,14 +1138,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						totalFound++;
 						string objectName = comp.gameObject.name;
 						Debug.Log($"🔍 Found SubScene component on '{objectName}' (reflection mode)");
-						
+
 						// Try to assign via SerializedObject
 						SerializedObject so = new SerializedObject(comp);
-						
+
 						// Try to find the correct property name
 						SerializedProperty sceneProp = null;
 						string[] propertyNames = { "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
-						
+
 						foreach (string propName in propertyNames)
 						{
 							sceneProp = so.FindProperty(propName);
@@ -1157,15 +1157,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 									Debug.Log($"✅ SubScene '{objectName}' already has valid reference");
 									break;
 								}
-								
+
 								// Try to find matching scene file
 								string[] potentialPaths = new string[]
 								{
 									$"Assets/Scenes/SubScenes/{objectName}.unity",
-									$"Assets/Scenes/{objectName}.unity", 
+									$"Assets/Scenes/{objectName}.unity",
 									$"Assets/{objectName}.unity"
 								};
-								
+
 								foreach (string path in potentialPaths)
 								{
 									var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);

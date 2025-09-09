@@ -27,11 +27,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Biome", "TinyWalnutGames.MetVD.Biome.csproj", "{657EBCB1-E90D-F326-9D47-83652F99795B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.GridLayerEditor", "TinyWalnutGames.GridLayerEditor.csproj", "{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor-firstpass", "Assembly-CSharp-Editor-firstpass.csproj", "{E887DBEB-A199-9739-92C2-0CF4336BC7C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Core.Tests", "TinyWalnutGames.MetVD.Core.Tests.csproj", "{E9C4D347-2E1D-F368-39D1-5811E421A254}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.GridLayerEditor", "TinyWalnutGames.GridLayerEditor.csproj", "{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.Tools.Editor", "TinyWalnutGames.Tools.Editor.csproj", "{54AF92FA-E09D-D5AC-820C-76EFC9812DD4}"
 EndProject
@@ -95,6 +95,10 @@ Global
 		{657EBCB1-E90D-F326-9D47-83652F99795B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{657EBCB1-E90D-F326-9D47-83652F99795B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{657EBCB1-E90D-F326-9D47-83652F99795B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E887DBEB-A199-9739-92C2-0CF4336BC7C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E887DBEB-A199-9739-92C2-0CF4336BC7C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E887DBEB-A199-9739-92C2-0CF4336BC7C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -103,10 +107,6 @@ Global
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0F6C547-34C0-D3CA-B35C-0C0B4FF8765C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{54AF92FA-E09D-D5AC-820C-76EFC9812DD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{54AF92FA-E09D-D5AC-820C-76EFC9812DD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54AF92FA-E09D-D5AC-820C-76EFC9812DD4}.Release|Any CPU.ActiveCfg = Release|Any CPU

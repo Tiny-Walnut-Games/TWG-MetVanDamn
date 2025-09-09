@@ -13,30 +13,22 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		static MetVDGizmoDrawer()
 			{
 			// Auto-load settings (first asset found)
-			string [ ] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
+			string[] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
 			if (guids.Length > 0)
 				{
-				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids [ 0 ]));
+				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
 				}
 			SceneView.duringSceneGui += OnSceneGUI;
 			}
 
 		private static void OnSceneGUI(SceneView sv)
 			{
-			if (_settings == null)
-				{
-				return;
-				}
-
-			if (_settings.enableTransformSnapUtility && GUILayout.Button("MetVD Snap Districts To Grid", GUILayout.Width(220)))
-				{
-				SnapAllDistrictsToGrid();
-				}
+			// Scene GUI removed - snap button moved to ProceduralLayoutGizmoDrawer where it belongs
 			}
 
-		private static void SnapAllDistrictsToGrid()
+		public static void SnapAllDistrictsToGrid()
 			{
-			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			Undo.RecordObjects(districts, "Snap Districts To Grid");
 			foreach (DistrictAuthoring d in districts)
 				{
@@ -81,19 +73,55 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 
 			Vector3 pos = GridPositionFromAuthoring(district);
+
+			// 🔧 DEBUG: Log what we're about to draw
+			Debug.Log($"[MetVDGizmoDrawer] Drawing district {district.nodeId} at pos={pos}, magnitude={pos.magnitude}");
+
+			// 🔧 FIX: Prevent massive rectangles from invalid coordinates
+			if (pos.magnitude > 10000f || float.IsNaN(pos.x) || float.IsNaN(pos.y) || float.IsNaN(pos.z))
+				{
+				Debug.LogWarning($"[MetVDGizmoDrawer] SKIPPING district {district.nodeId} - extreme position: {pos}");
+				return; // Don't draw - likely invalid coordinates
+				}
+
 			Vector2 size = _settings.useGridCoordinatesForGizmos && _settings.adaptDistrictSizeToCell
 				? new Vector2(_settings.gridCellSize, _settings.gridCellSize)
 				: _settings.districtSize;
 
+			// 🔧 FIX: Clamp size to reasonable bounds and validate
+			size.x = Mathf.Clamp(size.x, 0.1f, 100f);
+			size.y = Mathf.Clamp(size.y, 0.1f, 100f);
+
+			if (float.IsNaN(size.x) || float.IsNaN(size.y))
+				{
+				return; // Don't draw if size is invalid
+				}
+
 			Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
 			Color prev = Handles.color;
 			Handles.color = _settings.districtColor;
-			Handles.DrawSolidRectangleWithOutline(new [ ] {
-				pos + new Vector3(-size.x*0.5f, 0, -size.y*0.5f),
-				pos + new Vector3(-size.x*0.5f, 0,  size.y*0.5f),
-				pos + new Vector3( size.x*0.5f, 0,  size.y*0.5f),
-				pos + new Vector3( size.x*0.5f, 0, -size.y*0.5f)
-			}, _settings.districtColor, _settings.districtOutline);
+
+			// 🔧 FIX: Calculate rectangle corners safely
+			Vector3 halfX = new Vector3(size.x * 0.5f, 0, 0);
+			Vector3 halfZ = new Vector3(0, 0, size.y * 0.5f);
+			Vector3[] corners = {
+				pos - halfX - halfZ,
+				pos - halfX + halfZ,
+				pos + halfX + halfZ,
+				pos + halfX - halfZ
+			};
+
+			// 🔧 FIX: Validate all corners before drawing
+			foreach (var corner in corners)
+				{
+				if (corner.magnitude > 10000f || float.IsNaN(corner.x) || float.IsNaN(corner.y) || float.IsNaN(corner.z))
+					{
+					Handles.color = prev; // Restore color
+					return; // Don't draw if any corner is extreme
+					}
+				}
+
+			Handles.DrawSolidRectangleWithOutline(corners, _settings.districtColor, _settings.districtOutline);
 
 			// Label
 			var style = new GUIStyle(EditorStyles.boldLabel)

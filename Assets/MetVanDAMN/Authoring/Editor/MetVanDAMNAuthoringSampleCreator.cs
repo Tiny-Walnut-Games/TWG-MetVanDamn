@@ -19,7 +19,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	public static class MetVanDAMNAuthoringSampleCreator
 		{
 		private const string SubScenesFolder = "Assets/Scenes/SubScenes";
-		private static readonly string [ ] SampleSubScenes = { "SampleGeneration", "SampleBiomes" };
+		private static readonly string[] SampleSubScenes = { "SampleGeneration", "SampleBiomes" };
 
 		[MenuItem("Tiny Walnut Games/MetVanDAMN/Sample Creation/Create Authoring Sample Scene")]
 		public static void CreateAuthoringSampleScene()
@@ -133,64 +133,31 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorSceneManager.MarkSceneDirty(mainScene);
 			EditorSceneManager.SaveScene(mainScene);
 
-			// 🧙‍♂️ PHASE 3F: ULTRA AGGRESSIVE sync before reference assignment
-			Debug.Log("🔄 ULTRA synchronizing before reference assignment...");
-			AssetDatabase.SaveAssets();
-			AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-			System.Threading.Thread.Sleep(1000); // Even longer wait before references
-
-			// 🎯 PHASE 3G: Assign SceneAsset references with INDIVIDUAL validation
-			Debug.Log("🔗 Assigning SceneAsset references with INDIVIDUAL validation...");
-			foreach (string subName in SampleSubScenes)
-				{
-				AssignSubSceneReferenceWithValidation(subName);
-
-				// 🔥 INDIVIDUAL save after each reference assignment
-				EditorSceneManager.MarkSceneDirty(mainScene);
-				EditorSceneManager.SaveScene(mainScene);
-				AssetDatabase.SaveAssets();
-
-				// 🧙‍♂️ Brief pause between assignments
-				System.Threading.Thread.Sleep(200);
-				}
-
-			// 🏁 PHASE 3H: FINAL save with complete references
-			Debug.Log("💾 FINAL save with complete references...");
-			EditorSceneManager.MarkSceneDirty(mainScene);
-			EditorSceneManager.SaveScene(mainScene);
+			// 🧙‍♂️ PHASE 3F: Simple sync before reference assignment (working approach)
+			Debug.Log("🔄 Synchronizing before reference assignment...");
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
 
-			Debug.Log("✅ SubScene creation complete with ULTRA timing synchronization!");
-
-			// 🔍 PHASE 3I: Validation report
-			Debug.Log("🔍 Validation Report:");
-			foreach (string subName in SampleSubScenes)
+			// ✅ PHASE 3G: Use EditorApplication.delayCall for proper timing (WORKING APPROACH!)
+			Debug.Log("🔗 Assigning SceneAsset references with proper timing...");
+			EditorApplication.delayCall += () =>
 				{
-				var go = GameObject.Find(subName);
-				if (go != null)
-					{
-#if METVD_FULL_DOTS
-					if (go.TryGetComponent(out Unity.Scenes.SubScene subScene))
+					Debug.Log("🔗 DELAYED: Starting SceneAsset reference assignment...");
+
+					foreach (string subName in SampleSubScenes)
 						{
-						SerializedObject so = new(subScene);
-						SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
-						bool hasReference = sceneProp != null && sceneProp.objectReferenceValue != null;
-						Debug.Log($"📋 {subName}: SubScene component ✓, Reference: {(hasReference ? "✓" : "❌")}");
+						Debug.Log($"🔗 Attempting reference assignment for: {subName}");
+						AssignSubSceneReferenceWithValidation(subName);
 						}
-					else
-						{
-						Debug.Log($"📋 {subName}: SubScene component ❌");
-						}
-#else
-                    Debug.Log($"📋 {subName}: Created (reflection mode)");
-#endif
-					}
-				else
-					{
-					Debug.Log($"📋 {subName}: GameObject ❌");
-					}
-				}
+
+					// Final save
+					Scene activeScene = EditorSceneManager.GetActiveScene();
+					EditorSceneManager.MarkSceneDirty(activeScene);
+					EditorSceneManager.SaveScene(activeScene);
+					AssetDatabase.SaveAssets();
+
+					Debug.Log("✅ SubScene creation complete with WORKING assignment logic!");
+				};
 			}
 
 		/// <summary>
@@ -304,13 +271,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					biomeMarker.transform.position = basePosition;
 
 					// 🧙‍♂️ BIOME-AWARE SPATIAL DEMONSTRATION
-					string [ ] biomeTypes = new [ ] { "Solar", "Volcanic", "Icy", "Hub" };
-					Color [ ] biomeColors = new [ ] { Color.yellow, Color.red, Color.cyan, Color.blue };
+					string[] biomeTypes = new[] { "Solar", "Volcanic", "Icy", "Hub" };
+					Color[] biomeColors = new[] { Color.yellow, Color.red, Color.cyan, Color.blue };
 
 					for (int i = 0; i < biomeTypes.Length; i++)
 						{
 						var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-						sphere.name = $"BiomeContent_{biomeTypes [ i ]}";
+						sphere.name = $"BiomeContent_{biomeTypes[i]}";
 						sphere.transform.SetParent(biomeMarker.transform);
 
 						// 🎯 RADIAL COORDINATE INTELLIGENCE
@@ -323,7 +290,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						Renderer renderer = sphere.GetComponent<Renderer>();
 						renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"))
 							{
-							color = biomeColors [ i ]
+							color = biomeColors[i]
 							};
 						}
 					break;
@@ -352,7 +319,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		/// <summary>
-		/// Assigns SceneAsset reference to existing SubScene GameObject with ENHANCED validation
+		/// ✅ WORKING APPROACH: Copy proven SubScene assignment logic from MetVanDAMNSceneBootstrap.cs
+		/// This uses the exact same logic that successfully assigns SubScene references
 		/// </summary>
 		private static void AssignSubSceneReferenceWithValidation(string subName)
 			{
@@ -365,59 +333,106 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return;
 				}
 
+			Debug.Log($"✅ Found GameObject: {subName}");
+
 			if (!go.TryGetComponent(out Unity.Scenes.SubScene subSceneComp))
 				{
 				Debug.LogError($"❌ SubScene component not found on '{subName}'!");
 				return;
 				}
 
-			// 🧙‍♂️ ENHANCED: Multiple attempts to load the SceneAsset
-			SceneAsset sceneAsset = null;
-			int loadAttempts = 0;
-			while (sceneAsset == null && loadAttempts < 10)
+			Debug.Log($"✅ Found SubScene component on: {subName}");
+
+			// 🔍 VALIDATION: Load SceneAsset and verify GUID (from working approach)
+			SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
+			if (sceneAsset == null)
 				{
-				sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
-				if (sceneAsset == null)
-					{
-					Debug.Log($"🔄 Attempt {loadAttempts + 1}: Waiting for SceneAsset to load: {scenePath}");
-					AssetDatabase.Refresh();
-					System.Threading.Thread.Sleep(100);
-					loadAttempts++;
-					}
+				Debug.LogError($"❌ Failed to load SceneAsset from path: {scenePath}");
+				return;
 				}
 
-			if (sceneAsset != null)
+			string guid = AssetDatabase.AssetPathToGUID(scenePath);
+			if (string.IsNullOrEmpty(guid))
 				{
-				string guid = AssetDatabase.AssetPathToGUID(scenePath);
-				if (string.IsNullOrEmpty(guid))
+				Debug.LogError($"❌ Scene asset at '{scenePath}' has no GUID! SubScene will show as Missing.");
+				return;
+				}
+
+			Debug.Log($"✅ SceneAsset loaded with GUID: {guid}");
+
+			// 🔗 ASSIGNMENT: Set SceneAsset reference (WORKING APPROACH!)
+			try
+				{
+				SerializedObject so = new(subSceneComp);
+
+				// 🧙‍♂️ DEBUG: List all available properties to identify the correct one
+				SerializedProperty iterator = so.GetIterator();
+				var availableProperties = new System.Collections.Generic.List<string>();
+
+				if (iterator.NextVisible(true))
 					{
-					Debug.LogError($"❌ Scene asset at '{scenePath}' has no GUID! SubScene will show as Missing.");
-					return;
+					do
+						{
+						availableProperties.Add(iterator.propertyPath);
+						}
+					while (iterator.NextVisible(false));
 					}
 
-				SerializedObject so = new(subSceneComp);
+				Debug.Log($"🔍 Available properties on {subName}: {string.Join(", ", availableProperties)}");
+
+				// 🎯 CRITICAL: Try multiple property names for SceneAsset reference (WORKING APPROACH!)
 				SerializedProperty sceneProp = so.FindProperty("m_SceneAsset");
+				if (sceneProp == null) sceneProp = so.FindProperty("_SceneAsset");
+				if (sceneProp == null) sceneProp = so.FindProperty("sceneAsset");
+				if (sceneProp == null) sceneProp = so.FindProperty("SceneAsset");
+				if (sceneProp == null) sceneProp = so.FindProperty("m_Scene");
+				if (sceneProp == null) sceneProp = so.FindProperty("_Scene");
+
 				if (sceneProp != null)
 					{
 					sceneProp.objectReferenceValue = sceneAsset;
+					Debug.Log($"✅ Set SceneAsset reference for {subName} using property: {sceneProp.propertyPath}");
+					}
+				else
+					{
+					Debug.LogWarning($"⚠️ SceneAsset property not found on {subName} - available properties: {string.Join(", ", availableProperties)}");
 					}
 
+				// 🔗 ASSIGNMENT: Set auto-load (from working approach)
 				SerializedProperty autoLoadProp = so.FindProperty("m_AutoLoadScene");
+				if (autoLoadProp == null) autoLoadProp = so.FindProperty("AutoLoadScene");
 				if (autoLoadProp != null)
 					{
 					autoLoadProp.boolValue = true;
+					Debug.Log($"✅ Set auto-load = true for {subName}");
 					}
 
-				so.ApplyModifiedPropertiesWithoutUndo();
-
+				// 🔥 ENHANCED: Force dirty state and ensure changes are applied (from working approach)
 				EditorUtility.SetDirty(subSceneComp);
 				EditorUtility.SetDirty(go);
 
-				Debug.Log($"✅ SubScene reference assigned: '{subName}' -> {scenePath} (GUID: {guid})");
+				// 💾 SAVE: Apply changes with force update (from working approach)
+				bool applied = so.ApplyModifiedPropertiesWithoutUndo();
+				if (!applied)
+					{
+					Debug.LogWarning($"⚠️ Failed to apply SerializedObject changes for {subName}");
+					return;
+					}
+
+				// 🧙‍♂️ FINAL VALIDATION: Verify the assignment worked (from working approach)
+				SerializedObject validation = new(subSceneComp);
+				SerializedProperty validateScene = validation.FindProperty("_SceneAsset");
+				if (validateScene == null) validateScene = validation.FindProperty("m_SceneAsset");
+				if (validateScene == null) validateScene = validation.FindProperty("sceneAsset");
+				if (validateScene == null) validateScene = validation.FindProperty("SceneAsset");
+
+				bool assignmentSuccess = validateScene != null && validateScene.objectReferenceValue != null;
+
+				Debug.Log($"✅ SubScene reference assignment {(assignmentSuccess ? "SUCCESSFUL" : "FAILED")} for '{subName}' -> {scenePath}");
 				}
-			else
+			catch (System.Exception ex)
 				{
-				Debug.LogError($"❌ SceneAsset at '{scenePath}' could not be loaded after {loadAttempts} attempts!");
+				Debug.LogError($"❌ Exception during SubScene reference assignment for {subName}: {ex.Message}");
 				}
 			}
 
@@ -437,11 +452,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         {
             var go = new GameObject(subName);
             go.transform.SetParent(parent, false);
-            
+
             // Fixed: Use System.Array.IndexOf instead of Array.IndexOf
             int index = System.Array.IndexOf(SampleSubScenes, subName);
             go.transform.localPosition = new Vector3(index * 2f, 0, 0);
-            
+
             System.Type subSceneType = FindTypeAnywhere("Unity.Scenes.SubScene");
             if (subSceneType != null)
             {
@@ -462,7 +477,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private static void AssignSubSceneReferenceWithValidation(string subName)
         {
             string scenePath = Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/");
-            
+
             System.Type subSceneType = FindTypeAnywhere("Unity.Scenes.SubScene");
             var go = GameObject.Find(subName);
             if (go == null || subSceneType == null)
@@ -492,7 +507,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     loadAttempts++;
                 }
             }
-            
+
             if (sceneAsset != null)
             {
                 try
@@ -504,7 +519,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                     if (autoLoadProp != null) autoLoadProp.boolValue = true;
                     so.ApplyModifiedProperties();
                     EditorUtility.SetDirty(existing);
-                    
+
                     Debug.Log($"✅ SubScene reference assigned: '{subName}' -> {scenePath} (reflection mode)");
                 }
                 catch (System.Exception e)
@@ -517,7 +532,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
                 Debug.LogError($"❌ SceneAsset at '{scenePath}' could not be loaded after {loadAttempts} attempts!");
             }
         }
-        
+
         /// <summary>
         /// Legacy method for compatibility
         /// </summary>
@@ -648,7 +663,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			var connectionsParent = new GameObject("Connections");
 
 			// Find all district authoring components
-			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 
 			// Create connections between adjacent districts
 			foreach (DistrictAuthoring district1 in districts)
@@ -717,7 +732,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			var biomeFieldsParent = new GameObject("BiomeFields");
 
 			// Create a few biome fields with different configurations
-			var biomeConfigs = new (Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) [ ]
+			var biomeConfigs = new (Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient)[]
 			{
 				(new Vector3(-3, 1, -3), BiomeType.SolarPlains, BiomeType.Unknown, 1.0f, 0.3f),
 				(new Vector3(3, 1, 3), BiomeType.VolcanicCore, BiomeType.Unknown, 0.8f, 0.6f),
@@ -728,7 +743,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// @jmeyer1980: ⚠ nitpick ⚠ I deconstructed config directly in the loop for clarity
 			for (int i = 0; i < biomeConfigs.Length; i++)
 				{
-				(Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) = biomeConfigs [ i ];
+				(Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) = biomeConfigs[i];
 				var biomeFieldGO = new GameObject($"BiomeField_{i + 1}");
 				biomeFieldGO.transform.SetParent(biomeFieldsParent.transform);
 				biomeFieldGO.transform.position = position;
@@ -788,7 +803,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			wfcLibraryParent.transform.position = new Vector3(10, 0, 0); // Offset from main scene
 
 			// Create the tile prototypes as defined in the sample data
-			var tileConfigs = new (string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) [ ]
+			var tileConfigs = new (string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn)[]
 			{
 				("Hub", 1, 1.0f, BiomeType.HubArea, Polarity.None, 2, 4),
 				("Corridor", 2, 0.8f, BiomeType.TransitionZone, Polarity.None, 2, 2),
@@ -799,7 +814,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// @jmeyer1980: ⚠ Intention ⚠ I deconstructed config directly in the loop for clarity
 			for (int i = 0; i < tileConfigs.Length; i++)
 				{
-				(string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) = tileConfigs [ i ];
+				(string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) = tileConfigs[i];
 				var tileGO = new GameObject($"WfcTilePrototype_{name}");
 				tileGO.transform.SetParent(wfcLibraryParent.transform);
 				tileGO.transform.position = new Vector3(i * 2f, 0, 0);
@@ -816,19 +831,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				// @jmeyer1980: ⚠ nitpick ⚠ I switched the switch to an expression named switch
 				wfcTile.sockets = name switch
 					{
-						"Hub" => new WfcSocketConfig [ ]
+						"Hub" => new WfcSocketConfig[]
 												{
 							new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
 												},
-						"Corridor" => new WfcSocketConfig [ ]
+						"Corridor" => new WfcSocketConfig[]
 							{
 							new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
 							},
-						_ => new WfcSocketConfig [ ]
+						_ => new WfcSocketConfig[]
 							{
 							new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true }
@@ -907,7 +922,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// @jmeyer1980: ⚠ nitpick ⚠ I changed this next line as it was previously split into two lines:
 			labelGO.transform.SetLocalPositionAndRotation(Vector3.up * 1.2f, Quaternion.Euler(90, 0, 0));
 			TextMesh labelMesh = labelGO.AddComponent<TextMesh>();
-			labelMesh.text = typeName [ ..Mathf.Min(3, typeName.Length) ]; // Short abbreviation - ⚠ nitpick ⚠ @jmeyer1980: I changed this to a range operator
+			labelMesh.text = typeName[..Mathf.Min(3, typeName.Length)]; // Short abbreviation - ⚠ nitpick ⚠ @jmeyer1980: I changed this to a range operator
 			labelMesh.fontSize = 6;
 			labelMesh.color = Color.black;
 			labelMesh.anchor = TextAnchor.MiddleCenter;
@@ -960,14 +975,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return;
 				}
 
-			string [ ] segments = path.Split('/');
-			string current = segments [ 0 ];
+			string[] segments = path.Split('/');
+			string current = segments[0];
 			for (int i = 1; i < segments.Length; i++)
 				{
-				string next = current + "/" + segments [ i ];
+				string next = current + "/" + segments[i];
 				if (!AssetDatabase.IsValidFolder(next))
 					{
-					AssetDatabase.CreateFolder(current, segments [ i ]);
+					AssetDatabase.CreateFolder(current, segments[i]);
 					}
 				current = next;
 				}

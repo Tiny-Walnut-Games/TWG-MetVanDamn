@@ -45,7 +45,7 @@ namespace LivingDevAgent.Editor.Modules
 
 		// Scene view overlay state
 		private static bool _moduleEnabled = true; // Module can be completely disabled
-		private static bool _sceneViewOverlayEnabled = true; // Scene overlay works independently
+		private static bool _sceneViewOverlayEnabled = false; // Scene overlay disabled by default for cleaner demo experience
 		private static Rect _overlayRect = new(10, 10, 300, 120);
 		private static bool _isDragging = false;
 		private static Vector2 _dragOffset;
@@ -203,7 +203,7 @@ namespace LivingDevAgent.Editor.Modules
 			if (EditorGUI.EndChangeCheck())
 				{
 				_selectedTaskIndex = newTaskIndex;
-				_showCustomTask = (_availableTasks [ _selectedTaskIndex ] == "🎯 Custom Task...");
+				_showCustomTask = (_availableTasks[_selectedTaskIndex] == "🎯 Custom Task...");
 				Event.current.Use(); // Consume the event
 				SceneView.RepaintAll();
 				}
@@ -583,7 +583,7 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			return _showCustomTask
 				? string.IsNullOrEmpty(_customTaskName) ? "" : _customTaskName
-				: _availableTasks [ _selectedTaskIndex ];
+				: _availableTasks[_selectedTaskIndex];
 			}
 
 		private TimeCardData GetOrCreateTimeCard(string taskName)
@@ -620,7 +620,7 @@ namespace LivingDevAgent.Editor.Modules
 
 			if (!System.IO.Directory.Exists(_timeCardDirectory)) return;
 
-			string [ ] guids = AssetDatabase.FindAssets("t:TimeCardData", new [ ] { _timeCardDirectory });
+			string[] guids = AssetDatabase.FindAssets("t:TimeCardData", new[] { _timeCardDirectory });
 			foreach (string guid in guids)
 				{
 				string assetPath = AssetDatabase.GUIDToAssetPath(guid);
@@ -763,7 +763,7 @@ namespace LivingDevAgent.Editor.Modules
 
 		private string SanitizeFileName(string fileName)
 			{
-			char [ ] invalids = System.IO.Path.GetInvalidFileNameChars();
+			char[] invalids = System.IO.Path.GetInvalidFileNameChars();
 			return string.Join("_", fileName.Split(invalids, System.StringSplitOptions.RemoveEmptyEntries));
 			}
 		}

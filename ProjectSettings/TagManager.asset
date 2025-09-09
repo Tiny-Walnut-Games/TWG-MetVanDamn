@@ -13,21 +13,21 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Parallax5
+  - Parallax4
+  - Parallax3
+  - Parallax2
+  - Parallax1
+  - Background2
+  - Background1
+  - BackgroundProps
+  - WalkableGround
+  - WalkableProps
+  - Hazards
+  - Foreground
+  - ForegroundProps
+  - RoomMasking
+  - Blending
   - 
   - 
   - 
@@ -76,6 +76,39 @@ TagManager:
     locked: 0
   - name: Parallax
     uniqueID: 3245399809
+    locked: 0
+  - name: Parallax5
+    uniqueID: 1784956717
+    locked: 0
+  - name: Parallax4
+    uniqueID: 1784946773
+    locked: 0
+  - name: Parallax3
+    uniqueID: 1784946773
+    locked: 0
+  - name: Parallax2
+    uniqueID: 1784946773
+    locked: 0
+  - name: Parallax1
+    uniqueID: 1784946773
+    locked: 0
+  - name: Background2
+    uniqueID: 1784946773
+    locked: 0
+  - name: Background1
+    uniqueID: 1784946773
+    locked: 0
+  - name: BackgroundProps
+    uniqueID: 1784946773
+    locked: 0
+  - name: Hazards
+    uniqueID: 1784946773
+    locked: 0
+  - name: Foreground
+    uniqueID: 1784946773
+    locked: 0
+  - name: ForegroundProps
+    uniqueID: 1784946773
     locked: 0
   m_RenderingLayers:
   - Default

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring.Editor::TinyWalnutGames.MetVD.Authoring.Editor.MetVDGizmoSettings
   districtColor: {r: 0.2, g: 0.8, b: 1, a: 0.35}
   districtOutline: {r: 0.1, g: 0.6, b: 0.9, a: 1}
+  placedDistrictColor: {r: 0.1, g: 0.9, b: 0.8, a: 0.35}
   districtSize: {x: 6, y: 6}
   connectionColor: {r: 0.9, g: 0.9, b: 0.3, a: 1}
   oneWayColor: {r: 1, g: 0.5, b: 0.2, a: 1}

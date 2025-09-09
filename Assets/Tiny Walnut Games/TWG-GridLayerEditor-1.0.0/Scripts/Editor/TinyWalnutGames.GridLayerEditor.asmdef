@@ -2,6 +2,7 @@
   "name": "TinyWalnutGames.GridLayerEditor",
   "rootNamespace": "TinyWalnutGames.GridLayerEditor",
   "references": [
+    "TinyWalnutGames.GridLayerConfig",
     "UnityEditor",
     "UnityEngine.TilemapModule"
   ],
