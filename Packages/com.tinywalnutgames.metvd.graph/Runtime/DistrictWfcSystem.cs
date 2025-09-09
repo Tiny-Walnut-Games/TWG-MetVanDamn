@@ -27,8 +27,8 @@ namespace TinyWalnutGames.MetVD.Graph
 		public ComponentLookup<WfcState> wfcStatesLookup;
 		public ComponentLookup<NodeId> nodeIdsLookup;
 
-		// Debug flag for internal logging
-		public static bool DebugWfc = true; // Set to true for debug output
+		// Debug flag for internal logging (disabled for production job execution)
+		public static bool DebugWfc = false;
 
 		[BurstCompile]
 		public void OnCreate(ref SystemState state)
@@ -133,8 +133,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			var wfcStates = wfcStatesLookup;
 			var nodeIds = nodeIdsLookup;
 
-			// 🔍 DEBUGGING: Run on main thread instead of as job to see debug logs
-			// Execute the job logic directly on main thread for debugging
+			// � PRODUCTION: Restore job execution for performance
 			var wfcJob = new WfcProcessingJob
 				{
 				CandidateBufferLookup = candidateBufferLookup,
@@ -147,12 +146,9 @@ namespace TinyWalnutGames.MetVD.Graph
 				TilePrototypes = tilePrototypes
 				};
 
-			// Execute on main thread for debugging
-			wfcJob.Execute();
-
-			// Original job scheduling (commented for debugging):
-			// JobHandle jobHandle = wfcJob.Schedule(state.Dependency);
-			// state.Dependency = jobHandle;
+			// Schedule job for production performance
+			JobHandle jobHandle = wfcJob.Schedule(state.Dependency);
+			state.Dependency = jobHandle;
 
 			// Complete the job immediately to ensure synchronization and dispose TempJob memory
 			state.Dependency.Complete();
