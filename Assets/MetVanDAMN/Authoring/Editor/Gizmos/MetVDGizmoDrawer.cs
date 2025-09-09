@@ -21,11 +21,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SceneView.duringSceneGui += OnSceneGUI;
 			}
 
-		private static void OnSceneGUI(SceneView sv)
-			{
-			// Scene GUI removed - snap button moved to ProceduralLayoutGizmoDrawer where it belongs
-			}
-
 		public static void SnapAllDistrictsToGrid()
 			{
 			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
