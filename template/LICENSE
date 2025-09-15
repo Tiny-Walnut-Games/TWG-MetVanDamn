@@ -1,0 +1,45 @@
+MIT License
+
+Copyright (c) 2025 Jerry Meyer (Tiny Walnut Games)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Living Dev Agent Template
+
+This template contains debugging and development workflow tools originally 
+developed for the MetVanDAMN procedural generation engine, now available 
+for general use across all platforms and frameworks.
+
+### Tools Included:
+- Console Commentary System for debugging session documentation
+- Adjustable Code Snapshot System with configurable context range
+- TaskMaster project management with time tracking integration
+- Chronas time tracking with professional reporting
+- AI collaboration tools and workflow optimization
+
+### MetVanDAMN Origins:
+These tools were developed and tested during MetVanDAMN game development.
+The debugging workflows that proved useful for complex game systems are now
+available to help with any software development project.
+
+### Attribution:
+While this template is MIT licensed for maximum adoption, attribution to 
+Jerry Meyer and Tiny Walnut Games is appreciated when practical.

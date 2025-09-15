@@ -1,0 +1,135 @@
+# TLDL Entry Template
+
+**Entry ID:** TLDL-YYYY-MM-DD-DescriptiveTitle  
+**Author:** [Your Name]  
+**Context:** [Brief context description]  
+**Summary:** [One-line summary of what this entry documents]
+
+---
+
+## 🎯 Objective
+
+[What are you trying to accomplish? What problem are you solving?]
+
+## 🔍 Discovery
+
+[What did you learn or discover during this work? Include unexpected findings.]
+
+## ⚡ Actions Taken
+
+[What specific steps did you take? Be detailed enough for future reference.]
+
+### Code Changes
+- [List any code modifications with file paths]
+- [Include key logic changes or architectural decisions]
+- [Note any refactoring or cleanup performed]
+
+### Configuration Updates
+- [Any config file changes]
+- [Environment or build configuration changes]
+- [Tool or dependency updates]
+
+### Documentation Updates
+- [New documentation created]
+- [Existing documentation updated]
+- [Comments added to code]
+
+## 🧠 Key Insights
+
+[Important insights or lessons learned that others should know]
+
+### Technical Learnings
+- [Technical discoveries or gotchas]
+- [Architecture decisions and rationale]
+- [Performance considerations]
+- [Security implications]
+
+### Process Improvements
+- [Workflow improvements discovered]
+- [Tooling discoveries or optimizations]
+- [Team communication improvements]
+
+## 🚧 Challenges Encountered
+
+[What obstacles did you face and how did you overcome them?]
+
+### Problems Solved
+- [Specific issues encountered]
+- [Root cause analysis]
+- [Solution approaches tried]
+- [Final solution implemented]
+
+### Known Issues
+- [Any remaining issues or limitations]
+- [Workarounds in place]
+- [Technical debt created]
+
+## 📋 Next Steps
+
+- [ ] [Immediate next action items]
+- [ ] [Future considerations or improvements]
+- [ ] [Follow-up tasks or validation needed]
+- [ ] [Documentation or testing to complete]
+
+## 🔗 Related Links
+
+- [Link to relevant GitHub issues]
+- [Link to pull requests]
+- [Link to external documentation or references]
+- [Link to related TLDL entries]
+
+---
+
+## TLDL Metadata
+**Tags**: #tag1 #tag2 #tag3 #category  
+**Complexity**: [Low/Medium/High]  
+**Impact**: [Low/Medium/High/Critical]  
+**Team Members**: @username1 @username2  
+**Duration**: [Time spent on this work]  
+**Related Epic**: [Epic name if applicable]  
+
+---
+
+**Created**: YYYY-MM-DD HH:MM:SS UTC  
+**Last Updated**: YYYY-MM-DD HH:MM:SS UTC  
+**Status**: [In Progress/Complete/Blocked/Deprecated]  
+
+---
+
+## Template Instructions
+
+### How to Use This Template
+
+1. **Copy this template** to create a new TLDL entry
+2. **Name the file** using the pattern: `TLDL-YYYY-MM-DD-DescriptiveTitle.md`
+3. **Fill in all sections** with relevant information
+4. **Use descriptive titles** that explain the work at a glance
+5. **Include context** about why the work was needed
+6. **Document both successes and challenges** for learning
+
+### Section Guidelines
+
+- **Objective**: Clear statement of goals and success criteria
+- **Discovery**: What you learned, including unexpected findings
+- **Actions Taken**: Step-by-step record of what was done
+- **Key Insights**: Important learnings for future reference
+- **Challenges**: Problems encountered and solutions found
+- **Next Steps**: Actionable items for follow-up work
+
+### Tagging Guidelines
+
+Use relevant tags to make entries discoverable:
+- **Technology tags**: #python #javascript #unity #react
+- **Type tags**: #bugfix #feature #refactor #documentation
+- **Domain tags**: #frontend #backend #database #security
+- **Process tags**: #debugging #testing #deployment #optimization
+
+### Writing Tips
+
+- **Write for your future self** - include enough detail to understand later
+- **Write for your team** - include context that helps others learn
+- **Include code snippets** when they help explain the work
+- **Link to related resources** for additional context
+- **Update status** as work progresses
+
+*This TLDL entry template is part of Jerry's legendary Living Dev Agent system.* 🧙‍♂️⚡📜

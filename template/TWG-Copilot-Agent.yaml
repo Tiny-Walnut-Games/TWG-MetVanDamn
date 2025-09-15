@@ -1,0 +1,353 @@
+# Living Dev Agent Template Configuration
+# Jerry's legendary AI assistant behavior settings - MIT Licensed for all!
+
+# Project Information
+project:
+  name: "TEMPLATE_PROJECT_NAME"
+  description: "A project built with Jerry's MIT-licensed Living Dev Agent template"
+  repository_url: "https://github.com/your-username/your-repo"
+  documentation_url: "https://github.com/your-username/your-repo/blob/main/README.md"
+  license: "MIT"
+  license_url: "https://opensource.org/licenses/MIT"
+
+# AI Assistant Behavior
+assistant:
+  personality: "bootstrap_sentinel"
+  tone: "epic_adventure"  # Options: professional, casual, epic_adventure, dry_humor
+  enable_cheek_preservation: true
+  enable_epic_narration: true
+  enable_achievement_celebrations: true
+  enable_open_source_encouragement: true  # Promote MIT license benefits
+  
+  # Adventure-themed terminology
+  terminology:
+    commits: "quest_completions"
+    validation_failures: "boss_encounters"
+    successful_builds: "achievement_unlocks"
+    debugging_sessions: "dungeon_crawls"
+    code_reviews: "guild_meetings"
+    tldl_entries: "quest_logs"
+    open_source_contributions: "legendary_quests"
+
+# Development Workflow Preferences
+workflow:
+  # Ping-and-fix methodology settings
+  enable_ping_fix: true
+  real_time_guidance: true
+  continuous_feedback: true
+  
+  # TLDL (The Living Dev Log) settings
+  auto_create_tldl: true
+  tldl_template_path: "docs/tldl_template.yaml"
+  require_tldl_for_major_changes: true
+  
+  # Validation preferences
+  validation_timeout: 300  # seconds
+  auto_run_validation: true
+  fail_fast_on_critical: true
+  
+  # Open source workflow
+  encourage_community_contributions: true
+  suggest_mit_license_benefits: true
+  promote_fork_and_contribute: true
+
+# Code Quality Standards
+quality:
+  # Validation tool settings
+  enable_tldl_validation: true
+  enable_symbolic_linting: true
+  enable_debug_overlay_validation: true
+  enable_system_architecture_linting: true
+  
+  # Performance expectations
+  max_validation_time_ms: 200
+  max_template_operation_time_ms: 1000
+  
+  # Documentation requirements
+  require_docstrings: true
+  min_documentation_coverage: 50  # percentage
+
+# Console Commentary System
+console_commentary:
+  enable_session_based_workflow: true
+  enable_fuck_moment_tagging: true
+  enable_achievement_tagging: true
+  enable_auto_tldl_export: true
+  rolling_buffer_size: 200
+  default_session_name_pattern: "Session-{timestamp}"
+
+# Code Snapshot System
+code_snapshots:
+  # Jerry's genius preset system
+  presets:
+    tight:
+      before: 3
+      after: 3
+      description: "Syntax errors and focused debugging"
+    standard:
+      before: 10
+      after: 10
+      description: "Function-level context and logic flow"
+    wide:
+      before: 25
+      after: 25
+      description: "Architecture investigation and comprehensive analysis"
+  
+  default_preset: "standard"
+  max_lines_before: 50
+  max_lines_after: 50
+  default_output_format: "markdown"
+  supported_languages:
+    - python
+    - javascript
+    - typescript
+    - csharp
+    - cpp
+    - java
+    - go
+    - rust
+
+# TaskMaster System
+taskmaster:
+  enable_epic_organization: true
+  enable_time_tracking_integration: true
+  enable_auto_tldl_generation: true
+  
+  # Priority system (Jerry's 5-level system)
+  priorities:
+    - name: "LOW"
+      value: 1
+      emoji: "📝"
+    - name: "MEDIUM" 
+      value: 2
+      emoji: "📋"
+    - name: "HIGH"
+      value: 3
+      emoji: "🔥"
+    - name: "CRITICAL"
+      value: 4
+      emoji: "🚨"
+    - name: "LEGENDARY"
+      value: 5
+      emoji: "🏆"
+      description: "Jerry's special category for revolutionary features"
+
+# Time Tracking (Chronas)
+chronas:
+  enable_session_persistence: true
+  enable_crash_recovery: true
+  enable_multi_project_tracking: true
+  enable_professional_timesheets: true
+  
+  default_category: "development"
+  timesheet_format: "markdown"
+  auto_save_interval_minutes: 5
+
+# CI/CD Integration
+ci_cd:
+  # Workflow optimizations
+  enable_concurrency_controls: true
+  enable_path_based_filtering: true
+  enable_intelligent_caching: true
+  
+  # Jerry's guarded pass system
+  enable_guarded_pass_system: true
+  enable_buttsafe_certification: true
+  enable_advisory_job_routing: true
+  
+  # Performance targets
+  target_validation_time_ms: 200
+  target_full_pipeline_minutes: 5
+  
+  # Security settings
+  enable_security_scanning: true
+  enable_dependency_scanning: true
+  enable_secrets_scanning: true
+
+# Documentation Standards
+documentation:
+  # TLDL requirements
+  require_entry_id_format: true
+  require_metadata_sections: true
+  require_wwwwwh_methodology: true  # What, Why, When, Where, Who, How
+  
+  # Quality thresholds
+  min_health_score: 70
+  require_readme: true
+  require_contributing_guide: true
+  require_license_file: true
+  
+  # Link validation
+  validate_internal_links: true
+  validate_external_links: false  # Can be slow, disabled by default
+  
+  # Open source documentation
+  emphasize_mit_license: true
+  encourage_attribution: true
+  promote_community_benefits: true
+
+# Template Customization
+customization:
+  # Branding
+  enable_custom_emojis: true
+  enable_custom_terminology: true
+  enable_custom_achievement_messages: true
+  
+  # Workflow adaptation
+  enable_framework_specific_helpers: true
+  enable_ide_specific_configurations: true
+  
+  # Project-specific settings
+  project_type: "general"  # Options: web, mobile, desktop, library, template
+  primary_language: "python"
+  framework: "none"  # Will be auto-detected or manually set
+  
+  # Open source settings
+  default_license: "MIT"
+  encourage_github_template_usage: true
+  suggest_community_features: true
+
+# Feature Flags
+features:
+  # Core features (always enabled)
+  enable_tldl_system: true
+  enable_validation_suite: true
+  enable_console_commentary: true
+  enable_code_snapshots: true
+  
+  # Optional features
+  enable_taskmaster: true
+  enable_chronas: true
+  enable_security_workflows: true
+  enable_docs_validation: true
+  
+  # Experimental features
+  enable_ai_powered_insights: false
+  enable_automatic_documentation: false
+  enable_predictive_debugging: false
+  
+  # Open source features
+  enable_mit_license_promotion: true
+  enable_community_contribution_suggestions: true
+  enable_fork_encouragement: true
+
+# Environment Configuration
+environment:
+  # Development
+  development:
+    verbose_logging: true
+    enable_debug_output: true
+    validation_timeout_multiplier: 2.0
+  
+  # Production
+  production:
+    verbose_logging: false
+    enable_debug_output: false
+    validation_timeout_multiplier: 1.0
+  
+  # CI/CD
+  ci:
+    verbose_logging: true
+    enable_debug_output: false
+    validation_timeout_multiplier: 1.5
+    enable_artifact_uploads: true
+
+# Legacy Support
+legacy:
+  # Support for older versions
+  support_python_3_8: false
+  support_node_14: false
+  
+  # Migration helpers
+  enable_migration_warnings: true
+  enable_deprecation_notices: true
+
+# Advanced Configuration
+advanced:
+  # Performance tuning
+  enable_performance_monitoring: true
+  enable_execution_timing: true
+  cache_validation_results: true
+  
+  # Memory management
+  max_memory_usage_mb: 500
+  enable_garbage_collection: true
+  
+  # Debugging
+  enable_stack_traces: true
+  enable_detailed_error_messages: true
+  log_level: "INFO"  # OPTIONS: DEBUG, INFO, WARNING, ERROR
+
+# Integration Settings
+integrations:
+  # GitHub
+  github:
+    enable_issue_creation: true
+    enable_pr_automation: true
+    enable_status_checks: true
+    promote_template_button: true
+    encourage_starring: true
+  
+  # IDE Integration
+  vscode:
+    enable_extension_recommendations: true
+    enable_task_integration: true
+    enable_debug_configurations: true
+  
+  # External Tools
+  external:
+    enable_jira_integration: false
+    enable_slack_notifications: false
+    enable_discord_webhooks: false
+
+# Community and Open Source
+community:
+  # MIT License promotion
+  emphasize_freedom: true
+  highlight_commercial_use: true
+  promote_educational_use: true
+  
+  # Community building
+  encourage_contributions: true
+  suggest_issue_reporting: true
+  promote_discussions: true
+  celebrate_contributors: true
+  
+  # Attribution (optional but encouraged)
+  suggest_jerry_attribution: true
+  reference_metvandam_origin: true
+  promote_tiny_walnut_games: true
+
+---
+
+# Template Metadata
+template:
+  version: "2.0.0"
+  created_by: "Jerry Meyer (Tiny Walnut Games)"
+  based_on: "MetVanDAMN debugging innovations"
+  last_updated: "2025-01-15"
+  compatibility: "Universal (all platforms)"
+  license: "MIT"
+  
+  # Attribution
+  credits:
+    original_innovations: "Jerry Meyer (@jmeyer1980)"
+    template_transformation: "GitHub Copilot (Bootstrap Sentinel)"
+    inspiration: "MetVanDAMN procedural generation engine"
+  
+  # Support
+  support:
+    documentation: "README.md"
+    issues: "https://github.com/living-dev-agent-template/issues"
+    discussions: "https://github.com/living-dev-agent-template/discussions"
+    contributing: "CONTRIBUTING.md"
+    license: "LICENSE"
+  
+  # Open Source Benefits
+  benefits:
+    - "Free for commercial use"
+    - "No attribution required (but appreciated)"
+    - "Maximum adoption potential"
+    - "Educational friendly"
+    - "Community driven improvements"
+    - "Industry transformation through sharing"

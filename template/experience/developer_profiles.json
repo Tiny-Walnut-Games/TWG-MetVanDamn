@@ -1,0 +1,109 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-09-09T05:08:58.736469",
+  "profiles": {
+    "Bellok": {
+      "developer_name": "Bellok",
+      "total_xp": 410,
+      "level": 1,
+      "title": "🌱 Seedling Apprentice",
+      "copilot_coins": 118,
+      "contributions": [
+        {
+          "contribution_id": "1b181028",
+          "developer_name": "Bellok",
+          "contribution_type": "architecture",
+          "quality_level": "epic",
+          "description": "Git commit: Add cross-platform XP system integration with Windows/macOS/Linux support and VS Code/Unity/Rider/Vi...",
+          "files_affected": [
+            "template/src/DeveloperExperience/cross_platform_integration.py"
+          ],
+          "timestamp": "2025-09-01T14:53:57.332448",
+          "base_xp": 100,
+          "quality_multiplier": 2.0,
+          "total_xp": 200,
+          "coins_earned": 60,
+          "metrics": {
+            "files_changed": 1,
+            "commit_hash": "132832d9",
+            "message_length": 123,
+            "lines_added": 874,
+            "lines_deleted": 0,
+            "net_lines": 874
+          }
+        },
+        {
+          "contribution_id": "4f3c9d0e",
+          "developer_name": "Bellok",
+          "contribution_type": "test_coverage",
+          "quality_level": "good",
+          "description": "Git commit: Test automatic XP tracking on Windows - should award XP for this commit...",
+          "files_affected": [],
+          "timestamp": "2025-09-01T14:54:55.784709",
+          "base_xp": 60,
+          "quality_multiplier": 1.0,
+          "total_xp": 60,
+          "coins_earned": 18,
+          "metrics": {
+            "files_changed": 0,
+            "commit_hash": "a03c1a35",
+            "message_length": 71
+          }
+        },
+        {
+          "contribution_id": "b1ed6c7a",
+          "developer_name": "Bellok",
+          "contribution_type": "debugging_session",
+          "quality_level": "epic",
+          "description": "Git commit: 🎉 Fix entity duplication in scene setup tests\n\n- Fixed double entity creation by introducing SetupTe...",
+          "files_affected": [
+            "Assets/MetVanDAMN/Authoring/Tests/SceneSetupIntegrationTests.cs",
+            "Assets/MetVanDAMN/Authoring/Tests/SmokeTestSceneSetupTests.cs",
+            "Assets/debug/EntityDebugDisplay.cs",
+            "Packages/com.tinywalnutgames.metvd.samples/Runtime/SmokeTestSceneSetup.cs"
+          ],
+          "timestamp": "2025-09-09T05:08:58.736062",
+          "base_xp": 75,
+          "quality_multiplier": 2.0,
+          "total_xp": 150,
+          "coins_earned": 40,
+          "metrics": {
+            "files_changed": 4,
+            "commit_hash": "0ec7b8f9",
+            "message_length": 509,
+            "lines_added": 209,
+            "lines_deleted": 18,
+            "net_lines": 191
+          }
+        }
+      ],
+      "achievements": [
+        {
+          "achievement_id": "first_steps",
+          "name": "First Steps",
+          "description": "Made your first contribution to the codebase",
+          "emoji": "👶",
+          "badge_color": "green",
+          "date_earned": "2025-09-01T14:53:57.332680",
+          "contribution_id": "1b181028",
+          "faculty_signature": "🧙‍♂️ Bootstrap Sentinel"
+        },
+        {
+          "achievement_id": "system_architect",
+          "name": "System Architect",
+          "description": "Contributed to system architecture",
+          "emoji": "🏗️",
+          "badge_color": "silver",
+          "date_earned": "2025-09-01T14:53:57.332695",
+          "contribution_id": "1b181028",
+          "faculty_signature": "🏗️ System Design Oracle"
+        }
+      ],
+      "faculty_badges": [
+        "📝 Console Commentary Sage"
+      ],
+      "created_date": "2025-09-01T14:53:57.332488",
+      "last_active": "2025-09-09T05:08:58.736080"
+    }
+  }
+}
