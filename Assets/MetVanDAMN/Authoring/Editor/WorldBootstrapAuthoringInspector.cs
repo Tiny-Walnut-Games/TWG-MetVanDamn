@@ -2,6 +2,7 @@
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
+using Unity.Entities;
 
 namespace TinyWalnutGames.MetVD.Authoring.Editor
 	{
@@ -163,6 +164,59 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			EditorGUILayout.EndHorizontal();
 
+			// Runtime Regeneration Controls (only show during play mode)
+			if (Application.isPlaying)
+				{
+				EditorGUILayout.Space(10);
+				EditorGUILayout.LabelField("🎮 Runtime Regeneration", EditorStyles.boldLabel);
+
+				EditorGUILayout.BeginHorizontal();
+
+				// Full randomization button
+				GUI.backgroundColor = new Color(1.0f, 0.8f, 0.8f); // Light red
+				if (GUILayout.Button("🎲 FULL Random", GUILayout.Height(35)))
+					{
+					PerformFullRandomRegeneration(bootstrap);
+					}
+
+				// Partial randomization button
+				GUI.backgroundColor = new Color(0.8f, 1.0f, 0.8f); // Light green
+				if (GUILayout.Button("🔄 Partial Random", GUILayout.Height(35)))
+					{
+					PerformPartialRandomRegeneration(bootstrap);
+					}
+
+				GUI.backgroundColor = Color.white;
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.Space(5);
+
+				EditorGUILayout.BeginHorizontal();
+				GUI.backgroundColor = new Color(0.9f, 0.9f, 1.0f); // Light blue
+				if (GUILayout.Button("🔨 Regenerate Current", GUILayout.Height(30)))
+					{
+					RegenerateWithCurrentSettings(bootstrap);
+					}
+
+				GUI.backgroundColor = new Color(1.0f, 1.0f, 0.8f); // Light yellow
+				if (GUILayout.Button("🎯 New Random Seed", GUILayout.Height(30)))
+					{
+					GenerateNewRandomSeed(bootstrap);
+					}
+
+				GUI.backgroundColor = Color.white;
+				EditorGUILayout.EndHorizontal();
+
+				EditorGUILayout.Space(5);
+				EditorGUILayout.HelpBox(
+					"🎮 RUNTIME CONTROLS:\n" +
+					"FULL Random: Completely different world (all parameters randomized)\n" +
+					"Partial Random: Same structure, randomized details\n" +
+					"Regenerate Current: Same exact settings for testing\n" +
+					"New Random Seed: Keep settings, change seed only",
+					MessageType.Info);
+				}
+
 			if (_hasPreviewData)
 				{
 				EditorGUILayout.Space(5);
@@ -223,6 +277,118 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				EditorUtility.SetDirty(bootstrap);
 				}
 			}
+
+		#region Runtime Regeneration Methods
+
+		private void PerformFullRandomRegeneration(WorldBootstrapAuthoring bootstrap)
+			{
+			if (!Application.isPlaying) return;
+
+			Debug.Log("🎲 FULL Random Regeneration: Randomizing ALL parameters");
+
+			// Randomize all range-based parameters
+			var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.Millisecond);
+
+			// Randomize seed
+			bootstrap.seed = random.NextInt(1, 999999);
+
+			// Randomize world size (using int2 not Vector2Int)
+			bootstrap.worldSize = new int2(random.NextInt(30, 100), random.NextInt(30, 100));
+
+			// Randomize biome count
+			bootstrap.biomeCount = new Vector2Int(random.NextInt(2, 6), random.NextInt(4, 8));
+
+			// Randomize district count
+			bootstrap.districtCount = new Vector2Int(random.NextInt(1, 4), random.NextInt(3, 8));
+
+			// Randomize sectors per district
+			bootstrap.sectorsPerDistrict = new Vector2Int(random.NextInt(1, 3), random.NextInt(2, 6));
+
+			// Randomize rooms per sector
+			bootstrap.roomsPerSector = new Vector2Int(random.NextInt(1, 4), random.NextInt(3, 8));
+
+			// Randomize float parameters
+			bootstrap.biomeWeight = random.NextFloat(0.1f, 2.0f);
+			bootstrap.districtMinDistance = random.NextFloat(5f, 50f);
+			bootstrap.districtWeight = random.NextFloat(0.1f, 2.0f);
+
+			EditorUtility.SetDirty(bootstrap);
+			TriggerWorldRegeneration(bootstrap, "FULL_RANDOM");
+			}
+
+		private void PerformPartialRandomRegeneration(WorldBootstrapAuthoring bootstrap)
+			{
+			if (!Application.isPlaying) return;
+
+			Debug.Log("🔄 Partial Random Regeneration: Keeping structure, randomizing details");
+
+			// Only randomize seed and minor parameters while preserving structure
+			var random = new Unity.Mathematics.Random((uint)System.DateTime.Now.Millisecond);
+
+			// Change seed for different generation while keeping settings
+			bootstrap.seed = random.NextInt(1, 999999);
+
+			// Slightly adjust range parameters (±1 within reasonable bounds)
+			bootstrap.roomsPerSector = new Vector2Int(
+				Mathf.Max(1, bootstrap.roomsPerSector.x + random.NextInt(-1, 2)),
+				Mathf.Max(bootstrap.roomsPerSector.x + 1, bootstrap.roomsPerSector.y + random.NextInt(-1, 2))
+			);
+
+			bootstrap.sectorsPerDistrict = new Vector2Int(
+				Mathf.Max(1, bootstrap.sectorsPerDistrict.x + random.NextInt(-1, 2)),
+				Mathf.Max(bootstrap.sectorsPerDistrict.x + 1, bootstrap.sectorsPerDistrict.y + random.NextInt(-1, 2))
+			);
+
+			EditorUtility.SetDirty(bootstrap);
+			TriggerWorldRegeneration(bootstrap, "PARTIAL_RANDOM");
+			}
+
+		private void RegenerateWithCurrentSettings(WorldBootstrapAuthoring bootstrap)
+			{
+			if (!Application.isPlaying) return;
+
+			Debug.Log("🔨 Regenerating with EXACT current settings for testing");
+			TriggerWorldRegeneration(bootstrap, "CURRENT_SETTINGS");
+			}
+
+		private void GenerateNewRandomSeed(WorldBootstrapAuthoring bootstrap)
+			{
+			if (!Application.isPlaying) return;
+
+			int newSeed = UnityEngine.Random.Range(1, 999999);
+			bootstrap.seed = newSeed;
+			EditorUtility.SetDirty(bootstrap);
+
+			Debug.Log($"🎯 New Random Seed Generated: {newSeed}");
+			TriggerWorldRegeneration(bootstrap, "NEW_SEED");
+			}
+
+		private void TriggerWorldRegeneration(WorldBootstrapAuthoring bootstrap, string regenerationType)
+			{
+			try
+				{
+				Debug.Log($"🔄 Triggering world regeneration: {regenerationType} with seed {bootstrap.seed}");
+
+				// Simple approach: disable and re-enable the GameObject
+				// This triggers the authoring conversion process again
+				bootstrap.gameObject.SetActive(false);
+				EditorApplication.delayCall += () =>
+					{
+						if (bootstrap != null && bootstrap.gameObject != null)
+							{
+							bootstrap.gameObject.SetActive(true);
+							Debug.Log($"✅ World regeneration completed: {regenerationType}");
+							}
+					};
+				}
+			catch (System.Exception ex)
+				{
+				Debug.LogError($"World regeneration failed: {ex.Message}");
+				Debug.LogError($"Stack trace: {ex.StackTrace}");
+				}
+			}
+
+		#endregion
 
 		private void OnSceneGUI()
 			{

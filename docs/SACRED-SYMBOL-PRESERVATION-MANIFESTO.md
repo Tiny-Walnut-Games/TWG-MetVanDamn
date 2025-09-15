@@ -2,6 +2,7 @@
 ## The MetVanDAMN Code of Creative Honor
 
 **BY THE POWER OF UTC 2025-08-29 11:57:37, LET IT BE KNOWN:**
+MetVanDAMN is a customer facing product that relies on complex Unity ECS code. To preserve the integrity of our codebase and ensure future maintainability, we hereby establish the following sacred commandments regarding symbol preservation. And promise to treat this project as if our own butt depends on it. Because it does. 100% CPU based implementation success rate or bust. GPU stuff can shoot for >95% as not all hardware is the same.
 
 ### 🚫 THE FORBIDDEN ACTS
 **Thou Shalt NOT:**

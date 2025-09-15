@@ -641,13 +641,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// 🎯 DEBUG INTELLIGENCE: Add coordinate text for spatial awareness
 			var textGO = new GameObject("CoordinateLabel");
-			textGO.transform.SetParent(visual.transform);
-			// @jmeyer1980: ⚠ Fix/Upgrade ⚠ - I changed this:
-			//
-			// textGO.transform.localPosition = Vector3.up * 0.5f;
-			// textGO.transform.localRotation = Quaternion.Euler(90, 0, 0);
-			//
-			// to this for better control...
+			textGO.transform.SetParent(parent.transform); // 🔧 FIX: Parent to district (not visual) to avoid scale inheritance
 			textGO.transform.SetLocalPositionAndRotation(Vector3.up * 0.5f, Quaternion.Euler(90, 0, 0));
 
 			// 🧙‍♂️ SPATIAL DEBUGGING AID: Visual coordinate confirmation
@@ -656,6 +650,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			textMesh.fontSize = 8;
 			textMesh.color = Color.white;
 			textMesh.anchor = TextAnchor.MiddleCenter;
+			// 🔧 FIX: Ensure normal scale for text readability (no .5x5x.5 nonsense!)
+			textGO.transform.localScale = Vector3.one;
 			}
 
 		private static void CreateSampleConnections()

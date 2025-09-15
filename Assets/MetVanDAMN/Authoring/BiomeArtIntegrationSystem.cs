@@ -378,7 +378,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 							}
 
 						int2 neighborPos = coordinates + new int2(dx, dy);
-						connectivityData [ index ] = DetermineBiomeConnectionStrength(neighborPos, coordinates);
+						connectivityData[index] = DetermineBiomeConnectionStrength(neighborPos, coordinates);
 						index++;
 						}
 					}
@@ -459,7 +459,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Calculate both simple average and weighted clustering metrics
 			for (int i = 0; i < connectivityData.Length; i++)
 				{
-				float connection = connectivityData [ i ];
+				float connection = connectivityData[i];
 				totalConnections += connection;
 
 				// Weight connections based on their strength and position in the pattern
@@ -567,7 +567,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Grid-based accessibility (for tile-by-tile movement)
 			float gridAccessibility = 1f / (1f + manhattanDistance * 0.2f);
 
-			// Direct line accessibility (for flying/teleporting entities)  
+			// Direct line accessibility (for flying/teleporting entities)
 			float directAccessibility = 1f / (1f + euclideanDistance * 0.3f);
 
 			// Combine based on movement types expected in this biome
@@ -642,15 +642,15 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 					// If this entity has a BiomeTransition component, ensure transition tiles are applied
 					if (em.HasComponent<BiomeTransition>(entity))
-					{
+						{
 						var transition = em.GetComponentData<BiomeTransition>(entity);
 						if (!transition.TransitionTilesApplied)
-						{
+							{
 							// Minimal safe action: mark the transition as applied via ECB so tests can observe it
 							transition.TransitionTilesApplied = true;
 							ecb.SetComponent(entity, transition);
+							}
 						}
-					}
 
 				}).Run();
 			}
@@ -711,7 +711,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 					// Place prop
 					int propIndex = rng.Next(0, settings.propPrefabs.Length);
-					GameObject propPrefab = settings.propPrefabs [ propIndex ];
+					GameObject propPrefab = settings.propPrefabs[propIndex];
 					if (propPrefab == null)
 						{
 						continue;
@@ -745,10 +745,10 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private Grid CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
 			{
 			// Get appropriate layer configuration based on projection type
-			string [ ] layerNames = GetLayerNamesForProjection(projectionType);
+			string[] layerNames = GetLayerNamesForProjection(projectionType);
 
 			// Create grid with appropriate projection settings (factory methods are void; capture before/after set)
-			Grid [ ] existing = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
+			Grid[] existing = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
 			HashSet<Grid> before = new(existing);
 			InvokeProjectionCreation(projectionType);
 			Grid createdGrid = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
@@ -763,9 +763,17 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			if (createdGrid != null)
 				{
-				// Use previously unused parameters nodeId + biome to position and label the grid meaningfully
-				var biomeCenter = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0f);
-				createdGrid.transform.position = biomeCenter; // Anchor grid at biome logical center
+				// 🔧 FIX: Position biome grid to match debug grid coordinate system
+				// Use same scaling logic as MetVDGizmoDrawer to align with debug visualization
+				// TODO: Load from MetVDGizmoSettings.asset instead of hardcoding
+				float gridCellSize = 11.38f; // From MetVDGizmoSettings.asset
+				Vector3 gridOriginOffset = Vector3.zero; // From MetVDGizmoSettings.asset
+				var biomeCenter = new Vector3(
+					nodeId.Coordinates.x * gridCellSize,
+					0f,
+					nodeId.Coordinates.y * gridCellSize
+				) + gridOriginOffset;
+				createdGrid.transform.position = biomeCenter; // Anchor grid at scaled biome position
 
 				createdGrid.name = string.IsNullOrEmpty(artProfile.biomeName)
 					? $"Biome Grid [{biome.Type}] ({projectionType}) @ {nodeId.Coordinates}" // include biome type + coords
@@ -795,16 +803,16 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return createdGrid;
 			}
 
-		private string [ ] GetLayerNamesForProjection(ProjectionType projectionType)
+		private string[] GetLayerNamesForProjection(ProjectionType projectionType)
 			{
 			// Define layer configurations directly instead of using Editor-only enums
 			return projectionType switch
 				{
-					ProjectionType.Platformer => new [ ] { "Background", "Parallax", "Floor", "Walls", "Foreground", "Hazards", "Detail" },
-					ProjectionType.TopDown => new [ ] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-					ProjectionType.Isometric => new [ ] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-					ProjectionType.Hexagonal => new [ ] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-					_ => new [ ] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" }
+					ProjectionType.Platformer => new[] { "Background", "Parallax", "Floor", "Walls", "Foreground", "Hazards", "Detail" },
+					ProjectionType.TopDown => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+					ProjectionType.Isometric => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+					ProjectionType.Hexagonal => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+					_ => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" }
 					};
 			}
 
@@ -846,11 +854,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 			gridGO.transform.position = Vector3.zero;
 
 			// Create tilemap layers for this grid
-			string [ ] layerNames = GetLayerNamesForProjection(projectionType);
+			string[] layerNames = GetLayerNamesForProjection(projectionType);
 			for (int i = 0; i < layerNames.Length; i++)
 				{
 				int flippedZ = layerNames.Length - 1 - i;
-				CreateTilemapLayer(gridGO.transform, layerNames [ i ], flippedZ);
+				CreateTilemapLayer(gridGO.transform, layerNames[i], flippedZ);
 				}
 			}
 
@@ -869,7 +877,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			renderer.sortingOrder = 0;
 			}
 
-		private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string [ ] layerNames, Grid grid)
+		private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string[] layerNames, Grid grid)
 			{
 			if (grid == null)
 				{
@@ -969,7 +977,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = artProfile.checkerSettings.ToComplexitySettings();
 
 			// Apply checkered override to all tilemap layers in the grid
-			Tilemap [ ] tilemaps = grid.GetComponentsInChildren<Tilemap>(includeInactive: true);
+			Tilemap[] tilemaps = grid.GetComponentsInChildren<Tilemap>(includeInactive: true);
 			foreach (Tilemap tilemap in tilemaps)
 				{
 				// Each tilemap layer gets coordinate-aware material based on its purpose
@@ -1124,7 +1132,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Set coordinate-aware material properties
 			ApplyCoordinateBasedMaterialProperties(material, nodeId, complexitySettings);
 
-			_cachedBiomeMaterials [ biome ] = material;
+			_cachedBiomeMaterials[biome] = material;
 			return material;
 			}
 
@@ -1168,7 +1176,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			GenerateCoordinateInfluencedCheckerPattern(texture, primaryColor, secondaryColor, baseCheckerSize, coords, settings);
 
 			texture.Apply();
-			_cachedCheckerTextures [ textureKey ] = texture;
+			_cachedCheckerTextures[textureKey] = texture;
 			return texture;
 			}
 
@@ -1335,7 +1343,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				symmetryScore += 0.3f;
 				}
 
-			// Vertical symmetry  
+			// Vertical symmetry
 			if (coordinates.y == -coordinates.y)
 				{
 				symmetryScore += 0.3f;
@@ -1424,9 +1432,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private static float CalculateFibonacciCloseness(int number)
 			{
 			// Generate Fibonacci sequence up to reasonable limit
-			int [ ] fibonacci = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597 };
+			int[] fibonacci = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597 };
 
-			int closestFib = fibonacci [ 0 ];
+			int closestFib = fibonacci[0];
 			int minDistance = math.abs(number - closestFib);
 
 			foreach (int fib in fibonacci)
@@ -1765,15 +1773,15 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 
 			// Parse biome type from material name (format: "BiomeChecker_{BiomeType}_{x}_{y}")
-			string [ ] parts = materialName.Split('_');
-			return parts.Length >= 2 && System.Enum.TryParse(parts [ 1 ], out BiomeType biomeType) ? biomeType : BiomeType.Unknown;
+			string[] parts = materialName.Split('_');
+			return parts.Length >= 2 && System.Enum.TryParse(parts[1], out BiomeType biomeType) ? biomeType : BiomeType.Unknown;
 			}
 
 		/// <summary>
 		/// Custom hash code combination for .NET Framework 4.7.1 compatibility
 		/// Replaces System.HashCode.Combine which is not available in older framework versions
 		/// </summary>
-		private static int CombineHashCodes(params object [ ] values)
+		private static int CombineHashCodes(params object[] values)
 			{
 			unchecked
 				{

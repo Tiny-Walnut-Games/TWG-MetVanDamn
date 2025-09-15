@@ -15,7 +15,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		[Header("Room Generation Settings")]
 		[SerializeField] private readonly int roomWidth = 16;
 		[SerializeField] private readonly int roomHeight = 12;
-		[SerializeField] private RoomType roomType = RoomType.Normal;
+		[SerializeField] private Graph.RoomType roomType = Graph.RoomType.Normal;
 		[SerializeField] private BiomeType targetBiome = BiomeType.SolarPlains;
 		[SerializeField] private readonly bool useSkillGates = true;
 		[SerializeField] private readonly bool enableSecrets = true;
@@ -143,16 +143,16 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// <summary>
 		/// Determine the optimal generator based on the Best Fit Matrix
 		/// </summary>
-		private RoomGeneratorType DetermineOptimalGenerator(RoomType roomType, RectInt bounds, BiomeType biome)
+		private RoomGeneratorType DetermineOptimalGenerator(Graph.RoomType roomType, RectInt bounds, BiomeType biome)
 			{
 			float aspectRatio = (float)bounds.width / bounds.height;
 
 			// Apply Best Fit Matrix logic
 			return roomType switch
 				{
-					RoomType.Boss when useSkillGates => RoomGeneratorType.PatternDrivenModular,
-					RoomType.Treasure => RoomGeneratorType.ParametricChallenge,
-					RoomType.Save or RoomType.Shop or RoomType.Hub => RoomGeneratorType.WeightedTilePrefab,
+					Graph.RoomType.Boss when useSkillGates => RoomGeneratorType.PatternDrivenModular,
+					Graph.RoomType.Treasure => RoomGeneratorType.ParametricChallenge,
+					Graph.RoomType.Save or Graph.RoomType.Shop or Graph.RoomType.Hub => RoomGeneratorType.WeightedTilePrefab,
 					_ when IsSkyBiome(biome) => RoomGeneratorType.LayeredPlatformCloud,
 					_ when IsTerrainBiome(biome) => RoomGeneratorType.BiomeWeightedHeightmap,
 					_ when aspectRatio > 1.5f => RoomGeneratorType.LinearBranchingCorridor,
@@ -279,7 +279,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		private RoomNavigationData CreateNavigationData(RectInt bounds)
 			{
 			var primaryEntrance = new int2(bounds.x + 1, bounds.y + 1);
-			bool isCriticalPath = roomType is RoomType.Boss or RoomType.Entrance or RoomType.Exit;
+			bool isCriticalPath = roomType is Graph.RoomType.Boss or Graph.RoomType.Entrance or Graph.RoomType.Exit;
 			float traversalTime = CalculateTraversalTime(bounds);
 
 			return new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime);
@@ -294,9 +294,9 @@ namespace TinyWalnutGames.MetVD.Samples
 
 			return roomType switch
 				{
-					RoomType.Boss => baseTime * 3.0f,      // Boss fights take longer
-					RoomType.Treasure => baseTime * 2.0f,  // Puzzle rooms take longer
-					RoomType.Save => baseTime * 0.5f,      // Safe rooms are quick
+					Graph.RoomType.Boss => baseTime * 3.0f,      // Boss fights take longer
+					Graph.RoomType.Treasure => baseTime * 2.0f,  // Puzzle rooms take longer
+					Graph.RoomType.Save => baseTime * 0.5f,      // Safe rooms are quick
 					_ => baseTime
 					};
 			}
@@ -314,9 +314,9 @@ namespace TinyWalnutGames.MetVD.Samples
 			int area = roomWidth * roomHeight;
 			return roomType switch
 				{
-					RoomType.Treasure => math.max(2, area / 20),
-					RoomType.Normal => area / 40,
-					RoomType.Boss => 1,
+					Graph.RoomType.Treasure => math.max(2, area / 20),
+					Graph.RoomType.Normal => area / 40,
+					Graph.RoomType.Boss => 1,
 					_ => 0
 					};
 			}
@@ -350,24 +350,24 @@ namespace TinyWalnutGames.MetVD.Samples
 		[ContextMenu("Demo All Generator Types")]
 		public void DemoAllGeneratorTypes()
 			{
-			RoomType originalType = roomType;
+			Graph.RoomType originalType = roomType;
 			BiomeType originalBiome = targetBiome;
 
 			StartCoroutine(DemoGeneratorSequence(originalType, originalBiome));
 			}
 
-		private System.Collections.IEnumerator DemoGeneratorSequence(RoomType originalType, BiomeType originalBiome)
+		private System.Collections.IEnumerator DemoGeneratorSequence(Graph.RoomType originalType, BiomeType originalBiome)
 			{
-			(RoomType, BiomeType, string) [ ] generatorTypes = new [ ]
+			(Graph.RoomType, BiomeType, string)[] generatorTypes = new[]
 			{
-				(RoomType.Boss, BiomeType.VolcanicCore, "Pattern-Driven Modular - Skill Challenges"),
-				(RoomType.Treasure, BiomeType.CrystalCaverns, "Parametric Challenge - Jump Testing"),
-				(RoomType.Normal, BiomeType.HubArea, "Weighted Tile/Prefab - Standard Platforming"),
-				(RoomType.Normal, BiomeType.SkyGardens, "Layered Platform/Cloud - Sky Biome"),
-				(RoomType.Normal, BiomeType.SolarPlains, "Biome-Weighted Heightmap - Terrain")
+				(Graph.RoomType.Boss, BiomeType.VolcanicCore, "Pattern-Driven Modular - Skill Challenges"),
+				(Graph.RoomType.Treasure, BiomeType.CrystalCaverns, "Parametric Challenge - Jump Testing"),
+				(Graph.RoomType.Normal, BiomeType.HubArea, "Weighted Tile/Prefab - Standard Platforming"),
+				(Graph.RoomType.Normal, BiomeType.SkyGardens, "Layered Platform/Cloud - Sky Biome"),
+				(Graph.RoomType.Normal, BiomeType.SolarPlains, "Biome-Weighted Heightmap - Terrain")
 			};
 
-			foreach ((RoomType type, BiomeType biome, string description) in generatorTypes)
+			foreach ((Graph.RoomType type, BiomeType biome, string description) in generatorTypes)
 				{
 				roomType = type;
 				targetBiome = biome;

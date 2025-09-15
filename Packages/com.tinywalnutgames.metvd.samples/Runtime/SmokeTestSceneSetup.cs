@@ -208,6 +208,9 @@ namespace TinyWalnutGames.MetVD.Samples
 			EntityManager.AddBuffer<WfcCandidateBufferElement>(hubEntity);
 			EntityManager.AddBuffer<ConnectionBufferElement>(hubEntity);
 
+			// Create rooms for hub district
+			CreateRoomsForDistrict(hubEntity, int2.zero, 0);
+
 			int districtId = 1;
 			int districtsCreated = 0;
 			int halfGrid = gridSize / 2;
@@ -224,11 +227,12 @@ namespace TinyWalnutGames.MetVD.Samples
 					Entity districtEntity = EntityManager.CreateEntity();
 					EntityManager.SetName(districtEntity, $"District_{x}_{y}");
 
+					var coordinates = new int2(x * 10, y * 10);
 					EntityManager.AddComponentData(districtEntity, new NodeId
 						{
-						Coordinates = new int2(x * 10, y * 10),
+						Coordinates = coordinates,
 						Level = (byte)(math.abs(x) + math.abs(y)),
-						_value = (uint)districtId++,
+						_value = (uint)districtId,
 						ParentId = 0
 						});
 
@@ -238,6 +242,10 @@ namespace TinyWalnutGames.MetVD.Samples
 					EntityManager.AddComponentData(districtEntity, new SectorRefinementData(0.3f));
 					EntityManager.AddBuffer<GateConditionBufferElement>(districtEntity);
 
+					// Create rooms for this district
+					CreateRoomsForDistrict(districtEntity, coordinates, districtId);
+
+					districtId++;
 					districtsCreated++;
 					}
 				}
@@ -254,6 +262,65 @@ namespace TinyWalnutGames.MetVD.Samples
 			CreatePolarityField(Polarity.Moon, new float2(-15, -15), "MoonField");
 			CreatePolarityField(Polarity.Heat, new float2(15, -15), "HeatField");
 			CreatePolarityField(Polarity.Cold, new float2(-15, 15), "ColdField");
+			}
+
+		/// <summary>
+		/// Creates room entities within a district for demonstration purposes
+		/// Each district gets 2-6 rooms arranged in a small grid pattern
+		/// </summary>
+		private void CreateRoomsForDistrict(Entity districtEntity, int2 districtCenter, int districtId)
+			{
+			var random = new Unity.Mathematics.Random(worldSeed + (uint)districtId + 1000u);
+			int roomCount = random.NextInt(2, 7); // 2-6 rooms per district
+
+			// Arrange rooms in a small grid around the district center
+			int roomGridSize = (int)math.ceil(math.sqrt(roomCount));
+			float roomSpacing = 3f; // Spacing between rooms
+			float halfSpread = (roomGridSize - 1) * roomSpacing * 0.5f;
+
+			int roomsCreated = 0;
+			for (int x = 0; x < roomGridSize && roomsCreated < roomCount; x++)
+				{
+				for (int y = 0; y < roomGridSize && roomsCreated < roomCount; y++)
+					{
+					Entity roomEntity = EntityManager.CreateEntity();
+					string roomName = $"Room_{districtId}_{roomsCreated}";
+					EntityManager.SetName(roomEntity, roomName);
+
+					// Position room relative to district center
+					float2 roomOffset = new float2(
+						(x * roomSpacing) - halfSpread,
+						(y * roomSpacing) - halfSpread);
+					int2 roomCoordinates = districtCenter + (int2)roomOffset;
+
+					EntityManager.AddComponentData(roomEntity, new NodeId
+						{
+						Coordinates = roomCoordinates,
+						Level = 1, // Rooms are level 1 (districts are level 0)
+						_value = (uint)(districtId * 1000 + roomsCreated), // Unique room ID
+						ParentId = (uint)districtId // Reference parent district
+						});
+
+					EntityManager.AddComponentData(roomEntity, new WfcState());
+					EntityManager.AddBuffer<WfcCandidateBufferElement>(roomEntity);
+					EntityManager.AddBuffer<ConnectionBufferElement>(roomEntity);
+
+					// Add room-specific component for visual identification
+					EntityManager.AddComponentData(roomEntity, new RoomData
+						{
+						RoomType = (RoomType)(roomsCreated % 4), // Cycle through room types
+						Size = random.NextFloat(1.5f, 3.5f),
+						DistrictId = (uint)districtId
+						});
+
+					roomsCreated++;
+					}
+				}
+
+			if (logGenerationSteps)
+				{
+				Debug.Log($"Created {roomsCreated} rooms for district {districtId}");
+				}
 			}
 
 		private void CreatePolarityField(Polarity polarity, float2 center, string name)
@@ -278,10 +345,11 @@ namespace TinyWalnutGames.MetVD.Samples
 			{
 			if (logGenerationSteps)
 				{
-				Debug.Log("🎨 Creating visual representations for districts and polarity fields...");
+				Debug.Log("🎨 Creating visual representations for districts, rooms, and polarity fields...");
 				}
 
 			CreateDistrictVisuals();
+			CreateRoomVisuals();
 			CreatePolarityFieldVisuals();
 
 			if (logGenerationSteps)
@@ -299,6 +367,9 @@ namespace TinyWalnutGames.MetVD.Samples
 				{
 				NodeId nodeId = EntityManager.GetComponentData<NodeId>(entity);
 				string entityName = EntityManager.GetName(entity);
+
+				// Skip rooms (Level 1) - only show districts (Level 0)
+				if (nodeId.Level != 0) continue;
 
 				// Create a visual cube for each district
 				GameObject districtVisual = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -320,6 +391,53 @@ namespace TinyWalnutGames.MetVD.Samples
 
 				// Parent to this component's GameObject for organization
 				districtVisual.transform.SetParent(transform);
+				}
+
+			entities.Dispose();
+			}
+
+		private void CreateRoomVisuals()
+			{
+			using EntityQuery roomQuery = EntityManager.CreateEntityQuery(typeof(NodeId), typeof(RoomData));
+			var entities = roomQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+
+			foreach (Entity entity in entities)
+				{
+				NodeId nodeId = EntityManager.GetComponentData<NodeId>(entity);
+				RoomData roomData = EntityManager.GetComponentData<RoomData>(entity);
+				string entityName = EntityManager.GetName(entity);
+
+				// Create different shapes based on room type
+				GameObject roomVisual = roomData.RoomType switch
+					{
+						RoomType.Chamber => GameObject.CreatePrimitive(PrimitiveType.Cube),
+						RoomType.Corridor => GameObject.CreatePrimitive(PrimitiveType.Capsule),
+						RoomType.Hub => GameObject.CreatePrimitive(PrimitiveType.Sphere),
+						RoomType.Specialty => GameObject.CreatePrimitive(PrimitiveType.Cylinder),
+						_ => GameObject.CreatePrimitive(PrimitiveType.Cube)
+						};
+
+				roomVisual.name = $"Visual_{entityName}";
+				roomVisual.transform.position = new Vector3(nodeId.Coordinates.x, 0.5f, nodeId.Coordinates.y);
+				roomVisual.transform.localScale = Vector3.one * (roomData.Size * 0.5f); // Scale based on room size
+
+				// Color based on room type
+				Renderer renderer = roomVisual.GetComponent<Renderer>();
+				renderer.material.color = roomData.RoomType switch
+					{
+						RoomType.Chamber => Color.green,
+						RoomType.Corridor => Color.gray,
+						RoomType.Hub => Color.magenta,
+						RoomType.Specialty => Color.red,
+						_ => Color.white
+						};
+
+				// Make rooms slightly transparent to distinguish from districts
+				var color = renderer.material.color;
+				renderer.material.color = new Color(color.r, color.g, color.b, 0.8f);
+
+				// Parent to this component's GameObject for organization
+				roomVisual.transform.SetParent(transform);
 				}
 
 			entities.Dispose();
@@ -405,5 +523,27 @@ namespace TinyWalnutGames.MetVD.Samples
 		public float2 Center;
 		public float Radius;
 		public float Strength;
+		}
+
+	/// <summary>
+	/// Room data component for visual identification and debugging
+	/// Helps distinguish different room types in the generated world
+	/// </summary>
+	public struct RoomData : IComponentData
+		{
+		public RoomType RoomType;
+		public float Size;
+		public uint DistrictId;
+		}
+
+	/// <summary>
+	/// Types of rooms that can be generated for visual variety
+	/// </summary>
+	public enum RoomType : byte
+		{
+		Chamber = 0,
+		Corridor = 1,
+		Hub = 2,
+		Specialty = 3
 		}
 	}

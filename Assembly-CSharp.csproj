@@ -90,6 +90,7 @@
     <None Include="Assets\debug\TestResults_20250908_201740.xml" />
     <None Include="Assets\debug\TestResults_20250908_202844.xml" />
     <None Include="Assets\debug\DockerUnity.txt" />
+    <None Include="Assets\debug\TestResults_BiomeArt_20250909_141757.xml" />
     <None Include="Assets\debug\TestResults_Full_20250909_140323.xml" />
     <None Include="Assets\debug\TestResults_20250909_140154.xml" />
     <None Include="Assets\samvieten\Documentation\SAMVIETEN ASSETPACKS LICENSE.txt" />

@@ -1,9 +1,9 @@
 # TLDL Entry: NavLinkBufferElement Type Conflict Resolution
 
-**Date**: 2025-09-09  
-**Author**: GitHub Copilot + Jerry Meyer  
-**Tags**: `debugging`, `ECS`, `type-conflicts`, `pathfinding`, `NavLinkBufferElement`, `cheek-preservation`  
-**Status**: ✅ RESOLVED  
+**Date**: 2025-09-09
+**Author**: GitHub Copilot + Jerry Meyer
+**Tags**: `debugging`, `ECS`, `type-conflicts`, `pathfinding`, `NavLinkBufferElement`, `cheek-preservation`
+**Status**: ✅ RESOLVED
 
 ## 🐉 The Dragon We Slayed
 
