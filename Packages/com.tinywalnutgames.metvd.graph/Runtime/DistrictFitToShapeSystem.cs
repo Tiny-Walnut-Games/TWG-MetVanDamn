@@ -33,6 +33,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
             {
             if (_doneQ.IsEmptyIgnoreFilter == false) return;
+            if (_configQ.IsEmptyIgnoreFilter) return; // no world config yet
             var config = _configQ.GetSingleton<WorldConfiguration>();
             if (config.Flow != GenerationFlow.ShapeFirstOrganic) return;
             if (_shapeQ.IsEmptyIgnoreFilter) return;

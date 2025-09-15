@@ -42,8 +42,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
             EmitRequest("pickup_weapon", new float3(10, 0, 0));
             EmitRequest("setpiece_crashed_ship", new float3(20, 0, 0));
 
-            var sys = _world.GetOrCreateSystemManaged<SudoActionEcsConsumerSystem>();
-            sys.Update(_world.Unmanaged);
+            var sim = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            _world.GetOrCreateSystem<SudoActionEcsConsumerSystem>();
+            sim.Update();
 
             // Requests consumed
             Assert.AreEqual(0, _em.CreateEntityQuery(typeof(SudoActionRequest)).CalculateEntityCount());
@@ -55,7 +56,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
 
         private Entity MakePrefab<T>() where T : unmanaged, IComponentData
             {
-            var e = _em.CreateEntity(typeof(T), typeof(LocalTransform));
+            var e = _em.CreateEntity(typeof(T));
             _em.AddComponent<Prefab>(e);
             return e;
             }
@@ -72,7 +73,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
 
         private void AssertSpawned<T>() where T : unmanaged, IComponentData
             {
-            var q = _em.CreateEntityQuery(ComponentType.ReadOnly<T>(), ComponentType.ReadOnly<LocalTransform>());
+            var q = _em.CreateEntityQuery(ComponentType.ReadOnly<T>());
             var entities = q.ToEntityArray(Allocator.Temp);
             bool foundInstance = false;
             for (int i = 0; i < entities.Length; i++)

@@ -7,7 +7,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem;
+// using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem; // Removed cross-group ordering dependency
 // Disambiguate Biome component from potential namespace collisions
 using CoreBiome = TinyWalnutGames.MetVD.Core.Biome;
 
@@ -19,7 +19,6 @@ namespace TinyWalnutGames.MetVD.Authoring
 	/// Implements comprehensive pre-pass logic with advanced terrain analysis and spatial optimization
 	/// </summary>
 	[UpdateInGroup(typeof(PresentationSystemGroup))]
-	[UpdateAfter(typeof(BiomeFieldSystem))]
 	public partial struct BiomeArtIntegrationSystem : ISystem
 		{
 		private ComponentLookup<CoreBiome> biomeLookup;

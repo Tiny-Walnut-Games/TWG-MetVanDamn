@@ -22,12 +22,12 @@ namespace TinyWalnutGames.MetVD.Graph
             {
             _configQ = new EntityQueryBuilder(Allocator.Temp).WithAll<WorldConfiguration>().Build(ref state);
             _biasQ = new EntityQueryBuilder(Allocator.Temp).WithAll<WorldAspectBias>().Build(ref state);
-            state.RequireForUpdate(_configQ);
             }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
             {
+            if (_configQ.IsEmptyIgnoreFilter) return;
             var config = _configQ.GetSingleton<WorldConfiguration>();
             if (config.Flow != GenerationFlow.ShapeFirstOrganic)
                 {

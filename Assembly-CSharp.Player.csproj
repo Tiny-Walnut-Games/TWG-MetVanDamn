@@ -74,16 +74,51 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\debug\TestLifecycleDebug.cs" />
+    <Compile Include="Assets\MetVanDAMN\debug_enum_test.cs" />
+    <Compile Include="Assets\debug\EntityDebugDisplay.cs" />
     <Compile Include="Assets\debug\MetVanDAMNQuickStart.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\debug\TestResults_20250909_132704.xml" />
+    <None Include="Assets\debug\TestResults_20250909_140546.xml" />
+    <None Include="Assets\debug\TestResults_20250909_130008.xml" />
+    <None Include="Assets\debug\TestResults_20250908_203231.xml" />
+    <None Include="Assets\debug\TestResults_20250909_134905.xml" />
+    <None Include="Assets\debug\UnityConsoleLogs.txt" />
+    <None Include="Assets\debug\TestResults_20250909_115801.xml" />
+    <None Include="Assets\debug\TestResults_20250909_133228.xml" />
+    <None Include="Assets\debug\TestResults_20250908_203839.xml" />
+    <None Include="Assets\debug\TestResults_20250909_135534.xml" />
+    <None Include="Assets\debug\TestResults_20250908_193833.xml" />
+    <None Include="Assets\debug\TestResults_20250908_211041.xml" />
+    <None Include="Assets\debug\TestResults_20250909_133052.xml" />
+    <None Include="Assets\debug\TestResults_20250909_133820.xml" />
     <None Include="Assets\debug\Chronos Security Hardening Required.txt" />
+    <None Include="Assets\debug\TestResults_20250908_205548.xml" />
+    <None Include="Assets\debug\TestResults_20250909_125558.xml" />
+    <None Include="Assets\debug\TestResults_20250909_134620.xml" />
+    <None Include="Assets\debug\TestResults_20250909_134243.xml" />
     <None Include="Assets\Tiny Walnut Games\MetVanDAMN\Docs\TestResults.xml" />
+    <None Include="Assets\debug\TestResults_20250908_210611.xml" />
+    <None Include="Assets\debug\TestResults_20250908_201740.xml" />
+    <None Include="Assets\debug\TestResults_20250908_202844.xml" />
     <None Include="Assets\debug\DockerUnity.txt" />
+    <None Include="Assets\debug\TestResults_BiomeArt_20250909_141757.xml" />
+    <None Include="Assets\debug\TestResults_Full_20250909_140323.xml" />
+    <None Include="Assets\debug\TestResults_20250909_140154.xml" />
     <None Include="Assets\samvieten\Documentation\SAMVIETEN ASSETPACKS LICENSE.txt" />
+    <None Include="Assets\debug\TestResults_20250909_141034.xml" />
+    <None Include="Assets\debug\TestResults_20250908_195338.xml" />
+    <None Include="Assets\debug\TestResults_20250909_135408.xml" />
     <None Include="Assets\debug\TestResults_20250908_153812.xml" />
     <None Include="Assets\debug\TestResults_20250908_152729.xml" />
+    <None Include="Assets\debug\TestResults_20250909_045946.xml" />
+    <None Include="Assets\debug\TestResults_20250909_124816.xml" />
     <None Include="Assets\debug\TestResults_20250908_160527.xml" />
+    <None Include="Assets\debug\TestResults_20250909_115112.xml" />
+    <None Include="Assets\debug\TestResults_20250909_123425.xml" />
+    <None Include="Assets\debug\TestResults_20250909_140658.xml" />
+    <None Include="Assets\debug\TestResults_20250908_205201.xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

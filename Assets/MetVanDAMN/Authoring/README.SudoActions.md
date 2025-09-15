@@ -41,3 +41,20 @@ foreach (var (request, e) in SystemAPI.Query<RefRO<SudoActionRequest>>().WithEnt
 - Use multiple hints with different `ActionKey`s to drive separate systems.
 - Keep `ActionKey` short and stable to preserve determinism across versions.
 - One-off hints are tagged with `SudoActionDispatched` after emission to prevent re-emission.
+
+## SudoCode Snippets (Editor authoring → ECS at runtime)
+
+- Add `SudoCodeSnippetAuthoring` to any GameObject.
+- Enter commands in the `Code` field (TextArea). Supported commands:
+- `log <message>` → writes to console at init time
+- `spawn <key> [x y z]` → emits a `SudoActionRequest` with optional position
+- Set `RunOnce` if the snippet should execute a single time per scene load.
+- Example:
+
+```
+log Preparing debug markers
+spawn spawn_marker_waypoint 0 0 0
+spawn spawn_boss 12 0 0
+```
+
+This flows through the same ECS pipeline: snippet → `SudoActionRequest` → registry + consumer → entity prefab spawn.

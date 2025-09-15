@@ -82,7 +82,6 @@ namespace TinyWalnutGames.MetVD.Graph
 				.WithAll<RuleRandomizationDoneTag>()
 				.Build(ref state);
 
-			state.RequireForUpdate(_worldConfigQuery);
 			state.RequireForUpdate(_layoutDoneQuery);
 			}
 
@@ -101,6 +100,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return;
 				}
 
+			if (_worldConfigQuery.IsEmptyIgnoreFilter) return;
 			WorldConfiguration worldConfig = _worldConfigQuery.GetSingleton<WorldConfiguration>();
 			DistrictLayoutDoneTag layoutDone = _layoutDoneQuery.GetSingleton<DistrictLayoutDoneTag>();
 
@@ -184,7 +184,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			// Keep curated upgrades for reachability
 			uint curatedUpgrades = 0u;
 			curatedUpgrades |= 1u << 0; // Jump upgrade
-			curatedUpgrades |= 1u << 1; // Double jump  
+			curatedUpgrades |= 1u << 1; // Double jump
 			curatedUpgrades |= 1u << 2; // Dash
 			curatedUpgrades |= 1u << 3; // Wall jump
 

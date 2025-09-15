@@ -3,6 +3,11 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+#if UNITY_TRANSFORMS_LOCALTRANSFORM
+using TransformT = Unity.Transforms.LocalTransform;
+#else
+using TransformT = TinyWalnutGames.MetVD.Core.Compat.LocalTransformCompat;
+#endif
 
 namespace TinyWalnutGames.MetVD.Core
     {
@@ -19,26 +24,36 @@ namespace TinyWalnutGames.MetVD.Core
             _registry = state.GetEntityQuery(ComponentType.ReadOnly<EcsPrefabRegistry>(), ComponentType.ReadOnly<EcsPrefabEntry>());
             state.RequireForUpdate(_requests);
             state.RequireForUpdate(_registry);
+
+            // Auto-register into Simulation group for manually created worlds used in tests (Editor only)
+#if UNITY_EDITOR
+            var simGroup = state.World.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            simGroup.AddSystemToUpdateList(state.SystemHandle);
+#endif
             }
 
         public void OnUpdate(ref SystemState state)
             {
             var ecb = new EntityCommandBuffer(Allocator.Temp);
-            var registryEntity = _registry.GetSingletonEntity();
-            var entries = state.EntityManager.GetBuffer<EcsPrefabEntry>(registryEntity);
+            Entity registryEntity = _registry.GetSingletonEntity();
+            DynamicBuffer<EcsPrefabEntry> entries = state.EntityManager.GetBuffer<EcsPrefabEntry>(registryEntity);
 
-            foreach (var (reqRO, reqEntity) in SystemAPI.Query<RefRO<SudoActionRequest>>().WithEntityAccess())
+            foreach ((RefRO<SudoActionRequest> reqRO, Entity reqEntity) in SystemAPI.Query<RefRO<SudoActionRequest>>().WithEntityAccess())
                 {
-                var req = reqRO.ValueRO;
-                if (TryLookupPrefab(entries, req.ActionKey, out var prefab))
+                SudoActionRequest req = reqRO.ValueRO;
+                if (TryLookupPrefab(entries, req.ActionKey, out Entity prefab))
                     {
-                    var spawned = ecb.Instantiate(prefab);
-                    ecb.SetComponent(spawned, new LocalTransform
+                    Entity spawned = ecb.Instantiate(prefab);
+                    var t = new TransformT
                         {
                         Position = new float3(req.ResolvedPosition.x, req.ResolvedPosition.y, req.ResolvedPosition.z),
                         Rotation = quaternion.identity,
                         Scale = 1f
-                        });
+                        };
+                    if (state.EntityManager.HasComponent<TransformT>(prefab))
+                        ecb.SetComponent(spawned, t);
+                    else
+                        ecb.AddComponent(spawned, t);
                     }
                 // Always destroy the request to avoid reprocessing (even if no prefab found)
                 ecb.DestroyEntity(reqEntity);

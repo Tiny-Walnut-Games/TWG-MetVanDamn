@@ -14,7 +14,6 @@ namespace TinyWalnutGames.MetVD.Authoring
     /// </summary>
     [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
-    [UpdateBefore(typeof(BiomeArtIntegrationSystem))]
     public partial struct BiomeArtAutoAssignmentSystem : ISystem
         {
         private EntityQuery _libraryQ;

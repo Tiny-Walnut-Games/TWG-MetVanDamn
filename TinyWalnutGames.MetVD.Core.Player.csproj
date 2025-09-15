@@ -73,16 +73,24 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BiomeElevationMask.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\DistrictLayoutTags.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Connection.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\WorldBootstrapComponents.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\NavNode.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BossComponents.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BuildConnectionBuffersSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BiomeElevation.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Compat\LocalTransformCompat.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\NodeId.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Biome.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\ConnectionEdge.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\GateCondition.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BiomeElevationHint.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\SudoActionEcsConsumerSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\SpawnableTags.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\EcsPrefabRegistry.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\SudoActionComponents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\com.tinywalnutgames.metvd.core\Runtime\TinyWalnutGames.MetVD.Core.asmdef" />

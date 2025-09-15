@@ -1,0 +1,1253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="72" result="Failed(Child)" total="72" passed="71" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:32Z" duration="1.342279">
+  <test-suite type="TestSuite" id="1098" name="TWG-MetVanDamn" fullname="TWG-MetVanDamn" runstate="Runnable" testcasecount="72" result="Failed" site="Child" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:32Z" duration="1.342279" total="72" passed="71" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1015" name="TinyWalnutGames.MetVD.Core.Tests.dll" fullname="E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/ScriptAssemblies/TinyWalnutGames.MetVD.Core.Tests.dll" runstate="Runnable" testcasecount="12" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.485609" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="50828" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+      <test-suite type="TestSuite" id="1016" name="TinyWalnutGames" fullname="TinyWalnutGames" runstate="Runnable" testcasecount="12" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.419112" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+        <test-suite type="TestSuite" id="1017" name="MetVD" fullname="TinyWalnutGames.MetVD" runstate="Runnable" testcasecount="12" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.356791" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+          <test-suite type="TestSuite" id="1018" name="Tests" fullname="TinyWalnutGames.MetVD.Tests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.294329" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+            <test-suite type="TestFixture" id="1001" name="GateConditionTests" fullname="TinyWalnutGames.MetVD.Tests.GateConditionTests" classname="TinyWalnutGames.MetVD.Tests.GateConditionTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.167100" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              <test-case id="1008" name="AnyPolarityRequirement_PassesWithAny" fullname="TinyWalnutGames.MetVD.Tests.GateConditionTests.AnyPolarityRequirement_PassesWithAny" methodname="AnyPolarityRequirement_PassesWithAny" classname="TinyWalnutGames.MetVD.Tests.GateConditionTests" runstate="Runnable" seed="1028755523" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.014390" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1003" name="CanPass_ActiveHardGate_RequiresAll" fullname="TinyWalnutGames.MetVD.Tests.GateConditionTests.CanPass_ActiveHardGate_RequiresAll" methodname="CanPass_ActiveHardGate_RequiresAll" classname="TinyWalnutGames.MetVD.Tests.GateConditionTests" runstate="Runnable" seed="1587950995" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000865" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="CanPass_InactiveOrUnlocked_AlwaysTrue" fullname="TinyWalnutGames.MetVD.Tests.GateConditionTests.CanPass_InactiveOrUnlocked_AlwaysTrue" methodname="CanPass_InactiveOrUnlocked_AlwaysTrue" classname="TinyWalnutGames.MetVD.Tests.GateConditionTests" runstate="Runnable" seed="879397589" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000477" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1005" name="CanPass_SoftGate_BypassesWithSkill" fullname="TinyWalnutGames.MetVD.Tests.GateConditionTests.CanPass_SoftGate_BypassesWithSkill" methodname="CanPass_SoftGate_BypassesWithSkill" classname="TinyWalnutGames.MetVD.Tests.GateConditionTests" runstate="Runnable" seed="1827728406" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000408" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1006" name="CanPass_TrivialGate_EasyBypass" fullname="TinyWalnutGames.MetVD.Tests.GateConditionTests.CanPass_TrivialGate_EasyBypass" methodname="CanPass_TrivialGate_EasyBypass" classname="TinyWalnutGames.MetVD.Tests.GateConditionTests" runstate="Runnable" seed="175958561" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000370" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1007" name="GetMissingRequirements_ReturnsExpectedMasks" fullname="TinyWalnutGames.MetVD.Tests.GateConditionTests.GetMissingRequirements_ReturnsExpectedMasks" methodname="GetMissingRequirements_ReturnsExpectedMasks" classname="TinyWalnutGames.MetVD.Tests.GateConditionTests" runstate="Runnable" seed="1262532030" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.008941" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="Polarity_AllSinglePairs_FormExpectedDualMask" fullname="TinyWalnutGames.MetVD.Tests.GateConditionTests.Polarity_AllSinglePairs_FormExpectedDualMask" methodname="Polarity_AllSinglePairs_FormExpectedDualMask" classname="TinyWalnutGames.MetVD.Tests.GateConditionTests" runstate="Runnable" seed="2115144513" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000741" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1009" name="PolaritySystemTests" fullname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests" classname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.017492" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              <test-case id="1011" name="PolarityAny_ShouldOrAllPoles" fullname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests.PolarityAny_ShouldOrAllPoles" methodname="PolarityAny_ShouldOrAllPoles" classname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests" runstate="Runnable" seed="392921624" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.001603" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="PolarityBitmasks_DualPolarityGates_ShouldWorkCorrectly" fullname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests.PolarityBitmasks_DualPolarityGates_ShouldWorkCorrectly" methodname="PolarityBitmasks_DualPolarityGates_ShouldWorkCorrectly" classname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests" runstate="Runnable" seed="1592429649" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000326" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="PolarityEnum_NoCollisions_ShouldHaveUniqueValues" fullname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests.PolarityEnum_NoCollisions_ShouldHaveUniqueValues" methodname="PolarityEnum_NoCollisions_ShouldHaveUniqueValues" classname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests" runstate="Runnable" seed="532084496" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000369" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1013" name="PolarityMatching_SingleVsDualPoles_ShouldMatchCorrectly" fullname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests.PolarityMatching_SingleVsDualPoles_ShouldMatchCorrectly" methodname="PolarityMatching_SingleVsDualPoles_ShouldMatchCorrectly" classname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests" runstate="Runnable" seed="537274041" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000389" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1014" name="PolarityNone_ShouldBeZero" fullname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests.PolarityNone_ShouldBeZero" methodname="PolarityNone_ShouldBeZero" classname="TinyWalnutGames.MetVD.Tests.PolaritySystemTests" runstate="Runnable" seed="2016394494" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.000344" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1089" name="TinyWalnutGames.MetVD.Graph.Tests.dll" fullname="E:/Tiny_Walnut_Games/TWG-MetVanDamn/Library/ScriptAssemblies/TinyWalnutGames.MetVD.Graph.Tests.dll" runstate="Runnable" testcasecount="60" result="Failed" site="Child" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:32Z" duration="0.780033" total="60" passed="59" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="50828" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+      <test-suite type="TestSuite" id="1090" name="TinyWalnutGames" fullname="TinyWalnutGames" runstate="Runnable" testcasecount="60" result="Failed" site="Child" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:32Z" duration="0.768255" total="60" passed="59" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+        <test-suite type="TestSuite" id="1091" name="MetVD" fullname="TinyWalnutGames.MetVD" runstate="Runnable" testcasecount="60" result="Failed" site="Child" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:32Z" duration="0.751626" total="60" passed="59" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+          <test-suite type="TestSuite" id="1093" name="Graph" fullname="TinyWalnutGames.MetVD.Graph" runstate="Runnable" testcasecount="40" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:32Z" duration="0.469295" total="40" passed="40" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+            <test-suite type="TestSuite" id="1094" name="Tests" fullname="TinyWalnutGames.MetVD.Graph.Tests" runstate="Runnable" testcasecount="40" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:32Z" duration="0.454562" total="40" passed="40" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              <test-suite type="TestFixture" id="1044" name="DistrictSectorRoomFeaturesTests" fullname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" classname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.067780" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+                <test-case id="1045" name="DistrictLayoutSystem_RespectsTargetSectors" fullname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests.DistrictLayoutSystem_RespectsTargetSectors" methodname="DistrictLayoutSystem_RespectsTargetSectors" classname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" runstate="Runnable" seed="1013489922" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.032397" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1049" name="HierarchicalNodeIds_CreateUniqueIds" fullname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests.HierarchicalNodeIds_CreateUniqueIds" methodname="HierarchicalNodeIds_CreateUniqueIds" classname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" runstate="Runnable" seed="867448851" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.005770" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1050" name="RoomFeatures_SupportDifferentTypes" fullname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests.RoomFeatures_SupportDifferentTypes" methodname="RoomFeatures_SupportDifferentTypes" classname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" runstate="Runnable" seed="813733325" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.002639" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1047" name="RoomHierarchyData_SupportsDifferentRoomTypes" fullname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests.RoomHierarchyData_SupportsDifferentRoomTypes" methodname="RoomHierarchyData_SupportsDifferentRoomTypes" classname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" runstate="Runnable" seed="756771761" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.001597" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1048" name="RoomManagement_CreatesProperFeatures" fullname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests.RoomManagement_CreatesProperFeatures" methodname="RoomManagement_CreatesProperFeatures" classname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" runstate="Runnable" seed="1842948961" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.004276" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1046" name="SectorHierarchyData_CreatesProperlyStructuredSectors" fullname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests.SectorHierarchyData_CreatesProperlyStructuredSectors" methodname="SectorHierarchyData_CreatesProperlyStructuredSectors" classname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" runstate="Runnable" seed="726372081" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.001663" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1051" name="WorldConfiguration_TargetSectorsNowUsed" fullname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests.WorldConfiguration_TargetSectorsNowUsed" methodname="WorldConfiguration_TargetSectorsNowUsed" classname="TinyWalnutGames.MetVD.Graph.Tests.DistrictSectorRoomFeaturesTests" runstate="Runnable" seed="60638182" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.001462" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1052" name="ProceduralLayoutSystemTests" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.130128" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+                <test-case id="1053" name="DistrictLayoutSystem_WithUnplacedDistricts_ShouldAssignCoordinates" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests.DistrictLayoutSystem_WithUnplacedDistricts_ShouldAssignCoordinates" methodname="DistrictLayoutSystem_WithUnplacedDistricts_ShouldAssignCoordinates" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests" runstate="Runnable" seed="437277223" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.041472" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Initial coordinates: District1=int2(0, 0), District2=int2(0, 0)
+Final coordinates: District1=int2(24, 12), District2=int2(5, 24)
+DistrictLayoutDoneTag entities: 1
+Test result: District1 moved: True, District2 moved: True, Layout done created: True
+]]></output>
+                </test-case>
+                <test-case id="1056" name="RuleRandomizationSystem_WithFullMode_ShouldRandomizeEverything" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests.RuleRandomizationSystem_WithFullMode_ShouldRandomizeEverything" methodname="RuleRandomizationSystem_WithFullMode_ShouldRandomizeEverything" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests" runstate="Runnable" seed="455447884" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.018730" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA['TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+]]></output>
+                </test-case>
+                <test-case id="1057" name="RuleRandomizationSystem_WithNoneMode_ShouldUseCuratedRules" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests.RuleRandomizationSystem_WithNoneMode_ShouldUseCuratedRules" methodname="RuleRandomizationSystem_WithNoneMode_ShouldUseCuratedRules" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests" runstate="Runnable" seed="1281371977" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.007579" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA['TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+]]></output>
+                </test-case>
+                <test-case id="1055" name="RuleRandomizationSystem_WithPartialMode_ShouldRandomizeBiomes" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests.RuleRandomizationSystem_WithPartialMode_ShouldRandomizeBiomes" methodname="RuleRandomizationSystem_WithPartialMode_ShouldRandomizeBiomes" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests" runstate="Runnable" seed="2108854394" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.013245" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA['TinyWalnutGames.MetVD.Graph.ConnectionBuilderSystem' creates a query during OnUpdate. Please create queries in OnCreate and store them in the system for use in OnUpdate instead. This is significantly faster.
+WorldConfiguration entities: 1
+DistrictLayoutDoneTag entities: 1
+WorldRuleSet entities: 1
+RuleRandomizationDoneTag entities: 1
+]]></output>
+                </test-case>
+                <test-case id="1054" name="SectorRoomHierarchySystem_GeneratesSectorsAndRooms" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests.SectorRoomHierarchySystem_GeneratesSectorsAndRooms" methodname="SectorRoomHierarchySystem_GeneratesSectorsAndRooms" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralLayoutSystemTests" runstate="Runnable" seed="332311835" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:31Z" duration="0.007221" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1058" name="ProceduralRoomGenerationIntegrationTests" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2025-09-15 15:50:31Z" end-time="2025-09-15 15:50:32Z" duration="0.124047" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+                <test-case id="1066" name="BiomePolarity_MatchesRoomContent" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.BiomePolarity_MatchesRoomContent" methodname="BiomePolarity_MatchesRoomContent" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="1264361825" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.009150" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1059" name="BossRoom_SkillChallenge_GeneratesCorrectly" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.BossRoom_SkillChallenge_GeneratesCorrectly" methodname="BossRoom_SkillChallenge_GeneratesCorrectly" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="1037808445" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.004964" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1069" name="DifferentGenerators_ProduceUniqueContent" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.DifferentGenerators_ProduceUniqueContent" methodname="DifferentGenerators_ProduceUniqueContent" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="132647972" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.005383" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1062" name="HorizontalRoom_CorridorFlow_GeneratesRhythm" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.HorizontalRoom_CorridorFlow_GeneratesRhythm" methodname="HorizontalRoom_CorridorFlow_GeneratesRhythm" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="817415092" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.001925" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1068" name="JumpArcSolver_ValidatesRoomConnectivity" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.JumpArcSolver_ValidatesRoomConnectivity" methodname="JumpArcSolver_ValidatesRoomConnectivity" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="1314045151" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.011787" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1067" name="Pipeline_SixSteps_CompletesCorrectly" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.Pipeline_SixSteps_CompletesCorrectly" methodname="Pipeline_SixSteps_CompletesCorrectly" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="1420694683" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.001978" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1065" name="SaveRoom_SafeArea_UsesWeightedGeneration" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.SaveRoom_SafeArea_UsesWeightedGeneration" methodname="SaveRoom_SafeArea_UsesWeightedGeneration" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="1709492861" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002355" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1064" name="SecretAreas_WithBombSkill_GeneratesDestructibleWalls" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.SecretAreas_WithBombSkill_GeneratesDestructibleWalls" methodname="SecretAreas_WithBombSkill_GeneratesDestructibleWalls" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="1889323576" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002371" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1061" name="SkyBiome_CloudPlatforms_GeneratesMotion" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.SkyBiome_CloudPlatforms_GeneratesMotion" methodname="SkyBiome_CloudPlatforms_GeneratesMotion" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="282785188" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.001926" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1060" name="TreasureRoom_JumpTesting_ValidatesPhysics" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.TreasureRoom_JumpTesting_ValidatesPhysics" methodname="TreasureRoom_JumpTesting_ValidatesPhysics" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="1892028821" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002798" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1063" name="VerticalRoom_StackedSegments_EnsuresConnectivity" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests.VerticalRoom_StackedSegments_EnsuresConnectivity" methodname="VerticalRoom_StackedSegments_EnsuresConnectivity" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationIntegrationTests" runstate="Runnable" seed="1214247127" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002165" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1070" name="ProceduralRoomGenerationTests" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.081915" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+                <test-case id="1073" name="CinemachineZoneGenerator_CreatesBiomeSpecificCameraSettings" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests.CinemachineZoneGenerator_CreatesBiomeSpecificCameraSettings" methodname="CinemachineZoneGenerator_CreatesBiomeSpecificCameraSettings" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" runstate="Runnable" seed="402237924" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.033850" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.ProceduralRoomGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomManagementSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.CinemachineZoneGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomNavigationGeneratorSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.SimulationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+]]></output>
+                </test-case>
+                <test-case id="1077" name="CompleteGenerationPipeline_ProcessesRoomCorrectly" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests.CompleteGenerationPipeline_ProcessesRoomCorrectly" methodname="CompleteGenerationPipeline_ProcessesRoomCorrectly" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" runstate="Runnable" seed="1161030852" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.011303" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.ProceduralRoomGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomManagementSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.CinemachineZoneGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomNavigationGeneratorSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.SimulationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+]]></output>
+                </test-case>
+                <test-case id="1074" name="JumpArcSolver_ValidatesReachability_WithDifferentMovementTypes" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests.JumpArcSolver_ValidatesReachability_WithDifferentMovementTypes" methodname="JumpArcSolver_ValidatesReachability_WithDifferentMovementTypes" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" runstate="Runnable" seed="770824915" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002383" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1075" name="MovementCapabilityTags_DetermineCorrectSkillRequirements" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests.MovementCapabilityTags_DetermineCorrectSkillRequirements" methodname="MovementCapabilityTags_DetermineCorrectSkillRequirements" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" runstate="Runnable" seed="1416894712" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002061" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1072" name="NavigationGenerator_CreatesMovementConnections_WithCorrectAbilityTags" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests.NavigationGenerator_CreatesMovementConnections_WithCorrectAbilityTags" methodname="NavigationGenerator_CreatesMovementConnections_WithCorrectAbilityTags" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" runstate="Runnable" seed="1850966452" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.005126" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.ProceduralRoomGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomManagementSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+]]></output>
+                </test-case>
+                <test-case id="1071" name="ProceduralRoomGenerator_CreatesRoomTemplate_WithCorrectCapabilityTags" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests.ProceduralRoomGenerator_CreatesRoomTemplate_WithCorrectCapabilityTags" methodname="ProceduralRoomGenerator_CreatesRoomTemplate_WithCorrectCapabilityTags" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" runstate="Runnable" seed="96541017" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.004130" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Ignoring invalid [Unity.Entities.UpdateAfterAttribute] attribute on TinyWalnutGames.MetVD.Graph.ProceduralRoomGeneratorSystem targeting TinyWalnutGames.MetVD.Graph.RoomManagementSystem.
+This attribute can only order systems that are members of the same ComponentSystemGroup instance.
+Make sure that both systems are in the same system group with [UpdateInGroup(typeof(Unity.Entities.InitializationSystemGroup))],
+or by manually adding both systems to the same group's update list.
+]]></output>
+                </test-case>
+                <test-case id="1076" name="RoomTemplate_InitializesWithCorrectDefaults" fullname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests.RoomTemplate_InitializesWithCorrectDefaults" methodname="RoomTemplate_InitializesWithCorrectDefaults" classname="TinyWalnutGames.MetVD.Graph.Tests.ProceduralRoomGenerationTests" runstate="Runnable" seed="208897492" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.001522" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-suite type="TestFixture" id="1078" name="TerrainAndSkyGeneratorsSymbolTest" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" testcasecount="10" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.038532" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+                <test-case id="1083" name="BeatType_Enum_CanBeUsed" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.BeatType_Enum_CanBeUsed" methodname="BeatType_Enum_CanBeUsed" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="1825110873" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002391" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1081" name="BiomeWeightedHeightmapGenerator_CanBeCreated" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.BiomeWeightedHeightmapGenerator_CanBeCreated" methodname="BiomeWeightedHeightmapGenerator_CanBeCreated" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="516015978" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002071" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1084" name="CloudMotionType_Enum_CanBeUsed" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.CloudMotionType_Enum_CanBeUsed" methodname="CloudMotionType_Enum_CanBeUsed" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="790804505" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.001413" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1088" name="JumpArcSolver_CanCalculateJumpArc" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.JumpArcSolver_CanCalculateJumpArc" methodname="JumpArcSolver_CanCalculateJumpArc" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="617415036" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002331" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1086" name="JumpArcSolver_CanCalculateMinimumSpacing" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.JumpArcSolver_CanCalculateMinimumSpacing" methodname="JumpArcSolver_CanCalculateMinimumSpacing" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="1504210555" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002372" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1087" name="JumpArcSolver_CanCheckReachability" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.JumpArcSolver_CanCheckReachability" methodname="JumpArcSolver_CanCheckReachability" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="377376144" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002055" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1082" name="LayeredPlatformCloudGenerator_CanBeCreated" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.LayeredPlatformCloudGenerator_CanBeCreated" methodname="LayeredPlatformCloudGenerator_CanBeCreated" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="1586499756" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002083" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1080" name="LinearBranchingCorridorGenerator_CanBeCreated" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.LinearBranchingCorridorGenerator_CanBeCreated" methodname="LinearBranchingCorridorGenerator_CanBeCreated" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="575185090" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002023" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1079" name="StackedSegmentGenerator_CanBeCreated" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.StackedSegmentGenerator_CanBeCreated" methodname="StackedSegmentGenerator_CanBeCreated" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="1482034204" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002022" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1085" name="TypeConversionUtility_CanConvertTypes" fullname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest.TypeConversionUtility_CanConvertTypes" methodname="TypeConversionUtility_CanConvertTypes" classname="TinyWalnutGames.MetVD.Graph.Tests.TerrainAndSkyGeneratorsSymbolTest" runstate="Runnable" seed="949526310" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.001911" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+          <test-suite type="TestSuite" id="1092" name="Tests" fullname="TinyWalnutGames.MetVD.Tests" runstate="Runnable" testcasecount="20" result="Failed" site="Child" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.271083" total="20" passed="19" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+            <test-suite type="TestFixture" id="1019" name="DistrictWfcSystemDebugTests" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.051455" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              <test-case id="1021" name="Debug_SingleSystemUpdate_ShouldShowStateChanges" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests.Debug_SingleSystemUpdate_ShouldShowStateChanges" methodname="Debug_SingleSystemUpdate_ShouldShowStateChanges" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests" runstate="Runnable" seed="1263855895" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.023775" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[DEBUG] Created entity 87 with WfcState=Initialized, HasBuffer=True
+[DEBUG] BEFORE Update: State=Initialized, Iteration=0, Entropy=2147483647, BufferLength=0
+[DEBUG] AFTER Update: State=InProgress, Iteration=0, Entropy=4, BufferLength=4
+[DEBUG] Candidate 0: TileId=1, Weight=1.418755
+[DEBUG] Candidate 1: TileId=4, Weight=0.2608316
+[DEBUG] Candidate 2: TileId=2, Weight=0.7921208
+[DEBUG] Candidate 3: TileId=3, Weight=0.6181721
+[DEBUG] Test completed. Expected: InProgress with 4 candidates. Actual: InProgress with 4 candidates
+]]></output>
+              </test-case>
+              <test-case id="1020" name="Debug_SystemSetup_ShouldHaveCorrectComponents" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests.Debug_SystemSetup_ShouldHaveCorrectComponents" methodname="Debug_SystemSetup_ShouldHaveCorrectComponents" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests" runstate="Runnable" seed="1289217874" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.006948" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[DEBUG] Created entity 87 with WfcState=Initialized, HasBuffer=True
+[DEBUG] Initial WfcState: Initialized, Iteration: 0, Entropy: 2147483647
+[DEBUG] Initial buffer length: 0
+]]></output>
+              </test-case>
+              <test-case id="1023" name="Debug_WfcStateQuery_ShouldFindEntities" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests.Debug_WfcStateQuery_ShouldFindEntities" methodname="Debug_WfcStateQuery_ShouldFindEntities" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests" runstate="Runnable" seed="879955483" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.004041" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[DEBUG] Created entity 87 with WfcState=Initialized, HasBuffer=True
+[DEBUG] Entities matching WfcState+NodeId query: 1
+]]></output>
+              </test-case>
+              <test-case id="1022" name="Debug_WorldSeedCheck_ShouldFindSeedEntity" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests.Debug_WorldSeedCheck_ShouldFindSeedEntity" methodname="Debug_WorldSeedCheck_ShouldFindSeedEntity" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemDebugTests" runstate="Runnable" seed="700231118" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.003791" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[DEBUG] WorldSeed entities found: 1
+[DEBUG] WorldSeed entity 86 has seed value: 42
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1024" name="DistrictWfcSystemTests" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.088060" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              <test-case id="1028" name="EmptyCandidateBuffer_SetsContradiction" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests.EmptyCandidateBuffer_SetsContradiction" methodname="EmptyCandidateBuffer_SetsContradiction" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests" runstate="Runnable" seed="1659570144" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.011759" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1025" name="Initialization_AddsCandidates_SetsInProgress" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests.Initialization_AddsCandidates_SetsInProgress" methodname="Initialization_AddsCandidates_SetsInProgress" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests" runstate="Runnable" seed="1260002393" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.016526" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[TEST] BEFORE Update: Entity=91, State=Initialized, BufferLength=0, NodeId=0
+[TEST] Entities matching WfcState+NodeId: 1
+[TEST] WorldSeed entities: 1
+[DistrictWfcSystem] OnUpdate: Found 4 tile prototypes, processing 1 WFC entities
+  Prototype 0: TileId=1, Weight=1
+  Prototype 1: TileId=2, Weight=0.8
+  Prototype 2: TileId=3, Weight=0.6
+  Prototype 3: TileId=4, Weight=0.4
+[TEST] AFTER Update: State=InProgress, BufferLength=4, Entropy=4
+[TEST] Candidate 0: TileId=2, Weight=1.337932
+[TEST] Candidate 1: TileId=3, Weight=0.5405869
+[TEST] Candidate 2: TileId=1, Weight=1.411554
+[TEST] Candidate 3: TileId=4, Weight=0.5593698
+]]></output>
+              </test-case>
+              <test-case id="1029" name="MissingCandidateBuffer_MarksFailed" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests.MissingCandidateBuffer_MarksFailed" methodname="MissingCandidateBuffer_MarksFailed" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests" runstate="Runnable" seed="1397623759" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.008751" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[DistrictWfcSystem] OnUpdate: Found 4 tile prototypes, processing 1 WFC entities
+  Prototype 0: TileId=1, Weight=1
+  Prototype 1: TileId=2, Weight=0.8
+  Prototype 2: TileId=3, Weight=0.6
+  Prototype 3: TileId=4, Weight=0.4
+]]></output>
+              </test-case>
+              <test-case id="1030" name="OverIterationThreshold_TriggersRandomCollapse" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests.OverIterationThreshold_TriggersRandomCollapse" methodname="OverIterationThreshold_TriggersRandomCollapse" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests" runstate="Runnable" seed="1650469253" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.010871" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[DistrictWfcSystem] OnUpdate: Found 4 tile prototypes, processing 1 WFC entities
+  Prototype 0: TileId=1, Weight=1
+  Prototype 1: TileId=2, Weight=0.8
+  Prototype 2: TileId=3, Weight=0.6
+  Prototype 3: TileId=4, Weight=0.4
+]]></output>
+              </test-case>
+              <test-case id="1026" name="Progression_IncrementsIteration_EntropyReflectsCandidateCount" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests.Progression_IncrementsIteration_EntropyReflectsCandidateCount" methodname="Progression_IncrementsIteration_EntropyReflectsCandidateCount" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests" runstate="Runnable" seed="1711377976" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.015342" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[DistrictWfcSystem] OnUpdate: Found 4 tile prototypes, processing 1 WFC entities
+  Prototype 0: TileId=1, Weight=1
+  Prototype 1: TileId=2, Weight=0.8
+  Prototype 2: TileId=3, Weight=0.6
+  Prototype 3: TileId=4, Weight=0.4
+[DistrictWfcSystem] OnUpdate: Found 4 tile prototypes, processing 1 WFC entities
+  Prototype 0: TileId=1, Weight=1
+  Prototype 1: TileId=2, Weight=0.8
+  Prototype 2: TileId=3, Weight=0.6
+  Prototype 3: TileId=4, Weight=0.4
+]]></output>
+              </test-case>
+              <test-case id="1027" name="SingleCandidate_CollapsesToCompleted" fullname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests.SingleCandidate_CollapsesToCompleted" methodname="SingleCandidate_CollapsesToCompleted" classname="TinyWalnutGames.MetVD.Tests.DistrictWfcSystemTests" runstate="Runnable" seed="1290485236" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.012027" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[[DistrictWfcSystem] OnUpdate: Found 4 tile prototypes, processing 1 WFC entities
+  Prototype 0: TileId=1, Weight=1
+  Prototype 1: TileId=2, Weight=0.8
+  Prototype 2: TileId=3, Weight=0.6
+  Prototype 3: TileId=4, Weight=0.4
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1031" name="SectorRefineSystemTests" fullname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests" classname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.046285" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              <test-case id="1034" name="LockPlacement_AddsHardLocks_AndAdvancesToPathValidation" fullname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests.LockPlacement_AddsHardLocks_AndAdvancesToPathValidation" methodname="LockPlacement_AddsHardLocks_AndAdvancesToPathValidation" classname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests" runstate="Runnable" seed="1817505367" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.011392" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="LoopCreation_PhaseAdvances_WhenTargetLoopsAlreadyReached" fullname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests.LoopCreation_PhaseAdvances_WhenTargetLoopsAlreadyReached" methodname="LoopCreation_PhaseAdvances_WhenTargetLoopsAlreadyReached" classname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests" runstate="Runnable" seed="127378856" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.003106" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1035" name="PathValidation_Completes_WhenLoopsAndLocksPresent" fullname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests.PathValidation_Completes_WhenLoopsAndLocksPresent" methodname="PathValidation_Completes_WhenLoopsAndLocksPresent" classname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests" runstate="Runnable" seed="1349662707" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002847" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1036" name="PathValidation_Fails_WhenNoLoopsOrLocks" fullname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests.PathValidation_Fails_WhenNoLoopsOrLocks" methodname="PathValidation_Fails_WhenNoLoopsOrLocks" classname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests" runstate="Runnable" seed="312781903" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002231" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="PlanningPhase_Completes_WhenWfcCompleted" fullname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests.PlanningPhase_Completes_WhenWfcCompleted" methodname="PlanningPhase_Completes_WhenWfcCompleted" classname="TinyWalnutGames.MetVD.Tests.SectorRefineSystemTests" runstate="Runnable" seed="700977944" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.003128" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1037" name="WfcMinimalDebugTest" fullname="TinyWalnutGames.MetVD.Tests.WfcMinimalDebugTest" classname="TinyWalnutGames.MetVD.Tests.WfcMinimalDebugTest" runstate="Runnable" testcasecount="1" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.023358" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              <test-case id="1038" name="MinimalTest_SystemShouldProcessInitializedEntity" fullname="TinyWalnutGames.MetVD.Tests.WfcMinimalDebugTest.MinimalTest_SystemShouldProcessInitializedEntity" methodname="MinimalTest_SystemShouldProcessInitializedEntity" classname="TinyWalnutGames.MetVD.Tests.WfcMinimalDebugTest" runstate="Runnable" seed="515254148" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.011855" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <reason>
+                  <message><![CDATA[Debug test complete. Final state: InProgress, Buffer length: 4]]></message>
+                </reason>
+                <output><![CDATA[WorldSeed entities: 1
+WfcState+NodeId entities: 1
+BEFORE: State=Initialized, Iteration=0, BufferLength=0
+[DistrictWfcSystem] OnUpdate: Found 0 tile prototypes, processing 1 WFC entities
+AFTER: State=InProgress, Iteration=0, BufferLength=4
+✅ System worked correctly!
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1039" name="WfcSystemTests" fullname="TinyWalnutGames.MetVD.Tests.WfcSystemTests" classname="TinyWalnutGames.MetVD.Tests.WfcSystemTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.048026" total="4" passed="3" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              <test-case id="1042" name="WfcBiomeValidation_PolarityConstraints_ShouldEnforceCoherence" fullname="TinyWalnutGames.MetVD.Tests.WfcSystemTests.WfcBiomeValidation_PolarityConstraints_ShouldEnforceCoherence" methodname="WfcBiomeValidation_PolarityConstraints_ShouldEnforceCoherence" classname="TinyWalnutGames.MetVD.Tests.WfcSystemTests" runstate="Runnable" seed="1796668862" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002629" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1041" name="WfcConstraintPropagation_SocketCompatibility_ShouldValidateCorrectly" fullname="TinyWalnutGames.MetVD.Tests.WfcSystemTests.WfcConstraintPropagation_SocketCompatibility_ShouldValidateCorrectly" methodname="WfcConstraintPropagation_SocketCompatibility_ShouldValidateCorrectly" classname="TinyWalnutGames.MetVD.Tests.WfcSystemTests" runstate="Runnable" seed="1017747814" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.002297" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1043" name="WfcGenerationStress_MultipleFrames_ShouldCompleteWithoutErrors" fullname="TinyWalnutGames.MetVD.Tests.WfcSystemTests.WfcGenerationStress_MultipleFrames_ShouldCompleteWithoutErrors" methodname="WfcGenerationStress_MultipleFrames_ShouldCompleteWithoutErrors" classname="TinyWalnutGames.MetVD.Tests.WfcSystemTests" runstate="Runnable" seed="417735500" result="Failed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.023230" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[Unhandled log message: '[Exception] InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()'. Use UnityEngine.TestTools.LogAssert.Expect]]></message>
+                  <stack-trace><![CDATA[Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[InvalidOperationException: GetSingleton<TinyWalnutGames.MetVD.Shared.WorldConfiguration>() requires that exactly one entity exists that match this query, but there are none. Are you missing a call to RequireForUpdate<T>()? You could also use TryGetSingleton<T>()
+Unity.Entities.EntityQueryImpl.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:1454)
+Unity.Entities.EntityQuery.GetSingleton[T] () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Iterators/EntityQuery.cs:2743)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.OnUpdate (Unity.Entities.SystemState& state) (at ./Packages/com.tinywalnutgames.metvd.graph/Runtime/DistrictFitToShapeSystem.cs:36)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate$BurstManaged (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem+__codegen__OnUpdate_0000001C$BurstDirectCall.Invoke (System.IntPtr self, System.IntPtr state) (at <f0af65e577364e77976c8809a3604eba>:0)
+TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate (System.IntPtr self, System.IntPtr state) <0x21893c45520 + 0x0005a> in <f0af65e577364e77976c8809a3604eba>:0
+(wrapper native-to-managed) TinyWalnutGames.MetVD.Graph.DistrictFitToShapeSystem.__codegen__OnUpdate(intptr,intptr)
+Unity.Entities.SystemBaseRegistry.ForwardToManaged (System.IntPtr delegateIntPtr, Unity.Entities.SystemState* systemState, System.Void* systemPointer) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:364)
+Unity.Entities.SystemBaseRegistry.CallForwardingFunction (Unity.Entities.SystemState* systemState, Unity.Entities.UnmanagedSystemFunctionType functionType) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:333)
+Unity.Entities.SystemBaseRegistry.CallOnUpdate (Unity.Entities.SystemState* systemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBaseRegistry.cs:376)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate$BurstManaged (System.Void* pSystemState) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:852)
+Unity.Entities.WorldUnmanagedImpl+UnmanagedUpdate_00001677$BurstDirectCall.Invoke (System.Void* pSystemState) (at <8d3254b11af941bb89e09f98aabb9788>:0)
+Unity.Entities.WorldUnmanagedImpl.UnmanagedUpdate (System.Void* pSystemState) <0x21893c3a960 + 0x00052> in <8d3254b11af941bb89e09f98aabb9788>:0
+Unity.Entities.WorldUnmanagedImpl.UpdateSystem (Unity.Entities.SystemHandle sh) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/WorldUnmanaged.cs:910)
+Unity.Entities.ComponentSystemGroup.UpdateAllSystems () (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:717)
+UnityEngine.Debug:LogException(Exception)
+Unity.Debug:LogException(Exception) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/Stubs/Unity/Debug.cs:17)
+Unity.Entities.ComponentSystemGroup:UpdateAllSystems() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:728)
+Unity.Entities.ComponentSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ComponentSystemGroup.cs:681)
+Unity.Entities.InitializationSystemGroup:OnUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/DefaultWorld.cs:169)
+Unity.Entities.SystemBase:Update() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/SystemBase.cs:418)
+Unity.Entities.DummyDelegateWrapper:TriggerUpdate() (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Entities/ScriptBehaviourUpdateOrder.cs:523)
+
+]]></output>
+              </test-case>
+              <test-case id="1040" name="WfcSystem_ThreadSafety_ShouldUseParallelRandomArray" fullname="TinyWalnutGames.MetVD.Tests.WfcSystemTests.WfcSystem_ThreadSafety_ShouldUseParallelRandomArray" methodname="WfcSystem_ThreadSafety_ShouldUseParallelRandomArray" classname="TinyWalnutGames.MetVD.Tests.WfcSystemTests" runstate="Runnable" seed="579362266" result="Passed" start-time="2025-09-15 15:50:32Z" end-time="2025-09-15 15:50:32Z" duration="0.004260" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: C:/Users/Jerry/AppData/LocalLow/DefaultCompany/TWG-MetVanDamn\TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

@@ -45,6 +45,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 .Build(ref state);
 
             _requestArch = state.EntityManager.CreateArchetype(typeof(SudoActionRequest));
+
+            // Auto-register into the Initialization group for manually created worlds in tests (Editor only)
+#if UNITY_EDITOR
+            var initGroup = state.World.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            initGroup.AddSystemToUpdateList(state.SystemHandle);
+#endif
             }
 
         [BurstCompile]

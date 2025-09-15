@@ -29,6 +29,12 @@ namespace TinyWalnutGames.MetVD.Authoring
                 .WithAll<CoreBiome, NodeId>()
                 .WithNone<BiomeElevationMask>()
                 .Build(ref state);
+
+            // Auto-register into Initialization group for manually created worlds used in tests (Editor only)
+#if UNITY_EDITOR
+            var initGroup = state.World.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            initGroup.AddSystemToUpdateList(state.SystemHandle);
+#endif
             }
 
         [BurstCompile]

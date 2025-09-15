@@ -46,6 +46,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					return;
 					}
 				}
+			// If there is no world config at all, we will use a fallback config below.
 
 			if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
 				{
