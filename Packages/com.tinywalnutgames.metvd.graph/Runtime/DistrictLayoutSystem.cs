@@ -37,6 +37,16 @@ namespace TinyWalnutGames.MetVD.Graph
 		[BurstCompile]
 		public void OnUpdate(ref SystemState state)
 			{
+			// Respect generation flow: run this legacy placer only for GridFirstLegacy
+			if (!_worldConfigQuery.IsEmptyIgnoreFilter)
+				{
+				var wc = _worldConfigQuery.GetSingleton<WorldConfiguration>();
+				if (wc.Flow != TinyWalnutGames.MetVD.Shared.GenerationFlow.GridFirstLegacy)
+					{
+					return;
+					}
+				}
+
 			if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
 				{
 				return;
@@ -69,7 +79,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				int unplacedCount = 0;
 				for (int i = 0; i < nodeIds.Length; i++)
 					{
-					NodeId n = nodeIds [ i ];
+					NodeId n = nodeIds[i];
 					if (n.Level == 0 && n.Coordinates.x == 0 && n.Coordinates.y == 0)
 						{
 						unplacedCount++;
@@ -103,16 +113,16 @@ namespace TinyWalnutGames.MetVD.Graph
 					int placedCount = 0;
 					for (int i = 0; i < nodeIds.Length && positionIndex < unplacedCount; i++)
 						{
-						NodeId nodeId = nodeIds [ i ];
+						NodeId nodeId = nodeIds[i];
 						if (nodeId.Level == 0 && nodeId.Coordinates.x == 0 && nodeId.Coordinates.y == 0)
 							{
-							nodeId.Coordinates = positions [ positionIndex++ ];
-							state.EntityManager.SetComponentData(unplacedEntities [ i ], nodeId);
+							nodeId.Coordinates = positions[positionIndex++];
+							state.EntityManager.SetComponentData(unplacedEntities[i], nodeId);
 							// Attach sector hierarchy data if not already present
-							if (!state.EntityManager.HasComponent<SectorHierarchyData>(unplacedEntities [ i ]))
+							if (!state.EntityManager.HasComponent<SectorHierarchyData>(unplacedEntities[i]))
 								{
 								var sectorData = new SectorHierarchyData(new int2(6, 6), sectorsPerDistrict, random.NextUInt());
-								state.EntityManager.AddComponentData(unplacedEntities [ i ], sectorData);
+								state.EntityManager.AddComponentData(unplacedEntities[i], sectorData);
 								}
 							placedCount++;
 							}
@@ -166,19 +176,19 @@ namespace TinyWalnutGames.MetVD.Graph
 					validPosition = true;
 					for (int j = 0; j < i; j++)
 						{
-						float distance = math.length(new float2(candidate - positions [ j ]));
+						float distance = math.length(new float2(candidate - positions[j]));
 						if (distance < minDistance) { validPosition = false; break; }
 						}
 					if (validPosition)
 						{
-						positions [ i ] = candidate;
+						positions[i] = candidate;
 						}
 
 					attempts++;
 					}
 				if (!validPosition)
 					{
-					positions [ i ] = new(random.NextInt(0, worldSize.x), random.NextInt(0, worldSize.y));
+					positions[i] = new(random.NextInt(0, worldSize.x), random.NextInt(0, worldSize.y));
 					}
 				}
 			}
@@ -190,19 +200,19 @@ namespace TinyWalnutGames.MetVD.Graph
 			var shuffledIndices = new NativeArray<int>(positions.Length, Allocator.Temp);
 			for (int i = 0; i < shuffledIndices.Length; i++)
 				{
-				shuffledIndices [ i ] = i;
+				shuffledIndices[i] = i;
 				}
 
 			for (int i = shuffledIndices.Length - 1; i > 0; i--)
-				{ int j = random.NextInt(0, i + 1); (shuffledIndices [ i ], shuffledIndices [ j ]) = (shuffledIndices [ j ], shuffledIndices [ i ]); }
+				{ int j = random.NextInt(0, i + 1); (shuffledIndices[i], shuffledIndices[j]) = (shuffledIndices[j], shuffledIndices[i]); }
 			for (int i = 0; i < positions.Length; i++)
 				{
-				int gridIndex = shuffledIndices [ i ];
+				int gridIndex = shuffledIndices[i];
 				int gridX = gridIndex % gridDim; int gridY = gridIndex / gridDim;
 				float2 cellCenter = new float2(gridX + 0.5f, gridY + 0.5f) * cellSize;
 				float2 jitter = new(random.NextFloat(-jitterAmount, jitterAmount), random.NextFloat(-jitterAmount, jitterAmount));
 				float2 finalPosition = cellCenter + jitter;
-				positions [ i ] = new(math.clamp((int)finalPosition.x, 0, worldSize.x - 1), math.clamp((int)finalPosition.y, 0, worldSize.y - 1));
+				positions[i] = new(math.clamp((int)finalPosition.x, 0, worldSize.x - 1), math.clamp((int)finalPosition.y, 0, worldSize.y - 1));
 				}
 			shuffledIndices.Dispose();
 			}

@@ -4,20 +4,22 @@ The Procedural World Layout system is a comprehensive enhancement to MetVanDAMN'
 
 ## Overview
 
-The system operates in six distinct stages:
+By default the system uses the legacy Grid-First flow. An optional Shape-First flow can be enabled to generate an organic silhouette first, then place districts to fit the shape.
 
-1. **District Pre-Layout** - Places districts procedurally before WFC
-2. **Connection Building** - Creates graph connections between districts  
-3. **Rule Randomization** - Adapts biome polarities and upgrade rules
-4. **Sector/Room Hierarchy** - Subdivides districts into gameplay areas
-5. **WFC Integration** - Runs existing WFC with placed coordinates
-6. **Debug Visualization** - Comprehensive gizmo overlays for validation
+The overall generation involves the following stages:
+
+1. District pre-layout (or fit-to-shape in Shape-First)
+1. Connection building
+1. Rule randomization
+1. Sector/room hierarchy
+1. WFC integration
+1. Debug visualization
 
 ## System Architecture
 
 ### Core Components
 
-- `WorldConfiguration` - Extended with `RandomizationMode` enum
+- `WorldConfiguration` - Extended with `RandomizationMode` and `GenerationFlow` enums
 - `DistrictLayoutDoneTag` - Gates downstream systems
 - `WorldRuleSet` - Stores randomized biome/upgrade rules
 - `SectorHierarchyData` - Local grid subdivision data
@@ -26,103 +28,86 @@ The system operates in six distinct stages:
 ### ECS Systems (Execution Order)
 
 1. `BuildConnectionBuffersSystem` (existing, authoring layer)
-2. `DistrictLayoutSystem` (new, procedural placement)
-3. `ConnectionBuilderSystem` (new, graph connectivity)
-4. `RuleRandomizationSystem` (new, adaptive rules)
-5. `SectorRoomHierarchySystem` (new, subdivision)
-6. `DistrictWfcSystem` (updated, gated by layout completion)
+1. `WorldAspectRandomizerSystem` (shape-first only)
+1. `WorldShapeWfcSystem` (shape-first only)
+1. `DistrictFitToShapeSystem` (shape-first only)
+1. `DistrictLayoutSystem` (legacy only; gated by `WorldConfiguration.Flow`)
+1. `ConnectionBuilderSystem` (graph connectivity)
+1. `RuleRandomizationSystem` (adaptive rules)
+1. `SectorRoomHierarchySystem` (subdivision)
+1. `DistrictWfcSystem` (gated by layout completion)
 
 ## Randomization Modes
 
 ### None
-- **Biome Polarities**: Curated (Sun|Moon|Heat|Cold)
-- **Upgrades**: Standard set (Jump, DoubleJump, Dash, WallJump)
-- **Use Case**: Consistent, balanced gameplay
 
-### Partial  
-- **Biome Polarities**: Randomized (2-6 from available set)
-- **Upgrades**: Curated standard set
-- **Use Case**: Visual variety with predictable progression
+- Biome Polarities: Curated (Sun|Moon|Heat|Cold)
+- Upgrades: Standard set (Jump, DoubleJump, Dash, WallJump)
+- Use Case: Consistent, balanced gameplay
 
-### Full
-- **Biome Polarities**: Randomized (2-6 from available set)
-- **Upgrades**: Randomized with reachability guards
-- **Use Case**: Maximum variety with ensured completability
+### Partial
+
+- Biome Polarities: Randomized (2-6 from available set)
+- Upgrades: Curated standard set
+- Use Case: Visual variety with predictable progression
+
+## Optional Shape-First Flow
+
+1. World Shape (organic, optional) - Coarse WFC/cellular pass creates an organic silhouette
+1. District Fit-to-Shape - Places districts inside the silhouette (Poisson within mask)
+1. Connection Building - Creates graph connections between districts
+1. Rule Randomization - Adapts biome polarities and upgrade rules
+1. Sector/Room Hierarchy - Subdivides districts into gameplay areas
+1. WFC Integration - Runs existing WFC with placed coordinates
+1. Debug Visualization - Comprehensive gizmo overlays for validation
 
 ## District Placement Strategies
 
 ### Poisson-Disc Sampling (≤16 districts)
-- Organic spacing using rejection sampling
-- Minimum distance = 20% of world size
-- Maximum 30 placement attempts per district
-- Fallback to random placement if needed
 
-### Jittered Grid (>16 districts)
-- Grid-based placement with 30% jitter
-- Shuffled cell assignment for variation
+When using the ShapeFirstOrganic flow, sampling is constrained to the generated shape mask, producing non-rectangular, organic world layouts with varied aspect ratios.
+
 - Guaranteed no overlaps or clustering
 - Scales well to large district counts
 
-## Connection Graph Generation
+## Sector Subdivision
 
-### K-Nearest Neighbors
-- Each district connects to up to 3 nearest neighbors
-- Bidirectional connections with distance-based costs
-- Duplicate filtering to prevent redundancy
-
-### Random Long Edges
-- 1 long edge per 3 districts (minimum 1)
-- Creates loops for backtracking and replayability
-- Higher traversal cost (15% vs 10% for local connections)
-
-## Sector/Room Hierarchy
-
-### Sector Subdivision
 - 6x6 local grid within each district
-- 2-4 sectors per district (randomized)
-- Jittered placement within grid cells
 - Deterministic seeding per district
-
-### Room Generation (BSP)
-- Binary Space Partitioning within sectors
 - Minimum room size: 2x2 local units
 - Maximum 6 rooms per sector
-- Room types: Normal, Entrance, Exit, Boss, Treasure, Shop, Save, Hub
 
 ## Debug Visualization
 
-### Gizmo Features
-- **Unplaced Districts**: Gray wireframe placeholders at (0,0)
-- **Placed Districts**: Biome-colored filled areas with labels
-- **Connections**: Directional arrows (single/double for one-way/bidirectional)
-- **Biome Radius**: Wire discs showing influence areas
-- **Randomization Mode**: HUD display of current settings
+- Connections: Directional arrows (single/double for one-way/bidirectional)
+- Biome Radius: Wire discs showing influence areas
 
 ### Interactive Controls
+
 - Toggle visibility for each element type
-- Preview layout button (runs algorithms in edit mode)
-- Frame all districts camera tool
 - Real-time coordinate and connection display
 
-## Editor Tools
-
 ### ProceduralLayoutPreview Window
-- **Location**: `MetVanDAMN/World Layout Preview`
-- **Features**: Algorithm preview, settings application, district analysis
-- **Use Case**: Design-time validation without entering Play mode
+
+- Location: `MetVanDAMN/World Layout Preview`
+- Purpose: Inspect procedural layout stages
+- Use Case: Design-time validation without entering Play mode
 
 ### ProceduralLayoutDemo Component
-- **Auto-demo mode**: Cycles through all stages automatically
-- **Stage monitoring**: Real-time progress tracking
-- **Debug logging**: Detailed output for each stage
-- **GUI overlay**: In-game status display
+
+- Auto-demo mode: Cycles through all stages automatically
+- Stage monitoring: Real-time progress tracking
+- Debug logging: Detailed output for each stage
+- GUI overlay: In-game status display
 
 ## Integration Examples
 
 ### Basic Setup
+
 ```csharp
 // 1. Add WorldConfigurationAuthoring to scene
 worldConfig.randomizationMode = RandomizationMode.Partial;
+
 worldConfig.seed = 12345;
 worldConfig.worldSize = new int2(32, 32);
 
@@ -131,6 +116,7 @@ worldConfig.worldSize = new int2(32, 32);
 ```
 
 ### Custom Placement
+
 ```csharp
 // Districts with Level=0 and Coordinates=(0,0) will be processed
 var district = entityManager.CreateEntity();
@@ -139,6 +125,7 @@ entityManager.AddComponentData(district, new WfcState());
 ```
 
 ### Rule Access
+
 ```csharp
 // Access generated rules after randomization
 var ruleSet = SystemAPI.GetSingleton<WorldRuleSet>();
@@ -149,32 +136,32 @@ bool hasJumpUpgrade = (ruleSet.AvailableUpgradesMask & (1u << 0)) != 0;
 
 The system includes several safeguards to ensure world completability:
 
-1. **Essential Upgrades**: Jump upgrade always available in Full mode
-2. **Minimum Connections**: K-nearest ensures graph connectivity  
-3. **Loop Creation**: Random long edges prevent linear progression
-4. **Distance Validation**: Poisson-disc prevents impossible spacing
-5. **Polarity Minimums**: At least 2 polarities always assigned
+1. Essential Upgrades: Jump upgrade always available in Full mode
+1. Minimum Connections: K-nearest ensures graph connectivity
+1. Loop Creation: Random long edges prevent linear progression
+1. Distance Validation: Poisson-disc prevents impossible spacing
+1. Polarity Minimums: At least 2 polarities always assigned
 
 ## Performance Considerations
 
-- **Burst Compiled**: All systems use Burst for optimal performance
-- **Deterministic**: Same seed produces identical results
-- **Scalable**: Jittered grid handles 100+ districts efficiently
-- **Memory Efficient**: Temporary arrays disposed after use
-- **One-Shot**: Layout systems run once then disable
+- Burst Compiled: All systems use Burst for optimal performance
+- Deterministic: Same seed produces identical results
+- Scalable: Jittered grid handles 100+ districts efficiently
+- Memory Efficient: Temporary arrays disposed after use
+- One-Shot: Layout systems run once then disable
 
 ## Debugging Tips
 
-1. **Enable Debug Logging**: Set flags in ProceduralLayoutDemo
-2. **Use Preview Tool**: Test algorithms without entering Play mode
-3. **Check Gizmo Toggles**: Verify visualization settings
-4. **Monitor Stage Progress**: Watch for system execution order issues
-5. **Validate Seeds**: Ensure deterministic behavior across runs
+1. Enable Debug Logging: Set flags in ProceduralLayoutDemo
+1. Use Preview Tool: Test algorithms without entering Play mode
+1. Check Gizmo Toggles: Verify visualization settings
+1. Monitor Stage Progress: Watch for system execution order issues
+1. Validate Seeds: Ensure deterministic behavior across runs
 
 ## Future Extensions
 
-- **Custom Placement Strategies**: Plugin architecture for new algorithms
-- **Biome-Aware Connections**: Polarity-based connection filtering
-- **Dynamic Rule Adaptation**: Runtime rule modification
-- **Procedural Gate Placement**: Integration with progression system
-- **Multi-Level Hierarchies**: Support for sub-room divisions
+- Custom Placement Strategies: Plugin architecture for new algorithms
+- Biome-Aware Connections: Polarity-based connection filtering
+- Dynamic Rule Adaptation: Runtime rule modification
+- Procedural Gate Placement: Integration with progression system
+- Multi-Level Hierarchies: Support for sub-room divisions

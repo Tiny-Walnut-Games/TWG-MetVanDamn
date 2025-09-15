@@ -4,6 +4,21 @@ using Unity.Mathematics;
 namespace TinyWalnutGames.MetVD.Shared
 	{
 	/// <summary>
+	/// World generation flow selector
+	/// </summary>
+	public enum GenerationFlow : byte
+		{
+		/// <summary>
+		/// Legacy behavior: place districts directly in world bounds, then proceed (boxy worlds likely)
+		/// </summary>
+		GridFirstLegacy = 0,
+		/// <summary>
+		/// Intended behavior: generate an organic world silhouette first, then fit districts into that shape
+		/// </summary>
+		ShapeFirstOrganic = 1
+		}
+
+	/// <summary>
 	/// Randomization modes for world generation
 	/// </summary>
 	public enum RandomizationMode : byte
@@ -22,6 +37,10 @@ namespace TinyWalnutGames.MetVD.Shared
 		public int2 WorldSize;
 		public int TargetSectors;
 		public RandomizationMode RandomizationMode;
+		/// <summary>
+		/// Selects the world generation flow. Defaults to GridFirstLegacy if not set.
+		/// </summary>
+		public GenerationFlow Flow;
 		}
 
 	/// <summary>
@@ -50,5 +69,15 @@ namespace TinyWalnutGames.MetVD.Shared
 		public int TargetSectorCount;
 		public int MaxDistrictCount;
 		public float BiomeTransitionRadius;
+		}
+
+	/// <summary>
+	/// Biases for world aspect when generating shape-first organic silhouettes
+	/// </summary>
+	public struct WorldAspectBias : IComponentData
+		{
+		public byte WideWeight;   // tendency for width > height
+		public byte TallWeight;   // tendency for height > width
+		public byte SquareWeight; // tendency for near-square
 		}
 	}

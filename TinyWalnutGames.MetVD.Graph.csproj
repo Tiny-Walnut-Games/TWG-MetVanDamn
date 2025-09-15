@@ -62,14 +62,18 @@
   <ItemGroup>
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\CinemachineZoneGeneratorSystemTest.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldShapeComponents.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SectorRefineSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\DistrictFitToShapeSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\JumpArcSolver.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\DistrictLayoutSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\Data\SampleWfcData.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldShapeWfcSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WfcComponents.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldAspectRandomizerSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneration.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\TerrainAndSkyGenerators.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ConnectionBuilderSystem.cs" />
