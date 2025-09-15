@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@playwright/mcp": "0.0.35",
+    "@playwright/mcp": "0.0.37",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
