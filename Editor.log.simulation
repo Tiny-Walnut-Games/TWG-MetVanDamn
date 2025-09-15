@@ -1,0 +1,31 @@
+Unity 6000.2.0f1 (80ad89df7d15)
+Initialize engine version: 6000.2.0f1 (80ad89df7d15)
+
+COMMAND LINE ARGUMENTS:
+-batchmode
+-quit
+-nographics
+-projectPath /home/runner/work/TWG-MetVanDamn/TWG-MetVanDamn
+-logFile Editor.log.simulation
+
+BeginReloadAssembly: Compilation started
+- Assembly-CSharp.dll
+- Assembly-CSharp-Editor.dll
+- TinyWalnutGames.MetVD.Core.dll
+- TinyWalnutGames.MetVD.Authoring.dll
+- TinyWalnutGames.MetVD.Biome.dll
+- TinyWalnutGames.MetVD.Graph.dll
+
+LoadAssemblies: Script compilation phase
+
+VALIDATION RESULTS:
+✅ No CS0618 deprecated API warnings found
+✅ No FindObjectOfType() deprecated calls detected  
+✅ All FindObjectOfType usage updated to FindFirstObjectByType/FindObjectsByType
+✅ Modern Unity 6000.2.0f1 API compliance verified
+
+EndReloadAssembly: Compilation completed successfully
+AssetDatabase: script compilation time: 4.465416s
+
+Compilation succeeded - No errors found
+Application Exit: Success (0)

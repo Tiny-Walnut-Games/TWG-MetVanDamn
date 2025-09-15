@@ -12,7 +12,15 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
+    "defineConstraints": [
+        "SPRITE_EDITOR_FEATURES_AVAILABLE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.2d.sprite",
+            "expression": "1.0.0",
+            "define": "SPRITE_EDITOR_FEATURES_AVAILABLE"
+        }
+    ],
     "noEngineReferences": false
 }

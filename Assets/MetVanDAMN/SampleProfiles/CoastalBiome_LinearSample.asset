@@ -18,6 +18,11 @@ MonoBehaviour:
   wallTile: {fileID: 0}
   backgroundTile: {fileID: 0}
   transitionTiles: []
+  transitionFromTile: {fileID: 0}
+  transitionBlendA: {fileID: 0}
+  transitionBlendB: {fileID: 0}
+  transitionToTile: {fileID: 0}
+  transitionDeadzone: 0.1
   propSettings:
     propPrefabs: []
     allowedPropLayers:
@@ -75,5 +80,17 @@ MonoBehaviour:
       positionJitter: 0.3
     maxPropsPerBiome: 120
     useSpatialOptimization: 1
+  checkerSettings:
+    enableCheckerOverride: 0
+    coordinateInfluenceStrength: 0.7
+    distanceScalingFactor: 1
+    enableCoordinateWarping: 1
+    polarityAnimationSpeed: 0.2
+    complexityTierMultiplier: 1.2
+    baseCheckerSize: 8
+    useMathematicalPatterns: 1
+    mathematicalPatternStrength: 0.5
+    useBiomeColorHarmony: 1
+    biomeVisualizationIntensity: 0.8
   sortingLayerOverride: 
   materialOverride: {fileID: 0}

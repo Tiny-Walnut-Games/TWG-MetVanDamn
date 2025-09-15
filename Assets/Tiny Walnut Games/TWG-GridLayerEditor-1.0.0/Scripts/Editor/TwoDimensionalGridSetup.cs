@@ -84,23 +84,24 @@ namespace TinyWalnutGames.GridLayerEditor
         }
 
         /// <summary>
-        /// Attempts to load a GridLayerConfig asset and returns its layerNames if available.
+        /// Attempts to load a GridLayerConfig asset and returns its layerNames if available and different from defaults.
         /// Otherwise, returns the provided defaultLayers.
         /// </summary>
         private static string[] GetCustomOrDefaultLayers(string[] topDownDefaultLayers)
         {
             var config = AssetDatabase.LoadAssetAtPath<GridLayerConfig>("Assets/GridLayerConfig.asset");
-            // Platformer default layers
             string[] platformerDefaultLayers = Enum.GetNames(typeof(SideScrollingLayers));
+
             if (config != null && config.layerNames != null && config.layerNames.Length > 0)
             {
-                // If custom layers are equal to platformer default, use top-down default
-                if (config.layerNames.SequenceEqual(platformerDefaultLayers))
-                    return topDownDefaultLayers;
-                // If custom layers are different from top-down default, use custom
-                if (!config.layerNames.SequenceEqual(topDownDefaultLayers))
+                // If custom layers are different from both platformer and top-down defaults, use custom
+                if (!config.layerNames.SequenceEqual(platformerDefaultLayers) &&
+                    !config.layerNames.SequenceEqual(topDownDefaultLayers))
+                {
                     return config.layerNames;
+                }
             }
+            // Otherwise, use the provided top-down default layers
             return topDownDefaultLayers;
         }
 

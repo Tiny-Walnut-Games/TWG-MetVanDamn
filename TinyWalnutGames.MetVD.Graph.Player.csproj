@@ -76,13 +76,11 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\CinemachineZoneGeneratorSystemTest.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SpecializedGenerators.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomGenerationPipelineSystem.cs" />
-    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapConfiguration.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SectorRefineSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\JumpArcSolver.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomManagementSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\DistrictLayoutSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\Data\SampleWfcData.cs" />
-    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystemTest.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WfcComponents.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\WorldBootstrapSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneration.cs" />
@@ -90,6 +88,7 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ConnectionBuilderSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RuleRandomizationSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\CinemachineZoneGeneratorSystem.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystemHelpers.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\RoomNavigationGeneratorSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\SectorRoomHierarchySystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.graph\Runtime\ProceduralRoomGeneratorSystemTest.cs" />
@@ -927,6 +926,10 @@
     </Reference>
     <Reference Include="Unity.Mathematics">
       <HintPath>Library\ScriptAssemblies\Unity.Mathematics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Transforms">
+      <HintPath>Library\ScriptAssemblies\Unity.Transforms.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">

@@ -9,6 +9,7 @@
         "Unity.Entities.Hybrid",
         "Unity.Mathematics",
         "Unity.Scenes",
+        "Unity.2D.Sprite.Editor",
         "TinyWalnutGames.MetVD.Authoring",
         "TinyWalnutGames.MetVD.Biome",
         "TinyWalnutGames.MetVD.Core",
@@ -26,6 +27,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.2d.sprite",
+            "expression": "1.0.0",
+            "define": "UNITY_2D_SPRITE_EDITOR_AVAILABLE"
+        }
+    ],
     "noEngineReferences": false
 }

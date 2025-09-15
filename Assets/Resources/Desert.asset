@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c56fb115603c6b84eb9ee8b27de5e01f, type: 3}
+  m_Name: Desert
+  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVD.Authoring.BiomeArtProfile
+  biomeName: Desert
+  debugColor: {r: 0.8, g: 0.7, b: 0.3, a: 1}
+  floorTile: {fileID: 11400000, guid: 341c7b59fc5e3af429e285d67a8731a8, type: 2}
+  wallTile: {fileID: 11400000, guid: 341c7b59fc5e3af429e285d67a8731a8, type: 2}
+  backgroundTile: {fileID: 0}
+  transitionTiles:
+  - {fileID: 11400000, guid: cb08b06349d092a4bac7fa24fd687b6d, type: 2}
+  transitionFromTile: {fileID: 0}
+  transitionBlendA: {fileID: 0}
+  transitionBlendB: {fileID: 0}
+  transitionToTile: {fileID: 0}
+  transitionDeadzone: 0.1
+  propSettings:
+    propPrefabs: []
+    allowedPropLayers:
+    - Ground
+    - Sparse
+    strategy: 4
+    baseDensity: 0.08
+    densityCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.1
+        inSlope: 0
+        outSlope: 1.5999999
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0.9
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    densityMultiplier: 1.2
+    clustering:
+      clusterSize: 3
+      clusterRadius: 2.5
+      clusterDensity: 0.9
+      clusterSeparation: 25
+    avoidance:
+      avoidLayers:
+      - Hazards
+      - Walls
+      - Hazards
+      - Dunes
+      avoidanceRadius: 3
+      avoidTransitions: 1
+      transitionAvoidanceRadius: 4
+      avoidOvercrowding: 1
+      minimumPropDistance: 3
+    variation:
+      minScale: 0.6
+      maxScale: 1.1
+      randomRotation: 1
+      maxRotationAngle: 180
+      positionJitter: 0.6
+    maxPropsPerBiome: 50
+    useSpatialOptimization: 1
+  checkerSettings:
+    enableCheckerOverride: 0
+    coordinateInfluenceStrength: 0.7
+    distanceScalingFactor: 1
+    enableCoordinateWarping: 1
+    polarityAnimationSpeed: 0.2
+    complexityTierMultiplier: 1.2
+    baseCheckerSize: 8
+    useMathematicalPatterns: 1
+    mathematicalPatternStrength: 0.5
+    useBiomeColorHarmony: 1
+    biomeVisualizationIntensity: 0.8
+  sortingLayerOverride: 
+  materialOverride: {fileID: 0}

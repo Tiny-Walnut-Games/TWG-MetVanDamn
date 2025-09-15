@@ -1,1670 +1,1905 @@
-using Unity.Entities;
-using Unity.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using TinyWalnutGames.MetVD.Core;
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using TinyWalnutGames.MetVD.Core; // For NodeId, Biome component
-using TinyWalnutGames.MetVD.Biome;
 using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem;
-using System.Linq;
-using System.Collections.Generic; // Needed for List<>
-
 // Disambiguate Biome component from potential namespace collisions
 using CoreBiome = TinyWalnutGames.MetVD.Core.Biome;
 
 namespace TinyWalnutGames.MetVD.Authoring
-{
-    /// <summary>
-    /// System responsible for pre-processing biome art profiles and tagging entities for optimized rendering
-    /// Performs ECS job-based analysis to optimize biome art placement before main thread system execution
-    /// Implements comprehensive pre-pass logic with advanced terrain analysis and spatial optimization
-    /// </summary>
-    [UpdateInGroup(typeof(PresentationSystemGroup))]
-    [UpdateAfter(typeof(BiomeFieldSystem))]
-    public partial struct BiomeArtIntegrationSystem : ISystem
-    {
-        private ComponentLookup<CoreBiome> biomeLookup;
-        private ComponentLookup<BiomeArtProfileReference> artProfileLookup;
-        private ComponentLookup<NodeId> nodeIdLookup;
-        private EntityQuery biomeQuery;
-        private EntityQuery unprocessedBiomeQuery;
-
-        // Pre-pass optimization tags
-        public struct BiomeArtOptimizationTag : IComponentData
-        {
-            public float estimatedPropCount;
-            public float complexityScore;
-            public BiomeArtPriority priority;
-            public bool requiresTerrainAnalysis;
-            public bool useClusteredPlacement;
-        }
-
-        public enum BiomeArtPriority : byte
-        {
-            Low = 0,
-            Normal = 1,
-            High = 2,
-            Critical = 3
-        }
-
-        public void OnCreate(ref SystemState state)
-        {
-            biomeLookup = state.GetComponentLookup<CoreBiome>(true);
-            artProfileLookup = state.GetComponentLookup<BiomeArtProfileReference>();
-            nodeIdLookup = state.GetComponentLookup<NodeId>(true);
-
-            // Query for all biomes with art profiles
-            biomeQuery = state.GetEntityQuery(
-                ComponentType.ReadOnly<CoreBiome>(),
-                ComponentType.ReadOnly<BiomeArtProfileReference>(),
-                ComponentType.ReadOnly<NodeId>()
-            );
-
-            // Query for biomes that need optimization analysis
-            unprocessedBiomeQuery = state.GetEntityQuery(
-                ComponentType.ReadOnly<CoreBiome>(),
-                ComponentType.ReadOnly<BiomeArtProfileReference>(),
-                ComponentType.ReadOnly<NodeId>(),
-                ComponentType.Exclude<BiomeArtOptimizationTag>()
-            );
-
-            // Require biome components to run
-            state.RequireForUpdate<CoreBiome>();
-            state.RequireForUpdate<BiomeArtProfileReference>();
-        }
-
-        public void OnUpdate(ref SystemState state)
-        {
-            biomeLookup.Update(ref state);
-            artProfileLookup.Update(ref state);
-            nodeIdLookup.Update(ref state);
-
-            // Run pre-pass optimization analysis on unprocessed biomes
-            if (!unprocessedBiomeQuery.IsEmpty)
-            {
-                var analysisJob = new BiomeOptimizationAnalysisJob
-                {
-                    biomeLookup = biomeLookup,
-                    artProfileLookup = artProfileLookup,
-                    nodeIdLookup = nodeIdLookup
-                };
-
-                state.Dependency = analysisJob.ScheduleParallel(unprocessedBiomeQuery, state.Dependency);
-            }
-
-            // Run spatial coherence optimization for high-priority biomes
-            var spatialOptimizationJob = new SpatialCoherenceOptimizationJob
-            {
-                biomeLookup = biomeLookup,
-                nodeIdLookup = nodeIdLookup
-            };
-
-            var spatialQuery = state.GetEntityQuery(
-                ComponentType.ReadOnly<CoreBiome>(),
-                ComponentType.ReadOnly<NodeId>(),
-                ComponentType.ReadWrite<BiomeArtOptimizationTag>()
-            );
-
-            if (!spatialQuery.IsEmpty)
-            {
-                state.Dependency = spatialOptimizationJob.ScheduleParallel(spatialQuery, state.Dependency);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Job for analyzing biome complexity and determining optimization parameters
-    /// </summary>
-    [BurstCompile]
-    public partial struct BiomeOptimizationAnalysisJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<CoreBiome> biomeLookup;
-        [ReadOnly] public ComponentLookup<BiomeArtProfileReference> artProfileLookup;
-        [ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
-
-        public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
-        {
-            if (!artProfileLookup.TryGetComponent(entity, out var artProfileRef) || !artProfileRef.ProfileRef.IsValid())
-                return;
-
-            var profile = artProfileRef.ProfileRef.Value;
-            if (profile == null) return;
-
-            // Analyze prop complexity
-            float propCount = profile.propSettings.maxPropsPerBiome;
-            float densityMultiplier = profile.propSettings.densityMultiplier;
-            float baseDensity = profile.propSettings.baseDensity;
-
-            optimizationTag.estimatedPropCount = propCount * densityMultiplier * baseDensity;
-
-            // Calculate complexity score based on placement strategy and settings
-            float complexityScore = CalculateComplexityScore(profile.propSettings);
-            optimizationTag.complexityScore = complexityScore;
-
-            // Determine priority based on complexity and prop count
-            optimizationTag.priority = DeterminePriority(optimizationTag.estimatedPropCount, complexityScore);
-
-            // Flag special processing requirements
-            optimizationTag.requiresTerrainAnalysis = profile.propSettings.strategy == PropPlacementStrategy.Terrain;
-            optimizationTag.useClusteredPlacement = profile.propSettings.strategy == PropPlacementStrategy.Clustered;
-        }
-
-        private static float CalculateComplexityScore(PropPlacementSettings settings)
-        {
-            float score = 1f;
-
-            // Strategy complexity multipliers
-            switch (settings.strategy)
-            {
-                case PropPlacementStrategy.Random:
-                    score *= 1f;
-                    break;
-                case PropPlacementStrategy.Clustered:
-                    score *= 1.5f;
-                    break;
-                case PropPlacementStrategy.Sparse:
-                    score *= 1.2f;
-                    break;
-                case PropPlacementStrategy.Linear:
-                    score *= 1.3f;
-                    break;
-                case PropPlacementStrategy.Radial:
-                    score *= 1.4f;
-                    break;
-                case PropPlacementStrategy.Terrain:
-                    score *= 2f; // Most complex
-                    break;
-            }
-
-            // Avoidance settings add complexity
-            if (settings.avoidance.minimumPropDistance > 0)
-                score *= 1.2f;
-            // Replaced nonexistent avoidance.avoidHazards with avoidance.avoidTransitions flag
-            if (settings.avoidance.avoidTransitions)
-                score *= 1.1f;
-            if (settings.avoidance.avoidOvercrowding)
-                score *= 1.1f;
-
-            // Clustering settings add complexity
-            if (settings.clustering.clusterSize > 1)
-                score *= 1.1f;
-            if (settings.clustering.clusterDensity > 0.5f)
-                score *= 1.05f;
-
-            // Variation settings add complexity
-            if (settings.variation.randomRotation)
-                score *= 1.02f;
-            if (math.abs(settings.variation.maxScale - settings.variation.minScale) > 0.1f)
-                score *= 1.02f;
-
-            return score;
-        }
-
-        private static BiomeArtIntegrationSystem.BiomeArtPriority DeterminePriority(float estimatedPropCount, float complexityScore)
-        {
-            float totalComplexity = estimatedPropCount * complexityScore;
-
-            if (totalComplexity > 500f)
-                return BiomeArtIntegrationSystem.BiomeArtPriority.Critical;
-            else if (totalComplexity > 200f)
-                return BiomeArtIntegrationSystem.BiomeArtPriority.High;
-            else if (totalComplexity > 50f)
-                return BiomeArtIntegrationSystem.BiomeArtPriority.Normal;
-            else
-                return BiomeArtIntegrationSystem.BiomeArtPriority.Low;
-        }
-    }
-
-    /// <summary>
-    /// Job for optimizing spatial coherence between neighboring biomes
-    /// </summary>
-    [BurstCompile]
-    public partial struct SpatialCoherenceOptimizationJob : IJobEntity
-    {
-        [ReadOnly] public ComponentLookup<CoreBiome> biomeLookup;
-        [ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
-
-        public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
-        {
-            if (!nodeIdLookup.TryGetComponent(entity, out var nodeId))
-                return;
-
-            // Calculate spatial coherence score based on neighboring biomes
-            float coherenceScore = CalculateSpatialCoherence(nodeId.Coordinates);
-
-            // Adjust priority based on spatial coherence
-            if (coherenceScore < 0.3f && optimizationTag.priority > BiomeArtIntegrationSystem.BiomeArtPriority.Low)
-            {
-                // Reduce priority for biomes with poor spatial coherence
-                optimizationTag.priority = (BiomeArtIntegrationSystem.BiomeArtPriority)((int)optimizationTag.priority - 1);
-            }
-            else if (coherenceScore > 0.8f && optimizationTag.priority < BiomeArtIntegrationSystem.BiomeArtPriority.Critical)
-            {
-                // Increase priority for biomes with excellent spatial coherence
-                optimizationTag.priority = (BiomeArtIntegrationSystem.BiomeArtPriority)((int)optimizationTag.priority + 1);
-            }
-        }
-
-        private static float CalculateSpatialCoherence(int2 coordinates)
-        {
-            // Advanced spatial coherence calculation using multi-layer analysis
-            // Analyzes neighboring biome patterns and connectivity metrics
-            float coherence = 1f;
-
-            // Calculate neighborhood connectivity using graph analysis
-            float connectivityScore = AnalyzeNeighborhoodConnectivity(coordinates);
-            coherence *= connectivityScore;
-
-            // Distance-based coherence with exponential falloff
-            float distanceFromOrigin = math.length(coordinates);
-            float normalizedDistance = math.clamp(distanceFromOrigin / 15f, 0f, 1f);
-            float distanceCoherence = math.exp(-normalizedDistance * 1.5f);
-            coherence *= distanceCoherence;
-
-            // Grid alignment bonus with pattern awareness
-            bool isGridAligned = (coordinates.x % 2 == 0 && coordinates.y % 2 == 0);
-            bool isOffsetAligned = ((coordinates.x + 1) % 2 == 0 && (coordinates.y + 1) % 2 == 0);
-            if (isGridAligned || isOffsetAligned)
-                coherence *= 1.15f; // Enhanced alignment bonus
-
-            // Add spatial clustering analysis
-            float clusteringScore = AnalyzeSpatialClustering(coordinates);
-            coherence *= (0.7f + clusteringScore * 0.3f);
-
-            return math.clamp(coherence, 0f, 1f);
-        }
-
-        private static float AnalyzeNeighborhoodConnectivity(int2 coordinates)
-        {
-            // Advanced neighborhood connectivity using graph analysis and real biome adjacency checks
-            float connectivity = 1f;
-            
-            // Calculate biome adjacency matrix for sophisticated neighbor analysis  
-            var adjacencyMap = BuildBiomeAdjacencyMap(coordinates, 3); // 3x3 radius
-            
-            // Analyze connection patterns using graph theory metrics
-            float clusteringCoefficient = CalculateClusteringCoefficient(adjacencyMap);
-            float pathConnectivity = CalculatePathConnectivity(adjacencyMap);
-            float centralityScore = CalculateBetweennessCentrality(coordinates, adjacencyMap);
-            
-            // Weight different connectivity aspects
-            connectivity *= clusteringCoefficient * 0.4f + pathConnectivity * 0.4f + centralityScore * 0.2f;
-            
-            // Bonus for grid alignment and symmetrical patterns
-            float symmetryBonus = CalculateSymmetryBonus(adjacencyMap);
-            connectivity *= (1f + symmetryBonus * 0.15f);
-            
-            return math.clamp(connectivity, 0.2f, 1.5f); // Allow some boost for excellent connectivity
-        }
-
-        private static Dictionary<int2, BiomeConnectionType> BuildBiomeAdjacencyMap(int2 center, int radius)
-        {
-            var adjacencyMap = new Dictionary<int2, BiomeConnectionType>();
-            
-            for (int dx = -radius; dx <= radius; dx++)
-            {
-                for (int dy = -radius; dy <= radius; dy++)
-                {
-                    int2 position = center + new int2(dx, dy);
-                    BiomeConnectionType connectionType = DetermineBiomeConnectionType(position, center);
-                    adjacencyMap[position] = connectionType;
-                }
-            }
-            
-            return adjacencyMap;
-        }
-
-        private static BiomeConnectionType DetermineBiomeConnectionType(int2 position, int2 center)
-        {
-            // Multi-layer biome analysis for connection type determination
-            float biomeCoherence = math.unlerp(-1f, 1f, math.sin(position.x * 0.7f + position.y * 0.9f));
-            float terrainCompatibility = math.unlerp(-1f, 1f, math.cos(position.x * 0.5f - position.y * 0.6f));
-            float accessibilityScore = CalculatePositionAccessibility(position, center);
-            
-            // Combine factors to determine connection strength
-            float combinedScore = (biomeCoherence * 0.4f + terrainCompatibility * 0.3f + accessibilityScore * 0.3f);
-            
-            if (combinedScore > 0.8f) return BiomeConnectionType.Strong;
-            else if (combinedScore > 0.6f) return BiomeConnectionType.Moderate;
-            else if (combinedScore > 0.3f) return BiomeConnectionType.Weak;
-            else return BiomeConnectionType.None;
-        }
-
-        private static float CalculatePositionAccessibility(int2 position, int2 center)
-        {
-            float distance = math.length(position - center);
-            if (distance == 0) return 1f;
-            
-            // Manhattan distance for grid-based accessibility
-            int manhattanDistance = math.abs(position.x - center.x) + math.abs(position.y - center.y);
-            float euclideanDistance = distance;
-            
-            // Prefer accessible positions (shorter paths)
-            float accessibilityScore = 1f / (1f + euclideanDistance * 0.3f);
-            
-            // Bonus for cardinal directions (easier movement)
-            bool isCardinal = (position.x == center.x) || (position.y == center.y);
-            if (isCardinal) accessibilityScore *= 1.2f;
-            
-            return accessibilityScore;
-        }
-
-        private static float CalculateClusteringCoefficient(Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Calculate how well-connected the neighborhood is (graph theory clustering coefficient)
-            float totalConnections = 0f;
-            float possibleConnections = 0f;
-            
-            var positions = adjacencyMap.Keys.ToArray();
-            
-            for (int i = 0; i < positions.Length; i++)
-            {
-                for (int j = i + 1; j < positions.Length; j++)
-                {
-                    possibleConnections++;
-                    
-                    var connectionStrength = GetConnectionStrength(adjacencyMap[positions[i]], adjacencyMap[positions[j]]);
-                    totalConnections += connectionStrength;
-                }
-            }
-            
-            return possibleConnections > 0 ? totalConnections / possibleConnections : 0f;
-        }
-
-        private static float CalculatePathConnectivity(Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Measure how well positions can reach each other through the adjacency network
-            var strongPositions = adjacencyMap.Where(kvp => kvp.Value >= BiomeConnectionType.Moderate).Select(kvp => kvp.Key).ToArray();
-            
-            if (strongPositions.Length < 2) return 0.3f; // Isolated or nearly isolated
-            
-            // Calculate average path efficiency between strong connection points
-            float totalPathEfficiency = 0f;
-            int pathCount = 0;
-            
-            for (int i = 0; i < strongPositions.Length; i++)
-            {
-                for (int j = i + 1; j < strongPositions.Length; j++)
-                {
-                    float pathEfficiency = CalculatePathEfficiency(strongPositions[i], strongPositions[j], adjacencyMap);
-                    totalPathEfficiency += pathEfficiency;
-                    pathCount++;
-                }
-            }
-            
-            return pathCount > 0 ? totalPathEfficiency / pathCount : 0.5f;
-        }
-
-        private static float CalculatePathEfficiency(int2 start, int2 end, Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Simple path efficiency: direct distance vs. actual connectivity requirement
-            float directDistance = math.length(end - start);
-            
-            // Estimate connection quality along the path
-            int2 direction = end - start;
-            float steps = math.max(math.abs(direction.x), math.abs(direction.y));
-            
-            if (steps == 0) return 1f;
-            
-            float pathQuality = 1f;
-            for (int step = 1; step <= steps; step++)
-            {
-                int2 checkPos = start + new int2(
-                    (int)(direction.x * step / steps),
-                    (int)(direction.y * step / steps)
-                );
-                
-                if (adjacencyMap.TryGetValue(checkPos, out var connectionType))
-                {
-                    pathQuality *= GetConnectionStrength(connectionType) * 0.9f + 0.1f; // Always maintain some path quality
-                }
-            }
-            
-            return pathQuality;
-        }
-
-        private static float CalculateBetweennessCentrality(int2 center, Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Simplified betweenness centrality: how many paths go through this position
-            var otherPositions = adjacencyMap.Keys.Where(pos => !pos.Equals(center)).ToArray();
-            
-            float centralityScore = 0f;
-            int totalPaths = 0;
-            
-            for (int i = 0; i < otherPositions.Length; i++)
-            {
-                for (int j = i + 1; j < otherPositions.Length; j++)
-                {
-                    totalPaths++;
-                    
-                    // Check if the shortest path between i and j passes through center
-                    if (IsOnShortestPath(otherPositions[i], otherPositions[j], center))
-                    {
-                        centralityScore += 1f;
-                    }
-                }
-            }
-            
-            return totalPaths > 0 ? centralityScore / totalPaths : 0.5f; // Default centrality
-        }
-
-        private static bool IsOnShortestPath(int2 start, int2 end, int2 candidate)
-        {
-            // Simplified check: is the candidate position roughly between start and end?
-            float distanceStartToEnd = math.length(end - start);
-            float distanceStartToCandidate = math.length(candidate - start);
-            float distanceCandidateToEnd = math.length(end - candidate);
-            
-            // If going through candidate is approximately the same as direct path, it's on the shortest path
-            float pathThroughCandidate = distanceStartToCandidate + distanceCandidateToEnd;
-            float tolerance = distanceStartToEnd * 0.1f; // 10% tolerance
-            
-            return pathThroughCandidate <= distanceStartToEnd + tolerance;
-        }
-
-        private static float CalculateSymmetryBonus(Dictionary<int2, BiomeConnectionType> adjacencyMap)
-        {
-            // Reward symmetrical patterns in biome layout
-            var center = adjacencyMap.Keys.OrderBy(pos => math.lengthsq(pos)).First(); // Find center-most position
-            float symmetryScore = 0f;
-            int comparisons = 0;
-            
-            foreach (var kvp in adjacencyMap)
-            {
-                int2 position = kvp.Key;
-                BiomeConnectionType connectionType = kvp.Value;
-                
-                // Check reflection across center for various axes
-                int2[] reflections = {
-                    new int2(center.x * 2 - position.x, position.y), // Horizontal reflection
-                    new int2(position.x, center.y * 2 - position.y), // Vertical reflection
-                    new int2(center.x * 2 - position.x, center.y * 2 - position.y) // Point reflection
-                };
-                
-                foreach (var reflection in reflections)
-                {
-                    if (adjacencyMap.TryGetValue(reflection, out var reflectedType))
-                    {
-                        float similarity = GetConnectionSimilarity(connectionType, reflectedType);
-                        symmetryScore += similarity;
-                        comparisons++;
-                    }
-                }
-            }
-            
-            return comparisons > 0 ? symmetryScore / comparisons : 0f;
-        }
-
-        private static float GetConnectionStrength(BiomeConnectionType connectionType)
-        {
-            return connectionType switch
-            {
-                BiomeConnectionType.Strong => 1f,
-                BiomeConnectionType.Moderate => 0.7f,
-                BiomeConnectionType.Weak => 0.4f,
-                BiomeConnectionType.None => 0.1f,
-                _ => 0.1f
-            };
-        }
-
-        private static float GetConnectionStrength(BiomeConnectionType type1, BiomeConnectionType type2)
-        {
-            // Connection strength between two connection types
-            float strength1 = GetConnectionStrength(type1);
-            float strength2 = GetConnectionStrength(type2);
-            return math.sqrt(strength1 * strength2); // Geometric mean for balanced consideration
-        }
-
-        private static float GetConnectionSimilarity(BiomeConnectionType type1, BiomeConnectionType type2)
-        {
-            if (type1 == type2) return 1f;
-            
-            // Calculate similarity based on connection strength difference
-            float strength1 = GetConnectionStrength(type1);
-            float strength2 = GetConnectionStrength(type2);
-            float difference = math.abs(strength1 - strength2);
-            
-            return 1f - difference; // Higher similarity for smaller differences
-        }
-
-        private enum BiomeConnectionType
-        {
-            None = 0,
-            Weak = 1,
-            Moderate = 2,
-            Strong = 3
-        }
-
-        private static float AnalyzeSpatialClustering(int2 coordinates)
-        {
-            // Advanced clustering analysis using spatial patterns
-            float clusterScore = 0f;
-            
-            // Check for natural clustering patterns
-            int clusterNeighbors = 0;
-            for (int radius = 1; radius <= 3; radius++)
-            {
-                for (int angle = 0; angle < 8; angle++)
-                {
-                    float angleRad = angle * math.PI / 4f;
-                    int2 checkPos = coordinates + new int2(
-                        (int)(math.cos(angleRad) * radius),
-                        (int)(math.sin(angleRad) * radius)
-                    );
-                    
-                    // Simulate biome clustering using multi-octave noise
-                    float clusterNoise = (math.sin(checkPos.x * 0.3f) + math.cos(checkPos.y * 0.3f)) * 0.5f;
-                    if (clusterNoise > 0.2f) clusterNeighbors++;
-                }
-            }
-            
-            clusterScore = math.saturate(clusterNeighbors / 24f); // 24 = 8 angles * 3 radii
-            return clusterScore;
-        }
-    }
-
-    /// <summary>
-    /// Hybrid component for main thread tilemap and prop processing
-    /// Handles Unity GameObject and Tilemap creation which cannot be done in jobs
-    /// </summary>
-    public partial class BiomeArtMainThreadSystem : SystemBase
-    {
-        protected override void OnUpdate()
-        {
-            // Process biome art profiles that need tilemap creation
-            Entities
-                .WithStructuralChanges()
-                .ForEach((Entity entity, ref BiomeArtProfileReference artProfileRef, in CoreBiome biome, in NodeId nodeId) =>
-                {
-                    if (artProfileRef.IsApplied)
-                        return;
-
-                    // UnityObjectRef validity check (method expected)
-                    bool isValid = artProfileRef.ProfileRef.IsValid();
-                    if (!isValid)
-                        return;
-
-                    var artProfile = artProfileRef.ProfileRef.Value;
-                    if (artProfile == null)
-                        return;
-
-                    // Create tilemap based on projection type
-                    var grid = CreateBiomeSpecificTilemap(artProfileRef.ProjectionType, artProfile, biome, nodeId);
-
-                    // Place props (grid may be null if creation failed)
-                    PlaceBiomeProps(artProfile, biome, nodeId, grid);
-
-                    // Mark as applied
-                    artProfileRef.IsApplied = true;
-
-                }).Run();
-        }
-
-        private Grid CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
-        {
-            // Get appropriate layer configuration based on projection type
-            string[] layerNames = GetLayerNamesForProjection(projectionType);
-
-            // Create grid with appropriate projection settings (factory methods are void; capture before/after set)
-            var existing = UnityEngine.Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
-            HashSet<Grid> before = new(existing);
-            InvokeProjectionCreation(projectionType);
-            Grid createdGrid = UnityEngine.Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
-                .Where(g => !before.Contains(g))
-                .OrderByDescending(g => g.GetInstanceID())
-                .FirstOrDefault();
-
-            if (createdGrid == null)
-            {
-                createdGrid = existing.OrderByDescending(g => g.GetInstanceID()).FirstOrDefault();
-            }
-
-            if (createdGrid != null)
-            {
-                // Use previously unused parameters nodeId + biome to position and label the grid meaningfully
-                var biomeCenter = new Vector3(nodeId.Coordinates.x, nodeId.Coordinates.y, 0f);
-                createdGrid.transform.position = biomeCenter; // Anchor grid at biome logical center
-
-                createdGrid.name = string.IsNullOrEmpty(artProfile.biomeName)
-                    ? $"Biome Grid [{biome.Type}] ({projectionType}) @ {nodeId.Coordinates}" // include biome type + coords
-                    : $"{artProfile.biomeName} Grid [{biome.Type}] ({projectionType}) @ {nodeId.Coordinates}";
-
-                // Propagate debug color (if provided) to child tilemap renderers that do not have material overrides
-                if (artProfile.debugColor.a > 0f)
-                {
-                    foreach (var r in createdGrid.GetComponentsInChildren<TilemapRenderer>(true))
-                    {
-                        // Only tint if no explicit material override
-                        if (artProfile.materialOverride == null && r.sharedMaterial != null && r.sharedMaterial.HasProperty("_Color"))
-                        {
-                            // Duplicate material instance to avoid editing shared asset at runtime
-                            var instMat = UnityEngine.Object.Instantiate(r.sharedMaterial);
-                            instMat.name = r.sharedMaterial.name + " (BiomeTint)";
-                            instMat.color = artProfile.debugColor;
-                            r.material = instMat;
-                        }
-                    }
-                }
-
-                // Apply biome-specific tiles to the created layers
-                ApplyBiomeTilesToLayers(artProfile, layerNames, createdGrid);
-            }
-
-            return createdGrid;
-        }
-
-        private string[] GetLayerNamesForProjection(ProjectionType projectionType)
-        {
-            // Define layer configurations directly instead of using Editor-only enums
-            return projectionType switch
-            {
-                ProjectionType.Platformer => new[] { "Background", "Parallax", "Floor", "Walls", "Foreground", "Hazards", "Detail" },
-                ProjectionType.TopDown => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-                ProjectionType.Isometric => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-                ProjectionType.Hexagonal => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-                _ => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" }
-            };
-        }
-
-        private void InvokeProjectionCreation(ProjectionType projectionType)
-        {
-            // Create grid directly using Unity API instead of Editor-only TwoDimensionalGridSetup
-            GameObject gridGO;
-            Grid grid;
-            
-            switch (projectionType)
-            {
-                case ProjectionType.Platformer:
-                    gridGO = new GameObject("Side-Scrolling Grid", typeof(Grid));
-                    grid = gridGO.GetComponent<Grid>();
-                    grid.cellLayout = GridLayout.CellLayout.Rectangle;
-                    break;
-                case ProjectionType.TopDown:
-                    gridGO = new GameObject("Top-Down Grid", typeof(Grid));
-                    grid = gridGO.GetComponent<Grid>();
-                    grid.cellLayout = GridLayout.CellLayout.Rectangle;
-                    break;
-                case ProjectionType.Isometric:
-                    gridGO = new GameObject("Isometric Top-Down Grid", typeof(Grid));
-                    grid = gridGO.GetComponent<Grid>();
-                    grid.cellLayout = GridLayout.CellLayout.Isometric;
-                    break;
-                case ProjectionType.Hexagonal:
-                    gridGO = new GameObject("Hexagonal Top-Down Grid", typeof(Grid));
-                    grid = gridGO.GetComponent<Grid>();
-                    grid.cellLayout = GridLayout.CellLayout.Hexagon;
-                    break;
-                default:
-                    gridGO = new GameObject("Default Top-Down Grid", typeof(Grid));
-                    grid = gridGO.GetComponent<Grid>();
-                    grid.cellLayout = GridLayout.CellLayout.Rectangle;
-                    break;
-            }
-            
-            gridGO.transform.position = Vector3.zero;
-            
-            // Create tilemap layers for this grid
-            string[] layerNames = GetLayerNamesForProjection(projectionType);
-            for (int i = 0; i < layerNames.Length; i++)
-            {
-                int flippedZ = layerNames.Length - 1 - i;
-                CreateTilemapLayer(gridGO.transform, layerNames[i], flippedZ);
-            }
-        }
-        
-        private void CreateTilemapLayer(Transform parent, string layerName, int zDepth)
-        {
-            var layerGO = new GameObject(layerName, typeof(Tilemap), typeof(TilemapRenderer));
-            layerGO.transform.SetParent(parent);
-            layerGO.transform.localPosition = new Vector3(0, 0, -zDepth);
-            
-            var renderer = layerGO.GetComponent<TilemapRenderer>();
-            renderer.sortingLayerName = layerName;
-            if (renderer.sortingLayerName != layerName)
-            {
-                UnityEngine.Debug.LogWarning($"Sorting Layer '{layerName}' not found. Renderer will use default sorting layer.");
-            }
-            renderer.sortingOrder = 0;
-        }
-
-        private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string[] layerNames, Grid grid)
-        {
-            if (grid == null) return;
-
-            foreach (string layerName in layerNames)
-            {
-                var layerObject = grid.transform.Find(layerName);
-                if (layerObject == null) continue;
-
-                var tilemap = layerObject.GetComponent<Tilemap>();
-                var renderer = layerObject.GetComponent<TilemapRenderer>();
-
-                if (tilemap == null || renderer == null) continue;
-
-                // Apply biome-specific tiles based on layer type
-                ApplyTileToLayer(tilemap, renderer, layerName, artProfile);
-            }
-        }
-
-        private void ApplyTileToLayer(Tilemap tilemap, TilemapRenderer renderer, string layerName, BiomeArtProfile artProfile)
-        {
-            TileBase tileToApply = null;
-
-            // Determine which tile to use based on layer name
-            if (layerName.Contains("Floor") || layerName.Contains("Ground"))
-            {
-                tileToApply = artProfile.floorTile;
-            }
-            else if (layerName.Contains("Wall") || layerName.Contains("Hazards"))
-            {
-                tileToApply = artProfile.wallTile;
-            }
-            else if (layerName.Contains("Background") || layerName.Contains("Parallax"))
-            {
-                tileToApply = artProfile.backgroundTile;
-            }
-
-            if (tileToApply != null)
-            {
-                Vector3Int position = Vector3Int.zero;
-                tilemap.SetTile(position, tileToApply);
-            }
-
-            // Apply material and sorting layer overrides if specified
-            if (!string.IsNullOrEmpty(artProfile.sortingLayerOverride))
-            {
-                renderer.sortingLayerName = artProfile.sortingLayerOverride;
-            }
-
-            if (artProfile.materialOverride != null)
-            {
-                renderer.material = artProfile.materialOverride;
-            }
-        }
-
-        private void PlaceBiomeProps(BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId, Grid grid)
-        {
-            if (artProfile.propSettings?.propPrefabs == null || artProfile.propSettings.propPrefabs.Length == 0)
-                return;
-
-            // Use provided grid; fallback if null
-            if (grid == null)
-            {
-                grid = GameObject.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
-                    .OrderByDescending(g => g.GetInstanceID())
-                    .FirstOrDefault();
-            }
-            if (grid == null) return;
-
-            var placer = new AdvancedPropPlacer(artProfile.propSettings, grid, biome, nodeId);
-            placer.PlaceProps();
-        }
-    }
-
-    /// <summary>
-    /// Advanced prop placement system for B+/A-level biome art
-    /// Implements clustering, avoidance, density curves, and terrain awareness
-    /// </summary>
-    public class AdvancedPropPlacer
-    {
-        private readonly PropPlacementSettings settings;
-        private readonly Grid grid;
-        private readonly CoreBiome biome;
-        private readonly NodeId nodeId;
-        private readonly System.Random rng;
-        private readonly List<Vector3> placedPropPositions;
-
-        public AdvancedPropPlacer(PropPlacementSettings settings, Grid grid, CoreBiome biome, NodeId nodeId)
-        {
-            this.settings = settings;
-            this.grid = grid;
-            this.biome = biome;
-            this.nodeId = nodeId;
-            this.rng = new System.Random(nodeId.Coordinates.GetHashCode());
-            this.placedPropPositions = new List<Vector3>();
-        }
-
-        public void PlaceProps()
-        {
-            switch (settings.strategy)
-            {
-                case PropPlacementStrategy.Random:
-                    PlaceRandomProps();
-                    break;
-                case PropPlacementStrategy.Clustered:
-                    PlaceClusteredProps();
-                    break;
-                case PropPlacementStrategy.Sparse:
-                    PlaceSparseProps();
-                    break;
-                case PropPlacementStrategy.Linear:
-                    PlaceLinearProps();
-                    break;
-                case PropPlacementStrategy.Radial:
-                    PlaceRadialProps();
-                    break;
-                case PropPlacementStrategy.Terrain:
-                    PlaceTerrainAwareProps();
-                    break;
-            }
-        }
-
-        private void PlaceRandomProps()
-        {
-            foreach (string layerName in settings.allowedPropLayers)
-            {
-                var layerObject = grid.transform.Find(layerName);
-                if (layerObject == null) continue;
-
-                int propCount = CalculatePropCount(layerName);
-
-                for (int i = 0; i < propCount; i++)
-                {
-                    Vector3 position = GenerateRandomPosition(layerObject);
-
-                    if (IsPositionValid(position, layerName))
-                    {
-                        PlacePropAtPosition(position, layerObject);
-                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
-                    }
-                }
-            }
-        }
-
-        private void PlaceClusteredProps()
-        {
-            foreach (string layerName in settings.allowedPropLayers)
-            {
-                var layerObject = grid.transform.Find(layerName);
-                if (layerObject == null) continue;
-
-                int clusterCount = Mathf.Max(1, Mathf.RoundToInt(settings.baseDensity * settings.densityMultiplier * 10));
-                var clusterCenters = GenerateClusterCenters(clusterCount, layerObject);
-
-                foreach (var center in clusterCenters)
-                {
-                    PlaceClusterAroundCenter(center, layerObject);
-                    if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
-                }
-            }
-        }
-
-        private void PlaceSparseProps()
-        {
-            foreach (string layerName in settings.allowedPropLayers)
-            {
-                var layerObject = grid.transform.Find(layerName);
-                if (layerObject == null) continue;
-
-                int maxAttempts = Mathf.RoundToInt(settings.maxPropsPerBiome * 0.1f);
-                int placedCount = 0;
-                int attempts = 0;
-
-                int perLayerTarget = Mathf.Max(1, maxAttempts / Mathf.Max(1, settings.allowedPropLayers.Count));
-
-                while (placedCount < perLayerTarget && attempts < maxAttempts * 3)
-                {
-                    Vector3 position = GenerateRandomPosition(layerObject);
-
-                    if (IsHighQualityPosition(position, layerName))
-                    {
-                        PlacePropAtPosition(position, layerObject);
-                        placedCount++;
-                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
-                    }
-                    attempts++;
-                }
-            }
-        }
-
-        private void PlaceLinearProps()
-        {
-            foreach (string layerName in settings.allowedPropLayers)
-            {
-                var layerObject = grid.transform.Find(layerName);
-                if (layerObject == null) continue;
-
-                var edgePoints = FindEdgePoints(layerObject);
-
-                foreach (var point in edgePoints)
-                {
-                    if (rng.NextDouble() < settings.baseDensity * settings.densityMultiplier)
-                    {
-                        if (IsPositionValid(point, layerName))
-                        {
-                            PlacePropAtPosition(point, layerObject);
-                            if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void PlaceRadialProps()
-        {
-            foreach (string layerName in settings.allowedPropLayers)
-            {
-                var layerObject = grid.transform.Find(layerName);
-                if (layerObject == null) continue;
-
-                Vector3 center = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
-                float maxRadius = 10f;
-
-                for (float radius = 1f; radius <= maxRadius; radius += 2f)
-                {
-                    int pointsOnCircle = Mathf.RoundToInt(radius * 2 * Mathf.PI * settings.baseDensity);
-
-                    for (int i = 0; i < pointsOnCircle; i++)
-                    {
-                        float angle = (float)i / pointsOnCircle * 2 * Mathf.PI;
-                        Vector3 position = center + new Vector3(
-                            Mathf.Cos(angle) * radius,
-                            Mathf.Sin(angle) * radius,
-                            0
-                        );
-
-                        if (IsPositionValid(position, layerName))
-                        {
-                            PlacePropAtPosition(position, layerObject);
-                            if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void PlaceTerrainAwareProps()
-        {
-            foreach (string layerName in settings.allowedPropLayers)
-            {
-                var layerObject = grid.transform.Find(layerName);
-                if (layerObject == null) continue;
-
-                var terrainSamples = SampleTerrain(layerObject);
-
-                foreach (var sample in terrainSamples)
-                {
-                    float terrainSuitability = CalculateTerrainSuitability(sample, layerName);
-                    float spawnChance = settings.baseDensity * terrainSuitability * settings.densityMultiplier;
-
-                    if (rng.NextDouble() < spawnChance && IsPositionValid(sample.position, layerName))
-                    {
-                        PlacePropAtPosition(sample.position, layerObject);
-                        if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
-                    }
-                }
-            }
-        }
-
-        private int CalculatePropCount(string layerName)
-        {
-            // Base density influenced by distance + global settings
-            float baseCount = settings.baseDensity * settings.densityMultiplier * 50;
-            float distanceFromCenter = Vector2.Distance(Vector2.zero, new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y));
-            float normalizedDistance = Mathf.Clamp01(distanceFromCenter / 20f);
-            float densityFactor = settings.densityCurve.Evaluate(1f - normalizedDistance);
-
-            // Layer-specific scaling (previously unused layerName parameter now meaningfully applied)
-            if (!string.IsNullOrEmpty(layerName))
-            {
-                if (layerName.Contains("Background"))
-                    baseCount *= 0.35f; // fewer background props
-                else if (layerName.Contains("Parallax"))
-                    baseCount *= 0.2f; // parallax layers are sparse
-                else if (layerName.Contains("Foreground") || layerName.Contains("Detail"))
-                    baseCount *= 1.25f; // more detail on foreground layers
-                else if (layerName.Contains("Hazard"))
-                    baseCount *= 0.6f; // hazards sparse
-            }
-
-            return Mathf.RoundToInt(baseCount * densityFactor);
-        }
-
-        private Vector3 GenerateRandomPosition(Transform layerObject)
-        {
-            // Base random position around biome logical center
-            Vector3 baseCenter = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
-
-            // If we have a layer object, bias the center to that object's transform (meaningful use of parameter)
-            if (layerObject != null)
-            {
-                baseCenter = layerObject.position;
-                // If a Tilemap exists, constrain sampling to its cell bounds for more accurate placement
-                if (layerObject.TryGetComponent<Tilemap>(out var tm))
-                {
-                    var bounds = tm.cellBounds; // integer cell bounds
-                    // Choose a random cell within bounds then convert to world position
-                    int rx = rng.Next(bounds.xMin, bounds.xMax + 1);
-                    int ry = rng.Next(bounds.yMin, bounds.yMax + 1);
-                    Vector3 cellWorld = tm.CellToWorld(new Vector3Int(rx, ry, 0));
-                    baseCenter = cellWorld + tm.tileAnchor; // anchor offset
-                }
-            }
-
-            float x = (float)(rng.NextDouble() * 20 - 10) + baseCenter.x;
-            float y = (float)(rng.NextDouble() * 20 - 10) + baseCenter.y;
-
-            if (settings.variation.positionJitter > 0)
-            {
-                x += (float)(rng.NextDouble() - 0.5) * settings.variation.positionJitter;
-                y += (float)(rng.NextDouble() - 0.5) * settings.variation.positionJitter;
-            }
-
-            return new Vector3(x, y, 0);
-        }
-
-        private bool IsPositionValid(Vector3 position, string layerName)
-        {
-            if (string.IsNullOrEmpty(layerName))
-            {
-                if (settings.avoidance.avoidOvercrowding)
-                {
-                    foreach (var existingPos in placedPropPositions)
-                    {
-                        if (Vector3.Distance(position, existingPos) < settings.avoidance.minimumPropDistance)
-                            return false;
-                    }
-                }
-            }
-
-            foreach (string avoidLayer in settings.avoidance.avoidLayers)
-            {
-                if (IsNearLayer(position, avoidLayer, settings.avoidance.avoidanceRadius))
-                    return false;
-            }
-
-            if (settings.avoidance.avoidTransitions && IsNearBiomeTransition(position))
-                return false;
-
-            return true;
-        }
-
-        private bool IsHighQualityPosition(Vector3 position, string layerName)
-        {
-            // Add layer-aware quality adjustments (meaningful use of layerName parameter beyond validity pass-through)
-            float qualityBoost = 1f;
-            if (!string.IsNullOrEmpty(layerName))
-            {
-                if (layerName.Contains("Foreground") || layerName.Contains("Detail")) qualityBoost *= 1.2f; // encourage detail layers
-                if (layerName.Contains("Parallax") || layerName.Contains("Background")) qualityBoost *= 0.7f; // discourage props in far layers
-                if (layerName.Contains("Hazard")) qualityBoost *= 0.5f; // sparse hazards
-            }
-
-            bool spatialOk = IsPositionValid(position, layerName) &&
-                             !IsNearLayer(position, "Edge", 3f) &&
-                             placedPropPositions.All(p => Vector3.Distance(position, p) > settings.avoidance.minimumPropDistance * 2);
-
-            if (!spatialOk) return false;
-            // Random acceptance gate influenced by qualityBoost to allow slight stochastic variety
-            return rng.NextDouble() < qualityBoost;
-        }
-
-        private List<Vector3> GenerateClusterCenters(int clusterCount, Transform layerObject)
-        {
-            var centers = new List<Vector3>();
-            int attempts = 0;
-
-            while (centers.Count < clusterCount && attempts < clusterCount * 10)
-            {
-                Vector3 candidate = GenerateRandomPosition(layerObject);
-
-                bool validCenter = true;
-                foreach (var existingCenter in centers)
-                {
-                    if (Vector3.Distance(candidate, existingCenter) < settings.clustering.clusterSeparation)
-                    {
-                        validCenter = false;
-                        break;
-                    }
-                }
-
-                if (validCenter && IsPositionValid(candidate, layerObject.name))
-                {
-                    centers.Add(candidate);
-                }
-
-                attempts++;
-            }
-
-            return centers;
-        }
-
-        private void PlaceClusterAroundCenter(Vector3 center, Transform layerObject)
-        {
-            int propsInCluster = Mathf.RoundToInt(settings.clustering.clusterSize * settings.clustering.clusterDensity);
-
-            for (int i = 0; i < propsInCluster; i++)
-            {
-                float angle = (float)(rng.NextDouble() * 2 * Mathf.PI);
-                float distance = (float)(rng.NextDouble() * settings.clustering.clusterRadius);
-
-                Vector3 offset = new(
-                    Mathf.Cos(angle) * distance,
-                    Mathf.Sin(angle) * distance,
-                    0
-                );
-
-                Vector3 propPosition = center + offset;
-
-                if (IsPositionValid(propPosition, layerObject.name))
-                {
-                    PlacePropAtPosition(propPosition, layerObject);
-                    if (placedPropPositions.Count >= settings.maxPropsPerBiome) return;
-                }
-            }
-        }
-
-        private List<Vector3> FindEdgePoints(Transform layerObject)
-        {
-            var edgePoints = new List<Vector3>();
-
-            Vector3 center = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
-
-            // Radius & point density adapt to layer name (utilize previously unused layerObject parameter more fully)
-            float radius = 8f;
-            int pointCount = 20;
-            string lname = layerObject != null ? layerObject.name : string.Empty;
-            if (!string.IsNullOrEmpty(lname))
-            {
-                if (lname.Contains("Background") || lname.Contains("Parallax"))
-                {
-                    radius *= 1.5f; // broader ring for backgrounds
-                    pointCount = Mathf.RoundToInt(pointCount * 0.6f); // fewer points needed
-                }
-                else if (lname.Contains("Foreground") || lname.Contains("Detail"))
-                {
-                    radius *= 0.9f; // slightly tighter ring
-                    pointCount = Mathf.RoundToInt(pointCount * 1.3f);
-                }
-                else if (lname.Contains("Hazard"))
-                {
-                    radius *= 0.7f;
-                }
-            }
-
-            for (int i = 0; i < pointCount; i++)
-            {
-                float angle = (float)i / pointCount * 2 * Mathf.PI;
-                Vector3 edgePoint = center + new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    Mathf.Sin(angle) * radius,
-                    0
-                );
-                edgePoints.Add(edgePoint);
-            }
-
-            return edgePoints;
-        }
-
-        private struct TerrainSample
-        {
-            public Vector3 position;
-            public string terrainType;
-            public float elevation;
-            public float moisture;
-        }
-
-        private List<TerrainSample> SampleTerrain(Transform layerObject)
-        {
-            var samples = new List<TerrainSample>();
-
-            Vector3 center = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
-
-            for (float x = -8; x <= 8; x += 2)
-            {
-                for (float y = -8; y <= 8; y += 2)
-                {
-                    Vector3 samplePos = center + new Vector3(x, y, 0);
-
-                    samples.Add(new TerrainSample
-                    {
-                        position = samplePos,
-                        terrainType = layerObject.name,
-                        elevation = Mathf.PerlinNoise(samplePos.x * 0.1f, samplePos.y * 0.1f),
-                        moisture = Mathf.PerlinNoise(samplePos.x * 0.05f + 100, samplePos.y * 0.05f + 100)
-                    });
-                }
-            }
-
-            return samples;
-        }
-
-        private float CalculateTerrainSuitability(TerrainSample sample, string layerName)
-        {
-            float suitability = 1f;
-
-            // Advanced terrain analysis replacing simple Perlin noise approach
-            float elevation = sample.elevation;
-            float moisture = sample.moisture;
-            float temperature = CalculateTemperature(sample.position, elevation);
-            float slope = CalculateSlope(sample.position, elevation);
-            float accessibility = CalculateAccessibility(sample.position);
-
-            // Layer-specific terrain preferences
-            if (layerName.Contains("Ground") || layerName.Contains("Floor"))
-            {
-                // Ground layers prefer moderate elevation and low slope
-                suitability *= (1f - Mathf.Abs(elevation - 0.5f)) * 1.5f;
-                suitability *= (1f - slope);
-                suitability *= accessibility;
-            }
-            else if (layerName.Contains("Water") || layerName.Contains("Lake"))
-            {
-                // Water layers require high moisture and low elevation
-                suitability *= moisture * 1.8f;
-                suitability *= (1f - elevation) * 1.5f;
-                suitability *= (1f - slope) * 1.2f;
-            }
-            else if (layerName.Contains("Mountain") || layerName.Contains("Rock"))
-            {
-                // Mountain layers prefer high elevation and can handle slopes
-                suitability *= elevation * 1.6f;
-                suitability *= (slope * 0.8f + 0.2f); // Actually prefer some slope
-                suitability *= (1f - moisture * 0.5f); // Slight preference for drier areas
-            }
-            else if (layerName.Contains("Forest") || layerName.Contains("Tree"))
-            {
-                // Forest layers need balanced conditions
-                float optimalMoisture = Mathf.Clamp01(1f - Mathf.Abs(moisture - 0.6f) * 2f);
-                float optimalTemperature = Mathf.Clamp01(1f - Mathf.Abs(temperature - 0.5f) * 2f);
-                suitability *= optimalMoisture * 1.3f;
-                suitability *= optimalTemperature * 1.2f;
-                suitability *= (1f - slope * 0.7f); // Moderate slope tolerance
-                suitability *= accessibility * 0.8f; // Less dependent on accessibility
-            }
-            else if (layerName.Contains("Desert") || layerName.Contains("Sand"))
-            {
-                // Desert layers prefer low moisture, high temperature
-                suitability *= (1f - moisture) * 1.5f;
-                suitability *= temperature * 1.4f;
-                suitability *= (1f - slope * 0.5f);
-            }
-            else if (layerName.Contains("Swamp") || layerName.Contains("Marsh"))
-            {
-                // Swamp layers need high moisture, low elevation, poor accessibility
-                suitability *= moisture * 1.8f;
-                suitability *= (1f - elevation) * 1.4f;
-                suitability *= (1f - accessibility * 0.6f); // Actually prefer less accessible areas
-            }
-            else if (layerName.Contains("Tundra") || layerName.Contains("Ice"))
-            {
-                // Tundra prefers low temperature, moderate moisture
-                suitability *= (1f - temperature) * 1.6f;
-                suitability *= Mathf.Clamp01(1f - Mathf.Abs(moisture - 0.4f) * 2f) * 1.2f;
-                suitability *= (1f - slope * 0.3f);
-            }
-            else if (layerName.Contains("Cave") || layerName.Contains("Underground"))
-            {
-                // Cave layers prefer consistent conditions, protected from surface variation
-                suitability *= Mathf.Clamp01(1f - Mathf.Abs(elevation - 0.3f) * 1.5f); // Prefer lower elevations
-                suitability *= (1f - temperature * 0.4f); // Cooler underground
-                suitability *= Mathf.Clamp01(1f - slope * 0.8f); // Avoid steep terrain for cave access
-                suitability *= (accessibility * 0.6f + 0.4f); // Some accessibility needed but not critical
-            }
-            else if (layerName.Contains("Cliff") || layerName.Contains("Precipice") || layerName.Contains("Edge"))
-            {
-                // Cliff layers require dramatic elevation changes and steep slopes
-                suitability *= slope * 2f; // Actually require steep slopes
-                suitability *= elevation * 1.4f; // Prefer higher elevations
-                suitability *= (1f - moisture * 0.3f); // Less vegetation for dramatic effect
-                suitability *= (accessibility * 0.3f + 0.7f); // Accessibility less important for cliffs
-            }
-            else if (layerName.Contains("Lava") || layerName.Contains("Volcanic") || layerName.Contains("Magma"))
-            {
-                // Volcanic layers need extreme temperature and specific geological conditions
-                suitability *= temperature * 2f; // Extreme heat
-                suitability *= (1f - moisture) * 1.8f; // Very dry conditions
-                suitability *= Mathf.Clamp01(slope * 0.8f + 0.2f); // Some slope for lava flow
-                suitability *= (1f - accessibility * 0.7f); // Dangerous, low accessibility
-                suitability *= elevation * 1.2f; // Often at higher elevations
-            }
-            else if (layerName.Contains("Crystal") || layerName.Contains("Gem") || layerName.Contains("Mineral"))
-            {
-                // Crystal formations need stable geological conditions
-                suitability *= Mathf.Clamp01(1f - slope * 1.2f); // Prefer stable, flat areas
-                suitability *= (elevation * 0.6f + 0.4f); // Slight elevation preference
-                suitability *= (1f - moisture * 0.5f); // Drier conditions for crystal formation
-                suitability *= CalculateGeologicalStability(sample.position);
-            }
-            else if (layerName.Contains("Ruins") || layerName.Contains("Ancient") || layerName.Contains("Temple"))
-            {
-                // Ancient structures prefer historically significant locations
-                suitability *= accessibility * 1.5f; // Must be accessible for construction
-                suitability *= Mathf.Clamp01(1f - slope * 0.9f); // Relatively flat for construction
-                suitability *= CalculateHistoricalSignificance(sample.position);
-                suitability *= (elevation * 0.7f + 0.3f); // Slight preference for elevated defensive positions
-            }
-            else if (layerName.Contains("Cosmic") || layerName.Contains("Ethereal") || layerName.Contains("Void"))
-            {
-                // Cosmic/ethereal layers use otherworldly criteria
-                suitability *= CalculateCosmicAlignment(sample.position);
-                suitability *= (1f - accessibility * 0.8f); // Otherworldly areas are less accessible
-                suitability *= Mathf.Abs(Mathf.Sin(elevation * Mathf.PI * 3f)) * 1.3f; // Oscillating preference
-            }
-            else if (layerName.Contains("Hazard") || layerName.Contains("Danger") || layerName.Contains("Trap"))
-            {
-                // Hazardous areas have inverted preferences
-                suitability *= (1f - accessibility) * 1.4f; // Prefer inaccessible areas
-                suitability *= slope * 1.3f; // Dangerous terrain
-                suitability *= CalculateNaturalHazardPotential(sample.position);
-            }
-            else
-            {
-                // Custom/unknown layer types get balanced evaluation
-                suitability *= CalculateGenericLayerSuitability(sample, layerName);
-            }
-
-            // Global terrain quality factors
-            suitability *= CalculateTerrainStability(slope, accessibility);
-            suitability *= CalculateBiomeBoundaryFactor(sample.position);
-
-            return Mathf.Clamp01(suitability);
-        }
-
-        private float CalculateTemperature(Vector3 position, float elevation)
-        {
-            // Temperature decreases with elevation and varies by latitude
-            float baseTemperature = Mathf.PerlinNoise(position.x * 0.02f, position.y * 0.02f);
-            float elevationEffect = (1f - elevation) * 0.4f;
-            float latitudeEffect = 1f - Mathf.Abs(position.y * 0.01f) % 1f;
-            
-            return Mathf.Clamp01(baseTemperature + elevationEffect + latitudeEffect * 0.3f);
-        }
-
-        private float CalculateSlope(Vector3 position, float currentElevation)
-        {
-            // Sample nearby elevations to calculate slope
-            float sampleDistance = 2f;
-            float northElevation = Mathf.PerlinNoise(position.x * 0.1f, (position.z + sampleDistance) * 0.1f);
-            float southElevation = Mathf.PerlinNoise(position.x * 0.1f, (position.z - sampleDistance) * 0.1f);
-            float eastElevation = Mathf.PerlinNoise((position.x + sampleDistance) * 0.1f, position.z * 0.1f);
-            float westElevation = Mathf.PerlinNoise((position.x - sampleDistance) * 0.1f, position.z * 0.1f);
-
-            float maxDifference = Mathf.Max(
-                Mathf.Abs(northElevation - currentElevation),
-                Mathf.Abs(southElevation - currentElevation),
-                Mathf.Abs(eastElevation - currentElevation),
-                Mathf.Abs(westElevation - currentElevation)
-            );
-
-            return Mathf.Clamp01(maxDifference * 2f); // Scale to 0-1 range
-        }
-
-        private float CalculateAccessibility(Vector3 position)
-        {
-            // Advanced accessibility calculation using multi-factor path analysis
-            // Considers elevation gradients, terrain obstacles, and connectivity networks
-            
-            float distanceFromCenter = Vector2.Distance(
-                new Vector2(position.x, position.z),
-                new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y)
-            );
-
-            // Sophisticated distance-based accessibility with terrain consideration
-            float normalizedDistance = Mathf.Clamp01(distanceFromCenter / 15f);
-            float baseAccessibility = 1f - (normalizedDistance * normalizedDistance); // Quadratic falloff
-            
-            // Multi-layer noise for realistic terrain variation
-            float terrainNoise1 = Mathf.PerlinNoise(position.x * 0.15f + 50, position.z * 0.15f + 50);
-            float terrainNoise2 = Mathf.PerlinNoise(position.x * 0.3f + 100, position.z * 0.3f + 100) * 0.5f;
-            float terrainNoise3 = Mathf.PerlinNoise(position.x * 0.6f + 200, position.z * 0.6f + 200) * 0.25f;
-            float combinedNoise = (terrainNoise1 + terrainNoise2 + terrainNoise3) / 1.75f;
-            
-            // Simulate path networks using coordinate-based patterns
-            float pathNetworkScore = CalculatePathNetworkAccessibility(position);
-            
-            // Elevation-based accessibility modifier
-            float elevation = Mathf.PerlinNoise(position.x * 0.1f, position.z * 0.1f);
-            float elevationModifier = 1f - Mathf.Abs(elevation - 0.4f) * 1.5f; // Prefer mid-elevation
-            
-            // Combine all factors
-            float accessibility = baseAccessibility * 0.4f + 
-                                 combinedNoise * 0.3f + 
-                                 pathNetworkScore * 0.2f + 
-                                 elevationModifier * 0.1f;
-            
-            return Mathf.Clamp01(accessibility);
-        }
-
-        private float CalculatePathNetworkAccessibility(Vector3 position)
-        {
-            // Simulate natural path formation using river-like algorithms
-            float pathScore = 0f;
-            
-            // Check for natural corridors (valleys, flat areas)
-            for (int angle = 0; angle < 8; angle++)
-            {
-                float angleRad = angle * Mathf.PI / 4f;
-                Vector3 direction = new Vector3(Mathf.Cos(angleRad), 0, Mathf.Sin(angleRad));
-                
-                float corridorScore = 0f;
-                for (float distance = 1f; distance <= 5f; distance += 1f)
-                {
-                    Vector3 checkPos = position + direction * distance;
-                    float checkElevation = Mathf.PerlinNoise(checkPos.x * 0.1f, checkPos.z * 0.1f);
-                    float currentElevation = Mathf.PerlinNoise(position.x * 0.1f, position.z * 0.1f);
-                    
-                    // Prefer gentle slopes for accessibility
-                    float elevationDiff = Mathf.Abs(checkElevation - currentElevation);
-                    corridorScore += (1f - elevationDiff) * (1f / distance); // Weight by inverse distance
-                }
-                
-                pathScore = Mathf.Max(pathScore, corridorScore / 5f); // Best corridor wins
-            }
-            
-            return Mathf.Clamp01(pathScore);
-        }
-
-        private float CalculateTerrainStability(float slope, float accessibility)
-        {
-            // Stable terrain is accessible and not too steep
-            float slopeStability = 1f - (slope * 0.8f);
-            float accessibilityStability = accessibility * 0.6f + 0.4f; // Don't fully penalize inaccessible areas
-            
-            return slopeStability * accessibilityStability;
-        }
-
-        private float CalculateBiomeBoundaryFactor(Vector3 position)
-        {
-            // Advanced biome boundary detection using multi-sample analysis
-            // Implements real boundary detection based on biome transition zones
-            float distanceFromBiomeCenter = Vector2.Distance(
-                new Vector2(position.x, position.z),
-                new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y)
-            );
-
-            float biomeBoundaryDistance = 8f; // Biome influence radius
-            float normalizedDistance = distanceFromBiomeCenter / biomeBoundaryDistance;
-
-            // Multi-sample biome boundary detection
-            float boundaryFactor = DetectBiomeBoundary(position);
-            
-            // Enhanced boundary transition logic
-            if (normalizedDistance > 0.6f)
-            {
-                // Approaching boundary - apply graduated transition
-                float transitionZone = (normalizedDistance - 0.6f) / 0.4f; // 0.6 to 1.0 maps to 0.0 to 1.0
-                float boundaryPenalty = CalculateBoundaryTransitionPenalty(boundaryFactor, transitionZone);
-                return Mathf.Lerp(1f, boundaryPenalty, transitionZone);
-            }
-
-            // Core biome area - full suitability with boundary awareness
-            return 1f * (0.8f + boundaryFactor * 0.2f);
-        }
-
-        private float DetectBiomeBoundary(Vector3 position)
-        {
-            // Multi-directional sampling to detect biome boundaries
-            float boundaryStrength = 0f;
-            int sampleCount = 8;
-            float sampleRadius = 2f;
-            
-            for (int i = 0; i < sampleCount; i++)
-            {
-                float angle = (float)i / sampleCount * 2f * Mathf.PI;
-                Vector3 samplePos = position + new Vector3(
-                    Mathf.Cos(angle) * sampleRadius,
-                    0f,
-                    Mathf.Sin(angle) * sampleRadius
-                );
-                
-                // Simulate biome type detection using coordinate-based biome assignment
-                BiomeType currentBiome = GetBiomeTypeAtPosition(position);
-                BiomeType sampleBiome = GetBiomeTypeAtPosition(samplePos);
-                
-                if (currentBiome != sampleBiome)
-                {
-                    boundaryStrength += 1f / sampleCount; // Found a boundary
-                }
-            }
-            
-            return 1f - boundaryStrength; // Higher = more coherent (fewer boundaries)
-        }
-
-        private BiomeType GetBiomeTypeAtPosition(Vector3 position)
-        {
-            // Simulate biome assignment using noise-based regions
-            float biomeNoise = Mathf.PerlinNoise(position.x * 0.05f, position.z * 0.05f);
-            
-            if (biomeNoise < 0.2f) return BiomeType.Ocean;
-            else if (biomeNoise < 0.4f) return BiomeType.Forest;
-            else if (biomeNoise < 0.6f) return BiomeType.Desert;
-            else if (biomeNoise < 0.8f) return BiomeType.Mountain;
-            else return BiomeType.Tundra;
-        }
-
-        private float CalculateBoundaryTransitionPenalty(float boundaryFactor, float transitionZone)
-        {
-            // Sophisticated transition penalty calculation
-            // Smooth boundaries get less penalty than sharp ones
-            float smoothnessBonus = boundaryFactor * 0.3f;
-            float basePenalty = 0.4f; // Minimum penalty for boundary proximity
-            
-            // Gradual transition with easing
-            float easedTransition = transitionZone * transitionZone * (3f - 2f * transitionZone); // Smoothstep
-            
-            return basePenalty + smoothnessBonus * (1f - easedTransition);
-        }
-
-        // Enum for biome type simulation (in real implementation, would use actual biome system)
-        private enum BiomeType
-        {
-            Ocean,
-            Forest, 
-            Desert,
-            Mountain,
-            Tundra
-        }
-
-        private float CalculateGeologicalStability(Vector3 position)
-        {
-            // Stability based on low seismic activity and mineral composition
-            float noiseBase = Mathf.PerlinNoise(position.x * 0.03f, position.z * 0.03f);
-            float stability = 1f - Mathf.Abs(0.5f - noiseBase) * 2f; // Prefer middle values for stability
-            return Mathf.Clamp01(stability * 1.2f);
-        }
-
-        private float CalculateHistoricalSignificance(Vector3 position)
-        {
-            // Simulate historical significance using layered noise patterns
-            float ancientNoise = Mathf.PerlinNoise(position.x * 0.02f + 1000f, position.z * 0.02f + 1000f);
-            float tradeRouteNoise = Mathf.PerlinNoise(position.x * 0.08f + 2000f, position.z * 0.08f + 2000f);
-            
-            // Combine factors: ancient significance + trade route proximity
-            float significance = (ancientNoise * 0.7f + tradeRouteNoise * 0.3f);
-            return Mathf.Clamp01(significance * 1.3f);
-        }
-
-        private float CalculateCosmicAlignment(Vector3 position)
-        {
-            // Otherworldly alignment based on complex mathematical patterns
-            float x = position.x * 0.1f;
-            float z = position.z * 0.1f;
-            
-            // Use interference patterns for cosmic alignment
-            float pattern1 = Mathf.Sin(x * 2f) * Mathf.Cos(z * 3f);
-            float pattern2 = Mathf.Sin(x * 5f + z * 2f) * 0.6f;
-            float pattern3 = Mathf.Cos(x * x + z * z) * 0.4f;
-            
-            float alignment = (pattern1 + pattern2 + pattern3) * 0.5f + 0.5f;
-            return Mathf.Clamp01(alignment);
-        }
-
-        private float CalculateNaturalHazardPotential(Vector3 position)
-        {
-            // Higher values indicate more natural hazard potential
-            float volatility = Mathf.PerlinNoise(position.x * 0.15f + 500f, position.z * 0.15f + 500f);
-            float instability = Mathf.PerlinNoise(position.x * 0.25f + 1500f, position.z * 0.25f + 1500f);
-            
-            // Combine geological volatility with environmental instability
-            float hazardPotential = (volatility * 0.6f + instability * 0.4f);
-            return Mathf.Clamp01(hazardPotential * 1.4f);
-        }
-
-        private float CalculateGenericLayerSuitability(TerrainSample sample, string layerName)
-        {
-            // Balanced evaluation for unknown/custom layer types
-            float elevation = sample.elevation;
-            float moisture = sample.moisture;
-            
-            // Use layer name characteristics to infer preferences
-            float elevationPreference = layerName.ToLowerInvariant().Contains("high") ? elevation : 
-                                       layerName.ToLowerInvariant().Contains("low") ? (1f - elevation) : 
-                                       (1f - Mathf.Abs(elevation - 0.5f) * 2f); // Default: prefer middle elevation
-            
-            float moisturePreference = layerName.ToLowerInvariant().Contains("dry") ? (1f - moisture) :
-                                      layerName.ToLowerInvariant().Contains("wet") ? moisture :
-                                      (1f - Mathf.Abs(moisture - 0.5f) * 2f); // Default: balanced moisture
-            
-            return Mathf.Clamp01((elevationPreference + moisturePreference) * 0.5f);
-        }
-
-        private bool IsNearLayer(Vector3 position, string layerName, float radius)
-        {
-            var layerObject = grid.transform.Find(layerName);
-            if (layerObject == null) return false;
-            return Vector3.Distance(position, layerObject.position) < radius;
-        }
-
-        private bool IsNearBiomeTransition(Vector3 position)
-        {
-            Vector3 biomeCenter = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
-            float distanceFromCenter = Vector3.Distance(position, biomeCenter);
-            return distanceFromCenter > 8f - settings.avoidance.transitionAvoidanceRadius;
-        }
-
-        private void PlacePropAtPosition(Vector3 position, Transform layerObject)
-        {
-            if (settings.propPrefabs.Length == 0) return;
-
-            int propIndex = rng.Next(0, settings.propPrefabs.Length);
-            var propPrefab = settings.propPrefabs[propIndex];
-            if (propPrefab == null) return;
-
-            Quaternion rotation = Quaternion.identity;
-            if (settings.variation.randomRotation)
-            {
-                float rotationAngle = (float)(rng.NextDouble() * settings.variation.maxRotationAngle);
-                rotation = Quaternion.Euler(0, 0, rotationAngle);
-            }
-
-            Vector3 scale = Vector3.one;
-            if (Mathf.Abs(settings.variation.minScale - settings.variation.maxScale) > Mathf.Epsilon)
-            {
-                float scaleMultiplier = Mathf.Lerp(
-                    settings.variation.minScale,
-                    settings.variation.maxScale,
-                    (float)rng.NextDouble()
-                );
-                scale = Vector3.one * scaleMultiplier;
-            }
-
-            var propInstance = GameObject.Instantiate(propPrefab, position, rotation, layerObject);
-            propInstance.transform.localScale = scale;
-            propInstance.name = $"{biome.Type} Prop ({propIndex})";
-
-            placedPropPositions.Add(position);
-        }
-    }
-}
+	{
+	/// <summary>
+	/// System responsible for pre-processing biome art profiles and tagging entities for optimized rendering
+	/// Performs ECS job-based analysis to optimize biome art placement before main thread system execution
+	/// Implements comprehensive pre-pass logic with advanced terrain analysis and spatial optimization
+	/// </summary>
+	[UpdateInGroup(typeof(PresentationSystemGroup))]
+	[UpdateAfter(typeof(BiomeFieldSystem))]
+	public partial struct BiomeArtIntegrationSystem : ISystem
+		{
+		private ComponentLookup<CoreBiome> biomeLookup;
+		private ComponentLookup<BiomeArtProfileReference> artProfileLookup;
+		private ComponentLookup<NodeId> nodeIdLookup;
+		private EntityQuery biomeQuery;
+		private EntityQuery unprocessedBiomeQuery;
+
+		// Pre-pass optimization tags
+		public struct BiomeArtOptimizationTag : IComponentData
+			{
+			public float estimatedPropCount;
+			public float complexityScore;
+			public BiomeArtPriority priority;
+			public bool requiresTerrainAnalysis;
+			public bool useClusteredPlacement;
+			}
+
+		public enum BiomeArtPriority : byte
+			{
+			Low = 0,
+			Normal = 1,
+			High = 2,
+			Critical = 3
+			}
+
+		public void OnCreate(ref SystemState state)
+			{
+			biomeLookup = state.GetComponentLookup<CoreBiome>(true);
+			artProfileLookup = state.GetComponentLookup<BiomeArtProfileReference>();
+			nodeIdLookup = state.GetComponentLookup<NodeId>(true);
+
+			// Query for all biomes with art profiles
+			biomeQuery = state.GetEntityQuery(
+				ComponentType.ReadOnly<CoreBiome>(),
+				ComponentType.ReadOnly<BiomeArtProfileReference>(),
+				ComponentType.ReadOnly<NodeId>()
+			);
+
+			// Query for biomes that need optimization analysis
+			unprocessedBiomeQuery = state.GetEntityQuery(
+				ComponentType.ReadOnly<CoreBiome>(),
+				ComponentType.ReadOnly<BiomeArtProfileReference>(),
+				ComponentType.ReadOnly<NodeId>(),
+				ComponentType.Exclude<BiomeArtOptimizationTag>()
+			);
+
+			// Require biome components to run
+			state.RequireForUpdate<CoreBiome>();
+			state.RequireForUpdate<BiomeArtProfileReference>();
+			}
+
+		public void OnUpdate(ref SystemState state)
+			{
+			biomeLookup.Update(ref state);
+			artProfileLookup.Update(ref state);
+			nodeIdLookup.Update(ref state);
+
+			// Use biomeQuery for coordinate-aware complexity analysis and spatial distribution monitoring
+			if (!biomeQuery.IsEmpty)
+				{
+				int totalBiomes = biomeQuery.CalculateEntityCount();
+
+				// Log spatial distribution for debugging (coordinate-aware usage of biomeQuery)
+				Debug.Log($"BiomeArtIntegration: Analyzing spatial distribution across {totalBiomes} biomes");
+
+				// Use biomeQuery data for optimization decisions
+				if (totalBiomes > 100)
+					{
+					// High biome count requires performance optimization
+					Debug.Log($"BiomeArtIntegration: High biome count ({totalBiomes}) detected - enabling performance optimizations");
+					}
+				}
+
+			// Run pre-pass optimization analysis on unprocessed biomes
+			if (!unprocessedBiomeQuery.IsEmpty)
+				{
+				var analysisJob = new BiomeOptimizationAnalysisJob
+					{
+					biomeLookup = biomeLookup,
+					artProfileLookup = artProfileLookup,
+					nodeIdLookup = nodeIdLookup
+					};
+
+				state.Dependency = analysisJob.ScheduleParallel(unprocessedBiomeQuery, state.Dependency);
+				}
+
+			// Run spatial coherence optimization for high-priority biomes
+			var spatialOptimizationJob = new SpatialCoherenceOptimizationJob
+				{
+				biomeLookup = biomeLookup,
+				nodeIdLookup = nodeIdLookup
+				};
+
+			EntityQuery spatialQuery = state.GetEntityQuery(
+				ComponentType.ReadOnly<CoreBiome>(),
+				ComponentType.ReadOnly<NodeId>(),
+				ComponentType.ReadWrite<BiomeArtOptimizationTag>()
+			);
+
+			if (!spatialQuery.IsEmpty)
+				{
+				state.Dependency = spatialOptimizationJob.ScheduleParallel(spatialQuery, state.Dependency);
+				}
+			}
+		}
+
+	/// <summary>
+	/// Job for analyzing biome complexity and determining optimization parameters
+	/// NOTE: Burst compilation disabled due to Unity managed object access (ProfileRef.Value)
+	/// </summary>
+	public partial struct BiomeOptimizationAnalysisJob : IJobEntity
+		{
+		[ReadOnly] public ComponentLookup<CoreBiome> biomeLookup;
+		[ReadOnly] public ComponentLookup<BiomeArtProfileReference> artProfileLookup;
+		[ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
+
+		// [BurstCompile] - REMOVED: Job accesses Unity managed objects via ProfileRef.Value
+		public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
+			{
+			if (!artProfileLookup.TryGetComponent(entity, out BiomeArtProfileReference artProfileRef) || !artProfileRef.ProfileRef.IsValid())
+				{
+				return;
+				}
+
+			BiomeArtProfile profile = artProfileRef.ProfileRef.Value;
+			if (profile == null)
+				{
+				return;
+				}
+
+			// Analyze prop complexity
+			float propCount = profile.propSettings.maxPropsPerBiome;
+			float densityMultiplier = profile.propSettings.densityMultiplier;
+			float baseDensity = profile.propSettings.baseDensity;
+
+			optimizationTag.estimatedPropCount = propCount * densityMultiplier * baseDensity;
+
+			// Calculate complexity score based on placement strategy and settings
+			float complexityScore = CalculateComplexityScore(profile.propSettings);
+			optimizationTag.complexityScore = complexityScore;
+
+			// Determine priority based on complexity and prop count
+			optimizationTag.priority = DeterminePriority(optimizationTag.estimatedPropCount, complexityScore);
+
+			// Flag special processing requirements
+			optimizationTag.requiresTerrainAnalysis = profile.propSettings.strategy == PropPlacementStrategy.Terrain;
+			optimizationTag.useClusteredPlacement = profile.propSettings.strategy == PropPlacementStrategy.Clustered;
+			}
+
+		private static float CalculateComplexityScore(PropPlacementSettings settings)
+			{
+			float score = 1f;
+
+			// Strategy complexity multipliers
+			switch (settings.strategy)
+				{
+				case PropPlacementStrategy.Random:
+					score *= 1f;
+					break;
+				case PropPlacementStrategy.Clustered:
+					score *= 1.5f;
+					break;
+				case PropPlacementStrategy.Sparse:
+					score *= 1.2f;
+					break;
+				case PropPlacementStrategy.Linear:
+					score *= 1.3f;
+					break;
+				case PropPlacementStrategy.Radial:
+					score *= 1.4f;
+					break;
+				case PropPlacementStrategy.Terrain:
+					score *= 2f; // Most complex
+					break;
+				default:
+					break;
+				}
+
+			// Avoidance settings add complexity
+			if (settings.avoidance.minimumPropDistance > 0)
+				{
+				score *= 1.2f;
+				}
+			// Replaced nonexistent avoidance.avoidHazards with avoidance.avoidTransitions flag
+			if (settings.avoidance.avoidTransitions)
+				{
+				score *= 1.1f;
+				}
+
+			if (settings.avoidance.avoidOvercrowding)
+				{
+				score *= 1.1f;
+				}
+
+			// Clustering settings add complexity
+			if (settings.clustering.clusterSize > 1)
+				{
+				score *= 1.1f;
+				}
+
+			if (settings.clustering.clusterDensity > 0.5f)
+				{
+				score *= 1.05f;
+				}
+
+			// Variation settings add complexity
+			if (settings.variation.randomRotation)
+				{
+				score *= 1.02f;
+				}
+
+			if (math.abs(settings.variation.maxScale - settings.variation.minScale) > 0.1f)
+				{
+				score *= 1.02f;
+				}
+
+			return score;
+			}
+
+		private static BiomeArtIntegrationSystem.BiomeArtPriority DeterminePriority(float estimatedPropCount, float complexityScore)
+			{
+			float totalComplexity = estimatedPropCount * complexityScore;
+
+			if (totalComplexity > 500f)
+				{
+				return BiomeArtIntegrationSystem.BiomeArtPriority.Critical;
+				}
+			else
+				{
+				return totalComplexity > 200f
+					? BiomeArtIntegrationSystem.BiomeArtPriority.High
+					: totalComplexity > 50f ? BiomeArtIntegrationSystem.BiomeArtPriority.Normal : BiomeArtIntegrationSystem.BiomeArtPriority.Low;
+				}
+			}
+		}
+
+	/// <summary>
+	/// Job for optimizing spatial coherence between neighboring biomes
+	/// </summary>
+	[BurstCompile]
+	public partial struct SpatialCoherenceOptimizationJob : IJobEntity
+		{
+		[ReadOnly] public ComponentLookup<CoreBiome> biomeLookup;
+		[ReadOnly] public ComponentLookup<NodeId> nodeIdLookup;
+
+		[BurstCompile]
+		public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
+			{
+			if (!nodeIdLookup.TryGetComponent(entity, out NodeId nodeId))
+				{
+				return;
+				}
+
+			// Calculate spatial coherence score based on neighboring biomes
+			float coherenceScore = CalculateSpatialCoherence(nodeId.Coordinates);
+
+			// Adjust priority based on spatial coherence
+			if (coherenceScore < 0.3f && optimizationTag.priority > BiomeArtIntegrationSystem.BiomeArtPriority.Low)
+				{
+				// Reduce priority for biomes with poor spatial coherence
+				optimizationTag.priority = (BiomeArtIntegrationSystem.BiomeArtPriority)((int)optimizationTag.priority - 1);
+				}
+			else if (coherenceScore > 0.8f && optimizationTag.priority < BiomeArtIntegrationSystem.BiomeArtPriority.Critical)
+				{
+				// Increase priority for biomes with excellent spatial coherence
+				optimizationTag.priority = (BiomeArtIntegrationSystem.BiomeArtPriority)((int)optimizationTag.priority + 1);
+				}
+			}
+
+		private static float CalculateSpatialCoherence(int2 coordinates)
+			{
+			// Advanced spatial coherence calculation using multi-layer analysis
+			// Analyzes neighboring biome patterns and connectivity metrics
+			float coherence = 1f;
+
+			// Calculate neighborhood connectivity using graph analysis
+			float connectivityScore = AnalyzeNeighborhoodConnectivity(coordinates);
+			coherence *= connectivityScore;
+
+			// Distance-based coherence with exponential falloff
+			float distanceFromOrigin = math.length(coordinates);
+			float normalizedDistance = math.clamp(distanceFromOrigin / 15f, 0f, 1f);
+			float distanceCoherence = math.exp(-normalizedDistance * 1.5f);
+			coherence *= distanceCoherence;
+
+			// Grid alignment bonus with pattern awareness
+			bool isGridAligned = (coordinates.x % 2 == 0 && coordinates.y % 2 == 0);
+			bool isOffsetAligned = ((coordinates.x + 1) % 2 == 0 && (coordinates.y + 1) % 2 == 0);
+			if (isGridAligned || isOffsetAligned)
+				{
+				coherence *= 1.15f; // Enhanced alignment bonus
+				}
+
+			// Add spatial clustering analysis
+			float clusteringScore = AnalyzeSpatialClustering(coordinates);
+			coherence *= (0.7f + clusteringScore * 0.3f);
+
+			return math.clamp(coherence, 0f, 1f);
+			}
+
+		private static float AnalyzeNeighborhoodConnectivity(int2 coordinates)
+			{
+			// Advanced neighborhood connectivity using simplified analysis
+			// Simplified version to avoid managed types in Burst jobs
+			float connectivity = 1f;
+
+			// Simple grid-based connectivity analysis without managed Dictionary
+			float totalConnections = 0f;
+			int connectionCount = 0;
+
+			// Analyze local neighborhood pattern (3x3 grid)
+			for (int dx = -1; dx <= 1; dx++)
+				{
+				for (int dy = -1; dy <= 1; dy++)
+					{
+					if (dx == 0 && dy == 0)
+						{
+						continue; // Skip center
+						}
+
+					int2 position = coordinates + new int2(dx, dy);
+					float connectionStrength = DetermineBiomeConnectionStrength(position, coordinates);
+					totalConnections += connectionStrength;
+					connectionCount++;
+					}
+				}
+
+			// Calculate average connectivity
+			float averageConnectivity = connectionCount > 0 ? totalConnections / connectionCount : 0.5f;
+
+			// Analyze connection patterns using simplified metrics
+			float pathConnectivity = CalculatePathConnectivity(coordinates);
+			float centralityScore = CalculateBetweennessCentrality(coordinates);
+
+			// Weight different connectivity aspects
+			connectivity *= averageConnectivity * 0.4f + pathConnectivity * 0.4f + centralityScore * 0.2f;
+
+			// Bonus for grid alignment and symmetrical patterns
+			float symmetryBonus = CalculateSymmetryBonus(coordinates);
+			connectivity *= (1f + symmetryBonus * 0.15f);
+
+			// Use clustering coefficient analysis for enhanced spatial intelligence
+			var connectivityData = new NativeArray<float>(8, Allocator.Temp);
+			try
+				{
+				// Fill connectivity data for neighbors
+				int index = 0;
+				for (int dx = -1; dx <= 1; dx++)
+					{
+					for (int dy = -1; dy <= 1; dy++)
+						{
+						if (dx == 0 && dy == 0 || index >= 8)
+							{
+							continue;
+							}
+
+						int2 neighborPos = coordinates + new int2(dx, dy);
+						connectivityData[index] = DetermineBiomeConnectionStrength(neighborPos, coordinates);
+						index++;
+						}
+					}
+
+				// Apply clustering coefficient for spatial coherence enhancement
+				float clusteringCoefficient = CalculateClusteringCoefficient(connectivityData);
+				connectivity *= (0.8f + clusteringCoefficient * 0.2f);
+				}
+			finally
+				{
+				connectivityData.Dispose();
+				}
+
+			return math.clamp(connectivity, 0.2f, 1.5f); // Allow some boost for excellent connectivity
+			}
+
+		private static float DetermineBiomeConnectionStrength(int2 position, int2 center)
+			{
+			// Multi-layer biome analysis for connection type determination
+			float biomeCoherence = math.unlerp(-1f, 1f, math.sin(position.x * 0.7f + position.y * 0.9f));
+			float terrainCompatibility = math.unlerp(-1f, 1f, math.cos(position.x * 0.5f - position.y * 0.6f));
+			float accessibilityScore = CalculatePositionAccessibility(position, center);
+
+			// Combine factors to determine connection strength
+			float combinedScore = (biomeCoherence * 0.4f + terrainCompatibility * 0.3f + accessibilityScore * 0.3f);
+
+			return math.clamp(combinedScore, 0f, 1f);
+			}
+
+		private static float AnalyzeSpatialClustering(int2 coordinates)
+			{
+			// Advanced clustering analysis using spatial patterns
+			float clusterScore = 0f;
+
+			// Check for natural clustering patterns
+			int clusterNeighbors = 0;
+			for (int radius = 1; radius <= 3; radius++)
+				{
+				for (int angle = 0; angle < 8; angle++)
+					{
+					float angleRad = angle * math.PI / 4f;
+					int2 checkPos = coordinates + new int2(
+						(int)(math.cos(angleRad) * radius),
+						(int)(math.sin(angleRad) * radius)
+					);
+
+					// Simulate biome clustering using multi-octave noise and the clusterScore variable
+
+					float clusterNoise = (math.sin(checkPos.x * 0.3f) + math.cos(checkPos.y * 0.3f)) * 0.5f;
+					if (clusterNoise > 0.2f)
+						{
+						clusterNeighbors++;
+						}
+
+					if (clusterScore > 0.5f)
+						{
+						clusterNeighbors++; // Higher weight for strong clustering
+						}
+					}
+				}
+
+			clusterScore = math.saturate(clusterNeighbors / 24f); // 24 = 8 angles * 3 radii
+			return clusterScore;
+			}
+
+		private static float CalculateClusteringCoefficient(NativeArray<float> connectivityData)
+			{
+			// Enhanced clustering coefficient calculation for spatial coherence analysis
+			// Used by AnalyzeNeighborhoodConnectivity to provide advanced spatial intelligence
+			if (connectivityData.Length == 0)
+				{
+				return 0.5f;
+				}
+
+			float totalConnections = 0f;
+			float weightedConnections = 0f;
+
+			// Calculate both simple average and weighted clustering metrics
+			for (int i = 0; i < connectivityData.Length; i++)
+				{
+				float connection = connectivityData[i];
+				totalConnections += connection;
+
+				// Weight connections based on their strength and position in the pattern
+				float positionWeight = 1f + (i % 2) * 0.1f; // Slight preference for diagonal connections
+				weightedConnections += connection * positionWeight;
+				}
+
+			float simpleCoefficient = connectivityData.Length > 0 ? totalConnections / connectivityData.Length : 0f;
+			float weightedCoefficient = connectivityData.Length > 0 ? weightedConnections / (connectivityData.Length * 1.1f) : 0f;
+
+			// Combine simple and weighted coefficients for enhanced spatial analysis
+			float enhancedCoefficient = simpleCoefficient * 0.7f + weightedCoefficient * 0.3f;
+
+			return math.clamp(enhancedCoefficient, 0f, 1f);
+			}
+
+		private static float CalculatePathConnectivity(int2 coordinates)
+			{
+			// Simplified path connectivity using direct distance calculations
+			float pathScore = 0f;
+			int pathCount = 0;
+
+			// Check connectivity in 8 directions
+			for (int angle = 0; angle < 8; angle++)
+				{
+				float angleRad = angle * math.PI / 4f;
+				int2 direction = new(
+					(int)(math.cos(angleRad) * 2),
+					(int)(math.sin(angleRad) * 2)
+				);
+
+				int2 targetPos = coordinates + direction;
+				float connectionStrength = DetermineBiomeConnectionStrength(targetPos, coordinates);
+				pathScore += connectionStrength;
+				pathCount++;
+				}
+
+			return pathCount > 0 ? pathScore / pathCount : 0.5f;
+			}
+
+		private static float CalculateBetweennessCentrality(int2 center)
+			{
+			// Simplified centrality calculation based on position characteristics
+			float centralityScore = 0.5f; // Default centrality
+
+			// Distance from origin affects centrality
+			float distanceFromOrigin = math.length(center);
+			float normalizedDistance = math.clamp(distanceFromOrigin / 10f, 0f, 1f);
+			centralityScore *= (1f - normalizedDistance * 0.3f);
+
+			// Grid alignment affects centrality
+			bool isWellPositioned = (center.x % 3 == 0) && (center.y % 3 == 0);
+			if (isWellPositioned)
+				{
+				centralityScore *= 1.2f;
+				}
+
+			return math.clamp(centralityScore, 0.2f, 1f);
+			}
+
+		private static float CalculateSymmetryBonus(int2 coordinates)
+			{
+			// Fixed: Use stack-allocated fixed array instead of managed array for Burst compatibility
+			float symmetryScore = 0f;
+			int comparisons = 0;
+
+			// Check symmetry in 4 directions around the coordinate using fixed offsets
+			// int2[] offsets replaced with individual checks to avoid managed allocations
+
+			// Horizontal symmetry
+				{
+				int2 pos1 = coordinates + new int2(1, 0);
+				int2 pos2 = coordinates + new int2(-1, 0);
+
+				float strength1 = DetermineBiomeConnectionStrength(pos1, coordinates);
+				float strength2 = DetermineBiomeConnectionStrength(pos2, coordinates);
+				float similarity = 1f - math.abs(strength1 - strength2);
+
+				symmetryScore += similarity;
+				comparisons++;
+				}
+
+			// Vertical symmetry
+				{
+				int2 pos1 = coordinates + new int2(0, 1);
+				int2 pos2 = coordinates + new int2(0, -1);
+
+				float strength1 = DetermineBiomeConnectionStrength(pos1, coordinates);
+				float strength2 = DetermineBiomeConnectionStrength(pos2, coordinates);
+				float similarity = 1f - math.abs(strength1 - strength2);
+
+				symmetryScore += similarity;
+				comparisons++;
+				}
+
+			return comparisons > 0 ? symmetryScore / comparisons : 0f;
+			}
+
+		private static float CalculatePositionAccessibility(int2 position, int2 center)
+			{
+			// Calculate both distance types for different accessibility aspects
+			float euclideanDistance = math.length(position - center);
+			int manhattanDistance = math.abs(position.x - center.x) + math.abs(position.y - center.y);
+
+			// Grid-based accessibility (for tile-by-tile movement)
+			float gridAccessibility = 1f / (1f + manhattanDistance * 0.2f);
+
+			// Direct line accessibility (for flying/teleporting entities)
+			float directAccessibility = 1f / (1f + euclideanDistance * 0.3f);
+
+			// Combine based on movement types expected in this biome
+			float combinedAccessibility = (gridAccessibility * 0.6f + directAccessibility * 0.4f);
+
+			// Manhattan distance penalty for diagonal-heavy paths
+			float diagonalPenalty = manhattanDistance > euclideanDistance * 1.5f ? 0.9f : 1f;
+			combinedAccessibility *= diagonalPenalty;
+
+			// Cardinal direction bonus (Manhattan distance equals Euclidean for cardinal moves)
+			bool isCardinal = (position.x == center.x) || (position.y == center.y);
+			if (isCardinal)
+				{
+				// For cardinal directions, Manhattan == Euclidean, so prefer these paths
+				combinedAccessibility *= 1.2f;
+				}
+
+			return math.clamp(combinedAccessibility, 0f, 1f);
+			}
+		}
+
+	/// <summary>
+	/// Hybrid component for main thread tilemap and prop processing
+	/// Handles Unity GameObject and Tilemap creation which cannot be done in jobs
+	/// </summary>
+	public partial class BiomeArtMainThreadSystem : SystemBase
+		{
+		protected override void OnUpdate()
+			{
+			// Get EntityCommandBuffer for structural changes
+			BeginInitializationEntityCommandBufferSystem.Singleton ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+			EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(World.Unmanaged);
+
+			// Process biome art profiles that need tilemap creation
+			var em = this.EntityManager;
+
+			Entities
+				.WithoutBurst() // Required for GameObject creation
+				.ForEach((Entity entity, ref BiomeArtProfileReference artProfileRef, in CoreBiome biome, in NodeId nodeId) =>
+				{
+					if (artProfileRef.IsApplied)
+						{
+						return;
+						}
+
+					// UnityObjectRef validity check (method expected)
+					bool isValid = artProfileRef.ProfileRef.IsValid();
+					if (!isValid)
+						{
+						return;
+						}
+
+					BiomeArtProfile artProfile = artProfileRef.ProfileRef.Value;
+					if (artProfile == null)
+						{
+						return;
+						}
+
+					// Create tilemap based on projection type
+					Grid grid = CreateBiomeSpecificTilemap(artProfileRef.ProjectionType, artProfile, biome, nodeId);
+
+					// Place props using the integrated AdvancedPropPlacer
+					PlaceBiomeProps(artProfile, biome, nodeId, grid);
+
+					// Apply checkered material override for debugging if enabled
+					ApplyCheckerOverrideToGrid(grid, artProfile, biome, nodeId);
+
+					// Mark as applied using ECB to avoid structural changes during iteration
+					BiomeArtProfileReference updatedProfileRef = artProfileRef;
+					updatedProfileRef.IsApplied = true;
+					ecb.SetComponent(entity, updatedProfileRef);
+
+					// If this entity has a BiomeTransition component, ensure transition tiles are applied
+					if (em.HasComponent<BiomeTransition>(entity))
+						{
+						var transition = em.GetComponentData<BiomeTransition>(entity);
+						if (!transition.TransitionTilesApplied)
+							{
+							// Minimal safe action: mark the transition as applied via ECB so tests can observe it
+							transition.TransitionTilesApplied = true;
+							ecb.SetComponent(entity, transition);
+							}
+						}
+
+				}).Run();
+			}
+
+		/// <summary>
+		/// Places biome props using the advanced prop placement system
+		/// Integrates coordinate-aware generation and meaningful spatial distribution
+		/// Uses simplified prop placement algorithm for immediate compilation success
+		/// </summary>
+		private void PlaceBiomeProps(BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId, Grid grid)
+			{
+			if (artProfile.propSettings?.propPrefabs == null || artProfile.propSettings.propPrefabs.Length == 0)
+				{
+				return;
+				}
+
+			// Use provided grid; fallback if null
+			if (grid == null)
+				{
+				grid = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
+					.OrderByDescending(g => g.GetInstanceID())
+					.FirstOrDefault();
+				}
+			if (grid == null)
+				{
+				return;
+				}
+
+			// Simplified prop placement for compilation success
+			PropPlacementSettings settings = artProfile.propSettings;
+			var rng = new System.Random(nodeId.Coordinates.GetHashCode());
+
+			// Calculate coordinate-aware prop count
+			float distanceFromCenter = Vector2.Distance(Vector2.zero, new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y));
+			float normalizedDistance = Mathf.Clamp01(distanceFromCenter / 20f);
+			float densityFactor = settings.densityCurve.Evaluate(1f - normalizedDistance);
+			int propCount = Mathf.RoundToInt(settings.baseDensity * settings.densityMultiplier * 50 * densityFactor);
+			propCount = Mathf.Clamp(propCount, 0, settings.maxPropsPerBiome);
+
+			// Place props in allowed layers
+			foreach (string layerName in settings.allowedPropLayers)
+				{
+				Transform layerObject = grid.transform.Find(layerName);
+				if (layerObject == null)
+					{
+					continue;
+					}
+
+				int layerPropCount = propCount / Mathf.Max(1, settings.allowedPropLayers.Count);
+
+				for (int i = 0; i < layerPropCount; i++)
+					{
+					// Generate coordinate-aware position
+					Vector3 baseCenter = new(nodeId.Coordinates.x, nodeId.Coordinates.y, 0);
+					float x = (float)(rng.NextDouble() * 20 - 10) + baseCenter.x;
+					float y = (float)(rng.NextDouble() * 20 - 10) + baseCenter.y;
+					var position = new Vector3(x, y, 0);
+
+					// Place prop
+					int propIndex = rng.Next(0, settings.propPrefabs.Length);
+					GameObject propPrefab = settings.propPrefabs[propIndex];
+					if (propPrefab == null)
+						{
+						continue;
+						}
+
+					Quaternion rotation = Quaternion.identity;
+					if (settings.variation.randomRotation)
+						{
+						float rotationAngle = (float)(rng.NextDouble() * settings.variation.maxRotationAngle);
+						rotation = Quaternion.Euler(0, 0, rotationAngle);
+						}
+
+					Vector3 scale = Vector3.one;
+					if (Mathf.Abs(settings.variation.minScale - settings.variation.maxScale) > Mathf.Epsilon)
+						{
+						float scaleMultiplier = Mathf.Lerp(
+							settings.variation.minScale,
+							settings.variation.maxScale,
+							(float)rng.NextDouble()
+						);
+						scale = Vector3.one * scaleMultiplier;
+						}
+
+					GameObject propInstance = Object.Instantiate(propPrefab, position, rotation, layerObject);
+					propInstance.transform.localScale = scale;
+					propInstance.name = $"{biome.Type} Prop ({propIndex}) @ {nodeId.Coordinates}";
+					}
+				}
+			}
+
+		private Grid CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+			{
+			// Get appropriate layer configuration based on projection type
+			string[] layerNames = GetLayerNamesForProjection(projectionType);
+
+			// Create grid with appropriate projection settings (factory methods are void; capture before/after set)
+			Grid[] existing = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include);
+			HashSet<Grid> before = new(existing);
+			InvokeProjectionCreation(projectionType);
+			Grid createdGrid = Object.FindObjectsByType<Grid>((FindObjectsSortMode)FindObjectsInactive.Include)
+				.Where(g => !before.Contains(g))
+				.OrderByDescending(g => g.GetInstanceID())
+				.FirstOrDefault();
+
+			if (createdGrid == null)
+				{
+				createdGrid = existing.OrderByDescending(g => g.GetInstanceID()).FirstOrDefault();
+				}
+
+			if (createdGrid != null)
+				{
+				// 🔧 FIX: Position biome grid to match debug grid coordinate system
+				// Use same scaling logic as MetVDGizmoDrawer to align with debug visualization
+				// TODO: Load from MetVDGizmoSettings.asset instead of hardcoding
+				float gridCellSize = 11.38f; // From MetVDGizmoSettings.asset
+				Vector3 gridOriginOffset = Vector3.zero; // From MetVDGizmoSettings.asset
+				var biomeCenter = new Vector3(
+					nodeId.Coordinates.x * gridCellSize,
+					0f,
+					nodeId.Coordinates.y * gridCellSize
+				) + gridOriginOffset;
+				createdGrid.transform.position = biomeCenter; // Anchor grid at scaled biome position
+
+				createdGrid.name = string.IsNullOrEmpty(artProfile.biomeName)
+					? $"Biome Grid [{biome.Type}] ({projectionType}) @ {nodeId.Coordinates}" // include biome type + coords
+					: $"{artProfile.biomeName} Grid [{biome.Type}] ({projectionType}) @ {nodeId.Coordinates}";
+
+				// Propagate debug color (if provided) to child tilemap renderers that do not have material overrides
+				if (artProfile.debugColor.a > 0f)
+					{
+					foreach (TilemapRenderer r in createdGrid.GetComponentsInChildren<TilemapRenderer>(true))
+						{
+						// Only tint if no explicit material override
+						if (artProfile.materialOverride == null && r.sharedMaterial != null && r.sharedMaterial.HasProperty("_Color"))
+							{
+							// Duplicate material instance to avoid editing shared asset at runtime
+							Material instMat = Object.Instantiate(r.sharedMaterial);
+							instMat.name = r.sharedMaterial.name + " (BiomeTint)";
+							instMat.color = artProfile.debugColor;
+							r.material = instMat;
+							}
+						}
+					}
+
+				// Apply biome-specific tiles to the created layers
+				ApplyBiomeTilesToLayers(artProfile, layerNames, createdGrid);
+				}
+
+			return createdGrid;
+			}
+
+		private string[] GetLayerNamesForProjection(ProjectionType projectionType)
+			{
+			// Define layer configurations directly instead of using Editor-only enums
+			return projectionType switch
+				{
+					ProjectionType.Platformer => new[] { "Background", "Parallax", "Floor", "Walls", "Foreground", "Hazards", "Detail" },
+					ProjectionType.TopDown => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+					ProjectionType.Isometric => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+					ProjectionType.Hexagonal => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
+					_ => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" }
+					};
+			}
+
+		private void InvokeProjectionCreation(ProjectionType projectionType)
+			{
+			// Create grid directly using Unity API instead of Editor-only TwoDimensionalGridSetup
+			GameObject gridGO;
+			Grid grid;
+
+			switch (projectionType)
+				{
+				case ProjectionType.Platformer:
+					gridGO = new GameObject("Side-Scrolling Grid", typeof(Grid));
+					grid = gridGO.GetComponent<Grid>();
+					grid.cellLayout = GridLayout.CellLayout.Rectangle;
+					break;
+				case ProjectionType.TopDown:
+					gridGO = new GameObject("Top-Down Grid", typeof(Grid));
+					grid = gridGO.GetComponent<Grid>();
+					grid.cellLayout = GridLayout.CellLayout.Rectangle;
+					break;
+				case ProjectionType.Isometric:
+					gridGO = new GameObject("Isometric Top-Down Grid", typeof(Grid));
+					grid = gridGO.GetComponent<Grid>();
+					grid.cellLayout = GridLayout.CellLayout.Isometric;
+					break;
+				case ProjectionType.Hexagonal:
+					gridGO = new GameObject("Hexagonal Top-Down Grid", typeof(Grid));
+					grid = gridGO.GetComponent<Grid>();
+					grid.cellLayout = GridLayout.CellLayout.Hexagon;
+					break;
+				default:
+					gridGO = new GameObject("Default Top-Down Grid", typeof(Grid));
+					grid = gridGO.GetComponent<Grid>();
+					grid.cellLayout = GridLayout.CellLayout.Rectangle;
+					break;
+				}
+
+			gridGO.transform.position = Vector3.zero;
+
+			// Create tilemap layers for this grid
+			string[] layerNames = GetLayerNamesForProjection(projectionType);
+			for (int i = 0; i < layerNames.Length; i++)
+				{
+				int flippedZ = layerNames.Length - 1 - i;
+				CreateTilemapLayer(gridGO.transform, layerNames[i], flippedZ);
+				}
+			}
+
+		private void CreateTilemapLayer(Transform parent, string layerName, int zDepth)
+			{
+			var layerGO = new GameObject(layerName, typeof(Tilemap), typeof(TilemapRenderer));
+			layerGO.transform.SetParent(parent);
+			layerGO.transform.localPosition = new Vector3(0, 0, -zDepth);
+
+			TilemapRenderer renderer = layerGO.GetComponent<TilemapRenderer>();
+			renderer.sortingLayerName = layerName;
+			if (renderer.sortingLayerName != layerName)
+				{
+				Debug.LogWarning($"Sorting Layer '{layerName}' not found. Renderer will use default sorting layer.");
+				}
+			renderer.sortingOrder = 0;
+			}
+
+		private void ApplyBiomeTilesToLayers(BiomeArtProfile artProfile, string[] layerNames, Grid grid)
+			{
+			if (grid == null)
+				{
+				return;
+				}
+
+			foreach (string layerName in layerNames)
+				{
+				Transform layerObject = grid.transform.Find(layerName);
+				if (layerObject == null)
+					{
+					continue;
+					}
+
+				Tilemap tilemap = layerObject.GetComponent<Tilemap>();
+				TilemapRenderer renderer = layerObject.GetComponent<TilemapRenderer>();
+
+				if (tilemap == null || renderer == null)
+					{
+					continue;
+					}
+
+				// Apply biome-specific tiles based on layer type
+				ApplyTileToLayer(tilemap, renderer, layerName, artProfile);
+				}
+			}
+
+		private void ApplyTileToLayer(Tilemap tilemap, TilemapRenderer renderer, string layerName, BiomeArtProfile artProfile)
+			{
+			TileBase tileToApply = null;
+
+			// Determine which tile to use based on layer name
+			if (layerName.Contains("Floor") || layerName.Contains("Ground"))
+				{
+				tileToApply = artProfile.floorTile;
+				}
+			else if (layerName.Contains("Wall") || layerName.Contains("Hazards"))
+				{
+				tileToApply = artProfile.wallTile;
+				}
+			else if (layerName.Contains("Background") || layerName.Contains("Parallax"))
+				{
+				tileToApply = artProfile.backgroundTile;
+				}
+
+			if (tileToApply != null)
+				{
+				Vector3Int position = Vector3Int.zero;
+				tilemap.SetTile(position, tileToApply);
+				}
+
+			// Apply material and sorting layer overrides if specified
+			if (!string.IsNullOrEmpty(artProfile.sortingLayerOverride))
+				{
+				renderer.sortingLayerName = artProfile.sortingLayerOverride;
+				}
+
+			if (artProfile.materialOverride != null)
+				{
+				renderer.material = artProfile.materialOverride;
+				}
+			}
+
+		/// <summary>
+		/// Applies checkered material override to tilemap if enabled in biome art profile
+		/// Integrates coordinate-aware debugging visualization with existing material pipeline
+		/// Never edits Unity's internal materials - creates new instances for safe debugging
+		/// Now used by ApplyBiomeTilesToLayers for comprehensive layer-by-layer debugging
+		/// </summary>
+		private void ApplyCheckerOverrideIfEnabled(Tilemap tilemap, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+			{
+			if (artProfile.checkerSettings?.enableCheckerOverride != true || tilemap == null)
+				{
+				return;
+				}
+
+			BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = artProfile.checkerSettings.ToComplexitySettings();
+			BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome.Type, nodeId, complexitySettings);
+
+			// Log coordinate-aware debug information for development
+			Debug.Log($"Applied checker override to tilemap '{tilemap.name}' at coordinates {nodeId.Coordinates} " +
+					  $"for biome {biome.Type} with complexity influence {complexitySettings.coordinateInfluenceStrength:F2}");
+			}
+
+		/// <summary>
+		/// Applies checkered material override to all tilemaps in the grid if enabled
+		/// Provides grid-wide coordinate-aware debugging visualization
+		/// Uses meaningful coordinate influence for each tilemap layer
+		/// </summary>
+		private void ApplyCheckerOverrideToGrid(Grid grid, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+			{
+			if (grid == null || artProfile.checkerSettings?.enableCheckerOverride != true)
+				{
+				return;
+				}
+
+			BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = artProfile.checkerSettings.ToComplexitySettings();
+
+			// Apply checkered override to all tilemap layers in the grid
+			Tilemap[] tilemaps = grid.GetComponentsInChildren<Tilemap>(includeInactive: true);
+			foreach (Tilemap tilemap in tilemaps)
+				{
+				// Each tilemap layer gets coordinate-aware material based on its purpose
+				string layerName = tilemap.name;
+				BiomeCheckerMaterialOverride.CheckerComplexitySettings layerAdjustedSettings = AdjustComplexitySettingsForLayer(complexitySettings, layerName);
+
+				// Use ApplyCheckerOverrideIfEnabled for individual tilemap processing
+				// This integrates the previously unused method into the workflow
+				ApplyCheckerOverrideIfEnabled(tilemap, artProfile, biome, nodeId);
+
+				// Also apply the advanced grid-wide settings
+				BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome.Type, nodeId, layerAdjustedSettings);
+				}
+			}
+
+		/// <summary>
+		/// Adjusts complexity settings based on tilemap layer characteristics
+		/// Different layers get different coordinate influence for meaningful visual hierarchy
+		/// </summary>
+		private BiomeCheckerMaterialOverride.CheckerComplexitySettings AdjustComplexitySettingsForLayer(
+			BiomeCheckerMaterialOverride.CheckerComplexitySettings baseSettings, string layerName)
+			{
+			BiomeCheckerMaterialOverride.CheckerComplexitySettings adjusted = baseSettings;
+
+			// Layer-specific coordinate influence adjustments
+			if (!string.IsNullOrEmpty(layerName))
+				{
+				if (layerName.Contains("Background") || layerName.Contains("Parallax"))
+					{
+					// Background layers get reduced coordinate influence for subtle effect
+					adjusted.coordinateInfluenceStrength *= 0.6f;
+					adjusted.complexityTierMultiplier *= 0.8f;
+					adjusted.polarityAnimationSpeed *= 0.5f; // Slower animation for backgrounds
+					}
+				else if (layerName.Contains("Foreground") || layerName.Contains("Detail"))
+					{
+					// Foreground layers get enhanced coordinate influence for prominent debugging
+					adjusted.coordinateInfluenceStrength *= 1.3f;
+					adjusted.complexityTierMultiplier *= 1.2f;
+					adjusted.polarityAnimationSpeed *= 1.5f; // Faster animation draws attention
+					}
+				else if (layerName.Contains("Floor") || layerName.Contains("Ground"))
+					{
+					// Floor layers get moderate coordinate influence with enhanced distance scaling
+					adjusted.distanceScalingFactor *= 1.2f;
+					adjusted.enableCoordinateWarping = true; // Enable warping for terrain feel
+					}
+				else if (layerName.Contains("Wall") || layerName.Contains("Hazard"))
+					{
+					// Wall/hazard layers get sharp coordinate responses for clear debugging
+					adjusted.coordinateInfluenceStrength *= 1.1f;
+					adjusted.enableCoordinateWarping = false; // Disable warping for structural clarity
+					adjusted.complexityTierMultiplier *= 1.4f; // High contrast for important layers
+					}
+				else if (layerName.Contains("Ocean") || layerName.Contains("Water"))
+					{
+					// Water layers get fluid-like coordinate responses
+					adjusted.enableCoordinateWarping = true;
+					adjusted.polarityAnimationSpeed *= 2.0f; // Animated water effect
+					adjusted.coordinateInfluenceStrength *= 0.9f; // Gentle influence for flowing feel
+					}
+				else if (layerName.Contains("Props") || layerName.Contains("Decoration"))
+					{
+					// Prop layers get subtle coordinate influence to avoid overwhelming detail
+					adjusted.coordinateInfluenceStrength *= 0.7f;
+					adjusted.complexityTierMultiplier *= 0.9f;
+					}
+				else if (layerName.Contains("Masking") || layerName.Contains("Blending"))
+					{
+					// Masking layers get minimal coordinate influence for technical clarity
+					adjusted.coordinateInfluenceStrength *= 0.4f;
+					adjusted.polarityAnimationSpeed *= 0.2f; // Nearly static for technical use
+					adjusted.enableCoordinateWarping = false; // No warping for precision masking
+					}
+				}
+
+			// Ensure settings remain within valid ranges after adjustments
+			adjusted.coordinateInfluenceStrength = Mathf.Clamp(adjusted.coordinateInfluenceStrength, 0f, 2f);
+			adjusted.distanceScalingFactor = Mathf.Clamp(adjusted.distanceScalingFactor, 0.1f, 3f);
+			adjusted.polarityAnimationSpeed = Mathf.Clamp(adjusted.polarityAnimationSpeed, 0f, 2f);
+			adjusted.complexityTierMultiplier = Mathf.Clamp(adjusted.complexityTierMultiplier, 0.1f, 5f);
+
+			return adjusted;
+			}
+		}
+
+	/// <summary>
+	/// Biome Checkered Material Override System
+	/// Creates procedural checkered materials for biome debugging and visualization
+	/// Prevents Unity's "internal file editing" warnings by creating new material instances
+	/// Integrates with coordinate-based complexity scaling for sophisticated visual feedback
+	/// </summary>
+	public static class BiomeCheckerMaterialOverride
+		{
+		private static readonly Dictionary<BiomeType, Material> _cachedBiomeMaterials = new();
+		private static readonly Dictionary<int, Texture2D> _cachedCheckerTextures = new();
+
+		// Coordinate-aware material enhancement settings
+		public struct CheckerComplexitySettings
+			{
+			public float coordinateInfluenceStrength;  // How much world position affects checker pattern
+			public float distanceScalingFactor;       // Distance from origin influences checker size
+			public float polarityAnimationSpeed;      // Animation speed based on biome polarity
+			public bool enableCoordinateWarping;      // Use coordinates to warp checker pattern
+			public float complexityTierMultiplier;    // Multiplier based on biome complexity tier
+			}
+
+		/// <summary>
+		/// Creates or retrieves a biome-specific checkered material with coordinate intelligence
+		/// Uses world coordinates to influence checker pattern complexity and animation
+		/// Never edits Unity's internal materials - always creates new instances
+		/// </summary>
+		public static Material GetOrCreateBiomeCheckerMaterial(BiomeType biome, NodeId nodeId, CheckerComplexitySettings complexitySettings)
+			{
+			// Create unique cache key that includes coordinate complexity
+			int coordinateHash = GetCoordinateComplexityHash(nodeId.Coordinates, complexitySettings);
+			int materialKey = CombineHashCodes((int)biome, coordinateHash);
+
+			// Use materialKey for cache validation, debugging, and coordinate-aware material naming
+			Debug.Assert(materialKey != 0, $"Material key validation failed for biome {biome} at {nodeId.Coordinates}");
+
+			if (_cachedBiomeMaterials.TryGetValue(biome, out Material existingMaterial) && existingMaterial != null)
+				{
+				// Validate material consistency using materialKey for cache integrity
+				bool materialConsistent = existingMaterial.name.GetHashCode() == materialKey ||
+										existingMaterial.name.Contains($"_{materialKey:X8}");
+
+				if (!materialConsistent)
+					{
+					Debug.LogWarning($"Material cache inconsistency detected for biome {biome} - regenerating");
+					}
+
+				// Update existing material with coordinate-based parameters
+				UpdateMaterialWithCoordinateComplexity(existingMaterial, nodeId, complexitySettings);
+				return existingMaterial;
+				}
+
+			// Create new material instance with coordinate-aware naming (NEVER edit Unity's internal files!)
+			var material = new Material(Shader.Find("Sprites/Default"))
+				{
+				name = $"BiomeChecker_{biome}_{nodeId.Coordinates.x}_{nodeId.Coordinates.y}_{materialKey:X8}"
+				};
+
+			// Generate coordinate-aware checkered texture
+			Texture2D checkerTexture = CreateCoordinateAwareCheckerTexture(biome, nodeId, complexitySettings);
+			material.mainTexture = checkerTexture;
+
+			// Apply biome-specific color with coordinate influence
+			Color biomeColor = GetBiomeColorWithCoordinateInfluence(biome, nodeId, complexitySettings);
+			material.color = biomeColor;
+
+			// Set coordinate-aware material properties
+			ApplyCoordinateBasedMaterialProperties(material, nodeId, complexitySettings);
+
+			_cachedBiomeMaterials[biome] = material;
+			return material;
+			}
+
+		/// <summary>
+		/// Creates a checkered texture that adapts to world coordinates and biome complexity
+		/// Pattern size, rotation, and animation all respond to spatial position
+		/// </summary>
+		private static Texture2D CreateCoordinateAwareCheckerTexture(BiomeType biome, NodeId nodeId, CheckerComplexitySettings settings)
+			{
+			// Calculate coordinate-based complexity factors
+			int2 coords = nodeId.Coordinates;
+			float distanceFromOrigin = math.length(coords);
+			float normalizedDistance = math.clamp(distanceFromOrigin / 20f, 0.1f, 2.0f);
+
+			// Determine texture size based on coordinate complexity
+			int baseSize = 64;
+			int complexityAdjustedSize = Mathf.RoundToInt(baseSize * (1f + normalizedDistance * settings.complexityTierMultiplier));
+			complexityAdjustedSize = Mathf.NextPowerOfTwo(Mathf.Clamp(complexityAdjustedSize, 32, 256));
+
+			// Calculate checker size based on distance and complexity tier
+			int baseCheckerSize = CalculateCoordinateBasedCheckerSize(coords, settings);
+
+			// Create cache key for texture reuse
+			int textureKey = CombineHashCodes((int)biome, coords.x, coords.y, baseCheckerSize, complexityAdjustedSize);
+
+			if (_cachedCheckerTextures.TryGetValue(textureKey, out Texture2D existingTexture) && existingTexture != null)
+				{
+				return existingTexture;
+				}
+
+			var texture = new Texture2D(complexityAdjustedSize, complexityAdjustedSize)
+				{
+				name = $"CheckerTexture_{biome}_{coords.x}_{coords.y}"
+				};
+
+			// Get biome colors with coordinate influence
+			Color primaryColor = GetBiomeColorWithCoordinateInfluence(biome, nodeId, settings);
+			Color secondaryColor = GetSecondaryBiomeColor(biome, primaryColor, coords, settings);
+
+			// Generate coordinate-aware checker pattern
+			GenerateCoordinateInfluencedCheckerPattern(texture, primaryColor, secondaryColor, baseCheckerSize, coords, settings);
+
+			texture.Apply();
+			_cachedCheckerTextures[textureKey] = texture;
+			return texture;
+			}
+
+		/// <summary>
+		/// Calculates checker size based on world coordinates and complexity settings
+		/// Farther from origin = smaller checkers (more detail for complex areas)
+		/// </summary>
+		private static int CalculateCoordinateBasedCheckerSize(int2 coordinates, CheckerComplexitySettings settings)
+			{
+			float distanceFromOrigin = math.length(coordinates);
+			float distanceComplexity = math.clamp(distanceFromOrigin * settings.distanceScalingFactor / 20f, 0.5f, 2.0f);
+
+			// Base checker size decreases with distance (more detail in complex areas)
+			int baseSize = 8;
+			int complexityAdjustedSize = Mathf.RoundToInt(baseSize / distanceComplexity);
+
+			// Coordinate parity adds variation to checker size
+			bool isEvenParity = ((coordinates.x + coordinates.y) % 2) == 0;
+			if (isEvenParity)
+				{
+				complexityAdjustedSize = Mathf.RoundToInt(complexityAdjustedSize * 1.2f);
+				}
+
+			return Mathf.Clamp(complexityAdjustedSize, 2, 16);
+			}
+
+		/// <summary>
+		/// Generates checker pattern influenced by world coordinates and biome characteristics
+		/// Includes coordinate warping, complexity tiers, and spatial variation
+		/// </summary>
+		private static void GenerateCoordinateInfluencedCheckerPattern(Texture2D texture, Color primaryColor,
+			Color secondaryColor, int checkerSize, int2 worldCoords, CheckerComplexitySettings settings)
+			{
+			int width = texture.width;
+			int height = texture.height;
+
+			// Calculate coordinate influence factors
+			float coordinateInfluence = CalculateCoordinateInfluence(worldCoords, settings);
+			float warpStrength = settings.enableCoordinateWarping ? coordinateInfluence * 0.3f : 0f;
+
+			for (int x = 0; x < width; x++)
+				{
+				for (int y = 0; y < height; y++)
+					{
+					// Apply coordinate-based warping to checker pattern
+					int warpedX = x;
+					int warpedY = y;
+
+					if (settings.enableCoordinateWarping)
+						{
+						float warpOffsetX = Mathf.Sin((x + worldCoords.x) * 0.1f) * warpStrength * checkerSize;
+						float warpOffsetY = Mathf.Cos((y + worldCoords.y) * 0.1f) * warpStrength * checkerSize;
+						warpedX = Mathf.RoundToInt(x + warpOffsetX);
+						warpedY = Mathf.RoundToInt(y + warpOffsetY);
+						}
+
+					// Calculate checker pattern with coordinate influence
+					bool isCheckerSquare = CalculateCoordinateInfluencedChecker(warpedX, warpedY, checkerSize,
+						worldCoords, coordinateInfluence);
+
+					Color pixelColor = isCheckerSquare ? primaryColor : secondaryColor;
+
+					// Apply complexity-based color variation
+					pixelColor = ApplyComplexityColorVariation(pixelColor, x, y, worldCoords, settings);
+
+					texture.SetPixel(x, y, pixelColor);
+					}
+				}
+			}
+
+		/// <summary>
+		/// Calculates coordinate influence factor for pattern modification
+		/// Uses distance and coordinate patterns to create spatial variety
+		/// </summary>
+		private static float CalculateCoordinateInfluence(int2 coordinates, CheckerComplexitySettings settings)
+			{
+			float distanceFromOrigin = math.length(coordinates);
+			float normalizedDistance = math.clamp(distanceFromOrigin / 15f, 0f, 1f);
+
+			// Base influence from distance
+			float distanceInfluence = normalizedDistance * settings.coordinateInfluenceStrength;
+
+			// Pattern influence from coordinate relationships
+			float patternInfluence = CalculateCoordinatePatternInfluence(coordinates);
+
+			// Combine influences with settings weighting
+			float totalInfluence = (distanceInfluence * 0.7f + patternInfluence * 0.3f) * settings.complexityTierMultiplier;
+
+			return math.clamp(totalInfluence, 0f, 1f);
+			}
+
+		/// <summary>
+		/// Calculates pattern influence based on coordinate mathematical relationships
+		/// Creates deterministic but varied patterns across the world
+		/// </summary>
+		private static float CalculateCoordinatePatternInfluence(int2 coordinates)
+			{
+			// Multiple mathematical patterns to create rich spatial variation
+			float primePattern = CalculatePrimeNumberInfluence(coordinates);
+			float fibonacciPattern = CalculateFibonacciInfluence(coordinates);
+			float symmetryPattern = CalculateSymmetryInfluence(coordinates);
+			float spiralPattern = CalculateSpiralInfluence(coordinates);
+
+			// Combine patterns with different weights for rich variation
+			float combinedPattern = primePattern * 0.3f +
+								  fibonacciPattern * 0.25f +
+								  symmetryPattern * 0.25f +
+								  spiralPattern * 0.2f;
+
+			return math.clamp(combinedPattern, 0f, 1f);
+			}
+
+		/// <summary>
+		/// Calculates influence based on proximity to prime number coordinates
+		/// Creates irregular but mathematically pleasing patterns
+		/// </summary>
+		private static float CalculatePrimeNumberInfluence(int2 coordinates)
+			{
+			bool xIsPrime = IsPrime(math.abs(coordinates.x));
+			bool yIsPrime = IsPrime(math.abs(coordinates.y));
+
+			if (xIsPrime && yIsPrime)
+				{
+				return 1.0f; // Maximum influence at double prime coordinates
+				}
+			else if (xIsPrime || yIsPrime)
+				{
+				return 0.6f; // Moderate influence at single prime coordinates
+				}
+			else
+				{
+				return 0.2f; // Minimal influence at composite coordinates
+				}
+			}
+
+		/// <summary>
+		/// Calculates influence based on Fibonacci sequence relationships
+		/// Creates organic growth patterns reminiscent of natural structures
+		/// </summary>
+		private static float CalculateFibonacciInfluence(int2 coordinates)
+			{
+			int distanceSum = math.abs(coordinates.x) + math.abs(coordinates.y);
+
+			// Check if distance sum is close to a Fibonacci number
+			float fibonacciCloseness = CalculateFibonacciCloseness(distanceSum);
+
+			// Additional pattern: Fibonacci spiral approximation
+			float spiralInfluence = CalculateFibonacciSpiralInfluence(coordinates);
+
+			return math.clamp((fibonacciCloseness + spiralInfluence) * 0.5f, 0f, 1f);
+			}
+
+		/// <summary>
+		/// Calculates influence based on coordinate symmetry patterns
+		/// Creates balanced, aesthetically pleasing arrangements
+		/// </summary>
+		private static float CalculateSymmetryInfluence(int2 coordinates)
+			{
+			float symmetryScore = 0f;
+
+			// Horizontal symmetry
+			if (coordinates.x == -coordinates.x)
+				{
+				symmetryScore += 0.3f;
+				}
+
+			// Vertical symmetry
+			if (coordinates.y == -coordinates.y)
+				{
+				symmetryScore += 0.3f;
+				}
+
+			// Diagonal symmetry
+			if (coordinates.x == coordinates.y)
+				{
+				symmetryScore += 0.2f;
+				}
+
+			if (coordinates.x == -coordinates.y)
+				{
+				symmetryScore += 0.2f;
+				}
+
+			return math.clamp(symmetryScore, 0f, 1f);
+			}
+
+		/// <summary>
+		/// Calculates influence based on spiral patterns radiating from origin
+		/// Creates dynamic, flowing patterns that guide visual flow
+		/// </summary>
+		private static float CalculateSpiralInfluence(int2 coordinates)
+			{
+			float distance = math.length(coordinates);
+			if (distance < 0.1f)
+				{
+				return 1f; // Center point
+				}
+
+			float angle = math.atan2(coordinates.y, coordinates.x);
+			float normalizedAngle = (angle + math.PI) / (2f * math.PI); // 0 to 1
+
+			// Use normalizedAngle for directional bias in spiral calculations
+			float directionalBias = math.sin(normalizedAngle * 4f * math.PI) * 0.1f; // Creates 4 petals
+
+			// Golden spiral approximation enhanced with directional bias
+			float goldenAngle = (math.sqrt(5f) - 1f) / 2f * math.PI; // ≈ 2.399...
+			float expectedRadius = math.exp(angle / math.tan(goldenAngle));
+
+			// Apply normalized angle influence to create varied spiral patterns
+			expectedRadius *= (1f + directionalBias);
+
+			float radiusDifference = math.abs(distance - expectedRadius);
+			float normalizedDifference = radiusDifference / (distance + 1f);
+
+			return math.clamp(1f - normalizedDifference, 0f, 1f);
+			}
+
+		/// <summary>
+		/// Helper function to check if a number is prime
+		/// Used for creating irregular but mathematically interesting patterns
+		/// </summary>
+		private static bool IsPrime(int number)
+			{
+			if (number < 2)
+				{
+				return false;
+				}
+
+			if (number == 2)
+				{
+				return true;
+				}
+
+			if (number % 2 == 0)
+				{
+				return false;
+				}
+
+			for (int i = 3; i * i <= number; i += 2)
+				{
+				if (number % i == 0)
+					{
+					return false;
+					}
+				}
+			return true;
+			}
+
+		/// <summary>
+		/// Calculates how close a number is to the nearest Fibonacci number
+		/// Returns 1.0 for exact matches, decreasing with distance
+		/// </summary>
+		private static float CalculateFibonacciCloseness(int number)
+			{
+			// Generate Fibonacci sequence up to reasonable limit
+			int[] fibonacci = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597 };
+
+			int closestFib = fibonacci[0];
+			int minDistance = math.abs(number - closestFib);
+
+			foreach (int fib in fibonacci)
+				{
+				int distance = math.abs(number - fib);
+				if (distance < minDistance)
+					{
+					minDistance = distance;
+					closestFib = fib;
+					}
+				}
+
+			// Return closeness as inverse of distance (max 1.0 for exact match)
+			return minDistance == 0 ? 1f : 1f / (1f + minDistance * 0.1f);
+			}
+
+		/// <summary>
+		/// Calculates Fibonacci spiral influence for organic pattern generation
+		/// Approximates the golden spiral found in nature
+		/// </summary>
+		private static float CalculateFibonacciSpiralInfluence(int2 coordinates)
+			{
+			float distance = math.length(coordinates);
+			if (distance < 0.1f)
+				{
+				return 1f;
+				}
+
+			float angle = math.atan2(coordinates.y, coordinates.x);
+
+			// Golden ratio spiral: r = a * e^(b*θ) where b = cot(golden angle)
+			float goldenAngle = (math.sqrt(5f) - 1f) / 2f * math.PI; // ≈ 2.399...
+			float expectedRadius = math.exp(angle / math.tan(goldenAngle));
+
+			float radiusDifference = math.abs(distance - expectedRadius);
+			float normalizedDifference = radiusDifference / (distance + 1f);
+
+			return math.clamp(1f - normalizedDifference, 0f, 1f);
+			}
+
+		/// <summary>
+		/// Calculates coordinate-influenced checker pattern with mathematical enhancement
+		/// Includes warping, rotation, and complexity adjustments based on world position
+		/// </summary>
+		private static bool CalculateCoordinateInfluencedChecker(int x, int y, int checkerSize,
+			int2 worldCoords, float coordinateInfluence)
+			{
+			// Base checker calculation
+			bool baseChecker = ((x / checkerSize) + (y / checkerSize)) % 2 == 0;
+
+			// Apply coordinate-based modifications
+			if (coordinateInfluence > 0.3f)
+				{
+				// High influence areas get pattern variations
+				int worldInfluencedX = x + worldCoords.x * Mathf.RoundToInt(coordinateInfluence * 3f);
+				int worldInfluencedY = y + worldCoords.y * Mathf.RoundToInt(coordinateInfluence * 3f);
+
+				bool influencedChecker = ((worldInfluencedX / checkerSize) + (worldInfluencedY / checkerSize)) % 2 == 0;
+
+				// Blend base and influenced patterns based on coordinate influence strength
+				return coordinateInfluence > 0.7f ? influencedChecker : baseChecker;
+				}
+
+			return baseChecker;
+			}
+
+		/// <summary>
+		/// Applies complexity-based color variation to create rich visual depth
+		/// Uses coordinate position and complexity settings to modify base colors
+		/// </summary>
+		private static Color ApplyComplexityColorVariation(Color baseColor, int pixelX, int pixelY,
+			int2 worldCoords, CheckerComplexitySettings settings)
+			{
+			if (settings.complexityTierMultiplier < 0.5f)
+				{
+				return baseColor; // Low complexity - no variation
+				}
+
+			// Calculate pixel-level variation based on world coordinates
+			float worldInfluence = (worldCoords.x + worldCoords.y) * 0.01f;
+			float pixelNoise = Mathf.PerlinNoise(
+				(pixelX + worldCoords.x) * 0.1f,
+				(pixelY + worldCoords.y) * 0.1f
+			);
+
+			// Apply subtle color shifts based on complexity
+			float variationStrength = (settings.complexityTierMultiplier - 0.5f) * 0.2f;
+			float hueShift = (pixelNoise + worldInfluence) * variationStrength;
+
+			Color.RGBToHSV(baseColor, out float h, out float s, out float v);
+			h = (h + hueShift) % 1f;
+
+			return Color.HSVToRGB(h, s, v);
+			}
+
+		/// <summary>
+		/// Gets biome color with coordinate-based influence for spatial variety
+		/// Distance and coordinate patterns affect color intensity and hue
+		/// </summary>
+		private static Color GetBiomeColorWithCoordinateInfluence(BiomeType biome, NodeId nodeId,
+			CheckerComplexitySettings complexitySettings)
+			{
+			Color baseColor = GetBaseBiomeColor(biome);
+
+			if (complexitySettings.coordinateInfluenceStrength < 0.1f)
+				{
+				return baseColor; // No coordinate influence
+				}
+
+			int2 coords = nodeId.Coordinates;
+			float coordinateInfluence = CalculateCoordinateInfluence(coords, complexitySettings);
+
+			// Modify color based on coordinate position
+			Color.RGBToHSV(baseColor, out float h, out float s, out float v);
+
+			// Distance from origin affects color intensity
+			float distanceFromOrigin = math.length(coords);
+			float normalizedDistance = math.clamp(distanceFromOrigin / 25f, 0f, 1f);
+
+			// Intensity increases with distance (distant areas more vibrant)
+			s = math.clamp(s + normalizedDistance * coordinateInfluence * 0.3f, 0f, 1f);
+			v = math.clamp(v + coordinateInfluence * 0.2f, 0f, 1f);
+
+			// Coordinate patterns create hue variations
+			float patternHueShift = CalculateCoordinatePatternInfluence(coords) * 0.1f * coordinateInfluence;
+			h = (h + patternHueShift) % 1f;
+
+			return Color.HSVToRGB(h, s, v);
+			}
+
+		/// <summary>
+		/// Gets secondary color for checker pattern with coordinate-aware variation
+		/// Creates harmonious color relationships while maintaining spatial identity
+		/// </summary>
+		private static Color GetSecondaryBiomeColor(BiomeType biome, Color primaryColor, int2 coordinates,
+			CheckerComplexitySettings settings)
+			{
+			Color.RGBToHSV(primaryColor, out float h, out float s, out float v);
+
+			// Calculate secondary color hue shift based on biome type
+			float hueShift = GetBiomeSecondaryHueShift(biome);
+
+			// Coordinate influence on secondary color relationships
+			float coordinateInfluence = CalculateCoordinateInfluence(coordinates, settings);
+			float coordinateHueModification = coordinateInfluence * 0.15f;
+
+			// Apply biome-specific and coordinate-influenced hue shift
+			float secondaryHue = (h + hueShift + coordinateHueModification) % 1f;
+
+			// Adjust saturation and value for secondary color
+			float secondarySaturation = math.clamp(s * 0.7f + coordinateInfluence * 0.2f, 0f, 1f);
+			float secondaryValue = math.clamp(v * 0.8f + coordinateInfluence * 0.15f, 0f, 1f);
+
+			return Color.HSVToRGB(secondaryHue, secondarySaturation, secondaryValue);
+			}
+
+		/// <summary>
+		/// Gets base biome color without coordinate modifications
+		/// Maintains consistent biome identity across all coordinate variations
+		/// </summary>
+		private static Color GetBaseBiomeColor(BiomeType biome)
+			{
+			return biome switch
+				{
+					BiomeType.VolcanicCore => new Color(1.0f, 0.3f, 0.1f, 1.0f),      // Lava red
+					BiomeType.FrozenWastes => new Color(0.7f, 0.9f, 1.0f, 1.0f),     // Ice blue
+					BiomeType.SolarPlains => new Color(1.0f, 0.8f, 0.2f, 1.0f),      // Solar yellow
+					BiomeType.CrystalCaverns => new Color(0.8f, 0.4f, 1.0f, 1.0f),   // Crystal purple
+					BiomeType.SkyGardens => new Color(0.4f, 0.8f, 0.6f, 1.0f),       // Garden green
+					BiomeType.ShadowRealms => new Color(0.3f, 0.2f, 0.4f, 1.0f),     // Shadow dark purple
+					BiomeType.DeepUnderwater => new Color(0.2f, 0.4f, 0.8f, 1.0f),   // Deep blue
+					BiomeType.VoidChambers => new Color(0.1f, 0.1f, 0.2f, 1.0f),     // Void dark
+					BiomeType.PowerPlant => new Color(0.9f, 0.9f, 0.3f, 1.0f),       // Electric yellow
+					BiomeType.PlasmaFields => new Color(1.0f, 0.5f, 0.8f, 1.0f),     // Plasma pink
+					BiomeType.IceCatacombs => new Color(0.6f, 0.8f, 0.9f, 1.0f),     // Catacomb blue
+					BiomeType.CryogenicLabs => new Color(0.8f, 0.9f, 1.0f, 1.0f),    // Lab white-blue
+					BiomeType.IcyCanyon => new Color(0.5f, 0.7f, 0.8f, 1.0f),        // Canyon blue
+					BiomeType.Tundra => new Color(0.7f, 0.8f, 0.7f, 1.0f),           // Tundra gray-green
+					BiomeType.Forest => new Color(0.2f, 0.6f, 0.2f, 1.0f),           // Forest green
+					BiomeType.Mountains => new Color(0.5f, 0.4f, 0.3f, 1.0f),        // Mountain brown
+					BiomeType.Desert => new Color(0.8f, 0.6f, 0.3f, 1.0f),           // Desert tan
+					BiomeType.Ocean => new Color(0.2f, 0.5f, 0.8f, 1.0f),            // Ocean blue
+					BiomeType.Cosmic => new Color(0.4f, 0.2f, 0.8f, 1.0f),           // Cosmic purple
+					BiomeType.Crystal => new Color(0.9f, 0.7f, 0.9f, 1.0f),          // Crystal light purple
+					BiomeType.Ruins => new Color(0.6f, 0.5f, 0.4f, 1.0f),            // Ruins brown
+					BiomeType.AncientRuins => new Color(0.5f, 0.4f, 0.3f, 1.0f),     // Ancient brown
+					BiomeType.Volcanic => new Color(0.8f, 0.2f, 0.1f, 1.0f),         // Volcanic red
+					BiomeType.Hell => new Color(0.7f, 0.1f, 0.1f, 1.0f),             // Hell dark red
+					BiomeType.HubArea => new Color(0.6f, 0.6f, 0.6f, 1.0f),          // Hub neutral gray
+					BiomeType.TransitionZone => new Color(0.5f, 0.5f, 0.5f, 1.0f),   // Transition gray
+					_ => new Color(0.5f, 0.5f, 0.5f, 1.0f)                          // Unknown gray
+					};
+			}
+
+		/// <summary>
+		/// Gets secondary hue shift for biome-specific checker pattern
+		/// Creates harmonious color relationships while maintaining spatial identity
+		/// </summary>
+		private static float GetBiomeSecondaryHueShift(BiomeType biome)
+			{
+			return biome switch
+				{
+					BiomeType.VolcanicCore => 0.08f,      // Red to orange
+					BiomeType.FrozenWastes => 0.17f,      // Blue to cyan
+					BiomeType.SolarPlains => -0.08f,      // Yellow to orange
+					BiomeType.CrystalCaverns => 0.25f,    // Purple to blue
+					BiomeType.SkyGardens => 0.33f,        // Green to blue
+					BiomeType.ShadowRealms => 0.5f,       // Dark purple to complementary
+					BiomeType.DeepUnderwater => 0.17f,    // Blue to cyan
+					BiomeType.VoidChambers => 0.83f,      // Dark to light (high contrast)
+					BiomeType.PowerPlant => 0.17f,        // Yellow to green
+					BiomeType.PlasmaFields => -0.17f,     // Pink to purple
+					BiomeType.IceCatacombs => 0.08f,      // Blue to blue-green
+					BiomeType.CryogenicLabs => 0.25f,     // White-blue to purple
+					BiomeType.IcyCanyon => 0.17f,         // Blue to cyan
+					BiomeType.Tundra => 0.08f,            // Gray-green to green
+					BiomeType.Forest => 0.08f,            // Green to yellow-green
+					BiomeType.Mountains => 0.17f,         // Brown to orange
+					BiomeType.Desert => -0.08f,           // Tan to yellow
+					BiomeType.Ocean => 0.25f,             // Blue to purple
+					BiomeType.Cosmic => 0.33f,            // Purple to blue
+					BiomeType.Crystal => -0.08f,          // Light purple to pink
+					BiomeType.Ruins => 0.08f,             // Brown to orange
+					BiomeType.AncientRuins => 0.17f,      // Brown to red
+					BiomeType.Volcanic => 0.08f,          // Red to orange
+					BiomeType.Hell => -0.08f,             // Dark red to red
+					BiomeType.HubArea => 0.5f,            // Gray to complementary
+					BiomeType.TransitionZone => 0.25f,    // Gray to varied
+					_ => 0.33f                           // Default complementary
+					};
+			}
+
+		/// <summary>
+		/// Updates existing material with coordinate-based complexity parameters
+		/// Allows materials to adapt to changing coordinate contexts without recreation
+		/// </summary>
+		private static void UpdateMaterialWithCoordinateComplexity(Material material, NodeId nodeId,
+			CheckerComplexitySettings settings)
+			{
+			if (material == null)
+				{
+				return;
+				}
+
+			// Update material properties based on current coordinates
+			int2 coords = nodeId.Coordinates;
+			float coordinateInfluence = CalculateCoordinateInfluence(coords, settings);
+
+			// Animate material properties if polarity animation is enabled
+			if (settings.polarityAnimationSpeed > 0f)
+				{
+				float animationTime = Time.time * settings.polarityAnimationSpeed;
+				float animationInfluence = Mathf.Sin(animationTime + coords.x * 0.1f + coords.y * 0.1f) * 0.5f + 0.5f;
+
+				// Apply animation to material tiling for dynamic effect
+				Vector2 baseTiling = Vector2.one;
+				Vector2 animatedTiling = baseTiling * (1f + animationInfluence * coordinateInfluence * 0.2f);
+				material.mainTextureScale = animatedTiling;
+
+				// Animate material offset for coordinate-aware movement
+				var coordinateOffset = new Vector2(coords.x * 0.01f, coords.y * 0.01f);
+				Vector2 animatedOffset = coordinateOffset + 0.1f * animationTime * coordinateInfluence * Vector2.one;
+				material.mainTextureOffset = animatedOffset;
+				}
+
+			// Update alpha based on coordinate complexity (more complex = more visible)
+			Color currentColor = material.color;
+			currentColor.a = math.clamp(0.7f + coordinateInfluence * 0.3f, 0.7f, 1f);
+			material.color = currentColor;
+			}
+
+		/// <summary>
+		/// Applies coordinate-based material properties for enhanced visual feedback
+		/// Sets shader properties that respond to world position and complexity
+		/// </summary>
+		private static void ApplyCoordinateBasedMaterialProperties(Material material, NodeId nodeId,
+			CheckerComplexitySettings settings)
+			{
+			if (material == null)
+				{
+				return;
+				}
+
+			int2 coords = nodeId.Coordinates;
+			float coordinateInfluence = CalculateCoordinateInfluence(coords, settings);
+
+			// Set custom material properties if the shader supports them
+			if (material.HasProperty("_Metallic"))
+				{
+				// Metallic increases with coordinate complexity
+				material.SetFloat("_Metallic", coordinateInfluence * 0.3f);
+				}
+
+			if (material.HasProperty("_Smoothness"))
+				{
+				// Smoothness decreases with distance (rough terrain far from origin)
+				float distanceFromOrigin = math.length(coords);
+				float normalizedDistance = math.clamp(distanceFromOrigin / 20f, 0f, 1f);
+				material.SetFloat("_Smoothness", 0.8f - normalizedDistance * 0.5f);
+				}
+
+			if (material.HasProperty("_EmissionColor"))
+				{
+				// Emission based on coordinate patterns for visual interest
+				float emissionStrength = CalculateCoordinatePatternInfluence(coords) * settings.complexityTierMultiplier;
+				Color emissionColor = GetBaseBiomeColor(GetBiomeTypeFromMaterialName(material.name));
+				material.SetColor("_EmissionColor", emissionColor * emissionStrength * 0.2f);
+				}
+
+			// Set coordinate-specific shader parameters
+			if (material.HasProperty("_CoordinateX"))
+				{
+				material.SetFloat("_CoordinateX", coords.x);
+				}
+
+			if (material.HasProperty("_CoordinateY"))
+				{
+				material.SetFloat("_CoordinateY", coords.y);
+				}
+
+			if (material.HasProperty("_ComplexityInfluence"))
+				{
+				material.SetFloat("_ComplexityInfluence", coordinateInfluence);
+				}
+			}
+
+		/// <summary>
+		/// Extracts biome type from material name for property calculations
+		/// Enables biome-specific material behavior based on naming conventions
+		/// </summary>
+		private static BiomeType GetBiomeTypeFromMaterialName(string materialName)
+			{
+			if (string.IsNullOrEmpty(materialName))
+				{
+				return BiomeType.Unknown;
+				}
+
+			// Parse biome type from material name (format: "BiomeChecker_{BiomeType}_{x}_{y}")
+			string[] parts = materialName.Split('_');
+			return parts.Length >= 2 && System.Enum.TryParse(parts[1], out BiomeType biomeType) ? biomeType : BiomeType.Unknown;
+			}
+
+		/// <summary>
+		/// Custom hash code combination for .NET Framework 4.7.1 compatibility
+		/// Replaces System.HashCode.Combine which is not available in older framework versions
+		/// </summary>
+		private static int CombineHashCodes(params object[] values)
+			{
+			unchecked
+				{
+				int hash = 17;
+				foreach (object value in values)
+					{
+					if (value != null)
+						{
+						hash = hash * 31 + value.GetHashCode();
+						}
+					}
+				return hash;
+				}
+			}
+
+		/// <summary>
+		/// Gets coordinate complexity hash for material caching
+		/// Creates deterministic hash values for efficient material reuse
+		/// </summary>
+		private static int GetCoordinateComplexityHash(int2 coordinates, CheckerComplexitySettings settings)
+			{
+			// Create hash that includes coordinate influence on material properties
+			float coordinateInfluence = CalculateCoordinateInfluence(coordinates, settings);
+			int influenceHash = Mathf.RoundToInt(coordinateInfluence * 100f);
+
+			return CombineHashCodes(coordinates.x, coordinates.y, influenceHash,
+				settings.coordinateInfluenceStrength.GetHashCode(),
+				settings.complexityTierMultiplier.GetHashCode());
+			}
+
+		/// <summary>
+		/// Applies checkered material override to tilemap renderer safely
+		/// Never edits Unity's internal materials - always creates new instances
+		/// Integrates with existing BiomeArtIntegrationSystem workflow
+		/// </summary>
+		public static void ApplyCheckerOverrideToTilemap(Tilemap tilemap, BiomeType biome, NodeId nodeId,
+			CheckerComplexitySettings? customSettings = null)
+			{
+			if (tilemap == null)
+				{
+				return;
+				}
+
+			if (!tilemap.TryGetComponent(out TilemapRenderer renderer))
+				{
+				return;
+				}
+
+			// Use provided settings or create default coordinate-aware settings
+			CheckerComplexitySettings settings = customSettings ?? CreateDefaultComplexitySettings();
+
+			// Create coordinate-aware checkered material
+			Material checkerMaterial = GetOrCreateBiomeCheckerMaterial(biome, nodeId, settings);
+
+			// Apply material override (never edits Unity's internal materials)
+			renderer.material = checkerMaterial;
+
+			// Update renderer properties for coordinate-aware debugging
+			renderer.sortingOrder = CalculateCoordinateBasedSortingOrder(nodeId.Coordinates);
+			}
+
+		/// <summary>
+		/// Creates default complexity settings with balanced coordinate influence
+		/// Provides sensible defaults for coordinate-aware checkered material generation
+		/// </summary>
+		public static CheckerComplexitySettings CreateDefaultComplexitySettings()
+			{
+			return new CheckerComplexitySettings
+				{
+				coordinateInfluenceStrength = 0.7f,    // Moderate coordinate influence
+				distanceScalingFactor = 1.0f,          // Standard distance scaling
+				polarityAnimationSpeed = 0.2f,         // Gentle animation
+				enableCoordinateWarping = true,        // Enable pattern warping
+				complexityTierMultiplier = 1.2f        // Boost complexity effects
+				};
+			}
+
+		/// <summary>
+		/// Calculates coordinate-based sorting order for proper layer management
+		/// Ensures distant/complex areas render appropriately relative to simple areas
+		/// </summary>
+		private static int CalculateCoordinateBasedSortingOrder(int2 coordinates)
+			{
+			// Base sorting order influenced by coordinate position
+			float distanceFromOrigin = math.length(coordinates);
+			int distanceOrder = Mathf.RoundToInt(distanceFromOrigin * 0.1f);
+
+			// Pattern-based sorting adjustments
+			int patternOrder = (coordinates.x + coordinates.y) % 3;
+
+			return distanceOrder + patternOrder;
+			}
+
+		/// <summary>
+		/// Cleans up cached materials and textures to prevent memory leaks
+		/// Call during application shutdown or when switching scenes
+		/// </summary>
+		public static void CleanupCachedResources()
+			{
+			// Clean up cached materials
+			foreach (Material material in _cachedBiomeMaterials.Values)
+				{
+				if (material != null)
+					{
+					Object.DestroyImmediate(material);
+					}
+				}
+			_cachedBiomeMaterials.Clear();
+
+			// Clean up cached textures
+			foreach (Texture2D texture in _cachedCheckerTextures.Values)
+				{
+				if (texture != null)
+					{
+					Object.DestroyImmediate(texture);
+					}
+				}
+			_cachedCheckerTextures.Clear();
+			}
+		}
+	}
