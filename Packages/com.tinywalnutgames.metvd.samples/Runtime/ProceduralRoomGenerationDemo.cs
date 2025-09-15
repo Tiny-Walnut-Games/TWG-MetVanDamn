@@ -1,397 +1,457 @@
-using Unity.Collections;
+using TinyWalnutGames.MetVD.Core;
+using TinyWalnutGames.MetVD.Graph;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-using TinyWalnutGames.MetVD.Core;
-using TinyWalnutGames.MetVD.Graph;
 
 namespace TinyWalnutGames.MetVD.Samples
-{
-    /// <summary>
-    /// Demonstration of the Procedural Room Generation Best Fit Matrix & Pipeline
-    /// Shows how to create different types of rooms for various gameplay goals
-    /// </summary>
-    public class ProceduralRoomGenerationDemo : MonoBehaviour
-    {
-        [Header("Room Generation Settings")]
-        [SerializeField] private int roomWidth = 16;
-        [SerializeField] private int roomHeight = 12;
-        [SerializeField] private RoomType roomType = RoomType.Normal;
-        [SerializeField] private BiomeType targetBiome = BiomeType.SolarPlains;
-        [SerializeField] private bool useSkillGates = true;
-        [SerializeField] private bool enableSecrets = true;
-        [SerializeField] private uint generationSeed = 12345;
+	{
+	/// <summary>
+	/// Demonstration of the Procedural Room Generation Best Fit Matrix & Pipeline
+	/// Shows how to create different types of rooms for various gameplay goals
+	/// </summary>
+	public class ProceduralRoomGenerationDemo : MonoBehaviour
+		{
+		[Header("Room Generation Settings")]
+		[SerializeField] private readonly int roomWidth = 16;
+		[SerializeField] private readonly int roomHeight = 12;
+		[SerializeField] private Graph.RoomType roomType = Graph.RoomType.Normal;
+		[SerializeField] private BiomeType targetBiome = BiomeType.SolarPlains;
+		[SerializeField] private readonly bool useSkillGates = true;
+		[SerializeField] private readonly bool enableSecrets = true;
+		[SerializeField] private uint generationSeed = 12345;
 
-        [Header("Available Player Skills")]
-        [SerializeField] private bool hasJump = true;
-        [SerializeField] private bool hasDoubleJump = false;
-        [SerializeField] private bool hasWallJump = false;
-        [SerializeField] private bool hasDash = false;
-        [SerializeField] private bool hasGrapple = false;
-        [SerializeField] private bool hasBomb = false;
+		[Header("Available Player Skills")]
+		[SerializeField] private readonly bool hasJump = true;
+		[SerializeField] private readonly bool hasDoubleJump = false;
+		[SerializeField] private readonly bool hasWallJump = false;
+		[SerializeField] private readonly bool hasDash = false;
+		[SerializeField] private readonly bool hasGrapple = false;
+		[SerializeField] private readonly bool hasBomb = false;
 
-        [Header("Jump Physics")]
-        [SerializeField] private float maxJumpHeight = 4.0f;
-        [SerializeField] private float maxJumpDistance = 6.0f;
-        [SerializeField] private float gravity = 9.81f;
-        [SerializeField] private float movementSpeed = 5.0f;
+		[Header("Jump Physics")]
+		[SerializeField] private readonly float maxJumpHeight = 4.0f;
+		[SerializeField] private readonly float maxJumpDistance = 6.0f;
+		[SerializeField] private readonly float gravity = 9.81f;
+		[SerializeField] private readonly float movementSpeed = 5.0f;
 
-        [Header("Debug Visualization")]
-        [SerializeField] private bool showJumpArcs = true;
-        [SerializeField] private bool showSecretAreas = true;
-        [SerializeField] private bool logGenerationSteps = true;
+		[Header("Debug Visualization")]
+		[SerializeField] private readonly bool showJumpArcs = true;
+		[SerializeField] private readonly bool showSecretAreas = true;
+		[SerializeField] private readonly bool logGenerationSteps = true;
 
-        private World _demoWorld;
-        private EntityManager _entityManager;
-        private Entity _demoRoomEntity;
+		private World _demoWorld;
+		private EntityManager _entityManager;
+		private Entity _demoRoomEntity;
 
-        void Start()
-        {
-            InitializeDemoWorld();
-            CreateDemoRoom();
-        }
+		private void Start()
+			{
+			InitializeDemoWorld();
+			CreateDemoRoom();
+			}
 
-        void OnDestroy()
-        {
-            if (_demoWorld != null && _demoWorld.IsCreated)
-            {
-                _demoWorld.Dispose();
-            }
-        }
+		private void OnDestroy()
+			{
+			if (_demoWorld != null && _demoWorld.IsCreated)
+				{
+				_demoWorld.Dispose();
+				}
+			}
 
-        /// <summary>
-        /// Initialize the demo world with necessary systems
-        /// </summary>
-        private void InitializeDemoWorld()
-        {
-            _demoWorld = new World("ProceduralRoomGenerationDemo");
-            _entityManager = _demoWorld.EntityManager;
+		/// <summary>
+		/// Initialize the demo world with necessary systems
+		/// </summary>
+		private void InitializeDemoWorld()
+			{
+			_demoWorld = new World("ProceduralRoomGenerationDemo");
+			_entityManager = _demoWorld.EntityManager;
 
-            // Add the procedural room generation systems
-            var systemGroup = _demoWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
-            
-            // Note: In a real Unity project, these systems would be automatically discovered
-            // Here we manually add them for demonstration
-            if (logGenerationSteps)
-            {
-                Debug.Log("Demo World initialized with procedural room generation systems");
-            }
-        }
+			// Add the procedural room generation systems
+			InitializationSystemGroup systemGroup = _demoWorld.GetOrCreateSystemManaged<InitializationSystemGroup>();
 
-        /// <summary>
-        /// Create a demo room using the procedural generation pipeline
-        /// </summary>
-        public void CreateDemoRoom()
-        {
-            if (_entityManager == null) return;
+			// Systems are manually added for this demonstration world
+			// This provides complete control over the generation pipeline
+			if (logGenerationSteps)
+				{
+				Debug.Log("Demo World initialized with procedural room generation systems");
+				}
+			}
 
-            // Clean up previous room if it exists
-            if (_demoRoomEntity != Entity.Null && _entityManager.Exists(_demoRoomEntity))
-            {
-                _entityManager.DestroyEntity(_demoRoomEntity);
-            }
+		/// <summary>
+		/// Create a demo room using the procedural generation pipeline
+		/// </summary>
+		public void CreateDemoRoom()
+			{
+			if (_entityManager == null)
+				{
+				return;
+				}
 
-            // Create new room entity
-            _demoRoomEntity = _entityManager.CreateEntity();
+			// Clean up previous room if it exists
+			if (_demoRoomEntity != Entity.Null && _entityManager.Exists(_demoRoomEntity))
+				{
+				_entityManager.DestroyEntity(_demoRoomEntity);
+				}
 
-            // Add core room data
-            var roomBounds = new RectInt(0, 0, roomWidth, roomHeight);
-            var roomData = new RoomHierarchyData(roomBounds, roomType, true);
-            var nodeId = new NodeId(1, 2, 1, new int2(0, 0));
+			// Create new room entity
+			_demoRoomEntity = _entityManager.CreateEntity();
 
-            _entityManager.AddComponentData(_demoRoomEntity, roomData);
-            _entityManager.AddComponentData(_demoRoomEntity, nodeId);
+			// Add core room data
+			var roomBounds = new RectInt(0, 0, roomWidth, roomHeight);
+			var roomData = new RoomHierarchyData(roomBounds, roomType, true);
+			var nodeId = new NodeId(1, 2, 1, new int2(0, 0));
 
-            // Create biome data
-            var biome = CreateBiomeFromType(targetBiome);
-            _entityManager.AddComponentData(_demoRoomEntity, biome);
+			_entityManager.AddComponentData(_demoRoomEntity, roomData);
+			_entityManager.AddComponentData(_demoRoomEntity, nodeId);
 
-            // Determine generator type based on Best Fit Matrix
-            var generatorType = DetermineOptimalGenerator(roomType, roomBounds, targetBiome);
-            
-            // Build available skills mask
-            var availableSkills = BuildSkillsMask();
+			// Create biome data
+			Core.Biome biome = CreateBiomeFromType(targetBiome);
+			_entityManager.AddComponentData(_demoRoomEntity, biome);
 
-            // Create room generation request
-            var generationRequest = new RoomGenerationRequest(
-                generatorType,
-                targetBiome,
-                biome.PrimaryPolarity,
-                availableSkills,
-                generationSeed
-            );
+			// Determine generator type based on Best Fit Matrix
+			RoomGeneratorType generatorType = DetermineOptimalGenerator(roomType, roomBounds, targetBiome);
 
-            _entityManager.AddComponentData(_demoRoomEntity, generationRequest);
+			// Build available skills mask
+			Ability availableSkills = BuildSkillsMask();
 
-            // Add specialized components based on generator type
-            AddGeneratorSpecificComponents(generatorType);
+			// Create room generation request
+			var generationRequest = new RoomGenerationRequest(
+				generatorType,
+				targetBiome,
+				biome.PrimaryPolarity,
+				availableSkills,
+				generationSeed
+			);
 
-            // Add room management components
-            _entityManager.AddComponentData(_demoRoomEntity, new RoomStateData(CalculateSecretCount()));
-            _entityManager.AddComponentData(_demoRoomEntity, CreateNavigationData(roomBounds));
-            _entityManager.AddBuffer<RoomFeatureElement>(_demoRoomEntity);
+			_entityManager.AddComponentData(_demoRoomEntity, generationRequest);
 
-            if (logGenerationSteps)
-            {
-                Debug.Log($"Created demo room: {roomType} using {generatorType} generator in {targetBiome} biome");
-                Debug.Log($"Room size: {roomWidth}x{roomHeight}, Skills: {availableSkills}");
-            }
-        }
+			// Add specialized components based on generator type
+			AddGeneratorSpecificComponents(generatorType);
 
-        /// <summary>
-        /// Determine the optimal generator based on the Best Fit Matrix
-        /// </summary>
-        private RoomGeneratorType DetermineOptimalGenerator(RoomType roomType, RectInt bounds, BiomeType biome)
-        {
-            var aspectRatio = (float)bounds.width / bounds.height;
+			// Add room management components
+			_entityManager.AddComponentData(_demoRoomEntity, new RoomStateData(CalculateSecretCount()));
+			_entityManager.AddComponentData(_demoRoomEntity, CreateNavigationData(roomBounds));
+			_entityManager.AddBuffer<RoomFeatureElement>(_demoRoomEntity);
 
-            // Apply Best Fit Matrix logic
-            return roomType switch
-            {
-                RoomType.Boss when useSkillGates => RoomGeneratorType.PatternDrivenModular,
-                RoomType.Treasure => RoomGeneratorType.ParametricChallenge,
-                RoomType.Save or RoomType.Shop or RoomType.Hub => RoomGeneratorType.WeightedTilePrefab,
-                _ when IsSkyBiome(biome) => RoomGeneratorType.LayeredPlatformCloud,
-                _ when IsTerrainBiome(biome) => RoomGeneratorType.BiomeWeightedHeightmap,
-                _ when aspectRatio > 1.5f => RoomGeneratorType.LinearBranchingCorridor,
-                _ when aspectRatio < 0.67f => RoomGeneratorType.StackedSegment,
-                _ => RoomGeneratorType.WeightedTilePrefab
-            };
-        }
+			if (logGenerationSteps)
+				{
+				Debug.Log($"Created demo room: {roomType} using {generatorType} generator in {targetBiome} biome");
+				Debug.Log($"Room size: {roomWidth}x{roomHeight}, Skills: {availableSkills}");
+				}
+			}
 
-        /// <summary>
-        /// Build skills mask from UI checkboxes
-        /// </summary>
-        private Ability BuildSkillsMask()
-        {
-            var skills = Ability.None;
-            
-            if (hasJump) skills |= Ability.Jump;
-            if (hasDoubleJump) skills |= Ability.DoubleJump;
-            if (hasWallJump) skills |= Ability.WallJump;
-            if (hasDash) skills |= Ability.Dash;
-            if (hasGrapple) skills |= Ability.Grapple;
-            if (hasBomb) skills |= Ability.Bomb;
+		/// <summary>
+		/// Determine the optimal generator based on the Best Fit Matrix
+		/// </summary>
+		private RoomGeneratorType DetermineOptimalGenerator(Graph.RoomType roomType, RectInt bounds, BiomeType biome)
+			{
+			float aspectRatio = (float)bounds.width / bounds.height;
 
-            return skills;
-        }
+			// Apply Best Fit Matrix logic
+			return roomType switch
+				{
+					Graph.RoomType.Boss when useSkillGates => RoomGeneratorType.PatternDrivenModular,
+					Graph.RoomType.Treasure => RoomGeneratorType.ParametricChallenge,
+					Graph.RoomType.Save or Graph.RoomType.Shop or Graph.RoomType.Hub => RoomGeneratorType.WeightedTilePrefab,
+					_ when IsSkyBiome(biome) => RoomGeneratorType.LayeredPlatformCloud,
+					_ when IsTerrainBiome(biome) => RoomGeneratorType.BiomeWeightedHeightmap,
+					_ when aspectRatio > 1.5f => RoomGeneratorType.LinearBranchingCorridor,
+					_ when aspectRatio < 0.67f => RoomGeneratorType.StackedSegment,
+					_ => RoomGeneratorType.WeightedTilePrefab
+					};
+			}
 
-        /// <summary>
-        /// Create biome data from biome type
-        /// </summary>
-        private Core.Biome CreateBiomeFromType(BiomeType biomeType)
-        {
-            var polarity = biomeType switch
-            {
-                BiomeType.SolarPlains => Polarity.Sun,
-                BiomeType.ShadowRealms => Polarity.Moon,
-                BiomeType.VolcanicCore => Polarity.Heat,
-                BiomeType.FrozenWastes => Polarity.Cold,
-                BiomeType.SkyGardens => Polarity.Wind,
-                BiomeType.PowerPlant => Polarity.Tech,
-                _ => Polarity.None
-            };
+		/// <summary>
+		/// Build skills mask from UI checkboxes
+		/// </summary>
+		private Ability BuildSkillsMask()
+			{
+			Ability skills = Ability.None;
 
-            return new Core.Biome(biomeType, polarity, 1.0f, Polarity.None, 1.0f);
-        }
+			if (hasJump)
+				{
+				skills |= Ability.Jump;
+				}
 
-        /// <summary>
-        /// Add components specific to the selected generator type
-        /// </summary>
-        private void AddGeneratorSpecificComponents(RoomGeneratorType generatorType)
-        {
-            switch (generatorType)
-            {
-                case RoomGeneratorType.PatternDrivenModular:
-                    _entityManager.AddBuffer<RoomPatternElement>(_demoRoomEntity);
-                    _entityManager.AddBuffer<RoomModuleElement>(_demoRoomEntity);
-                    break;
+			if (hasDoubleJump)
+				{
+				skills |= Ability.DoubleJump;
+				}
 
-                case RoomGeneratorType.ParametricChallenge:
-                    var jumpPhysics = new JumpPhysicsData(
-                        maxJumpHeight, maxJumpDistance, gravity, movementSpeed,
-                        hasDoubleJump, hasWallJump, hasDash
-                    );
-                    _entityManager.AddComponentData(_demoRoomEntity, jumpPhysics);
-                    _entityManager.AddComponentData(_demoRoomEntity, new JumpArcValidation(false, 0, 0));
-                    _entityManager.AddBuffer<JumpConnectionElement>(_demoRoomEntity);
-                    break;
+			if (hasWallJump)
+				{
+				skills |= Ability.WallJump;
+				}
 
-                case RoomGeneratorType.WeightedTilePrefab:
-                    if (enableSecrets)
-                    {
-                        var secretConfig = new SecretAreaConfig(
-                            0.15f, new int2(2, 2), new int2(4, 4),
-                            hasBomb ? Ability.Bomb : Ability.None, true, true
-                        );
-                        _entityManager.AddComponentData(_demoRoomEntity, secretConfig);
-                    }
-                    break;
-            }
-        }
+			if (hasDash)
+				{
+				skills |= Ability.Dash;
+				}
 
-        /// <summary>
-        /// Create navigation data for the room
-        /// </summary>
-        private RoomNavigationData CreateNavigationData(RectInt bounds)
-        {
-            var primaryEntrance = new int2(bounds.x + 1, bounds.y + 1);
-            var isCriticalPath = roomType == RoomType.Boss || roomType == RoomType.Entrance || roomType == RoomType.Exit;
-            var traversalTime = CalculateTraversalTime(bounds);
+			if (hasGrapple)
+				{
+				skills |= Ability.Grapple;
+				}
 
-            return new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime);
-        }
+			if (hasBomb)
+				{
+				skills |= Ability.Bomb;
+				}
 
-        /// <summary>
-        /// Calculate expected traversal time based on room size and type
-        /// </summary>
-        private float CalculateTraversalTime(RectInt bounds)
-        {
-            var baseTime = (bounds.width + bounds.height) * 0.5f;
-            
-            return roomType switch
-            {
-                RoomType.Boss => baseTime * 3.0f,      // Boss fights take longer
-                RoomType.Treasure => baseTime * 2.0f,  // Puzzle rooms take longer
-                RoomType.Save => baseTime * 0.5f,      // Safe rooms are quick
-                _ => baseTime
-            };
-        }
+			return skills;
+			}
 
-        /// <summary>
-        /// Calculate number of secrets based on room type and settings
-        /// </summary>
-        private int CalculateSecretCount()
-        {
-            if (!enableSecrets) return 0;
-            
-            var area = roomWidth * roomHeight;
-            return roomType switch
-            {
-                RoomType.Treasure => math.max(2, area / 20),
-                RoomType.Normal => area / 40,
-                RoomType.Boss => 1,
-                _ => 0
-            };
-        }
+		/// <summary>
+		/// Create biome data from biome type
+		/// </summary>
+		private Core.Biome CreateBiomeFromType(BiomeType biomeType)
+			{
+			Polarity polarity = biomeType switch
+				{
+					BiomeType.SolarPlains => Polarity.Sun,
+					BiomeType.ShadowRealms => Polarity.Moon,
+					BiomeType.VolcanicCore => Polarity.Heat,
+					BiomeType.FrozenWastes => Polarity.Cold,
+					BiomeType.SkyGardens => Polarity.Wind,
+					BiomeType.PowerPlant => Polarity.Tech,
+					_ => Polarity.None
+					};
 
-        /// <summary>
-        /// Helper methods for biome classification
-        /// </summary>
-        private static bool IsSkyBiome(BiomeType biome) => 
-            biome == BiomeType.SkyGardens || biome == BiomeType.PlasmaFields;
+			return new Core.Biome(biomeType, polarity, 1.0f, Polarity.None, 1.0f);
+			}
 
-        private static bool IsTerrainBiome(BiomeType biome) => 
-            biome == BiomeType.SolarPlains || biome == BiomeType.FrozenWastes;
+		/// <summary>
+		/// Add components specific to the selected generator type
+		/// </summary>
+		private void AddGeneratorSpecificComponents(RoomGeneratorType generatorType)
+			{
+			switch (generatorType)
+				{
+				case RoomGeneratorType.PatternDrivenModular:
+					_entityManager.AddBuffer<RoomPatternElement>(_demoRoomEntity);
+					_entityManager.AddBuffer<RoomModuleElement>(_demoRoomEntity);
+					break;
 
-        /// <summary>
-        /// Manual trigger for regenerating the room (for testing)
-        /// </summary>
-        [ContextMenu("Regenerate Room")]
-        public void RegenerateRoom()
-        {
-            generationSeed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
-            CreateDemoRoom();
-        }
+				case RoomGeneratorType.ParametricChallenge:
+					var jumpPhysics = new JumpPhysicsData(
+						maxJumpHeight, maxJumpDistance, gravity, movementSpeed,
+						hasDoubleJump, hasWallJump, hasDash
+					);
+					_entityManager.AddComponentData(_demoRoomEntity, jumpPhysics);
+					_entityManager.AddComponentData(_demoRoomEntity, new JumpArcValidation(false, 0, 0));
+					_entityManager.AddBuffer<JumpConnectionElement>(_demoRoomEntity);
+					break;
 
-        /// <summary>
-        /// Demonstrate different generator types
-        /// </summary>
-        [ContextMenu("Demo All Generator Types")]
-        public void DemoAllGeneratorTypes()
-        {
-            var originalType = roomType;
-            var originalBiome = targetBiome;
+				case RoomGeneratorType.WeightedTilePrefab:
+					if (enableSecrets)
+						{
+						var secretConfig = new SecretAreaConfig(
+							0.15f, new int2(2, 2), new int2(4, 4),
+							hasBomb ? Ability.Bomb : Ability.None, true, true
+						);
+						_entityManager.AddComponentData(_demoRoomEntity, secretConfig);
+						}
+					break;
+				case RoomGeneratorType.VerticalSegment:
+					break;
+				case RoomGeneratorType.HorizontalCorridor:
+					break;
+				case RoomGeneratorType.BiomeWeightedTerrain:
+					break;
+				case RoomGeneratorType.SkyBiomePlatform:
+					break;
+				case RoomGeneratorType.LinearBranchingCorridor:
+					break;
+				case RoomGeneratorType.StackedSegment:
+					break;
+				case RoomGeneratorType.LayeredPlatformCloud:
+					break;
+				case RoomGeneratorType.BiomeWeightedHeightmap:
+					break;
+				default:
+					break;
+				}
+			}
 
-            StartCoroutine(DemoGeneratorSequence(originalType, originalBiome));
-        }
+		/// <summary>
+		/// Create navigation data for the room
+		/// </summary>
+		private RoomNavigationData CreateNavigationData(RectInt bounds)
+			{
+			var primaryEntrance = new int2(bounds.x + 1, bounds.y + 1);
+			bool isCriticalPath = roomType is Graph.RoomType.Boss or Graph.RoomType.Entrance or Graph.RoomType.Exit;
+			float traversalTime = CalculateTraversalTime(bounds);
 
-        private System.Collections.IEnumerator DemoGeneratorSequence(RoomType originalType, BiomeType originalBiome)
-        {
-            var generatorTypes = new[]
-            {
-                (RoomType.Boss, BiomeType.VolcanicCore, "Pattern-Driven Modular - Skill Challenges"),
-                (RoomType.Treasure, BiomeType.CrystalCaverns, "Parametric Challenge - Jump Testing"),
-                (RoomType.Normal, BiomeType.HubArea, "Weighted Tile/Prefab - Standard Platforming"),
-                (RoomType.Normal, BiomeType.SkyGardens, "Layered Platform/Cloud - Sky Biome"),
-                (RoomType.Normal, BiomeType.SolarPlains, "Biome-Weighted Heightmap - Terrain")
-            };
+			return new RoomNavigationData(primaryEntrance, isCriticalPath, traversalTime);
+			}
 
-            foreach (var (type, biome, description) in generatorTypes)
-            {
-                roomType = type;
-                targetBiome = biome;
-                CreateDemoRoom();
-                
-                Debug.Log($"Generated: {description}");
-                yield return new WaitForSeconds(2.0f);
-            }
+		/// <summary>
+		/// Calculate expected traversal time based on room size and type
+		/// </summary>
+		private float CalculateTraversalTime(RectInt bounds)
+			{
+			float baseTime = (bounds.width + bounds.height) * 0.5f;
 
-            // Restore original settings
-            roomType = originalType;
-            targetBiome = originalBiome;
-            CreateDemoRoom();
-        }
+			return roomType switch
+				{
+					Graph.RoomType.Boss => baseTime * 3.0f,      // Boss fights take longer
+					Graph.RoomType.Treasure => baseTime * 2.0f,  // Puzzle rooms take longer
+					Graph.RoomType.Save => baseTime * 0.5f,      // Safe rooms are quick
+					_ => baseTime
+					};
+			}
 
-        /// <summary>
-        /// Visualize jump arcs and room features in the scene view
-        /// </summary>
-        void OnDrawGizmos()
-        {
-            if (!Application.isPlaying || _entityManager == null || !_entityManager.Exists(_demoRoomEntity))
-                return;
+		/// <summary>
+		/// Calculate number of secrets based on room type and settings
+		/// </summary>
+		private int CalculateSecretCount()
+			{
+			if (!enableSecrets)
+				{
+				return 0;
+				}
 
-            DrawRoomBounds();
-            
-            if (showJumpArcs)
-                DrawJumpArcs();
-                
-            if (showSecretAreas)
-                DrawSecretAreas();
-        }
+			int area = roomWidth * roomHeight;
+			return roomType switch
+				{
+					Graph.RoomType.Treasure => math.max(2, area / 20),
+					Graph.RoomType.Normal => area / 40,
+					Graph.RoomType.Boss => 1,
+					_ => 0
+					};
+			}
 
-        private void DrawRoomBounds()
-        {
-            Gizmos.color = Color.white;
-            var bounds = new Vector3(roomWidth, roomHeight, 1);
-            Gizmos.DrawWireCube(transform.position + bounds * 0.5f, bounds);
-        }
+		/// <summary>
+		/// Helper methods for biome classification
+		/// </summary>
+		private static bool IsSkyBiome(BiomeType biome)
+			{
+			return biome is BiomeType.SkyGardens or BiomeType.PlasmaFields;
+			}
 
-        private void DrawJumpArcs()
-        {
-            if (!_entityManager.HasBuffer<JumpConnectionElement>(_demoRoomEntity))
-                return;
+		private static bool IsTerrainBiome(BiomeType biome)
+			{
+			return biome is BiomeType.SolarPlains or BiomeType.FrozenWastes;
+			}
 
-            var connections = _entityManager.GetBuffer<JumpConnectionElement>(_demoRoomEntity);
-            Gizmos.color = Color.green;
-            
-            foreach (var connection in connections)
-            {
-                var from = new Vector3(connection.FromPosition.x, connection.FromPosition.y, 0);
-                var to = new Vector3(connection.ToPosition.x, connection.ToPosition.y, 0);
-                
-                Gizmos.DrawLine(transform.position + from, transform.position + to);
-                Gizmos.DrawSphere(transform.position + from, 0.2f);
-                Gizmos.DrawSphere(transform.position + to, 0.2f);
-            }
-        }
+		/// <summary>
+		/// Manual trigger for regenerating the room (for testing)
+		/// </summary>
+		[ContextMenu("Regenerate Room")]
+		public void RegenerateRoom()
+			{
+			generationSeed = (uint)UnityEngine.Random.Range(1, int.MaxValue);
+			CreateDemoRoom();
+			}
 
-        private void DrawSecretAreas()
-        {
-            if (!_entityManager.HasBuffer<RoomFeatureElement>(_demoRoomEntity))
-                return;
+		/// <summary>
+		/// Demonstrate different generator types
+		/// </summary>
+		[ContextMenu("Demo All Generator Types")]
+		public void DemoAllGeneratorTypes()
+			{
+			Graph.RoomType originalType = roomType;
+			BiomeType originalBiome = targetBiome;
 
-            var features = _entityManager.GetBuffer<RoomFeatureElement>(_demoRoomEntity);
-            
-            foreach (var feature in features)
-            {
-                if (feature.Type == RoomFeatureType.Secret)
-                {
-                    Gizmos.color = Color.yellow;
-                    var pos = new Vector3(feature.Position.x, feature.Position.y, 0);
-                    Gizmos.DrawCube(transform.position + pos, Vector3.one * 0.8f);
-                }
-            }
-        }
-    }
-}
+			StartCoroutine(DemoGeneratorSequence(originalType, originalBiome));
+			}
+
+		private System.Collections.IEnumerator DemoGeneratorSequence(Graph.RoomType originalType, BiomeType originalBiome)
+			{
+			(Graph.RoomType, BiomeType, string)[] generatorTypes = new[]
+			{
+				(Graph.RoomType.Boss, BiomeType.VolcanicCore, "Pattern-Driven Modular - Skill Challenges"),
+				(Graph.RoomType.Treasure, BiomeType.CrystalCaverns, "Parametric Challenge - Jump Testing"),
+				(Graph.RoomType.Normal, BiomeType.HubArea, "Weighted Tile/Prefab - Standard Platforming"),
+				(Graph.RoomType.Normal, BiomeType.SkyGardens, "Layered Platform/Cloud - Sky Biome"),
+				(Graph.RoomType.Normal, BiomeType.SolarPlains, "Biome-Weighted Heightmap - Terrain")
+			};
+
+			foreach ((Graph.RoomType type, BiomeType biome, string description) in generatorTypes)
+				{
+				roomType = type;
+				targetBiome = biome;
+				CreateDemoRoom();
+
+				Debug.Log($"Generated: {description}");
+				yield return new WaitForSeconds(2.0f);
+				}
+
+			// Restore original settings
+			roomType = originalType;
+			targetBiome = originalBiome;
+			CreateDemoRoom();
+			}
+
+		/// <summary>
+		/// Visualize jump arcs and room features in the scene view
+		/// </summary>
+		private void OnDrawGizmos()
+			{
+			if (!Application.isPlaying || _entityManager == null || !_entityManager.Exists(_demoRoomEntity))
+				{
+				return;
+				}
+
+			DrawRoomBounds();
+
+			if (showJumpArcs)
+				{
+				DrawJumpArcs();
+				}
+
+			if (showSecretAreas)
+				{
+				DrawSecretAreas();
+				}
+			}
+
+		private void DrawRoomBounds()
+			{
+			Gizmos.color = Color.white;
+			var bounds = new Vector3(roomWidth, roomHeight, 1);
+			Gizmos.DrawWireCube(transform.position + bounds * 0.5f, bounds);
+			}
+
+		private void DrawJumpArcs()
+			{
+			if (!_entityManager.HasBuffer<JumpConnectionElement>(_demoRoomEntity))
+				{
+				return;
+				}
+
+			DynamicBuffer<JumpConnectionElement> connections = _entityManager.GetBuffer<JumpConnectionElement>(_demoRoomEntity);
+			Gizmos.color = Color.green;
+
+			foreach (JumpConnectionElement connection in connections)
+				{
+				var from = new Vector3(connection.FromPosition.x, connection.FromPosition.y, 0);
+				var to = new Vector3(connection.ToPosition.x, connection.ToPosition.y, 0);
+
+				Gizmos.DrawLine(transform.position + from, transform.position + to);
+				Gizmos.DrawSphere(transform.position + from, 0.2f);
+				Gizmos.DrawSphere(transform.position + to, 0.2f);
+				}
+			}
+
+		private void DrawSecretAreas()
+			{
+			if (!_entityManager.HasBuffer<RoomFeatureElement>(_demoRoomEntity))
+				{
+				return;
+				}
+
+			DynamicBuffer<RoomFeatureElement> features = _entityManager.GetBuffer<RoomFeatureElement>(_demoRoomEntity);
+
+			foreach (RoomFeatureElement feature in features)
+				{
+				if (feature.Type == RoomFeatureType.Secret)
+					{
+					Gizmos.color = Color.yellow;
+					var pos = new Vector3(feature.Position.x, feature.Position.y, 0);
+					Gizmos.DrawCube(transform.position + pos, Vector3.one * 0.8f);
+					}
+				}
+			}
+		}
+	}

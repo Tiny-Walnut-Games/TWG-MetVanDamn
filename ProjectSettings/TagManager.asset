@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
@@ -13,21 +13,21 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Parallax5
+  - Parallax4
+  - Parallax3
+  - Parallax2
+  - Parallax1
+  - Background2
+  - Background1
+  - BackgroundProps
+  - WalkableGround
+  - WalkableProps
+  - Hazards
+  - Foreground
+  - ForegroundProps
+  - RoomMasking
+  - Blending
   - 
   - 
   - 
@@ -41,3 +41,74 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: DeepOcean
+    uniqueID: 1535477659
+    locked: 0
+  - name: Ocean
+    uniqueID: 3912155639
+    locked: 0
+  - name: ShallowWater
+    uniqueID: 1054615477
+    locked: 0
+  - name: Floor
+    uniqueID: 2628431357
+    locked: 0
+  - name: FloorProps
+    uniqueID: 2798400227
+    locked: 0
+  - name: WalkableGround
+    uniqueID: 959367781
+    locked: 0
+  - name: WalkableProps
+    uniqueID: 1297647219
+    locked: 0
+  - name: OverheadProps
+    uniqueID: 1724563873
+    locked: 0
+  - name: RoomMasking
+    uniqueID: 3679887185
+    locked: 0
+  - name: Blending
+    uniqueID: 508022863
+    locked: 0
+  - name: Background
+    uniqueID: 3176169113
+    locked: 0
+  - name: Parallax
+    uniqueID: 3245399809
+    locked: 0
+  - name: Parallax5
+    uniqueID: 1784956717
+    locked: 0
+  - name: Parallax4
+    uniqueID: 1784946773
+    locked: 0
+  - name: Parallax3
+    uniqueID: 1784946773
+    locked: 0
+  - name: Parallax2
+    uniqueID: 1784946773
+    locked: 0
+  - name: Parallax1
+    uniqueID: 1784946773
+    locked: 0
+  - name: Background2
+    uniqueID: 1784946773
+    locked: 0
+  - name: Background1
+    uniqueID: 1784946773
+    locked: 0
+  - name: BackgroundProps
+    uniqueID: 1784946773
+    locked: 0
+  - name: Hazards
+    uniqueID: 1784946773
+    locked: 0
+  - name: Foreground
+    uniqueID: 1784946773
+    locked: 0
+  - name: ForegroundProps
+    uniqueID: 1784946773
+    locked: 0
+  m_RenderingLayers:
+  - Default

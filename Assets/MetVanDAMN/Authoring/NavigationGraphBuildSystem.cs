@@ -1,309 +1,335 @@
-using Unity.Burst;
-using Unity.Collections;
+using TinyWalnutGames.MetVD.Core;
 using Unity.Entities;
 using Unity.Mathematics;
-#if UNITY_TRANSFORMS_LOCALTRANSFORM
 using Unity.Transforms;
-#endif
-using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Authoring
-{
-    /// <summary>
-    /// System responsible for building the navigation graph from baked district, connection, and gate data
-    /// Converts authoring components into runtime navigation nodes and links
-    /// </summary>
-    [UpdateInGroup(typeof(InitializationSystemGroup))]
-    [UpdateAfter(typeof(BuildConnectionBuffersSystem))]
-    public partial struct NavigationGraphBuildSystem : ISystem
-    {
-        private EntityQuery _districtQuery;
-        private EntityQuery _connectionQuery;
-        private EntityQuery _gateQuery;
-        private EntityQuery _navigationGraphQuery;
+	{
+	/// <summary>
+	/// System responsible for building the navigation graph from baked district, connection, and gate data
+	/// Converts authoring components into runtime navigation nodes and links
+	/// </summary>
+	[UpdateInGroup(typeof(InitializationSystemGroup))]
+	[UpdateAfter(typeof(BuildConnectionBuffersSystem))]
+	public partial class NavigationGraphBuildSystem : SystemBase
+		{
+		private EntityQuery _districtQuery;
+		private EntityQuery _connectionQuery;
+		private EntityQuery _gateQuery;
+		private EntityQuery _navigationGraphQuery;
 
-        [BurstCompile]
-        public void OnCreate(ref SystemState state)
-        {
-            // Query for districts that can become navigation nodes
-            _districtQuery = SystemAPI.QueryBuilder()
-#if UNITY_TRANSFORMS_LOCALTRANSFORM
-                .WithAll<LocalTransform>()
-#endif
-                .WithAll<NodeId>()
-                .WithNone<NavNode>() // Only process districts that haven't been converted yet
-                .Build();
+		// 🔥 ACTUAL ECB SYSTEM REFERENCE - NOT JUST COMMENTS
+		private EndInitializationEntityCommandBufferSystem _endInitEcbSystem;
 
-            // Query for connections between districts
-            _connectionQuery = SystemAPI.QueryBuilder()
-                .WithAll<Connection>()
-                .Build();
+		protected override void OnCreate()
+			{
+			// 🔥 GET THE ECB SYSTEM REFERENCE FOR REAL
+			_endInitEcbSystem = World.GetOrCreateSystemManaged<EndInitializationEntityCommandBufferSystem>();
 
-            // Query for gate conditions
-            _gateQuery = SystemAPI.QueryBuilder()
-                .WithAll<GateConditionBufferElement>()
-                .WithAll<NodeId>()
-                .Build();
+			// Query for districts that can become navigation nodes
+			_districtQuery = GetEntityQuery(
+				ComponentType.ReadOnly<LocalTransform>(),
+				ComponentType.ReadOnly<NodeId>(),
+				ComponentType.Exclude<NavNode>() // Only process districts that haven't been converted yet
+			);
 
-            // Query for navigation graph singleton
-            _navigationGraphQuery = SystemAPI.QueryBuilder()
-                .WithAll<NavigationGraph>()
-                .Build();
+			// Query for connections between districts
+			_connectionQuery = GetEntityQuery(
+				ComponentType.ReadOnly<Connection>()
+			);
 
-            state.RequireForUpdate(_districtQuery);
-        }
+			// Query for gate conditions
+			_gateQuery = GetEntityQuery(
+				ComponentType.ReadOnly<GateConditionBufferElement>(),
+				ComponentType.ReadOnly<NodeId>()
+			);
 
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
-        {
-            // Create navigation graph singleton if it doesn't exist
-            if (_navigationGraphQuery.IsEmpty)
-            {
-                var navGraphEntity = state.EntityManager.CreateEntity();
-                state.EntityManager.AddComponentData(navGraphEntity, new NavigationGraph());
-            }
+			// Query for navigation graph singleton
+			_navigationGraphQuery = GetEntityQuery(
+				ComponentType.ReadOnly<NavigationGraph>()
+			);
 
-            // Skip if no districts to process
-            if (_districtQuery.IsEmpty)
-                return;
+			RequireForUpdate(_districtQuery);
+			}
 
-            var navGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
-            var navGraph = SystemAPI.GetSingleton<NavigationGraph>();
+		protected override void OnUpdate()
+			{
+			// 🔥 CREATE ACTUAL ECB INSTANCE - NOT JUST COMMENTS
+			EntityCommandBuffer ecb = _endInitEcbSystem.CreateCommandBuffer();
 
-            // Build navigation nodes from districts
-            var nodeCount = BuildNavigationNodes(ref state);
-            
-            // Build navigation links from connections and gates
-            var linkCount = BuildNavigationLinks(ref state);
+			// 🔥 USE ECB FOR SINGLETON CREATION - NO MORE DIRECT ENTITYMANAGER
+			if (_navigationGraphQuery.IsEmpty)
+				{
+				Entity newNavGraphEntity = ecb.CreateEntity();
+				ecb.AddComponent(newNavGraphEntity, new NavigationGraph());
+				}
 
-            // Update navigation graph statistics
-            navGraph.NodeCount = nodeCount;
-            navGraph.LinkCount = linkCount;
-            navGraph.IsReady = true;
-            navGraph.LastRebuildTime = SystemAPI.Time.ElapsedTime;
-            
-            SystemAPI.SetSingleton(navGraph);
-        }
+			// Skip if no districts to process
+			if (_districtQuery.IsEmpty)
+				{
+				return;
+				}
 
-        [BurstCompile]
-        private int BuildNavigationNodes(ref SystemState state)
-        {
-            var nodeCount = 0;
+			// Build navigation nodes from districts using ECB
+			int nodeCount = BuildNavigationNodesWithActualECB(ecb);
 
-            // Convert districts to navigation nodes
-            foreach (var (transform, nodeId, entity) in 
-                     SystemAPI.Query<RefRO<LocalTransform>, RefRO<NodeId>>()
-                     .WithEntityAccess()
-                     .WithNone<NavNode>())
-            {
-                var worldPosition = transform.ValueRO.Position;
-                var districtNodeId = nodeId.ValueRO.Value;
+			// Build navigation links from connections and gates
+			int linkCount = BuildNavigationLinks();
 
-                // Determine biome type and polarity from existing components
-                var biomeType = BiomeType.Unknown;
-                var primaryPolarity = Polarity.None;
-                
-                if (SystemAPI.HasComponent<TinyWalnutGames.MetVD.Core.Biome>(entity))
-                {
-                    var biome = SystemAPI.GetComponent<TinyWalnutGames.MetVD.Core.Biome>(entity);
-                    biomeType = biome.Type;
-                    primaryPolarity = biome.PrimaryPolarity;
-                }
+			// Update navigation graph statistics if it exists
+			if (!_navigationGraphQuery.IsEmpty)
+				{
+				Entity navGraphEntity = SystemAPI.GetSingletonEntity<NavigationGraph>();
+				NavigationGraph navGraph = SystemAPI.GetSingleton<NavigationGraph>();
 
-                // Create navigation node
-                var navNode = new NavNode(districtNodeId, worldPosition, biomeType, primaryPolarity);
-                state.EntityManager.AddComponentData(entity, navNode);
+				navGraph.NodeCount = nodeCount;
+				navGraph.LinkCount = linkCount;
+				navGraph.IsReady = true;
+				navGraph.LastRebuildTime = SystemAPI.Time.ElapsedTime;
 
-                // Add navigation link buffer for outgoing connections
-                if (!SystemAPI.HasBuffer<NavLinkBufferElement>(entity))
-                {
-                    state.EntityManager.AddBuffer<NavLinkBufferElement>(entity);
-                }
+				// 🔥 USE ECB FOR SINGLETON UPDATE TOO
+				ecb.SetComponent(navGraphEntity, navGraph);
+				}
 
-                nodeCount++;
-            }
+			// 🔥 TELL ECB SYSTEM TO EXECUTE AFTER OUR JOBS
+			_endInitEcbSystem.AddJobHandleForProducer(Dependency);
+			}
 
-            return nodeCount;
-        }
+		/// <summary>
+		/// 🔥 ACTUAL ECB IMPLEMENTATION - NO MORE FAKE TODO COMMENTS
+		/// </summary>
+		private int BuildNavigationNodesWithActualECB(EntityCommandBuffer ecb)
+			{
+			int nodeCount = 0;
 
-        [BurstCompile]
-        private int BuildNavigationLinks(ref SystemState state)
-        {
-            var linkCount = 0;
+			// Convert districts to navigation nodes
+			Entities
+				.WithNone<NavNode>()
+				.ForEach((Entity entity, in LocalTransform transform, in NodeId nodeId) =>
+				{
+					float3 worldPosition = transform.Position;
+					uint districtNodeId = nodeId._value;
 
-            // Process all connections to create navigation links
-            foreach (var (connection, entity) in 
-                     SystemAPI.Query<RefRO<Connection>>()
-                     .WithEntityAccess())
-            {
-                var conn = connection.ValueRO;
-                
-                // Find source and destination entities
-                var sourceEntity = FindEntityByNodeId(ref state, conn.FromNodeId);
-                var destEntity = FindEntityByNodeId(ref state, conn.ToNodeId);
-                
-                if (sourceEntity == Entity.Null || destEntity == Entity.Null)
-                    continue;
+					// Determine biome type and polarity from existing components
+					BiomeType biomeType = BiomeType.Unknown;
+					Polarity primaryPolarity = Polarity.None;
 
-                // Check for gate conditions on source or destination
-                var gateConditions = CollectGateConditions(ref state, sourceEntity, destEntity);
-                
-                // Create navigation link with gate conditions
-                var navLink = CreateNavLinkFromConnection(conn, gateConditions);
-                
-                // Add link to source entity's buffer
-                if (SystemAPI.HasBuffer<NavLinkBufferElement>(sourceEntity))
-                {
-                    var linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(sourceEntity);
-                    linkBuffer.Add(navLink);
-                    linkCount++;
-                }
+					if (SystemAPI.HasComponent<Core.Biome>(entity))
+						{
+						Core.Biome biome = SystemAPI.GetComponent<Core.Biome>(entity);
+						biomeType = biome.Type;
+						primaryPolarity = biome.PrimaryPolarity;
+						}
 
-                // For bidirectional connections, add reverse link
-                if (conn.Type == ConnectionType.Bidirectional)
-                {
-                    var reverseLink = navLink;
-                    reverseLink.FromNodeId = conn.ToNodeId;
-                    reverseLink.ToNodeId = conn.FromNodeId;
-                    
-                    if (SystemAPI.HasBuffer<NavLinkBufferElement>(destEntity))
-                    {
-                        var reverseLinkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(destEntity);
-                        reverseLinkBuffer.Add(reverseLink);
-                        linkCount++;
-                    }
-                }
-            }
+					// 🔥 CREATE NAV NODE USING ECB - NO MORE COMMENTED OUT CODE
+					var navNode = new NavNode(districtNodeId, worldPosition);
+					ecb.AddComponent(entity, navNode);
 
-            return linkCount;
-        }
+					// 🔥 ADD NAV LINK BUFFER USING ECB - NO MORE DIRECT ENTITYMANAGER
+					if (!SystemAPI.HasBuffer<NavLinkBufferElement>(entity))
+						{
+						ecb.AddBuffer<NavLinkBufferElement>(entity);
+						}
 
-        [BurstCompile]
-        private Entity FindEntityByNodeId(ref SystemState state, uint nodeId)
-        {
-            foreach (var (id, entity) in SystemAPI.Query<RefRO<NodeId>>().WithEntityAccess())
-            {
-                if (id.ValueRO.Value == nodeId)
-                    return entity;
-            }
-            return Entity.Null;
-        }
+					nodeCount++;
+				})
+				.WithoutBurst() // Required for ECB and SystemAPI usage
+				.Run();
 
-        [BurstCompile]
-        private GateConditionCollection CollectGateConditions(ref SystemState state, Entity sourceEntity, Entity destEntity)
-        {
-            var gateConditions = new GateConditionCollection();
-            
-            // Collect gate conditions from source entity
-            if (SystemAPI.HasBuffer<GateConditionBufferElement>(sourceEntity))
-            {
-                var sourceGates = SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
-                for (int i = 0; i < sourceGates.Length && i < 4; i++) // Limit to 4 conditions
-                {
-                    gateConditions.Add(sourceGates[i].Value);
-                }
-            }
-            
-            // Collect gate conditions from destination entity
-            if (SystemAPI.HasBuffer<GateConditionBufferElement>(destEntity))
-            {
-                var destGates = SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
-                for (int i = 0; i < destGates.Length && i < (4 - gateConditions.Count); i++)
-                {
-                    gateConditions.Add(destGates[i].Value);
-                }
-            }
+			return nodeCount;
+			}
 
-            return gateConditions;
-        }
+		/// <summary>
+		/// Build navigation links - this doesn't need ECB since we're only modifying existing buffers
+		/// </summary>
+		private int BuildNavigationLinks()
+			{
+			int linkCount = 0;
 
-        [BurstCompile]
-        private NavLink CreateNavLinkFromConnection(Connection connection, GateConditionCollection gates)
-        {
-            // Determine combined requirements from all gate conditions
-            var combinedPolarity = Polarity.None;
-            var combinedAbilities = Ability.None;
-            var strictestSoftness = GateSoftness.Trivial;
-            var maxTraversalCost = connection.TraversalCost;
+			// Process all connections to create navigation links
+			Entities
+				.ForEach((Entity entity, in Connection connection) =>
+				{
+					Connection conn = connection;
 
-            for (int i = 0; i < gates.Count; i++)
-            {
-                var gate = gates[i];
-                combinedPolarity |= gate.RequiredPolarity;
-                combinedAbilities |= gate.RequiredAbilities;
-                
-                if (gate.Softness < strictestSoftness)
-                    strictestSoftness = gate.Softness;
-                    
-                // Increase cost for stricter gates
-                var gateCostMultiplier = (int)gate.Softness switch
-                {
-                    0 => 5.0f,  // Hard
-                    1 => 4.0f,  // VeryDifficult
-                    2 => 3.0f,  // Difficult
-                    3 => 2.0f,  // Moderate
-                    4 => 1.5f,  // Easy
-                    5 => 1.1f,  // Trivial
-                    _ => 1.0f
-                };
-                maxTraversalCost = math.max(maxTraversalCost, connection.TraversalCost * gateCostMultiplier);
-            }
+					// Find source and destination entities
+					Entity sourceEntity = FindEntityByNodeId(conn.FromNodeId);
+					Entity destEntity = FindEntityByNodeId(conn.ToNodeId);
 
-            // Override connection polarity with gate requirements if more restrictive
-            var effectivePolarity = combinedPolarity != Polarity.None ? combinedPolarity : connection.RequiredPolarity;
+					if (sourceEntity == Entity.Null || destEntity == Entity.Null)
+						{
+						return;
+						}
 
-            return new NavLink(
-                connection.FromNodeId,
-                connection.ToNodeId,
-                connection.Type,
-                effectivePolarity,
-                combinedAbilities,
-                maxTraversalCost,
-                5.0f, // Default polarity mismatch cost multiplier
-                strictestSoftness,
-                $"Link_{connection.FromNodeId}_{connection.ToNodeId}"
-            );
-        }
+					// Check for gate conditions on source or destination
+					GateConditionCollection gateConditions = CollectGateConditions(sourceEntity, destEntity);
 
-        /// <summary>
-        /// Helper struct for collecting gate conditions with fixed size
-        /// </summary>
-        private struct GateConditionCollection
-        {
-            private GateCondition _gate0;
-            private GateCondition _gate1;
-            private GateCondition _gate2;
-            private GateCondition _gate3;
-            private int _count;
+					// Create navigation link with gate conditions
+					NavLink navLink = CreateNavLinkFromConnection(conn, gateConditions);
 
-            public int Count => _count;
+					// Add link to source entity's buffer
+					if (SystemAPI.HasBuffer<NavLinkBufferElement>(sourceEntity))
+						{
+						DynamicBuffer<NavLinkBufferElement> linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(sourceEntity);
+						linkBuffer.Add(navLink);
+						linkCount++;
+						}
 
-            public void Add(GateCondition gate)
-            {
-                switch (_count)
-                {
-                    case 0: _gate0 = gate; break;
-                    case 1: _gate1 = gate; break;
-                    case 2: _gate2 = gate; break;
-                    case 3: _gate3 = gate; break;
-                }
-                if (_count < 4) _count++;
-            }
+					// For bidirectional connections, add reverse link
+					if (conn.Type == ConnectionType.Bidirectional)
+						{
+						NavLink reverseLink = navLink;
+						reverseLink.FromNodeId = conn.ToNodeId;
+						reverseLink.ToNodeId = conn.FromNodeId;
 
-            public GateCondition this[int index]
-            {
-                get
-                {
-                    return index switch
-                    {
-                        0 => _gate0,
-                        1 => _gate1,
-                        2 => _gate2,
-                        3 => _gate3,
-                        _ => default
-                    };
-                }
-            }
-        }
-    }
-}
+						if (SystemAPI.HasBuffer<NavLinkBufferElement>(destEntity))
+							{
+							DynamicBuffer<NavLinkBufferElement> reverseLinkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(destEntity);
+							reverseLinkBuffer.Add(reverseLink);
+							linkCount++;
+							}
+						}
+				})
+				.WithoutBurst()
+				.Run();
+
+			return linkCount;
+			}
+
+		private Entity FindEntityByNodeId(uint nodeId)
+			{
+			Entity foundEntity = Entity.Null;
+
+			Entities.ForEach((Entity entity, in NodeId id) =>
+			{
+				if (id._value == nodeId)
+					{
+					foundEntity = entity;
+					}
+			}).WithoutBurst().Run();
+
+			return foundEntity;
+			}
+
+		private GateConditionCollection CollectGateConditions(Entity sourceEntity, Entity destEntity)
+			{
+			var gateConditions = new GateConditionCollection();
+
+			// Collect gate conditions from source entity
+			if (SystemAPI.HasBuffer<GateConditionBufferElement>(sourceEntity))
+				{
+				DynamicBuffer<GateConditionBufferElement> sourceGates = SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
+				for (int i = 0; i < sourceGates.Length && i < 4; i++) // Limit to 4 conditions
+					{
+					gateConditions.Add(sourceGates [ i ].Value);
+					}
+				}
+
+			// Collect gate conditions from destination entity
+			if (SystemAPI.HasBuffer<GateConditionBufferElement>(destEntity))
+				{
+				DynamicBuffer<GateConditionBufferElement> destGates = SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
+				for (int i = 0; i < destGates.Length && i < (4 - gateConditions.Count); i++)
+					{
+					gateConditions.Add(destGates [ i ].Value);
+					}
+				}
+
+			return gateConditions;
+			}
+
+		private static NavLink CreateNavLinkFromConnection(Connection connection, GateConditionCollection gates)
+			{
+			// Determine combined requirements from all gate conditions
+			Polarity combinedPolarity = Polarity.None;
+			Ability combinedAbilities = Ability.None;
+			GateSoftness strictestSoftness = GateSoftness.Trivial;
+			float maxTraversalCost = connection.TraversalCost;
+
+			for (int i = 0; i < gates.Count; i++)
+				{
+				GateCondition gate = gates [ i ];
+				combinedPolarity |= gate.RequiredPolarity;
+				combinedAbilities |= gate.RequiredAbilities;
+
+				if (gate.Softness < strictestSoftness)
+					{
+					strictestSoftness = gate.Softness;
+					}
+
+				// Increase cost for stricter gates
+				float gateCostMultiplier = (int)gate.Softness switch
+					{
+						0 => 5.0f,  // Hard
+						1 => 4.0f,  // VeryDifficult
+						2 => 3.0f,  // Difficult
+						3 => 2.0f,  // Moderate
+						4 => 1.5f,  // Easy
+						5 => 1.1f,  // Trivial
+						_ => 1.0f
+						};
+				maxTraversalCost = math.max(maxTraversalCost, connection.TraversalCost * gateCostMultiplier);
+				}
+
+			// Override connection polarity with gate requirements if more restrictive
+			Polarity effectivePolarity = combinedPolarity != Polarity.None ? combinedPolarity : connection.RequiredPolarity;
+
+			return new NavLink(
+				connection.FromNodeId,
+				connection.ToNodeId,
+				connection.Type,
+				effectivePolarity,
+				combinedAbilities,
+				maxTraversalCost,
+				5.0f, // Default polarity mismatch cost multiplier
+				strictestSoftness,
+				$"Link_{connection.FromNodeId}_{connection.ToNodeId}"
+			);
+			}
+
+		/// <summary>
+		/// Helper struct for collecting gate conditions with fixed size
+		/// </summary>
+		private struct GateConditionCollection
+			{
+			private GateCondition _gate0;
+			private GateCondition _gate1;
+			private GateCondition _gate2;
+			private GateCondition _gate3;
+
+			public int Count { get; private set; }
+
+			public void Add(GateCondition gate)
+				{
+				switch (Count)
+					{
+					case 0: _gate0 = gate; break;
+					case 1: _gate1 = gate; break;
+					case 2: _gate2 = gate; break;
+					case 3: _gate3 = gate; break;
+					default:
+						break;
+					}
+				if (Count < 4)
+					{
+					Count++;
+					}
+				}
+
+			public readonly GateCondition this [ int index ]
+				{
+				get
+					{
+					return index switch
+						{
+							0 => _gate0,
+							1 => _gate1,
+							2 => _gate2,
+							3 => _gate3,
+							_ => default
+							};
+					}
+				}
+			}
+		}
+	}

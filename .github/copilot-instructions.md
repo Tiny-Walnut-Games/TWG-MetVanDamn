@@ -36,10 +36,20 @@ Always reference these instructions first and fallback to search or bash command
 ### Required Validation Steps
 - **ALWAYS run before making changes**:
   - TLDL validation: ~60ms execution time
-  - Debug overlay validation: ~56ms execution time  
+  - Debug overlay validation: ~56ms execution time
   - Symbolic linting: ~68ms execution time (may show expected parse errors)
 - **ALWAYS set timeouts to 300+ seconds** for any validation commands to account for system variations
 - **NEVER CANCEL any validation or linting commands** - they complete quickly but may appear to hang briefly
+
+### Unity Test Execution (Sacred PowerShell Incantation)
+- **Unity 6000.2.0f1 Specific Test Command**:
+  ```powershell
+  & "C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Unity.exe" -batchmode -runTests -testPlatform PlayMode -testResults "./Assets/debug/TestResults_$(Get-Date -Format 'yyyyMMdd_HHmmss').xml" -testFilter TestNameHere -logFile "./Assets/debug/unity_powershell_test_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+  ```
+- **Critical PowerShell Syntax**: Use `&` operator for executable paths with spaces
+- **Dynamic Timestamps**: `$(Get-Date -Format 'yyyyMMdd_HHmmss')` for unique file naming
+- **Test Filtering**: `-testFilter` parameter for running specific tests
+- **Always specify both**: `-testResults` for XML output and `-logFile` for detailed Unity logs
 
 ### Expected Validation Results
 - **TLDL validation**: Should PASS with potential warnings about entry ID format
@@ -124,7 +134,7 @@ living-dev-agent/
 
 ### Key Configuration Files
 - **TWG-Copilot-Agent.yaml**: Copilot behavior and integration settings
-- **mcp-config.json**: Model Context Protocol server configuration  
+- **mcp-config.json**: Model Context Protocol server configuration
 - **docs/devtimetravel_snapshot.yaml**: Development context capture settings
 - **docs/tldl_template.yaml**: Template for TLDL entries
 
@@ -168,8 +178,75 @@ living-dev-agent/
 - **Initialize with init_agent_context.sh** after template creation
 - **Customize configuration files** for project-specific needs
 
-## NEW: Biome Art Integration (MetVanDAMN)
-Recent PR introduced biome-aware tilemap + prop placement systems:
+## 🚀 CRITICAL: MetVanDAMN Base Scene Setup Workflow
+
+### Essential "Hit Play -> See Map" Experience
+The **PRIMARY ENTRY POINT** for MetVanDAMN validation and development:
+
+#### 🎯 Quick Setup (30 seconds to working world):
+1. **Add SmokeTestSceneSetup component** to any GameObject in your scene
+2. **Configure parameters** in inspector:
+   - `worldSeed`: 42 (or any uint for reproducible worlds)
+   - `worldSize`: (50, 50) (reasonable for testing)
+   - `targetSectorCount`: 5 (districts to generate)
+   - `biomeTransitionRadius`: 10.0f (polarity field size)
+   - `enableDebugVisualization`: true (see world bounds)
+   - `logGenerationSteps`: true (track progress)
+3. **Hit Play** - should see immediate console logs:
+   ```
+   🚀 MetVanDAMN Smoke Test: Starting world generation...
+   Created 5 districts based on targetSectorCount (5)
+   ✅ MetVanDAMN Smoke Test: World setup complete with seed 42
+   ```
+
+#### 🛠️ What the Scene Setup Creates:
+- **WorldConfiguration entities**: WorldSeed, WorldBounds, WorldGenerationConfig
+- **District entities** (hub + configured count): Each has NodeId, WfcState, buffers for WFC and connections
+- **Biome field entities**: 4 polarity fields (Sun/Moon/Heat/Cold) positioned for interesting interactions
+- **ECS integration**: All entities have proper components for systems to process
+
+#### 🧪 Comprehensive Test Coverage:
+The scene setup workflow has **22 dedicated tests** covering:
+- **SmokeTestSceneSetupTests**: Basic functionality, configuration validation, edge cases
+- **SceneSetupIntegrationTests**: ECS system integration, hierarchical structure, data integrity
+- **Validation coverage**: World config consistency, district grid placement, polarity field layout
+
+#### 🚨 Common Scene Setup Issues & Solutions:
+1. **"No world entities created"**:
+   - Verify SmokeTestSceneSetup component is active and enabled
+   - Check console for generation logs - should see "Starting world generation..."
+
+2. **"Districts not visible in Entity Debugger"**:
+   - Open Window > Entities > Entity Debugger
+   - Look for entities named "HubDistrict", "District_X_Y"
+   - Verify they have NodeId and WfcState components
+
+3. **"Systems not processing entities"**:
+   - Scene setup creates data, systems process it on subsequent frames
+   - Check that World.DefaultGameObjectInjectionWorld exists
+   - ECS systems may take 1-2 frames to begin processing
+
+4. **"Debug visualization not showing"**:
+   - Enable Scene view Gizmos
+   - Look for green wireframe bounds around world area
+   - Bounds redraw every 120 frames (2 seconds at 60fps)
+
+#### 🎮 Manual Validation Steps:
+1. **Visual verification**: Green debug bounds should appear in Scene view
+2. **Entity verification**: Entity Debugger should show hub + district entities
+3. **Component verification**: District entities should have WfcState, NodeId, and buffers
+4. **Console verification**: Should see clear generation progress logs
+
+#### 📚 Files for Scene Setup Workflow:
+- **Component**: `Packages/com.tinywalnutgames.metvd.samples/Runtime/SmokeTestSceneSetup.cs`
+- **Tests**: `Assets/MetVanDAMN/Authoring/Tests/SmokeTestSceneSetupTests.cs`
+- **Integration Tests**: `Assets/MetVanDAMN/Authoring/Tests/SceneSetupIntegrationTests.cs`
+- **Demo Scene**: `Assets/Scenes/MetVanDAMN_Baseline.unity` (if available)
+
+This workflow is the **foundation** that must work before any other MetVanDAMN features (biome art, WFC generation, etc.) can function properly.
+
+## Biome Art Integration (Advanced MetVanDAMN)
+After base scene setup works, biome-aware tilemap + prop placement systems become available:
 - BiomeArtProfile ScriptableObject (tiles, props, variation, avoidance, clustering)
 - Runtime systems: BiomeArtIntegrationSystem (ECS job pre-pass), BiomeArtMainThreadSystem (GameObject + Tilemap creation)
 - Multi-projection support: Platformer, TopDown, Isometric, Hexagonal via Grid Layer Editor

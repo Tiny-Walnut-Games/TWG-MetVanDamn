@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c56fb115603c6b84eb9ee8b27de5e01f, type: 3}
+  m_Name: PowerPlant
+  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVD.Authoring.BiomeArtProfile
+  biomeName: PowerPlant
+  debugColor: {r: 0.73333335, g: 0.7019608, b: 0.5176471, a: 1}
+  floorTile: {fileID: 11400000, guid: a91602d9773069849a8af5397401efda, type: 2}
+  wallTile: {fileID: 11400000, guid: a91602d9773069849a8af5397401efda, type: 2}
+  backgroundTile: {fileID: 0}
+  transitionTiles:
+  - {fileID: 11400000, guid: cb08b06349d092a4bac7fa24fd687b6d, type: 2}
+  transitionFromTile: {fileID: 0}
+  transitionBlendA: {fileID: 0}
+  transitionBlendB: {fileID: 0}
+  transitionToTile: {fileID: 0}
+  transitionDeadzone: 0.1
+  propSettings:
+    propPrefabs: []
+    allowedPropLayers:
+    - FloorProps
+    - WalkableProps
+    - OverheadProps
+    strategy: 3
+    baseDensity: 0.2
+    densityCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0.2
+        inSlope: -1.6
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    densityMultiplier: 1.3
+    clustering:
+      clusterSize: 5
+      clusterRadius: 2
+      clusterDensity: 0.8
+      clusterSeparation: 8
+    avoidance:
+      avoidLayers:
+      - Hazards
+      - Walls
+      - DeepWater
+      - Hazards
+      avoidanceRadius: 1.5
+      avoidTransitions: 0
+      transitionAvoidanceRadius: 2
+      avoidOvercrowding: 1
+      minimumPropDistance: 1.2
+    variation:
+      minScale: 0.9
+      maxScale: 1.2
+      randomRotation: 1
+      maxRotationAngle: 180
+      positionJitter: 0.3
+    maxPropsPerBiome: 120
+    useSpatialOptimization: 1
+  checkerSettings:
+    enableCheckerOverride: 0
+    coordinateInfluenceStrength: 0.7
+    distanceScalingFactor: 1
+    enableCoordinateWarping: 1
+    polarityAnimationSpeed: 0.2
+    complexityTierMultiplier: 1.2
+    baseCheckerSize: 8
+    useMathematicalPatterns: 1
+    mathematicalPatternStrength: 0.5
+    useBiomeColorHarmony: 1
+    biomeVisualizationIntensity: 0.8
+  sortingLayerOverride: 
+  materialOverride: {fileID: 0}

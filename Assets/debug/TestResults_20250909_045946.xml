@@ -1,0 +1,802 @@
+WORKING LOGS:
+✅ Created Bootstrap GameObject with SmokeTestSceneSetup component (DOTS mode)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBootstrapMono () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:338)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:92)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+   Configuration: Seed=42, WorldSize=(50,50), Sectors=5, Radius=10f
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBootstrapMono () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:339)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:92)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+   Debug visualization and logging enabled for immediate feedback
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBootstrapMono () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:340)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:92)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📁 Phase 2: Creating SubScene files...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:100)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📂 Scene opened: WorldGen_Terrain (Assets/Scenes/SubScenes/WorldGen_Terrain.unity) - Mode: Additive
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnOpened (UnityEngine.SceneManagement.Scene,UnityEditor.SceneManagement.OpenSceneMode) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:30)
+UnityEditor.SceneManagement.EditorSceneManager:OpenScene (string,UnityEditor.SceneManagement.OpenSceneMode)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:SafeEnsureScene (string,string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:482)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📂 Scene opened: WorldGen_Dungeon (Assets/Scenes/SubScenes/WorldGen_Dungeon.unity) - Mode: Additive
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnOpened (UnityEngine.SceneManagement.Scene,UnityEditor.SceneManagement.OpenSceneMode) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:30)
+UnityEditor.SceneManagement.EditorSceneManager:OpenScene (string,UnityEditor.SceneManagement.OpenSceneMode)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:SafeEnsureScene (string,string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:482)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📂 Scene opened: NPC_Interactions (Assets/Scenes/SubScenes/NPC_Interactions.unity) - Mode: Additive
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnOpened (UnityEngine.SceneManagement.Scene,UnityEditor.SceneManagement.OpenSceneMode) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:30)
+UnityEditor.SceneManagement.EditorSceneManager:OpenScene (string,UnityEditor.SceneManagement.OpenSceneMode)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:SafeEnsureScene (string,string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:482)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📂 Scene opened: UI_HUD (Assets/Scenes/SubScenes/UI_HUD.unity) - Mode: Additive
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnOpened (UnityEngine.SceneManagement.Scene,UnityEditor.SceneManagement.OpenSceneMode) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:30)
+UnityEditor.SceneManagement.EditorSceneManager:OpenScene (string,UnityEditor.SceneManagement.OpenSceneMode)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:SafeEnsureScene (string,string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:482)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+🔄 Phase 3: Synchronizing asset database...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:112)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+⏳ Phase 4: Validating meta file generation...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:117)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+✅ All meta files validated successfully.
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:149)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+🔗 Phase 5: Creating SubScene GameObjects...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:153)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📦 Created SubScene GameObject: WorldGen_Terrain (no reference assigned yet)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateSubSceneGameObject (string,UnityEngine.Transform) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:722)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:164)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📦 Created SubScene GameObject: WorldGen_Dungeon (no reference assigned yet)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateSubSceneGameObject (string,UnityEngine.Transform) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:722)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:164)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📦 Created SubScene GameObject: NPC_Interactions (no reference assigned yet)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateSubSceneGameObject (string,UnityEngine.Transform) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:722)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:164)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+📦 Created SubScene GameObject: UI_HUD (no reference assigned yet)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateSubSceneGameObject (string,UnityEngine.Transform) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:722)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:164)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+💾 Phase 6: Saving scene with SubScene GameObjects...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:168)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+🔄 Phase 7: Synchronizing before reference assignment...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:179)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+🔗 Phase 8: Assigning SceneAsset references...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaselineScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:185)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:CreateBaseline () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:37)
+
+🔗 Phase 8 DELAYED: Starting SceneAsset reference assignment...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:199)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔗 Active scene confirmed: MetVanDAMN_Baseline
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:210)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔗 Attempting reference assignment for: WorldGen_Terrain
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:223)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Found GameObject: WorldGen_Terrain
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:777)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Found SubScene component on: WorldGen_Terrain
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:787)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SceneAsset loaded with GUID: 66a175260c27a2f41a831b02795bbeea
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:804)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔍 Available properties on WorldGen_Terrain: m_Script, _SceneAsset, _HierarchyColor, AutoLoadScene
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:824)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Set SceneAsset reference for WorldGen_Terrain using property: _SceneAsset
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:837)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SubScene reference assignment SUCCESSFUL for 'WorldGen_Terrain' -> Assets/Scenes/SubScenes/WorldGen_Terrain.unity
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:950)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔗 Attempting reference assignment for: WorldGen_Dungeon
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:223)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Found GameObject: WorldGen_Dungeon
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:777)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Found SubScene component on: WorldGen_Dungeon
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:787)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SceneAsset loaded with GUID: d889a88128f5b4741ba48bc2c9dbfcea
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:804)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔍 Available properties on WorldGen_Dungeon: m_Script, _SceneAsset, _HierarchyColor, AutoLoadScene
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:824)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Set SceneAsset reference for WorldGen_Dungeon using property: _SceneAsset
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:837)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SubScene reference assignment SUCCESSFUL for 'WorldGen_Dungeon' -> Assets/Scenes/SubScenes/WorldGen_Dungeon.unity
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:950)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔗 Attempting reference assignment for: NPC_Interactions
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:223)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Found GameObject: NPC_Interactions
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:777)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Found SubScene component on: NPC_Interactions
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:787)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SceneAsset loaded with GUID: 226b932432fbea540b98c444cbac40b6
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:804)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔍 Available properties on NPC_Interactions: m_Script, _SceneAsset, _HierarchyColor, AutoLoadScene
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:824)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Set SceneAsset reference for NPC_Interactions using property: _SceneAsset
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:837)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SubScene reference assignment SUCCESSFUL for 'NPC_Interactions' -> Assets/Scenes/SubScenes/NPC_Interactions.unity
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:950)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔗 Attempting reference assignment for: UI_HUD
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:223)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Found GameObject: UI_HUD
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:777)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Found SubScene component on: UI_HUD
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:787)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SceneAsset loaded with GUID: 56e038279e272884b8467dfdaae8db32
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:804)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔍 Available properties on UI_HUD: m_Script, _SceneAsset, _HierarchyColor, AutoLoadScene
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:824)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ Set SceneAsset reference for UI_HUD using property: _SceneAsset
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:837)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SubScene reference assignment SUCCESSFUL for 'UI_HUD' -> Assets/Scenes/SubScenes/UI_HUD.unity
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:950)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:224)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ SubScene reference assignment completed: 4/4 successful
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:236)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+✅ MetVanDAMN baseline scene + 4 sub‑scenes created at Assets/Scenes/MetVanDAMN_Baseline.unity
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:238)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+   Next: Open the scene and press Play for immediate worldgen smoke validation.
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c__DisplayClass7_0:<CreateBaselineScene>b__0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:252)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔄 Performing final hierarchy refresh after scene creation...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:42)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔄 Invoking Faculty-grade SubScene hierarchy refresh...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1198)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+📣 Faculty V2 delegating to canonical SubScene ritual system (1 pass)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:41)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔓 Ritual lock acquired by: FACULTY_TOGGLE_V2
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.RitualLock:TryAcquire (string) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/RitualLock.cs:24)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:43)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔄 Faculty V2 processing 4 SubScene(s) with 1 pass(es)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:57)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔄 SceneEventTrace reset - clearing recent activity
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:Reset () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:45)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:60)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🧾 PRE-FACULTY Editing SubScenes: NPC_Interactions, WorldGen_Terrain, WorldGen_Dungeon, UI_HUD
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:DumpState (string,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:250)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:64)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🔄 FACULTY PASS 1/1: Processing 4 SubScenes...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>g__RunPass|0 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:76)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteRitualPasses (Unity.Scenes.SubScene[],int,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:67)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+📁 Scene closed: NPC_Interactions (Assets/Scenes/SubScenes/NPC_Interactions.unity)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnClosed (UnityEngine.SceneManagement.Scene) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:39)
+UnityEditor.SceneManagement.EditorSceneManager:CloseScene (UnityEngine.SceneManagement.Scene,bool)
+Unity.Scenes.Editor.SubSceneInspectorUtility:CloseSceneWithoutSaving (Unity.Scenes.SubScene[]) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Scenes.Editor/SubSceneInspectorUtility.cs:69)
+System.Reflection.MethodBase:Invoke (object,object[])
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:CloseAllSubScenes (Unity.Scenes.SubScene[]) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:123)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>g__RunPass|0 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:79)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteRitualPasses (Unity.Scenes.SubScene[],int,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:67)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+📁 Scene closed: WorldGen_Terrain (Assets/Scenes/SubScenes/WorldGen_Terrain.unity)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnClosed (UnityEngine.SceneManagement.Scene) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:39)
+UnityEditor.SceneManagement.EditorSceneManager:CloseScene (UnityEngine.SceneManagement.Scene,bool)
+Unity.Scenes.Editor.SubSceneInspectorUtility:CloseSceneWithoutSaving (Unity.Scenes.SubScene[]) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Scenes.Editor/SubSceneInspectorUtility.cs:69)
+System.Reflection.MethodBase:Invoke (object,object[])
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:CloseAllSubScenes (Unity.Scenes.SubScene[]) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:123)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>g__RunPass|0 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:79)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteRitualPasses (Unity.Scenes.SubScene[],int,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:67)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+📁 Scene closed: WorldGen_Dungeon (Assets/Scenes/SubScenes/WorldGen_Dungeon.unity)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnClosed (UnityEngine.SceneManagement.Scene) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:39)
+UnityEditor.SceneManagement.EditorSceneManager:CloseScene (UnityEngine.SceneManagement.Scene,bool)
+Unity.Scenes.Editor.SubSceneInspectorUtility:CloseSceneWithoutSaving (Unity.Scenes.SubScene[]) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Scenes.Editor/SubSceneInspectorUtility.cs:69)
+System.Reflection.MethodBase:Invoke (object,object[])
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:CloseAllSubScenes (Unity.Scenes.SubScene[]) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:123)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>g__RunPass|0 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:79)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteRitualPasses (Unity.Scenes.SubScene[],int,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:67)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+📁 Scene closed: UI_HUD (Assets/Scenes/SubScenes/UI_HUD.unity)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnClosed (UnityEngine.SceneManagement.Scene) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:39)
+UnityEditor.SceneManagement.EditorSceneManager:CloseScene (UnityEngine.SceneManagement.Scene,bool)
+Unity.Scenes.Editor.SubSceneInspectorUtility:CloseSceneWithoutSaving (Unity.Scenes.SubScene[]) (at ./Library/PackageCache/com.unity.entities@e581b903be8e/Unity.Scenes.Editor/SubSceneInspectorUtility.cs:69)
+System.Reflection.MethodBase:Invoke (object,object[])
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:CloseAllSubScenes (Unity.Scenes.SubScene[]) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:123)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>g__RunPass|0 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:79)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteRitualPasses (Unity.Scenes.SubScene[],int,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:67)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+📁 Faculty V2 bulk closed 4 SubScene(s) via CloseSceneWithoutSaving
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:CloseAllSubScenes (Unity.Scenes.SubScene[]) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:124)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>g__RunPass|0 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:79)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteRitualPasses (Unity.Scenes.SubScene[],int,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:104)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ExecuteCanonicalRitual (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:67)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:TryRun (int) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:36)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap:TurnThemOffAndOnAgain () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:1212)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:43)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+🎉 Baseline scene creation and hierarchy refresh complete!
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNSceneBootstrap/<>c:<CreateBaseline>b__6_0 () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNSceneBootstrap.cs:44)
+UnityEditor.EditorApplication:Internal_CallDelayFunctions ()
+
+[Worker0] 📂 Scene opened: WorldGen_Terrain (Assets/Scenes/SubScenes/WorldGen_Terrain.unity) - Mode: Additive
+
+[Worker1] 📂 Scene opened: NPC_Interactions (Assets/Scenes/SubScenes/NPC_Interactions.unity) - Mode: Additive
+
+🔄 FACULTY PASS 1/1: Reopening 4 SubScenes...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__1 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:84)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+⚠️ Faculty V2 falling back to manual SubScene reopen operations
+UnityEngine.Debug:LogWarning (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:OpenAllSubScenes (Unity.Scenes.SubScene[]) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:165)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__1 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:85)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+🧾 POST-FACULTY Editing SubScenes: (none)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:DumpState (string,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:250)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:FinalizeRitual (Unity.Scenes.SubScene[],TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:210)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__2 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:98)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+📊 Faculty V2 Diff -> ClosedOnly:[NPC_Interactions, WorldGen_Terrain, WorldGen_Dungeon, UI_HUD] RemainedOpen:[] NewlyOpened:[]
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:ReportDiff (TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState,TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:262)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:FinalizeRitual (Unity.Scenes.SubScene[],TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:211)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__2 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:98)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+📊 Recent Activity - Opened: 0, Closed: 4
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:FinalizeRitual (Unity.Scenes.SubScene[],TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:213)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__2 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:98)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+[Worker1] 📁 Scene closed: NPC_Interactions (Assets/Scenes/SubScenes/NPC_Interactions.unity)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:FinalizeRitual (Unity.Scenes.SubScene[],TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:216)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__2 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:98)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+[Worker0] 📁 Scene closed: WorldGen_Terrain (Assets/Scenes/SubScenes/WorldGen_Terrain.unity)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:FinalizeRitual (Unity.Scenes.SubScene[],TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:216)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__2 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:98)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+✅ Faculty V2 ritual complete - hierarchy should now be clean
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:FinalizeRitual (Unity.Scenes.SubScene[],TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:218)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__2 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:98)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+🔓 Ritual lock released by: FACULTY_TOGGLE_V2
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.RitualLock:Release (string) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/RitualLock.cs:32)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle:FinalizeRitual (Unity.Scenes.SubScene[],TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/EditingState) (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:220)
+TinyWalnutGames.MetVD.Authoring.Editor.FacultySubSceneToggle/<>c__DisplayClass5_0:<ExecuteRitualPasses>b__2 () (at Assets/MetVanDAMN/Authoring/Editor/FacultySubSceneToggle.cs:98)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.NonBlockingDelay/<>c__DisplayClass0_0:<AfterFrames>g__Tick|0 () (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/NonBlockingDelay.cs:25)
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions ()
+
+--- End of MetVanDAMN Scene Bootstrap log ---
+
+NOT WORKING LOGS:
+📁 Scene closed: MetVanDAMN_Baseline (Assets/Scenes/MetVanDAMN_Baseline.unity)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnClosed (UnityEngine.SceneManagement.Scene) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:39)
+UnityEditor.SceneManagement.EditorSceneManager:NewScene (UnityEditor.SceneManagement.NewSceneSetup,UnityEditor.SceneManagement.NewSceneMode)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:28)
+
+Created WorldConfiguration
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWorldConfiguration () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:569)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:30)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateDistrictVisual (UnityEngine.GameObject,int,int) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:625)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:594)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Created 9 sample districts in 3x3 grid
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleDistricts () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:598)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:31)
+
+Created connections between adjacent districts
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleConnections () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:690)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:32)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateBiomeFieldVisual (UnityEngine.GameObject,TinyWalnutGames.MetVD.Core.BiomeType,single) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:772)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleBiomeFields () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:743)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:33)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateBiomeFieldVisual (UnityEngine.GameObject,TinyWalnutGames.MetVD.Core.BiomeType,single) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:772)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleBiomeFields () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:743)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:33)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateBiomeFieldVisual (UnityEngine.GameObject,TinyWalnutGames.MetVD.Core.BiomeType,single) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:772)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleBiomeFields () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:743)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:33)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateBiomeFieldVisual (UnityEngine.GameObject,TinyWalnutGames.MetVD.Core.BiomeType,single) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:772)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleBiomeFields () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:743)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:33)
+
+Created 4 sample biome fields
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleBiomeFields () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:746)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:33)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTileVisual (UnityEngine.GameObject,string,TinyWalnutGames.MetVD.Core.BiomeType) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:902)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTilePrototypeLibrary () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:839)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:34)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTileVisual (UnityEngine.GameObject,string,TinyWalnutGames.MetVD.Core.BiomeType) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:902)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTilePrototypeLibrary () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:839)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:34)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTileVisual (UnityEngine.GameObject,string,TinyWalnutGames.MetVD.Core.BiomeType) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:902)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTilePrototypeLibrary () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:839)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:34)
+
+Instantiating material due to calling renderer.material during edit mode. This will leak materials into the scene. You most likely want to use renderer.sharedMaterial instead.
+UnityEngine.Renderer:get_material ()
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTileVisual (UnityEngine.GameObject,string,TinyWalnutGames.MetVD.Core.BiomeType) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:902)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTilePrototypeLibrary () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:839)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:34)
+
+Created WFC tile prototype library with 4 tile types
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateWfcTilePrototypeLibrary () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:842)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:34)
+
+Created sample camera
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleCamera () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:930)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:35)
+
+Created lighting setup
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateLighting () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:950)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:36)
+
+✅ Initial scene created at: Assets/Scenes/MetVanDAMN_AuthoringSample.unity
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:43)
+
+📁 Creating SubScene files...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:62)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+🔍 SubScene already exists: SampleGeneration
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:SafeEnsureSubScene (string,string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:203)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:65)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+🔍 SubScene already exists: SampleBiomes
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:SafeEnsureSubScene (string,string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:203)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:65)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+🔄 ULTRA synchronizing asset database...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:73)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+⏳ EXTENDED meta file validation...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:81)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+✅ ALL SubScene meta files validated successfully with EXTENDED validation.
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:115)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+🔗 Creating SubScene GameObjects...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:119)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+📁 Scene closed: MetVanDAMN_AuthoringSample (Assets/Scenes/MetVanDAMN_AuthoringSample.unity)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnClosed (UnityEngine.SceneManagement.Scene) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:39)
+UnityEditor.SceneManagement.EditorSceneManager:OpenScene (string,UnityEditor.SceneManagement.OpenSceneMode)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:120)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+📂 Scene opened: MetVanDAMN_AuthoringSample (Assets/Scenes/MetVanDAMN_AuthoringSample.unity) - Mode: Single
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport.SceneEventTrace:OnOpened (UnityEngine.SceneManagement.Scene,UnityEditor.SceneManagement.OpenSceneMode) (at Assets/MetVanDAMN/Authoring/Editor/RitualSupport/SceneEventTrace.cs:30)
+UnityEditor.SceneManagement.EditorSceneManager:OpenScene (string,UnityEditor.SceneManagement.OpenSceneMode)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:120)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+📦 Created SubScene GameObject: SampleGeneration (no reference assigned yet)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSubSceneGameObject (string,UnityEngine.Transform) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:350)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:128)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+⚠️ SubSceneComponent 'SampleGeneration (Unity.Scenes.SubScene)' reference will be assigned in a separate step to ensure stability.
+UnityEngine.Debug:LogWarning (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSubSceneGameObject (string,UnityEngine.Transform) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:351)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:128)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+📦 Created SubScene GameObject: SampleBiomes (no reference assigned yet)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSubSceneGameObject (string,UnityEngine.Transform) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:350)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:128)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+⚠️ SubSceneComponent 'SampleBiomes (Unity.Scenes.SubScene)' reference will be assigned in a separate step to ensure stability.
+UnityEngine.Debug:LogWarning (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSubSceneGameObject (string,UnityEngine.Transform) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:351)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:128)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+💾 Saving scene with SubScene GameObjects...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:132)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+🔄 ULTRA synchronizing before reference assignment...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:137)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+🔗 Assigning SceneAsset references with INDIVIDUAL validation...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:143)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+✅ SubScene reference assigned: 'SampleGeneration' -> Assets/Scenes/SubScenes/SampleGeneration.unity (GUID: 02ac2299266a36f48807e31a37d0c7b8)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:416)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:146)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+✅ SubScene reference assigned: 'SampleBiomes' -> Assets/Scenes/SubScenes/SampleBiomes.unity (GUID: 49eb58b3591176141b43f7dc503b55ae)
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:AssignSubSceneReferenceWithValidation (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:416)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:146)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+💾 FINAL save with complete references...
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:158)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+✅ SubScene creation complete with ULTRA timing synchronization!
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:164)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+🔍 Validation Report:
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:167)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+📋 SampleGeneration: SubScene component ✓, Reference: ❌
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:179)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+📋 SampleBiomes: SubScene component ✓, Reference: ❌
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateSampleSubScenesWithTiming (string) (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:179)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:46)
+
+🌟 MetVanDAMN Authoring Sample scene created at: Assets/Scenes/MetVanDAMN_AuthoringSample.unity
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:48)
+
+🎮 This scene can be played directly without custom bootstrappers!
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:49)
+
+🔍 SubScenes included for advanced workflow demonstration
+UnityEngine.Debug:Log (object)
+TinyWalnutGames.MetVD.Authoring.Editor.MetVanDAMNAuthoringSampleCreator:CreateAuthoringSampleScene () (at Assets/MetVanDAMN/Authoring/Editor/MetVanDAMNAuthoringSampleCreator.cs:50)
+
