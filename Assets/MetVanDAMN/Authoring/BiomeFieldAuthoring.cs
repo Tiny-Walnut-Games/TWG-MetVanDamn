@@ -19,7 +19,6 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Header("Node Configuration")]
 		public uint nodeId = 0;
 
-		[Header("Art Integration")]
-		public BiomeArtProfile artProfile;
+		// Art profiles are assigned automatically via BiomeArtProfileLibrary + AutoAssignmentSystem
 		}
 	}

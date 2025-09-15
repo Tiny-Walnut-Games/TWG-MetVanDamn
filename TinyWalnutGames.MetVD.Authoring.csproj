@@ -60,20 +60,32 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\MetVanDAMN\Authoring\SudoActionDispatcherSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoBossController.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\WorldConfigurationAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\AINavigationSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfile.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\PrefabRegistry.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\WorldBootstrapAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtAutoAssignmentSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\NavigationValidationSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\GateConditionAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\NavigationGraphBuildSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\SpawnableAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileReference.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeTransitionSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\BossAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\SudoActionRequestConsumerSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\WfcTilePrototypeAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileLibrary.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\BiomeElevationResolverSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileLibraryAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeFieldAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\ConnectionAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\EcsPrefabRegistryAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\SudoActionHintAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\DistrictAuthoring.cs" />
   </ItemGroup>
   <ItemGroup>

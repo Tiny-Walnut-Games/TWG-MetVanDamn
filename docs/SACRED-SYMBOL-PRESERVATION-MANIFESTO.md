@@ -52,7 +52,7 @@ MetVanDAMN is a customer facing product that relies on complex Unity ECS code. T
 ### 🔮 THE IMPLEMENTATION WISDOM
 **Practical techniques for symbol utilization:**
 
-#### For Unused Variables:
+#### For Unused Variables
 ```csharp
 // Instead of: // float unused = CalculateComplexity();
 // Do this:
@@ -60,7 +60,7 @@ float complexity = CalculateComplexity();
 Debug.Assert(complexity >= 0f, $"Complexity calculation at {nodeId.Coordinates}");
 ```
 
-#### For Unused Parameters:
+#### For Unused Parameters
 ```csharp
 // Instead of: public void Process(NodeId nodeId) { /* nodeId unused */ }
 // Do this:
@@ -71,7 +71,7 @@ public void Process(NodeId nodeId) {
 }
 ```
 
-#### For Unused Fields:
+#### For Unused Fields
 ```csharp
 // Instead of: private float debugValue; // never used
 // Do this:

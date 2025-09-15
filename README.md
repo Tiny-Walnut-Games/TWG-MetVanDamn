@@ -1,9 +1,10 @@
 # 🗺️ TWG-MetVanDamn
-## *Procedural MetroidVania World Generation with ECS/DOTS Architecture*
 
-> **"Every great adventure begins with a single step into the unknown. In our case, that unknown is procedurally generated and guaranteed to have proper biome distribution."**
-> 
-> — The Chronicles of Cheekdom, World Generation Division
+## *Procedural MetroidVania World Generation with ECS/DOTS Architecture*
+>
+> "May your worlds be procedurally perfect, your builds eternally green, and your development chair supremely comfortable."
+
+### 🍑 ✨ Happy Coding! ✨ 🍑
 
 [![Unity 6000.2+](https://img.shields.io/badge/Unity-6000.2+-black.svg?style=flat&logo=unity)](https://unity3d.com/get-unity/download)
 [![DOTS 1.2.0](https://img.shields.io/badge/DOTS-1.2.0-blue.svg)](https://docs.unity3d.com/Packages/com.unity.entities@1.2/)
@@ -30,6 +31,7 @@
 ### **Core Game Systems**
 
 #### **🗺️ World Generation Engine**
+
 - **District System**: Modular world areas with unique characteristics and connections
 - **Wave Function Collapse (WFC)**: Constraint-solving algorithm for coherent world layout
 - **Biome Field System**: Dynamic environmental influences across the world
@@ -37,6 +39,7 @@
 - **AI Navigation System**: Runtime pathfinding with polarized gate handling for intelligent agent movement
 
 #### **🤖 AI Navigation & Pathfinding**
+
 - **Navigation Graph**: Runtime graph built from districts, connections, and gates
 - **Agent Capabilities**: Polarity and ability-based agent configuration system
 - **Polarized Gate Handling**: Dual-mode support for hard blocking vs. soft cost-based gating
@@ -44,6 +47,7 @@
 - **Editor Visualization**: Interactive navigation graph debugging with cost overlays
 
 #### **🏛️ ECS/DOTS Foundation**
+
 - **Pure ECS Architecture**: All game logic implemented as performant, data-oriented systems
 - **Burst-Compiled Systems**: Maximum performance through Unity's Burst compiler
 - **Job System Integration**: Efficient multi-threaded processing for complex world generation
@@ -53,7 +57,7 @@
 
 ```
 com.tinywalnutgames.metvd.core     # Core components, IDs, math utilities
-com.tinywalnutgames.metvd.biome    # Biome field system and polarity rules  
+com.tinywalnutgames.metvd.biome    # Biome field system and polarity rules
 com.tinywalnutgames.metvd.graph    # District WFC and sector refinement
 com.tinywalnutgames.metvd.authoring # Scene authoring tools and bakers
 com.tinywalnutgames.metvd.utility  # Generic utilities and aggregation systems
@@ -74,6 +78,7 @@ com.tinywalnutgames.metvd.samples  # Example scenes and configurations
 ### **Setup Instructions**
 
 #### **1. Clone and Initialize**
+
 ```bash
 # Clone the repository
 git clone https://github.com/jmeyer1980/TWG-MetVanDamn.git
@@ -86,6 +91,7 @@ scripts/init_agent_context.sh
 ```
 
 #### **2. Unity Setup**
+
 ```bash
 # Open project in Unity 6000.2+
 # Unity will automatically resolve package dependencies
@@ -98,6 +104,7 @@ scripts/init_agent_context.sh
 ```
 
 #### **3. Development Environment**
+
 ```bash
 # Install development dependencies
 pip install -r scripts/requirements.txt
@@ -109,6 +116,7 @@ python3 src/SymbolicLinter/symbolic_linter.py --path src/
 ```
 
 #### **4. First Time Setup**
+
 1. Open Unity and load the project
 2. Navigate to `Assets/Scenes/` for example scenes
 3. Check `Assets/MetVanDAMN/Authoring/README.md` for authoring workflow
@@ -210,13 +218,23 @@ scripts/init_agent_context.sh --create-tldl "Title"  # Create new TLDL entry
 
 # Quality assurance
 python3 src/SymbolicLinter/validate_docs.py --tldl-path docs/    # ~60ms
-python3 src/DebugOverlayValidation/debug_overlay_validator.py    # ~56ms  
+python3 src/DebugOverlayValidation/debug_overlay_validator.py    # ~56ms
 python3 src/SymbolicLinter/symbolic_linter.py --path src/        # ~68ms
 
 # Project maintenance
 scripts/directory_lint.py                        # Validate project structure
 python3 scripts/cid-faculty/overlord-sentinel.js # Security validation
 ```
+
+### Biome Art Profile Library (Per-Type Buckets)
+
+- Use `Assets/MetVanDAMN/Authoring/BiomeArtProfileLibrary` to define available `BiomeArtProfile` assets.
+- Populate a global `profiles` list and optional `perTypeBuckets` for specific `BiomeType` values.
+- Runtime selection order in `BiomeArtAutoAssignmentSystem`:
+    1) Prefer matching `perTypeBuckets[type].profiles` when present and non-empty
+    2) Fallback to the global `profiles` list
+- Selection is deterministic per biome entity: seeded by world seed, biome type, and `NodeId`.
+- Editor tools (`Biome Color Legend`, `Sector Room Hierarchy`) use the same preference order for names/colors.
 
 ---
 
@@ -227,7 +245,7 @@ python3 scripts/cid-faculty/overlord-sentinel.js # Security validation
 The world generation system uses a constraint-solving approach where:
 
 1. **District Templates**: Pre-defined room types with connection rules
-2. **Constraint Propagation**: Ensures valid connections between adjacent areas  
+2. **Constraint Propagation**: Ensures valid connections between adjacent areas
 3. **Backtracking Algorithm**: Resolves conflicts through systematic exploration
 4. **Biome Coherence**: Environmental rules guide theme distribution
 
@@ -248,7 +266,7 @@ public partial struct BiomeFieldSystem : ISystem
 
 - **World Generation**: ~200ms for medium complexity worlds
 - **Biome Processing**: 60fps with 10,000+ entities
-- **Memory Usage**: <100MB for typical game worlds  
+- **Memory Usage**: <100MB for typical game worlds
 - **Build Time**: ~30s for incremental builds
 
 ---
@@ -266,7 +284,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 - [ ] Read the [MANIFESTO.md](MANIFESTO.md) and embrace the **Save The Butts!** philosophy
 - [ ] Create TLDL entries documenting your work
-- [ ] Follow ECS/DOTS best practices  
+- [ ] Follow ECS/DOTS best practices
 - [ ] Add tests for new functionality
 - [ ] Update documentation as needed
 - [ ] Run validation tools before submitting PRs
@@ -278,7 +296,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### **Essential Documentation**
 
 - **[MANIFESTO.md](MANIFESTO.md)**: Project philosophy and "Save The Butts!" doctrine
-- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Comprehensive contribution guidelines  
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Comprehensive contribution guidelines
 - **[CHANGELOG.md](CHANGELOG.md)**: Release history and feature evolution
 - **[Assets/Plugins/TLDA/docs/Copilot-Setup.md](Assets/Plugins/TLDA/docs/Copilot-Setup.md)**: AI collaboration setup
 
@@ -298,7 +316,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ## 🏆 **Achievements & Milestones**
 
 - **🛡️ Buttsafe Certified™**: Comprehensive developer comfort and code quality standards
-- **⚡ DOTS Optimized**: High-performance ECS architecture with Burst compilation  
+- **⚡ DOTS Optimized**: High-performance ECS architecture with Burst compilation
 - **🧬 Living Documentation**: Self-documenting codebase with comprehensive TLDL integration
 - **🤖 AI Collaboration Ready**: GitHub Copilot integration with ping-and-fix workflows
 
@@ -308,9 +326,9 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 This project is licensed under the **GNU General Public License v3.0**. See [LICENSE](LICENSE) for details.
 
-**Created by**: Tiny Walnut Games Development Team  
-**Template System**: Living Dev Agent workflow  
-**Philosophy**: Save The Butts! Manifesto  
+**Created by**: Tiny Walnut Games Development Team
+**Template System**: Living Dev Agent workflow
+**Philosophy**: Save The Butts! Manifesto
 **Powered by**: Unity DOTS, ECS architecture, and developer comfort principles
 
 ---

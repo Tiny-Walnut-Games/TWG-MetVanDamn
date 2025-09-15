@@ -486,7 +486,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			var biomeGO = new GameObject("InvalidBiome");
 			BiomeFieldAuthoring biome = biomeGO.AddComponent<BiomeFieldAuthoring>();
 			biome.nodeId = new NodeId { _value = 300 };
-			biome.artProfile = null; // Invalid - null profile
+			// Art profile is not assigned directly on fields anymore; validation is library driven
 
 			// Create another biome with profile but invalid settings
 			var invalidProfileBiomeGO = new GameObject("InvalidProfileBiome");
@@ -494,8 +494,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			invalidProfileBiome.nodeId = new NodeId { _value = 301 };
 
 			BiomeArtProfile invalidProfile = ScriptableObject.CreateInstance<BiomeArtProfile>();
-			// Intentionally leave tiles / prop arrays empty (not assignable via convenience properties)
-			invalidProfileBiome.artProfile = invalidProfile;
+			// Intentionally leave tiles / prop arrays empty; auto-assignment will ignore or use library
 
 			BakeGameObjects(world, biomeGO, invalidProfileBiomeGO);
 
