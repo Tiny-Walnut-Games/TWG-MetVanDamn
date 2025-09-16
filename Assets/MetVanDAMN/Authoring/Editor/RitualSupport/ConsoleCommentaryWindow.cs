@@ -13,7 +13,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 	{
 	public class ConsoleCommentaryWindow : EditorWindow
 		{
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Diagnostics/Console Commentary Window", priority = 200)]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Diagnostics/Console Commentary Window", priority = 200)]
 		private static void ShowWindow()
 			{
 			ConsoleCommentaryWindow window = GetWindow<ConsoleCommentaryWindow>("Console Commentary");
@@ -165,7 +165,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 			{
 			if (_selectedLogIndex >= 0 && _selectedLogIndex < _capturedLogs.Count)
 				{
-				LogEntry logEntry = _capturedLogs [ _selectedLogIndex ];
+				LogEntry logEntry = _capturedLogs[_selectedLogIndex];
 				_selectedLogEntry = logEntry.message;
 				_selectedLogType = logEntry.type;
 				}
@@ -219,7 +219,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				{
 				for (int i = _capturedLogs.Count - 1; i >= 0; i--) // Show newest first
 					{
-					LogEntry logEntry = _capturedLogs [ i ];
+					LogEntry logEntry = _capturedLogs[i];
 
 					EditorGUILayout.BeginHorizontal();
 
@@ -257,7 +257,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 					// Truncated message
 					string truncated = logEntry.message.Length > 60
-						? logEntry.message [ ..60 ] + "..."
+						? logEntry.message[..60] + "..."
 						: logEntry.message;
 
 					GUIStyle style = hasCommentary ? EditorStyles.boldLabel : EditorStyles.miniLabel;
@@ -379,13 +379,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 			for (int i = _commentaries.Count - 1; i >= 0; i--) // Show newest first
 				{
-				CommentaryEntry entry = _commentaries [ i ];
+				CommentaryEntry entry = _commentaries[i];
 
 				EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
 				// Header with timestamp and type
 				EditorGUILayout.BeginHorizontal();
-				GUILayout.Label($"🕒 {entry.timestamp [ 11.. ]}", EditorStyles.miniLabel, GUILayout.Width(60)); // Show only time
+				GUILayout.Label($"🕒 {entry.timestamp[11..]}", EditorStyles.miniLabel, GUILayout.Width(60)); // Show only time
 
 				string typeIcon = entry.logType switch
 					{
@@ -416,7 +416,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 				// Commentary (single line)
 				string truncatedComment = entry.developerComment.Length > 80
-					? entry.developerComment [ ..80 ] + "..."
+					? entry.developerComment[..80] + "..."
 					: entry.developerComment;
 				EditorGUILayout.LabelField(truncatedComment, EditorStyles.wordWrappedMiniLabel);
 
@@ -439,7 +439,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 			string stackTrace = "";
 			if (_selectedLogIndex >= 0 && _selectedLogIndex < _capturedLogs.Count)
 				{
-				stackTrace = _capturedLogs [ _selectedLogIndex ].stackTrace;
+				stackTrace = _capturedLogs[_selectedLogIndex].stackTrace;
 				}
 
 			var entry = new CommentaryEntry(_selectedLogEntry, _selectedLogType, _newComment, "", tags, stackTrace, _selectedLogIndex);
@@ -729,7 +729,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				// Convert absolute path to relative if within project
 				if (scriptPath.StartsWith(Application.dataPath))
 					{
-					scriptPath = "Assets" + scriptPath [ Application.dataPath.Length.. ];
+					scriptPath = "Assets" + scriptPath[Application.dataPath.Length..];
 					}
 
 				// Get line number from user - simplified approach for now
@@ -750,7 +750,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 					return;
 					}
 
-				string [ ] allLines = File.ReadAllLines(scriptPath);
+				string[] allLines = File.ReadAllLines(scriptPath);
 
 				if (targetLine < 1 || targetLine > allLines.Length)
 					{
@@ -777,14 +777,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 					{
 					string linePrefix = i == targetLine ? ">>> " : "    ";
 					string lineNumber = i.ToString().PadLeft(3);
-					string lineContent = i <= allLines.Length ? allLines [ i - 1 ] : "";
+					string lineContent = i <= allLines.Length ? allLines[i - 1] : "";
 
 					snapshot.AppendLine($"{linePrefix}{lineNumber} | {lineContent}");
 					}
 
 				snapshot.AppendLine("```");
 				snapshot.AppendLine();
-				snapshot.AppendLine($"**Target Line {targetLine}:** `{(targetLine <= allLines.Length ? allLines [ targetLine - 1 ].Trim() : "")}`");
+				snapshot.AppendLine($"**Target Line {targetLine}:** `{(targetLine <= allLines.Length ? allLines[targetLine - 1].Trim() : "")}`");
 
 				// Add configuration details for future reference
 				snapshot.AppendLine();
@@ -844,7 +844,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 								for (int i = startIndex; i < logCount; i++)
 									{
-									if (getEntryMethod.Invoke(null, new object [ ] { i, logEntry }) is bool success && success)
+									if (getEntryMethod.Invoke(null, new object[] { i, logEntry }) is bool success && success)
 										{
 										if (messageField?.GetValue(logEntry) is string message &&
 											modeField?.GetValue(logEntry) is int mode)

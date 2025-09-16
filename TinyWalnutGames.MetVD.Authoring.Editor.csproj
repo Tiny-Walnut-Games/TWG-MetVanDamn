@@ -63,10 +63,10 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeColorLegendWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\DistrictBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\EcsPrefabRegistryGizmoGenerator.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\ReadyDemoSceneMenu.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WfcTilePrototypeBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNAuthoringSampleCreator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\SceneEventTrace.cs" />
-    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BatchSpriteSlicer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\AuthoringValidator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\ConsoleCommentaryWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\NavigationGraphGizmo.cs" />
@@ -80,6 +80,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoDrawer.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNSamplePrefabCreator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\SmokeTestSceneSetupInspector.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\QuickStartMenu.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\CreateSampleSceneMenu.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtAssignmentsWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoSettings.cs" />

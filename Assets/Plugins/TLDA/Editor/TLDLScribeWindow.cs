@@ -7,17 +7,17 @@ namespace LivingDevAgent.Editor
 	{
 	/// <summary>
 	/// 🧙‍♂️ The Scribe - A Modular TLDL Documentation Dashboard
-	/// 
+	///
 	/// Transformed from a monolithic 2400+ line file into a clean modular architecture!
 	/// Each module is a specialized widget that can be independently maintained and extended.
-	/// 
+	///
 	/// Key architectural improvements:
 	/// - Templates moved to prime toolbar real estate (🎭 visible emojis!)
 	/// - Navigator with enhanced visual styling and left border
 	/// - Dashboard approach enables other devs to slot in custom modules
 	/// - Centralized data model prevents state drift between modules
 	/// - Each module handles its own UI lifecycle and operations
-	/// 
+	///
 	/// This modular approach treats each section as a "widget" in a documentation dashboard,
 	/// making it easy for teams to extend with custom functionality while maintaining
 	/// the core TLDL workflow integrity.
@@ -35,7 +35,7 @@ namespace LivingDevAgent.Editor
 		private PreviewModule _previewModule;
 
 		// Tab management - TaskMaster removed, pure documentation focus
-		private readonly string [ ] _tabNames = { "📋 Form", "✏️ Editor", "👁️ Preview" };
+		private readonly string[] _tabNames = { "📋 Form", "✏️ Editor", "👁️ Preview" };
 
 		// UI state
 		private string _statusLine = "🎭 Ready to begin your documentation quest!";
@@ -44,13 +44,13 @@ namespace LivingDevAgent.Editor
 		private GUIStyle _navBackgroundStyle;
 		private bool _stylesInitialized = false;
 
-		[MenuItem("Tools/Living Dev Agent/The Scribe", priority = 20)]
+		[MenuItem("Tiny Walnut Games/Living Dev Agent/The Scribe", priority = 20)]
 		public static void OpenScribe()
 			{
 			OpenWindow("📜 The Scribe");
 			}
 
-		[MenuItem("Tools/Living Dev Agent/TLDL Wizard (Deprecated)")]
+		[MenuItem("Tiny Walnut Games/Living Dev Agent/TLDL Wizard (Deprecated)")]
 		public static void OpenDeprecated()
 			{
 			OpenWindow("📜 The Scribe (Legacy)");
@@ -221,8 +221,8 @@ namespace LivingDevAgent.Editor
 					{
 					_data.SelectedTab = newTab;
 					// Update status when switching tabs
-					string [ ] tabNames = new [ ] { "Form Builder", "Raw Editor", "Live Preview" };
-					SetStatusLine($"🔄 Switched to {tabNames [ _data.SelectedTab ]}");
+					string[] tabNames = new[] { "Form Builder", "Raw Editor", "Live Preview" };
+					SetStatusLine($"🔄 Switched to {tabNames[_data.SelectedTab]}");
 					}
 
 				EditorGUILayout.Space(6);

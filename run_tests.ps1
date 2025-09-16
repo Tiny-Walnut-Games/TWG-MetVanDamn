@@ -1,69 +1,238 @@
 #!/usr/bin/env pwsh
 
-# Simple test runner for MetVanDAMN tests
-# Run from the project root directory
+# Simple, reliable headless PlayMode test runner
+# - Auto-detects Unity version from ProjectSettings/ProjectVersion.txt
+# - Finds Unity.exe via UNITY_EXE or Unity Hub standard locations
+# - Writes results/logs to debug
+# Usage:
+#   pwsh ./run_tests.ps1
+# Optional env vars:
+#   $env:UNITY_EXE, $env:UNITY_TEST_FILTER, $env:UNITY_TEST_PLATFORM, $env:UNITY_EXTRA_ARGS
 
-Write-Host "🚀 MetVanDAMN Test Runner" -ForegroundColor Green
-Write-Host "=========================="
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
-$unityPath = "C:\Program Files\Unity\Hub\Editor\2023.3.36f1\Editor\Unity.exe"
-$projectPath = Get-Location
+Write-Host "MetVanDAMN Test Runner" -ForegroundColor Green
+Write-Host "======================="
 
-if (-not (Test-Path $unityPath)) {
-    Write-Host "❌ Unity not found at: $unityPath" -ForegroundColor Red
-    Write-Host "Please update the Unity path in this script" -ForegroundColor Yellow
+function Get-UnityVersion([string]$projectPath) {
+    $pv = Join-Path $projectPath 'ProjectSettings/ProjectVersion.txt'
+    if (-not (Test-Path $pv)) { return $null }
+    $lines = Get-Content -LiteralPath $pv
+    foreach ($line in $lines) {
+        if ($line -match 'm_EditorVersion(?:WithRevision)?:\s*(.+)$') {
+            $v = $Matches[1].Trim()
+            # Trim possible revision in parentheses
+            if ($v -match '^(\S+)') { return $Matches[1] }
+            return $v
+        }
+    }
+    return $null
+}
+
+function Resolve-UnityEditor([string]$version) {
+    if ($env:UNITY_EXE -and (Test-Path $env:UNITY_EXE)) { return $env:UNITY_EXE }
+    if (-not $version) { return $null }
+    $candidates = @(
+        "C:\\Program Files\\Unity\\Hub\\Editor\\$version\\Editor\\Unity.exe",
+        "C:\\Program Files (x86)\\Unity\\Hub\\Editor\\$version\\Editor\\Unity.exe"
+    )
+    foreach ($c in $candidates) { if (Test-Path $c) { return $c } }
+    # Fallback: first Unity under Hub
+    $hubRoots = @("C:\\Program Files\\Unity\\Hub\\Editor", "C:\\Program Files (x86)\\Unity\\Hub\\Editor")
+    foreach ($root in $hubRoots) {
+        if (Test-Path $root) {
+            $sub = Get-ChildItem -LiteralPath $root -Directory -ErrorAction SilentlyContinue | Sort-Object Name -Descending
+            foreach ($d in $sub) {
+                $exe = Join-Path $d.FullName 'Editor/Unity.exe'
+                if (Test-Path $exe) { return $exe }
+            }
+        }
+    }
+    return $null
+}
+
+$projectPath = (Get-Location).Path
+$unityVersion = Get-UnityVersion -projectPath $projectPath
+$unityPath = Resolve-UnityEditor -version $unityVersion
+
+if (-not $unityPath) {
+    Write-Host "ERROR: Unable to resolve Unity editor for version '$unityVersion'." -ForegroundColor Red
+    Write-Host "   Set UNITY_EXE or install via Unity Hub." -ForegroundColor Yellow
     exit 1
 }
 
-Write-Host "🎮 Unity Path: $unityPath" -ForegroundColor Cyan
-Write-Host "📁 Project Path: $projectPath" -ForegroundColor Cyan
+Write-Host "Unity Version: $unityVersion" -ForegroundColor Cyan
+Write-Host "Unity Path:    $unityPath" -ForegroundColor Cyan
+Write-Host "Project Path:  $projectPath" -ForegroundColor Cyan
 
-# Test parameters
-$testResults = Join-Path $projectPath "TestResults_$(Get-Date -Format 'yyyyMMdd_HHmmss').xml"
+$resultsDir = Join-Path $projectPath 'debug'
+New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+$ts = Get-Date -Format 'yyyyMMdd_HHmmss'
+$testResults = Join-Path $resultsDir "TestResults_$ts.xml"
+$logPath = Join-Path $resultsDir "unity_powershell_test_$ts.log"
 
-Write-Host "🧪 Running Unity tests..." -ForegroundColor Yellow
-Write-Host "📊 Results will be saved to: $testResults" -ForegroundColor Cyan
+$testPlatform = if ($env:UNITY_TEST_PLATFORM) { $env:UNITY_TEST_PLATFORM } else { 'PlayMode' }
+$testFilter = $env:UNITY_TEST_FILTER
+$extraArgs = $env:UNITY_EXTRA_ARGS
 
-try {
-    # Run Unity tests in batch mode
-    & $unityPath -runTests -batchmode -projectPath $projectPath -testResults $testResults -testPlatform playmode -logFile -
+Write-Host "Running Unity tests..." -ForegroundColor Yellow
+Write-Host "Results: $testResults" -ForegroundColor Cyan
+Write-Host "Log:     $logPath" -ForegroundColor Cyan
 
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "✅ Tests completed successfully!" -ForegroundColor Green
+$argsList = @(
+    '-batchmode', '-nographics',
+    '-projectPath', $projectPath,
+    '-runTests',
+    '-testPlatform', $testPlatform,
+    '-testResults', $testResults,
+    '-logFile', $logPath,
+    '-quit'
+)
+if ($testFilter) { $argsList += @('-testFilter', $testFilter) }
+if ($extraArgs) { $argsList += $extraArgs.Split(' ') }
+
+# Ensure arguments are strings (Start-Process is picky about types)
+$argsList = $argsList | ForEach-Object { [string]$_ }
+
+# Remember start time for fallback scans
+$runStart = Get-Date
+
+# Launch Unity and wait; capture reliable exit code
+$proc = Start-Process -FilePath $unityPath -ArgumentList $argsList -NoNewWindow -PassThru -Wait
+$exit = $proc.ExitCode
+if ($null -eq $exit) { $exit = 1 }
+
+if ($exit -eq 0) {
+    Write-Host "Unity exited with code 0" -ForegroundColor Green
+}
+else {
+    Write-Host "Unity exited with code $exit" -ForegroundColor Yellow
+}
+
+if (Test-Path $logPath) {
+    Write-Host "\nLog tail:" -ForegroundColor DarkCyan
+    Get-Content -LiteralPath $logPath -Tail 60 | ForEach-Object { Write-Host $_ }
+}
+
+# Patiently wait for the results file to appear (some environments flush late)
+$maxWaitSec = 60
+for ($i = 0; $i -lt $maxWaitSec -and -not (Test-Path $testResults); $i += 2) {
+    Start-Sleep -Seconds 2
+}
+
+# Fallback: parse log for an alternate results path Unity may have used
+if (-not (Test-Path $testResults) -and (Test-Path $logPath)) {
+    try {
+        $logLines = Get-Content -LiteralPath $logPath
+        $prefixes = @(
+            'Saving results to:',
+            'Results saved to:',
+            'Test results written to:',
+            'Generated report (full):'
+        )
+        $altLine = $logLines | Where-Object { $line = $_; $prefixes | Where-Object { $line -like "*$_*" } } | Select-Object -First 1
+        if ($altLine) {
+            foreach ($p in $prefixes) {
+                $idx = $altLine.IndexOf($p)
+                if ($idx -ge 0) {
+                    $candidate = $altLine.Substring($idx + $p.Length).Trim().Trim('"')
+                    if (Test-Path $candidate) {
+                        try { Copy-Item -LiteralPath $candidate -Destination $testResults -Force } catch {}
+                    }
+                    break
+                }
+            }
+        }
     }
-    else {
-        Write-Host "⚠️ Tests completed with exit code: $LASTEXITCODE" -ForegroundColor Yellow
-    }
+    catch {}
+}
 
+# Fallback 2: scan common directories for any TestResults_*.xml created around run start
+if (-not (Test-Path $testResults)) {
+    try {
+        $probeDirs = @(
+            $resultsDir,
+            (Join-Path $projectPath 'Assets/debug'),
+            $projectPath
+        ) | Where-Object { Test-Path $_ }
+        $found = @()
+        foreach ($d in $probeDirs) {
+            $found += Get-ChildItem -LiteralPath $d -Filter 'TestResults_*.xml' -File -ErrorAction SilentlyContinue
+        }
+        $cand = $found | Where-Object { $_.LastWriteTime -ge $runStart.AddMinutes(-10) } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if ($cand) {
+            try { Copy-Item -LiteralPath $cand.FullName -Destination $testResults -Force } catch {}
+        }
+    }
+    catch {}
+}
+
+if (Test-Path $testResults) {
+    try {
+        [xml]$xml = Get-Content -LiteralPath $testResults
+        $tr = $xml.'test-run'
+        if ($tr) {
+            Write-Host "\nTest Summary" -ForegroundColor Cyan
+            Write-Host ("   Total: {0}" -f $tr.total)
+            Write-Host ("   Passed: {0}" -f $tr.passed) -ForegroundColor Green
+            Write-Host ("   Failed: {0}" -f $tr.failed) -ForegroundColor Red
+            Write-Host ("   Duration: {0}s" -f $tr.duration)
+            if ([int]$tr.failed -gt 0) { exit 2 } else { exit 0 }
+        }
+    }
+    catch {
+        Write-Host "ERROR: Could not parse test results XML: $($_.Exception.Message)" -ForegroundColor Red
+        exit 3
+    }
+}
+else {
+    Write-Host "No XML produced by -runTests. Trying Editor API fallback (-executeMethod)..." -ForegroundColor Yellow
+    $ts2 = Get-Date -Format 'yyyyMMdd_HHmmss'
+    $testResults2 = Join-Path $resultsDir "TestResults_$ts2.xml"
+    $logPath2 = Join-Path $resultsDir "unity_powershell_test_${ts2}_fallback.log"
+    $argsList2 = @(
+        '-batchmode', '-nographics',
+        '-projectPath', $projectPath,
+        '-executeMethod', 'TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunPlayMode',
+        '-testResults', $testResults2,
+        '-logFile', $logPath2,
+        '-quit'
+    )
+    # Propagate env filter/category if present
+    if ($env:UNITY_TEST_FILTER) { $argsList2 += @('-testFilter', $env:UNITY_TEST_FILTER) }
+    if ($env:UNITY_TEST_CATEGORY) { $argsList2 += @('-testCategory', $env:UNITY_TEST_CATEGORY) }
+    $argsList2 = $argsList2 | ForEach-Object { [string]$_ }
+    $proc2 = Start-Process -FilePath $unityPath -ArgumentList $argsList2 -NoNewWindow -PassThru -Wait
+    $exit2 = $proc2.ExitCode; if ($null -eq $exit2) { $exit2 = 1 }
+    if ($exit2 -ne 0) { Write-Host "Unity fallback exited with code $exit2" -ForegroundColor Yellow }
+    # Prefer the explicitly requested path, then fall back to scanning
+    $testResults = $testResults2
+    if (-not (Test-Path $testResults)) {
+        $found2 = Get-ChildItem -LiteralPath $resultsDir -Filter 'TestResults_*.xml' -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if ($found2) { $testResults = $found2.FullName }
+    }
     if (Test-Path $testResults) {
-        Write-Host "📄 Test results saved to: $testResults" -ForegroundColor Green
-
-        # Try to show a summary
         try {
-            [xml]$xml = Get-Content $testResults
-            $testRun = $xml.'test-run'
-            if ($testRun) {
-                Write-Host "" -ForegroundColor White
-                Write-Host "📊 Test Summary:" -ForegroundColor Cyan
-                Write-Host "   Total: $($testRun.total)" -ForegroundColor White
-                Write-Host "   Passed: $($testRun.passed)" -ForegroundColor Green
-                Write-Host "   Failed: $($testRun.failed)" -ForegroundColor Red
-                Write-Host "   Duration: $($testRun.duration)s" -ForegroundColor White
+            [xml]$xml = Get-Content -LiteralPath $testResults
+            $tr = $xml.'test-run'
+            if ($tr) {
+                Write-Host "\nTest Summary" -ForegroundColor Cyan
+                Write-Host ("   Total: {0}" -f $tr.total)
+                Write-Host ("   Passed: {0}" -f $tr.passed) -ForegroundColor Green
+                Write-Host ("   Failed: {0}" -f $tr.failed) -ForegroundColor Red
+                Write-Host ("   Duration: {0}s" -f $tr.duration)
+                if ([int]$tr.failed -gt 0) { exit 2 } else { exit 0 }
             }
         }
         catch {
-            Write-Host "❌ Could not parse test results XML" -ForegroundColor Red
+            Write-Host "ERROR: Could not parse fallback test results XML: $($_.Exception.Message)" -ForegroundColor Red
+            exit 3
         }
     }
-    else {
-        Write-Host "❌ Test results file not found" -ForegroundColor Red
-    }
-
-}
-catch {
-    Write-Host "❌ Error running Unity tests: $($_.Exception.Message)" -ForegroundColor Red
-    exit 1
+    Write-Host "ERROR: Test results file not found after fallback at $testResults" -ForegroundColor Red
+    if (Test-Path $logPath2) { Write-Host "See log: $logPath2" -ForegroundColor Yellow }
+    exit 4
 }
 
-Write-Host "" -ForegroundColor White
-Write-Host "🎯 Test run complete!" -ForegroundColor Green
+Write-Host "\nTest run complete!" -ForegroundColor Green

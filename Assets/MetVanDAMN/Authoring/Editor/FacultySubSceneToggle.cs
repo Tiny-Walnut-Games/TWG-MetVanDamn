@@ -16,13 +16,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		{
 		private const string RitualId = "FACULTY_TOGGLE_V2";
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Utilities/Close && Reopen ALL SubScenes (Faculty V2)", priority = 31)]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Tools/SubScenes/Close && Reopen ALL SubScenes (Faculty V2)", priority = 31)]
 		private static void Menu()
 			{
 			ExecuteCanonicalRitual(passCount: 1);
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Utilities/Close && Reopen ALL SubScenes (Faculty V2 x2 passes)", priority = 32)]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Tools/SubScenes/Close && Reopen ALL SubScenes (Faculty V2 x2 passes)", priority = 32)]
 		private static void MenuDouble()
 			{
 			ExecuteCanonicalRitual(passCount: 2);
@@ -46,7 +46,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return;
 				}
 
-			SubScene [ ] subScenes = UnityEngine.Object.FindObjectsByType<SubScene>(FindObjectsSortMode.None);
+			SubScene[] subScenes = UnityEngine.Object.FindObjectsByType<SubScene>(FindObjectsSortMode.None);
 			if (subScenes.Length == 0)
 				{
 				Debug.Log("🔍 No SubScenes found to process");
@@ -67,7 +67,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			ExecuteRitualPasses(subScenes, passCount, preState);
 			}
 
-		private static void ExecuteRitualPasses(SubScene [ ] subScenes, int passCount, EditingState preState)
+		private static void ExecuteRitualPasses(SubScene[] subScenes, int passCount, EditingState preState)
 			{
 			int currentPass = 1;
 
@@ -104,7 +104,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			RunPass();
 			}
 
-		private static void CloseAllSubScenes(SubScene [ ] subScenes)
+		private static void CloseAllSubScenes(SubScene[] subScenes)
 			{
 			// Use the established internal method discovery from original code
 			var subSceneInspectorUtilityType = System.Type.GetType("Unity.Scenes.Editor.SubSceneInspectorUtility, Unity.Scenes.Editor");
@@ -116,11 +116,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				if (closeMethod != null)
 					{
-					System.Reflection.ParameterInfo [ ] parameters = closeMethod.GetParameters();
-					if (parameters.Length > 0 && parameters [ 0 ].ParameterType == typeof(SubScene [ ]))
+					System.Reflection.ParameterInfo[] parameters = closeMethod.GetParameters();
+					if (parameters.Length > 0 && parameters[0].ParameterType == typeof(SubScene[]))
 						{
 						// Bulk close with array parameter
-						closeMethod.Invoke(null, new object [ ] { subScenes });
+						closeMethod.Invoke(null, new object[] { subScenes });
 						Debug.Log($"📁 Faculty V2 bulk closed {subScenes.Length} SubScene(s) via CloseSceneWithoutSaving");
 						return;
 						}
@@ -135,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void OpenAllSubScenes(SubScene [ ] subScenes)
+		private static void OpenAllSubScenes(SubScene[] subScenes)
 			{
 			// Use the established internal method discovery
 			var subSceneInspectorUtilityType = System.Type.GetType("Unity.Scenes.Editor.SubSceneInspectorUtility, Unity.Scenes.Editor");
@@ -150,10 +150,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					// EditScene typically takes single SubScene, so open individually
 					foreach (SubScene subScene in subScenes)
 						{
-						System.Reflection.ParameterInfo [ ] parameters = openMethod.GetParameters();
-						if (parameters.Length > 0 && parameters [ 0 ].ParameterType == typeof(SubScene))
+						System.Reflection.ParameterInfo[] parameters = openMethod.GetParameters();
+						if (parameters.Length > 0 && parameters[0].ParameterType == typeof(SubScene))
 							{
-							openMethod.Invoke(null, new object [ ] { subScene });
+							openMethod.Invoke(null, new object[] { subScene });
 							}
 						}
 					Debug.Log($"📂 Faculty V2 reopened {subScenes.Length} SubScene(s) via EditScene");
@@ -204,7 +204,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private static void FinalizeRitual(SubScene [ ] subScenes, EditingState preState)
+		private static void FinalizeRitual(SubScene[] subScenes, EditingState preState)
 			{
 			EditingState postState = CaptureEditingState(subScenes);
 			DumpState("POST-FACULTY", postState);
@@ -232,7 +232,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			public System.Collections.Generic.List<string> LoadedEditingSceneNames;
 			}
 
-		private static EditingState CaptureEditingState(SubScene [ ] subs)
+		private static EditingState CaptureEditingState(SubScene[] subs)
 			{
 			var names = new System.Collections.Generic.List<string>();
 			foreach (SubScene s in subs)

@@ -21,7 +21,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private readonly Dictionary<BiomeType, Dictionary<string, int>> _live = new();
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Biome Art Assignments")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Biome Art Assignments")]
 		public static void ShowWindow()
 			{
 			BiomeArtAssignmentsWindow win = GetWindow<BiomeArtAssignmentsWindow>("Biome Art Assignments");
@@ -129,18 +129,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				for (int i = 0; i < entities.Length; i++)
 					{
-					Core.Biome b = biomes [ i ];
-					BiomeArtProfileReference r = refs [ i ];
+					Core.Biome b = biomes[i];
+					BiomeArtProfileReference r = refs[i];
 					string profileName = r.ProfileRef.IsValid() && r.ProfileRef.Value != null ? r.ProfileRef.Value.name : "<none>";
 
 					if (!_live.TryGetValue(b.Type, out Dictionary<string, int> map))
 						{
 						map = new Dictionary<string, int>();
-						_live [ b.Type ] = map;
+						_live[b.Type] = map;
 						}
 
 					map.TryGetValue(profileName, out int count);
-					map [ profileName ] = count + 1;
+					map[profileName] = count + 1;
 					}
 				}
 			catch (System.Exception ex)

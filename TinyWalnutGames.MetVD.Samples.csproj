@@ -60,6 +60,7 @@
     <Analyzer Include="E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\PackageCache\com.unity.entities@e581b903be8e\Unity.Entities\SourceGenerators\Unity.Entities.Analyzer.CodeFixes.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\EnemyNamingSampleBootstrap.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\ProceduralLayoutDemo.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\SmokeTestSceneSetup.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.samples\Runtime\CrossScaleIntegrationExample.cs" />

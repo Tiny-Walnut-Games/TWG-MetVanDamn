@@ -15,7 +15,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private static bool _scanned;
 		internal static readonly List<MethodInfo> AllCandidateMethods = new();
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Diagnostics/Scan SubScene Internals", priority = 190)]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Diagnostics/Scan SubScene Internals", priority = 190)]
 		private static void ScanMenu()
 			{
 			Scan();
@@ -37,7 +37,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			foreach (Assembly asm in asms)
 				{
-				Type [ ] types;
+				Type[] types;
 				try { types = asm.GetTypes(); }
 				catch { continue; }
 
@@ -48,12 +48,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					foreach (MethodInfo m in t.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
 						{
 						if (m.IsGenericMethod) continue;
-						ParameterInfo [ ] ps = m.GetParameters();
+						ParameterInfo[] ps = m.GetParameters();
 						if (ps.Length == 0) continue;
 
 						// Need at least a SubScene or SubScene[] in parameter list to be interesting:
 						if (!ps.Any(p => p.ParameterType == typeof(Unity.Scenes.SubScene) ||
-										 p.ParameterType == typeof(Unity.Scenes.SubScene [ ])))
+										 p.ParameterType == typeof(Unity.Scenes.SubScene[])))
 							continue;
 
 						string lname = m.Name.ToLowerInvariant();

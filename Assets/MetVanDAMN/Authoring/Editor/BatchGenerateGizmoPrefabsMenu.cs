@@ -6,10 +6,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 	{
 	public static class BatchGenerateGizmoPrefabsMenu
 		{
-		[MenuItem("MetVanDAMN/Gizmos/Generate Gizmo Prefabs For All Registries In Scene")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Tools/Gizmos/Generate Gizmo Prefabs For All Registries In Scene")]
 		public static void GenerateAll()
 			{
-			EcsPrefabRegistryAuthoring [ ] registries = Object.FindObjectsByType<EcsPrefabRegistryAuthoring>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+			EcsPrefabRegistryAuthoring[] registries = Object.FindObjectsByType<EcsPrefabRegistryAuthoring>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 			if (registries == null || registries.Length == 0)
 				{
 				EditorUtility.DisplayDialog("ECS Prefab Registry", "No EcsPrefabRegistryAuthoring components found in the scene.", "OK");
