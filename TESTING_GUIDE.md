@@ -93,12 +93,19 @@ TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunAll
 - **Comprehensive logging**: Shows which method succeeded and why others failed
 
 ### VS Code Configuration
-**Files Created:**
-- `.vscode/tasks.json` - Test execution tasks
-- `.vscode/launch.json` - Debug configurations
-- `.vscode/settings.json` - Project-specific settings
-- `.vscode/test.runsettings` - Test runner configuration
-- `.vscode/extensions.json` - Recommended extensions
+**Files provided in `docs/vscode-setup/`** (copy to `.vscode/` to use):
+- `tasks.json` - Test execution tasks with 7 different testing workflows
+- `launch.json` - Debug configurations for Unity integration
+- `settings.json` - Optimized project settings for C# and Unity development
+- `test.runsettings` - Test runner configuration with coverage support
+- `extensions.json` - Recommended VS Code extensions
+- `README.md` - Setup instructions and configuration details
+
+**Quick Setup**:
+```bash
+# Copy configuration files to enable VS Code integration
+cp docs/vscode-setup/* .vscode/
+```
 
 ### Standalone Test Runner
 **vscode-test-runner.ps1**:
