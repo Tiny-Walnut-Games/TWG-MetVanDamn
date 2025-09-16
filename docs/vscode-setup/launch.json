@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Unity: Debug PlayMode Tests",
+            "type": "unity",
+            "request": "launch",
+            "unityPath": "${env:UNITY_EXE}",
+            "projectPath": "${workspaceFolder}",
+            "testMode": "PlayMode"
+        },
+        {
+            "name": "Unity: Debug EditMode Tests",
+            "type": "unity",
+            "request": "launch",
+            "unityPath": "${env:UNITY_EXE}",
+            "projectPath": "${workspaceFolder}",
+            "testMode": "EditMode"
+        },
+        {
+            "name": "Unity: Attach to Editor",
+            "type": "unity",
+            "request": "attach"
+        }
+    ]
+}
