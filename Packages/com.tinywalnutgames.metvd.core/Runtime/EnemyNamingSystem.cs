@@ -13,10 +13,17 @@ namespace TinyWalnutGames.MetVD.Core
 	[UpdateInGroup(typeof(InitializationSystemGroup))]
 	public partial struct EnemyNamingSystem : ISystem
 		{
+		private struct PendingNaming
+			{
+			public Entity Entity;
+			public EnemyNaming Naming;
+			}
+
 		[BurstCompile]
 		public void OnCreate(ref SystemState state)
 			{
 			state.RequireForUpdate<EnemyNamingConfig>();
+			state.RequireForUpdate<NeedsNameGeneration>();
 			}
 
 		[BurstCompile]
@@ -24,26 +31,51 @@ namespace TinyWalnutGames.MetVD.Core
 			{
 			var namingConfig = SystemAPI.GetSingleton<EnemyNamingConfig>();
 
+			// Lookups for safe read access during iteration (no EntityManager calls inside loop)
+			var affixLookupRO = SystemAPI.GetBufferLookup<EnemyAffixBufferElement>(true);
+
+			// Collect results to apply after iteration to avoid structural changes during iteration
+			var toApply = new Unity.Collections.NativeList<PendingNaming>(Allocator.Temp);
+
 			// Process entities that need name generation
-			foreach (var (profile, entity) in SystemAPI.Query<RefRW<EnemyProfile>>()
+			foreach (var (profile, entity) in SystemAPI.Query<RefRO<EnemyProfile>>()
 				.WithAll<NeedsNameGeneration>()
 				.WithEntityAccess())
 				{
-				GenerateEnemyName(ref state, entity, profile.ValueRO, namingConfig);
-
-				// Remove the generation tag
-				state.EntityManager.RemoveComponent<NeedsNameGeneration>(entity);
+				var naming = GenerateEnemyName(in affixLookupRO, entity, in profile.ValueRO, in namingConfig);
+				toApply.Add(new PendingNaming { Entity = entity, Naming = naming });
 				}
+
+			// Apply structural changes after enumeration
+			var em = state.EntityManager;
+			for (int i = 0; i < toApply.Length; i++)
+				{
+				var item = toApply[i];
+				if (!em.HasComponent<EnemyNaming>(item.Entity))
+					{
+					em.AddComponentData(item.Entity, item.Naming);
+					}
+				else
+					{
+					em.SetComponentData(item.Entity, item.Naming);
+					}
+				if (em.HasComponent<NeedsNameGeneration>(item.Entity))
+					{
+					em.RemoveComponent<NeedsNameGeneration>(item.Entity);
+					}
+				}
+
+			toApply.Dispose();
 			}
 
 		/// <summary>
 		/// Generate name and display settings for an enemy based on its profile and affixes
 		/// </summary>
-		private static void GenerateEnemyName(ref SystemState state, Entity entity, EnemyProfile profile,
-											  EnemyNamingConfig config)
+		private static EnemyNaming GenerateEnemyName(in BufferLookup<EnemyAffixBufferElement> affixLookupRO,
+											  Entity entity, in EnemyProfile profile, in EnemyNamingConfig config)
 			{
 			var random = Unity.Mathematics.Random.CreateFromIndex(profile.GenerationSeed);
-			
+
 			// Determine display behavior based on rarity
 			bool showFullName = ShouldShowFullName(profile.Rarity);
 			bool showIcons = ShouldShowIcons(profile.Rarity, config.GlobalDisplayMode);
@@ -52,7 +84,7 @@ namespace TinyWalnutGames.MetVD.Core
 
 			if (showFullName)
 				{
-				displayName = GenerateFullName(ref state, entity, profile, config, random);
+				displayName = GenerateFullName(in affixLookupRO, entity, in profile, in config, random);
 				}
 			else
 				{
@@ -60,8 +92,7 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Create the naming component
-			var naming = new EnemyNaming(displayName, showFullName, showIcons, config.GlobalDisplayMode);
-			state.EntityManager.AddComponentData(entity, naming);
+			return new EnemyNaming(displayName, showFullName, showIcons, config.GlobalDisplayMode);
 			}
 
 		/// <summary>
@@ -79,7 +110,7 @@ namespace TinyWalnutGames.MetVD.Core
 					RarityType.Boss => true,
 					RarityType.FinalBoss => true,
 					_ => false
-				};
+					};
 			}
 
 		/// <summary>
@@ -98,17 +129,18 @@ namespace TinyWalnutGames.MetVD.Core
 		/// <summary>
 		/// Generate a full name including prefixes and suffixes from affixes
 		/// </summary>
-		private static FixedString128Bytes GenerateFullName(ref SystemState state, Entity entity, EnemyProfile profile,
-														   EnemyNamingConfig config, Unity.Mathematics.Random random)
+		private static FixedString128Bytes GenerateFullName(in BufferLookup<EnemyAffixBufferElement> affixLookupRO,
+									   Entity entity, in EnemyProfile profile,
+									   in EnemyNamingConfig config, Unity.Mathematics.Random random)
 			{
 			// Check if entity has affixes
-			if (!state.EntityManager.HasBuffer<EnemyAffixBufferElement>(entity))
+			if (!affixLookupRO.HasBuffer(entity))
 				{
 				return profile.BaseType;
 				}
 
-			var affixBuffer = state.EntityManager.GetBuffer<EnemyAffixBufferElement>(entity);
-			
+			var affixBuffer = affixLookupRO[entity];
+
 			if (affixBuffer.Length == 0)
 				{
 				return profile.BaseType;
@@ -182,7 +214,7 @@ namespace TinyWalnutGames.MetVD.Core
 					RarityType.Boss => 3,
 					RarityType.FinalBoss => 4,
 					_ => 2
-				};
+					};
 			}
 
 		/// <summary>
@@ -196,7 +228,7 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Get last character of current name and first character of next syllable
-			byte lastChar = currentName[currentName.Length - 1];
+			byte lastChar = currentName[^1];
 			byte firstChar = nextSyllable[0];
 
 			// Insert connective if both are consonants (simple heuristic)
@@ -235,7 +267,11 @@ namespace TinyWalnutGames.MetVD.Core
 
 			if (suffix.Length > 0)
 				{
-				nameBuilder.Append(" of ");
+				// Burst-safe append of separator without using managed string
+				nameBuilder.Append(' ');
+				nameBuilder.Append('o');
+				nameBuilder.Append('f');
+				nameBuilder.Append(' ');
 				nameBuilder.Append(suffix);
 				}
 

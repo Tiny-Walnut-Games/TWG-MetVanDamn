@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Collections;
 using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
 
@@ -18,6 +19,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 		[Header("Affix Assignment")]
 		[SerializeField] private bool useRandomAffixes = true;
 		[SerializeField] private string[] specificAffixIds = new string[0];
+
+
 
 		[Header("Display Configuration")]
 		[SerializeField] private bool overrideGlobalDisplayMode = false;
@@ -70,14 +73,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 					{
 					// Specific affixes will be resolved during baking
 					AddComponent<NeedsSpecificAffixAssignment>(entity);
-					
+
 					// Store the affix IDs for later resolution
-					var affixIdBuffer = AddBuffer<PendingAffixIdElement>(entity);
+					var affixIdBuffer = AddBuffer<AuthoringPendingAffixIdElement>(entity);
 					foreach (var affixId in authoring.specificAffixIds)
 						{
 						if (!string.IsNullOrEmpty(affixId))
 							{
-							affixIdBuffer.Add(new PendingAffixIdElement { AffixId = affixId });
+							affixIdBuffer.Add(new AuthoringPendingAffixIdElement { AffixId = new FixedString64Bytes(affixId) });
 							}
 						}
 					}
@@ -98,7 +101,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 						RarityType.Boss => true,
 						RarityType.FinalBoss => true,
 						_ => false
-					};
+						};
 				}
 
 			/// <summary>
@@ -116,13 +119,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 		[ContextMenu("Preview Generated Name")]
 		private void PreviewGeneratedName()
 			{
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			Debug.Log($"Enemy Profile Preview:\n" +
 					 $"Rarity: {rarity}\n" +
 					 $"Base Type: {baseType}\n" +
 					 $"Seed: {generationSeed}\n" +
 					 $"Expected Behavior: {GetExpectedBehavior()}");
-			#endif
+#endif
 			}
 
 		/// <summary>
@@ -178,10 +181,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 					RarityType.Boss => 3,
 					RarityType.FinalBoss => 4,
 					_ => 1
-				};
+					};
 			}
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		/// <summary>
 		/// Validate configuration in the inspector
 		/// </summary>
@@ -205,7 +208,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 					}
 				}
 			}
-		#endif
+#endif
 		}
 
 	/// <summary>
@@ -219,23 +222,21 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 	public struct NeedsSpecificAffixAssignment : IComponentData { }
 
 	/// <summary>
-	/// Buffer element for storing pending affix IDs during baking
+	/// Authoring-only buffer element used to carry requested affix IDs during bake.
+	/// Resolved at runtime and then removed from the entity.
 	/// </summary>
-	public struct PendingAffixIdElement : IBufferElementData
+	public struct AuthoringPendingAffixIdElement : IBufferElementData
 		{
 		public FixedString64Bytes AffixId;
-
-		public PendingAffixIdElement(string affixId)
-			{
-			AffixId = new FixedString64Bytes(affixId);
-			}
 		}
+
+	// Note: Pending affix IDs are carried by the authoring-local buffer element (AuthoringPendingAffixIdElement)
 
 	/// <summary>
 	/// System that processes entities needing affix assignment after database initialization
 	/// </summary>
 	[UpdateInGroup(typeof(InitializationSystemGroup))]
-	[UpdateAfter(typeof(EnemyNamingSystem))]
+	[UpdateBefore(typeof(EnemyNamingSystem))]
 	public partial struct EnemyAffixAssignmentSystem : ISystem
 		{
 		public void OnCreate(ref SystemState state)
@@ -261,13 +262,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				}
 
 			// Process specific affix assignments
-			foreach (var (profile, pendingAffixBuffer, entity) in SystemAPI.Query<RefRO<EnemyProfile>, DynamicBuffer<PendingAffixIdElement>>()
+			foreach (var (profile, pendingAffixBuffer, entity) in SystemAPI.Query<RefRO<EnemyProfile>, DynamicBuffer<AuthoringPendingAffixIdElement>>()
 				.WithAll<NeedsSpecificAffixAssignment>()
 				.WithEntityAccess())
 				{
 				AssignSpecificAffixes(ref state, entity, pendingAffixBuffer);
 				state.EntityManager.RemoveComponent<NeedsSpecificAffixAssignment>(entity);
-				state.EntityManager.RemoveComponent<PendingAffixIdElement>(entity);
+				state.EntityManager.RemoveComponent<AuthoringPendingAffixIdElement>(entity);
 
 				// Mark for name generation if not already marked
 				if (!state.EntityManager.HasComponent<NeedsNameGeneration>(entity))
@@ -280,7 +281,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 		/// <summary>
 		/// Assign specific affixes based on IDs
 		/// </summary>
-		private static void AssignSpecificAffixes(ref SystemState state, Entity entity, DynamicBuffer<PendingAffixIdElement> pendingIds)
+		private static void AssignSpecificAffixes(ref SystemState state, Entity entity, DynamicBuffer<AuthoringPendingAffixIdElement> pendingIds)
 			{
 			if (pendingIds.Length == 0)
 				{

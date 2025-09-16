@@ -6,7 +6,6 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 	{
 	public static class CreateSampleSceneMenu
 		{
-		[MenuItem("MetVanDAMN/Create Sample Scene With ECS Registry")]
 		public static void CreateSampleScene()
 			{
 			UnityEngine.SceneManagement.Scene scene = UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.DefaultGameObjects);

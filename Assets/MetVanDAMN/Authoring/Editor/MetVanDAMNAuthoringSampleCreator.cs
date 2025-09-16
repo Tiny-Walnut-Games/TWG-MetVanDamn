@@ -19,9 +19,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	public static class MetVanDAMNAuthoringSampleCreator
 		{
 		private const string SubScenesFolder = "Assets/Scenes/SubScenes";
-		private static readonly string [ ] SampleSubScenes = { "SampleGeneration", "SampleBiomes" };
+		private static readonly string[] SampleSubScenes = { "SampleGeneration", "SampleBiomes" };
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Sample Creation/Create Authoring Sample Scene")]
 		public static void CreateAuthoringSampleScene()
 			{
 			// 🔥 PHASE 1: Create new scene and basic components
@@ -271,13 +270,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					biomeMarker.transform.position = basePosition;
 
 					// 🧙‍♂️ BIOME-AWARE SPATIAL DEMONSTRATION
-					string [ ] biomeTypes = new [ ] { "Solar", "Volcanic", "Icy", "Hub" };
-					Color [ ] biomeColors = new [ ] { Color.yellow, Color.red, Color.cyan, Color.blue };
+					string[] biomeTypes = new[] { "Solar", "Volcanic", "Icy", "Hub" };
+					Color[] biomeColors = new[] { Color.yellow, Color.red, Color.cyan, Color.blue };
 
 					for (int i = 0; i < biomeTypes.Length; i++)
 						{
 						var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-						sphere.name = $"BiomeContent_{biomeTypes [ i ]}";
+						sphere.name = $"BiomeContent_{biomeTypes[i]}";
 						sphere.transform.SetParent(biomeMarker.transform);
 
 						// 🎯 RADIAL COORDINATE INTELLIGENCE
@@ -290,7 +289,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						Renderer renderer = sphere.GetComponent<Renderer>();
 						renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"))
 							{
-							color = biomeColors [ i ]
+							color = biomeColors[i]
 							};
 						}
 					break;
@@ -659,7 +658,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			var connectionsParent = new GameObject("Connections");
 
 			// Find all district authoring components
-			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 
 			// Create connections between adjacent districts
 			foreach (DistrictAuthoring district1 in districts)
@@ -728,7 +727,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			var biomeFieldsParent = new GameObject("BiomeFields");
 
 			// Create a few biome fields with different configurations
-			var biomeConfigs = new (Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) [ ]
+			var biomeConfigs = new (Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient)[]
 			{
 				(new Vector3(-3, 1, -3), BiomeType.SolarPlains, BiomeType.Unknown, 1.0f, 0.3f),
 				(new Vector3(3, 1, 3), BiomeType.VolcanicCore, BiomeType.Unknown, 0.8f, 0.6f),
@@ -739,7 +738,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// @jmeyer1980: ⚠ nitpick ⚠ I deconstructed config directly in the loop for clarity
 			for (int i = 0; i < biomeConfigs.Length; i++)
 				{
-				(Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) = biomeConfigs [ i ];
+				(Vector3 position, BiomeType primary, BiomeType secondary, float strength, float gradient) = biomeConfigs[i];
 				var biomeFieldGO = new GameObject($"BiomeField_{i + 1}");
 				biomeFieldGO.transform.SetParent(biomeFieldsParent.transform);
 				biomeFieldGO.transform.position = position;
@@ -799,7 +798,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			wfcLibraryParent.transform.position = new Vector3(10, 0, 0); // Offset from main scene
 
 			// Create the tile prototypes as defined in the sample data
-			var tileConfigs = new (string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) [ ]
+			var tileConfigs = new (string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn)[]
 			{
 				("Hub", 1, 1.0f, BiomeType.HubArea, Polarity.None, 2, 4),
 				("Corridor", 2, 0.8f, BiomeType.TransitionZone, Polarity.None, 2, 2),
@@ -810,7 +809,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// @jmeyer1980: ⚠ Intention ⚠ I deconstructed config directly in the loop for clarity
 			for (int i = 0; i < tileConfigs.Length; i++)
 				{
-				(string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) = tileConfigs [ i ];
+				(string name, uint id, float weight, BiomeType biome, Polarity polarity, byte minConn, byte maxConn) = tileConfigs[i];
 				var tileGO = new GameObject($"WfcTilePrototype_{name}");
 				tileGO.transform.SetParent(wfcLibraryParent.transform);
 				tileGO.transform.position = new Vector3(i * 2f, 0, 0);
@@ -827,19 +826,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				// @jmeyer1980: ⚠ nitpick ⚠ I switched the switch to an expression named switch
 				wfcTile.sockets = name switch
 					{
-						"Hub" => new WfcSocketConfig [ ]
+						"Hub" => new WfcSocketConfig[]
 												{
 							new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
 												},
-						"Corridor" => new WfcSocketConfig [ ]
+						"Corridor" => new WfcSocketConfig[]
 							{
 							new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
 							},
-						_ => new WfcSocketConfig [ ]
+						_ => new WfcSocketConfig[]
 							{
 							new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 							new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true }
@@ -918,7 +917,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// @jmeyer1980: ⚠ nitpick ⚠ I changed this next line as it was previously split into two lines:
 			labelGO.transform.SetLocalPositionAndRotation(Vector3.up * 1.2f, Quaternion.Euler(90, 0, 0));
 			TextMesh labelMesh = labelGO.AddComponent<TextMesh>();
-			labelMesh.text = typeName [ ..Mathf.Min(3, typeName.Length) ]; // Short abbreviation - ⚠ nitpick ⚠ @jmeyer1980: I changed this to a range operator
+			labelMesh.text = typeName[..Mathf.Min(3, typeName.Length)]; // Short abbreviation - ⚠ nitpick ⚠ @jmeyer1980: I changed this to a range operator
 			labelMesh.fontSize = 6;
 			labelMesh.color = Color.black;
 			labelMesh.anchor = TextAnchor.MiddleCenter;
@@ -971,14 +970,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return;
 				}
 
-			string [ ] segments = path.Split('/');
-			string current = segments [ 0 ];
+			string[] segments = path.Split('/');
+			string current = segments[0];
 			for (int i = 1; i < segments.Length; i++)
 				{
-				string next = current + "/" + segments [ i ];
+				string next = current + "/" + segments[i];
 				if (!AssetDatabase.IsValidFolder(next))
 					{
-					AssetDatabase.CreateFolder(current, segments [ i ]);
+					AssetDatabase.CreateFolder(current, segments[i]);
 					}
 				current = next;
 				}

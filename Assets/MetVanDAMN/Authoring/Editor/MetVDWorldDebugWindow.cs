@@ -9,7 +9,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private MetVDGizmoSettings _settings;
 		private Vector2 _scroll;
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/World Debugger")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/World Debugger")]
 		public static void ShowWindow()
 			{
 			GetWindow<MetVDWorldDebugWindow>("MetVanDAMN World Debugger");
@@ -19,10 +19,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			{
 			if (_settings == null)
 				{
-				string [ ] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
+				string[] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
 				if (guids.Length > 0)
 					{
-					_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids [ 0 ]));
+					_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
 					}
 				}
 			}
@@ -64,10 +64,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			if (GUILayout.Button("Frame All Districts"))
 				{
 				// With this line:
-				DistrictAuthoring [ ] districts = FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+				DistrictAuthoring[] districts = FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 				if (districts.Length > 0)
 					{
-					Bounds b = new(districts [ 0 ].transform.position, Vector3.one);
+					Bounds b = new(districts[0].transform.position, Vector3.one);
 					foreach (DistrictAuthoring d in districts)
 						{
 						b.Encapsulate(d.transform.position);

@@ -45,6 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVanDAMN.Authoring.GizmoPrefabMarker
   Key: spawn_door_timed
-  Shape: 2
+  Shape: 0
   Size: 1
   Color: {r: 0.2, g: 0.9, b: 0.3, a: 0.9}

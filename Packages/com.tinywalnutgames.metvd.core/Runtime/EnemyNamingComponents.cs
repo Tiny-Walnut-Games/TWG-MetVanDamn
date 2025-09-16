@@ -244,4 +244,6 @@ namespace TinyWalnutGames.MetVD.Core
 	/// Tag component to identify affix database entities
 	/// </summary>
 	public struct AffixDatabaseTag : IComponentData { }
+
+
 	}

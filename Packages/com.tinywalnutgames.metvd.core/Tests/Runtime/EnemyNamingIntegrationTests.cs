@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Entities.Tests;
 using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVD.Core.Tests
@@ -11,25 +10,46 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 	/// Tests end-to-end functionality from enemy creation to final display
 	/// </summary>
 	[TestFixture]
-	public class EnemyNamingIntegrationTests : ECSTestsFixture
+	public class EnemyNamingIntegrationTests
 		{
-		private EnemyNamingSystem namingSystem;
+		private World world;
+		private EntityManager m_Manager;
+		private InitializationSystemGroup initGroup;
 
 		[SetUp]
-		public override void Setup()
+		public void Setup()
 			{
-			base.Setup();
+			world = new World("EnemyNamingIntegrationTests");
+			World.DefaultGameObjectInjectionWorld = world;
+			m_Manager = world.EntityManager;
 
 			// Initialize the complete system
-			namingSystem = World.GetOrCreateSystemManaged<EnemyNamingSystem>();
+			initGroup = world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+			var namingSystemHandle = world.GetOrCreateSystem<EnemyNamingSystem>();
+			initGroup.AddSystemToUpdateList(namingSystemHandle);
 			EnemyAffixDatabase.InitializeDatabase(m_Manager);
+
+			// Database initialize ensures config singleton exists; avoid double-creation
+			}
+
+		[TearDown]
+		public void TearDown()
+			{
+			if (world != null && world.IsCreated)
+				{
+				world.Dispose();
+				if (World.DefaultGameObjectInjectionWorld == world)
+					{
+					World.DefaultGameObjectInjectionWorld = null;
+					}
+				}
 			}
 
 		[Test]
 		public void Complete_Enemy_Creation_Workflow()
 			{
 			// Simulate complete enemy creation workflow
-			
+
 			// 1. Create enemy entity with profile
 			var enemyEntity = m_Manager.CreateEntity();
 			m_Manager.AddComponentData(enemyEntity, new EnemyProfile(RarityType.Rare, "Sentinel", 98765));
@@ -39,7 +59,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			EnemyAffixDatabase.AssignRandomAffixes(m_Manager, enemyEntity, RarityType.Rare, 98765);
 
 			// 3. Process naming system
-			namingSystem.Update();
+			initGroup.Update();
 
 			// 4. Verify complete setup
 			Assert.IsTrue(m_Manager.HasComponent<EnemyNaming>(enemyEntity));
@@ -60,7 +80,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			{
 			// Create multiple enemies of different rarities
 			var entities = new Entity[6];
-			var rarities = new[] { RarityType.Common, RarityType.Uncommon, RarityType.Rare, 
+			var rarities = new[] { RarityType.Common, RarityType.Uncommon, RarityType.Rare,
 								 RarityType.Unique, RarityType.MiniBoss, RarityType.Boss };
 			var baseTypes = new[] { "Crawler", "Archer", "Mage", "Guardian", "Warden", "Overlord" };
 
@@ -74,21 +94,21 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 				}
 
 			// Process all entities
-			namingSystem.Update();
+			initGroup.Update();
 
 			// Verify each entity is processed correctly
 			for (int i = 0; i < entities.Length; i++)
 				{
-				Assert.IsTrue(m_Manager.HasComponent<EnemyNaming>(entities[i]), 
+				Assert.IsTrue(m_Manager.HasComponent<EnemyNaming>(entities[i]),
 					$"Entity {i} ({rarities[i]}) should have EnemyNaming component");
-				
+
 				var naming = m_Manager.GetComponentData<EnemyNaming>(entities[i]);
-				
+
 				// Common and Uncommon should show base type only
 				if (rarities[i] is RarityType.Common or RarityType.Uncommon)
 					{
 					Assert.IsFalse(naming.ShowFullName, $"{rarities[i]} should not show full name");
-					Assert.AreEqual(baseTypes[i], naming.DisplayName.ToString(), 
+					Assert.AreEqual(baseTypes[i], naming.DisplayName.ToString(),
 						$"{rarities[i]} should show base type '{baseTypes[i]}'");
 					}
 				else
@@ -106,10 +126,10 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			{
 			// Create boss progression: MiniBoss -> Boss -> FinalBoss
 			var miniBoss = CreateBossWithAffixes(RarityType.MiniBoss, "Champion");
-			var boss = CreateBossWithAffixes(RarityType.Boss, "Overlord");  
+			var boss = CreateBossWithAffixes(RarityType.Boss, "Overlord");
 			var finalBoss = CreateBossWithAffixes(RarityType.FinalBoss, "Ancient");
 
-			namingSystem.Update();
+			initGroup.Update();
 
 			var miniBossNaming = m_Manager.GetComponentData<EnemyNaming>(miniBoss);
 			var bossNaming = m_Manager.GetComponentData<EnemyNaming>(boss);
@@ -140,7 +160,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 
 			// Test with NamesAndIcons mode
 			SetGlobalDisplayMode(AffixDisplayMode.NamesAndIcons);
-			namingSystem.Update();
+			initGroup.Update();
 
 			var naming1 = m_Manager.GetComponentData<EnemyNaming>(enemy1);
 			var naming2 = m_Manager.GetComponentData<EnemyNaming>(enemy2);
@@ -152,11 +172,11 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 
 			// Change to IconsOnly and recreate entities
 			SetGlobalDisplayMode(AffixDisplayMode.IconsOnly);
-			
+
 			enemy1 = CreateTestEnemy(RarityType.Rare, "Warrior");
 			enemy2 = CreateTestEnemy(RarityType.Common, "Scout");
-			
-			namingSystem.Update();
+
+			initGroup.Update();
 
 			naming1 = m_Manager.GetComponentData<EnemyNaming>(enemy1);
 			naming2 = m_Manager.GetComponentData<EnemyNaming>(enemy2);
@@ -207,11 +227,11 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			// Don't add any affixes
 
 			// Should not crash and should handle gracefully
-			Assert.DoesNotThrow(() => namingSystem.Update());
+			Assert.DoesNotThrow(() => initGroup.Update());
 
 			// Should still create naming component
 			Assert.IsTrue(m_Manager.HasComponent<EnemyNaming>(enemyEntity));
-			
+
 			var naming = m_Manager.GetComponentData<EnemyNaming>(enemyEntity);
 			// Should fall back to base type
 			Assert.AreEqual("Phantom", naming.DisplayName.ToString());
@@ -224,7 +244,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			var enemy1 = CreateBossWithAffixes(RarityType.Boss, "Titan", 77777);
 			var enemy2 = CreateBossWithAffixes(RarityType.Boss, "Titan", 77777);
 
-			namingSystem.Update();
+			initGroup.Update();
 
 			var naming1 = m_Manager.GetComponentData<EnemyNaming>(enemy1);
 			var naming2 = m_Manager.GetComponentData<EnemyNaming>(enemy2);
@@ -257,7 +277,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			{
 			var query = m_Manager.CreateEntityQuery(typeof(EnemyNamingConfig));
 			var configEntities = query.ToEntityArray(Allocator.Temp);
-			
+
 			if (configEntities.Length > 0)
 				{
 				var config = m_Manager.GetComponentData<EnemyNamingConfig>(configEntities[0]);

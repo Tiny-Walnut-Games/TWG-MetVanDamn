@@ -25,13 +25,13 @@ namespace DeveloperExperience
             "legendary", "epic", "excellent", "good", "needs_work"
         };
 
-        [MenuItem("Tools/Developer Experience/XP Tracker")]
+        [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/XP Tracker")]
         public static void ShowWindow()
             {
             GetWindow<UnityXPIntegrationEditor>("XP Tracker");
             }
 
-        [MenuItem("Tools/Developer Experience/Record Debug Session")]
+        [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/Record Debug Session")]
         public static void RecordDebugSession()
             {
             string workspace = Directory.GetCurrentDirectory();
@@ -49,7 +49,7 @@ namespace DeveloperExperience
                 }
             }
 
-        [MenuItem("Tools/Developer Experience/Show My Profile")]
+        [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/Show My Profile")]
         public static void ShowProfile()
             {
             string workspace = Directory.GetCurrentDirectory();
@@ -63,7 +63,7 @@ namespace DeveloperExperience
                 }
             }
 
-        [MenuItem("Tools/Developer Experience/Show Leaderboard")]
+        [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/Show Leaderboard")]
         public static void ShowLeaderboard()
             {
             string workspace = Directory.GetCurrentDirectory();
@@ -75,7 +75,7 @@ namespace DeveloperExperience
                 }
             }
 
-        [MenuItem("Tools/Developer Experience/Daily Bonus")]
+        [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/Daily Bonus")]
         public static void DailyBonus()
             {
             string workspace = Directory.GetCurrentDirectory();

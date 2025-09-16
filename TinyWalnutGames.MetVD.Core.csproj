@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\SudoCodeSnippet.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\EnemyNamingComponents.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BiomeElevationMask.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\WorldConfigAspectSampleSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\DistrictLayoutTags.cs" />
@@ -71,8 +72,11 @@
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\WorldConfigAspect.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BuildConnectionBuffersSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\BiomeElevation.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\EnemyAffixDatabase.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Compat\LocalTransformCompat.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\NodeId.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\AffixIconDisplayUI.cs" />
+    <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\EnemyNamingSystem.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\Biome.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\ConnectionEdge.cs" />
     <Compile Include="Packages\com.tinywalnutgames.metvd.core\Runtime\GateCondition.cs" />

@@ -15,14 +15,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	/// </summary>
 	public class ProceduralLayoutPreview : EditorWindow
 		{
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/World Layout Preview")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/World Layout Preview")]
 		public static void ShowWindow()
 			{
 			GetWindow<ProceduralLayoutPreview>("Layout Preview");
 			}
 
 		private WorldConfigurationAuthoring _worldConfig;
-		private DistrictAuthoring [ ] _districts;
+		private DistrictAuthoring[] _districts;
 		private int _previewDistrictCount = 5;
 		private int2 _previewWorldSize = new(32, 32);
 		private RandomizationMode _previewMode = RandomizationMode.Partial;
@@ -114,7 +114,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log($"   Strategy: {strategy}");
 
 			// Generate positions using the same algorithm as DistrictLayoutSystem
-			var positions = new int2 [ _previewDistrictCount ];
+			var positions = new int2[_previewDistrictCount];
 
 			if (strategy == DistrictPlacementStrategy.PoissonDisc)
 				{
@@ -128,14 +128,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log("   Calculated Positions:");
 			for (int i = 0; i < positions.Length; i++)
 				{
-				Debug.Log($"     District {i + 1}: ({positions [ i ].x}, {positions [ i ].y})");
+				Debug.Log($"     District {i + 1}: ({positions[i].x}, {positions[i].y})");
 				}
 
 			// Simulate rule randomization
 			PreviewRuleRandomization(ref random);
 			}
 
-		private void GeneratePreviewPoissonDisc(int2 [ ] positions, int2 worldSize, ref Unity.Mathematics.Random random)
+		private void GeneratePreviewPoissonDisc(int2[] positions, int2 worldSize, ref Unity.Mathematics.Random random)
 			{
 			float minDistance = math.min(worldSize.x, worldSize.y) * 0.2f;
 			int maxAttempts = 30;
@@ -155,7 +155,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					validPosition = true;
 					for (int j = 0; j < i; j++)
 						{
-						float distance = math.length(new float2(candidate - positions [ j ]));
+						float distance = math.length(new float2(candidate - positions[j]));
 						if (distance < minDistance)
 							{
 							validPosition = false;
@@ -165,7 +165,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 					if (validPosition)
 						{
-						positions [ i ] = candidate;
+						positions[i] = candidate;
 						}
 
 					attempts++;
@@ -173,7 +173,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				if (!validPosition)
 					{
-					positions [ i ] = new int2(
+					positions[i] = new int2(
 						random.NextInt(0, worldSize.x),
 						random.NextInt(0, worldSize.y)
 					);
@@ -181,7 +181,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private void GeneratePreviewJitteredGrid(int2 [ ] positions, int2 worldSize, ref Unity.Mathematics.Random random)
+		private void GeneratePreviewJitteredGrid(int2[] positions, int2 worldSize, ref Unity.Mathematics.Random random)
 			{
 			int gridDim = (int)math.ceil(math.sqrt(positions.Length));
 			float2 cellSize = new float2(worldSize) / gridDim;
@@ -199,7 +199,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				);
 
 				float2 finalPosition = cellCenter + jitter;
-				positions [ i ] = new int2(
+				positions[i] = new int2(
 					math.clamp((int)finalPosition.x, 0, worldSize.x - 1),
 					math.clamp((int)finalPosition.y, 0, worldSize.y - 1)
 				);
@@ -236,7 +236,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private Polarity GenerateRandomPolarities(ref Unity.Mathematics.Random random, bool allowMore)
 			{
-			Polarity [ ] availablePolarities = new [ ]
+			Polarity[] availablePolarities = new[]
 			{
 				Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold,
 				Polarity.Earth, Polarity.Wind, Polarity.Life, Polarity.Tech
@@ -248,7 +248,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			for (int i = 0; i < count; i++)
 				{
 				int index = random.NextInt(0, availablePolarities.Length);
-				result |= availablePolarities [ index ];
+				result |= availablePolarities[index];
 				}
 
 			return result;
@@ -294,7 +294,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Create district authoring objects at calculated positions
 			for (int i = 0; i < districtPositions.Count; i++)
 				{
-				Vector3 position = districtPositions [ i ];
+				Vector3 position = districtPositions[i];
 				var districtGO = new GameObject($"District_Preview_{i:D3}");
 				districtGO.transform.SetParent(previewParent.transform);
 				districtGO.transform.position = position;
@@ -339,7 +339,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private void ClearExistingPreviewDistricts()
 			{
 			// Find and remove existing preview district objects
-			GameObject [ ] existingPreviews = GameObject.FindGameObjectsWithTag("Untagged")
+			GameObject[] existingPreviews = GameObject.FindGameObjectsWithTag("Untagged")
 				.Where(go => go.name.Contains("[PREVIEW]") || go.name.Contains("District_Preview_"))
 				.ToArray();
 

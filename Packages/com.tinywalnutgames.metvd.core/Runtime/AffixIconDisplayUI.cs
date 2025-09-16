@@ -67,7 +67,7 @@ namespace TinyWalnutGames.MetVD.Core
 			{
 			targetEntity = entity;
 			entityManager = em;
-			
+
 			CreateIconImages();
 			isInitialized = true;
 			}
@@ -124,8 +124,7 @@ namespace TinyWalnutGames.MetVD.Core
 				GameObject iconGO = iconPrefab != null ? Instantiate(iconPrefab, iconContainer) : new GameObject($"Icon_{i}");
 				iconGO.transform.SetParent(iconContainer);
 
-				var rectTransform = iconGO.GetComponent<RectTransform>();
-				if (rectTransform == null)
+				if (!iconGO.TryGetComponent<RectTransform>(out var rectTransform))
 					{
 					rectTransform = iconGO.AddComponent<RectTransform>();
 					}
@@ -134,8 +133,7 @@ namespace TinyWalnutGames.MetVD.Core
 				rectTransform.anchoredPosition = new Vector2(i * iconSpacing, 0);
 				rectTransform.sizeDelta = new Vector2(20, 20);
 
-				var image = iconGO.GetComponent<Image>();
-				if (image == null)
+				if (!iconGO.TryGetComponent<Image>(out var image))
 					{
 					image = iconGO.AddComponent<Image>();
 					}
@@ -155,12 +153,12 @@ namespace TinyWalnutGames.MetVD.Core
 
 			// Display up to maxIcons
 			int iconsToShow = Mathf.Min(affixes.Length, maxIcons);
-			
+
 			for (int i = 0; i < iconsToShow; i++)
 				{
 				var affix = affixes[i].Value;
 				var sprite = GetSpriteForAffix(affix.IconRef.ToString());
-				
+
 				if (sprite != null && i < iconImages.Length)
 					{
 					iconImages[i].sprite = sprite;

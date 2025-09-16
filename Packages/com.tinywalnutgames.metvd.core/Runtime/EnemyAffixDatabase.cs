@@ -14,11 +14,31 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public static void InitializeDatabase(EntityManager entityManager)
 			{
-			// Create config entity
-			var configEntity = entityManager.CreateEntity();
-			entityManager.AddComponentData(configEntity, new EnemyNamingConfig());
+			// If database already initialized in this world, exit
+			var dbQuery = entityManager.CreateEntityQuery(typeof(AffixDatabaseTag));
+			if (dbQuery.CalculateEntityCount() > 0)
+				{
+				return;
+				}
 
-			// Create database entity
+			// Ensure a single config exists
+			var configQuery = entityManager.CreateEntityQuery(typeof(EnemyNamingConfig));
+			if (configQuery.CalculateEntityCount() == 0)
+				{
+				var configEntity = entityManager.CreateEntity();
+				// Explicitly set sensible defaults: show names and icons, allow procedural boss names
+				entityManager.AddComponentData(
+					configEntity,
+					new EnemyNamingConfig(
+						globalDisplayMode: AffixDisplayMode.NamesAndIcons,
+						maxDisplayedAffixes: 4,
+						useProceduralBossNames: true,
+						namingSeed: 12345
+					)
+				);
+				}
+
+			// Create database tag entity
 			var databaseEntity = entityManager.CreateEntity();
 			entityManager.AddComponentData(databaseEntity, new AffixDatabaseTag());
 
@@ -35,28 +55,28 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		private static void CreateCombatAffixes(EntityManager entityManager)
 			{
-			CreateAffix(entityManager, "berserker", "Berserker", "icon_berserker.png", 
-					   TraitCategory.Combat, 5, 3, 
+			CreateAffix(entityManager, "berserker", "Berserker", "icon_berserker.png",
+					   TraitCategory.Combat, 5, 3,
 					   "Gains attack speed/damage over time in combat",
 					   new[] { "Ber", "Zerk" });
 
-			CreateAffix(entityManager, "armored", "Armored", "icon_armor.png", 
-					   TraitCategory.Combat, 5, 3, 
+			CreateAffix(entityManager, "armored", "Armored", "icon_armor.png",
+					   TraitCategory.Combat, 5, 3,
 					   "Reduces incoming damage",
 					   new[] { "Arm", "Mor" });
 
-			CreateAffix(entityManager, "regenerator", "Regenerator", "icon_regen.png", 
-					   TraitCategory.Combat, 4, 2, 
+			CreateAffix(entityManager, "regenerator", "Regenerator", "icon_regen.png",
+					   TraitCategory.Combat, 4, 2,
 					   "Recovers health over time",
 					   new[] { "Re", "Gen" });
 
-			CreateAffix(entityManager, "poisonous", "Poisonous", "icon_poison.png", 
-					   TraitCategory.Combat, 4, 2, 
+			CreateAffix(entityManager, "poisonous", "Poisonous", "icon_poison.png",
+					   TraitCategory.Combat, 4, 2,
 					   "Attacks apply poison damage over time",
 					   new[] { "Ven", "Ox" });
 
-			CreateAffix(entityManager, "explosive", "Explosive", "icon_explosive.png", 
-					   TraitCategory.Combat, 3, 2, 
+			CreateAffix(entityManager, "explosive", "Explosive", "icon_explosive.png",
+					   TraitCategory.Combat, 3, 2,
 					   "Explodes on death",
 					   new[] { "Ex", "Plos" });
 			}
@@ -66,28 +86,28 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		private static void CreateMovementAffixes(EntityManager entityManager)
 			{
-			CreateAffix(entityManager, "teleporting", "Teleporting", "icon_teleport.png", 
-					   TraitCategory.Movement, 4, 2, 
+			CreateAffix(entityManager, "teleporting", "Teleporting", "icon_teleport.png",
+					   TraitCategory.Movement, 4, 2,
 					   "Can blink short distances",
 					   new[] { "Tel", "Port" });
 
-			CreateAffix(entityManager, "sprinting", "Sprinting", "icon_sprint.png", 
-					   TraitCategory.Movement, 5, 1, 
+			CreateAffix(entityManager, "sprinting", "Sprinting", "icon_sprint.png",
+					   TraitCategory.Movement, 5, 1,
 					   "Moves faster than normal",
 					   new[] { "Spr", "Int" });
 
-			CreateAffix(entityManager, "shuffling", "Shuffling", "icon_shuffle.png", 
-					   TraitCategory.Movement, 5, 1, 
+			CreateAffix(entityManager, "shuffling", "Shuffling", "icon_shuffle.png",
+					   TraitCategory.Movement, 5, 1,
 					   "Moves slowly and erratically",
 					   new[] { "Shuf", "Ling" });
 
-			CreateAffix(entityManager, "flying", "Flying", "icon_flying.png", 
-					   TraitCategory.Movement, 3, 2, 
+			CreateAffix(entityManager, "flying", "Flying", "icon_flying.png",
+					   TraitCategory.Movement, 3, 2,
 					   "Can move over obstacles",
 					   new[] { "Aero", "Wing" });
 
-			CreateAffix(entityManager, "burrowing", "Burrowing", "icon_burrow.png", 
-					   TraitCategory.Movement, 3, 2, 
+			CreateAffix(entityManager, "burrowing", "Burrowing", "icon_burrow.png",
+					   TraitCategory.Movement, 3, 2,
 					   "Can tunnel underground",
 					   new[] { "Bur", "Row" });
 			}
@@ -97,23 +117,23 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		private static void CreateBehaviorAffixes(EntityManager entityManager)
 			{
-			CreateAffix(entityManager, "pack_hunter", "Pack Hunter", "icon_pack.png", 
-					   TraitCategory.Behavior, 4, 1, 
+			CreateAffix(entityManager, "pack_hunter", "Pack Hunter", "icon_pack.png",
+					   TraitCategory.Behavior, 4, 1,
 					   "Gains bonuses near allies",
 					   new[] { "Pack", "Hun" });
 
-			CreateAffix(entityManager, "ambusher", "Ambusher", "icon_ambush.png", 
-					   TraitCategory.Behavior, 4, 1, 
+			CreateAffix(entityManager, "ambusher", "Ambusher", "icon_ambush.png",
+					   TraitCategory.Behavior, 4, 1,
 					   "Prefers surprise attacks",
 					   new[] { "Amb", "Ush" });
 
-			CreateAffix(entityManager, "cowardly", "Cowardly", "icon_coward.png", 
-					   TraitCategory.Behavior, 3, 0, 
+			CreateAffix(entityManager, "cowardly", "Cowardly", "icon_coward.png",
+					   TraitCategory.Behavior, 3, 0,
 					   "Avoids direct combat",
 					   new[] { "Cow", "Ard" });
 
-			CreateAffix(entityManager, "patrol", "Patrol", "icon_patrol.png", 
-					   TraitCategory.Behavior, 3, 0, 
+			CreateAffix(entityManager, "patrol", "Patrol", "icon_patrol.png",
+					   TraitCategory.Behavior, 3, 0,
 					   "Moves along set routes",
 					   new[] { "Pat", "Rol" });
 			}
@@ -123,28 +143,28 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		private static void CreateBossAffixes(EntityManager entityManager)
 			{
-			CreateAffix(entityManager, "summoner", "Summoner", "icon_summon.png", 
-					   TraitCategory.Boss, 4, 3, 
+			CreateAffix(entityManager, "summoner", "Summoner", "icon_summon.png",
+					   TraitCategory.Boss, 4, 3,
 					   "Summons additional enemies",
 					   new[] { "Mon", "Zedd" });
 
-			CreateAffix(entityManager, "arena_shaper", "Arena Shaper", "icon_arena.png", 
-					   TraitCategory.Boss, 3, 2, 
+			CreateAffix(entityManager, "arena_shaper", "Arena Shaper", "icon_arena.png",
+					   TraitCategory.Boss, 3, 2,
 					   "Alters arena layout mid-fight",
 					   new[] { "Are", "Sha" });
 
-			CreateAffix(entityManager, "trap_layer", "Trap Layer", "icon_trap.png", 
-					   TraitCategory.Boss, 3, 2, 
+			CreateAffix(entityManager, "trap_layer", "Trap Layer", "icon_trap.png",
+					   TraitCategory.Boss, 3, 2,
 					   "Places traps during combat",
 					   new[] { "Trap", "Lay" });
 
-			CreateAffix(entityManager, "meteor_slam", "Meteor Slam", "icon_meteor.png", 
-					   TraitCategory.Boss, 2, 3, 
+			CreateAffix(entityManager, "meteor_slam", "Meteor Slam", "icon_meteor.png",
+					   TraitCategory.Boss, 2, 3,
 					   "Calls down meteors",
 					   new[] { "Met", "Slam" });
 
-			CreateAffix(entityManager, "gravity_shift", "Gravity Shift", "icon_gravity.png", 
-					   TraitCategory.Boss, 2, 3, 
+			CreateAffix(entityManager, "gravity_shift", "Gravity Shift", "icon_gravity.png",
+					   TraitCategory.Boss, 2, 3,
 					   "Alters gravity in arena",
 					   new[] { "Grav", "Ity" });
 			}
@@ -154,28 +174,28 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		private static void CreateUniqueAffixes(EntityManager entityManager)
 			{
-			CreateAffix(entityManager, "eternal_flame", "Eternal Flame", "icon_flame.png", 
-					   TraitCategory.Unique, 1, 3, 
+			CreateAffix(entityManager, "eternal_flame", "Eternal Flame", "icon_flame.png",
+					   TraitCategory.Unique, 1, 3,
 					   "Constant fire aura that damages nearby players",
 					   new[] { "Eter", "Flam" });
 
-			CreateAffix(entityManager, "void_touched", "Void-Touched", "icon_void.png", 
-					   TraitCategory.Unique, 1, 3, 
+			CreateAffix(entityManager, "void_touched", "Void-Touched", "icon_void.png",
+					   TraitCategory.Unique, 1, 3,
 					   "Gains powers from the void, unpredictable attacks",
 					   new[] { "Void", "Tuch" });
 
-			CreateAffix(entityManager, "frostbound", "Frostbound", "icon_frost.png", 
-					   TraitCategory.Unique, 1, 2, 
+			CreateAffix(entityManager, "frostbound", "Frostbound", "icon_frost.png",
+					   TraitCategory.Unique, 1, 2,
 					   "Freezes terrain and slows enemies",
 					   new[] { "Fros", "Boun" });
 
-			CreateAffix(entityManager, "stormcaller", "Stormcaller", "icon_storm.png", 
-					   TraitCategory.Unique, 1, 2, 
+			CreateAffix(entityManager, "stormcaller", "Stormcaller", "icon_storm.png",
+					   TraitCategory.Unique, 1, 2,
 					   "Summons lightning strikes periodically",
 					   new[] { "Stor", "Call" });
 
-			CreateAffix(entityManager, "soulrender", "Soulrender", "icon_soul.png", 
-					   TraitCategory.Unique, 1, 3, 
+			CreateAffix(entityManager, "soulrender", "Soulrender", "icon_soul.png",
+					   TraitCategory.Unique, 1, 3,
 					   "Drains life from players to heal itself",
 					   new[] { "Soul", "Ren" });
 			}
@@ -299,7 +319,7 @@ namespace TinyWalnutGames.MetVD.Core
 					RarityType.Boss => 3,
 					RarityType.FinalBoss => 4,
 					_ => 1
-				};
+					};
 			}
 		}
 	}
