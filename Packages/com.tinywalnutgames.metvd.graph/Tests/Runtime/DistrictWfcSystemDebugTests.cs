@@ -102,7 +102,7 @@ namespace TinyWalnutGames.MetVD.Tests
             {
                 for (int i = 0; i < afterBuffer.Length; i++)
                 {
-                    var candidate = afterBuffer[i];
+					WfcCandidateBufferElement candidate = afterBuffer[i];
                     Debug.Log($"[DEBUG] Candidate {i}: TileId={candidate.TileId}, Weight={candidate.Weight}");
                 }
             }
@@ -115,7 +115,7 @@ namespace TinyWalnutGames.MetVD.Tests
         public void Debug_WorldSeedCheck_ShouldFindSeedEntity()
         {
             // Check if WorldSeed entity is properly set up
-            using var query = _world.EntityManager.CreateEntityQuery(typeof(WorldSeed));
+            using EntityQuery query = _world.EntityManager.CreateEntityQuery(typeof(WorldSeed));
             int count = query.CalculateEntityCount();
             Debug.Log($"[DEBUG] WorldSeed entities found: {count}");
 
@@ -135,7 +135,7 @@ namespace TinyWalnutGames.MetVD.Tests
             Entity e = CreateDebugEntity(WfcGenerationState.Initialized, withBuffer: true);
 
             // Check if the system's query will find our entity
-            using var query = _world.EntityManager.CreateEntityQuery(typeof(WfcState), typeof(NodeId));
+            using EntityQuery query = _world.EntityManager.CreateEntityQuery(typeof(WfcState), typeof(NodeId));
             int count = query.CalculateEntityCount();
             Debug.Log($"[DEBUG] Entities matching WfcState+NodeId query: {count}");
 

@@ -20,7 +20,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         {
         public override void Bake(BiomeArtProfileLibraryAuthoring authoring)
             {
-            var entity = GetEntity(TransformUsageFlags.None);
+			Entity entity = GetEntity(TransformUsageFlags.None);
             AddComponent(entity, new BiomeArtProfileLibraryRef
                 {
                 Library = new UnityObjectRef<BiomeArtProfileLibrary> { Value = authoring.library }

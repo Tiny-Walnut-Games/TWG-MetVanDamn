@@ -1,4 +1,4 @@
-﻿// Assets/Editor/TwoDimensionalGridSettup.cs
+// Assets/Editor/TwoDimensionalGridSettup.cs
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -89,7 +89,7 @@ namespace TinyWalnutGames.GridLayerEditor
         /// </summary>
         private static string[] GetCustomOrDefaultLayers(string[] topDownDefaultLayers)
         {
-            var config = AssetDatabase.LoadAssetAtPath<GridLayerConfig>("Assets/GridLayerConfig.asset");
+			GridLayerConfig config = AssetDatabase.LoadAssetAtPath<GridLayerConfig>("Assets/GridLayerConfig.asset");
             string[] platformerDefaultLayers = Enum.GetNames(typeof(SideScrollingLayers));
 
             if (config != null && config.layerNames != null && config.layerNames.Length > 0)
@@ -113,7 +113,7 @@ namespace TinyWalnutGames.GridLayerEditor
         {
             var gridGO = new GameObject("Top-Down Grid", typeof(Grid));
             gridGO.transform.position = Vector3.zero;
-            var layers = GetCustomOrDefaultLayers(Enum.GetNames(typeof(TopDownLayers)));
+			string [ ] layers = GetCustomOrDefaultLayers(Enum.GetNames(typeof(TopDownLayers)));
             int layerCount = layers.Length;
             for (int i = 0; i < layerCount; i++)
             {
@@ -171,9 +171,9 @@ namespace TinyWalnutGames.GridLayerEditor
         {
             var gridGO = new GameObject("Isometric Top-Down Grid", typeof(Grid));
             gridGO.transform.position = Vector3.zero;
-            var grid = gridGO.GetComponent<Grid>();
+			Grid grid = gridGO.GetComponent<Grid>();
             grid.cellLayout = GridLayout.CellLayout.Isometric;
-            var layers = GetCustomOrDefaultLayers(IsometricTopDownLayers);
+			string [ ] layers = GetCustomOrDefaultLayers(IsometricTopDownLayers);
             int layerCount = layers.Length;
             for (int i = 0; i < layerCount; i++)
             {
@@ -199,9 +199,9 @@ namespace TinyWalnutGames.GridLayerEditor
         {
             var gridGO = new GameObject("Hexagonal Top-Down Grid", typeof(Grid));
             gridGO.transform.position = Vector3.zero;
-            var grid = gridGO.GetComponent<Grid>();
+			Grid grid = gridGO.GetComponent<Grid>();
             grid.cellLayout = GridLayout.CellLayout.Hexagon;
-            var layers = GetCustomOrDefaultLayers(HexTopDownLayers);
+			string [ ] layers = GetCustomOrDefaultLayers(HexTopDownLayers);
             int layerCount = layers.Length;
             for (int i = 0; i < layerCount; i++)
             {
@@ -261,8 +261,8 @@ namespace TinyWalnutGames.GridLayerEditor
             else
                 Debug.LogWarning($"Layer '{layerName}' not found. GameObject will use default layer.");
 
-            // Try to set sorting layer by name; warn if not found
-            var renderer = tmGO.GetComponent<TilemapRenderer>();
+			// Try to set sorting layer by name; warn if not found
+			TilemapRenderer renderer = tmGO.GetComponent<TilemapRenderer>();
             renderer.sortingLayerName = layerName;
             if (renderer.sortingLayerName != layerName)
                 Debug.LogWarning($"Sorting Layer '{layerName}' not found. Renderer will use default sorting layer.");

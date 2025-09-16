@@ -75,7 +75,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			if (_worldSeedQuery.IsEmptyIgnoreFilter == false)
 				{
 				Entity seedEntity = _worldSeedQuery.GetSingletonEntity();
-				var ws = state.EntityManager.GetComponentData<WorldSeed>(seedEntity);
+				WorldSeed ws = state.EntityManager.GetComponentData<WorldSeed>(seedEntity);
 				baseSeed = ws.Value;
 				}
 			else
@@ -130,8 +130,8 @@ namespace TinyWalnutGames.MetVD.Graph
 				}
 
 			// use cached lookups
-			var wfcStates = wfcStatesLookup;
-			var nodeIds = nodeIdsLookup;
+			ComponentLookup<WfcState> wfcStates = wfcStatesLookup;
+			ComponentLookup<NodeId> nodeIds = nodeIdsLookup;
 
 			// � PRODUCTION: Restore job execution for performance
 			var wfcJob = new WfcProcessingJob
@@ -227,7 +227,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				if (DebugWfc)
 					{
-					var cands = CandidateBufferLookup[entity];
+					DynamicBuffer<WfcCandidateBufferElement> cands = CandidateBufferLookup[entity];
 					// Manual string construction to avoid LINQ/Join issues in test runners
 					System.Text.StringBuilder sb = new System.Text.StringBuilder();
 					for (int i = 0; i < cands.Length; i++)
@@ -325,7 +325,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					// Add candidates from actual tile prototypes
 					for (int i = 0; i < TilePrototypes.Length; i++)
 						{
-						var prototype = TilePrototypes[i];
+						WfcTilePrototype prototype = TilePrototypes[i];
 
 						// Calculate weight based on tile properties and position
 						float baseWeight = prototype.Weight;
@@ -370,7 +370,7 @@ namespace TinyWalnutGames.MetVD.Graph
 					uint tileId = candidates[t].TileId;
 					uint tileSeed = MakeEntitySeed(BaseSeed ^ (tileId * 59789u), nodeId, (int)nodeId._value, (uint)tileId);
 					float tileBias = ((tileSeed & 0x00FFFFFFu) / 16777216.0f) - 0.5f; // [-0.5,0.5)
-					var c = candidates[t];
+					WfcCandidateBufferElement c = candidates[t];
 					float factor = 1.0f + tileBias * 0.6f;
 					c.Weight = math.max(0.01f, c.Weight * factor);
 					candidates[t] = c;

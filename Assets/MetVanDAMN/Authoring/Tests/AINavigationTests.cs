@@ -385,7 +385,7 @@ namespace TinyWalnutGames.MetVD.Tests
 			// Method 1: Our working approach (manual test code style)
 			Entity foundEntity1_Manual = Entity.Null;
 			EntityQuery manualQuery = this._entityManager.CreateEntityQuery(ComponentType.ReadOnly<NodeId>());
-			var manualEntities = manualQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+			NativeArray<Entity> manualEntities = manualQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			foreach (Entity entity in manualEntities)
 				{

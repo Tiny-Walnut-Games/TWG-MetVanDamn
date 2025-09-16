@@ -13,17 +13,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		static MetVDGizmoDrawer()
 			{
 			// Auto-load settings (first asset found)
-			string[] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
+			string [ ] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
 			if (guids.Length > 0)
 				{
-				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
+				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids [ 0 ]));
 				}
 			// SceneView.duringSceneGui += OnSceneGUI;
 			}
 
 		public static void SnapAllDistrictsToGrid()
 			{
-			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			Undo.RecordObjects(districts, "Snap Districts To Grid");
 			foreach (DistrictAuthoring d in districts)
 				{
@@ -99,7 +99,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// 🔧 FIX: Calculate rectangle corners safely
 			Vector3 halfX = new Vector3(size.x * 0.5f, 0, 0);
 			Vector3 halfZ = new Vector3(0, 0, size.y * 0.5f);
-			Vector3[] corners = {
+			Vector3 [ ] corners = {
 				pos - halfX - halfZ,
 				pos - halfX + halfZ,
 				pos + halfX + halfZ,
@@ -107,7 +107,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			};
 
 			// 🔧 FIX: Validate all corners before drawing
-			foreach (var corner in corners)
+			foreach (Vector3 corner in corners)
 				{
 				if (corner.magnitude > 10000f || float.IsNaN(corner.x) || float.IsNaN(corner.y) || float.IsNaN(corner.z))
 					{

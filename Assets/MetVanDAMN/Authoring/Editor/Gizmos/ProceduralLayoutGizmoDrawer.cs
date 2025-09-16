@@ -37,17 +37,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private static void LoadSettings()
 			{
-			string[] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
+			string [ ] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
 			if (guids.Length > 0)
 				{
-				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
+				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids [ 0 ]));
 				}
 			}
 
 		private static void OnSceneGUI(SceneView _) // underscore to indicate unused parameter
 			{
 			// Only show debug panel if there are MetVanDAMN components in the scene
-			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			WorldConfigurationAuthoring worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
 
 			if (districts.Length == 0 && worldConfig == null)
@@ -100,7 +100,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private static void DrawProceduralLayoutGizmos()
 			{
-			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			WorldConfigurationAuthoring worldConfig = Object.FindFirstObjectByType<WorldConfigurationAuthoring>();
 			if (_showRandomizationMode && worldConfig != null)
 				{
@@ -180,18 +180,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private static void DrawDistrictBounds(Vector3 position, Vector3 size, Color biomeColor)
 			{
-			var corners = new Vector3[4];
-			corners[0] = position + new Vector3(-size.x / 2, 0, -size.z / 2);
-			corners[1] = position + new Vector3(size.x / 2, 0, -size.z / 2);
-			corners[2] = position + new Vector3(size.x / 2, 0, size.z / 2);
-			corners[3] = position + new Vector3(-size.x / 2, 0, size.z / 2);
+			var corners = new Vector3 [ 4 ];
+			corners [ 0 ] = position + new Vector3(-size.x / 2, 0, -size.z / 2);
+			corners [ 1 ] = position + new Vector3(size.x / 2, 0, -size.z / 2);
+			corners [ 2 ] = position + new Vector3(size.x / 2, 0, size.z / 2);
+			corners [ 3 ] = position + new Vector3(-size.x / 2, 0, size.z / 2);
 			Handles.color = new Color(biomeColor.r, biomeColor.g, biomeColor.b, 0.2f);
 			Handles.DrawAAConvexPolygon(corners);
 			Handles.color = biomeColor;
-			Handles.DrawLine(corners[0], corners[1]);
-			Handles.DrawLine(corners[1], corners[2]);
-			Handles.DrawLine(corners[2], corners[3]);
-			Handles.DrawLine(corners[3], corners[0]);
+			Handles.DrawLine(corners [ 0 ], corners [ 1 ]);
+			Handles.DrawLine(corners [ 1 ], corners [ 2 ]);
+			Handles.DrawLine(corners [ 2 ], corners [ 3 ]);
+			Handles.DrawLine(corners [ 3 ], corners [ 0 ]);
 			}
 
 		private static void DrawBiomeRadiusGizmo(Vector3 position, DistrictAuthoring _)
@@ -203,7 +203,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private static void DrawConnectionGizmos()
 			{
-			ConnectionAuthoring[] connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
+			ConnectionAuthoring [ ] connections = Object.FindObjectsByType<ConnectionAuthoring>(FindObjectsSortMode.None);
 			foreach (ConnectionAuthoring connection in connections)
 				{
 				if (connection.from != null && connection.to != null)
@@ -252,7 +252,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					Vector3 p = new(c.x, 0f, c.y);
 					float size = (_settings != null ? _settings.gridCellSize : 1f) * 0.6f;
 					Vector3 half = new(size * 0.5f, 0, size * 0.5f);
-					Vector3[] quad = { p - half, p + new Vector3(half.x, 0, -half.z), p + half, p + new Vector3(-half.x, 0, half.z) };
+					Vector3 [ ] quad = { p - half, p + new Vector3(half.x, 0, -half.z), p + half, p + new Vector3(-half.x, 0, half.z) };
 					Handles.DrawAAConvexPolygon(quad);
 					}
 				}
@@ -296,7 +296,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				_roomCoords.Clear();
 				for (int i = 0; i < nodeIds.Length; i++)
 					{
-					NodeId n = nodeIds[i];
+					NodeId n = nodeIds [ i ];
 					if (n.Level == 1)
 						{
 						_sectorCoords.Add(n.Coordinates);
@@ -390,7 +390,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				Debug.LogWarning("Procedural Layout Preview: WorldConfigurationAuthoring not found in scene.");
 				return;
 				}
-			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			if (districts.Length == 0)
 				{
 				Debug.LogWarning("Procedural Layout Preview: No DistrictAuthoring components found.");
@@ -413,18 +413,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			int targetCount = worldConfig.targetSectors > 0 ? math.min(worldConfig.targetSectors, unplaced.Count) : unplaced.Count;
 			var random = new Unity.Mathematics.Random((uint)(worldConfig.seed == 0 ? 1 : worldConfig.seed));
 			DistrictPlacementStrategy strategy = targetCount > 16 ? DistrictPlacementStrategy.JitteredGrid : DistrictPlacementStrategy.PoissonDisc;
-			var positions = new int2[targetCount];
+			var positions = new int2 [ targetCount ];
 			GeneratePositionsPreview(positions, worldConfig.worldSize, strategy, ref random);
 			for (int i = 0; i < targetCount; i++)
 				{
-				unplaced[i].gridCoordinates = positions[i];
-				EditorUtility.SetDirty(unplaced[i]);
+				unplaced [ i ].gridCoordinates = positions [ i ];
+				EditorUtility.SetDirty(unplaced [ i ]);
 				}
 			Debug.Log($"Procedural Layout Preview: Placed {targetCount} districts using {strategy} strategy.");
 			SceneView.RepaintAll();
 			}
 
-		private static void GeneratePositionsPreview(int2[] positions, int2 worldSize, DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
+		private static void GeneratePositionsPreview(int2 [ ] positions, int2 worldSize, DistrictPlacementStrategy strategy, ref Unity.Mathematics.Random random)
 			{
 			if (strategy == DistrictPlacementStrategy.PoissonDisc)
 				{
@@ -439,19 +439,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						valid = true;
 						for (int j = 0; j < i; j++)
 							{
-							float dist = math.length(new float2(candidate - positions[j]));
+							float dist = math.length(new float2(candidate - positions [ j ]));
 							if (dist < minDistance) { valid = false; break; }
 							}
 						if (valid)
 							{
-							positions[i] = candidate;
+							positions [ i ] = candidate;
 							}
 
 						attempts++;
 						}
 					if (!valid)
 						{
-						positions[i] = new(random.NextInt(0, worldSize.x), random.NextInt(0, worldSize.y));
+						positions [ i ] = new(random.NextInt(0, worldSize.x), random.NextInt(0, worldSize.y));
 						}
 					}
 				}
@@ -466,7 +466,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					float2 cellCenter = new float2(gridX + 0.5f, gridY + 0.5f) * cellSize;
 					float2 jitter = new(random.NextFloat(-jitterAmount, jitterAmount), random.NextFloat(-jitterAmount, jitterAmount));
 					float2 finalPos = cellCenter + jitter;
-					positions[i] = new(math.clamp((int)finalPos.x, 0, worldSize.x - 1), math.clamp((int)finalPos.y, 0, worldSize.y - 1));
+					positions [ i ] = new(math.clamp((int)finalPos.x, 0, worldSize.x - 1), math.clamp((int)finalPos.y, 0, worldSize.y - 1));
 					}
 				}
 			}
@@ -479,7 +479,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return;
 				}
 
-			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			if (districts.Length == 0)
 				{
 				return;

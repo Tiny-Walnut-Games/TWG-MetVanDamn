@@ -44,14 +44,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             public override void Bake(EcsPrefabRegistryAuthoring authoring)
                 {
-                var entity = GetEntity(TransformUsageFlags.None);
+				Entity entity = GetEntity(TransformUsageFlags.None);
                 AddComponent<EcsPrefabRegistry>(entity);
-                var buffer = AddBuffer<EcsPrefabEntry>(entity);
+				DynamicBuffer<EcsPrefabEntry> buffer = AddBuffer<EcsPrefabEntry>(entity);
                 if (authoring.Entries == null) return;
-                foreach (var e in authoring.Entries)
+                foreach (Entry e in authoring.Entries)
                     {
                     if (string.IsNullOrWhiteSpace(e.Key) || e.Prefab == null) continue;
-                    var prefabEntity = GetEntity(e.Prefab, TransformUsageFlags.None);
+					Entity prefabEntity = GetEntity(e.Prefab, TransformUsageFlags.None);
                     buffer.Add(new EcsPrefabEntry
                         {
                         Key = new Unity.Collections.FixedString64Bytes(e.Key),

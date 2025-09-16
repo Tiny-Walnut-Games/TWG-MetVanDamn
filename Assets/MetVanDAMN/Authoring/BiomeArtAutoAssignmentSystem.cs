@@ -12,7 +12,6 @@ namespace TinyWalnutGames.MetVD.Authoring
     /// Automatically assigns a BiomeArtProfile from the central library to biome entities
     /// that have no profile yet. Deterministically seeds by NodeId/biome type/world seed.
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial struct BiomeArtAutoAssignmentSystem : ISystem
         {
@@ -34,17 +33,16 @@ namespace TinyWalnutGames.MetVD.Authoring
                 .Build(ref state);
             }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
             {
             if (_libraryQ.IsEmptyIgnoreFilter) return;
             if (_targetsQ.IsEmptyIgnoreFilter) return;
-            var config = _configQ.IsEmptyIgnoreFilter ? default : _configQ.GetSingleton<WorldConfiguration>();
+            WorldConfiguration config = _configQ.IsEmptyIgnoreFilter ? default : _configQ.GetSingleton<WorldConfiguration>();
 
-            var libEntity = _libraryQ.GetSingletonEntity();
-            var libRef = state.EntityManager.GetComponentData<BiomeArtProfileLibraryRef>(libEntity);
+            Entity libEntity = _libraryQ.GetSingletonEntity();
+            BiomeArtProfileLibraryRef libRef = state.EntityManager.GetComponentData<BiomeArtProfileLibraryRef>(libEntity);
             if (!libRef.Library.IsValid()) return;
-            var lib = libRef.Library.Value;
+            BiomeArtProfileLibrary lib = libRef.Library.Value;
             if (lib == null) return;
 
             NativeArray<Entity> ents = _targetsQ.ToEntityArray(Allocator.Temp);
@@ -56,15 +54,15 @@ namespace TinyWalnutGames.MetVD.Authoring
                 {
                 for (int i = 0; i < ents.Length; i++)
                     {
-                    var r = refs[i];
+                    BiomeArtProfileReference r = refs[i];
                     if (r.ProfileRef.IsValid())
                         continue; // already has a profile
 
-                    var biome = biomes[i];
-                    var node = nodeIds[i];
+                    CoreBiome biome = biomes[i];
+                    NodeId node = nodeIds[i];
                     uint seed = (uint)math.max(1, config.Seed ^ (uint)biome.Type * 2654435761u ^ (uint)node.Value * 374761393u);
                     var rng = new Random(seed);
-                    var elevation = state.EntityManager.HasComponent<BiomeElevationMask>(ents[i])
+                    BiomeElevation elevation = state.EntityManager.HasComponent<BiomeElevationMask>(ents[i])
                         ? state.EntityManager.GetComponentData<BiomeElevationMask>(ents[i]).Value
                         : BiomeElevation.Any;
                     // If elevation is specified, fold into the seed to vary selection across layers deterministically
@@ -94,7 +92,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         private static BiomeArtProfile SelectProfileForTypeAndElevation(BiomeArtProfileLibrary lib, BiomeType type, BiomeElevation elevation, ref Random rng)
             {
             // Ask library for best matching profiles: type+elevation -> type -> global
-            var pool = lib.GetProfiles(type, elevation);
+            BiomeArtProfile[] pool = lib.GetProfiles(type, elevation);
             if (pool != null && pool.Length > 0)
                 {
                 int idx = rng.NextInt(0, pool.Length);

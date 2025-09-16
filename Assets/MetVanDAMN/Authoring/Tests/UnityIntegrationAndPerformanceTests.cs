@@ -123,7 +123,16 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 
 			// Assert - Verify colliders are properly generated
 			Assert.IsNotNull(tilemapCollider, "TilemapCollider2D should be created");
-			Assert.AreEqual(4, tilemap.GetUsedTilesCount(), "All 4 tiles should be placed");
+			// Unity's Tilemap.GetUsedTilesCount returns the number of UNIQUE tile assets used, not the number of cells
+			// Since we used the same Tile instance in all positions, this should be 1
+			Assert.AreEqual(1, tilemap.GetUsedTilesCount(), "Unique tile assets used should be 1");
+			// Verify that all 4 specific cells were actually populated
+			int placedCount = 0;
+			foreach (Vector3Int pos in positions)
+				{
+				if (tilemap.HasTile(pos)) placedCount++;
+				}
+			Assert.AreEqual(4, placedCount, "All 4 tiles should be placed");
 
 			// Verify bounds are reasonable
 			BoundsInt bounds = tilemap.cellBounds;

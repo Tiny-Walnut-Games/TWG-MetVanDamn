@@ -23,7 +23,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             public override void Bake(WorldAuthoring authoring)
                 {
-                var e = GetEntity(TransformUsageFlags.None);
+				Entity e = GetEntity(TransformUsageFlags.None);
                 AddComponent(e, new WorldSeedData { Value = authoring.worldSeed });
                 var center = (float3)authoring.transform.position;
                 var extents = (float3)(authoring.worldSize * 0.5f);

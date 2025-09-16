@@ -11,7 +11,6 @@ using TransformT = TinyWalnutGames.MetVD.Core.Compat.LocalTransformCompat;
 
 namespace TinyWalnutGames.MetVD.Core
     {
-    [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct SudoActionEcsConsumerSystem : ISystem
         {
@@ -27,20 +26,27 @@ namespace TinyWalnutGames.MetVD.Core
 
             // Auto-register into Simulation group for manually created worlds used in tests (Editor only)
 #if UNITY_EDITOR
-            var simGroup = state.World.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            SimulationSystemGroup simGroup = state.World.GetOrCreateSystemManaged<SimulationSystemGroup>();
             simGroup.AddSystemToUpdateList(state.SystemHandle);
 #endif
             }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
             {
             var ecb = new EntityCommandBuffer(Allocator.Temp);
             Entity registryEntity = _registry.GetSingletonEntity();
             DynamicBuffer<EcsPrefabEntry> entries = state.EntityManager.GetBuffer<EcsPrefabEntry>(registryEntity);
 
-            foreach ((RefRO<SudoActionRequest> reqRO, Entity reqEntity) in SystemAPI.Query<RefRO<SudoActionRequest>>().WithEntityAccess())
+            // Use more compatible query approach for Unity Entities 1.3.14
+            NativeArray<Entity> requestEntities = _requests.ToEntityArray(Allocator.Temp);
+            NativeArray<SudoActionRequest> requestComponents = _requests.ToComponentDataArray<SudoActionRequest>(Allocator.Temp);
+
+            for (int i = 0; i < requestEntities.Length; i++)
                 {
-                SudoActionRequest req = reqRO.ValueRO;
+                Entity reqEntity = requestEntities[i];
+                SudoActionRequest req = requestComponents[i];
+
                 if (TryLookupPrefab(entries, req.ActionKey, out Entity prefab))
                     {
                     Entity spawned = ecb.Instantiate(prefab);
@@ -59,6 +65,8 @@ namespace TinyWalnutGames.MetVD.Core
                 ecb.DestroyEntity(reqEntity);
                 }
 
+            requestEntities.Dispose();
+            requestComponents.Dispose();
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
             }

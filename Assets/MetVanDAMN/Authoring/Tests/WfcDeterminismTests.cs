@@ -205,8 +205,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			pairs.Capacity = entities.Length;
 			for (int i = 0; i < entities.Length; i++)
 				{
-				var n = this._entityManager.GetComponentData<NodeId>(entities[i]);
-				var s = this._entityManager.GetComponentData<WfcState>(entities[i]);
+				NodeId n = this._entityManager.GetComponentData<NodeId>(entities[i]);
+				WfcState s = this._entityManager.GetComponentData<WfcState>(entities[i]);
 				pairs.Add((n._value, s));
 				}
 

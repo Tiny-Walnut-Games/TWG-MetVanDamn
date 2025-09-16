@@ -66,7 +66,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Create test district entities
             for (int i = 0; i < 3; i++)
                 {
-                var districtEntity = this._entityManager.CreateEntity();
+				Entity districtEntity = this._entityManager.CreateEntity();
                 this._entityManager.AddComponentData(districtEntity, new NodeId((uint)i, 0, 0, new int2(i - 1, 0)));
                 this._entityManager.AddComponentData(districtEntity, new WfcState(WfcGenerationState.Initialized));
                 this._entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);

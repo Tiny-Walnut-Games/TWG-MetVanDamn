@@ -21,7 +21,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             public override void Bake(SudoCodeSnippetAuthoring authoring)
                 {
-                var e = GetEntity(TransformUsageFlags.None);
+				Entity e = GetEntity(TransformUsageFlags.None);
                 var snippet = new SudoCodeSnippet
                     {
                     RunOnce = authoring.RunOnce,

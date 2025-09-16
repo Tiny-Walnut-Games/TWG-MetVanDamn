@@ -116,12 +116,12 @@ namespace TinyWalnutGames.GridLayerEditor
         public void ToggleLayer(string layerName, bool enabled)
         {
             if (_config == null) return;
-            var names = _config.layerNames ?? new string[0];
+			string [ ] names = _config.layerNames ?? new string[0];
             if (enabled)
             {
                 if (!System.Array.Exists(names, l => l == layerName))
                 {
-                    var newNames = new string[names.Length + 1];
+					string [ ] newNames = new string[names.Length + 1];
                     names.CopyTo(newNames, 0);
                     newNames[names.Length] = layerName;
                     _config.layerNames = newNames;
@@ -148,7 +148,7 @@ namespace TinyWalnutGames.GridLayerEditor
         [MenuItem("Tiny Walnut Games/Edit Grid Layers")]
         public static void ShowWindow()
         {
-            var window = GetWindow<GridLayerEditorWindow>("Edit Grid Layers");
+			GridLayerEditorWindow window = GetWindow<GridLayerEditorWindow>("Edit Grid Layers");
             window.minSize = new Vector2(600, 400); // Set minimum size for column layout
         }
 

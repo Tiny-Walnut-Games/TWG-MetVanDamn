@@ -11,13 +11,16 @@ namespace TinyWalnutGames.MetVD.Core
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial struct SudoCodeSnippetExecutorSystem : ISystem
         {
+        private EntityQuery _snippetsQuery;
+
         public void OnCreate(ref SystemState state)
             {
+            _snippetsQuery = state.GetEntityQuery(ComponentType.ReadWrite<SudoCodeSnippet>());
             state.RequireForUpdate<SudoCodeSnippet>();
 
-            // Auto-register into Initialization group for manually created worlds used in tests (Editor only)
+			// Auto-register into Initialization group for manually created worlds used in tests (Editor only)
 #if UNITY_EDITOR
-            var initGroup = state.World.GetOrCreateSystemManaged<InitializationSystemGroup>();
+			InitializationSystemGroup initGroup = state.World.GetOrCreateSystemManaged<InitializationSystemGroup>();
             initGroup.AddSystemToUpdateList(state.SystemHandle);
 #endif
             }
@@ -25,9 +28,16 @@ namespace TinyWalnutGames.MetVD.Core
         public void OnUpdate(ref SystemState state)
             {
             var ecb = new EntityCommandBuffer(Allocator.Temp);
-            foreach ((RefRW<SudoCodeSnippet> snippetRW, Entity e) in SystemAPI.Query<RefRW<SudoCodeSnippet>>().WithEntityAccess())
+
+			// Use more compatible query approach for Unity Entities 1.3.14
+			NativeArray<Entity> snippetEntities = _snippetsQuery.ToEntityArray(Allocator.Temp);
+			NativeArray<SudoCodeSnippet> snippetComponents = _snippetsQuery.ToComponentDataArray<SudoCodeSnippet>(Allocator.Temp);
+
+            for (int i = 0; i < snippetEntities.Length; i++)
                 {
-                ref SudoCodeSnippet snippet = ref snippetRW.ValueRW;
+				Entity entity = snippetEntities[i];
+				SudoCodeSnippet snippet = snippetComponents[i];
+                
                 if (snippet.RunOnce && snippet.HasExecuted) continue;
 
                 Execute(ref state, ref ecb, ref snippet);
@@ -35,8 +45,12 @@ namespace TinyWalnutGames.MetVD.Core
                 if (snippet.RunOnce)
                     {
                     snippet.HasExecuted = true;
+                    state.EntityManager.SetComponentData(entity, snippet);
                     }
                 }
+
+            snippetEntities.Dispose();
+            snippetComponents.Dispose();
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
             }
@@ -83,15 +97,17 @@ namespace TinyWalnutGames.MetVD.Core
                                     {
                                     ActionKey = new FixedString64Bytes(key),
                                     ResolvedPosition = pos,
-                                    ElevationMask = BiomeElevation.Surface,
                                     HasTypeConstraint = 0,
-                                    TypeConstraint = default
+                                    TypeConstraint = default,
+                                    ElevationMask = default,
+                                    Seed = 0,
+                                    SourceHint = Entity.Null
                                     });
                                 }
                             break;
                             }
                     default:
-                        Debug.LogWarning($"[SudoCode] Unknown command: {cmd}");
+                        // Ignore unknown commands
                         break;
                     }
                 }

@@ -10,7 +10,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             public override void Bake(BossAuthoring authoring)
                 {
-                var entity = GetEntity(TransformUsageFlags.None);
+				Entity entity = GetEntity(TransformUsageFlags.None);
                 AddComponent<BossTag>(entity);
                 }
             }

@@ -16,10 +16,10 @@ namespace TinyWalnutGames.MetVD.Core
 
         public void OnUpdate(ref SystemState state)
             {
-            var em = state.EntityManager;
+			EntityManager em = state.EntityManager;
 
             // Try to get existing shared configuration
-            bool hasCfg = SystemAPI.TryGetSingletonEntity<Shared.WorldConfiguration>(out var cfgEntity);
+            bool hasCfg = SystemAPI.TryGetSingletonEntity<Shared.WorldConfiguration>(out Entity cfgEntity);
             Shared.WorldConfiguration cfg = default;
             if (hasCfg)
                 {
@@ -29,18 +29,18 @@ namespace TinyWalnutGames.MetVD.Core
             bool updated = false;
 
             // Derive from legacy Shared components when present
-            if (SystemAPI.TryGetSingleton<Shared.WorldGenerationConfig>(out var gen))
+            if (SystemAPI.TryGetSingleton<Shared.WorldGenerationConfig>(out Shared.WorldGenerationConfig gen))
                 {
                 cfg.TargetSectors = gen.TargetSectorCount;
                 cfg.Seed = unchecked((int)gen.WorldSeed);
                 updated = true;
                 }
-            if (SystemAPI.TryGetSingleton<Shared.WorldSeed>(out var seed))
+            if (SystemAPI.TryGetSingleton<Shared.WorldSeed>(out Shared.WorldSeed seed))
                 {
                 cfg.Seed = unchecked((int)seed.Value);
                 updated = true;
                 }
-            if (SystemAPI.TryGetSingleton<Shared.WorldBounds>(out var bounds))
+            if (SystemAPI.TryGetSingleton<Shared.WorldBounds>(out Shared.WorldBounds bounds))
                 {
                 int2 size = bounds.Max - bounds.Min + new int2(1, 1); // assume inclusive bounds
                 cfg.WorldSize = math.max(new int2(1, 1), size);
@@ -48,18 +48,18 @@ namespace TinyWalnutGames.MetVD.Core
                 }
 
             // Derive from new Data components when present
-            if (SystemAPI.TryGetSingleton<WorldGenerationConfigData>(out var genData))
+            if (SystemAPI.TryGetSingleton<WorldGenerationConfigData>(out WorldGenerationConfigData genData))
                 {
                 if (genData.TargetSectorCount > 0)
                     cfg.TargetSectors = genData.TargetSectorCount;
                 updated = true;
                 }
-            if (SystemAPI.TryGetSingleton<WorldSeedData>(out var seedData))
+            if (SystemAPI.TryGetSingleton<WorldSeedData>(out WorldSeedData seedData))
                 {
                 cfg.Seed = unchecked((int)seedData.Value);
                 updated = true;
                 }
-            if (SystemAPI.TryGetSingleton<WorldBoundsData>(out var boundsData))
+            if (SystemAPI.TryGetSingleton<WorldBoundsData>(out WorldBoundsData boundsData))
                 {
                 int w = math.max(1, (int)math.round(boundsData.Extents.x * 2f));
                 int h = math.max(1, (int)math.round(boundsData.Extents.y * 2f));
@@ -79,7 +79,7 @@ namespace TinyWalnutGames.MetVD.Core
 
             if (!hasCfg)
                 {
-                var e = em.CreateEntity();
+				Entity e = em.CreateEntity();
                 em.AddComponentData(e, cfg);
                 }
             else if (updated)

@@ -31,7 +31,7 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
             {
             if (_configQ.IsEmptyIgnoreFilter) return;
-            var config = _configQ.GetSingleton<WorldConfiguration>();
+			WorldConfiguration config = _configQ.GetSingleton<WorldConfiguration>();
             if (config.Flow != GenerationFlow.ShapeFirstOrganic || _done)
                 return;
 
@@ -49,8 +49,8 @@ namespace TinyWalnutGames.MetVD.Graph
                 shapeEntity = _shapeQ.GetSingletonEntity();
                 }
 
-            var shape = state.EntityManager.GetComponentData<WorldShapeConfig>(shapeEntity);
-            var buffer = state.EntityManager.GetBuffer<ShapeCell>(shapeEntity);
+			WorldShapeConfig shape = state.EntityManager.GetComponentData<WorldShapeConfig>(shapeEntity);
+			DynamicBuffer<ShapeCell> buffer = state.EntityManager.GetBuffer<ShapeCell>(shapeEntity);
             buffer.Clear();
 
             var rng = new Random((uint)math.max(1, config.Seed * 1103515245 + 12345));

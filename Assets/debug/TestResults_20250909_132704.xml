@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<test-run id="2" testcasecount="0" result="Passed" total="0" passed="0" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2025-09-09 17:29:27Z" end-time="2025-09-09 17:29:27Z" duration="0.0074654">
-  <test-suite type="TestSuite" id="1098" name="TWG-MetVanDamn" fullname="TWG-MetVanDamn" runstate="Runnable" testcasecount="72" result="Passed" start-time="2025-09-09 17:29:27Z" end-time="2025-09-09 17:29:27Z" duration="0.007465" total="0" passed="0" failed="0" inconclusive="0" skipped="0" asserts="0">
-    <properties>
-      <property name="platform" value="PlayMode" />
-    </properties>
-  </test-suite>
-</test-run>

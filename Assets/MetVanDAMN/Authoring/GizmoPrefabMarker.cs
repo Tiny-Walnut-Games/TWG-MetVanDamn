@@ -19,9 +19,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private void OnDrawGizmos()
             {
-            var prev = Gizmos.color;
+			Color prev = Gizmos.color;
             Gizmos.color = Color;
-            var pos = transform.position;
+			Vector3 pos = transform.position;
 
             switch (Shape)
                 {

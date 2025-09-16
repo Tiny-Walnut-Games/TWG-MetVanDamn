@@ -20,7 +20,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	public static class MetVanDAMNSceneBootstrap
 		{
 		private const string RootSceneName = "MetVanDAMN_Baseline";
-		private static readonly string[] SubSceneNames = { "WorldGen_Terrain", "WorldGen_Dungeon", "NPC_Interactions", "UI_HUD" };
+		private static readonly string [ ] SubSceneNames = { "WorldGen_Terrain", "WorldGen_Dungeon", "NPC_Interactions", "UI_HUD" };
 		private const string ScenesRootFolder = "Assets/Scenes";
 		private const string SubScenesFolder = "Assets/Scenes/SubScenes";
 		private static bool _fallbackTriggeredThisRun = false; // track if fallback unloaded baseline
@@ -686,14 +686,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return;
 				}
 
-			string[] segments = path.Split('/');
-			string current = segments[0];
+			string [ ] segments = path.Split('/');
+			string current = segments [ 0 ];
 			for (int i = 1; i < segments.Length; i++)
 				{
-				string next = current + "/" + segments[i];
+				string next = current + "/" + segments [ i ];
 				if (!AssetDatabase.IsValidFolder(next))
 					{
-					AssetDatabase.CreateFolder(current, segments[i]);
+					AssetDatabase.CreateFolder(current, segments [ i ]);
 					}
 				current = next;
 				}
@@ -1056,7 +1056,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// Find all SubScene components in the current scene
 #if METVD_FULL_DOTS // #8
-			SubScene[] allSubScenes = UnityEngine.Object.FindObjectsByType<Unity.Scenes.SubScene>(FindObjectsSortMode.None);
+			SubScene [ ] allSubScenes = UnityEngine.Object.FindObjectsByType<Unity.Scenes.SubScene>(FindObjectsSortMode.None);
 
 			foreach (SubScene subScene in allSubScenes)
 				{
@@ -1071,7 +1071,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					}
 
 				// Try to find matching scene file based on GameObject name
-				string[] potentialPaths = new string[]
+				string [ ] potentialPaths = new string [ ]
 				{
 					$"Assets/Scenes/SubScenes/{objectName}.unity",
 					$"Assets/Scenes/{objectName}.unity",
@@ -1099,7 +1099,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 					// Try to find the correct property name
 					SerializedProperty sceneProp = null;
-					string[] propertyNames = { "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
+					string [ ] propertyNames = { "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
 
 					foreach (string propName in propertyNames)
 						{

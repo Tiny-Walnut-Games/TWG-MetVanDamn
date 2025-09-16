@@ -168,7 +168,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// Transition preview (designer-friendly)
 			DrawTransitionPreview();
-			
+
 			EditorGUILayout.Space();
 			EditorGUILayout.BeginHorizontal();
 			if (GUILayout.Button("Apply Live Preview"))
@@ -180,7 +180,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				ClearLivePreviewFromScene();
 				}
 			EditorGUILayout.EndHorizontal();
- 			}
+			}
 
 		private void DrawAdvancedSettings()
 			{
@@ -357,14 +357,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			{
 			return strategy switch
 				{
-				PropPlacementStrategy.Random => "Random scatter distribution. Good for general decoration and ambient props.",
-				PropPlacementStrategy.Clustered => "Natural clustering behavior. Excellent for vegetation, rocks, and organic features.",
-				PropPlacementStrategy.Sparse => "High-quality selective placement. Perfect for landmarks, special items, and focal points.",
-				PropPlacementStrategy.Linear => "Edge-following placement. Ideal for fences, paths, shorelines, and boundaries.",
-				PropPlacementStrategy.Radial => "Center-outward distribution. Great for settlements, clearings, and oasis effects.",
-				PropPlacementStrategy.Terrain => "Terrain-aware intelligent placement. Best for realistic environmental distribution.",
-				_ => "Unknown strategy"
-				};
+					PropPlacementStrategy.Random => "Random scatter distribution. Good for general decoration and ambient props.",
+					PropPlacementStrategy.Clustered => "Natural clustering behavior. Excellent for vegetation, rocks, and organic features.",
+					PropPlacementStrategy.Sparse => "High-quality selective placement. Perfect for landmarks, special items, and focal points.",
+					PropPlacementStrategy.Linear => "Edge-following placement. Ideal for fences, paths, shorelines, and boundaries.",
+					PropPlacementStrategy.Radial => "Center-outward distribution. Great for settlements, clearings, and oasis effects.",
+					PropPlacementStrategy.Terrain => "Terrain-aware intelligent placement. Best for realistic environmental distribution.",
+					_ => "Unknown strategy"
+					};
 			}
 
 		private string CalculateQualityRating(PropPlacementSettings settings)
@@ -416,16 +416,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			return score switch
 				{
-				8 => "A+ (Exceptional)",
-				7 => "A (Excellent)",
-				6 => "A- (Very Good)",
-				5 => "B+ (Good)",
-				4 => "B (Above Average)",
-				3 => "B- (Average)",
-				2 => "C+ (Below Average)",
-				1 => "C (Standard)",
-				_ => "C- (Limited)"
-				};
+					8 => "A+ (Exceptional)",
+					7 => "A (Excellent)",
+					6 => "A- (Very Good)",
+					5 => "B+ (Good)",
+					4 => "B (Above Average)",
+					3 => "B- (Average)",
+					2 => "C+ (Below Average)",
+					1 => "C (Standard)",
+					_ => "C- (Limited)"
+					};
 			}
 
 		private void ValidateProfile()
@@ -504,9 +504,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 
 			if (!previewRoot.TryGetComponent<Grid>(out Grid grid))
-			{
+				{
 				grid = previewRoot.AddComponent<Grid>();
-			}
+				}
 
 			Tilemap tilemap = previewRoot.GetComponentInChildren<Tilemap>();
 			if (tilemap == null)

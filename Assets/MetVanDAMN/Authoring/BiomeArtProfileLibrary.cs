@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				for (int i = 0; i < perTypeElevationBuckets.Length; i++)
 					{
-					var b = perTypeElevationBuckets[i];
+					BiomeTypeElevationBucket b = perTypeElevationBuckets[i];
 					if (b == null || b.profiles == null || b.profiles.Length == 0) continue;
 					if (b.type != type) continue;
 					if ((b.elevations & elevation) == 0 && elevation != BiomeElevation.None) continue;
@@ -58,7 +58,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				for (int i = 0; i < perTypeBuckets.Length; i++)
 					{
-					var b = perTypeBuckets[i];
+					BiomeTypeBucket b = perTypeBuckets[i];
 					if (b == null || b.profiles == null || b.profiles.Length == 0) continue;
 					if (b.type != type) continue;
 					return b.profiles;

@@ -132,7 +132,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			this.InvokeMethod("CreateDistrictEntities");
 
-			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(NodeId), typeof(SectorRefinementData));
+			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(DistrictTag), typeof(NodeId), typeof(SectorRefinementData));
 			NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
 
 			// Verify sector refinement data is present on non-hub districts
@@ -271,7 +271,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 		private void VerifyDistrictConfiguration()
 			{
-			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(NodeId), typeof(WfcState));
+			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(DistrictTag), typeof(NodeId), typeof(WfcState));
 			int districtCount = query.CalculateEntityCount();
 			Assert.AreEqual(7, districtCount, "Should create hub + 6 districts = 7 total");
 

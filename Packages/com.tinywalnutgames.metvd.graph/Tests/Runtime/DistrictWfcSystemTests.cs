@@ -70,10 +70,10 @@ namespace TinyWalnutGames.MetVD.Tests
 			UnityEngine.Debug.Log($"[TEST] BEFORE Update: Entity={e.Index}, State={initialState.State}, BufferLength={initialBuffer.Length}, NodeId={nodeId._value}");
 
 			// Check if system can find our entity
-			using var testQuery = em.CreateEntityQuery(typeof(WfcState), typeof(NodeId));
+			using EntityQuery testQuery = em.CreateEntityQuery(typeof(WfcState), typeof(NodeId));
 			UnityEngine.Debug.Log($"[TEST] Entities matching WfcState+NodeId: {testQuery.CalculateEntityCount()}");
 
-			using var seedQuery = em.CreateEntityQuery(typeof(WorldSeed));
+			using EntityQuery seedQuery = em.CreateEntityQuery(typeof(WorldSeed));
 			UnityEngine.Debug.Log($"[TEST] WorldSeed entities: {seedQuery.CalculateEntityCount()}");
 
 			_simGroup.Update();

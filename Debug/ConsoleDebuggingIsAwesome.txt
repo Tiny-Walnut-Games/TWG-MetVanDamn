@@ -1,0 +1,43 @@
+Severity	Code	Description	File	Line	Details
+Error (active)	CS0414	The field 'SmokeTestSceneSetupInspector._lastPlayModeState' is assigned but its value is never used	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Editor\SmokeTestSceneSetupInspector.cs	19	
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SudoCodeSnippetExecutorSystem__System_4700335150.g.cs	57	
+Error (active)	CS7036	There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\SystemGenerator\Unity.Entities.SourceGen.SystemGenerator.SystemGenerator\SudoActionEcsConsumerSystem__System_6704891290.g.cs	74	
+Error (active)	CS7069	Reference to type 'AtomicSafetyHandle' claims it is defined in 'UnityEngine.CoreModule', but it could not be found	E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\AspectGenerator\Unity.Entities.SourceGen.Aspect.AspectGenerator\WorldConfigAspect__Aspect_1749449100.g.cs	141	
+Message (active)	IDE0008	Use explicit type instead of 'var'	E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Tests\SmokeTestSceneSetupTests.cs	284	
+
+---
+
+Build started at 11:33 PM...
+------ Build started: Project: TinyWalnutGames.MetVD.Utility.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: LivingDevAgent.Editor, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Shared.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.GridLayerEditor, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Utility, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Player, Configuration: Debug Any CPU ------
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Core/SudoCodeSnippetExecutorSystem__System_4700335150.g.cs(56,414): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRW<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\obj\Debug\AspectGenerator\Unity.Entities.SourceGen.Aspect.AspectGenerator\WorldConfigAspect__Aspect_1749449100.g.cs(141,8): error CS7069: Reference to type 'AtomicSafetyHandle' claims it is defined in 'UnityEngine.CoreModule', but it could not be found
+Temp/GeneratedCode/TinyWalnutGames.MetVD.Core/SudoActionEcsConsumerSystem__System_6704891290.g.cs(74,418): error CS7036: There is no argument given that corresponds to the required parameter 'typeHandle' of 'InternalCompilerInterface.UnsafeGetUncheckedRefRO<T>(IntPtr, int, ref ComponentTypeHandle<T>)'
+------ Build started: Project: TinyWalnutGames.MetVD.Shared, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Biome.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Tests.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Biome, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Core.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Tests.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Samples.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Graph.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: Assembly-CSharp-firstpass.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Samples, Configuration: Debug Any CPU ------
+------ Build started: Project: Assembly-CSharp.Player, Configuration: Debug Any CPU ------
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Editor, Configuration: Debug Any CPU ------
+E:\Tiny_Walnut_Games\TWG-MetVanDamn\Assets\MetVanDAMN\Authoring\Editor\SmokeTestSceneSetupInspector.cs(19,22): error CS0414: The field 'SmokeTestSceneSetupInspector._lastPlayModeState' is assigned but its value is never used
+------ Build started: Project: TinyWalnutGames.MetVD.Authoring.Tests, Configuration: Debug Any CPU ------
+------ Build started: Project: Assembly-CSharp-firstpass, Configuration: Debug Any CPU ------
+------ Build started: Project: Assembly-CSharp, Configuration: Debug Any CPU ------
+------ Build started: Project: Assembly-CSharp-Editor-firstpass, Configuration: Debug Any CPU ------
+========== Build: 22 succeeded or up-to-date, 5 failed, 0 skipped ==========
+========== Build completed at 11:33 PM and took 06.470 seconds ==========

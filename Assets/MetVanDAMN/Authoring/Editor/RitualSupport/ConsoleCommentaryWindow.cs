@@ -33,7 +33,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 		private int _selectedLogIndex = -1;
 		private string _sessionName = "";
 		private bool _autoScrollLogs = true;
-		
+
 		// Jerry's BRILLIANT adjustable range system
 		private int _snapshotLinesBefore = 10;
 		private int _snapshotLinesAfter = 10;
@@ -326,40 +326,40 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 			// Code snapshot section - Jerry's BRILLIANT idea!
 			EditorGUILayout.LabelField("📸 Code Snapshot Tools:", EditorStyles.boldLabel);
-			
+
 			// Jerry's GENIUS adjustable range controls
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField("Snapshot Range:", GUILayout.Width(100));
 			_snapshotLinesBefore = EditorGUILayout.IntSlider("Before", _snapshotLinesBefore, 1, 50, GUILayout.Width(120));
 			_snapshotLinesAfter = EditorGUILayout.IntSlider("After", _snapshotLinesAfter, 1, 50, GUILayout.Width(120));
-			
+
 			// Quick presets for common scenarios
 			if (GUILayout.Button("📏 Tight (3)", GUILayout.Width(80)))
-			{
+				{
 				_snapshotLinesBefore = _snapshotLinesAfter = 3;
-			}
+				}
 			if (GUILayout.Button("📐 Standard (10)", GUILayout.Width(90)))
-			{
+				{
 				_snapshotLinesBefore = _snapshotLinesAfter = 10;
-			}
+				}
 			if (GUILayout.Button("📊 Wide (25)", GUILayout.Width(80)))
-			{
+				{
 				_snapshotLinesBefore = _snapshotLinesAfter = 25;
-			}
+				}
 			EditorGUILayout.EndHorizontal();
-			
+
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.LabelField($"Total capture: {_snapshotLinesBefore + 1 + _snapshotLinesAfter} lines", EditorStyles.miniLabel);
 			GUILayout.FlexibleSpace();
-			
+
 			if (GUILayout.Button("🎯 Capture Current Editor Line", GUILayout.Height(25)))
-			{
+				{
 				CaptureCurrentEditorLine();
-			}
+				}
 			if (GUILayout.Button("📸 Snapshot Script + Line", GUILayout.Height(25)))
-			{
+				{
 				ShowScriptLineSnapshotDialog();
-			}
+				}
 			EditorGUILayout.EndHorizontal();
 
 			GUILayout.Space(10);
@@ -682,87 +682,87 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 			}
 
 		private void CaptureCurrentEditorLine()
-		{
-			try
 			{
-				// Get the current active script editor
-				var editorWindow = EditorWindow.focusedWindow;
-				if (editorWindow != null && editorWindow.GetType().Name == "ScriptEditorWindow")
+			try
 				{
-					// Use reflection to get current script and line
-					var scriptField = editorWindow.GetType().GetField("m_CurrentScript", BindingFlags.NonPublic | BindingFlags.Instance);
-					var lineField = editorWindow.GetType().GetField("m_CurrentLine", BindingFlags.NonPublic | BindingFlags.Instance);
-					
-					if (scriptField != null && lineField != null)
+				// Get the current active script editor
+				EditorWindow editorWindow = EditorWindow.focusedWindow;
+				if (editorWindow != null && editorWindow.GetType().Name == "ScriptEditorWindow")
 					{
-						var script = scriptField.GetValue(editorWindow);
-						var line = lineField.GetValue(editorWindow);
-						
-						if (script != null && line != null)
+					// Use reflection to get current script and line
+					FieldInfo scriptField = editorWindow.GetType().GetField("m_CurrentScript", BindingFlags.NonPublic | BindingFlags.Instance);
+					FieldInfo lineField = editorWindow.GetType().GetField("m_CurrentLine", BindingFlags.NonPublic | BindingFlags.Instance);
+
+					if (scriptField != null && lineField != null)
 						{
-							var scriptPath = AssetDatabase.GetAssetPath((UnityEngine.Object)script);
-							var lineNumber = (int)line;
-							
+						object script = scriptField.GetValue(editorWindow);
+						object line = lineField.GetValue(editorWindow);
+
+						if (script != null && line != null)
+							{
+							string scriptPath = AssetDatabase.GetAssetPath((UnityEngine.Object)script);
+							int lineNumber = (int)line;
+
 							CaptureCodeSnapshot(scriptPath, lineNumber, "Current editor cursor position");
 							return;
+							}
 						}
 					}
-				}
-				
+
 				// Fallback: Show manual input dialog
 				ShowScriptLineSnapshotDialog();
-				
-			}
+
+				}
 			catch (Exception ex)
-			{
+				{
 				Debug.LogWarning($"Could not capture current editor line automatically: {ex.Message}");
 				ShowScriptLineSnapshotDialog();
+				}
 			}
-		}
 
 		private void ShowScriptLineSnapshotDialog()
-		{
+			{
 			// Simple input dialog for script path and line number
 			string scriptPath = EditorUtility.OpenFilePanel("Select Script File", Application.dataPath, "cs");
 			if (!string.IsNullOrEmpty(scriptPath))
-			{
+				{
 				// Convert absolute path to relative if within project
 				if (scriptPath.StartsWith(Application.dataPath))
-				{
-					scriptPath = "Assets" + scriptPath[Application.dataPath.Length..];
-				}
-				
+					{
+					scriptPath = "Assets" + scriptPath [ Application.dataPath.Length.. ];
+					}
+
 				// Get line number from user - simplified approach for now
 				int lineNumber = 1;
-				
+
 				// For now, just use line 1 - this could be enhanced with a proper input field later
 				CaptureCodeSnapshot(scriptPath, lineNumber, "Manual script selection - line 1 (enhance this dialog for custom line input)");
+				}
 			}
-		}
 
 		private void CaptureCodeSnapshot(string scriptPath, int targetLine, string context)
-		{
-			try
 			{
-				if (!File.Exists(scriptPath))
+			try
 				{
+				if (!File.Exists(scriptPath))
+					{
 					Debug.LogError($"📸 Code Snapshot: File not found - {scriptPath}");
 					return;
-				}
-				
-				string[] allLines = File.ReadAllLines(scriptPath);
-				
+					}
+
+				string [ ] allLines = File.ReadAllLines(scriptPath);
+
 				if (targetLine < 1 || targetLine > allLines.Length)
-				{
+					{
 					Debug.LogError($"📸 Code Snapshot: Line {targetLine} out of range (1-{allLines.Length}) in {Path.GetFileName(scriptPath)}");
 					return;
-				}
-				
+					}
+
 				// Jerry's GENIUS: Use adjustable range instead of fixed 21-line window
 				int startLine = Math.Max(1, targetLine - _snapshotLinesBefore);
 				int endLine = Math.Min(allLines.Length, targetLine + _snapshotLinesAfter);
 				int totalLines = endLine - startLine + 1;
-				
+
 				// Build the snapshot
 				var snapshot = new System.Text.StringBuilder();
 				snapshot.AppendLine($"📸 **Code Snapshot: {Path.GetFileName(scriptPath)}:{targetLine}**");
@@ -772,141 +772,141 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				snapshot.AppendLine($"**Window:** {_snapshotLinesBefore} before + target + {_snapshotLinesAfter} after");
 				snapshot.AppendLine();
 				snapshot.AppendLine("```csharp");
-				
+
 				for (int i = startLine; i <= endLine; i++)
-				{
+					{
 					string linePrefix = i == targetLine ? ">>> " : "    ";
 					string lineNumber = i.ToString().PadLeft(3);
-					string lineContent = i <= allLines.Length ? allLines[i - 1] : "";
-					
+					string lineContent = i <= allLines.Length ? allLines [ i - 1 ] : "";
+
 					snapshot.AppendLine($"{linePrefix}{lineNumber} | {lineContent}");
-				}
-				
+					}
+
 				snapshot.AppendLine("```");
 				snapshot.AppendLine();
-				snapshot.AppendLine($"**Target Line {targetLine}:** `{(targetLine <= allLines.Length ? allLines[targetLine - 1].Trim() : "")}`");
-				
+				snapshot.AppendLine($"**Target Line {targetLine}:** `{(targetLine <= allLines.Length ? allLines [ targetLine - 1 ].Trim() : "")}`");
+
 				// Add configuration details for future reference
 				snapshot.AppendLine();
 				snapshot.AppendLine($"**Capture Settings:** {_snapshotLinesBefore} lines before, {_snapshotLinesAfter} lines after (total window: {totalLines} lines)");
-				
+
 				// Add to commentary as a special code snapshot entry
 				var snapshotEntry = new CommentaryEntry(
-					$"Code Snapshot: {Path.GetFileName(scriptPath)}:{targetLine}", 
-					LogType.Log, 
-					snapshot.ToString(), 
-					scriptPath, 
-					$"Code-Snapshot,TLDL-Reference,Range-{_snapshotLinesBefore}+{_snapshotLinesAfter}", 
-					"", 
+					$"Code Snapshot: {Path.GetFileName(scriptPath)}:{targetLine}",
+					LogType.Log,
+					snapshot.ToString(),
+					scriptPath,
+					$"Code-Snapshot,TLDL-Reference,Range-{_snapshotLinesBefore}+{_snapshotLinesAfter}",
+					"",
 					-1
 				);
-				
+
 				_commentaries.Add(snapshotEntry);
 				SaveCommentaries();
-				
+
 				Debug.Log($"📸 Code Snapshot captured: {Path.GetFileName(scriptPath)} line {targetLine} ({totalLines} lines: {_snapshotLinesBefore}+1+{_snapshotLinesAfter})");
 				Repaint();
-				
-			}
+
+				}
 			catch (Exception ex)
-			{
+				{
 				Debug.LogError($"📸 Code Snapshot failed: {ex.Message}");
+				}
+			}
+
+		private void RefreshConsoleCapture()
+			{
+			try
+				{
+				// Attempt to access Unity's internal console log entries via reflection
+				Type consoleWindowType = typeof(EditorWindow).Assembly.GetType("UnityEditor.ConsoleWindow");
+				if (consoleWindowType != null)
+					{
+					// Try to get the static console entries
+					Type logEntriesType = typeof(EditorWindow).Assembly.GetType("UnityEditor.LogEntries");
+					if (logEntriesType != null)
+						{
+						// Try to get count and entries
+						MethodInfo getCountMethod = logEntriesType.GetMethod("GetCount", BindingFlags.Static | BindingFlags.Public);
+						MethodInfo getEntryMethod = logEntriesType.GetMethod("GetEntryInternal", BindingFlags.Static | BindingFlags.NonPublic);
+
+						if (getCountMethod != null && getEntryMethod != null)
+							{
+							int logCount = (int)getCountMethod.Invoke(null, null);
+							int startIndex = Math.Max(0, logCount - 50); // Get last 50 entries
+
+							Type logEntryType = typeof(EditorWindow).Assembly.GetType("UnityEditor.LogEntry");
+							if (logEntryType != null)
+								{
+								object logEntry = Activator.CreateInstance(logEntryType);
+								FieldInfo messageField = logEntryType.GetField("message");
+								FieldInfo modeField = logEntryType.GetField("mode");
+
+								for (int i = startIndex; i < logCount; i++)
+									{
+									if (getEntryMethod.Invoke(null, new object [ ] { i, logEntry }) is bool success && success)
+										{
+										if (messageField?.GetValue(logEntry) is string message &&
+											modeField?.GetValue(logEntry) is int mode)
+											{
+											LogType logType = mode switch
+												{
+													0 => LogType.Error,
+													1 => LogType.Assert,
+													2 => LogType.Warning,
+													3 => LogType.Log,
+													4 => LogType.Exception,
+													_ => LogType.Log
+													};
+
+											var newLogEntry = new LogEntry(message, logType, "");
+
+											// Only add if not already captured and not our own commentary
+											if (!newLogEntry.isCommentaryLog && !_capturedLogs.Any(l => l.message == message && l.type == logType))
+												{
+												_capturedLogs.Add(newLogEntry);
+												}
+											}
+										}
+									}
+
+								// Trim to our limit
+								while (_capturedLogs.Count > 200)
+									{
+									_capturedLogs.RemoveAt(0);
+									if (_selectedLogIndex >= 0) _selectedLogIndex--;
+									}
+
+								// Auto-select most recent if none selected
+								if (_selectedLogIndex < 0 && _capturedLogs.Count > 0)
+									{
+									_selectedLogIndex = _capturedLogs.Count - 1;
+									UpdateSelectedLogFromIndex();
+									}
+
+								Debug.Log($"🔄 Console Commentary: Refreshed {_capturedLogs.Count} log entries from Unity console");
+								Repaint();
+								return;
+								}
+							}
+						}
+					}
+
+				// Fallback: Show friendly message that manual refresh attempted
+				Debug.Log("🔄 Console Commentary: Manual refresh attempted - Unity console API access limited. Enable auto-capture for real-time monitoring.");
+
+				}
+			catch (Exception ex)
+				{
+				Debug.LogWarning($"🔄 Console Commentary: Manual refresh failed - {ex.Message}. Unity console reflection API may have changed.");
+				}
+			}
+
+		[Serializable]
+		private class CommentaryWrapper
+			{
+			public List<CommentaryEntry> commentaries;
 			}
 		}
-
-        private void RefreshConsoleCapture()
-        {
-            try
-            {
-                // Attempt to access Unity's internal console log entries via reflection
-                Type consoleWindowType = typeof(EditorWindow).Assembly.GetType("UnityEditor.ConsoleWindow");
-                if (consoleWindowType != null)
-                {
-                    // Try to get the static console entries
-                    var logEntriesType = typeof(EditorWindow).Assembly.GetType("UnityEditor.LogEntries");
-                    if (logEntriesType != null)
-                    {
-                        // Try to get count and entries
-                        var getCountMethod = logEntriesType.GetMethod("GetCount", BindingFlags.Static | BindingFlags.Public);
-                        var getEntryMethod = logEntriesType.GetMethod("GetEntryInternal", BindingFlags.Static | BindingFlags.NonPublic);
-                        
-                        if (getCountMethod != null && getEntryMethod != null)
-                        {
-                            int logCount = (int)getCountMethod.Invoke(null, null);
-                            int startIndex = Math.Max(0, logCount - 50); // Get last 50 entries
-                            
-                            var logEntryType = typeof(EditorWindow).Assembly.GetType("UnityEditor.LogEntry");
-                            if (logEntryType != null)
-                            {
-                                object logEntry = Activator.CreateInstance(logEntryType);
-                                var messageField = logEntryType.GetField("message");
-                                var modeField = logEntryType.GetField("mode");
-                                
-                                for (int i = startIndex; i < logCount; i++)
-                                {
-                                    if (getEntryMethod.Invoke(null, new object[] { i, logEntry }) is bool success && success)
-                                    {
-                                        if (messageField?.GetValue(logEntry) is string message &&
-                                            modeField?.GetValue(logEntry) is int mode)
-                                        {
-                                            LogType logType = mode switch
-                                            {
-                                                0 => LogType.Error,
-                                                1 => LogType.Assert,
-                                                2 => LogType.Warning,
-                                                3 => LogType.Log,
-                                                4 => LogType.Exception,
-                                                _ => LogType.Log
-                                            };
-                                            
-                                            var newLogEntry = new LogEntry(message, logType, "");
-                                            
-                                            // Only add if not already captured and not our own commentary
-                                            if (!newLogEntry.isCommentaryLog && !_capturedLogs.Any(l => l.message == message && l.type == logType))
-                                            {
-                                                _capturedLogs.Add(newLogEntry);
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                // Trim to our limit
-                                while (_capturedLogs.Count > 200)
-                                {
-                                    _capturedLogs.RemoveAt(0);
-                                    if (_selectedLogIndex >= 0) _selectedLogIndex--;
-                                }
-                                
-                                // Auto-select most recent if none selected
-                                if (_selectedLogIndex < 0 && _capturedLogs.Count > 0)
-                                {
-                                    _selectedLogIndex = _capturedLogs.Count - 1;
-                                    UpdateSelectedLogFromIndex();
-                                }
-                                
-                                Debug.Log($"🔄 Console Commentary: Refreshed {_capturedLogs.Count} log entries from Unity console");
-                                Repaint();
-                                return;
-                            }
-                        }
-                    }
-                }
-                
-                // Fallback: Show friendly message that manual refresh attempted
-                Debug.Log("🔄 Console Commentary: Manual refresh attempted - Unity console API access limited. Enable auto-capture for real-time monitoring.");
-                
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"🔄 Console Commentary: Manual refresh failed - {ex.Message}. Unity console reflection API may have changed.");
-            }
-        }
-
-        [Serializable]
-        private class CommentaryWrapper
-        {
-            public List<CommentaryEntry> commentaries;
-        }
-    }
-}
+	}
 #endif

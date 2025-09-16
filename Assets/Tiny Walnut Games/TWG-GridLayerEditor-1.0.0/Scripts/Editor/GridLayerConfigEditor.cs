@@ -25,8 +25,8 @@ namespace TinyWalnutGames.GridLayerEditor
             // Generate a unique asset path for the new config
             string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(Path.Combine(path, "GridLayerConfig.asset"));
 
-            // Create and save the new GridLayerConfig asset
-            var asset = ScriptableObject.CreateInstance<GridLayerConfig>();
+			// Create and save the new GridLayerConfig asset
+			GridLayerConfig asset = ScriptableObject.CreateInstance<GridLayerConfig>();
             AssetDatabase.CreateAsset(asset, assetPathAndName);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

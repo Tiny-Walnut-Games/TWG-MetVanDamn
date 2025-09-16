@@ -189,12 +189,24 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void CreateDistrictEntities()
 			{
+			// Idempotence guard: if districts already exist, skip
+			using (EntityQuery existingDistricts = EntityManager.CreateEntityQuery(typeof(DistrictTag)))
+				{
+				if (existingDistricts.CalculateEntityCount() > 0)
+					{
+					if (logGenerationSteps)
+						Debug.Log("⚠️ CreateDistrictEntities skipped (districts already present)");
+					return;
+					}
+				}
 			// Use targetSectorCount to determine how many districts to create
 			int actualDistrictCount = math.min(targetSectorCount, 24); // Reasonable upper limit
 			int gridSize = (int)math.ceil(math.sqrt(actualDistrictCount));
 
 			Entity hubEntity = EntityManager.CreateEntity();
 			EntityManager.SetName(hubEntity, "HubDistrict");
+			// Tag as district (rooms won't get this)
+			EntityManager.AddComponentData(hubEntity, new DistrictTag());
 
 			EntityManager.AddComponentData(hubEntity, new NodeId
 				{
@@ -226,6 +238,7 @@ namespace TinyWalnutGames.MetVD.Samples
 
 					Entity districtEntity = EntityManager.CreateEntity();
 					EntityManager.SetName(districtEntity, $"District_{x}_{y}");
+					EntityManager.AddComponentData(districtEntity, new DistrictTag());
 
 					var coordinates = new int2(x * 10, y * 10);
 					EntityManager.AddComponentData(districtEntity, new NodeId
@@ -258,6 +271,16 @@ namespace TinyWalnutGames.MetVD.Samples
 
 		private void CreateBiomeFieldEntities()
 			{
+			// Idempotence guard: if polarity fields already exist, skip
+			using (EntityQuery existingFields = EntityManager.CreateEntityQuery(typeof(PolarityFieldData)))
+				{
+				if (existingFields.CalculateEntityCount() >= 4) // expected full set
+					{
+					if (logGenerationSteps)
+						Debug.Log("⚠️ CreateBiomeFieldEntities skipped (polarity fields already present)");
+					return;
+					}
+				}
 			CreatePolarityField(Polarity.Sun, new float2(15, 15), "SunField");
 			CreatePolarityField(Polarity.Moon, new float2(-15, -15), "MoonField");
 			CreatePolarityField(Polarity.Heat, new float2(15, -15), "HeatField");
@@ -361,7 +384,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		private void CreateDistrictVisuals()
 			{
 			using EntityQuery districtQuery = EntityManager.CreateEntityQuery(typeof(NodeId));
-			var entities = districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+			Unity.Collections.NativeArray<Entity> entities = districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			foreach (Entity entity in entities)
 				{
@@ -399,7 +422,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		private void CreateRoomVisuals()
 			{
 			using EntityQuery roomQuery = EntityManager.CreateEntityQuery(typeof(NodeId), typeof(RoomData));
-			var entities = roomQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+			Unity.Collections.NativeArray<Entity> entities = roomQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			foreach (Entity entity in entities)
 				{
@@ -433,7 +456,7 @@ namespace TinyWalnutGames.MetVD.Samples
 						};
 
 				// Make rooms slightly transparent to distinguish from districts
-				var color = renderer.material.color;
+				Color color = renderer.material.color;
 				renderer.material.color = new Color(color.r, color.g, color.b, 0.8f);
 
 				// Parent to this component's GameObject for organization
@@ -446,7 +469,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		private void CreatePolarityFieldVisuals()
 			{
 			using EntityQuery polarityQuery = EntityManager.CreateEntityQuery(typeof(PolarityFieldData));
-			var entities = polarityQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+			Unity.Collections.NativeArray<Entity> entities = polarityQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			foreach (Entity entity in entities)
 				{
@@ -512,6 +535,12 @@ namespace TinyWalnutGames.MetVD.Samples
 	// ✅ REMOVE: Duplicate WorldSeed definition - using the shared one instead
 	// ✅ REMOVE: Duplicate WorldBounds definition - using the shared one instead
 	// ✅ REMOVE: Duplicate WorldGenerationConfig definition - using the shared one instead
+
+	/// <summary>
+	/// Tag component identifying district (level 0) entities so tests can distinguish
+	/// them from room (child) entities that also have NodeId.
+	/// </summary>
+	public struct DistrictTag : IComponentData { }
 
 	/// <summary>
 	/// Local polarity field data component for biome field creation
