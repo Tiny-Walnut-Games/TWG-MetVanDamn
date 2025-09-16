@@ -115,8 +115,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			// Invoke district creation
 			this.InvokePrivateMethod("CreateDistrictEntities");
 
-			// Verify districts were created
-			using EntityQuery nodeQuery = this.entityManager.CreateEntityQuery(typeof(NodeId), typeof(WfcState));
+			// Verify districts were created (filter by DistrictTag to exclude room entities)
+			using EntityQuery nodeQuery = this.entityManager.CreateEntityQuery(typeof(DistrictTag), typeof(NodeId), typeof(WfcState));
 			int districtCount = nodeQuery.CalculateEntityCount();
 
 			// Should create hub (1) + min(8, 24) districts = 9 total
@@ -185,7 +185,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			this.InvokePrivateMethod("CreateDistrictEntities");
 
-			using EntityQuery nodeQuery = this.entityManager.CreateEntityQuery(typeof(NodeId));
+			using EntityQuery nodeQuery = this.entityManager.CreateEntityQuery(typeof(DistrictTag), typeof(NodeId));
 			NativeArray<Entity> nodeEntities = nodeQuery.ToEntityArray(Allocator.Temp);
 			var positions = new List<int2>();
 
@@ -219,7 +219,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			this.InvokePrivateMethod("CreateDistrictEntities");
 
+			// Filter by DistrictTag so we exclude rooms (which also have NodeId/WfcState/buffers)
 			using EntityQuery districtQuery = this.entityManager.CreateEntityQuery(
+				typeof(DistrictTag),
 				typeof(NodeId),
 				typeof(WfcState),
 				typeof(WfcCandidateBufferElement),
@@ -272,18 +274,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			this.SetPrivateField("targetSectorCount", 100);
 			this.InvokePrivateMethod("CreateDistrictEntities");
 
-			using EntityQuery query = this.entityManager.CreateEntityQuery(typeof(NodeId));
-			int entityCount = query.CalculateEntityCount();
-			Assert.AreEqual(25, entityCount, "Should clamp to 24 districts + 1 hub = 25 total");
+			using EntityQuery districtOnlyQ = this.entityManager.CreateEntityQuery(typeof(DistrictTag));
+			int districtCount = districtOnlyQ.CalculateEntityCount();
+			Assert.AreEqual(25, districtCount, "Should clamp to 24 districts + 1 hub = 25 total");
 
-			// Clean up for next test
-			this.entityManager.DestroyEntity(query.ToEntityArray(Allocator.Temp));
+			// Clean up ALL entities with NodeId (districts + rooms) for next part
+			using (EntityQuery allNodesQ = this.entityManager.CreateEntityQuery(typeof(NodeId)))
+				{
+				NativeArray<Entity> all = allNodesQ.ToEntityArray(Allocator.Temp);
+				this.entityManager.DestroyEntity(all);
+				all.Dispose();
+				}
 
 			// Test zero value (should create only hub)
 			this.SetPrivateField("targetSectorCount", 0);
 			this.InvokePrivateMethod("CreateDistrictEntities");
 
-			int hubOnlyCount = query.CalculateEntityCount();
+			int hubOnlyCount = this.entityManager.CreateEntityQuery(typeof(DistrictTag)).CalculateEntityCount();
 			Assert.AreEqual(1, hubOnlyCount, "Should create only hub with targetSectorCount of 0");
 			}
 

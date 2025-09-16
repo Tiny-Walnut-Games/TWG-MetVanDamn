@@ -28,7 +28,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             {
             _cache.Clear();
             if (Entries == null) return;
-            foreach (var e in Entries)
+            foreach (Entry e in Entries)
                 {
                 if (string.IsNullOrWhiteSpace(e.Key) || e.Prefab == null) continue;
                 if (!_cache.ContainsKey(e.Key))
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 // Try slow path scan
                 if (Entries != null)
                     {
-                    foreach (var e in Entries)
+                    foreach (Entry e in Entries)
                         {
                         if (e.Prefab != null && string.Equals(e.Key, key, StringComparison.Ordinal))
                             {

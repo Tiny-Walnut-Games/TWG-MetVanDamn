@@ -60,6 +60,12 @@ Behavior:
 Editor helper
 - Use menu `MetVanDAMN > Create Sample Scene With ECS Registry` to generate `Assets/Scenes/MetVanDAMN_Baseline.unity` with an `EcsPrefabRegistryAuthoring` GameObject pre-populated with representative keys. Assign your DOTS-ready prefabs in the Inspector, then enter Play.
 
+Gizmo prefab generation (Editor-only)
+- In `EcsPrefabRegistryAuthoring`, enable `Gizmo Prefab Auto-Generation` to create lightweight debug prefabs per key.
+- Choose `GizmoShape`, `Size`, and `Color`, set a target folder (default `Assets/MetVanDAMN/Debug/GizmoPrefabs`).
+- Click `Generate Gizmo Prefabs For Missing/All Keys` in the Inspector to bulk-generate prefabs and auto-assign them to entries.
+- Toggle `OverwriteExistingWithGizmos` if you want to replace already assigned prefabs.
+
 Contract:
 - Requests are consumed exactly once (request entity is destroyed after handling).
 - Spawns use `SudoActionRequest.ResolvedPosition`.

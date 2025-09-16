@@ -11,7 +11,6 @@ namespace TinyWalnutGames.MetVD.Authoring
     /// Applies elevation masks to biome entities based on available BiomeElevationHint components.
     /// Runs before art auto-assignment so selection can consider elevation.
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     [UpdateBefore(typeof(BiomeArtAutoAssignmentSystem))]
     public partial struct BiomeElevationResolverSystem : ISystem
@@ -19,7 +18,6 @@ namespace TinyWalnutGames.MetVD.Authoring
         private EntityQuery _hintQ;
         private EntityQuery _biomesQ;
 
-        [BurstCompile]
         public void OnCreate(ref SystemState state)
             {
             _hintQ = new EntityQueryBuilder(Allocator.Temp)
@@ -29,9 +27,14 @@ namespace TinyWalnutGames.MetVD.Authoring
                 .WithAll<CoreBiome, NodeId>()
                 .WithNone<BiomeElevationMask>()
                 .Build(ref state);
+
+            // Auto-register into Initialization group for manually created worlds used in tests (Editor only)
+#if UNITY_EDITOR
+            InitializationSystemGroup initGroup = state.World.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            initGroup.AddSystemToUpdateList(state.SystemHandle);
+#endif
             }
 
-        [BurstCompile]
         public void OnUpdate(ref SystemState state)
             {
             if (_hintQ.IsEmptyIgnoreFilter) return;
@@ -44,10 +47,10 @@ namespace TinyWalnutGames.MetVD.Authoring
                 var typeToMask = new NativeParallelHashMap<byte, BiomeElevation>(hints.Length, Allocator.Temp);
                 try
                     {
-                    foreach (var h in hints)
+                    foreach (BiomeElevationHint h in hints)
                         {
                         byte key = (byte)h.Type;
-                        if (typeToMask.TryGetValue(key, out var existing))
+                        if (typeToMask.TryGetValue(key, out BiomeElevation existing))
                             {
                             typeToMask[key] = existing | h.Mask;
                             }
@@ -64,7 +67,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                         for (int i = 0; i < ents.Length; i++)
                             {
                             byte key = (byte)biomes[i].Type;
-                            if (typeToMask.TryGetValue(key, out var mask) && mask != BiomeElevation.None)
+                            if (typeToMask.TryGetValue(key, out BiomeElevation mask) && mask != BiomeElevation.None)
                                 {
                                 state.EntityManager.AddComponentData(ents[i], new BiomeElevationMask(mask));
                                 }

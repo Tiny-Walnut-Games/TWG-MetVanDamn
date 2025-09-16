@@ -62,15 +62,22 @@
   <ItemGroup>
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WorldConfigAspectPlayModeTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SudoActionDispatcherAndResolverPlayModeTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\AuthoringBakeIntegrationTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WfcQuickTest.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SubSceneConversionTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SpawnableKeysEquipmentAndSetpiecesEcsPlayModeTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SpawnableKeysEcsPlayModeTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WfcDebugTest.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SudoCodeSnippetPlayModeTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtProfileTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WorldBootstrapTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SmokeTestSceneSetupTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\AINavigationTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SudoActionConsumerPlayModeTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\PlayerExperienceAndEndToEndTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SudoActionEcsConsumerPlayModeTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\UnityIntegrationAndPerformanceTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WfcDeterminismTests.cs" />
   </ItemGroup>

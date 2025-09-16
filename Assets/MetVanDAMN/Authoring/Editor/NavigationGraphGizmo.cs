@@ -34,7 +34,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		[Header("Color Scheme")]
 		[SerializeField] private readonly NavigationColorScheme colorScheme = NavigationColorScheme.Default;
 
-		private static readonly Color [ ] DefaultColors = new Color [ ]
+		private static readonly Color[] DefaultColors = new Color[]
 		{
 			Color.green,      // Reachable nodes
             Color.red,        // Unreachable nodes
@@ -45,7 +45,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             Color.cyan        // Highlighted path
         };
 
-		private static readonly Color [ ] HighContrastColors = new Color [ ]
+		private static readonly Color[] HighContrastColors = new Color[]
 		{
 			new(0.2f, 0.8f, 0.2f),  // Bright green
             new(0.8f, 0.2f, 0.2f),  // Bright red
@@ -56,14 +56,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             new(0.2f, 0.9f, 0.9f)   // Bright cyan
         };
 
-		private Color [ ] _currentColors;
+		private Color[] _currentColors;
 		private World _world;
 		private EntityManager _entityManager;
 
 		/// <summary>
 		/// Menu item to create a navigation graph gizmo in the scene
 		/// </summary>
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Create Navigation Graph Gizmo")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Navigation/Create Navigation Graph Gizmo")]
 		public static void CreateNavigationGraphGizmo()
 			{
 			var gizmoGO = new GameObject("NavigationGraphGizmo");
@@ -76,11 +76,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Menu item to toggle navigation graph visualization for all gizmos in scene
 		/// </summary>
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Toggle Navigation Graph Visualization")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Navigation/Toggle Navigation Graph Visualization")]
 		public static void ToggleNavigationGraphVisualization()
 			{
-			NavigationGraphGizmo [ ] gizmos = FindObjectsByType<NavigationGraphGizmo>(FindObjectsSortMode.None);
-			bool newState = gizmos.Length == 0 || !gizmos [ 0 ].showNavigationGraph;
+			NavigationGraphGizmo[] gizmos = FindObjectsByType<NavigationGraphGizmo>(FindObjectsSortMode.None);
+			bool newState = gizmos.Length == 0 || !gizmos[0].showNavigationGraph;
 
 			foreach (NavigationGraphGizmo gizmo in gizmos)
 				{
@@ -93,7 +93,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Menu item to validate navigation connectivity and show results
 		/// </summary>
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Validate Navigation Connectivity")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Navigation/Validate Navigation Connectivity")]
 		public static void ValidateNavigationConnectivity()
 			{
 			World world = World.DefaultGameObjectInjectionWorld;
@@ -123,7 +123,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					Debug.Log("=== Navigation Connectivity Issues ===");
 					for (int i = 0; i < report.Issues.Length; i++)
 						{
-						NavigationIssue issue = report.Issues [ i ];
+						NavigationIssue issue = report.Issues[i];
 						Debug.LogWarning($"{issue.Type}: {issue.Description} (Node: {issue.NodeId})");
 						}
 					}
@@ -211,7 +211,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			for (int i = 0; i < entities.Length; i++)
 				{
-				Entity e = entities [ i ];
+				Entity e = entities[i];
 				NavNode navNode = _entityManager.GetComponentData<NavNode>(e);
 				NodeId nodeId = _entityManager.GetComponentData<NodeId>(e);
 
@@ -219,7 +219,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				bool reachable = navNode.IsCompatibleWith(caps);
 
 				// Choose color based on reachability
-				Gizmos.color = reachable ? _currentColors [ 0 ] : _currentColors [ 1 ];
+				Gizmos.color = reachable ? _currentColors[0] : _currentColors[1];
 
 				// Draw node sphere
 				Gizmos.DrawWireSphere(wp, nodeRadius);
@@ -249,13 +249,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			for (int i = 0; i < entities.Length; i++)
 				{
-				Entity e = entities [ i ];
+				Entity e = entities[i];
 				NavNode navNode = _entityManager.GetComponentData<NavNode>(e);
 				DynamicBuffer<NavLinkBufferElement> buffer = _entityManager.GetBuffer<NavLinkBufferElement>(e);
 
 				for (int j = 0; j < buffer.Length; j++)
 					{
-					NavLink link = buffer [ j ].Value;
+					NavLink link = buffer[j].Value;
 					DrawNavigationLink(navNode, link, caps);
 					}
 				}
@@ -275,8 +275,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// Choose link color based on gate requirements and traversability
 			Color linkColor = link.RequiredPolarity != Polarity.None || link.RequiredAbilities != Ability.None
-				? link.GateSoftness == GateSoftness.Hard ? _currentColors [ 4 ] : _currentColors [ 5 ]
-				: _currentColors [ 2 ];
+				? link.GateSoftness == GateSoftness.Hard ? _currentColors[4] : _currentColors[5]
+				: _currentColors[2];
 			if (!canTraverse)
 				{
 				linkColor = Color.gray;
@@ -399,9 +399,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			for (int i = 0; i < ids.Length; i++)
 				{
-				if (ids [ i ]._value == nodeId)
+				if (ids[i]._value == nodeId)
 					{
-					return entities [ i ];
+					return entities[i];
 					}
 				}
 
@@ -455,7 +455,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return Color.magenta; // Grapple agents get magenta paths
 				}
 
-			return _currentColors [ 6 ]; // Default path color for basic agents
+			return _currentColors[6]; // Default path color for basic agents
 			}
 
 		private PathVisualizationStyle GetPathStyleByCapabilities(AgentCapabilities caps)

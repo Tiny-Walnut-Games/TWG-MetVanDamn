@@ -15,10 +15,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	{
 	/// <summary>
 	/// 🧙‍♂️ PHASE 2: SubScene Conversion Validation Tests
-	/// 
+	///
 	/// These tests validate the SubScene conversion workflow concepts that make
 	/// MetVanDAMN entities discoverable by Unity's runtime ECS systems.
-	/// 
+	///
 	/// NOTE: Due to Unity Editor test limitations, we validate the logic and workflow
 	/// rather than creating actual scene files during test execution.
 	/// </summary>
@@ -96,7 +96,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				InvokePrivateMethod("SetupSmokeTestWorld");
 
 				// Assert - Verify entities exist and are ready for SubScene conversion
-				using EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(NodeId));
+				using EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(DistrictTag), typeof(NodeId));
 				int districtCount = districtQuery.CalculateEntityCount();
 
 				Assert.Greater(districtCount, 0, "District entities should be created for SubScene conversion");
@@ -134,7 +134,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				InvokePrivateMethod("SetupSmokeTestWorld");
 
 				// Act - Test the naming logic that would be used for SubScene creation
-				using EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(NodeId));
+				using EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(DistrictTag), typeof(NodeId));
 				Unity.Collections.NativeArray<Entity> districtEntities = districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 				var generatedNames = new System.Collections.Generic.List<string>();
 
@@ -184,7 +184,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				InvokePrivateMethod("SetupSmokeTestWorld");
 
 				// Act - Simulate the SubScene conversion workflow logic
-				using EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(NodeId));
+				using EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(DistrictTag), typeof(NodeId));
 				Unity.Collections.NativeArray<Entity> districtEntities = districtQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 				var conversionResults = new System.Collections.Generic.List<(string name, bool canConvert)>();

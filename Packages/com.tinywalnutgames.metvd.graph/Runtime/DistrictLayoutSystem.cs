@@ -40,12 +40,13 @@ namespace TinyWalnutGames.MetVD.Graph
 			// Respect generation flow: run this legacy placer only for GridFirstLegacy
 			if (!_worldConfigQuery.IsEmptyIgnoreFilter)
 				{
-				var wc = _worldConfigQuery.GetSingleton<WorldConfiguration>();
+				WorldConfiguration wc = _worldConfigQuery.GetSingleton<WorldConfiguration>();
 				if (wc.Flow != TinyWalnutGames.MetVD.Shared.GenerationFlow.GridFirstLegacy)
 					{
 					return;
 					}
 				}
+			// If there is no world config at all, we will use a fallback config below.
 
 			if (!_layoutDoneQuery.IsEmptyIgnoreFilter)
 				{

@@ -22,13 +22,13 @@ namespace TinyWalnutGames.MetVD.Graph
             {
             _configQ = new EntityQueryBuilder(Allocator.Temp).WithAll<WorldConfiguration>().Build(ref state);
             _biasQ = new EntityQueryBuilder(Allocator.Temp).WithAll<WorldAspectBias>().Build(ref state);
-            state.RequireForUpdate(_configQ);
             }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
             {
-            var config = _configQ.GetSingleton<WorldConfiguration>();
+            if (_configQ.IsEmptyIgnoreFilter) return;
+			WorldConfiguration config = _configQ.GetSingleton<WorldConfiguration>();
             if (config.Flow != GenerationFlow.ShapeFirstOrganic)
                 {
                 return; // legacy flow - do nothing
@@ -37,7 +37,7 @@ namespace TinyWalnutGames.MetVD.Graph
             if (_initialized)
                 return;
 
-            var bias = _biasQ.IsEmptyIgnoreFilter ? new WorldAspectBias { WideWeight = 55, TallWeight = 35, SquareWeight = 10 } : _biasQ.GetSingleton<WorldAspectBias>();
+			WorldAspectBias bias = _biasQ.IsEmptyIgnoreFilter ? new WorldAspectBias { WideWeight = 55, TallWeight = 35, SquareWeight = 10 } : _biasQ.GetSingleton<WorldAspectBias>();
             var rng = new Random((uint)math.max(1, config.Seed));
             int total = bias.WideWeight + bias.TallWeight + bias.SquareWeight;
             int pick = rng.NextInt(0, math.max(1, total));

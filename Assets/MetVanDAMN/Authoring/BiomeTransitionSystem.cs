@@ -180,8 +180,8 @@ namespace TinyWalnutGames.MetVD.Authoring
                 // deconstruct to satisfy analyzers
                 (Entity entity, BiomeArtProfile profile, BiomeTransition transition, NodeId nodeId) = candidates[i];
                 ApplyTransitionTiles(profile, transition, nodeId);
-                // mark applied
-                var updated = transition;
+				// mark applied
+				BiomeTransition updated = transition;
                 updated.TransitionTilesApplied = true;
                 if (EntityManager.HasComponent<BiomeTransition>(entity))
                 {
@@ -194,11 +194,11 @@ namespace TinyWalnutGames.MetVD.Authoring
         private BiomeArtProfile GetArtProfileForBiome(BiomeType biomeType)
         {
 #if UNITY_EDITOR
-            var guids = UnityEditor.AssetDatabase.FindAssets("t:BiomeArtProfile");
-            foreach (var g in guids)
+			string [ ] guids = UnityEditor.AssetDatabase.FindAssets("t:BiomeArtProfile");
+            foreach (string g in guids)
             {
-                var path = UnityEditor.AssetDatabase.GUIDToAssetPath(g);
-                var profile = UnityEditor.AssetDatabase.LoadAssetAtPath<BiomeArtProfile>(path);
+				string path = UnityEditor.AssetDatabase.GUIDToAssetPath(g);
+				BiomeArtProfile profile = UnityEditor.AssetDatabase.LoadAssetAtPath<BiomeArtProfile>(path);
                 if (profile != null && string.Equals(profile.biomeName, biomeType.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
                     return profile;
@@ -236,7 +236,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 // Attempt to locate by convention
                 for (int i = 0; i < grid.transform.childCount; i++)
                 {
-                    var child = grid.transform.GetChild(i);
+					Transform child = grid.transform.GetChild(i);
                     if (child.name == "Blending")
                     {
                         blendingTilemap = child.GetComponent<Tilemap>();
@@ -314,7 +314,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                     // Color fallback: if explicit transition tiles are missing, tint the chosen tile
                     // Determine colors for blending: prefer art profiles' debugColor, fallback to hash-based color
                     Color colorA = artProfile != null ? artProfile.debugColor : new Color(0.5f, 0.5f, 0.5f, 1f);
-                    var otherProfile = GetArtProfileForBiome(transition.ToBiome);
+					BiomeArtProfile otherProfile = GetArtProfileForBiome(transition.ToBiome);
                     Color colorB = otherProfile != null ? otherProfile.debugColor : GenerateHashBasedBiomeColor(transition.ToBiome);
                     // Blend factor uses normalized distance and transition strength bias
                     float blendFactor = math.clamp((t * 0.5f) + (transition.TransitionStrength * 0.5f), 0f, 1f);

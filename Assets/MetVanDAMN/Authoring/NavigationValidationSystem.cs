@@ -444,7 +444,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Use direct iteration instead of ToEntityArray to avoid potential issues
 			Entity foundEntity = Entity.Null;
 
-			using (var entities = nodeQuery.ToEntityArray(Allocator.Temp))
+			using (NativeArray<Entity> entities = nodeQuery.ToEntityArray(Allocator.Temp))
 				{
 				for (int i = 0; i < entities.Length; i++)
 					{

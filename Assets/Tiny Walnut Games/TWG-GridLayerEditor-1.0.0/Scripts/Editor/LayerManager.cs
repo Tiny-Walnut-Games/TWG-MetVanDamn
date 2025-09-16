@@ -128,8 +128,8 @@ namespace TinyWalnutGames.GridLayerEditor
         [MenuItem("Tiny Walnut Games/Layer Management/Create All Layers")]
         public static void CreateAllLayers()
         {
-            var allLayers = PlatformerLayers.Union(TopDownLayers).Distinct().ToArray();
-            var allSortingLayers = PlatformerSortingLayers.Union(TopDownSortingLayers).Distinct().ToArray();
+			string [ ] allLayers = PlatformerLayers.Union(TopDownLayers).Distinct().ToArray();
+			string [ ] allSortingLayers = PlatformerSortingLayers.Union(TopDownSortingLayers).Distinct().ToArray();
             
             CreateLayers(allLayers, "All Game Types");
             CreateSortingLayers(allSortingLayers, "All Game Types");
@@ -141,8 +141,8 @@ namespace TinyWalnutGames.GridLayerEditor
         [MenuItem("Tiny Walnut Games/Layer Management/Show Layer Report")]
         public static void ShowLayerReport()
         {
-            var usedLayers = GetUsedLayers();
-            var usedSortingLayers = GetUsedSortingLayers();
+			List<string> usedLayers = GetUsedLayers();
+			List<string> usedSortingLayers = GetUsedSortingLayers();
             
             string report = "=== UNITY LAYER REPORT ===\n\n";
             
@@ -161,7 +161,7 @@ namespace TinyWalnutGames.GridLayerEditor
             }
             
             report += "\nSORTING LAYERS:\n";
-            foreach (var sortingLayer in usedSortingLayers)
+            foreach (string sortingLayer in usedSortingLayers)
             {
                 report += $"  • {sortingLayer}\n";
             }
@@ -200,14 +200,14 @@ namespace TinyWalnutGames.GridLayerEditor
         /// <param name="setupType">Description of the setup type for logging.</param>
         private static void CreateLayers(string[] layerNames, string setupType)
         {
-            var tagManager = GetTagManager();
+			SerializedObject tagManager = GetTagManager();
             if (tagManager == null)
             {
                 Debug.LogError("Could not access TagManager. Layer creation failed.");
                 return;
             }
 
-            var layersProperty = tagManager.FindProperty("layers");
+			SerializedProperty layersProperty = tagManager.FindProperty("layers");
             var createdLayers = new List<string>();
             var skippedLayers = new List<string>();
 
@@ -230,7 +230,7 @@ namespace TinyWalnutGames.GridLayerEditor
                 bool layerCreated = false;
                 for (int i = 8; i < 32; i++) // Start at 8 to skip built-in layers
                 {
-                    var layerProperty = layersProperty.GetArrayElementAtIndex(i);
+					SerializedProperty layerProperty = layersProperty.GetArrayElementAtIndex(i);
                     if (string.IsNullOrEmpty(layerProperty.stringValue))
                     {
                         layerProperty.stringValue = layerName;
@@ -277,10 +277,10 @@ namespace TinyWalnutGames.GridLayerEditor
         /// <param name="setupType">Description of the setup type for logging.</param>
         private static void CreateSortingLayers(string[] sortingLayerNames, string setupType)
         {
-            var tagManager = GetTagManager();
+			SerializedObject tagManager = GetTagManager();
             if (tagManager == null) return;
 
-            var sortingLayersProperty = tagManager.FindProperty("m_SortingLayers");
+			SerializedProperty sortingLayersProperty = tagManager.FindProperty("m_SortingLayers");
             var createdSortingLayers = new List<string>();
             var skippedSortingLayers = new List<string>();
 
@@ -295,7 +295,7 @@ namespace TinyWalnutGames.GridLayerEditor
 
                 // Add new sorting layer
                 sortingLayersProperty.InsertArrayElementAtIndex(sortingLayersProperty.arraySize);
-                var newSortingLayer = sortingLayersProperty.GetArrayElementAtIndex(sortingLayersProperty.arraySize - 1);
+				SerializedProperty newSortingLayer = sortingLayersProperty.GetArrayElementAtIndex(sortingLayersProperty.arraySize - 1);
                 newSortingLayer.FindPropertyRelative("name").stringValue = sortingLayerName;
                 newSortingLayer.FindPropertyRelative("uniqueID").intValue = System.DateTime.Now.GetHashCode();
                 
@@ -327,7 +327,7 @@ namespace TinyWalnutGames.GridLayerEditor
         /// <returns>SerializedObject for the TagManager, or null if not found.</returns>
         private static SerializedObject GetTagManager()
         {
-            var tagManagerAsset = AssetDatabase.LoadAssetAtPath<Object>("ProjectSettings/TagManager.asset");
+			Object tagManagerAsset = AssetDatabase.LoadAssetAtPath<Object>("ProjectSettings/TagManager.asset");
             if (tagManagerAsset == null)
             {
                 Debug.LogError("Could not load TagManager.asset");
@@ -357,7 +357,7 @@ namespace TinyWalnutGames.GridLayerEditor
         /// <returns>True if the sorting layer exists, false otherwise.</returns>
         private static bool SortingLayerExists(string sortingLayerName)
         {
-            var sortingLayers = SortingLayer.layers;
+			SortingLayer [ ] sortingLayers = SortingLayer.layers;
             return sortingLayers.Any(layer => layer.name == sortingLayerName);
         }
 
@@ -393,16 +393,16 @@ namespace TinyWalnutGames.GridLayerEditor
         /// </summary>
         private static void CleanLayers()
         {
-            var tagManager = GetTagManager();
+			SerializedObject tagManager = GetTagManager();
             if (tagManager == null) return;
 
-            var layersProperty = tagManager.FindProperty("layers");
+			SerializedProperty layersProperty = tagManager.FindProperty("layers");
             var standardLayers = PlatformerLayers.Union(TopDownLayers).ToHashSet();
             var removedLayers = new List<string>();
 
             for (int i = 8; i < 32; i++) // Start at 8 to skip built-in layers
             {
-                var layerProperty = layersProperty.GetArrayElementAtIndex(i);
+				SerializedProperty layerProperty = layersProperty.GetArrayElementAtIndex(i);
                 string layerName = layerProperty.stringValue;
                 
                 if (!string.IsNullOrEmpty(layerName) && !standardLayers.Contains(layerName))

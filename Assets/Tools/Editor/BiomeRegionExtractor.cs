@@ -64,7 +64,7 @@ namespace TinyWalnutGames.Tools.Editor
         /// <summary>
         /// Opens the Biome Region Extractor window in the Unity Editor.
         /// </summary>
-        [MenuItem("Tools/Biome Region Extractor")]
+        [MenuItem("Tiny Walnut Games/MetVanDAMN!/Tools/Biome Region Extractor")]
         public static void OpenWindow()
             {
             GetWindow<BiomeRegionExtractor>("Biome Region Extractor");

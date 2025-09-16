@@ -2,8 +2,6 @@
   "name": "TinyWalnutGames.MetVD.Utility.Tests",
   "rootNamespace": "TinyWalnutGames.MetVD.Tests.Utility",
   "references": [
-    "UnityEngine.TestRunner",
-    "UnityEditor.TestRunner",
     "Unity.Entities",
     "Unity.Mathematics",
     "Unity.Collections",
@@ -18,9 +16,10 @@
     "nunit.framework.dll"
   ],
   "autoReferenced": true,
-  "defineConstraints": [
-    "UNITY_INCLUDE_TESTS"
+  "optionalUnityReferences": [
+    "TestAssemblies"
   ],
+  "defineConstraints": [],
   "versionDefines": [],
   "noEngineReferences": false
 }

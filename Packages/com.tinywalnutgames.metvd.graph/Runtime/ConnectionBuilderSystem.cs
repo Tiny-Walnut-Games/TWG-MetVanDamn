@@ -42,7 +42,7 @@ namespace TinyWalnutGames.MetVD.Graph
 				return;
 				}
 
-			DistrictLayoutDoneTag layoutDone = layoutDoneArray [ 0 ];
+			DistrictLayoutDoneTag layoutDone = layoutDoneArray[0];
 			layoutDoneArray.Dispose();
 
 			// Skip if connections already built
@@ -59,7 +59,7 @@ namespace TinyWalnutGames.MetVD.Graph
 			int districtCount = 0;
 			for (int i = 0; i < nodeIds.Length; i++)
 				{
-				if (nodeIds [ i ].Level == 0)
+				if (nodeIds[i].Level == 0)
 					{
 					districtCount++;
 					}
@@ -78,17 +78,18 @@ namespace TinyWalnutGames.MetVD.Graph
 			int districtIndex = 0;
 			for (int i = 0; i < nodeIds.Length; i++)
 				{
-				if (nodeIds [ i ].Level == 0)
+				if (nodeIds[i].Level == 0)
 					{
-					districtEntities [ districtIndex ] = entities [ i ];
-					districtPositions [ districtIndex ] = nodeIds [ i ].Coordinates;
-					districtNodeIds [ districtIndex ] = nodeIds [ i ]._value;
+					districtEntities[districtIndex] = entities[i];
+					districtPositions[districtIndex] = nodeIds[i].Coordinates;
+					districtNodeIds[districtIndex] = nodeIds[i]._value;
 					districtIndex++;
 					}
 				}
 
 			// Get world configuration for random seed
 			EntityQuery worldConfigQuery = state.GetEntityQuery(ComponentType.ReadOnly<WorldConfiguration>());
+			if (worldConfigQuery.IsEmpty) return; // wait until config exists (bridge or authoring)
 			WorldConfiguration worldConfig = worldConfigQuery.GetSingleton<WorldConfiguration>();
 			var random = new Random((uint)(worldConfig.Seed + 1337)); // Different seed for connections
 
@@ -122,9 +123,9 @@ namespace TinyWalnutGames.MetVD.Graph
 			// For each district, connect to K nearest neighbors
 			for (int i = 0; i < districtPositions.Length; i++)
 				{
-				int2 sourcePos = districtPositions [ i ];
-				uint sourceNodeId = districtNodeIds [ i ];
-				Entity sourceEntity = districtEntities [ i ];
+				int2 sourcePos = districtPositions[i];
+				uint sourceNodeId = districtNodeIds[i];
+				Entity sourceEntity = districtEntities[i];
 
 				// Find K nearest neighbors
 				var distances = new NativeArray<DistanceEntry>(districtPositions.Length - 1, Allocator.Temp);
@@ -137,9 +138,9 @@ namespace TinyWalnutGames.MetVD.Graph
 						continue; // Skip self
 						}
 
-					int2 targetPos = districtPositions [ j ];
+					int2 targetPos = districtPositions[j];
 					float distance = math.length(new float2(targetPos - sourcePos));
-					distances [ entryIndex ] = new DistanceEntry
+					distances[entryIndex] = new DistanceEntry
 						{
 						Index = j,
 						Distance = distance
@@ -154,14 +155,14 @@ namespace TinyWalnutGames.MetVD.Graph
 				DynamicBuffer<ConnectionBufferElement> connectionBuffer = entityManager.GetBuffer<ConnectionBufferElement>(sourceEntity);
 				for (int k_idx = 0; k_idx < math.min(k, distances.Length); k_idx++)
 					{
-					int targetIndex = distances [ k_idx ].Index;
-					uint targetNodeId = districtNodeIds [ targetIndex ];
+					int targetIndex = distances[k_idx].Index;
+					uint targetNodeId = districtNodeIds[targetIndex];
 
 					// Check if connection already exists (avoid duplicates)
 					bool connectionExists = false;
 					for (int c = 0; c < connectionBuffer.Length; c++)
 						{
-						if (connectionBuffer [ c ].Value.ToNodeId == targetNodeId)
+						if (connectionBuffer[c].Value.ToNodeId == targetNodeId)
 							{
 							connectionExists = true;
 							break;
@@ -175,7 +176,7 @@ namespace TinyWalnutGames.MetVD.Graph
 							targetNodeId,
 							ConnectionType.Bidirectional,
 							Polarity.None,
-							distances [ k_idx ].Distance * 0.1f // Scale down traversal cost
+							distances[k_idx].Distance * 0.1f // Scale down traversal cost
 						);
 
 						connectionBuffer.Add(new ConnectionBufferElement { Value = connection });
@@ -199,16 +200,16 @@ namespace TinyWalnutGames.MetVD.Graph
 					targetIdx = (targetIdx + 1) % districtPositions.Length;
 					}
 
-				Entity sourceEntity = districtEntities [ sourceIdx ];
-				uint sourceNodeId = districtNodeIds [ sourceIdx ];
-				uint targetNodeId = districtNodeIds [ targetIdx ];
+				Entity sourceEntity = districtEntities[sourceIdx];
+				uint sourceNodeId = districtNodeIds[sourceIdx];
+				uint targetNodeId = districtNodeIds[targetIdx];
 
 				// Check if long edge connection already exists
 				DynamicBuffer<ConnectionBufferElement> connectionBuffer = entityManager.GetBuffer<ConnectionBufferElement>(sourceEntity);
 				bool connectionExists = false;
 				for (int c = 0; c < connectionBuffer.Length; c++)
 					{
-					if (connectionBuffer [ c ].Value.ToNodeId == targetNodeId)
+					if (connectionBuffer[c].Value.ToNodeId == targetNodeId)
 						{
 						connectionExists = true;
 						break;
@@ -217,7 +218,7 @@ namespace TinyWalnutGames.MetVD.Graph
 
 				if (!connectionExists)
 					{
-					float distance = math.length(new float2(districtPositions [ targetIdx ] - districtPositions [ sourceIdx ]));
+					float distance = math.length(new float2(districtPositions[targetIdx] - districtPositions[sourceIdx]));
 					var connection = new Connection(
 						sourceNodeId,
 						targetNodeId,
@@ -243,9 +244,9 @@ namespace TinyWalnutGames.MetVD.Graph
 				{
 				for (int j = 0; j < distances.Length - i - 1; j++)
 					{
-					if (distances [ j ].Distance > distances [ j + 1 ].Distance)
+					if (distances[j].Distance > distances[j + 1].Distance)
 						{
-						(distances [ j ], distances [ j + 1 ]) = (distances [ j + 1 ], distances [ j ]);
+						(distances[j], distances[j + 1]) = (distances[j + 1], distances[j]);
 						}
 					}
 				}

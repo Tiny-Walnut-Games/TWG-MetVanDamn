@@ -41,7 +41,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			public uint nodeId = 0; // NodeId for better tracking
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Biome Color Legend")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Biome Color Legend")]
 		public static void ShowWindow()
 			{
 			BiomeColorLegendWindow window = GetWindow<BiomeColorLegendWindow>("Biome Legend");
@@ -595,14 +595,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			string typeName = type.ToString();
 
 			// Prefer per-type bucket colors if available
-			var lib = libAuth.library;
+			BiomeArtProfileLibrary lib = libAuth.library;
 			if (lib.perTypeBuckets != null)
 				{
 				for (int i = 0; i < lib.perTypeBuckets.Length; i++)
 					{
-					var bucket = lib.perTypeBuckets[i];
+					BiomeArtProfileLibrary.BiomeTypeBucket bucket = lib.perTypeBuckets[i];
 					if (bucket == null || bucket.type != type || bucket.profiles == null) continue;
-					foreach (var p in bucket.profiles)
+					foreach (BiomeArtProfile p in bucket.profiles)
 						{
 						if (p != null && p.debugColor.a > 0f) return p.debugColor;
 						}
@@ -613,7 +613,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			if (lib.profiles != null && lib.profiles.Length > 0)
 				{
 				// First try: exact or contains match by biomeName
-				foreach (var p in lib.profiles)
+				foreach (BiomeArtProfile p in lib.profiles)
 					{
 					if (p == null || string.IsNullOrEmpty(p.biomeName)) continue;
 					if (p.biomeName.IndexOf(typeName, System.StringComparison.OrdinalIgnoreCase) >= 0 && p.debugColor.a > 0f)
@@ -623,7 +623,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					}
 
 				// Fallback: use first with a valid debug color
-				foreach (var p in lib.profiles)
+				foreach (BiomeArtProfile p in lib.profiles)
 					{
 					if (p != null && p.debugColor.a > 0f) return p.debugColor;
 					}
@@ -727,20 +727,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				return null;
 
 			// Count types
-			var topType = instances
+			BiomeType? topType = instances
 				.GroupBy(i => i.biomeType)
 				.OrderByDescending(g => g.Count())
 				.FirstOrDefault()?.Key;
 
 			if (topType == null) return null;
 
-			var lib = libAuth.library;
+			BiomeArtProfileLibrary lib = libAuth.library;
 			// Prefer per-type bucket profiles
 			if (lib.perTypeBuckets != null)
 				{
 				for (int i = 0; i < lib.perTypeBuckets.Length; i++)
 					{
-					var bucket = lib.perTypeBuckets[i];
+					BiomeArtProfileLibrary.BiomeTypeBucket bucket = lib.perTypeBuckets[i];
 					if (bucket == null || bucket.type != topType || bucket.profiles == null || bucket.profiles.Length == 0) continue;
 					// choose first defined profile
 					for (int j = 0; j < bucket.profiles.Length; j++)
@@ -754,7 +754,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			string typeName = topType.ToString();
 			if (lib.profiles != null)
 				{
-				foreach (var p in lib.profiles)
+				foreach (BiomeArtProfile p in lib.profiles)
 					{
 					if (p == null || string.IsNullOrEmpty(p.biomeName)) continue;
 					if (p.biomeName.IndexOf(typeName, System.StringComparison.OrdinalIgnoreCase) >= 0)

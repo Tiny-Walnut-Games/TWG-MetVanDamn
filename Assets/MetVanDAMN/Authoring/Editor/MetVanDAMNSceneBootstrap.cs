@@ -31,7 +31,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         private class SubSceneMarker : MonoBehaviour { }
 #endif // #2
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Sample Creation/Create Baseline Scene %#m", priority = 10)]
+		// Menu item moved under Quick Start; keep public method for reuse
 		public static void CreateBaseline()
 			{
 			CreateBaselineScene();
@@ -1046,7 +1046,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 #endif // #7
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Utilities/Fix Missing SubScene References", priority = 20)]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Tools/SubScenes/Fix Missing SubScene References", priority = 20)]
 		public static void FixMissingSubSceneReferences()
 			{
 			Debug.Log("🔧 Starting manual SubScene reference fix...");
@@ -1191,7 +1191,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		// ⚠ Intention ⚠ - @jmeyer1980: This method now uses Faculty-grade SubScene lifecycle management
 		// This bug causes the scene hierarchy to show the subscenes as both subscenes and normal scenes in the hierarchy
 		// We now use proper Unity internal methods to replicate the "Close" -> "Open" button workflow
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Utilities/Close and Reopen SubScenes", priority = 30)]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Tools/SubScenes/Close and Reopen SubScenes", priority = 30)]
 		public static void TurnThemOffAndOnAgain()
 			{
 #if METVD_FULL_DOTS // #10

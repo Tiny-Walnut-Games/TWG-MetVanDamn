@@ -70,7 +70,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			public string connectionType;
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Sector Room Hierarchy")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Sector Room Hierarchy")]
 		public static void ShowWindow()
 			{
 			GetWindow<SectorRoomHierarchyWindow>("Sector/Room Hierarchy");
@@ -538,11 +538,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private string TryGetBiomeNameFromLibrary(BiomeType type)
 			{
-			var libAuth = Object.FindFirstObjectByType<BiomeArtProfileLibraryAuthoring>(FindObjectsInactive.Include);
+			BiomeArtProfileLibraryAuthoring libAuth = Object.FindFirstObjectByType<BiomeArtProfileLibraryAuthoring>(FindObjectsInactive.Include);
 			if (libAuth == null || libAuth.library == null)
 				return null;
 
-			var lib = libAuth.library;
+			BiomeArtProfileLibrary lib = libAuth.library;
 			string typeName = type.ToString();
 
 			// Prefer per-type bucket
@@ -550,11 +550,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				for (int i = 0; i < lib.perTypeBuckets.Length; i++)
 					{
-					var bucket = lib.perTypeBuckets[i];
+					BiomeArtProfileLibrary.BiomeTypeBucket bucket = lib.perTypeBuckets[i];
 					if (bucket == null || bucket.type != type || bucket.profiles == null) continue;
 					for (int j = 0; j < bucket.profiles.Length; j++)
 						{
-						var p = bucket.profiles[j];
+						BiomeArtProfile p = bucket.profiles[j];
 						if (p == null || string.IsNullOrEmpty(p.biomeName)) continue;
 						return p.biomeName;
 						}
@@ -564,7 +564,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Fallback: global profiles
 			if (lib.profiles != null)
 				{
-				foreach (var p in lib.profiles)
+				foreach (BiomeArtProfile p in lib.profiles)
 					{
 					if (p == null || string.IsNullOrEmpty(p.biomeName)) continue;
 					if (p.biomeName.IndexOf(typeName, System.StringComparison.OrdinalIgnoreCase) >= 0)

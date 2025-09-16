@@ -17,42 +17,47 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
             {
             _world = new World("TestWorld_ECS_Consumer");
             _em = _world.EntityManager;
+            World.DefaultGameObjectInjectionWorld = _world;
             }
 
         [TearDown]
         public void TearDown()
             {
+            if (World.DefaultGameObjectInjectionWorld == _world)
+                World.DefaultGameObjectInjectionWorld = null;
             _world?.Dispose();
             }
 
         [Test]
         public void EcsConsumer_Instantiates_BossPrefab_And_Destroys_Request()
             {
-            // Create a simple prefab entity with BossTag
-            var prefab = _em.CreateEntity(typeof(BossTag), typeof(LocalTransform));
+			// Create a simple prefab entity with BossTag
+			Entity prefab = _em.CreateEntity(typeof(BossTag));
             _em.AddComponent<Prefab>(prefab);
 
-            // Create registry singleton with one entry
-            var reg = _em.CreateEntity(typeof(EcsPrefabRegistry));
-            var buf = _em.AddBuffer<EcsPrefabEntry>(reg);
+			// Create registry singleton with one entry
+			Entity reg = _em.CreateEntity(typeof(EcsPrefabRegistry));
+			DynamicBuffer<EcsPrefabEntry> buf = _em.AddBuffer<EcsPrefabEntry>(reg);
             buf.Add(new EcsPrefabEntry { Key = new FixedString64Bytes("spawn_boss"), Prefab = prefab });
 
-            // Create a request
-            var req = _em.CreateEntity(typeof(SudoActionRequest));
+			// Create a request
+			Entity req = _em.CreateEntity(typeof(SudoActionRequest));
             _em.SetComponentData(req, new SudoActionRequest
                 {
                 ActionKey = new FixedString64Bytes("spawn_boss"),
                 ResolvedPosition = new float3(5, 0, 7)
                 });
 
-            var sys = _world.GetOrCreateSystemManaged<SudoActionEcsConsumerSystem>();
-            sys.Update(_world.Unmanaged);
+			// Drive ISystem via sim group
+			SimulationSystemGroup sim = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            _world.GetOrCreateSystem<SudoActionEcsConsumerSystem>();
+            sim.Update();
 
             // Request must be consumed
             Assert.AreEqual(0, _em.CreateEntityQuery(typeof(SudoActionRequest)).CalculateEntityCount());
-            // One non-prefab BossTag entity should be present
-            var q = _em.CreateEntityQuery(ComponentType.ReadOnly<BossTag>(), ComponentType.ReadOnly<LocalTransform>());
-            var entities = q.ToEntityArray(Allocator.Temp);
+			// One non-prefab BossTag entity should be present
+			EntityQuery q = _em.CreateEntityQuery(ComponentType.ReadOnly<BossTag>());
+			NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
             Assert.GreaterOrEqual(entities.Length, 1);
             // Ensure spawned entity is not the prefab
             bool foundInstance = false;

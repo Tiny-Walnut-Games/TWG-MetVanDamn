@@ -15,7 +15,7 @@ namespace TinyWalnutGames.MetVD.Graph
 	/// - Captures lightweight profiling (time spent) into ProceduralRoomGenerated.GenerationTime
 	/// Converted to SystemBase so tests/harness can drive Update() directly.
 	/// </summary>
-	[UpdateInGroup(typeof(SimulationSystemGroup))]
+	[UpdateInGroup(typeof(InitializationSystemGroup))]
 	[UpdateAfter(typeof(RoomNavigationGeneratorSystem))]
 	public partial class CinemachineZoneGeneratorSystem : SystemBase
 		{
@@ -39,10 +39,10 @@ namespace TinyWalnutGames.MetVD.Graph
 
 			for (int i = 0; i < roomEntities.Length; i++)
 				{
-				Entity roomEntity = roomEntities [ i ];
-				NodeId nodeId = nodeIds [ i ];
-				RoomHierarchyData hierarchy = roomData [ i ];
-				RoomTemplate template = templates [ i ];
+				Entity roomEntity = roomEntities[i];
+				NodeId nodeId = nodeIds[i];
+				RoomHierarchyData hierarchy = roomData[i];
+				RoomTemplate template = templates[i];
 
 				ProceduralRoomGenerated genStatus = EntityManager.GetComponentData<ProceduralRoomGenerated>(roomEntity);
 				if (genStatus.CinemachineGenerated)

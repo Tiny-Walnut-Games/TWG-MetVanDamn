@@ -30,22 +30,22 @@ namespace TinyWalnutGames.MetVD.Tests
             em.AddComponentData(testEntity, new NodeId(value: 1u, level: 0, parentId: 0, coordinates: int2.zero));
             em.AddBuffer<WfcCandidateBufferElement>(testEntity);
 
-            // Manually create and run the system
-            var simGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
-            var systemHandle = world.CreateSystem(typeof(DistrictWfcSystem));
+			// Manually create and run the system
+			SimulationSystemGroup simGroup = world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+			SystemHandle systemHandle = world.CreateSystem(typeof(DistrictWfcSystem));
             simGroup.AddSystemToUpdateList(systemHandle);
             simGroup.SortSystems();
 
             // Debug: Check what the system's queries will find
-            using var worldSeedQuery = em.CreateEntityQuery(typeof(WorldSeed));
-            using var wfcQuery = em.CreateEntityQuery(typeof(WfcState), typeof(NodeId));
+            using EntityQuery worldSeedQuery = em.CreateEntityQuery(typeof(WorldSeed));
+            using EntityQuery wfcQuery = em.CreateEntityQuery(typeof(WfcState), typeof(NodeId));
 
             Debug.Log($"WorldSeed entities: {worldSeedQuery.CalculateEntityCount()}");
             Debug.Log($"WfcState+NodeId entities: {wfcQuery.CalculateEntityCount()}");
 
             // Check initial state
             WfcState initialState = em.GetComponentData<WfcState>(testEntity);
-            var initialBuffer = em.GetBuffer<WfcCandidateBufferElement>(testEntity);
+			DynamicBuffer<WfcCandidateBufferElement> initialBuffer = em.GetBuffer<WfcCandidateBufferElement>(testEntity);
             Debug.Log($"BEFORE: State={initialState.State}, Iteration={initialState.Iteration}, BufferLength={initialBuffer.Length}");
 
             // Run the system
@@ -53,7 +53,7 @@ namespace TinyWalnutGames.MetVD.Tests
 
             // Check final state
             WfcState finalState = em.GetComponentData<WfcState>(testEntity);
-            var finalBuffer = em.GetBuffer<WfcCandidateBufferElement>(testEntity);
+			DynamicBuffer<WfcCandidateBufferElement> finalBuffer = em.GetBuffer<WfcCandidateBufferElement>(testEntity);
             Debug.Log($"AFTER: State={finalState.State}, Iteration={finalState.Iteration}, BufferLength={finalBuffer.Length}");
 
             // The test should work - if not, we'll see exactly what's happening

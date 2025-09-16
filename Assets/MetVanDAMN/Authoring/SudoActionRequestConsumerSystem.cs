@@ -14,7 +14,6 @@ namespace TinyWalnutGames.MetVD.Authoring
     /// - Filters by ActionKey when `FilterKey` is non-empty.
     /// - Demonstrates reading radius/center and elevation/type constraints.
     /// - Destroys request entities after handling to avoid reprocessing.
-    [BurstCompile]
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct SudoActionRequestConsumerSystem : ISystem
         {

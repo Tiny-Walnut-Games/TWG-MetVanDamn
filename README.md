@@ -238,6 +238,52 @@ python3 scripts/cid-faculty/overlord-sentinel.js # Security validation
 
 ---
 
+### WorldConfig Aspect quickstart
+
+Set up and query world configuration data via a single ECS aspect.
+
+- Authoring: Add `WorldAuthoring` to any GameObject in your scene and configure `Seed`, `World Size (Extents)`, `Target Sector Count`, `Biome Transition Radius`, and toggles for debug/logging. The baker adds `WorldSeedData`, `WorldBoundsData`, and `WorldGenerationConfigData` to an entity.
+- Query: Use `WorldConfigAspect` to read/write the values from systems.
+
+```csharp
+using Unity.Burst;
+using Unity.Entities;
+using TinyWalnutGames.MetVD.Core; // WorldConfigAspect and Data components
+
+[BurstCompile]
+[UpdateInGroup(typeof(InitializationSystemGroup))]
+public partial struct WorldConfigAspectQuickstartSystem : ISystem
+{
+    public void OnCreate(ref SystemState state) {}
+
+    public void OnUpdate(ref SystemState state)
+    {
+        foreach (var world in SystemAPI.Query<WorldConfigAspect>())
+        {
+            // Read authored values
+            var seed = world.WorldSeed;
+            var center = world.Center;   // float3
+            var extents = world.Extents; // float3
+
+            // Adjust generation config at runtime
+            world.TargetSectors = math.max(1, world.TargetSectors);
+            world.BiomeTransitionRadius = math.max(1f, world.BiomeTransitionRadius);
+
+            if (world.LogSteps)
+            {
+                UnityEngine.Debug.Log($"World seed {seed} @ center {center} extents {extents}");
+            }
+        }
+    }
+}
+```
+
+Files and references:
+- `Assets/MetVanDAMN/Authoring/WorldAuthoring.cs` (authoring + baker)
+- `Packages/com.tinywalnutgames.metvd.core/Runtime/WorldConfigAspect.cs` (aspect)
+- `Packages/com.tinywalnutgames.metvd.core/Runtime/WorldConfigAspectSampleSystem.cs` (example system)
+- `Assets/MetVanDAMN/Authoring/Tests/WorldConfigAspectPlayModeTests.cs` (PlayMode test)
+
 ## 🎯 **Technical Deep Dive**
 
 ### **Wave Function Collapse Implementation**

@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f284d04bc8bce964ba2c649f089b1f65, type: 3}
+  m_Name: BiomeArtProfileLibrary
+  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVD.Authoring.BiomeArtProfileLibrary
+  profiles:
+  - {fileID: 11400000, guid: 4734062094628374ab84375109a5fa40, type: 2}
+  - {fileID: 11400000, guid: a50c9ee65001f4248bb4202adcd4145e, type: 2}
+  - {fileID: 11400000, guid: f18c617ce0fc26b4dbeecd42b7b63648, type: 2}
+  - {fileID: 11400000, guid: 1464c4ca046a7e04a9bf70ce6ffaaa7e, type: 2}
+  - {fileID: 11400000, guid: 04b11b8946ca3e348a2e5ef61e2ac236, type: 2}
+  - {fileID: 11400000, guid: 1159ef96fcbbd0a4bbe3712b959bd09a, type: 2}
+  - {fileID: 11400000, guid: d77ef7a1752f84945bf25e634f584a88, type: 2}
+  - {fileID: 11400000, guid: 8b4f440179e6df44f9db0c45cb3754ee, type: 2}
+  - {fileID: 11400000, guid: 54a6848da2e863447927ec799dfb6222, type: 2}
+  - {fileID: 11400000, guid: aa44c424877d59948be8e1194359bc7e, type: 2}
+  - {fileID: 11400000, guid: 6291202b681fb31419d322e8ad74dd4d, type: 2}
+  - {fileID: 11400000, guid: 9cfd6ba71b2ecc049970ad8972d11755, type: 2}
+  - {fileID: 11400000, guid: a8d7851279a70c54dbb24f48c832037b, type: 2}
+  - {fileID: 11400000, guid: fcb677bd109dc0842a0c54d6e704048f, type: 2}
+  - {fileID: 11400000, guid: 2814c855836991c4d8635a886ed9def5, type: 2}
+  - {fileID: 11400000, guid: f417d125203d6fd4db6f07660ba24d9b, type: 2}
+  - {fileID: 11400000, guid: 2ee182b49f1012a4cbbcf5cbd8e79fae, type: 2}
+  - {fileID: 11400000, guid: 0bc12c364443d134a9f8483d0d0ef02b, type: 2}
+  - {fileID: 11400000, guid: 7d71f44f8f065f14baa78b2ebdd6dc99, type: 2}
+  - {fileID: 11400000, guid: fcf87d654df10dc4aba68b521d659017, type: 2}
+  - {fileID: 11400000, guid: 0d98472f5bd77574db59c182951bda6d, type: 2}
+  - {fileID: 11400000, guid: 253af07231c51514aa4b242bacbc92d4, type: 2}
+  perTypeBuckets:
+  - type: 1
+    profiles:
+    - {fileID: 11400000, guid: 8b4f440179e6df44f9db0c45cb3754ee, type: 2}
+    - {fileID: 11400000, guid: d77ef7a1752f84945bf25e634f584a88, type: 2}
+    - {fileID: 11400000, guid: fcb677bd109dc0842a0c54d6e704048f, type: 2}
+  perTypeElevationBuckets: []

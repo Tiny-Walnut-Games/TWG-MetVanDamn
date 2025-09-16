@@ -32,9 +32,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             public override void Bake(SudoActionHintAuthoring authoring)
                 {
-                var entity = GetEntity(TransformUsageFlags.None);
+				Entity entity = GetEntity(TransformUsageFlags.None);
                 var key = new Unity.Collections.FixedString64Bytes(authoring.actionKey ?? "");
-                var center = authoring.transform.position;
+				Vector3 center = authoring.transform.position;
                 AddComponent(entity, new SudoActionHint
                     {
                     ActionKey = key,

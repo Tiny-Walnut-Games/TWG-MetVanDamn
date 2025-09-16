@@ -7,7 +7,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem;
+// using BiomeFieldSystem = TinyWalnutGames.MetVD.Biome.BiomeFieldSystem; // Removed cross-group ordering dependency
 // Disambiguate Biome component from potential namespace collisions
 using CoreBiome = TinyWalnutGames.MetVD.Core.Biome;
 
@@ -19,7 +19,6 @@ namespace TinyWalnutGames.MetVD.Authoring
 	/// Implements comprehensive pre-pass logic with advanced terrain analysis and spatial optimization
 	/// </summary>
 	[UpdateInGroup(typeof(PresentationSystemGroup))]
-	[UpdateAfter(typeof(BiomeFieldSystem))]
 	public partial struct BiomeArtIntegrationSystem : ISystem
 		{
 		private ComponentLookup<CoreBiome> biomeLookup;
@@ -602,7 +601,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(World.Unmanaged);
 
 			// Process biome art profiles that need tilemap creation
-			var em = this.EntityManager;
+			EntityManager em = this.EntityManager;
 
 			Entities
 				.WithoutBurst() // Required for GameObject creation
@@ -643,7 +642,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					// If this entity has a BiomeTransition component, ensure transition tiles are applied
 					if (em.HasComponent<BiomeTransition>(entity))
 						{
-						var transition = em.GetComponentData<BiomeTransition>(entity);
+						BiomeTransition transition = em.GetComponentData<BiomeTransition>(entity);
 						if (!transition.TransitionTilesApplied)
 							{
 							// Minimal safe action: mark the transition as applied via ECB so tests can observe it
@@ -768,7 +767,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				// TODO: Load from MetVDGizmoSettings.asset instead of hardcoding
 				float gridCellSize = 11.38f; // From MetVDGizmoSettings.asset
 				Vector3 gridOriginOffset = Vector3.zero; // From MetVDGizmoSettings.asset
-				var biomeCenter = new Vector3(
+				Vector3 biomeCenter = new Vector3(
 					nodeId.Coordinates.x * gridCellSize,
 					0f,
 					nodeId.Coordinates.y * gridCellSize

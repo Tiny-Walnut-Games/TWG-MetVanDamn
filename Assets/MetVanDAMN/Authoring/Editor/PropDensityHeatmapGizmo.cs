@@ -38,7 +38,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Bounds bounds = CalculateBiomeBounds(biomeAuthoring.transform);
 
 			// Sample density across the biome area
-			float [ , ] densityData = SampleDensityGrid(bounds, profile, s_heatmapResolution);
+			float[,] densityData = SampleDensityGrid(bounds, profile, s_heatmapResolution);
 
 			// Draw heatmap visualization
 			DrawHeatmapGrid(densityData, bounds);
@@ -72,7 +72,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return new Bounds(center, size);
 			}
 
-		private static float [ , ] SampleDensityGrid(Bounds bounds, BiomeArtProfile profile, float resolution)
+		private static float[,] SampleDensityGrid(Bounds bounds, BiomeArtProfile profile, float resolution)
 			{
 			int gridWidth = Mathf.RoundToInt(bounds.size.x / resolution);
 			int gridHeight = Mathf.RoundToInt(bounds.size.z / resolution);
@@ -80,7 +80,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			gridWidth = Mathf.Min(gridWidth, s_maxSamples);
 			gridHeight = Mathf.Min(gridHeight, s_maxSamples);
 
-			float [ , ] densityGrid = new float [ gridWidth, gridHeight ];
+			float[,] densityGrid = new float[gridWidth, gridHeight];
 
 			for (int x = 0; x < gridWidth; x++)
 				{
@@ -92,7 +92,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						bounds.min.z + (z * resolution) + (resolution * 0.5f)
 					);
 
-					densityGrid [ x, z ] = CalculateExpectedDensity(worldPos, profile);
+					densityGrid[x, z] = CalculateExpectedDensity(worldPos, profile);
 					}
 				}
 
@@ -139,7 +139,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return baseDensity * multiplier * densityFactor * terrainModifier;
 			}
 
-		private static void DrawHeatmapGrid(float [ , ] densityData, Bounds bounds)
+		private static void DrawHeatmapGrid(float[,] densityData, Bounds bounds)
 			{
 			int width = densityData.GetLength(0);
 			int height = densityData.GetLength(1);
@@ -153,7 +153,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				for (int z = 0; z < height; z++)
 					{
-					maxDensity = Mathf.Max(maxDensity, densityData [ x, z ]);
+					maxDensity = Mathf.Max(maxDensity, densityData[x, z]);
 					}
 				}
 
@@ -173,8 +173,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						bounds.min.z + (z * cellHeight) + (cellHeight * 0.5f)
 					);
 
-					float normalizedDensity = densityData [ x, z ] / maxDensity;
-					float actualDensity = densityData [ x, z ];
+					float normalizedDensity = densityData[x, z] / maxDensity;
+					float actualDensity = densityData[x, z];
 					Color heatColor = GetHeatMapColor(normalizedDensity);
 
 					// Draw heat map cell
@@ -261,7 +261,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		/// <summary>
 		/// Draws a legend overlay showing the heatmap color scale and density values
 		/// </summary>
-		private static void DrawHeatmapLegend(float [ , ] densityData, Bounds bounds)
+		private static void DrawHeatmapLegend(float[,] densityData, Bounds bounds)
 			{
 			// Calculate legend position (offset from the heatmap area)
 			Vector3 legendPosition = bounds.max + new Vector3(2f, 0f, 0f);
@@ -277,7 +277,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				for (int z = 0; z < height; z++)
 					{
-					float density = densityData [ x, z ];
+					float density = densityData[x, z];
 					minDensity = Mathf.Min(minDensity, density);
 					maxDensity = Mathf.Max(maxDensity, density);
 					}
@@ -318,17 +318,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private static void DrawLegendLabels(Vector3 legendPosition, float legendHeight, float minDensity, float maxDensity)
 			{
 			// Use Handles.Label for proper text rendering in scene view
-			float [ ] labelPositions = { 0f, 0.25f, 0.5f, 0.75f, 1f };
-			string [ ] labelTexts = { "Min", "Low", "Med", "High", "Max" };
+			float[] labelPositions = { 0f, 0.25f, 0.5f, 0.75f, 1f };
+			string[] labelTexts = { "Min", "Low", "Med", "High", "Max" };
 
 			for (int i = 0; i < labelPositions.Length; i++)
 				{
-				float t = labelPositions [ i ];
+				float t = labelPositions[i];
 				Vector3 labelPos = legendPosition + new Vector3(1.2f, 0f, t * legendHeight);
 				float densityValue = Mathf.Lerp(minDensity, maxDensity, t);
 
 				// Create comprehensive label with value and description
-				string labelText = $"{labelTexts [ i ]}\n{densityValue:F1}";
+				string labelText = $"{labelTexts[i]}\n{densityValue:F1}";
 
 				// Set up label style for better visibility
 				var labelStyle = new GUIStyle(EditorStyles.boldLabel)
@@ -372,7 +372,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		// Menu items for controlling heatmap display
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Toggle Prop Density Heatmap")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Toggle Prop Density Heatmap")]
 		public static void TogglePropDensityHeatmap()
 			{
 			s_showHeatmap = !s_showHeatmap;
@@ -381,7 +381,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log($"Prop Density Heatmap: {(s_showHeatmap ? "Enabled" : "Disabled")}");
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Toggle Heatmap Legend")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Toggle Heatmap Legend")]
 		public static void ToggleHeatmapLegend()
 			{
 			s_showLegend = !s_showLegend;
@@ -390,7 +390,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Debug.Log($"Heatmap Legend: {(s_showLegend ? "Enabled" : "Disabled")}");
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Settings/Low Resolution")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Settings/Low Resolution")]
 		public static void SetLowResolution()
 			{
 			s_heatmapResolution = 4f;
@@ -398,7 +398,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Settings/Medium Resolution")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Settings/Medium Resolution")]
 		public static void SetMediumResolution()
 			{
 			s_heatmapResolution = 2f;
@@ -406,7 +406,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Settings/High Resolution")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Settings/High Resolution")]
 		public static void SetHighResolution()
 			{
 			s_heatmapResolution = 1f;
@@ -415,35 +415,35 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		// Color scheme menu items
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Colors/Blue to Red")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Colors/Blue to Red")]
 		public static void SetBlueToRedColors()
 			{
 			s_colorScheme = HeatmapColorScheme.BlueToRed;
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Colors/Grayscale")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Colors/Grayscale")]
 		public static void SetGrayscaleColors()
 			{
 			s_colorScheme = HeatmapColorScheme.Grayscale;
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Colors/Rainbow")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Colors/Rainbow")]
 		public static void SetRainbowColors()
 			{
 			s_colorScheme = HeatmapColorScheme.Rainbow;
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Colors/Green Gradient")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Colors/Green Gradient")]
 		public static void SetGreenColors()
 			{
 			s_colorScheme = HeatmapColorScheme.Green;
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Colors/Custom")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Colors/Custom")]
 		public static void SetCustomColors()
 			{
 			s_colorScheme = HeatmapColorScheme.Custom;
@@ -451,28 +451,28 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		// Intensity adjustment menu items
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Intensity/Low (0.5x)")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Intensity/Low (0.5x)")]
 		public static void SetLowIntensity()
 			{
 			s_intensityMultiplier = 0.5f;
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Intensity/Normal (1.0x)")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Intensity/Normal (1.0x)")]
 		public static void SetNormalIntensity()
 			{
 			s_intensityMultiplier = 1f;
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Intensity/High (2.0x)")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Intensity/High (2.0x)")]
 		public static void SetHighIntensity()
 			{
 			s_intensityMultiplier = 2f;
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap Intensity/Very High (3.0x)")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Intensity/Very High (3.0x)")]
 		public static void SetVeryHighIntensity()
 			{
 			s_intensityMultiplier = 3f;
@@ -480,17 +480,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			}
 
 		// Legend visibility toggle
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap/Toggle Legend Visibility")]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Toggle Legend Visibility")]
 		public static void ToggleLegendVisibility()
 			{
 			s_showLegend = !s_showLegend;
 			SceneView.RepaintAll();
 			}
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap/Toggle Legend Visibility", true)]
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Toggle Legend Visibility", true)]
 		public static bool ToggleLegendVisibility_Validate()
 			{
-			Menu.SetChecked("Tiny Walnut Games/MetVanDAMN/Debug/Heatmap/Toggle Legend Visibility", s_showLegend);
+			Menu.SetChecked("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Heatmap/Toggle Legend Visibility", s_showLegend);
 			return true;
 			}
 		}

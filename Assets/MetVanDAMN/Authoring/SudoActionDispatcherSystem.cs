@@ -14,7 +14,6 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
     /// Consumers should listen for SudoActionRequest, act on matching ActionKey, and then
     /// destroy the request entity to avoid re-processing.
     /// </summary>
-    [BurstCompile]
     [UpdateInGroup(typeof(InitializationSystemGroup))]
     public partial struct SudoActionDispatcherSystem : ISystem
         {
@@ -36,7 +35,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             return hash == 0 ? 1u : hash;
             }
 
-        [BurstCompile]
+        // Do not Burst-compile OnCreate: it can trigger managed allocations (e.g., ComponentType[])
         public void OnCreate(ref SystemState state)
             {
             _hintsQ = new EntityQueryBuilder(Allocator.Temp)
@@ -45,17 +44,25 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 .Build(ref state);
 
             _requestArch = state.EntityManager.CreateArchetype(typeof(SudoActionRequest));
+
+            // Auto-register into the Initialization group for manually created worlds in tests (Editor only)
+#if UNITY_EDITOR
+            InitializationSystemGroup initGroup = state.World.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            initGroup.AddSystemToUpdateList(state.SystemHandle);
+#endif
             }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
             {
             if (_hintsQ.IsEmptyIgnoreFilter) return;
-            var worldSeed = 0u;
-            if (SystemAPI.TryGetSingleton<WorldConfiguration>(out var config))
+            uint worldSeed = 0u;
+            if (SystemAPI.TryGetSingleton<WorldConfiguration>(out WorldConfiguration config))
                 {
                 worldSeed = (uint)config.Seed;
                 }
+
+            // Debug logging removed after stabilization to keep console output clean.
 
             NativeArray<Entity> ents = _hintsQ.ToEntityArray(Allocator.Temp);
             NativeArray<SudoActionHint> hints = _hintsQ.ToComponentDataArray<SudoActionHint>(Allocator.Temp);
@@ -63,8 +70,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 {
                 for (int i = 0; i < ents.Length; i++)
                     {
-                    var e = ents[i];
-                    var h = hints[i];
+                    Entity e = ents[i];
+                    SudoActionHint h = hints[i];
                     // Guard: empty action keys are skipped (optionally mark dispatched if OneOff)
                     if (h.ActionKey.Length == 0)
                         {
@@ -98,7 +105,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                         resolved = h.Center + new float3(offset.x, 0f, offset.y);
                         }
 
-                    var reqEntity = state.EntityManager.CreateEntity(_requestArch);
+                    Entity reqEntity = state.EntityManager.CreateEntity(_requestArch);
                     state.EntityManager.SetComponentData(reqEntity, new SudoActionRequest
                         {
                         ActionKey = h.ActionKey,
@@ -109,6 +116,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                         Seed = seed,
                         SourceHint = e
                         });
+
+                    // Debug logging removed after stabilization to keep console output clean.
 
                     if (h.OneOff)
                         {

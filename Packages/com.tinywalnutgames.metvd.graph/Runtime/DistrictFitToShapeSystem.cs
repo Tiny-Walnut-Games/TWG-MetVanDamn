@@ -33,13 +33,14 @@ namespace TinyWalnutGames.MetVD.Graph
         public void OnUpdate(ref SystemState state)
             {
             if (_doneQ.IsEmptyIgnoreFilter == false) return;
-            var config = _configQ.GetSingleton<WorldConfiguration>();
+            if (_configQ.IsEmptyIgnoreFilter) return; // no world config yet
+			WorldConfiguration config = _configQ.GetSingleton<WorldConfiguration>();
             if (config.Flow != GenerationFlow.ShapeFirstOrganic) return;
             if (_shapeQ.IsEmptyIgnoreFilter) return;
 
-            var shapeEntity = _shapeQ.GetSingletonEntity();
-            var shape = state.EntityManager.GetComponentData<WorldShapeConfig>(shapeEntity);
-            var cells = state.EntityManager.GetBuffer<ShapeCell>(shapeEntity);
+			Entity shapeEntity = _shapeQ.GetSingletonEntity();
+			WorldShapeConfig shape = state.EntityManager.GetComponentData<WorldShapeConfig>(shapeEntity);
+			DynamicBuffer<ShapeCell> cells = state.EntityManager.GetBuffer<ShapeCell>(shapeEntity);
 
             // Gather filled cells
             var inside = new NativeList<int2>(Allocator.Temp);
@@ -56,7 +57,7 @@ namespace TinyWalnutGames.MetVD.Graph
                 int2 worldSize = config.WorldSize;
                 for (int i = 0; i < nodeIds.Length; i++)
                     {
-                    var id = nodeIds[i];
+					NodeId id = nodeIds[i];
                     if (id.Level != 0 || (id.Coordinates.x | id.Coordinates.y) != 0) continue;
                     // pick a random filled cell, map from shape grid to world coords
                     int2 cell = inside[rng.NextInt(0, inside.Length)];
@@ -67,7 +68,7 @@ namespace TinyWalnutGames.MetVD.Graph
                     placed++;
                     }
 
-                var done = state.EntityManager.CreateEntity();
+				Entity done = state.EntityManager.CreateEntity();
                 state.EntityManager.AddComponentData(done, new DistrictLayoutDoneTag(placed, 0));
                 }
             finally

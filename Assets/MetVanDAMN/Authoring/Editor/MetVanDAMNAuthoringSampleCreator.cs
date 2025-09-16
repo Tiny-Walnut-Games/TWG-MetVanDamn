@@ -21,7 +21,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private const string SubScenesFolder = "Assets/Scenes/SubScenes";
 		private static readonly string[] SampleSubScenes = { "SampleGeneration", "SampleBiomes" };
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Sample Creation/Create Authoring Sample Scene")]
 		public static void CreateAuthoringSampleScene()
 			{
 			// 🔥 PHASE 1: Create new scene and basic components

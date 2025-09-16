@@ -15,7 +15,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		{
 		private const string PrefabPath = "Assets/MetVanDAMN/Prefabs/Samples/";
 
-		[MenuItem("Tiny Walnut Games/MetVanDAMN/Sample Creation/Create Sample Prefabs")]
 		public static void CreateAllSamplePrefabs()
 			{
 			// Ensure directory exists
@@ -111,7 +110,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			sphere.transform.localPosition = Vector3.zero;
 			sphere.transform.localScale = Vector3.one * 2.0f; // Larger to show field area
 
-			// 📝 Learning Opportunity Enhanced 📝 - @copilot: @jmeyer1980 discovered that `renderer.material` 
+			// 📝 Learning Opportunity Enhanced 📝 - @copilot: @jmeyer1980 discovered that `renderer.material`
 			// leaks materials in editor scripts. HOWEVER, modifying `sharedMaterial` affects ALL objects!
 			// For prefabs, we need to create a NEW material instance that won't leak.
 			Renderer renderer = sphere.GetComponent<Renderer>();
@@ -162,7 +161,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			switch (name)
 				{
 				case "Hub":
-					wfcTile.sockets = new WfcSocketConfig [ ]
+					wfcTile.sockets = new WfcSocketConfig[]
 					{
 						new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 						new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
@@ -171,14 +170,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					};
 					break;
 				case "Corridor":
-					wfcTile.sockets = new WfcSocketConfig [ ]
+					wfcTile.sockets = new WfcSocketConfig[]
 					{
 						new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
 						new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
 					};
 					break;
 				case "Chamber":
-					wfcTile.sockets = new WfcSocketConfig [ ]
+					wfcTile.sockets = new WfcSocketConfig[]
 					{
 						new() { socketId = 2, direction = 0, requiredPolarity = Polarity.Sun, isOpen = true },
 						new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
@@ -186,7 +185,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					};
 					break;
 				case "Specialist":
-					wfcTile.sockets = new WfcSocketConfig [ ]
+					wfcTile.sockets = new WfcSocketConfig[]
 					{
 						new() { socketId = 3, direction = 1, requiredPolarity = Polarity.Heat, isOpen = true },
 						new() { socketId = 2, direction = 3, requiredPolarity = Polarity.Heat, isOpen = true }
@@ -196,7 +195,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					break;
 				}
 
-			// 📝 Learning Opportunity: Fixed Material Leak Pattern 📝 
+			// 📝 Learning Opportunity: Fixed Material Leak Pattern 📝
 			// @copilot - Create visual with proper material management - no leaks!
 			GameObject visual = null;
 			Color visualColor = Color.white; // Define color first

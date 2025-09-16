@@ -2,8 +2,6 @@
     "name": "TinyWalnutGames.MetVD.Graph.Tests",
     "rootNamespace": "TinyWalnutGames.MetVD.Tests",
     "references": [
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
         "TinyWalnutGames.MetVD.Core",
         "TinyWalnutGames.MetVD.Graph",
         "TinyWalnutGames.MetVD.Shared",
@@ -11,8 +9,7 @@
         "Unity.Mathematics",
         "Unity.Collections",
         "Unity.Burst",
-        "Unity.Cinemachine",
-        "Unity.Cinemachine.Editor"
+        "Unity.Cinemachine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -22,9 +19,10 @@
         "nunit.framework.dll"
     ],
     "autoReferenced": true,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
+    "optionalUnityReferences": [
+        "TestAssemblies"
     ],
+    "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
 }
