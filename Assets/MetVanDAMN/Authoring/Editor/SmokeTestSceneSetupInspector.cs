@@ -329,7 +329,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void ClearAllGeneratedEntities(SmokeTestSceneSetup smokeTest)
 			{
-			if (!Application.isPlaying || smokeTest.EntityManager == null)
+			if (!Application.isPlaying || smokeTest.DefaultWorld == null || !smokeTest.DefaultWorld.IsCreated)
 				return;
 
 			Debug.Log("🧹 Clearing all generated entities...");
