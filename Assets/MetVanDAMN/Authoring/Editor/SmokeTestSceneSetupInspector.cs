@@ -18,7 +18,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private bool _showAdvancedOptions = false;
 
 		// Cache for reducing constant redraws
-		private int _cachedEntityCounts = -1;
+		private int _cachedWorldSeeds = -1;
+		private int _cachedDistricts = -1;
+		private int _cachedPolarityFields = -1;
+		private uint _cachedCurrentSeed = 0;
 		private float _lastUpdateTime = 0f;
 		private const float UPDATE_INTERVAL = 0.5f; // Update every 500ms instead of every frame
 
@@ -153,7 +156,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				if (GUILayout.Button("🔄 Refresh Display"))
 					{
 					// Force immediate cache refresh
-					_cachedEntityCounts = -1;
+					_cachedWorldSeeds = -1;
+					_cachedDistricts = -1;
+					_cachedPolarityFields = -1;
+					_cachedCurrentSeed = 0;
 					_lastUpdateTime = 0f;
 					Repaint();
 					}
@@ -172,45 +178,55 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				// Only update entity counts periodically to reduce constant redraws
 				float currentTime = (float)EditorApplication.timeSinceStartup;
-				bool shouldUpdate = currentTime - _lastUpdateTime > UPDATE_INTERVAL || _cachedEntityCounts == -1;
+				bool shouldUpdate = currentTime - _lastUpdateTime > UPDATE_INTERVAL || _cachedWorldSeeds == -1;
 
 				if (shouldUpdate)
 					{
 					_lastUpdateTime = currentTime;
-					// Count entities by type
+					// Count entities by type - cache results to avoid constant EntityQuery operations
 					using EntityQuery worldSeedQuery = smokeTest.EntityManager.CreateEntityQuery(typeof(WorldSeed));
 					using EntityQuery districtQuery = smokeTest.EntityManager.CreateEntityQuery(typeof(NodeId));
 					using EntityQuery polarityQuery = smokeTest.EntityManager.CreateEntityQuery(typeof(PolarityFieldData));
 
-					EditorGUILayout.BeginVertical("box");
-					EditorGUILayout.LabelField($"🌱 World Seeds: {worldSeedQuery.CalculateEntityCount()}");
-					EditorGUILayout.LabelField($"🏰 Districts: {districtQuery.CalculateEntityCount()}");
-					EditorGUILayout.LabelField($"🌊 Polarity Fields: {polarityQuery.CalculateEntityCount()}");
+					_cachedWorldSeeds = worldSeedQuery.CalculateEntityCount();
+					_cachedDistricts = districtQuery.CalculateEntityCount();
+					_cachedPolarityFields = polarityQuery.CalculateEntityCount();
 
-					// Get current world seed
-					if (worldSeedQuery.CalculateEntityCount() > 0)
+					// Get current world seed if available
+					if (_cachedWorldSeeds > 0)
 						{
 						Entity seedEntity = worldSeedQuery.GetSingletonEntity();
 						WorldSeed worldSeed = smokeTest.EntityManager.GetComponentData<WorldSeed>(seedEntity);
-						EditorGUILayout.LabelField($"🎲 Current Seed: {worldSeed.Value}");
+						_cachedCurrentSeed = worldSeed.Value;
 						}
+					else
+						{
+						_cachedCurrentSeed = 0;
+						}
+					}
 
-					EditorGUILayout.EndVertical();
-					_cachedEntityCounts = worldSeedQuery.CalculateEntityCount() + districtQuery.CalculateEntityCount() + polarityQuery.CalculateEntityCount();
-					}
-				else
+				// Always display cached values to avoid constant updates
+				EditorGUILayout.BeginVertical("box");
+				EditorGUILayout.LabelField($"🌱 World Seeds: {_cachedWorldSeeds}");
+				EditorGUILayout.LabelField($"🏰 Districts: {_cachedDistricts}");
+				EditorGUILayout.LabelField($"🌊 Polarity Fields: {_cachedPolarityFields}");
+
+				if (_cachedCurrentSeed > 0)
 					{
-					// Use cached display to avoid constant queries
-					EditorGUILayout.BeginVertical("box");
-					EditorGUILayout.LabelField($"📊 Entity counts (cached - updating every {UPDATE_INTERVAL}s)");
-					EditorGUILayout.LabelField($"Total cached entities: {_cachedEntityCounts}");
-					EditorGUILayout.EndVertical();
+					EditorGUILayout.LabelField($"🎲 Current Seed: {_cachedCurrentSeed}");
 					}
+
+				EditorGUILayout.LabelField($"📊 Next update in: {Mathf.Ceil(UPDATE_INTERVAL - (currentTime - _lastUpdateTime))}s", EditorStyles.miniLabel);
+				EditorGUILayout.EndVertical();
 				}
 			else
 				{
 				EditorGUILayout.LabelField("EntityManager not available");
-				_cachedEntityCounts = -1; // Reset cache when not available
+				// Reset cache when not available
+				_cachedWorldSeeds = -1;
+				_cachedDistricts = -1;
+				_cachedPolarityFields = -1;
+				_cachedCurrentSeed = 0;
 				}
 			}
 
@@ -308,7 +324,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					setupMethod.Invoke(smokeTest, null);
 
 					// Reset cache after regeneration to force immediate update
-					_cachedEntityCounts = -1;
+					_cachedWorldSeeds = -1;
+					_cachedDistricts = -1;
+					_cachedPolarityFields = -1;
+					_cachedCurrentSeed = 0;
 					_lastUpdateTime = 0f;
 
 					Debug.Log("✅ World regeneration complete!");
@@ -332,23 +351,60 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			if (!Application.isPlaying || smokeTest.DefaultWorld == null || !smokeTest.DefaultWorld.IsCreated)
 				return;
 
-			Debug.Log("🧹 Clearing all generated entities...");
+			Debug.Log("🧹 Clearing generated MetVanDAMN entities...");
 
-			// More comprehensive cleanup - destroy ALL entities to ensure clean slate
-			Unity.Collections.NativeArray<Entity> allEntities = smokeTest.EntityManager.GetAllEntities();
-			Debug.Log($"🧹 Found {allEntities.Length} total entities to clear");
+			// More selective cleanup - only destroy MetVanDAMN-specific entities, not system entities
+			EntityManager entityManager = smokeTest.EntityManager;
+			int destroyedCount = 0;
 
-			if (allEntities.Length > 0)
+			// Clear World Seed entities
+			using (EntityQuery worldSeedQuery = entityManager.CreateEntityQuery(typeof(WorldSeed)))
 				{
-				smokeTest.EntityManager.DestroyEntity(allEntities);
+				if (worldSeedQuery.CalculateEntityCount() > 0)
+					{
+					entityManager.DestroyEntity(worldSeedQuery);
+					destroyedCount += worldSeedQuery.CalculateEntityCount();
+					}
 				}
-			allEntities.Dispose();
+
+			// Clear District entities (NodeId components)
+			using (EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(NodeId)))
+				{
+				if (districtQuery.CalculateEntityCount() > 0)
+					{
+					entityManager.DestroyEntity(districtQuery);
+					destroyedCount += districtQuery.CalculateEntityCount();
+					}
+				}
+
+			// Clear Polarity Field entities
+			using (EntityQuery polarityQuery = entityManager.CreateEntityQuery(typeof(PolarityFieldData)))
+				{
+				if (polarityQuery.CalculateEntityCount() > 0)
+					{
+					entityManager.DestroyEntity(polarityQuery);
+					destroyedCount += polarityQuery.CalculateEntityCount();
+					}
+				}
+
+			// Clear World Config entities
+			using (EntityQuery worldConfigQuery = entityManager.CreateEntityQuery(typeof(WorldSeedData)))
+				{
+				if (worldConfigQuery.CalculateEntityCount() > 0)
+					{
+					entityManager.DestroyEntity(worldConfigQuery);
+					destroyedCount += worldConfigQuery.CalculateEntityCount();
+					}
+				}
 
 			// Reset cache since we cleared everything
-			_cachedEntityCounts = -1;
+			_cachedWorldSeeds = -1;
+			_cachedDistricts = -1;
+			_cachedPolarityFields = -1;
+			_cachedCurrentSeed = 0;
 			_lastUpdateTime = 0f;
 
-			Debug.Log("🧹 Complete entity cleanup finished - world is now empty");
+			Debug.Log($"🧹 Selective entity cleanup finished - destroyed {destroyedCount} MetVanDAMN entities");
 			}
 
 		// Helper methods to get/set private fields using reflection
