@@ -267,14 +267,17 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private void SetCategoryVisuals()
         {
             var categoryColor = GetCategoryColor();
+            var categoryIconSymbol = GetCategoryIcon();
 
-            // Set category icon color
+            // Set category icon with proper Unicode symbol display
             if (categoryIcon != null)
             {
-                categoryIcon.color = categoryColor;
-                
-                // For now, just use a colored square. In a full implementation,
-                // you'd load actual category icon sprites
+                // Since we're using an Image component but need to display Unicode symbols,
+                // we'll create a proper sprite-based solution using Unity's built-in methods
+                var iconTexture = CreateCategoryIconTexture(categoryIconSymbol, categoryColor);
+                var iconSprite = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), new Vector2(0.5f, 0.5f));
+                categoryIcon.sprite = iconSprite;
+                categoryIcon.color = Color.white; // Use white since color is baked into texture
             }
 
             // Optionally tint the background slightly with category color
@@ -283,6 +286,238 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 var tintedNormal = Color.Lerp(normalColor, categoryColor, 0.1f);
                 normalColor = tintedNormal;
                 backgroundImage.color = normalColor;
+            }
+        }
+
+        /// <summary>
+        /// Creates a texture with the category icon symbol rendered as an image
+        /// </summary>
+        private Texture2D CreateCategoryIconTexture(string iconSymbol, Color iconColor)
+        {
+            // Create a small texture for the icon
+            var texture = new Texture2D(32, 32, TextureFormat.RGBA32, false);
+            
+            // Fill with transparent background
+            var pixels = new Color32[32 * 32];
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = Color.clear;
+            }
+            
+            // For this implementation, we'll create simple geometric shapes for each category
+            // This provides a complete solution without relying on external font rendering
+            switch (iconSymbol)
+            {
+                case "🏃": // Movement - Arrow pointing right
+                    DrawArrow(pixels, 32, iconColor);
+                    break;
+                case "⚔️": // Offense - Cross/sword shape
+                    DrawCross(pixels, 32, iconColor);
+                    break;
+                case "🛡️": // Defense - Shield shape
+                    DrawShield(pixels, 32, iconColor);
+                    break;
+                case "🔧": // Utility - Gear/cog shape
+                    DrawGear(pixels, 32, iconColor);
+                    break;
+                case "✨": // Special - Star shape
+                    DrawStar(pixels, 32, iconColor);
+                    break;
+                default:
+                    DrawCircle(pixels, 32, iconColor); // Fallback
+                    break;
+            }
+            
+            texture.SetPixels32(pixels);
+            texture.Apply();
+            return texture;
+        }
+
+        private void DrawArrow(Color32[] pixels, int size, Color color)
+        {
+            Color32 c = color;
+            int center = size / 2;
+            
+            // Draw arrow pointing right
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int index = y * size + x;
+                    
+                    // Arrow shaft (horizontal line)
+                    if (y >= center - 2 && y <= center + 2 && x >= 8 && x <= 20)
+                    {
+                        pixels[index] = c;
+                    }
+                    // Arrow head (triangle)
+                    else if (x >= 18 && x <= 24)
+                    {
+                        int distFromCenter = Mathf.Abs(y - center);
+                        int allowedDist = (24 - x) * 2;
+                        if (distFromCenter <= allowedDist)
+                        {
+                            pixels[index] = c;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void DrawCross(Color32[] pixels, int size, Color color)
+        {
+            Color32 c = color;
+            int center = size / 2;
+            
+            // Draw cross/sword
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int index = y * size + x;
+                    
+                    // Vertical line
+                    if (x >= center - 2 && x <= center + 2 && y >= 4 && y <= 28)
+                    {
+                        pixels[index] = c;
+                    }
+                    // Horizontal line (crossguard)
+                    else if (y >= center - 2 && y <= center + 2 && x >= 8 && x <= 24)
+                    {
+                        pixels[index] = c;
+                    }
+                }
+            }
+        }
+
+        private void DrawShield(Color32[] pixels, int size, Color color)
+        {
+            Color32 c = color;
+            int center = size / 2;
+            
+            // Draw shield shape
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int index = y * size + x;
+                    
+                    float dx = x - center;
+                    float dy = y - center;
+                    
+                    // Shield outline (rounded rectangle with pointed bottom)
+                    if (y < center + 8)
+                    {
+                        // Upper rounded part
+                        if (Mathf.Abs(dx) <= 8 && Mathf.Abs(dy) <= 8)
+                        {
+                            float dist = Mathf.Sqrt(dx * dx + dy * dy);
+                            if ((Mathf.Abs(dx) <= 6 || Mathf.Abs(dy) <= 6) && dist <= 10)
+                            {
+                                pixels[index] = c;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Lower pointed part
+                        float allowedWidth = 8 - (y - center - 8) * 0.8f;
+                        if (Mathf.Abs(dx) <= allowedWidth)
+                        {
+                            pixels[index] = c;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void DrawGear(Color32[] pixels, int size, Color color)
+        {
+            Color32 c = color;
+            int center = size / 2;
+            
+            // Draw gear/cog
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int index = y * size + x;
+                    
+                    float dx = x - center;
+                    float dy = y - center;
+                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
+                    float angle = Mathf.Atan2(dy, dx);
+                    
+                    // Gear teeth (8 teeth)
+                    float teethAngle = (angle + Mathf.PI) / (2 * Mathf.PI) * 8;
+                    bool isTeeth = (teethAngle % 1) < 0.4f;
+                    
+                    // Outer ring with teeth
+                    if (dist >= 8 && dist <= (isTeeth ? 12 : 10))
+                    {
+                        pixels[index] = c;
+                    }
+                    // Inner circle
+                    else if (dist <= 5)
+                    {
+                        pixels[index] = c;
+                    }
+                }
+            }
+        }
+
+        private void DrawStar(Color32[] pixels, int size, Color color)
+        {
+            Color32 c = color;
+            int center = size / 2;
+            
+            // Draw 5-pointed star
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int index = y * size + x;
+                    
+                    float dx = x - center;
+                    float dy = y - center;
+                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
+                    float angle = Mathf.Atan2(dy, dx) + Mathf.PI / 2; // Rotate so star points up
+                    
+                    if (angle < 0) angle += 2 * Mathf.PI;
+                    
+                    // 5-pointed star calculation
+                    float starAngle = (angle % (2 * Mathf.PI / 5)) / (2 * Mathf.PI / 5);
+                    float radius = 6 + 4 * Mathf.Cos(starAngle * 2 * Mathf.PI);
+                    
+                    if (dist <= radius && dist >= 2)
+                    {
+                        pixels[index] = c;
+                    }
+                }
+            }
+        }
+
+        private void DrawCircle(Color32[] pixels, int size, Color color)
+        {
+            Color32 c = color;
+            int center = size / 2;
+            
+            // Draw simple circle as fallback
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    int index = y * size + x;
+                    
+                    float dx = x - center;
+                    float dy = y - center;
+                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
+                    
+                    if (dist <= 8 && dist >= 6)
+                    {
+                        pixels[index] = c;
+                    }
+                }
             }
         }
 
