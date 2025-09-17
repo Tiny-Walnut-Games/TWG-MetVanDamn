@@ -230,7 +230,7 @@ else {
             exit 3
         }
     }
-    Write-Host "ERROR: Test results file not found after fallback. Trying enhanced methods..." -ForegroundColor Yellow
+    Write-Host "ERROR: Test results file not found after fallback. Trying enhanced methods..." -ForegroundColor Red
     $ts3 = Get-Date -Format 'yyyyMMdd_HHmmss'
     $testResults3 = Join-Path $resultsDir "TestResults_$ts3.xml"
     $logPath3 = Join-Path $resultsDir "unity_powershell_test_${ts3}_enhanced.log"
