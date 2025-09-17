@@ -80,6 +80,11 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         public float SessionDuration => Time.time - sessionStartTime;
         public bool IsDungeonCompleted => bossesDefeated.All(defeated => defeated);
         public int TotalSecretsFound => secretsFoundPerFloor.Sum();
+        public IReadOnlyList<DungeonFloor> GeneratedFloors => floors.AsReadOnly();
+        public IReadOnlyList<GameObject> ActiveBosses => activeBosses.AsReadOnly();
+        public IReadOnlyList<GameObject> ActiveProgressionLocks => activeProgressionLocks.AsReadOnly();
+        public IReadOnlyList<GameObject> ActiveSecrets => activeSecrets.AsReadOnly();
+        public IReadOnlyList<GameObject> ActivePickups => activePickups.AsReadOnly();
         
         private void Awake()
         {
