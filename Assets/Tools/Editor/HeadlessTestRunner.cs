@@ -122,7 +122,9 @@ namespace TinyWalnutGames.Tools.Editor
                     {
                     try { AssetDatabase.SaveAssets(); } catch { }
                     
-                    // Give Unity a moment to flush logs before exiting
+                    // Schedule exit on the next editor update to give Unity enough time to flush logs to disk.
+                    // In most cases, this is sufficient for log flushing, but on slower machines or under heavy load,
+                    // consider waiting for multiple frames or using a longer delay if logs are missing.
                     EditorApplication.delayCall += () => EditorApplication.Exit(0);
                     }
                 }
