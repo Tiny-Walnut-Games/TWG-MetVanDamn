@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring
 {
@@ -580,14 +581,39 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                     roomObjects.Add(obj);
                 }
                 
-                // Check layer membership
+                // Check layer membership and apply comprehensive room-specific logic
                 if (((1 << obj.layer) & roomLayers) != 0)
                 {
-                    // Additional room-specific logic could be added here
+                    // Enhanced room-specific logic with multiple validation methods
                     var parentRoom = GetRoomIdFromHierarchy(obj);
                     if (parentRoom == roomId)
                     {
                         roomObjects.Add(obj);
+                    }
+                    
+                    // Check for room-specific components that might indicate membership
+                    var roomSpecificComponents = obj.GetComponents<MonoBehaviour>();
+                    foreach (var component in roomSpecificComponents)
+                    {
+                        // Check if component has room-specific data or metadata
+                        var componentType = component.GetType();
+                        if (componentType.Name.Contains("Room") || 
+                            (component is IRoomSpecific roomSpecific && roomSpecific.GetRoomId() == roomId))
+                        {
+                            roomObjects.Add(obj);
+                            break;
+                        }
+                    }
+                    
+                    // Check for room boundaries and spatial containment
+                    var roomIdentifier = FindRoomIdentifier(roomId);
+                    if (roomIdentifier != null)
+                    {
+                        var roomBounds = new Bounds(roomIdentifier.transform.position, roomIdentifier.roomBounds);
+                        if (roomBounds.Contains(obj.transform.position))
+                        {
+                            roomObjects.Add(obj);
+                        }
                     }
                 }
             }
@@ -871,6 +897,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
     {
         void OnRoomEnter(int roomId);
         void OnRoomExit(int roomId);
+    }
+    
+    // Interface for room-specific components
+    public interface IRoomSpecific
+    {
+        int GetRoomId();
+        void SetRoomId(int roomId);
     }
     
     // Public API for external systems to interact with room masking
