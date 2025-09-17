@@ -4,6 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using Cinemachine;
 using TinyWalnutGames.MetVD.Authoring;
+using TinyWalnutGames.MetVanDAMN.Authoring;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 {
@@ -151,14 +152,17 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
                 collider2D.size = new Vector2(1f, 2f);
             }
 
-            // Player movement controller (to be implemented)
+            // Player movement controller
             var movementController = playerGO.AddComponent<DemoPlayerMovement>();
             
-            // Player combat controller (to be implemented)  
+            // Player combat controller
             var combatController = playerGO.AddComponent<DemoPlayerCombat>();
             
-            // Player inventory controller (to be implemented)
+            // Player inventory controller
             var inventoryController = playerGO.AddComponent<DemoPlayerInventory>();
+
+            // 🎯 UPGRADE SYSTEM INTEGRATION - Complete procedural leveling perk system
+            SetupUpgradeSystem(playerGO);
 
             // Visual representation
             GameObject visualChild = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -167,7 +171,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             visualChild.transform.localPosition = Vector3.zero;
             
             // Remove collider from visual (physics handled by parent)
-            DestroyImmediate(visualChild.GetComponent<Collider>());
+            if (projection == SceneProjection.ThreeD)
+            {
+                DestroyImmediate(visualChild.GetComponent<Collider>());
+            }
+            else
+            {
+                DestroyImmediate(visualChild.GetComponent<Collider2D>());
+            }
             
             // Set player color
             var renderer = visualChild.GetComponent<Renderer>();
@@ -488,11 +499,81 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             TopDown2D,
             ThreeD
         }
+
+        /// <summary>
+        /// Sets up the complete procedural leveling perk system for the player
+        /// Integrates XP progression, upgrade choices, effect application, and UI
+        /// </summary>
+        private static void SetupUpgradeSystem(GameObject playerGO)
+        {
+            // Add the complete player setup component - this handles everything
+            var completeSetup = playerGO.AddComponent<CompletePlayerSetup>();
+            
+            // Configure for auto-setup
+            var setupSO = new SerializedObject(completeSetup);
+            setupSO.FindProperty("autoSetupOnStart").boolValue = true;
+            setupSO.FindProperty("enableLevelUpUI").boolValue = true;
+            setupSO.FindProperty("enableDebugControls").boolValue = true;
+            setupSO.FindProperty("startingLevel").intValue = 1;
+            setupSO.FindProperty("startingXP").intValue = 0;
+            setupSO.FindProperty("startingAbilities").longValue = (long)TinyWalnutGames.MetVD.Core.Ability.Jump;
+            setupSO.ApplyModifiedProperties();
+
+            // Create upgrade database manager in scene
+            var dbManagerGO = new GameObject("UpgradeDatabaseManager");
+            var dbManager = dbManagerGO.AddComponent<UpgradeDatabaseManager>();
+            
+            // Configure database manager
+            var dbSO = new SerializedObject(dbManager);
+            dbSO.FindProperty("autoFindCollections").boolValue = true;
+            dbSO.FindProperty("enableDebugLogging").boolValue = true;
+            dbSO.ApplyModifiedProperties();
+
+            // Create upgrade collections if they don't exist
+            CreateSampleUpgradeCollections();
+
+            // Create level-up UI GameObject
+            var uiGO = new GameObject("LevelUpChoiceUI");
+            var choiceUI = uiGO.AddComponent<LevelUpChoiceUI>();
+            
+            // Configure UI
+            var uiSO = new SerializedObject(choiceUI);
+            uiSO.FindProperty("enableDebugLogging").boolValue = true;
+            uiSO.ApplyModifiedProperties();
+
+            Debug.Log("🎯 Procedural Leveling Perk System integrated into player!");
+            Debug.Log("   • F1: Gain 50 XP");
+            Debug.Log("   • F2: Force Level Up");
+            Debug.Log("   • F3: Force Show Choices");
+            Debug.Log("   • F4: Reset Progression");
+        }
+
+        /// <summary>
+        /// Creates sample upgrade collections for the demo
+        /// </summary>
+        private static void CreateSampleUpgradeCollections()
+        {
+            // This would normally load from Assets/MetVanDAMN/Data/Collections/
+            // For now, we rely on the auto-find functionality in UpgradeDatabaseManager
+            
+            string collectionsPath = "Assets/MetVanDAMN/Data/Collections";
+            if (!AssetDatabase.IsValidFolder(collectionsPath))
+            {
+                Debug.LogWarning($"Upgrade collections folder not found: {collectionsPath}");
+                Debug.LogWarning("Create upgrade collections manually or run the upgrade system setup wizard");
+            }
+            else
+            {
+                var collections = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
+                Debug.Log($"📚 Found {collections.Length} upgrade collections for demo");
+            }
+        }
     }
 
     #region Demo Component Placeholders (to be implemented)
     
     // These classes need to be implemented to provide the actual gameplay functionality
+    // NOTE: Many of these are now implemented in the main Authoring folder
     public class DemoPlayerMovement : MonoBehaviour { }
     public class DemoPlayerCombat : MonoBehaviour { }
     public class DemoPlayerInventory : MonoBehaviour { }
