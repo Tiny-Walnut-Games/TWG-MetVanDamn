@@ -169,13 +169,59 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         {
             if (levelProgression != null)
             {
-                // Note: This would need to be configured via inspector or through public properties
-                // We can't modify serialized fields at runtime like this
+                // Configure starting values through public API methods
+                // Since we can't modify serialized fields at runtime, we use the component's public interface
+                
+                // Set starting abilities if different from default
+                if (startingAbilities != Ability.Jump)
+                {
+                    // Force the starting abilities by creating a temporary upgrade
+                    var startingUpgrade = ScriptableObject.CreateInstance<UpgradeDefinition>();
+                    SetStartingUpgradeData(startingUpgrade, startingAbilities);
+                    levelProgression.ApplyUpgrade(startingUpgrade);
+                }
+                
+                // Grant starting XP if specified
+                if (startingXP > 0)
+                {
+                    levelProgression.GainXP(startingXP);
+                }
+                
+                // Force level to starting level if higher than 1
+                if (startingLevel > 1)
+                {
+                    int targetXP = levelProgression.CalculateXPRequiredForLevel(startingLevel);
+                    int currentXP = levelProgression.CurrentXP;
+                    if (targetXP > currentXP)
+                    {
+                        levelProgression.GainXP(targetXP - currentXP);
+                    }
+                }
+                
                 if (enableDebugLogging)
                 {
-                    Debug.Log($"🎯 Configure starting state manually: Level {startingLevel}, XP {startingXP}, Abilities {startingAbilities}");
+                    Debug.Log($"🎯 Configured starting state: Level {levelProgression.CurrentLevel}, " +
+                             $"XP {levelProgression.CurrentXP}, Abilities: {levelProgression.CurrentAbilities}");
                 }
             }
+        }
+
+        /// <summary>
+        /// Helper method to create a starting abilities upgrade for configuration
+        /// </summary>
+        private void SetStartingUpgradeData(UpgradeDefinition upgrade, Ability abilities)
+        {
+            // Use reflection to set the granted abilities for starting configuration
+            var abilitiesField = typeof(UpgradeDefinition).GetField("grantsAbilities",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var nameField = typeof(UpgradeDefinition).GetField("upgradeName",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var modifierTypeField = typeof(UpgradeDefinition).GetField("modifierType",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            abilitiesField?.SetValue(upgrade, abilities);
+            nameField?.SetValue(upgrade, "Starting Configuration");
+            modifierTypeField?.SetValue(upgrade, ModifierType.NewAbility);
         }
 
         private void SetupUI()

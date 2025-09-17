@@ -384,19 +384,76 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         }
 
         /// <summary>
-        /// Test show panel with dummy choices (for debugging)
+        /// Test show panel with sample upgrade choices (for debugging and validation)
         /// </summary>
         [ContextMenu("Test Show Choices")]
         public void TestShowChoices()
         {
-            // Create dummy choices for testing
-            var dummyChoices = new UpgradeDefinition[3];
-            // This would normally come from actual UpgradeDefinition assets
-            // For testing we'd need actual ScriptableObject instances
+            // Create actual test upgrade definitions programmatically
+            var testChoices = new UpgradeDefinition[3];
+            
+            // Create sample Movement upgrade
+            testChoices[0] = ScriptableObject.CreateInstance<UpgradeDefinition>();
+            SetUpgradeData(testChoices[0], "Test Speed Boost", "Increases movement speed by 20%", UpgradeCategory.Movement);
+            
+            // Create sample Offense upgrade  
+            testChoices[1] = ScriptableObject.CreateInstance<UpgradeDefinition>();
+            SetUpgradeData(testChoices[1], "Test Damage Boost", "Increases attack damage by 15%", UpgradeCategory.Offense);
+            
+            // Create sample Defense upgrade
+            testChoices[2] = ScriptableObject.CreateInstance<UpgradeDefinition>();
+            SetUpgradeData(testChoices[2], "Test Health Boost", "Increases maximum health by 25", UpgradeCategory.Defense);
+            
+            // Show the test choices
+            ShowChoices(testChoices);
             
             if (enableDebugLogging)
             {
-                Debug.Log("TestShowChoices called - would need actual UpgradeDefinition assets to test");
+                Debug.Log("🧪 Test choices displayed with programmatically created upgrade definitions");
+            }
+        }
+
+        /// <summary>
+        /// Helper method to set upgrade data on ScriptableObject instances for testing
+        /// </summary>
+        private void SetUpgradeData(UpgradeDefinition upgrade, string name, string description, UpgradeCategory category)
+        {
+            // Use reflection to set private serialized fields for testing
+            var nameField = typeof(UpgradeDefinition).GetField("upgradeName", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var descField = typeof(UpgradeDefinition).GetField("description",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var categoryField = typeof(UpgradeDefinition).GetField("category",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var valueField = typeof(UpgradeDefinition).GetField("value",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var modifierTypeField = typeof(UpgradeDefinition).GetField("modifierType",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var targetStatField = typeof(UpgradeDefinition).GetField("targetStat",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            nameField?.SetValue(upgrade, name);
+            descField?.SetValue(upgrade, description);
+            categoryField?.SetValue(upgrade, category);
+            
+            // Set appropriate stat and value based on category
+            switch (category)
+            {
+                case UpgradeCategory.Movement:
+                    targetStatField?.SetValue(upgrade, "runspeed");
+                    valueField?.SetValue(upgrade, 1.2f);
+                    modifierTypeField?.SetValue(upgrade, ModifierType.Multiplicative);
+                    break;
+                case UpgradeCategory.Offense:
+                    targetStatField?.SetValue(upgrade, "attackdamage");
+                    valueField?.SetValue(upgrade, 1.15f);
+                    modifierTypeField?.SetValue(upgrade, ModifierType.Multiplicative);
+                    break;
+                case UpgradeCategory.Defense:
+                    targetStatField?.SetValue(upgrade, "maxhealth");
+                    valueField?.SetValue(upgrade, 25f);
+                    modifierTypeField?.SetValue(upgrade, ModifierType.Additive);
+                    break;
             }
         }
 

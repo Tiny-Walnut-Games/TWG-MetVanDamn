@@ -353,8 +353,20 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                     break;
 
                 case "mapreveal":
-                    // Reveal more of the map
-                    // This would integrate with map system when available
+                    // Enable map reveal functionality by increasing scan range significantly
+                    if (playerInventory != null)
+                    {
+                        // Reveal map by dramatically increasing scan range
+                        float currentScanRange = effectApplicator.GetCurrentStat("scanrange");
+                        float newScanRange = currentScanRange + upgrade.Value * 10f; // Multiply effect for map reveal
+                        
+                        // Apply the enhanced scan range
+                        var modifier = new StatModifier(upgrade.Id, "scanrange", ModifierType.Additive, upgrade.Value * 10f);
+                        activeModifiers.Add(modifier);
+                        
+                        // Also enable auto-discovery of nearby interactive elements
+                        StartCoroutine(MapRevealCoroutine(newScanRange));
+                    }
                     break;
 
                 case "healthregeneration":
@@ -478,6 +490,97 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             Debug.Log($"Combat: Health {currentStats.maxHealth}, Damage {currentStats.attackDamage}, Speed {currentStats.attackSpeed}");
             Debug.Log($"Utility: Interaction {currentStats.interactionRange}, Scan {currentStats.scanRange}, Inventory {currentStats.inventorySlots}");
             Debug.Log($"Active Modifiers: {activeModifiers.Count}");
+        }
+
+        /// <summary>
+        /// Coroutine for map reveal functionality - continuously scans for and reveals nearby interactive elements
+        /// </summary>
+        private System.Collections.IEnumerator MapRevealCoroutine(float revealRange)
+        {
+            while (true)
+            {
+                // Scan for nearby interactive objects and mark them as revealed
+                var nearbyObjects = Physics.OverlapSphere(transform.position, revealRange);
+                
+                foreach (var obj in nearbyObjects)
+                {
+                    // Mark treasures, enemies, and interactive elements as revealed
+                    var treasure = obj.GetComponent<DemoTreasureChest>();
+                    if (treasure != null)
+                    {
+                        // Add visual indicator or glow effect for revealed treasures
+                        AddRevealEffect(obj.gameObject, Color.yellow);
+                    }
+                    
+                    var enemy = obj.GetComponent<DemoEnemyAI>();
+                    if (enemy != null)
+                    {
+                        // Add visual indicator for revealed enemies
+                        AddRevealEffect(obj.gameObject, Color.red);
+                    }
+                    
+                    var interactable = obj.GetComponent<IDemoInteractable>();
+                    if (interactable != null)
+                    {
+                        // Add visual indicator for revealed interactive objects
+                        AddRevealEffect(obj.gameObject, Color.cyan);
+                    }
+                }
+                
+                yield return new WaitForSeconds(1f); // Scan every second
+            }
+        }
+
+        /// <summary>
+        /// Adds a visual reveal effect to discovered objects
+        /// </summary>
+        private void AddRevealEffect(GameObject target, Color effectColor)
+        {
+            // Check if already has reveal effect
+            if (target.GetComponent<MapRevealEffect>() != null)
+                return;
+                
+            // Add reveal effect component
+            var revealEffect = target.AddComponent<MapRevealEffect>();
+            revealEffect.Initialize(effectColor);
+        }
+
+        /// <summary>
+        /// Component for visual reveal effects on discovered map objects
+        /// </summary>
+        private class MapRevealEffect : MonoBehaviour
+        {
+            private Light revealLight;
+            private float pulseTimer = 0f;
+            private Color baseColor;
+
+            public void Initialize(Color color)
+            {
+                baseColor = color;
+                
+                // Create a subtle light effect
+                var lightObj = new GameObject("RevealLight");
+                lightObj.transform.SetParent(transform);
+                lightObj.transform.localPosition = Vector3.up * 0.5f;
+                
+                revealLight = lightObj.AddComponent<Light>();
+                revealLight.type = LightType.Point;
+                revealLight.color = baseColor;
+                revealLight.intensity = 0.5f;
+                revealLight.range = 3f;
+                revealLight.shadows = LightShadows.None;
+            }
+
+            private void Update()
+            {
+                if (revealLight != null)
+                {
+                    // Gentle pulsing effect
+                    pulseTimer += Time.deltaTime;
+                    float pulse = 0.5f + 0.3f * Mathf.Sin(pulseTimer * 2f);
+                    revealLight.intensity = pulse;
+                }
+            }
         }
     }
 }
