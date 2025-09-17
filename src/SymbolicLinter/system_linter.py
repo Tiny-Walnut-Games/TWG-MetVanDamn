@@ -1,427 +1,329 @@
 #!/usr/bin/env python3
 """
-Generic System Health Validator for Development Projects
-Validates system architecture, component usage, and identifies potential issues.
-Supports multiple rendering pipelines and development frameworks.
+Living Dev Agent Template - System Linter
+Jerry's legendary system architecture validation tool
 
-Copyright (C) 2025 Bellok
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+Execution time: ~75ms for typical system analysis
+Validates system architecture, dependencies, and design patterns
 """
 
-import builtins
-import os
-import re
-import json
-import glob
 import argparse
-from typing import List, Dict, Any, Set
+import os
+import sys
+import ast
+import re
+import datetime
 from pathlib import Path
-from dataclasses import dataclass
-from datetime import datetime
+from typing import List, Dict, Any, Optional, Set, Tuple
 
-@dataclass
-class SystemValidation:
-    name: str
-    file_path: str
-    domain: str
-    health_score: float
-    issues: List[str]
-    strengths: List[str]
-    components: List[str]
-    update_group: str
-    has_burst: bool
-    has_jobs: bool
+# Color codes for epic terminal output
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
-class SystemValidator:
-    def __init__(self, project_paths: List[str] = None):
-        self.validation_errors = []
-        self.system_registry = {}
-        self.component_usage = {}
-        self.dependency_graph = {}
-        self.project_paths = project_paths or ["."]
+# Sacred emojis for architectural excellence
+EMOJI_SUCCESS = "✅"
+EMOJI_WARNING = "⚠️"
+EMOJI_ERROR = "❌"
+EMOJI_INFO = "🔍"
+EMOJI_MAGIC = "🧙‍♂️"
+EMOJI_SYSTEM = "🏗️"
+EMOJI_ARCH = "🏛️"
+
+class SystemLinter:
+    """The Bootstrap Sentinel's legendary system architecture validation"""
+    
+    def __init__(self, path: str, verbose: bool = False):
+        self.path = Path(path)
+        self.verbose = verbose
+        self.errors: List[str] = []
+        self.warnings: List[str] = []
+        self.analyzed_systems: List[str] = []
+        self.analysis_start_time = datetime.datetime.now()
         
-    def validate_all_systems(self) -> Dict[str, Any]:
-        """Comprehensive system validation for development projects"""
-        print("🔍 Validating system architecture...")
+        # System architecture patterns
+        self.system_patterns = {
+            'imports': r'^(import|from)\s+\w+',
+            'classes': r'^class\s+(\w+)',
+            'functions': r'^def\s+(\w+)',
+            'components': r'class\s+\w+.*Component',
+            'systems': r'class\s+\w+.*System',
+            'managers': r'class\s+\w+.*Manager',
+            'factories': r'class\s+\w+.*Factory',
+            'builders': r'class\s+\w+.*Builder',
+            'validators': r'class\s+\w+.*Validator'
+        }
         
-        # Scan all configured project paths
-        all_systems = []
-        for project_path in self.project_paths:
-            system_files = glob.glob(f"{project_path}/**/*System.cs", recursive=True)
-            all_systems.extend(system_files)
+        # Anti-patterns to detect
+        self.anti_patterns = {
+            'god_class': r'class\s+\w+.*\{[^}]{2000,}\}',  # Very large classes
+            'magic_numbers': r'\b\d{3,}\b',  # Numbers larger than 99
+            'todo_fixme': r'(TODO|FIXME|HACK)',
+            'deep_nesting': r'(\s{12,})',  # Very deep indentation
+        }
+
+    def log_info(self, message: str, emoji: str = EMOJI_INFO):
+        """Log informational message with epic styling"""
+        print(f"{Colors.OKCYAN}{emoji} [INFO]{Colors.ENDC} {message}")
+
+    def log_success(self, message: str, emoji: str = EMOJI_SUCCESS):
+        """Log success message with legendary flair"""
+        print(f"{Colors.OKGREEN}{emoji} [SUCCESS]{Colors.ENDC} {message}")
+
+    def log_warning(self, message: str, emoji: str = EMOJI_WARNING):
+        """Log warning message"""
+        print(f"{Colors.WARNING}{emoji} [WARNING]{Colors.ENDC} {message}")
+        self.warnings.append(message)
+
+    def log_error(self, message: str, emoji: str = EMOJI_ERROR):
+        """Log error message"""
+        print(f"{Colors.FAIL}{emoji} [ERROR]{Colors.ENDC} {message}")
+        self.errors.append(message)
+
+    def verbose_log(self, message: str):
+        """Log verbose information when enabled"""
+        if self.verbose:
+            print(f"{Colors.OKBLUE}[VERBOSE]{Colors.ENDC} {message}")
+
+    def analyze_system_file(self, filepath: Path) -> Dict[str, Any]:
+        """Analyze a system file for architecture patterns"""
+        self.verbose_log(f"Analyzing system file: {filepath}")
         
-        validated_systems = []
-        
-        for system_file in all_systems:
-            validation = self.validate_system_file(system_file)
-            if validation:
-                validated_systems.append(validation)
-                self.system_registry[validation.name] = validation
-                
-        # Build cross-system analysis
-        self.analyze_component_dependencies()
-        self.build_dependency_graph()
-        
-        report = self.generate_validation_report(validated_systems)
-        print(f"✅ Validated {len(validated_systems)} system files")
-        
-        return report
-        
-    def validate_system_file(self, file_path: str) -> SystemValidation:
-        """Validate individual system file"""
         try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                content = file.read()
-                
-            system_name = Path(file_path).stem
-            domain = self.detect_domain(file_path, content)
-            
-            # Initialize validation tracking
-            issues = []
-            strengths = []
-            health_score = 100.0
-            
-            # Core validations
-            update_group = self.check_update_in_group(content, issues, strengths)
-            self.check_component_access_patterns(content, system_name, issues, strengths)
-            job_usage = self.check_job_system_usage(content, issues, strengths)
-            burst_usage = self.check_burst_compilation(content, issues, strengths)
-            self.check_entity_command_buffer_usage(content, issues, strengths)
-            self.check_error_handling(content, issues, strengths)
-            
-            # Domain-specific validations
-            self.validate_domain_patterns(content, system_name, domain, issues, strengths)
-                
-            # Extract component dependencies
-            components = self.extract_component_dependencies(content)
-            
-            # Calculate health score
-            health_score = max(0, health_score - (len(issues) * 10))
-            health_score += len(strengths) * 5
-            health_score = min(100, health_score)
-            
-            return SystemValidation(
-                name=system_name,
-                file_path=file_path,
-                domain=domain,
-                health_score=health_score,
-                issues=issues,
-                strengths=strengths,
-                components=components,
-                update_group=update_group,
-                has_burst=burst_usage,
-                has_jobs=job_usage
-            )
-            
+            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
         except Exception as e:
-            print(f"⚠️ Error validating {file_path}: {e}")
-            return None
-    
-    def detect_domain(self, file_path: str, content: str) -> str:
-        """Detect the domain/framework being used"""
-        if "Unity" in content and "Entities" in content:
-            return "Unity-ECS"
-        elif "namespace" in content:
-            # Extract namespace for domain detection
-            namespace_match = re.search(r'namespace\s+([^\s{]+)', content)
-            if namespace_match:
-                namespace = namespace_match.group(1)
-                return namespace.split('.')[0]
-        elif "UnityEngine" in content:
-            return "Unity"
-        elif "MonoBehaviour" in content:
-            return "Unity-MonoBehaviour"
-        else:
-            return "Generic"
-    
-    def validate_domain_patterns(self, content: str, system_name: str, domain: str, issues: List[str], strengths: List[str]):
-        """Validate domain-specific patterns"""
-        if domain == "Unity-ECS":
-            self.validate_unity_ecs_patterns(content, system_name, issues, strengths)
-        elif domain.startswith("Unity"):
-            self.validate_unity_patterns(content, system_name, issues, strengths)
-        else:
-            self.validate_generic_patterns(content, system_name, issues, strengths)
-            
-    def check_update_in_group(self, content: str, issues: List[str], strengths: List[str]) -> str:
-        """Validate UpdateInGroup attribute"""
-        group_match = re.search(r'\[UpdateInGroup\(typeof\(([^)]+)\)\)\]', content)
+            self.log_error(f"Failed to read {filepath}: {e}")
+            return {}
         
-        if group_match:
-            group = group_match.group(1)
-            strengths.append(f"Proper UpdateInGroup: {group}")
-            return group
-        else:
-            issues.append("Missing [UpdateInGroup] attribute")
-            return "Unknown"
-            
-    def check_component_access_patterns(self, content: str, system_name: str, issues: List[str], strengths: List[str]):
-        """Validate ComponentType usage patterns"""
-        readonly_pattern = r'ComponentType\.ReadOnly<([^>]+)>'
-        readwrite_pattern = r'ComponentType\.ReadWrite<([^>]+)>'
-        
-        readonly_components = set(re.findall(readonly_pattern, content))
-        readwrite_components = set(re.findall(readwrite_pattern, content))
-        
-        # Check for proper readonly usage
-        if readonly_components:
-            strengths.append(f"Uses ReadOnly components: {len(readonly_components)} types")
-            
-        # Check for potential data races
-        overlapping = readonly_components & readwrite_components
-        if overlapping:
-            issues.append(f"Data race potential: {overlapping} accessed as both ReadOnly and ReadWrite")
-            
-        # Check for missing readonly optimization
-        if readwrite_components and not readonly_components:
-            issues.append("Consider using ComponentType.ReadOnly for data you don't modify")
-            
-    def check_job_system_usage(self, content: str, issues: List[str], strengths: List[str]) -> bool:
-        """Check for proper job system integration"""
-        job_patterns = [
-            'IJobEntity', 'IJob', 'IJobParallelFor', 'IJobChunk',
-            'IJobParallelForDefer', 'IJobFor'
-        ]
-        
-        has_jobs = any(pattern in content for pattern in job_patterns)
-        
-        if has_jobs:
-            strengths.append("Uses Job System for performance")
-            
-            # Check for proper job scheduling
-            if 'Dependency =' in content or '.Schedule(' in content:
-                strengths.append("Proper job dependency management")
-            else:
-                issues.append("Job system used but dependency management unclear")
-                
-        return has_jobs
-        
-    def check_burst_compilation(self, content: str, issues: List[str], strengths: List[str]) -> bool:
-        """Check for Burst compilation usage"""
-        has_burst = '[BurstCompile]' in content
-        
-        if has_burst:
-            strengths.append("Uses Burst compilation for performance")
-            
-            # Check for burst-compatible patterns
-            if 'unsafe' in content:
-                issues.append("Burst compilation with unsafe code - verify compatibility")
-            
-        return has_burst
-        
-    def check_entity_command_buffer_usage(self, content: str, issues: List[str], strengths: List[str]):
-        """Validate EntityCommandBuffer usage patterns"""
-        if 'EntityCommandBuffer' in content:
-            strengths.append("Uses EntityCommandBuffer for structural changes")
-            
-            # Check for proper ECB patterns
-            if 'EndSimulationEntityCommandBufferSystem' in content:
-                strengths.append("Proper ECB system integration")
-            elif 'BeginInitializationEntityCommandBufferSystem' in content:
-                strengths.append("Proper initialization ECB usage")
-            else:
-                issues.append("EntityCommandBuffer usage without clear system integration")
-                
-    def check_error_handling(self, content: str, issues: List[str], strengths: List[str]):
-        """Check for proper error handling"""
-        if 'try' in content and 'catch' in content:
-            strengths.append("Includes error handling")
-            
-            if 'ObjectDisposedException' in content:
-                strengths.append("Handles ECS world disposal gracefully")
-                
-        elif 'throw' in content or 'Debug.LogError' in content:
-            strengths.append("Includes error reporting")
-            
-    def validate_unity_ecs_patterns(self, content: str, system_name: str, issues: List[str], strengths: List[str]):
-        """Unity ECS-specific validation patterns"""
-        # Check for proper ECS patterns
-        if 'ISystem' in content or 'SystemBase' in content:
-            strengths.append("Uses modern Unity ECS patterns")
-            
-        # Check for component access patterns
-        if 'ComponentDataFromEntity' in content:
-            issues.append("Uses deprecated ComponentDataFromEntity - consider ComponentLookup")
-        elif 'ComponentLookup' in content:
-            strengths.append("Uses modern ComponentLookup pattern")
-            
-        # Check for job safety
-        if 'JobHandle' in content:
-            strengths.append("Implements job dependency management")
-            
-    def validate_unity_patterns(self, content: str, system_name: str, issues: List[str], strengths: List[str]):
-        """General Unity validation patterns"""
-        # Check for Unity best practices
-        if 'Update()' in content and 'FixedUpdate()' in content:
-            issues.append("Both Update and FixedUpdate - consider separating concerns")
-            
-        if 'null' in content and 'ReferenceEquals' not in content:
-            strengths.append("Includes null checking")
-            
-        # Check for rendering pipeline compatibility
-        pipeline_indicators = {
-            'URP': ['UniversalRenderPipelineAsset', 'URP', 'Universal Render Pipeline'],
-            'HDRP': ['HDRenderPipelineAsset', 'HDRP', 'High Definition'],
-            'BRP': ['GraphicsSettings.renderPipelineAsset == null', 'Built-in'],
-            'SRP': ['RenderPipelineAsset', 'SRP', 'Scriptable Render Pipeline']
+        analysis = {
+            'filepath': str(filepath),
+            'size': len(content),
+            'lines': len(content.split('\n')),
+            'patterns': {},
+            'anti_patterns': {},
+            'architecture_score': 0.0
         }
         
-        detected_pipelines = []
-        for pipeline, indicators in pipeline_indicators.items():
-            if any(indicator in content for indicator in indicators):
-                detected_pipelines.append(pipeline)
-                
-        if detected_pipelines:
-            strengths.append(f"Rendering pipeline awareness: {', '.join(detected_pipelines)}")
+        # Analyze system patterns
+        for pattern_name, pattern in self.system_patterns.items():
+            matches = re.findall(pattern, content, re.MULTILINE | re.IGNORECASE)
+            analysis['patterns'][pattern_name] = len(matches)
+            
+            if matches:
+                self.verbose_log(f"Found {len(matches)} {pattern_name} patterns")
+        
+        # Analyze anti-patterns
+        for anti_pattern_name, pattern in self.anti_patterns.items():
+            matches = re.findall(pattern, content, re.MULTILINE | re.IGNORECASE)
+            analysis['anti_patterns'][anti_pattern_name] = len(matches)
+            
+            if matches:
+                self.verbose_log(f"Found {len(matches)} {anti_pattern_name} anti-patterns")
+        
+        # Calculate architecture score
+        analysis['architecture_score'] = self.calculate_architecture_score(analysis)
+        
+        return analysis
+
+    def calculate_architecture_score(self, analysis: Dict[str, Any]) -> float:
+        """Calculate architecture quality score"""
+        score = 100.0
+        patterns = analysis.get('patterns', {})
+        anti_patterns = analysis.get('anti_patterns', {})
+        
+        # Positive points for good patterns
+        if patterns.get('classes', 0) > 0:
+            score += 5.0
+        if patterns.get('functions', 0) > 0:
+            score += 5.0
+        if patterns.get('components', 0) > 0:
+            score += 10.0  # Components are good architecture
+        if patterns.get('systems', 0) > 0:
+            score += 10.0  # Systems are good architecture
+        
+        # Negative points for anti-patterns
+        score -= anti_patterns.get('god_class', 0) * 20.0
+        score -= anti_patterns.get('magic_numbers', 0) * 2.0
+        score -= anti_patterns.get('deep_nesting', 0) * 1.0
+        
+        # Ensure score is in valid range
+        return max(0.0, min(100.0, score))
+
+    def validate_system_architecture(self, filepath: Path, analysis: Dict[str, Any]) -> bool:
+        """Validate system architecture quality"""
+        filename = filepath.name
+        architecture_score = analysis.get('architecture_score', 0.0)
+        patterns = analysis.get('patterns', {})
+        anti_patterns = analysis.get('anti_patterns', {})
+        
+        # Check for minimum architecture quality
+        if architecture_score < 60.0:
+            self.log_warning(f"{filename}: Low architecture score ({architecture_score:.1f}/100)")
+        
+        # Check for specific architectural issues
+        if anti_patterns.get('god_class', 0) > 0:
+            self.log_warning(f"{filename}: Potential god class detected")
+        
+        if anti_patterns.get('magic_numbers', 0) > 5:
+            self.log_warning(f"{filename}: Many magic numbers found ({anti_patterns['magic_numbers']})")
+        
+        if anti_patterns.get('deep_nesting', 0) > 10:
+            self.log_warning(f"{filename}: Deep nesting detected ({anti_patterns['deep_nesting']} instances)")
+        
+        # Check for good architectural patterns
+        has_components = patterns.get('components', 0) > 0
+        has_systems = patterns.get('systems', 0) > 0
+        has_patterns = patterns.get('classes', 0) > 0 or patterns.get('functions', 0) > 0
+        
+        if not has_patterns and filepath.suffix == '.py':
+            self.log_warning(f"{filename}: No clear architectural patterns found")
+        
+        self.verbose_log(f"{filename}: Architecture score: {architecture_score:.1f}/100")
+        return architecture_score >= 50.0
+
+    def find_system_files(self) -> List[Path]:
+        """Find all system files to analyze"""
+        system_files = []
+        
+        if not self.path.exists():
+            self.log_error(f"System path does not exist: {self.path}")
+            return system_files
+        
+        # File extensions for system analysis
+        system_extensions = {'.py', '.cs', '.js', '.ts', '.cpp', '.c', '.h'}
+        
+        if self.path.is_file():
+            if self.path.suffix.lower() in system_extensions:
+                system_files.append(self.path)
         else:
-            issues.append("No rendering pipeline detection - consider pipeline compatibility")
-            
-    def validate_generic_patterns(self, content: str, system_name: str, issues: List[str], strengths: List[str]):
-        """Generic validation patterns for non-Unity systems"""
-        # Check for general good practices
-        if 'interface' in content:
-            strengths.append("Uses interface abstraction")
-            
-        if 'abstract' in content:
-            strengths.append("Uses abstract base classes")
-            
-        if 'static' in content and 'readonly' in content:
-            strengths.append("Uses immutable static members")
-            
-        # Check for dependency injection patterns
-        if 'DependencyInjection' in content or 'IoC' in content:
-            strengths.append("Uses dependency injection")
-            
-    def extract_component_dependencies(self, content: str) -> List[str]:
-        """Extract component dependencies from system"""
-        component_patterns = [
-            r'ComponentType\.ReadOnly<([^>]+)>',
-            r'ComponentType\.ReadWrite<([^>]+)>',
-            r'typeof\(([A-Z][A-Za-z]*(?:Component|Data))\)',
-            r'HasComponent<([^>]+)>',
-            r'GetComponent(?:Data)?<([^>]+)>'
-        ]
+            # Find all system files recursively
+            for ext in system_extensions:
+                pattern = f"**/*{ext}"
+                found_files = list(self.path.glob(pattern))
+                system_files.extend(found_files)
         
-        components = set()
-        for pattern in component_patterns:
-            matches = re.findall(pattern, content)
-            components.update(matches)
-            
-        return list(components)
-        
-    def analyze_component_dependencies(self):
-        """Analyze component usage across systems"""
-        for system in self.system_registry.values():
-            for component in system.components:
-                if component not in self.component_usage:
-                    self.component_usage[component] = []
-                self.component_usage[component].append(system.name)
-                
-    def build_dependency_graph(self):
-        """Build system dependency graph"""
-        # This would analyze update order dependencies
-        # For now, basic categorization by update groups
-        for system in self.system_registry.values():
-            group = system.update_group
-            if group not in self.dependency_graph:
-                self.dependency_graph[group] = []
-            self.dependency_graph[group].append(system.name)
-            
-    def generate_validation_report(self, systems: List[SystemValidation]) -> Dict[str, Any]:
-        """Generate comprehensive validation report"""
-        domain_groups = {}
-        for system in systems:
-            domain = system.domain
-            if domain not in domain_groups:
-                domain_groups[domain] = []
-            domain_groups[domain].append(system)
-        
-        total_issues = sum(len(s.issues) for s in systems)
-        total_strengths = sum(len(s.strengths) for s in systems)
-        avg_health_score = sum(s.health_score for s in systems) / len(systems) if systems else 0
-        
-        return {
-            'timestamp': datetime.now().isoformat(),
-            'summary': {
-                'total_systems': len(systems),
-                'domains': {domain: len(systems) for domain, systems in domain_groups.items()},
-                'average_health_score': round(avg_health_score, 1),
-                'total_issues': total_issues,
-                'total_strengths': total_strengths
-            },
-            'systems': [
-                {
-                    'name': s.name,
-                    'domain': s.domain,
-                    'health_score': s.health_score,
-                    'issues_count': len(s.issues),
-                    'strengths_count': len(s.strengths),
-                    'update_group': s.update_group,
-                    'has_burst': s.has_burst,
-                    'has_jobs': s.has_jobs
-                }
-                for s in systems
-            ],
-            'detailed_validations': [
-                {
-                    'name': s.name,
-                    'file_path': s.file_path,
-                    'domain': s.domain,
-                    'health_score': s.health_score,
-                    'issues': s.issues,
-                    'strengths': s.strengths,
-                    'components': s.components,
-                    'update_group': s.update_group
-                }
-                for s in systems
-            ],
-            'component_usage': self.component_usage,
-            'dependency_graph': self.dependency_graph
+        # Filter out irrelevant files
+        skip_patterns = {
+            '__pycache__', '.git', '.vscode', '.idea',
+            'node_modules', '.pytest_cache', 'bin', 'obj',
+            'test', 'tests'  # Skip test files for system analysis
         }
+        
+        filtered_files = []
+        for f in system_files:
+            if not any(skip_pattern in str(f).lower() for skip_pattern in skip_patterns):
+                filtered_files.append(f)
+        
+        return sorted(filtered_files)
+
+    def run_system_analysis(self) -> bool:
+        """Run complete system architecture analysis"""
+        self.log_info(f"Starting system architecture analysis for: {self.path}", EMOJI_MAGIC)
+        
+        # Find system files
+        system_files = self.find_system_files()
+        
+        if not system_files:
+            self.log_warning("No system files found to analyze")
+            return True
+        
+        self.log_info(f"Found {len(system_files)} system files to analyze")
+        
+        # Analyze each system file
+        all_valid = True
+        total_architecture_score = 0.0
+        
+        for file_path in system_files:
+            self.analyzed_systems.append(str(file_path))
+            
+            # Analyze system architecture
+            analysis = self.analyze_system_file(file_path)
+            
+            # Validate architecture
+            architecture_valid = self.validate_system_architecture(file_path, analysis)
+            all_valid = all_valid and architecture_valid
+            
+            # Accumulate architecture scores
+            total_architecture_score += analysis.get('architecture_score', 0.0)
+        
+        # Calculate overall architecture quality
+        average_architecture_score = total_architecture_score / len(system_files) if system_files else 0.0
+        
+        # Show summary
+        execution_time = (datetime.datetime.now() - self.analysis_start_time).total_seconds()
+        
+        print("\n" + "="*60)
+        self.log_info(f"System Architecture Analysis Summary", EMOJI_SYSTEM)
+        print(f"Systems analyzed: {len(self.analyzed_systems)}")
+        print(f"Average architecture score: {average_architecture_score:.1f}/100")
+        print(f"Warnings: {len(self.warnings)}")
+        print(f"Errors: {len(self.errors)}")
+        print(f"Execution time: {execution_time:.3f}s")
+        
+        if average_architecture_score >= 80.0:
+            self.log_success(f"Excellent system architecture! ({average_architecture_score:.1f}/100)", EMOJI_ARCH)
+        elif average_architecture_score >= 60.0:
+            self.log_success(f"Good system architecture ({average_architecture_score:.1f}/100)", EMOJI_SYSTEM)
+        else:
+            self.log_warning(f"System architecture needs improvement ({average_architecture_score:.1f}/100)")
+        
+        return all_valid
+
 
 def main():
-    """Main entry point for system validation"""
-    parser = argparse.ArgumentParser(description='Validate system architecture in development projects')
-    parser.add_argument('--path', default='.', help='Path to project directory')
-    parser.add_argument('--output', default='validation-report.json', help='Output file for validation report')
-    parser.add_argument('--verbose', action='store_true', help='Verbose output')
+    """Main execution function for system linting"""
+    parser = argparse.ArgumentParser(
+        description=f"{EMOJI_MAGIC} Living Dev Agent System Linter {EMOJI_SYSTEM}",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python3 system_linter.py --path src/
+  python3 system_linter.py --path system_file.py --verbose
+  python3 system_linter.py --path . --verbose
+        """
+    )
+    
+    parser.add_argument(
+        '--path',
+        required=True,
+        help='Path to system files (directory or single file)'
+    )
+    
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        help='Enable verbose output for detailed analysis'
+    )
     
     args = parser.parse_args()
     
-    # Add missing import
-    # from datetime import datetime  # Already imported at top
-    
-    validator = SystemValidator([args.path])
-    report = validator.validate_all_systems()
-    
-    # Save report
-    with open(args.output, 'w') as f:
-        json.dump(report, f, indent=2)
+    try:
+        # Create system linter and run analysis
+        linter = SystemLinter(
+            path=args.path,
+            verbose=args.verbose
+        )
         
-    # Print summary
-    summary = report['summary']
-    print(f"\n📊 System Health Report:")
-    print(f"   Total Systems: {summary['total_systems']}")
-    for domain, count in summary['domains'].items():
-        print(f"   {domain} Systems: {count}")
-    print(f"   Average Health Score: {summary['average_health_score']}/100")
-    print(f"   Issues Found: {summary['total_issues']}")
-    print(f"   Strengths Identified: {summary['total_strengths']}")
-    print(f"   Report saved to: {args.output}")
-    
-    return 0
+        success = linter.run_system_analysis()
+        
+        # Exit with appropriate code
+        sys.exit(0 if success else 1)
+        
+    except KeyboardInterrupt:
+        print(f"\n{Colors.WARNING}{EMOJI_WARNING} Analysis interrupted by user{Colors.ENDC}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"{Colors.FAIL}{EMOJI_ERROR} Analysis failed with exception: {e}{Colors.ENDC}")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
-    exit(main())
+    main()

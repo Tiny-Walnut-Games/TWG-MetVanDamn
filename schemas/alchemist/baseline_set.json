@@ -1,0 +1,423 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/jmeyer1980/TWG-TLDA/main/schemas/alchemist/baseline_set.json",
+  "title": "Alchemist Faculty Baseline Set Schema",
+  "description": "Schema for validating baseline measurement sets captured before experiment execution",
+  "type": "object",
+  "required": ["baseline_id", "experiment_id", "capture_timestamp", "metrics", "environment"],
+  "additionalProperties": false,
+  "properties": {
+    "baseline_id": {
+      "type": "string",
+      "pattern": "^baseline_[a-zA-Z0-9_-]+$",
+      "description": "Unique identifier for this baseline measurement set"
+    },
+    "experiment_id": {
+      "type": "string",
+      "pattern": "^exp_[a-zA-Z0-9_-]+$",
+      "description": "Associated experiment identifier from manifest"
+    },
+    "issue_number": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "GitHub issue number this baseline relates to"
+    },
+    "capture_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when baseline was captured"
+    },
+    "capture_duration_seconds": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Duration of baseline capture in seconds"
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Baseline measurement data",
+      "required": ["performance", "behavioral"],
+      "additionalProperties": true,
+      "properties": {
+        "performance": {
+          "type": "object",
+          "description": "Performance-related baseline metrics",
+          "required": ["throughput", "latency", "resource_usage"],
+          "properties": {
+            "throughput": {
+              "type": "object",
+              "required": ["value", "unit", "measurement_window"],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": ["ops/sec", "items/sec", "requests/sec", "fps", "tps"]
+                },
+                "measurement_window": {
+                  "type": "string",
+                  "description": "Duration over which throughput was measured"
+                },
+                "variance": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Statistical variance in throughput measurements"
+                },
+                "samples": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Number of samples taken"
+                }
+              }
+            },
+            "latency": {
+              "type": "object",
+              "required": ["mean_ms", "percentiles"],
+              "properties": {
+                "mean_ms": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "median_ms": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "percentiles": {
+                  "type": "object",
+                  "required": ["p95", "p99"],
+                  "properties": {
+                    "p50": { "type": "number", "minimum": 0 },
+                    "p90": { "type": "number", "minimum": 0 },
+                    "p95": { "type": "number", "minimum": 0 },
+                    "p99": { "type": "number", "minimum": 0 },
+                    "p99_9": { "type": "number", "minimum": 0 }
+                  }
+                },
+                "max_ms": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            },
+            "resource_usage": {
+              "type": "object",
+              "required": ["cpu_percent", "memory_mb"],
+              "properties": {
+                "cpu_percent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "memory_mb": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "disk_io_mb_per_sec": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "network_io_mb_per_sec": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "gpu_percent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                }
+              }
+            }
+          }
+        },
+        "behavioral": {
+          "type": "object",
+          "description": "Behavioral and qualitative baseline metrics",
+          "required": ["user_engagement", "system_stability"],
+          "properties": {
+            "user_engagement": {
+              "type": "object",
+              "required": ["session_duration_avg", "interaction_rate"],
+              "properties": {
+                "session_duration_avg": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Average session duration in seconds"
+                },
+                "interaction_rate": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Interactions per minute"
+                },
+                "task_completion_rate": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Fraction of tasks completed successfully"
+                },
+                "error_rate": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Fraction of actions resulting in errors"
+                },
+                "satisfaction_score": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 10,
+                  "description": "User satisfaction score (1-10 scale)"
+                }
+              }
+            },
+            "system_stability": {
+              "type": "object",
+              "required": ["uptime_percent", "error_count"],
+              "properties": {
+                "uptime_percent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "error_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "crash_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "recovery_time_avg_seconds": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        },
+        "custom": {
+          "type": "object",
+          "description": "Experiment-specific custom metrics",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["value", "unit"],
+            "properties": {
+              "value": {
+                "oneOf": [
+                  {"type": "number"},
+                  {"type": "string"},
+                  {"type": "boolean"}
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "measurement_method": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "description": "Environmental context for baseline measurements",
+      "required": ["system_info", "configuration"],
+      "properties": {
+        "system_info": {
+          "type": "object",
+          "required": ["platform", "version"],
+          "properties": {
+            "platform": {
+              "type": "string",
+              "enum": ["windows", "macos", "linux", "unity-editor", "unity-player"]
+            },
+            "version": {
+              "type": "string",
+              "description": "Platform/engine version"
+            },
+            "hardware": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": "string" },
+                "memory_gb": { "type": "number", "minimum": 0 },
+                "gpu": { "type": "string" },
+                "storage_type": { 
+                  "type": "string", 
+                  "enum": ["ssd", "hdd", "nvme", "unknown"] 
+                }
+              }
+            }
+          }
+        },
+        "configuration": {
+          "type": "object",
+          "required": ["quality_settings", "resolution"],
+          "properties": {
+            "quality_settings": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "ultra", "custom"]
+            },
+            "resolution": {
+              "type": "string",
+              "pattern": "^\\d+x\\d+$"
+            },
+            "vsync": {
+              "type": "boolean"
+            },
+            "fullscreen": {
+              "type": "boolean"
+            },
+            "target_framerate": {
+              "type": "integer",
+              "minimum": 30,
+              "maximum": 300
+            }
+          }
+        },
+        "external_factors": {
+          "type": "object",
+          "description": "External factors that might affect measurements",
+          "properties": {
+            "background_load": {
+              "type": "string",
+              "enum": ["minimal", "normal", "high"]
+            },
+            "network_condition": {
+              "type": "string",
+              "enum": ["offline", "lan", "wifi", "mobile", "slow"]
+            },
+            "time_of_day": {
+              "type": "string",
+              "pattern": "^\\d{2}:\\d{2}$"
+            },
+            "notes": {
+              "type": "string",
+              "description": "Additional notes about environmental conditions"
+            }
+          }
+        }
+      }
+    },
+    "measurement_methodology": {
+      "type": "object",
+      "description": "Details about how baseline was measured",
+      "required": ["tools_used", "sampling_strategy"],
+      "properties": {
+        "tools_used": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of tools/instruments used for measurement"
+        },
+        "sampling_strategy": {
+          "type": "string",
+          "enum": ["continuous", "periodic", "event-driven", "manual"],
+          "description": "How measurements were collected"
+        },
+        "sampling_interval": {
+          "type": "string",
+          "description": "Interval between samples (e.g., '100ms', '1s')"
+        },
+        "warmup_duration": {
+          "type": "string",
+          "description": "System warmup period before measurement"
+        },
+        "measurement_duration": {
+          "type": "string",
+          "description": "Total duration of measurement period"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation and quality checks for baseline data",
+      "required": ["is_valid", "quality_score"],
+      "properties": {
+        "is_valid": {
+          "type": "boolean",
+          "description": "Whether baseline passed validation checks"
+        },
+        "quality_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall quality score (0-1)"
+        },
+        "validation_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["check_name", "passed"],
+            "properties": {
+              "check_name": {
+                "type": "string"
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "details": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "anomalies_detected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["metric", "description"],
+            "properties": {
+              "metric": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "critical"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata about the baseline",
+      "properties": {
+        "captured_by": {
+          "type": "string",
+          "description": "Person or system that captured the baseline"
+        },
+        "capture_reason": {
+          "type": "string",
+          "description": "Reason for baseline capture"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags for categorizing this baseline"
+        },
+        "related_baselines": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of related baseline measurements"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes about this baseline"
+        }
+      }
+    }
+  }
+}

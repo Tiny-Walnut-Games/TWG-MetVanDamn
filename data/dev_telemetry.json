@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-09-02T09:46:20.838837",
+  "last_updated": "2025-09-02T11:40:14.227774",
+  "sleep_tracking": {
+    "enabled": true,
+    "entries": [
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T09:46:20.838847",
+        "hours": 7.5,
+        "quality": "good",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T09:47:11.937560",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T09:51:10.301076",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T11:33:26.885700",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T11:33:44.990058",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T11:37:11.214557",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T11:38:21.908840",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T11:38:56.634599",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T11:40:14.104838",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      },
+      {
+        "date": "2025-09-02",
+        "timestamp": "2025-09-02T11:40:14.227724",
+        "hours": 8.0,
+        "quality": "excellent",
+        "notes": "",
+        "low_sleep_flag": false
+      }
+    ]
+  },
+  "energy_tracking": {
+    "enabled": true,
+    "entries": []
+  },
+  "flags": {
+    "low_sleep": false,
+    "low_energy": false,
+    "cognitive_sensitivity": false
+  },
+  "daily_stats": {
+    "2025-09-02": {
+      "sleep": {
+        "hours": 8.0,
+        "quality": "excellent",
+        "low_sleep": false
+      }
+    }
+  },
+  "hours_slept_last_night": 8.0
+}

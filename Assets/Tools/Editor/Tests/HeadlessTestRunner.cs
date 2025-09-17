@@ -16,7 +16,7 @@ namespace TinyWalnutGames.Tools.Editor.Tests
             {
             var api = new TestRunnerApi();
 
-            var (testNames, resultsPath) = ParseArgs();
+            (string[] testNames, string resultsPath) = ParseArgs();
             EnsureDirectory(resultsPath);
 
             var callbacks = new CliCallbacks(resultsPath);
@@ -46,7 +46,7 @@ namespace TinyWalnutGames.Tools.Editor.Tests
                 testMode = TestMode.EditMode
                 };
 
-            var resultsPath = GetResultsPath();
+            string resultsPath = GetResultsPath();
             EnsureDirectory(resultsPath);
 
             var callbacks = new CliCallbacks(resultsPath);
@@ -59,10 +59,10 @@ namespace TinyWalnutGames.Tools.Editor.Tests
         private static string GetResultsPath()
             {
             // Allow overriding via env var; default to repo debug folder
-            var path = Environment.GetEnvironmentVariable("BIO_TEST_RESULTS");
+            string path = Environment.GetEnvironmentVariable("BIO_TEST_RESULTS");
             if (string.IsNullOrWhiteSpace(path))
                 {
-                var ts = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string ts = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 path = Path.Combine(Directory.GetCurrentDirectory(), "debug", $"TestResults_Editor_{ts}.xml");
                 }
             return path;
@@ -70,14 +70,14 @@ namespace TinyWalnutGames.Tools.Editor.Tests
 
         private static (string[] testNames, string resultsPath) ParseArgs()
             {
-            var args = Environment.GetCommandLineArgs();
+            string[] args = Environment.GetCommandLineArgs();
 
             string testFilter = null;
             string resultsPath = null;
 
             for (int i = 0; i < args.Length; i++)
                 {
-                var arg = args[i];
+                string arg = args[i];
                 if (string.Equals(arg, "-testFilter", StringComparison.OrdinalIgnoreCase)
                     || string.Equals(arg, "-filter", StringComparison.OrdinalIgnoreCase))
                     {
@@ -113,7 +113,7 @@ namespace TinyWalnutGames.Tools.Editor.Tests
             {
             try
                 {
-                var dir = Path.GetDirectoryName(filePath);
+                string dir = Path.GetDirectoryName(filePath);
                 if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
                     {
                     Directory.CreateDirectory(dir);
@@ -146,7 +146,7 @@ namespace TinyWalnutGames.Tools.Editor.Tests
                     {
                     try
                         {
-                        var logPath = Path.ChangeExtension(_resultsPath, ".log");
+                        string logPath = Path.ChangeExtension(_resultsPath, ".log");
                         File.WriteAllText(logPath, e.ToString());
                         }
                     catch { /* ignore secondary failures */ }
@@ -184,7 +184,7 @@ namespace TinyWalnutGames.Tools.Editor.Tests
                 {
                 if (node.HasChildren)
                     {
-                    foreach (var child in node.Children)
+                    foreach (ITestResultAdaptor child in node.Children)
                         CountResults(child, ref passed, ref failed, ref skipped, ref inconclusive);
                     }
                 else

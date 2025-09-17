@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "last_updated": "2025-09-06T20:45:14.747360",
+  "registrations": {
+    "warden": {
+      "module_name": "warden",
+      "module_path": "engine/governance.py",
+      "last_known_good_hash": "fdd6704909c54b2ac77e36c24bc5d95be7d97547015f1bd8713cbcc147c678e6",
+      "backup_strategy": "file_copy",
+      "validation_command": "python3 -m py_compile engine/governance.py",
+      "dependencies": [],
+      "repair_actions_enabled": [
+        "restore_from_snapshot",
+        "validate_and_rollback"
+      ],
+      "registered_at": "2025-09-06T20:43:01.481419",
+      "last_repair": null,
+      "repair_count": 0
+    },
+    "alice": {
+      "module_name": "alice",
+      "module_path": "engine/telemetry.py",
+      "last_known_good_hash": "636b9cbc9ebd42aac52a58a3060a71505b5f9efced0159a3bc2e451d2d6c65f8",
+      "backup_strategy": "file_copy",
+      "validation_command": "python3 -m py_compile engine/telemetry.py",
+      "dependencies": [],
+      "repair_actions_enabled": [
+        "relink_dependencies",
+        "restore_from_snapshot",
+        "validate_and_rollback"
+      ],
+      "registered_at": "2025-09-06T20:43:01.481706",
+      "last_repair": "2025-09-06T20:45:14.747353",
+      "repair_count": 1
+    }
+  }
+}

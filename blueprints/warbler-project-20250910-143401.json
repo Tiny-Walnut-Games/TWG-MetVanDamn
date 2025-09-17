@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "name": "Warbler-Generated-Custom",
+    "created_date": "2025-09-10T14:34:01.092318",
+    "user_request": "Create a simple test game",
+    "warbler_analysis": {
+      "game_type": "custom",
+      "complexity_level": "moderate",
+      "required_systems": [
+        "PlayerController",
+        "GameManager",
+        "UIManager",
+        "InputHandler",
+        "SceneManager",
+        "AudioManager"
+      ],
+      "recommended_folders": [
+        "Scripts/Player",
+        "Scripts/Managers",
+        "Scripts/UI",
+        "Scripts/Audio",
+        "Scripts/Core"
+      ],
+      "unity_packages": [
+        "InputSystem",
+        "Audio Mixer"
+      ],
+      "estimated_dev_time": "4-6 weeks",
+      "key_mechanics": [
+        "custom_gameplay",
+        "user_interaction"
+      ],
+      "technical_considerations": [
+        "performance",
+        "maintainability",
+        "extensibility"
+      ],
+      "suggested_architecture": "Component-based",
+      "warbler_insights": "Custom game detected - analysis based on common game development patterns. Consider refining the request for more specific recommendations.",
+      "warbler_enhancement": {
+        "tlda_integration": true,
+        "auto_documentation": true,
+        "performance_monitoring": true,
+        "suggested_tldl_tags": [
+          "project-setup",
+          "warbler-generated",
+          "custom",
+          "custom-gameplay"
+        ],
+        "development_milestones": [
+          "Core system setup (Week 1-2)",
+          "Basic gameplay implementation (Week 3-4)",
+          "UI and polish (Week 5-6)"
+        ],
+        "testing_strategy": [
+          "Basic functionality testing",
+          "Performance validation",
+          "User experience testing"
+        ]
+      }
+    }
+  },
+  "development_plan": {
+    "milestones": [
+      "Core system setup (Week 1-2)",
+      "Basic gameplay implementation (Week 3-4)",
+      "UI and polish (Week 5-6)"
+    ],
+    "testing_strategy": [
+      "Basic functionality testing",
+      "Performance validation",
+      "User experience testing"
+    ],
+    "estimated_timeline": "4-6 weeks"
+  },
+  "technical_specs": {
+    "unity_version": "2022.3 LTS or later",
+    "target_platforms": [
+      "PC",
+      "Mobile"
+    ],
+    "required_packages": [
+      "InputSystem",
+      "Audio Mixer"
+    ],
+    "architecture": "Component-based"
+  },
+  "tlda_integration": {
+    "auto_documentation": true,
+    "performance_monitoring": true,
+    "suggested_tags": [
+      "project-setup",
+      "warbler-generated",
+      "custom",
+      "custom-gameplay"
+    ],
+    "warbler_insights": "Custom game detected - analysis based on common game development patterns. Consider refining the request for more specific recommendations."
+  }
+}

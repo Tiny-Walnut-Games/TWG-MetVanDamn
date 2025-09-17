@@ -1,0 +1,494 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2025-01-02T09:00:00Z",
+  "last_updated": "2025-09-02T11:40:13.891455",
+  "last_rollover": null,
+  "ideas": [
+    {
+      "id": "e33846d0",
+      "text": "Test idea for the self-care system",
+      "timestamp": "2025-09-02T09:45:26.878772",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "ba111fee",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T09:47:11.714491",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "1eadc190",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T09:51:10.076628",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "a96b2105",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T11:32:19.112701",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "3e60977e",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T11:33:26.605342",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "dac4fc97",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T11:33:44.747627",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "d481ef02",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T11:37:10.977719",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "33e80e19",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T11:38:21.676030",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "b591237c",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T11:38:56.355602",
+      "tag": "!",
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "9a48f9be",
+      "text": "Implement weekly auto-issue generation for RitualBot phases",
+      "timestamp": "2025-09-02T11:39:11.430264",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "3dd86d74",
+      "text": "Research semantic clustering algorithms for idea deduplication",
+      "timestamp": "2025-09-02T11:39:11.456641",
+      "tag": "?",
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "82b2ff82",
+      "text": "Demo idea 1 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:47.591831",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "ac67ffef",
+      "text": "Demo idea 2 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:47.653058",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "5706b045",
+      "text": "Demo idea 3 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:47.722338",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "03e1e1c5",
+      "text": "Demo idea 4 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:47.781998",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "d033cd94",
+      "text": "Demo idea 5 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:47.832558",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "7162b241",
+      "text": "Demo idea 6 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:47.883364",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "4e0715cd",
+      "text": "Demo idea 7 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:47.954248",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "ca890e2a",
+      "text": "Demo idea 8 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.026043",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "bbb60121",
+      "text": "Demo idea 9 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.098343",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "c9df57b5",
+      "text": "Demo idea 10 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.157389",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "ea65a134",
+      "text": "Demo idea 11 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.207629",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "f4b2c41d",
+      "text": "Demo idea 12 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.258463",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "d568369b",
+      "text": "Demo idea 13 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.309802",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "b8a916d4",
+      "text": "Demo idea 14 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.362940",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "11778b79",
+      "text": "Demo idea 15 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.426128",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "852430d3",
+      "text": "Demo idea 16 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.495720",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "259a4e67",
+      "text": "Demo idea 17 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.550557",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "067d45aa",
+      "text": "Demo idea 18 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.601223",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "9e868285",
+      "text": "Demo idea 19 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.652949",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "62459ccf",
+      "text": "Demo idea 20 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:48.705486",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "04df1f44",
+      "text": "Demo idea 1 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.060202",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "299710d3",
+      "text": "Demo idea 2 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.060656",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "663eef54",
+      "text": "Demo idea 3 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.061317",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "a47f542f",
+      "text": "Demo idea 4 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.061834",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "189a3ff9",
+      "text": "Demo idea 5 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.062317",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "d92b7e28",
+      "text": "Demo idea 6 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.063162",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "974499d1",
+      "text": "Demo idea 7 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.063681",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "61e2d8e1",
+      "text": "Demo idea 8 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.064554",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "3a61d6ee",
+      "text": "Demo idea 9 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.065152",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "f49dbb43",
+      "text": "Demo idea 10 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.065675",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "1eacfb95",
+      "text": "Demo idea 11 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.066326",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "8b359008",
+      "text": "Demo idea 12 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.066902",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "09170834",
+      "text": "Demo idea 13 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.067483",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "3a8ab0ac",
+      "text": "Demo idea 14 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.068100",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "e417cc45",
+      "text": "Demo idea 15 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.068657",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "437320e8",
+      "text": "Demo idea 16 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.069305",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "5cfe4ea1",
+      "text": "Demo idea 17 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.069976",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "9cca9eb8",
+      "text": "Demo idea 18 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.070704",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "fb8ba452",
+      "text": "Demo idea 19 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.071311",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "55939c81",
+      "text": "Demo idea 20 for Self-Care Phase 1 validation",
+      "timestamp": "2025-09-02T11:39:56.071934",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "85bee1ec",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T11:40:13.767176",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    },
+    {
+      "id": "3387a05b",
+      "text": "Test idea from test suite",
+      "timestamp": "2025-09-02T11:40:13.891415",
+      "tag": null,
+      "promoted": false,
+      "promoted_at": null,
+      "metadata": {}
+    }
+  ],
+  "promoted_count": 0,
+  "daily_stats": {
+    "2025-09-02": {
+      "added": 53,
+      "promoted": 0,
+      "classified": 0
+    }
+  },
+  "rollover_history": []
+}

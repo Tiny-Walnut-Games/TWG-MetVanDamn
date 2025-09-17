@@ -1,0 +1,167 @@
+name: DevTimeTravel Compression
+
+on:
+  schedule:
+    # Daily execution at 02:15 UTC to avoid peak times
+    - cron: '15 2 * * *'
+  workflow_dispatch:
+    inputs:
+      verbose:
+        description: 'Enable verbose output'
+        required: false
+        default: 'false'
+        type: boolean
+      config_path:
+        description: 'Path to custom config file (optional)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  compress-snapshots:
+    runs-on: ubuntu-latest
+    name: Giant-in-the-Well Compression
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for proper compression
+          
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyYAML
+          
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "DevTimeTravel Compression Bot"
+          
+      - name: Run DevTimeTravel compression
+        id: compression
+        run: |
+          # Determine verbose flag
+          VERBOSE_FLAG=""
+          if [ "${{ github.event.inputs.verbose || 'false' }}" = "true" ]; then
+            VERBOSE_FLAG="--verbose"
+          fi
+          
+          # Determine config flag
+          CONFIG_FLAG=""
+          if [ -n "${{ github.event.inputs.config_path }}" ]; then
+            CONFIG_FLAG="--config ${{ github.event.inputs.config_path }}"
+          fi
+          
+          # Run compression script
+          python3 scripts/devtimetravel/compress_snapshots.py \
+            --root .devtimetravel \
+            --report devtimetravel_compress_report.json \
+            $VERBOSE_FLAG \
+            $CONFIG_FLAG
+          
+          # Store exit code for later use
+          echo "compression_exit_code=$?" >> $GITHUB_OUTPUT
+          
+      - name: Check for changes
+        id: changes
+        run: |
+          # Check if there are any changes to commit
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+            echo "Files changed:"
+            git status --short
+          else
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+            echo "No files changed during compression"
+          fi
+          
+      - name: Commit and push changes
+        if: steps.changes.outputs.changes_detected == 'true'
+        run: |
+          # Add only the files we care about
+          git add .devtimetravel/index.json
+          git add .devtimetravel/snapshots/
+          git add .devtimetravel/decisions/
+          
+          # Check if there's anything to commit after selective add
+          if [ -n "$(git diff --cached --name-only)" ]; then
+            # Create commit message based on compression results
+            COMMIT_MSG="🕰️ DevTimeTravel: Giant-in-the-Well compression $(date '+%Y-%m-%d %H:%M UTC')"
+            
+            # Add details if verbose or significant changes
+            CHANGED_FILES=$(git diff --cached --name-only | wc -l)
+            if [ "$CHANGED_FILES" -gt 1 ]; then
+              # Create extended commit message
+              echo "🕰️ DevTimeTravel: Giant-in-the-Well compression $(date '+%Y-%m-%d %H:%M UTC')" > /tmp/commit_msg.txt
+              echo "" >> /tmp/commit_msg.txt
+              echo "Applied snapshot compaction and layer migrations:" >> /tmp/commit_msg.txt
+              git diff --cached --name-only | sed 's/^/- /' >> /tmp/commit_msg.txt
+              git commit -F /tmp/commit_msg.txt
+              rm -f /tmp/commit_msg.txt
+            else
+              git commit -m "$COMMIT_MSG"
+            fi
+            git push
+            echo "✅ Changes committed and pushed"
+          else
+            echo "ℹ️ No relevant changes to commit after selective staging"
+          fi
+          
+      - name: Upload compression report
+        uses: actions/upload-artifact@v4
+        with:
+          name: devtimetravel-compression-report-${{ github.run_number }}
+          path: devtimetravel_compress_report.json
+          retention-days: 30
+          
+      - name: Display compression summary
+        run: |
+          echo "## 🕰️ DevTimeTravel Compression Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "devtimetravel_compress_report.json" ]; then
+            # Extract key metrics from report using simple parsing
+            echo "**Report Generated:** ✅" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Processing time
+            PROC_TIME=$(python3 -c "import json; r=json.load(open('devtimetravel_compress_report.json')); print(r.get('processing_time_seconds', 0))" 2>/dev/null || echo "unknown")
+            echo "**Processing Time:** ${PROC_TIME}s" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Layer migrations count
+            RAW_COUNT=$(python3 -c "import json; r=json.load(open('devtimetravel_compress_report.json')); print(len(r.get('migrations', {}).get('raw_to_compacted', [])))" 2>/dev/null || echo "0")
+            COMP_COUNT=$(python3 -c "import json; r=json.load(open('devtimetravel_compress_report.json')); print(len(r.get('migrations', {}).get('compacted_to_daily', [])))" 2>/dev/null || echo "0")
+            
+            echo "**Layer Migrations:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Raw → Compacted: ${RAW_COUNT} files" >> $GITHUB_STEP_SUMMARY
+            echo "- Compacted → Daily: ${COMP_COUNT} files" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Status
+            echo "**Status:** Compression completed successfully ✅" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Compression report not found"
+          fi
+          
+      - name: Handle compression warnings
+        if: steps.compression.outputs.compression_exit_code == '2'
+        run: |
+          echo "⚠️ High pressure detected in one or more layers"
+          echo "Check the compression report for recommended actions"
+          exit 0  # Don't fail the workflow for warnings
+          
+      - name: Handle compression errors
+        if: steps.compression.outputs.compression_exit_code != '0' && steps.compression.outputs.compression_exit_code != '2'
+        run: |
+          echo "❌ Compression failed with exit code ${{ steps.compression.outputs.compression_exit_code }}"
+          exit 1

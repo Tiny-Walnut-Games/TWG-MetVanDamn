@@ -1,0 +1,51 @@
+{
+  "version": "2.0.0",
+  "last_updated": "2025-09-02T10:29:43.394024",
+  "tasks": {
+    "7326b543-3d90-4a81-a1a1-f2cb7a1d19e0": {
+      "id": "7326b543-3d90-4a81-a1a1-f2cb7a1d19e0",
+      "title": "TLDA Validation Test",
+      "description": "Testing TaskMaster system functionality during validation checkpoint",
+      "priority": 3,
+      "status": "done",
+      "complexity": 3,
+      "created_date": "2025-09-01T23:41:35.915956",
+      "due_date": null,
+      "completed_date": "2025-09-01T23:42:35.585849",
+      "estimated_hours": 0.0,
+      "actual_hours": 0.0,
+      "tags": [
+        "validation",
+        "testing"
+      ],
+      "epic": "TLDA v1.0 Launch Prep",
+      "assignee": "",
+      "related_tldl_entries": [],
+      "code_references": [],
+      "time_sessions": [],
+      "is_timer_active": false,
+      "current_session_start": null
+    },
+    "b8e40fb7-3ac6-472b-9764-7f99e160a642": {
+      "id": "b8e40fb7-3ac6-472b-9764-7f99e160a642",
+      "title": "Test TaskMaster sync",
+      "description": "",
+      "priority": 3,
+      "status": "todo",
+      "complexity": 3,
+      "created_date": "2025-09-02T10:29:43.394020",
+      "due_date": null,
+      "completed_date": null,
+      "estimated_hours": 0.0,
+      "actual_hours": 0.0,
+      "tags": [],
+      "epic": "Integration Testing",
+      "assignee": "",
+      "related_tldl_entries": [],
+      "code_references": [],
+      "time_sessions": [],
+      "is_timer_active": false,
+      "current_session_start": null
+    }
+  }
+}

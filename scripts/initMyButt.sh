@@ -1,67 +1,252 @@
 #!/usr/bin/env bash
 #
+# MIT License
+#
+# Copyright (c) 2025 Jerry Meyer (Tiny Walnut Games)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
 # 🍑 initMyButt.sh - The Sacred Butt Initialization Ritual
 # Part of the Living Dev Agent Workflow - Save The Butts! Edition
 #
 # This script initializes your development environment with proper
 # butt-saving protocols, ergonomic awareness, and documentation habits.
-#
-# Copyright (C) 2025 Bellok
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#
+
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Sacred colors for the ritual
-SACRED_BLUE='\033[0;34m'
-BUTT_GOLD='\033[1;33m'
-COMFORT_GREEN='\033[0;32m'
-DANGER_RED='\033[0;31m'
-WISDOM_PURPLE='\033[0;35m'
-NC='\033[0m' # No Color
+# Source shared utilities
+source "$SCRIPT_DIR/lib/lda_common.sh"
 
 # Configuration
 COMFORT_MODE=false
 VERBOSE=false
 CHARACTER_CLASS=""
 SKIP_ERGONOMIC_CHECK=false
+ERGONOMICS_ONLY=false
+CHARACTER_ONLY=false
+COMFORT_ONLY=false
+NON_INTERACTIVE=false
+QUIET=false
+JSON_OUTPUT=""
 
-# Sacred emojis for the journey
-BUTT_EMOJI="🍑"
-SHIELD_EMOJI="🛡️"
-MAGIC_EMOJI="✨"
-SCROLL_EMOJI="📜"
-CROWN_EMOJI="👑"
+# JSON report data
+declare -A BUTT_REPORT_DATA
 
-# Logging helpers
+# Additional emojis specific to this script
+BUTT_EMOJI="${LDA_EMOJI_BUTT}"
+SHIELD_EMOJI="${LDA_EMOJI_SHIELD}"
+MAGIC_EMOJI="${LDA_EMOJI_SPARKLE}"
+SCROLL_EMOJI="${LDA_EMOJI_SCROLL}"
+CROWN_EMOJI="${LDA_EMOJI_CROWN}"
+
+# Legacy color aliases for compatibility
+SACRED_BLUE="$LDA_BLUE"
+BUTT_GOLD="$LDA_GOLD"
+COMFORT_GREEN="$LDA_GREEN"
+DANGER_RED="$LDA_RED"
+WISDOM_PURPLE="$LDA_PURPLE"
+NC="$LDA_NC"
+
+# Legacy logging function aliases for backward compatibility
 log_comfort() {
-    echo -e "${COMFORT_GREEN}${SHIELD_EMOJI} $1${NC}"
+    lda_log_comfort "$1"
 }
 
 log_wisdom() {
-    echo -e "${WISDOM_PURPLE}${SCROLL_EMOJI} $1${NC}"
+    lda_log_wisdom "$1"
 }
 
 log_sacred() {
-    echo -e "${BUTT_GOLD}${CROWN_EMOJI} $1${NC}"
+    lda_log_sacred "$1"
 }
 
 log_danger() {
-    echo -e "${DANGER_RED}⚠️  $1${NC}"
+    lda_log_danger "$1"
+}
+
+show_help() {
+    cat << EOF
+$(lda_cecho "$LDA_GOLD" "${BUTT_EMOJI} Sacred Butt Initialization Ritual ${BUTT_EMOJI}")
+
+Initialize your development environment with proper butt-saving protocols,
+ergonomic awareness, and documentation habits.
+
+USAGE:
+    $0 [OPTIONS]
+
+OPTIONS:
+    --ergonomics-only      Run only ergonomic setup checks
+    --character-only       Run only character class configuration  
+    --comfort-only         Run only comfort reminder setup
+    --character-class NAME Set specific character class (codereaper|oracle|branchdancer)
+    --non-interactive      Run without interactive prompts
+    --quiet               Minimize output messages
+    --no-color            Disable colored output
+    --json-out FILE       Output summary report to JSON file
+    -h, --help            Show this help message
+
+EXAMPLES:
+    # Full interactive setup
+    $0
+    
+    # Ergonomics check only
+    $0 --ergonomics-only
+    
+    # Set character class non-interactively
+    $0 --character-class oracle --non-interactive
+    
+    # Generate JSON report
+    $0 --json-out butt_report.json
+
+The Sacred Butt Initialization Ritual ensures your development environment
+is properly configured for comfortable, productive, and butt-safe coding!
+EOF
+}
+
+parse_arguments() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --ergonomics-only)
+                ERGONOMICS_ONLY=true
+                shift
+                ;;
+            --character-only)
+                CHARACTER_ONLY=true
+                shift
+                ;;
+            --comfort-only)
+                COMFORT_ONLY=true
+                shift
+                ;;
+            --character-class)
+                if [[ -n "$2" ]]; then
+                    CHARACTER_CLASS="$2"
+                    shift 2
+                else
+                    lda_die "Error: --character-class requires a class name"
+                fi
+                ;;
+            --non-interactive)
+                NON_INTERACTIVE=true
+                export LDA_NON_INTERACTIVE=true
+                shift
+                ;;
+            --quiet)
+                QUIET=true
+                shift
+                ;;
+            --no-color)
+                export NO_COLOR=1
+                source "$SCRIPT_DIR/lib/lda_common.sh"  # Reload with no color
+                shift
+                ;;
+            --json-out)
+                if [[ -n "$2" ]]; then
+                    JSON_OUTPUT="$2"
+                    shift 2
+                else
+                    lda_die "Error: --json-out requires a filename"
+                fi
+                ;;
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            # Legacy options for backward compatibility
+            --comfort)
+                COMFORT_MODE=true
+                shift
+                ;;
+            --verbose)
+                VERBOSE=true
+                shift
+                ;;
+            *)
+                lda_die "Unknown option: $1. Use --help for usage information."
+                ;;
+        esac
+    done
+}
+
+validate_arguments() {
+    # Validate character class if provided
+    if [[ -n "$CHARACTER_CLASS" && ! "$CHARACTER_CLASS" =~ ^(codereaper|oracle|branchdancer)$ ]]; then
+        lda_die "Invalid character class: $CHARACTER_CLASS. Must be one of: codereaper, oracle, branchdancer"
+    fi
+    
+    # Count exclusive modes
+    local mode_count=0
+    [[ "$ERGONOMICS_ONLY" == "true" ]] && ((mode_count++))
+    [[ "$CHARACTER_ONLY" == "true" ]] && ((mode_count++))
+    [[ "$COMFORT_ONLY" == "true" ]] && ((mode_count++))
+    
+    if [[ $mode_count -gt 1 ]]; then
+        lda_die "Cannot specify multiple exclusive modes (--ergonomics-only, --character-only, --comfort-only)"
+    fi
+}
+
+initialize_report() {
+    BUTT_REPORT_DATA[timestamp]="$(lda_timestamp_iso)"
+    BUTT_REPORT_DATA[mode]="full"
+    BUTT_REPORT_DATA[ergonomics_only]="$ERGONOMICS_ONLY"
+    BUTT_REPORT_DATA[character_only]="$CHARACTER_ONLY"
+    BUTT_REPORT_DATA[comfort_only]="$COMFORT_ONLY"
+    BUTT_REPORT_DATA[character_class]="$CHARACTER_CLASS"
+    BUTT_REPORT_DATA[non_interactive]="$NON_INTERACTIVE"
+    BUTT_REPORT_DATA[status]="in_progress"
+    BUTT_REPORT_DATA[ergonomics_completed]="false"
+    BUTT_REPORT_DATA[character_completed]="false"
+    BUTT_REPORT_DATA[comfort_completed]="false"
+    BUTT_REPORT_DATA[errors]=""
+    BUTT_REPORT_DATA[warnings]=""
+}
+
+write_json_report() {
+    if [[ -z "$JSON_OUTPUT" ]]; then
+        return 0
+    fi
+    
+    [[ "$QUIET" != "true" ]] && lda_log_info "Writing butt initialization report to $JSON_OUTPUT"
+    
+    # Create JSON report
+    cat > "$JSON_OUTPUT" << EOF
+{
+  "timestamp": "$(lda_json_escape "${BUTT_REPORT_DATA[timestamp]}")",
+  "mode": "$(lda_json_escape "${BUTT_REPORT_DATA[mode]}")",
+  "ergonomics_only": $(if [[ "$ERGONOMICS_ONLY" == "true" ]]; then echo "true"; else echo "false"; fi),
+  "character_only": $(if [[ "$CHARACTER_ONLY" == "true" ]]; then echo "true"; else echo "false"; fi),
+  "comfort_only": $(if [[ "$COMFORT_ONLY" == "true" ]]; then echo "true"; else echo "false"; fi),
+  "character_class": "$(lda_json_escape "${BUTT_REPORT_DATA[character_class]}")",
+  "non_interactive": $(if [[ "$NON_INTERACTIVE" == "true" ]]; then echo "true"; else echo "false"; fi),
+  "status": "$(lda_json_escape "${BUTT_REPORT_DATA[status]}")",
+  "ergonomics_completed": $(if [[ "${BUTT_REPORT_DATA[ergonomics_completed]}" == "true" ]]; then echo "true"; else echo "false"; fi),
+  "character_completed": $(if [[ "${BUTT_REPORT_DATA[character_completed]}" == "true" ]]; then echo "true"; else echo "false"; fi),
+  "comfort_completed": $(if [[ "${BUTT_REPORT_DATA[comfort_completed]}" == "true" ]]; then echo "true"; else echo "false"; fi),
+  "errors": "$(lda_json_escape "${BUTT_REPORT_DATA[errors]}")",
+  "warnings": "$(lda_json_escape "${BUTT_REPORT_DATA[warnings]}")"
+}
+EOF
+    
+    [[ "$QUIET" != "true" ]] && lda_log_success "Report written to $JSON_OUTPUT"
 }
 
 # ---------- Python bootstrap (cross-platform) ----------
@@ -69,9 +254,8 @@ command_exists() { command -v "$1" >/dev/null 2>&1; }
 
 create_python3_shim_if_needed() {
   if command_exists python && ! command_exists python3; then
-    echo -n "Create a 'python3' shim that calls 'python'? [Y/n] "
-    read -r ans
-    if [[ -z "$ans" || "$ans" =~ ^[Yy]$ ]]; then
+    if [[ "$NON_INTERACTIVE" == "true" ]]; then
+      [[ "$QUIET" != "true" ]] && log_wisdom "Non-interactive mode: creating python3 shim automatically"
       mkdir -p "$PROJECT_ROOT/.bin"
       cat > "$PROJECT_ROOT/.bin/python3" <<'EOF'
 #!/usr/bin/env bash
@@ -79,9 +263,22 @@ exec python "$@"
 EOF
       chmod +x "$PROJECT_ROOT/.bin/python3"
       export PATH="$PROJECT_ROOT/.bin:$PATH"
-      log_comfort "Created python3 shim in .bin and updated PATH for this session"
+      [[ "$QUIET" != "true" ]] && log_comfort "Created python3 shim in .bin and updated PATH for this session"
     else
-      log_wisdom "Skipping shim creation"
+      echo -n "Create a 'python3' shim that calls 'python'? [Y/n] "
+      read -r ans
+      if [[ -z "$ans" || "$ans" =~ ^[Yy]$ ]]; then
+        mkdir -p "$PROJECT_ROOT/.bin"
+        cat > "$PROJECT_ROOT/.bin/python3" <<'EOF'
+#!/usr/bin/env bash
+exec python "$@"
+EOF
+        chmod +x "$PROJECT_ROOT/.bin/python3"
+        export PATH="$PROJECT_ROOT/.bin:$PATH"
+        log_comfort "Created python3 shim in .bin and updated PATH for this session"
+      else
+        log_wisdom "Skipping shim creation"
+      fi
     fi
   fi
 }
@@ -167,6 +364,13 @@ ensure_python() {
     create_python3_shim_if_needed
     return 0
   fi
+  
+  if [[ "$NON_INTERACTIVE" == "true" ]]; then
+    [[ "$QUIET" != "true" ]] && log_warning "Python not found on PATH - skipping installation in non-interactive mode"
+    [[ "$QUIET" != "true" ]] && log_wisdom "Some validation steps will be disabled"
+    return 1
+  fi
+  
   log_danger "Python not found on PATH."
   echo -n "Get latest Python now? [y/N] "
   read -r go
@@ -230,50 +434,27 @@ log_danger() {
     echo -e "${DANGER_RED}⚠️  $1${NC}"
 }
 
-show_help() {
-    cat << EOF
-${BUTT_EMOJI} Sacred Butt Initialization Ritual ${BUTT_EMOJI}
-
-USAGE:
-    $0 [OPTIONS]
-
-OPTIONS:
-    --comfort-mode         Enable enhanced comfort features and checks
-    --character-class CLASS Choose your path: buttwarden, lintmage, oracle, branchdancer
-    --skip-ergonomic       Skip the ergonomic assessment (not recommended)
-    --verbose              Enable detailed ritual commentary
-    --help                 Display this sacred wisdom
-
-EXAMPLES:
-    $0                                    # Basic butt initialization
-    $0 --comfort-mode --verbose           # Full comfort ritual with commentary
-    $0 --character-class buttwarden       # Initialize as a Buttwarden
-    $0 --character-class lintmage         # Begin the path of the Lintmage
-
-DESCRIPTION:
-    This sacred script performs the ancient ritual of butt initialization,
-    ensuring your development environment is properly configured for:
-
-    • Ergonomic comfort and safety
-    • Living Dev Log workflow setup
-    • Character class selection and configuration
-    • Sacred documentation habits
-    • Buttsafe Certification standards
-
-    Choose your path wisely, for the comfort of your posterior depends upon it.
-
-EOF
-}
-
 perform_ergonomic_assessment() {
     if [[ "$SKIP_ERGONOMIC_CHECK" == true ]]; then
-        log_wisdom "Skipping ergonomic assessment (your posterior's risk)"
+        [[ "$QUIET" != "true" ]] && log_wisdom "Skipping ergonomic assessment (your posterior's risk)"
         return 0
     fi
 
-    echo ""
-    log_sacred "Performing Sacred Ergonomic Assessment..."
-    echo ""
+    if [[ "$QUIET" != "true" ]]; then
+        echo ""
+        log_sacred "Performing Sacred Ergonomic Assessment..."
+        echo ""
+    fi
+
+    # Handle non-interactive mode
+    if [[ "$NON_INTERACTIVE" == "true" ]]; then
+        [[ "$QUIET" != "true" ]] && log_wisdom "Non-interactive mode: assuming optimal ergonomic setup"
+        [[ "$QUIET" != "true" ]] && log_comfort "Chair comfort assumed acceptable. Your posterior approves."
+        [[ "$QUIET" != "true" ]] && log_comfort "Posture check assumed passed. Spine alignment maintained."
+        [[ "$QUIET" != "true" ]] && log_comfort "Break habits assumed approved. Circulation maintained."
+        [[ "$QUIET" != "true" ]] && log_sacred "Ergonomic Assessment Complete!"
+        return 0
+    fi
 
     echo -e "${SACRED_BLUE}Please answer these sacred questions about your setup:${NC}"
     echo ""
@@ -319,8 +500,15 @@ perform_ergonomic_assessment() {
 
 choose_character_class() {
     if [[ -n "$CHARACTER_CLASS" ]]; then
-        log_wisdom "Character class pre-selected: $CHARACTER_CLASS"
+        [[ "$QUIET" != "true" ]] && log_wisdom "Character class pre-selected: $CHARACTER_CLASS"
         configure_character_class "$CHARACTER_CLASS"
+        return 0
+    fi
+
+    # Handle non-interactive mode
+    if [[ "$NON_INTERACTIVE" == "true" ]]; then
+        [[ "$QUIET" != "true" ]] && log_wisdom "Non-interactive mode: defaulting to oracle class"
+        configure_character_class "oracle"
         return 0
     fi
 
@@ -580,85 +768,100 @@ validate_buttsafe_standards() {
     fi
 }
 
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --comfort-mode)
-            COMFORT_MODE=true
-            shift
-            ;;
-        --character-class)
-            CHARACTER_CLASS="$2"
-            shift 2
-            ;;
-        --skip-ergonomic)
-            SKIP_ERGONOMIC_CHECK=true
-            shift
-            ;;
-        --verbose)
-            VERBOSE=true
-            shift
-            ;;
-        --help)
-            show_help
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            show_help
-            exit 1
-            ;;
-    esac
-done
-
 # Main ritual execution
 main() {
+    # Parse and validate arguments
+    parse_arguments "$@"
+    validate_arguments
+    initialize_report
+    
     # Preflight: ensure Python available and set $PY for called scripts
     ensure_python || true
     PY=$(command -v python3 || command -v python || echo "python3")
     export PY
 
-    show_sacred_banner
+    # Show banner unless in quiet mode
+    if [[ "$QUIET" != "true" ]]; then
+        show_sacred_banner
+        echo -e "${SACRED_BLUE}Preparing to initialize your development sanctuary...${NC}"
+        echo ""
+    fi
 
-    echo -e "${SACRED_BLUE}Preparing to initialize your development sanctuary...${NC}"
-    echo ""
+    # Execute based on mode
+    if [[ "$ERGONOMICS_ONLY" == "true" ]]; then
+        BUTT_REPORT_DATA[mode]="ergonomics_only"
+        [[ "$QUIET" != "true" ]] && lda_log_info "Running ergonomics-only mode"
+        perform_ergonomic_assessment
+        BUTT_REPORT_DATA[ergonomics_completed]="true"
+    elif [[ "$CHARACTER_ONLY" == "true" ]]; then
+        BUTT_REPORT_DATA[mode]="character_only"
+        [[ "$QUIET" != "true" ]] && lda_log_info "Running character-only mode"
+        choose_character_class
+        BUTT_REPORT_DATA[character_completed]="true"
+    elif [[ "$COMFORT_ONLY" == "true" ]]; then
+        BUTT_REPORT_DATA[mode]="comfort_only"
+        [[ "$QUIET" != "true" ]] && lda_log_info "Running comfort-only mode"
+        create_comfort_reminders
+        BUTT_REPORT_DATA[comfort_completed]="true"
+    else
+        # Full ritual mode
+        BUTT_REPORT_DATA[mode]="full"
+        
+        # Step 1: Ergonomic Assessment
+        perform_ergonomic_assessment
+        BUTT_REPORT_DATA[ergonomics_completed]="true"
 
-    # Step 1: Ergonomic Assessment
-    perform_ergonomic_assessment
+        # Step 2: Character Class Selection
+        choose_character_class
+        BUTT_REPORT_DATA[character_completed]="true"
 
-    # Step 2: Character Class Selection
-    choose_character_class
+        # Step 3: Living Dev Log Initialization
+        initialize_living_dev_log
 
-    # Step 3: Living Dev Log Initialization
-    initialize_living_dev_log
+        # Step 4: Comfort System Setup
+        create_comfort_reminders
+        BUTT_REPORT_DATA[comfort_completed]="true"
 
-    # Step 4: Comfort System Setup
-    create_comfort_reminders
+        # Step 5: Buttsafe Validation
+        validate_buttsafe_standards
+    fi
 
-    # Step 5: Buttsafe Validation
-    validate_buttsafe_standards
-
-    echo ""
-    echo -e "${BUTT_GOLD}${MAGIC_EMOJI} SACRED RITUAL COMPLETE! ${MAGIC_EMOJI}${NC}"
-    echo ""
-    echo -e "${WISDOM_PURPLE}Your development environment has been blessed with:${NC}"
-    echo "• Ergonomic awareness and comfort protocols"
-    echo "• Character class configuration and quests"
-    echo "• Living Dev Log workflow activation"
-    echo "• Sacred documentation practices"
-    echo "• Buttsafe Certification standards"
-    echo ""
-    echo -e "${BUTT_GOLD}May your builds always pass, your chairs always comfort,${NC}"
-    echo -e "${BUTT_GOLD}and your butts always be safe.${NC}"
-    echo ""
-    echo -e "${SACRED_BLUE}Next steps:${NC}"
-    echo "1. Review your character configuration in .character_config"
-    echo "2. Create your first TLDL entry documenting today's ritual"
-    echo "3. Set up comfort reminders for regular breaks"
-    echo "4. Begin your first quest in the realm of Cheekdom!"
-    echo ""
-    echo -e "${COMFORT_GREEN}${BUTT_EMOJI} Welcome to the Buttsafe development lifestyle! ${BUTT_EMOJI}${NC}"
+    # Mark as successful
+    BUTT_REPORT_DATA[status]="success"
+    
+    # Show completion message unless in quiet mode
+    if [[ "$QUIET" != "true" ]]; then
+        echo ""
+        echo -e "${BUTT_GOLD}${MAGIC_EMOJI} SACRED RITUAL COMPLETE! ${MAGIC_EMOJI}${NC}"
+        echo ""
+        
+        if [[ "$ERGONOMICS_ONLY" != "true" && "$CHARACTER_ONLY" != "true" && "$COMFORT_ONLY" != "true" ]]; then
+            echo -e "${WISDOM_PURPLE}Your development environment has been blessed with:${NC}"
+            echo "• Ergonomic awareness and comfort protocols"
+            echo "• Character class configuration and quests"
+            echo "• Living Dev Log workflow activation"
+            echo "• Sacred documentation practices"
+            echo "• Buttsafe Certification standards"
+            echo ""
+            echo -e "${BUTT_GOLD}May your builds always pass, your chairs always comfort,${NC}"
+            echo -e "${BUTT_GOLD}and your butts always be safe.${NC}"
+            echo ""
+            echo -e "${SACRED_BLUE}Next steps:${NC}"
+            echo "1. Review your character configuration in .character_config"
+            echo "2. Create your first TLDL entry documenting today's ritual"
+            echo "3. Set up comfort reminders for regular breaks"
+            echo "4. Begin your first quest in the realm of Cheekdom!"
+            echo ""
+        fi
+        
+        echo -e "${COMFORT_GREEN}${BUTT_EMOJI} Welcome to the Buttsafe development lifestyle! ${BUTT_EMOJI}${NC}"
+    fi
+    
+    # Write JSON report if requested
+    write_json_report
 }
 
-# Execute the sacred ritual
-main "$@"
+# Execute the sacred ritual only if script is run directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

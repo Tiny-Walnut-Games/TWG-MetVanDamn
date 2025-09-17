@@ -48,22 +48,38 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.0f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeMarkdownParser.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeCore.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TemplateModule.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\ScribeModuleBase.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\SpellsmithCodeWindow.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TaskData.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeImageManager.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\NavigatorModule.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TimeCardData.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\TerminusShellConsole.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeCommitWindow.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\ScribeUtils.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeDataManager.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ChronasTimerOverlay.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeMarkdownGenerator.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\MenuRefreshForcer.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\EditorModule.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\FormModule.cs" />
-    <Compile Include="Assets\Plugins\TLDA\Editor\TLDLScribeWindow.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribePreviewRenderer.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeFileOperations.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\PreviewModule.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TLDLScribeData.cs" />
     <Compile Include="Assets\Plugins\TLDA\Editor\Modules\TaskMasterModule.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeGitWindow.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeRawEditor.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeNavigator.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeTemplateManager.cs" />
+    <Compile Include="Assets\Plugins\TLDA\Editor\ScribeFormBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Plugins\TLDA\Editor\LivingDevAgent.Editor.asmdef" />
+    <None Include="Assets\Plugins\TLDA\Editor\LivingDevAgent.Editor.csc.rsp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

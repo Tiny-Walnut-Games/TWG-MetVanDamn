@@ -29,28 +29,28 @@ namespace TinyWalnutGames.MetVD.Core
 		[BurstCompile]
 		public void OnUpdate(ref SystemState state)
 			{
-			var namingConfig = SystemAPI.GetSingleton<EnemyNamingConfig>();
+			EnemyNamingConfig namingConfig = SystemAPI.GetSingleton<EnemyNamingConfig>();
 
 			// Lookups for safe read access during iteration (no EntityManager calls inside loop)
-			var affixLookupRO = SystemAPI.GetBufferLookup<EnemyAffixBufferElement>(true);
+			BufferLookup<EnemyAffixBufferElement> affixLookupRO = SystemAPI.GetBufferLookup<EnemyAffixBufferElement>(true);
 
 			// Collect results to apply after iteration to avoid structural changes during iteration
 			var toApply = new Unity.Collections.NativeList<PendingNaming>(Allocator.Temp);
 
 			// Process entities that need name generation
-			foreach (var (profile, entity) in SystemAPI.Query<RefRO<EnemyProfile>>()
+			foreach ((RefRO<EnemyProfile> profile, Entity entity) in SystemAPI.Query<RefRO<EnemyProfile>>()
 				.WithAll<NeedsNameGeneration>()
 				.WithEntityAccess())
 				{
-				var naming = GenerateEnemyName(in affixLookupRO, entity, in profile.ValueRO, in namingConfig);
+				EnemyNaming naming = GenerateEnemyName(in affixLookupRO, entity, in profile.ValueRO, in namingConfig);
 				toApply.Add(new PendingNaming { Entity = entity, Naming = naming });
 				}
 
 			// Apply structural changes after enumeration
-			var em = state.EntityManager;
+			EntityManager em = state.EntityManager;
 			for (int i = 0; i < toApply.Length; i++)
 				{
-				var item = toApply[i];
+				PendingNaming item = toApply[i];
 				if (!em.HasComponent<EnemyNaming>(item.Entity))
 					{
 					em.AddComponentData(item.Entity, item.Naming);
@@ -139,7 +139,7 @@ namespace TinyWalnutGames.MetVD.Core
 				return profile.BaseType;
 				}
 
-			var affixBuffer = affixLookupRO[entity];
+			DynamicBuffer<EnemyAffixBufferElement> affixBuffer = affixLookupRO[entity];
 
 			if (affixBuffer.Length == 0)
 				{
@@ -175,14 +175,14 @@ namespace TinyWalnutGames.MetVD.Core
 			int maxSyllables = GetMaxSyllablesForRarity(profile.Rarity);
 
 			// Concatenate syllables from affixes
-			foreach (var affixElement in affixes)
+			foreach (EnemyAffixBufferElement affixElement in affixes)
 				{
 				if (syllablesUsed >= maxSyllables)
 					{
 					break;
 					}
 
-				var syllable = affixElement.Value.GetRandomBossSyllable(random.NextUInt());
+				FixedString32Bytes syllable = affixElement.Value.GetRandomBossSyllable(random.NextUInt());
 				if (syllable.Length > 0)
 					{
 					if (nameBuilder.Length > 0 && ShouldInsertConnective(nameBuilder, syllable))
@@ -253,8 +253,8 @@ namespace TinyWalnutGames.MetVD.Core
 			var nameBuilder = new FixedString128Bytes();
 
 			// Select prefix and suffix from available affixes
-			var prefix = SelectAffixForPosition(affixes, true, random);
-			var suffix = SelectAffixForPosition(affixes, false, random);
+			FixedString64Bytes prefix = SelectAffixForPosition(affixes, true, random);
+			FixedString64Bytes suffix = SelectAffixForPosition(affixes, false, random);
 
 			// Build name: prefix + base + suffix
 			if (prefix.Length > 0)

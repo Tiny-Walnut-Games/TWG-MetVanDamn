@@ -24,12 +24,9 @@ declare -A KNOWN_TOOLS=(
     ["docs-validator"]="Expected exits: 1 for validation warnings/failures that are informational"
     ["symbolic-linter"]="Expected exits: 0 for warnings-only (current), 1 if strict mode enabled"
     ["debug-overlay"]="Expected exits: 0 for health scores >= 50%, warnings are informational"
-    ["mcp-validator"]="Expected exits: 0-1 for configuration warnings that don't block functionality"
+    ["mcp-validator"]="Expected exits: 1 for configuration warnings that don't block functionality"
     ["structure-check"]="Expected exits: 1 for template structure deviations that are advisory"
     ["security-scan"]="Expected exits: 1 for security findings that are informational or low-risk"
-    ["system-linter"]="Expected exits: 0-1 for system warnings that are informational"
-    ["package-validator"]="Expected exits: 0-1 for dependency warnings that are advisory"
-    ["ci-validator"]="Expected exits: 0-1 for CI configuration warnings that are informational"
 )
 
 # Function to log with timestamp and context
@@ -138,29 +135,10 @@ main() {
                     exit $exit_code
                 fi
                 ;;
-            "mcp-validator"|"structure-check"|"security-scan"|"system-linter"|"package-validator"|"ci-validator")
+            "mcp-validator"|"structure-check"|"security-scan")
                 if [[ $exit_code -eq 0 || $exit_code -eq 1 ]]; then
                     if [[ $exit_code -eq 1 ]]; then
-                        case "$tool_name" in
-                            "structure-check")
-                                display_guarded_pass "$tool_name" "$exit_code" "Template structure deviations are advisory - core functionality intact"
-                                ;;
-                            "security-scan")
-                                display_guarded_pass "$tool_name" "$exit_code" "Security findings are informational - no critical vulnerabilities blocking"
-                                ;;
-                            "system-linter")
-                                display_guarded_pass "$tool_name" "$exit_code" "System linting warnings are informational - architecture is sound"
-                                ;;
-                            "package-validator")
-                                display_guarded_pass "$tool_name" "$exit_code" "Package validation warnings are advisory - dependencies are stable"
-                                ;;
-                            "ci-validator")
-                                display_guarded_pass "$tool_name" "$exit_code" "CI configuration warnings are informational - pipeline functionality preserved"
-                                ;;
-                            *)
-                                display_guarded_pass "$tool_name" "$exit_code" "Configuration warnings are advisory - core functionality preserved"
-                                ;;
-                        esac
+                        display_guarded_pass "$tool_name" "$exit_code" "Configuration warnings are advisory - core functionality preserved"
                     else
                         log_with_context "PASS" "$tool_name completed successfully with no issues"
                     fi

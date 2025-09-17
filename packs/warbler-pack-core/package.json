@@ -1,0 +1,56 @@
+{
+  "name": "warbler-pack-core",
+  "version": "0.1.0",
+  "description": "Core conversation pack for Warbler NPC system with essential dialogue templates",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./templates": "./pack/templates.json"
+  },
+  "files": [
+    "dist/**/*",
+    "pack/templates.json",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Info: Content pack - no tests required\"",
+    "validate": "node ../../scripts/validate-warbler-pack.mjs pack/templates.json",
+    "prepublishOnly": "npm run build && npm run validate"
+  },
+  "keywords": [
+    "warbler",
+    "npc",
+    "conversation",
+    "dialogue",
+    "templates",
+    "core"
+  ],
+  "author": "TWG Team",
+  "license": "MIT",
+  "dependencies": {
+    "warbler-core": "^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmeyer1980/TWG-TLDA.git",
+    "directory": "packs/warbler-pack-core"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "warbler": {
+    "packType": "core",
+    "templateCount": 8,
+    "compatibleEngine": "^0.1.0"
+  }
+}

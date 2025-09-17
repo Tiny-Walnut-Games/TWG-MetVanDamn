@@ -64,7 +64,7 @@ namespace TinyWalnutGames.Tools.Editor.Tests
             Assert.DoesNotThrow(() =>
             {
                 // Use GetWindow so Unity initializes internal state correctly for show/close lifecycle
-                var window = EditorWindow.GetWindow<BiomeRegionExtractor>(utility: true, title: "Biome Region Extractor", focus: false);
+                BiomeRegionExtractor window = EditorWindow.GetWindow<BiomeRegionExtractor>(utility: true, title: "Biome Region Extractor", focus: false);
                 Assert.IsNotNull(window);
                 // Ensure the window is shown before closing to avoid Close() NREs in some Unity versions
                 window.Show();
@@ -105,7 +105,7 @@ namespace TinyWalnutGames.Tools.Editor.Tests
             Assert.IsNotEmpty(json);
             Assert.IsTrue(json.Contains("TestBiome"));
 
-            var deserialized = JsonUtility.FromJson<BiomeRegionExtractor.BiomeMetadata>(json);
+            BiomeRegionExtractor.BiomeMetadata deserialized = JsonUtility.FromJson<BiomeRegionExtractor.BiomeMetadata>(json);
             Assert.AreEqual("TestBiome", deserialized.biomeName);
             Assert.AreEqual(Color.green, deserialized.biomeColor);
             }

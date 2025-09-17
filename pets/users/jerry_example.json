@@ -1,0 +1,61 @@
+{
+  "developer_name": "jerry_example",
+  "active_pets": [
+    {
+      "pet_id": "pet-001-scrollhound",
+      "archetype": "scrollhound",
+      "current_level": "guardian",
+      "xp": 2100,
+      "abilities": [
+        "basic_documentation",
+        "tldl_reading",
+        "cross_reference",
+        "link_validation",
+        "basic_editing",
+        "quality_assessment",
+        "template_mastery",
+        "collaborative_editing"
+      ],
+      "achievements": [
+        "first_pet",
+        "documentation_sage"
+      ],
+      "adoption_date": "2025-08-15T10:30:00.000Z",
+      "last_activity": "2025-09-02T14:22:00.000Z",
+      "evolution_history": [
+        "event-001-adoption",
+        "event-034-evolution-tracker",
+        "event-067-evolution-guardian"
+      ]
+    },
+    {
+      "pet_id": "pet-002-chronocat",
+      "archetype": "chronocat",
+      "current_level": "watcher",
+      "xp": 850,
+      "abilities": [
+        "basic_scheduling",
+        "deadline_awareness",
+        "milestone_tracking",
+        "velocity_monitoring",
+        "burndown_analysis"
+      ],
+      "achievements": [],
+      "adoption_date": "2025-08-20T09:15:00.000Z",
+      "last_activity": "2025-09-02T13:45:00.000Z",
+      "evolution_history": [
+        "event-012-adoption",
+        "event-045-evolution-watcher"
+      ]
+    }
+  ],
+  "total_pet_xp": 2950,
+  "achievements": [
+    "first_pet",
+    "documentation_sage",
+    "collaboration_champion"
+  ],
+  "opt_out": false,
+  "created_date": "2025-08-15T10:30:00.000Z",
+  "last_active": "2025-09-02T14:22:00.000Z"
+}

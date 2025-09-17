@@ -36,7 +36,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 			{
 			public override void Bake(EnemyNamingAuthoring authoring)
 				{
-				var entity = GetEntity(TransformUsageFlags.Dynamic);
+				Entity entity = GetEntity(TransformUsageFlags.Dynamic);
 
 				// Add enemy profile
 				AddComponent(entity, new EnemyProfile(
@@ -75,8 +75,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 					AddComponent<NeedsSpecificAffixAssignment>(entity);
 
 					// Store the affix IDs for later resolution
-					var affixIdBuffer = AddBuffer<AuthoringPendingAffixIdElement>(entity);
-					foreach (var affixId in authoring.specificAffixIds)
+					DynamicBuffer<AuthoringPendingAffixIdElement> affixIdBuffer = AddBuffer<AuthoringPendingAffixIdElement>(entity);
+					foreach (string affixId in authoring.specificAffixIds)
 						{
 						if (!string.IsNullOrEmpty(affixId))
 							{
@@ -247,7 +247,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 		public void OnUpdate(ref SystemState state)
 			{
 			// Process random affix assignments
-			foreach (var (profile, entity) in SystemAPI.Query<RefRO<EnemyProfile>>()
+			foreach ((RefRO<EnemyProfile> profile, Entity entity) in SystemAPI.Query<RefRO<EnemyProfile>>()
 				.WithAll<NeedsRandomAffixAssignment>()
 				.WithEntityAccess())
 				{
@@ -262,7 +262,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				}
 
 			// Process specific affix assignments
-			foreach (var (profile, pendingAffixBuffer, entity) in SystemAPI.Query<RefRO<EnemyProfile>, DynamicBuffer<AuthoringPendingAffixIdElement>>()
+			foreach ((RefRO<EnemyProfile> profile, DynamicBuffer<AuthoringPendingAffixIdElement> pendingAffixBuffer, Entity entity) in SystemAPI.Query<RefRO<EnemyProfile>, DynamicBuffer<AuthoringPendingAffixIdElement>>()
 				.WithAll<NeedsSpecificAffixAssignment>()
 				.WithEntityAccess())
 				{
@@ -289,8 +289,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				}
 
 			// Get all available affixes
-			var affixQuery = state.EntityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
-			var affixEntities = affixQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+			EntityQuery affixQuery = state.EntityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
+			NativeArray<Entity> affixEntities = affixQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			if (affixEntities.Length == 0)
 				{
@@ -299,14 +299,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				}
 
 			// Create affix buffer on enemy
-			var affixBuffer = state.EntityManager.AddBuffer<EnemyAffixBufferElement>(entity);
+			DynamicBuffer<EnemyAffixBufferElement> affixBuffer = state.EntityManager.AddBuffer<EnemyAffixBufferElement>(entity);
 
 			// Find and assign requested affixes
-			foreach (var pendingId in pendingIds)
+			foreach (AuthoringPendingAffixIdElement pendingId in pendingIds)
 				{
-				foreach (var affixEntity in affixEntities)
+				foreach (Entity affixEntity in affixEntities)
 					{
-					var affix = state.EntityManager.GetComponentData<EnemyAffix>(affixEntity);
+					EnemyAffix affix = state.EntityManager.GetComponentData<EnemyAffix>(affixEntity);
 					if (affix.Id.Equals(pendingId.AffixId))
 						{
 						affixBuffer.Add(affix);

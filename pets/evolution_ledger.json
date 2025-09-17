@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2025-09-02T03:01:39.422507",
+    "totalEvents": 2,
+    "integrityHash": "6ca2f2cfde2d28a5f81326413b2b2e2db2b6861cfedc9be11e06981acc84b320"
+  },
+  "events": [
+    {
+      "event_id": "0401b033-610f-4254-9c9c-f3e7fb41f66a",
+      "pet_id": "2eb82d3d-88c3-49a8-829d-d36de3aed0b5",
+      "developer_name": "integration_demo_dev",
+      "event_type": "adoption",
+      "from_level": null,
+      "to_level": "baby",
+      "xp_gained": 0,
+      "timestamp": "2025-09-02T03:01:39.420379",
+      "contribution_hash": "",
+      "signature": "7de26af6941bf670cef9c5ea2761d2b19ed840d5b82e63b9f36c76f570f6802b"
+    },
+    {
+      "event_id": "d5192552-d94d-4814-b4e9-a6789f9c54a0",
+      "pet_id": "29e510cc-13f1-4391-84e3-ba391f66f0e9",
+      "developer_name": "integration_demo_dev",
+      "event_type": "adoption",
+      "from_level": null,
+      "to_level": "baby",
+      "xp_gained": 0,
+      "timestamp": "2025-09-02T03:01:39.421504",
+      "contribution_hash": "",
+      "signature": "8bd27d331ea11f33c8fa7cd3b2970a590b93c28dde58b8b6b70f91d9baabbca5"
+    }
+  ]
+}

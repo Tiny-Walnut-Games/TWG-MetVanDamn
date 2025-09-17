@@ -1,0 +1,5 @@
+{
+  "_comment": "Sediment strata created by GiantCompressor.stomp(). Each stratum groups clustered raw fragments. Future: implement weekly roll-ups & compaction ratios.",
+  "version": 1,
+  "strata": []
+}

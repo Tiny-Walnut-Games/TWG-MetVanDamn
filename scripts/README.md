@@ -179,6 +179,57 @@ which python3 || which python  # Locate Python installation
 - **Provide usage examples** - show common and edge-case scenarios
 - **Integrate with existing workflows** - respect established patterns
 
+## 🔒 Dependabot Label Management
+
+### Problem Solved: Missing Dependabot Labels
+The repository's Dependabot configuration requires specific labels that may not exist, causing PR creation failures.
+
+### 🛠️ `create-dependabot-labels.sh`
+**The Label Creation Spell** - Creates missing labels required by Dependabot
+
+**Execution Profile:**
+- **Timing**: ~2-3s (network dependent)
+- **Purpose**: Create `dependencies`, `github-actions`, and `security` labels
+- **Requirements**: GitHub CLI (gh) installed and authenticated
+- **Auto-Magic**: Handles existing labels gracefully
+
+**Usage:**
+```bash
+# Create missing Dependabot labels (the label rescue mission!)
+scripts/create-dependabot-labels.sh
+```
+
+### 🐍 `create_dependabot_labels.py`
+**The Python Label Ritual** - Alternative Python-based label creation
+
+**Execution Profile:**
+- **Timing**: ~1-2s (API dependent)
+- **Purpose**: Create labels using GitHub API directly
+- **Requirements**: GITHUB_TOKEN environment variable
+- **Smart Detection**: Auto-detects repository from git remote
+
+**Usage:**
+```bash
+# Set token and create labels (the Python way!)
+export GITHUB_TOKEN="your_token_here"
+python3 scripts/create_dependabot_labels.py
+```
+
+### 🎬 GitHub Actions Workflow
+**The Automated Label Deployment** - Workflow-based label creation
+
+- **File**: `.github/workflows/create-dependabot-labels.yml`
+- **Trigger**: Manual dispatch from Actions tab
+- **Benefits**: No local setup required, uses repository secrets
+- **Usage**: Go to Actions → "🔒 Create Dependabot Labels" → Run workflow
+
+### Created Labels
+| Label | Color | Description |
+|-------|-------|-------------|
+| `dependencies` | 🔵 Blue | Pull requests that update dependencies |
+| `github-actions` | 🔵 Blue | Pull requests that update GitHub Actions |
+| `security` | 🔴 Red | Pull requests that address security issues |
+
 ---
 
 *"Great scripts are like trusted companions - reliable, helpful, and they make the journey more enjoyable."* 🛠️✨

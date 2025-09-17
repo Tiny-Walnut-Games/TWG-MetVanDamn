@@ -11,6 +11,7 @@ const path = require('path');
 const { SmartUsageMeter } = require('./usage.js');
 const { ContextCache } = require('./shared/context-cache.js');
 const { VisionQueue } = require('./vision-queue.js');
+const { SeededAnalysis } = require('./seeded-analysis.js');
 
 class Advisor {
     constructor(config = {}) {
@@ -28,6 +29,9 @@ class Advisor {
         
         // Initialize Vision Queue for Oracle integration
         this.visionQueue = new VisionQueue();
+        
+        // Initialize seeded analysis for enhanced strategic guidance
+        this.seededAnalysis = new SeededAnalysis();
         
         console.log(`🧙‍♂️ The Advisor has arrived - providing grounded guidance`);
     }
@@ -67,12 +71,15 @@ class Advisor {
         this.prioritizeActionItems(context);
         this.meter.endTiming(critiqueTimer, 'advisor');
         
-        const report = this.generateAdvisoryReport();
+        const baseReport = this.generateAdvisoryReport();
+        
+        // Apply seeded analysis enhancements if applicable
+        const enhancedReport = this.seededAnalysis.enhanceAdvisorReport(baseReport, context);
         
         // Cache the results
-        this.cache.setCachedFacultyResults(cacheKey, 'advisor', report);
+        this.cache.setCachedFacultyResults(cacheKey, 'advisor', enhancedReport);
         
-        return this.addTelemetryToReport(report);
+        return this.addTelemetryToReport(enhancedReport);
     }
 
     /**

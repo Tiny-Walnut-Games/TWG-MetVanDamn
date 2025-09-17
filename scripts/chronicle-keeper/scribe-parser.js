@@ -9,14 +9,17 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const RFFProtocol = require('./rff-protocol.js');
 
 class ScribeParser {
     constructor(configPath = null) {
         this.config = this.loadConfig(configPath);
+        this.rffProtocol = new RFFProtocol();
         this.stats = {
             parsed: 0,
             loreWorthy: 0,
-            errors: 0
+            errors: 0,
+            rffIssued: 0
         };
     }
 
@@ -92,7 +95,9 @@ class ScribeParser {
             };
         }
 
-        return { ...content, lore_worthy: false };
+        // Generate RFF message for rejected content
+        const rffMessage = this.generateRFFForContent(content, 'lore_worthiness_failed');
+        return { ...content, lore_worthy: false, rff_message: rffMessage };
     }
 
     /**
@@ -148,7 +153,9 @@ class ScribeParser {
             };
         }
 
-        return { ...content, lore_worthy: false };
+        // Generate RFF message for rejected content
+        const rffMessage = this.generateRFFForContent(content, 'lore_worthiness_failed');
+        return { ...content, lore_worthy: false, rff_message: rffMessage };
     }
 
     /**
@@ -195,7 +202,9 @@ class ScribeParser {
             };
         }
 
-        return { ...content, lore_worthy: false };
+        // Generate RFF message for rejected content
+        const rffMessage = this.generateRFFForContent(content, 'lore_worthiness_failed');
+        return { ...content, lore_worthy: false, rff_message: rffMessage };
     }
 
     /**
@@ -367,16 +376,81 @@ class ScribeParser {
             };
         }
 
-        return { ...content, lore_worthy: false };
+        // Generate RFF message for rejected content
+        const rffMessage = this.generateRFFForContent(content, 'lore_worthiness_failed');
+        return { ...content, lore_worthy: false, rff_message: rffMessage };
     }
 
     /**
-     * Get parsing statistics
-     * @returns {Object} Statistics object
+     * Generate RFF message for rejected content
+     * @param {Object} content - Content that was rejected
+     * @param {string} reason - Primary reason for rejection
+     * @returns {Object} RFF message
+     */
+    generateRFFForContent(content, reason) {
+        this.stats.rffIssued++;
+        return this.rffProtocol.generateRFFMessage(content, reason);
+    }
+
+    /**
+     * Check if content is a resubmission in response to an RFF
+     * @param {Object} content - Content to check
+     * @returns {boolean} True if this appears to be a resubmission
+     */
+    isResubmission(content) {
+        const text = `${content.title || ''} ${content.body || ''}`;
+        const resubmissionIndicators = [
+            /RFF-\d+/i,  // References an RFF ID
+            /resubmit/i,
+            /corrected/i,
+            /updated.*format/i,
+            /TLDL.*correction/i
+        ];
+        
+        return resubmissionIndicators.some(pattern => pattern.test(text));
+    }
+
+    /**
+     * Process resubmission and check if it addresses RFF issues
+     * @param {Object} content - Resubmitted content
+     * @param {string} originalRffId - Original RFF ID if available
+     * @returns {Object} Resubmission evaluation result
+     */
+    processResubmission(content, originalRffId = null) {
+        const evaluation = this.rffProtocol.trackResubmission(originalRffId, content);
+        
+        if (evaluation.readyForChronicle) {
+            // Content now meets standards, treat as lore-worthy
+            this.stats.loreWorthy++;
+            return {
+                ...content,
+                lore_worthy: true,
+                category: this.classifyContent(content),
+                resubmission: true,
+                rff_resolution: evaluation
+            };
+        } else {
+            // Still has issues, generate new RFF
+            const newRFF = this.generateRFFForContent(content, 'resubmission_still_has_issues');
+            return {
+                ...content,
+                lore_worthy: false,
+                resubmission: true,
+                rff_message: newRFF,
+                previous_rff_id: originalRffId
+            };
+        }
+    }
+
+    /**
+     * Get combined statistics including RFF data
+     * @returns {Object} Complete statistics
      */
     getStats() {
+        const rffStats = this.rffProtocol.getStats();
         return {
             ...this.stats,
+            rff_protocol: rffStats,
             lore_percentage: this.stats.parsed > 0 ? 
                 Math.round((this.stats.loreWorthy / this.stats.parsed) * 100) : 0
         };

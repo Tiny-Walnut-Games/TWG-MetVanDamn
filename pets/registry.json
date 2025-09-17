@@ -1,0 +1,261 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-09-02T00:00:00.000Z",
+    "lastUpdated": "2025-09-02T00:00:00.000Z",
+    "description": "Badge Pet System Registry - Defines available pet archetypes, evolution paths, and abilities"
+  },
+  "archetypes": {
+    "scrollhound": {
+      "id": "scrollhound",
+      "name": "📜 Scrollhound",
+      "description": "A loyal companion that hunts through documentation and TLDL entries, growing stronger with each scroll mastered.",
+      "emoji": "🐕",
+      "category": "documentation",
+      "baseStats": {
+        "sniffing": 8,
+        "loyalty": 9,
+        "speed": 6,
+        "intelligence": 7
+      },
+      "evolutionTree": {
+        "puppy": {
+          "level": 1,
+          "xpRequired": 0,
+          "title": "🐶 Scroll Puppy",
+          "abilities": ["basic_documentation", "tldl_reading"],
+          "description": "Just learned to fetch simple documentation"
+        },
+        "tracker": {
+          "level": 2,
+          "xpRequired": 500,
+          "title": "🔍 Documentation Tracker",
+          "abilities": ["cross_reference", "link_validation", "basic_editing"],
+          "description": "Can track documentation trails and find broken links"
+        },
+        "guardian": {
+          "level": 3,
+          "xpRequired": 1500,
+          "title": "🛡️ Scroll Guardian",
+          "abilities": ["quality_assessment", "template_mastery", "collaborative_editing"],
+          "description": "Protects documentation quality and helps others improve their scrolls"
+        },
+        "master": {
+          "level": 4,
+          "xpRequired": 4000,
+          "title": "📚 Scrollmaster Hound",
+          "abilities": ["documentation_generation", "style_enforcement", "mentorship"],
+          "description": "Master of all documentation arts, can generate templates and guide others"
+        }
+      },
+      "specialties": [
+        "TLDL entry validation",
+        "Cross-reference hunting",
+        "Documentation quality assessment",
+        "Template generation"
+      ],
+      "preferredActivities": [
+        "reviewing_documentation",
+        "creating_tldl_entries",
+        "improving_readme_files",
+        "building_tutorials"
+      ]
+    },
+    "chronocat": {
+      "id": "chronocat",
+      "name": "⏰ ChronoCat",
+      "description": "A time-aware feline that tracks project timelines, deadlines, and development velocity with mystical precision.",
+      "emoji": "🐱",
+      "category": "time_management",
+      "baseStats": {
+        "temporal_awareness": 9,
+        "agility": 8,
+        "curiosity": 9,
+        "precision": 7
+      },
+      "evolutionTree": {
+        "kitten": {
+          "level": 1,
+          "xpRequired": 0,
+          "title": "🐱 Time Kitten",
+          "abilities": ["basic_scheduling", "deadline_awareness"],
+          "description": "Just learned to tell time and purr about schedules"
+        },
+        "watcher": {
+          "level": 2,
+          "xpRequired": 600,
+          "title": "⏲️ Deadline Watcher",
+          "abilities": ["milestone_tracking", "velocity_monitoring", "burndown_analysis"],
+          "description": "Keeps careful watch over project timelines and sprint progress"
+        },
+        "oracle": {
+          "level": 3,
+          "xpRequired": 1800,
+          "title": "🔮 Temporal Oracle",
+          "abilities": ["predictive_analysis", "risk_assessment", "timeline_optimization"],
+          "description": "Sees patterns in time and predicts project outcomes"
+        },
+        "master": {
+          "level": 4,
+          "xpRequired": 5000,
+          "title": "⚡ ChronoMaster Cat",
+          "abilities": ["time_manipulation", "parallel_timeline_management", "temporal_mentorship"],
+          "description": "Master of time itself, can optimize any timeline and guide others through temporal complexities"
+        }
+      },
+      "specialties": [
+        "Sprint planning optimization",
+        "Velocity prediction",
+        "Deadline risk assessment",
+        "Timeline visualization"
+      ],
+      "preferredActivities": [
+        "sprint_planning",
+        "milestone_tracking",
+        "retrospectives",
+        "time_estimation"
+      ]
+    },
+    "debugger_ferret": {
+      "id": "debugger_ferret",
+      "name": "🔧 Debugger Ferret",
+      "description": "A persistent and clever ferret that burrows deep into code to find the most elusive bugs and performance issues.",
+      "emoji": "🦔",
+      "category": "debugging",
+      "baseStats": {
+        "persistence": 9,
+        "cleverness": 8,
+        "energy": 7,
+        "attention_to_detail": 9
+      },
+      "evolutionTree": {
+        "kit": {
+          "level": 1,
+          "xpRequired": 0,
+          "title": "🐾 Debug Kit",
+          "abilities": ["basic_logging", "simple_breakpoints"],
+          "description": "Just learned to spot obvious bugs and add print statements"
+        },
+        "hunter": {
+          "level": 2,
+          "xpRequired": 700,
+          "title": "🔍 Bug Hunter",
+          "abilities": ["advanced_debugging", "performance_profiling", "test_creation"],
+          "description": "Actively hunts bugs with sophisticated debugging techniques"
+        },
+        "investigator": {
+          "level": 3,
+          "xpRequired": 2000,
+          "title": "🕵️ Code Investigator",
+          "abilities": ["root_cause_analysis", "security_scanning", "optimization_suggestions"],
+          "description": "Investigates complex issues and finds root causes others miss"
+        },
+        "master": {
+          "level": 4,
+          "xpRequired": 6000,
+          "title": "🧙 Debugmaster Ferret",
+          "abilities": ["quantum_debugging", "predictive_error_detection", "debugging_mentorship"],
+          "description": "Master debugger who can find bugs before they happen and teach others the art"
+        }
+      },
+      "specialties": [
+        "Performance bottleneck identification",
+        "Memory leak detection",
+        "Race condition hunting",
+        "Security vulnerability assessment"
+      ],
+      "preferredActivities": [
+        "code_review",
+        "performance_testing",
+        "writing_unit_tests",
+        "investigating_production_issues"
+      ]
+    }
+  },
+  "evolutionFormulas": {
+    "xpCalculation": {
+      "description": "Base XP calculation with quality and collaboration multipliers",
+      "formula": "base_xp * quality_multiplier * collaboration_bonus * diversity_reward",
+      "baseLevels": {
+        "tldl_entry": 100,
+        "code_contribution": 75,
+        "documentation_improvement": 50,
+        "bug_fix": 125,
+        "feature_implementation": 150,
+        "collaborative_session": 200
+      },
+      "qualityMultipliers": {
+        "excellent": 1.5,
+        "good": 1.2,
+        "average": 1.0,
+        "poor": 0.5
+      },
+      "collaborationBonus": {
+        "solo": 1.0,
+        "pair": 1.2,
+        "team": 1.4,
+        "cross_team": 1.6
+      },
+      "diversityReward": {
+        "single_archetype": 1.0,
+        "dual_archetype": 1.1,
+        "triple_archetype": 1.3
+      }
+    },
+    "diminishingReturns": {
+      "description": "Prevents XP farming with diminishing returns",
+      "dailyCapMultiplier": 0.9,
+      "weeklyCapMultiplier": 0.8,
+      "activityTypeLimit": 3
+    }
+  },
+  "abilityRegistry": {
+    "basic_documentation": {
+      "name": "Basic Documentation",
+      "description": "Can read and understand simple documentation",
+      "unlockLevel": 1,
+      "category": "documentation"
+    },
+    "quantum_debugging": {
+      "name": "Quantum Debugging",
+      "description": "Can find bugs that exist in superposition - both there and not there",
+      "unlockLevel": 4,
+      "category": "debugging",
+      "legendary": true
+    },
+    "time_manipulation": {
+      "name": "Time Manipulation",
+      "description": "Can optimize timelines and manage parallel development streams",
+      "unlockLevel": 4,
+      "category": "time_management",
+      "legendary": true
+    }
+  },
+  "achievements": {
+    "first_pet": {
+      "name": "🥇 First Companion",
+      "description": "Adopted your first pet archetype",
+      "xpReward": 50,
+      "requirements": ["adopt_any_pet"]
+    },
+    "tri_archetype_master": {
+      "name": "🏆 Trinity Master",
+      "description": "Achieved mastery in all three archetypes",
+      "xpReward": 1000,
+      "requirements": ["scrollhound_master", "chronocat_master", "debugger_ferret_master"],
+      "legendary": true
+    },
+    "documentation_sage": {
+      "name": "📚 Documentation Sage",
+      "description": "Created 50 validated TLDL entries",
+      "xpReward": 500,
+      "requirements": ["tldl_entries_50"]
+    },
+    "bug_whisperer": {
+      "name": "🐛 Bug Whisperer",
+      "description": "Fixed 100 confirmed bugs",
+      "xpReward": 750,
+      "requirements": ["bugs_fixed_100"]
+    }
+  }
+}

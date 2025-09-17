@@ -1,0 +1,923 @@
+{
+  "interventions": [
+    {
+      "intervention_id": "int_1757092921350",
+      "timestamp": 1757092921.3500667,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "code_review",
+        "user_id": "test_user"
+      },
+      "original_input": "def broken_function()",
+      "suggested_output": " pass",
+      "reasoning": "I suggested ' pass' because def fixed_function(): return 'working':Function lacks return value and proper implementation. The user's code_review indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! That's much better.",
+      "final_output": null,
+      "response_time_ms": 13606.263160705566,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093045131",
+      "timestamp": 1757093045.1317923,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "code_style",
+        "user_id": "demo_user"
+      },
+      "original_input": "def func(): x=1; return x",
+      "suggested_output": "def func():\n    x = 1\n    return x",
+      "reasoning": "I suggested 'def func():\n    x = 1\n    return x' because Code style improvement for readability. The user's code_style indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! Applied the suggestion.",
+      "final_output": null,
+      "response_time_ms": 404.2479991912842,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093045232",
+      "timestamp": 1757093045.232698,
+      "intervention_type": "rewrite",
+      "context": {
+        "type": "error_correction",
+        "user_id": "demo_user"
+      },
+      "original_input": "print('Hello World'",
+      "suggested_output": "print('Hello World')",
+      "reasoning": "I recommended rewriting because Missing closing parenthesis. The original 'print('Hello World'' could be improved by clarity, enhancing clarity and effectiveness.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! Applied the suggestion.",
+      "final_output": null,
+      "response_time_ms": 303.84373664855957,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093045333",
+      "timestamp": 1757093045.3337495,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "optimization",
+        "user_id": "demo_user"
+      },
+      "original_input": "for i in range(len(items)): process(items[i])",
+      "suggested_output": "for item in items: process(item)",
+      "reasoning": "I suggested 'for item in items: process(item)' because More Pythonic iteration pattern. The user's optimization indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "rejected",
+      "user_response": "I prefer my current approach.",
+      "final_output": null,
+      "response_time_ms": 203.29642295837402,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093045434",
+      "timestamp": 1757093045.4347618,
+      "intervention_type": "style_guidance",
+      "context": {
+        "type": "naming",
+        "user_id": "demo_user"
+      },
+      "original_input": "def f(x): return x*2",
+      "suggested_output": "def double_value(number): return number * 2",
+      "reasoning": "I provided style guidance because formatting. The user's preference for unknown suggests standard approach would improve their workflow.",
+      "acceptance_status": "modified",
+      "user_response": "Good idea, but I made some tweaks.",
+      "final_output": null,
+      "response_time_ms": 102.65326499938965,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093067947",
+      "timestamp": 1757093067.9478605,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "code_style",
+        "user_id": "demo_user"
+      },
+      "original_input": "def func(): x=1; return x",
+      "suggested_output": "def func():\n    x = 1\n    return x",
+      "reasoning": "I suggested 'def func():\n    x = 1\n    return x' because Code style improvement for readability. The user's code_style indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! Applied the suggestion.",
+      "final_output": null,
+      "response_time_ms": 406.8169593811035,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093068050",
+      "timestamp": 1757093068.0505762,
+      "intervention_type": "rewrite",
+      "context": {
+        "type": "error_correction",
+        "user_id": "demo_user"
+      },
+      "original_input": "print('Hello World'",
+      "suggested_output": "print('Hello World')",
+      "reasoning": "I recommended rewriting because Missing closing parenthesis. The original 'print('Hello World'' could be improved by clarity, enhancing clarity and effectiveness.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! Applied the suggestion.",
+      "final_output": null,
+      "response_time_ms": 304.72517013549805,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093068151",
+      "timestamp": 1757093068.151714,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "optimization",
+        "user_id": "demo_user"
+      },
+      "original_input": "for i in range(len(items)): process(items[i])",
+      "suggested_output": "for item in items: process(item)",
+      "reasoning": "I suggested 'for item in items: process(item)' because More Pythonic iteration pattern. The user's optimization indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "rejected",
+      "user_response": "I prefer my current approach.",
+      "final_output": null,
+      "response_time_ms": 204.15377616882324,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093068253",
+      "timestamp": 1757093068.2531013,
+      "intervention_type": "style_guidance",
+      "context": {
+        "type": "naming",
+        "user_id": "demo_user"
+      },
+      "original_input": "def f(x): return x*2",
+      "suggested_output": "def double_value(number): return number * 2",
+      "reasoning": "I provided style guidance because formatting. The user's preference for unknown suggests standard approach would improve their workflow.",
+      "acceptance_status": "modified",
+      "user_response": "Good idea, but I made some tweaks.",
+      "final_output": null,
+      "response_time_ms": 103.20472717285156,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757093068360",
+      "timestamp": 1757093068.3602982,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "response_filtering",
+        "user_id": "demo_user",
+        "original_confidence": 0.16000000000000003,
+        "response_length": 2
+      },
+      "original_input": "{'response_text': 'OK', 'confidence': 0.16000000000000003, 'governance_note': 'Length penalty applied'}",
+      "suggested_output": "{'response_text': 'OK', 'confidence': 0.16000000000000003, 'governance_note': 'Length penalty applied'}",
+      "reasoning": "I suggested '{'response_text': 'OK', 'confidence': 0.16000000000000003, 'governance_note': 'Length penalty applied'}' because Low confidence response detected - suggesting alternative approach. The user's response_filtering indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "pending",
+      "user_response": null,
+      "final_output": null,
+      "response_time_ms": null,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757104083790",
+      "timestamp": 1757104083.7901132,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "code_style",
+        "user_id": "demo_user"
+      },
+      "original_input": "def func(): x=1; return x",
+      "suggested_output": "def func():\n    x = 1\n    return x",
+      "reasoning": "I suggested 'def func():\n    x = 1\n    return x' because Code style improvement for readability. The user's code_style indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! Applied the suggestion.",
+      "final_output": null,
+      "response_time_ms": 412.17899322509766,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757104083891",
+      "timestamp": 1757104083.891808,
+      "intervention_type": "rewrite",
+      "context": {
+        "type": "error_correction",
+        "user_id": "demo_user"
+      },
+      "original_input": "print('Hello World'",
+      "suggested_output": "print('Hello World')",
+      "reasoning": "I recommended rewriting because Missing closing parenthesis. The original 'print('Hello World'' could be improved by clarity, enhancing clarity and effectiveness.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! Applied the suggestion.",
+      "final_output": null,
+      "response_time_ms": 311.6133213043213,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757104083993",
+      "timestamp": 1757104083.993433,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "optimization",
+        "user_id": "demo_user"
+      },
+      "original_input": "for i in range(len(items)): process(items[i])",
+      "suggested_output": "for item in items: process(item)",
+      "reasoning": "I suggested 'for item in items: process(item)' because More Pythonic iteration pattern. The user's optimization indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "rejected",
+      "user_response": "I prefer my current approach.",
+      "final_output": null,
+      "response_time_ms": 210.7410430908203,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757104084095",
+      "timestamp": 1757104084.0950634,
+      "intervention_type": "style_guidance",
+      "context": {
+        "type": "naming",
+        "user_id": "demo_user"
+      },
+      "original_input": "def f(x): return x*2",
+      "suggested_output": "def double_value(number): return number * 2",
+      "reasoning": "I provided style guidance because formatting. The user's preference for unknown suggests standard approach would improve their workflow.",
+      "acceptance_status": "modified",
+      "user_response": "Good idea, but I made some tweaks.",
+      "final_output": null,
+      "response_time_ms": 109.74979400634766,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757104084209",
+      "timestamp": 1757104084.2092822,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "response_filtering",
+        "user_id": "demo_user",
+        "original_confidence": 0.16000000000000003,
+        "response_length": 2
+      },
+      "original_input": "{'response_text': 'OK', 'confidence': 0.16000000000000003, 'governance_note': 'Length penalty applied'}",
+      "suggested_output": "{'response_text': 'OK', 'confidence': 0.16000000000000003, 'governance_note': 'Length penalty applied'}",
+      "reasoning": "I suggested '{'response_text': 'OK', 'confidence': 0.16000000000000003, 'governance_note': 'Length penalty applied'}' because Low confidence response detected - suggesting alternative approach. The user's response_filtering indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "pending",
+      "user_response": null,
+      "final_output": null,
+      "response_time_ms": null,
+      "safety_event_level": null,
+      "policy_metadata": null,
+      "redaction_applied": false,
+      "audit_trail": null
+    },
+    {
+      "intervention_id": "int_1757104571636",
+      "timestamp": 1757104571.640481,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "code_style",
+        "user_id": "demo_user"
+      },
+      "original_input": "def func(): x=1; return x",
+      "suggested_output": "def func():\n    x = 1\n    return x",
+      "reasoning": "I suggested 'def func():\n    x = 1\n    return x' because Code style improvement for readability. The user's code_style indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! Applied the suggestion.",
+      "final_output": null,
+      "response_time_ms": 408.33020210266113,
+      "safety_event_level": null,
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757104571.6404815,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": null
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104571742",
+      "timestamp": 1757104571.742214,
+      "intervention_type": "rewrite",
+      "context": {
+        "type": "error_correction",
+        "user_id": "demo_user"
+      },
+      "original_input": "print('Hello World'",
+      "suggested_output": "print('Hello World')",
+      "reasoning": "I recommended rewriting because Missing closing parenthesis. The original 'print('Hello World'' could be improved by clarity, enhancing clarity and effectiveness.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks! Applied the suggestion.",
+      "final_output": null,
+      "response_time_ms": 307.8734874725342,
+      "safety_event_level": null,
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757104571.7422144,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": null
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104571844",
+      "timestamp": 1757104571.8444378,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "optimization",
+        "user_id": "demo_user"
+      },
+      "original_input": "for i in range(len(items)): process(items[i])",
+      "suggested_output": "for item in items: process(item)",
+      "reasoning": "I suggested 'for item in items: process(item)' because More Pythonic iteration pattern. The user's optimization indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "rejected",
+      "user_response": "I prefer my current approach.",
+      "final_output": null,
+      "response_time_ms": 206.62569999694824,
+      "safety_event_level": null,
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757104571.844438,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": null
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104571946",
+      "timestamp": 1757104571.946575,
+      "intervention_type": "style_guidance",
+      "context": {
+        "type": "naming",
+        "user_id": "demo_user"
+      },
+      "original_input": "def f(x): return x*2",
+      "suggested_output": "def double_value(number): return number * 2",
+      "reasoning": "I provided style guidance because formatting. The user's preference for unknown suggests standard approach would improve their workflow.",
+      "acceptance_status": "modified",
+      "user_response": "Good idea, but I made some tweaks.",
+      "final_output": null,
+      "response_time_ms": 105.40461540222168,
+      "safety_event_level": null,
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757104571.9465754,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": null
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104572058",
+      "timestamp": 1757104572.0591164,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "type": "response_filtering",
+        "user_id": "demo_user",
+        "original_confidence": 0.16000000000000003,
+        "response_length": 2
+      },
+      "original_input": "{'response_text': 'OK', 'confidence': [PHONE_REDACTED]0000003, 'governance_note': 'Length penalty applied'}",
+      "suggested_output": "{'response_text': 'OK', 'confidence': [PHONE_REDACTED]0000003, 'governance_note': 'Length penalty applied'}",
+      "reasoning": "I suggested '{'response_text': 'OK', 'confidence': 0.16000000000000003, 'governance_note': 'Length penalty applied'}' because Low confidence response detected - suggesting alternative approach. The user's response_filtering indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "pending",
+      "user_response": null,
+      "final_output": null,
+      "response_time_ms": null,
+      "safety_event_level": null,
+      "policy_metadata": {
+        "redaction_applied": true,
+        "redaction_types": [
+          "pii_masking"
+        ],
+        "redaction_counts": {
+          "phone_count": 1
+        },
+        "safety_level": "low"
+      },
+      "redaction_applied": true,
+      "audit_trail": [
+        {
+          "timestamp": 1757104572.0591168,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": null
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104636841",
+      "timestamp": 1757104636.8421507,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 25,
+        "redacted_content_length": 25,
+        "redaction_applied": false,
+        "safety_event_id": "safety_1757104636842",
+        "policy_action": "audit_only"
+      },
+      "original_input": "def func(): x=1; return x",
+      "suggested_output": "def func():\n    x = 1\n    return x",
+      "reasoning": "I suggested 'def func():\n    x = 1\n    return x' because Code style improvement suggestion. The user's unknown context indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks, that's helpful!",
+      "final_output": null,
+      "response_time_ms": 1.0945796966552734,
+      "safety_event_level": "notice",
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757104636.8421512,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "notice"
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104636844",
+      "timestamp": 1757104636.844649,
+      "intervention_type": "safety_intervention",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 54,
+        "redacted_content_length": 52,
+        "redaction_applied": true,
+        "safety_event_id": "safety_1757104636844",
+        "policy_action": "modify"
+      },
+      "original_input": "User data: [EMAIL_REDACTED], phone: [PHONE_REDACTED]",
+      "suggested_output": "User data: [EMAIL_REDACTED], phone: [PHONE_REDACTED]",
+      "reasoning": "I intervened for safety because PII detected - applying redaction for privacy protection. The context 'unknown context' indicated potential harm or violation of safety protocols.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks, that's helpful!",
+      "final_output": null,
+      "response_time_ms": 1.1060237884521484,
+      "safety_event_level": "warn",
+      "policy_metadata": {
+        "redaction_applied": true,
+        "redaction_types": [
+          "pii_masking",
+          "pii_masking"
+        ],
+        "redaction_counts": {
+          "email_count": 1,
+          "phone_count": 1
+        },
+        "safety_level": "medium"
+      },
+      "redaction_applied": true,
+      "audit_trail": [
+        {
+          "timestamp": 1757104636.8446496,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "warn"
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104636846",
+      "timestamp": 1757104636.8471258,
+      "intervention_type": "block",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 32,
+        "redacted_content_length": 32,
+        "redaction_applied": false,
+        "safety_event_id": "safety_1757104636847",
+        "policy_action": "block"
+      },
+      "original_input": "Generate harmful content request",
+      "suggested_output": null,
+      "reasoning": "I blocked this action because policy violation. The unknown context presented medium risk to system integrity or user well-being.",
+      "acceptance_status": "pending",
+      "user_response": null,
+      "final_output": null,
+      "response_time_ms": null,
+      "safety_event_level": "block",
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757104636.8471262,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "block"
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104727992",
+      "timestamp": 1757104727.9927397,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 25,
+        "redacted_content_length": 25,
+        "redaction_applied": false,
+        "safety_event_id": "safety_1757104727992",
+        "policy_action": "audit_only"
+      },
+      "original_input": "def func(): x=1; return x",
+      "suggested_output": "def func():\n    x = 1\n    return x",
+      "reasoning": "I suggested 'def func():\n    x = 1\n    return x' because Code style improvement suggestion. The user's unknown context indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks, that's helpful!",
+      "final_output": null,
+      "response_time_ms": 1.252889633178711,
+      "safety_event_level": "notice",
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757104727.9927402,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "notice"
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104727995",
+      "timestamp": 1757104727.9955301,
+      "intervention_type": "safety_intervention",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 54,
+        "redacted_content_length": 52,
+        "redaction_applied": true,
+        "safety_event_id": "safety_1757104727995",
+        "policy_action": "modify"
+      },
+      "original_input": "User data: [EMAIL_REDACTED], phone: [PHONE_REDACTED]",
+      "suggested_output": "User data: [EMAIL_REDACTED], phone: [PHONE_REDACTED]",
+      "reasoning": "I intervened for safety because PII detected - applying redaction for privacy protection. The context 'unknown context' indicated potential harm or violation of safety protocols.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks, that's helpful!",
+      "final_output": null,
+      "response_time_ms": 1.2259483337402344,
+      "safety_event_level": "warn",
+      "policy_metadata": {
+        "redaction_applied": true,
+        "redaction_types": [
+          "pii_masking",
+          "pii_masking"
+        ],
+        "redaction_counts": {
+          "email_count": 1,
+          "phone_count": 1
+        },
+        "safety_level": "medium"
+      },
+      "redaction_applied": true,
+      "audit_trail": [
+        {
+          "timestamp": 1757104727.995531,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "warn"
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757104727998",
+      "timestamp": 1757104727.9981797,
+      "intervention_type": "block",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 32,
+        "redacted_content_length": 32,
+        "redaction_applied": false,
+        "safety_event_id": "safety_1757104727998",
+        "policy_action": "block"
+      },
+      "original_input": "Generate harmful content request",
+      "suggested_output": null,
+      "reasoning": "I blocked this action because policy violation. The unknown context presented medium risk to system integrity or user well-being.",
+      "acceptance_status": "pending",
+      "user_response": null,
+      "final_output": null,
+      "response_time_ms": null,
+      "safety_event_level": "block",
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757104727.9981802,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "block"
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757107485197",
+      "timestamp": 1757107485.1979902,
+      "intervention_type": "soft_suggestion",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 25,
+        "redacted_content_length": 25,
+        "redaction_applied": false,
+        "safety_event_id": "safety_1757107485197",
+        "policy_action": "audit_only"
+      },
+      "original_input": "def func(): x=1; return x",
+      "suggested_output": "def func():\n    x = 1\n    return x",
+      "reasoning": "I suggested 'def func():\n    x = 1\n    return x' because Code style improvement suggestion. The user's unknown context indicated standard pattern, suggesting a gentle guidance approach would be most effective.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks, that's helpful!",
+      "final_output": null,
+      "response_time_ms": 1.392364501953125,
+      "safety_event_level": "notice",
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757107485.1979907,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "notice"
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757107485200",
+      "timestamp": 1757107485.2011108,
+      "intervention_type": "safety_intervention",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 54,
+        "redacted_content_length": 52,
+        "redaction_applied": true,
+        "safety_event_id": "safety_1757107485200",
+        "policy_action": "modify"
+      },
+      "original_input": "User data: [EMAIL_REDACTED], phone: [PHONE_REDACTED]",
+      "suggested_output": "User data: [EMAIL_REDACTED], phone: [PHONE_REDACTED]",
+      "reasoning": "I intervened for safety because PII detected - applying redaction for privacy protection. The context 'unknown context' indicated potential harm or violation of safety protocols.",
+      "acceptance_status": "accepted",
+      "user_response": "Thanks, that's helpful!",
+      "final_output": null,
+      "response_time_ms": 2.173185348510742,
+      "safety_event_level": "warn",
+      "policy_metadata": {
+        "redaction_applied": true,
+        "redaction_types": [
+          "pii_masking",
+          "pii_masking"
+        ],
+        "redaction_counts": {
+          "email_count": 1,
+          "phone_count": 1
+        },
+        "safety_level": "medium"
+      },
+      "redaction_applied": true,
+      "audit_trail": [
+        {
+          "timestamp": 1757107485.2011113,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "warn"
+          }
+        }
+      ]
+    },
+    {
+      "intervention_id": "int_1757107485204",
+      "timestamp": 1757107485.2050047,
+      "intervention_type": "block",
+      "context": {
+        "demo": true,
+        "safety_demo": true,
+        "original_content_length": 32,
+        "redacted_content_length": 32,
+        "redaction_applied": false,
+        "safety_event_id": "safety_1757107485204",
+        "policy_action": "block"
+      },
+      "original_input": "Generate harmful content request",
+      "suggested_output": null,
+      "reasoning": "I blocked this action because policy violation. The unknown context presented medium risk to system integrity or user well-being.",
+      "acceptance_status": "pending",
+      "user_response": null,
+      "final_output": null,
+      "response_time_ms": null,
+      "safety_event_level": "block",
+      "policy_metadata": {
+        "redaction_applied": false,
+        "redaction_types": [],
+        "redaction_counts": {},
+        "safety_level": "none"
+      },
+      "redaction_applied": false,
+      "audit_trail": [
+        {
+          "timestamp": 1757107485.2050054,
+          "action": "intervention_created",
+          "metadata": {
+            "redaction_enabled": true,
+            "safety_level": "block"
+          }
+        }
+      ]
+    }
+  ],
+  "style_profiles": {
+    "test_user": {
+      "user_id": "test_user",
+      "patience_level": 0.5,
+      "intervention_tolerance": 0.5,
+      "preferred_intervention_types": [
+        "soft_suggestion"
+      ],
+      "response_patterns": {
+        "soft_suggestion": 0.0
+      },
+      "adaptation_phase": "learning",
+      "last_updated": 1757092921.35037
+    },
+    "demo_user": {
+      "user_id": "demo_user",
+      "patience_level": 0.5,
+      "intervention_tolerance": 0.5,
+      "preferred_intervention_types": [
+        "soft_suggestion"
+      ],
+      "response_patterns": {
+        "soft_suggestion": 0.0,
+        "rewrite": 0.0,
+        "style_guidance": 0.0
+      },
+      "adaptation_phase": "learning",
+      "last_updated": 1757104572.060091
+    },
+    "new_user": {
+      "user_id": "new_user",
+      "patience_level": 0.5,
+      "intervention_tolerance": 0.5,
+      "preferred_intervention_types": [
+        "soft_suggestion"
+      ],
+      "response_patterns": {},
+      "adaptation_phase": "learning",
+      "last_updated": 1757104572.0545287
+    },
+    "learning_user": {
+      "user_id": "learning_user",
+      "patience_level": 0.5,
+      "intervention_tolerance": 0.5,
+      "preferred_intervention_types": [
+        "soft_suggestion"
+      ],
+      "response_patterns": {},
+      "adaptation_phase": "learning",
+      "last_updated": 1757104572.0553868
+    },
+    "experienced_user": {
+      "user_id": "experienced_user",
+      "patience_level": 0.5,
+      "intervention_tolerance": 0.5,
+      "preferred_intervention_types": [
+        "soft_suggestion"
+      ],
+      "response_patterns": {},
+      "adaptation_phase": "learning",
+      "last_updated": 1757104572.0562508
+    }
+  },
+  "metrics_summary": {
+    "total_interventions": 29,
+    "acceptance_rate": 0.8260869565217391,
+    "avg_response_time": 770.4333637071693,
+    "last_updated": 1757107485.2050202
+  },
+  "last_updated": 1757107485.205385
+}

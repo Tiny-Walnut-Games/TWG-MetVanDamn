@@ -16,13 +16,13 @@ namespace TinyWalnutGames.Tools.Editor
         public static void RunPlayMode()
             {
             // Allow explicit output via -testResults, test filtering via -testFilter and -testCategory
-            ParseArgs(out var explicitResultsPath, out var cliTestNames, out var cliCategories);
+            ParseArgs(out string explicitResultsPath, out string[] cliTestNames, out string[] cliCategories);
 
-            var projectPath = Directory.GetCurrentDirectory();
-            var debugDir = Path.Combine(projectPath, "debug");
+            string projectPath = Directory.GetCurrentDirectory();
+            string debugDir = Path.Combine(projectPath, "debug");
             Directory.CreateDirectory(debugDir);
-            var ts = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            var resultsPath = string.IsNullOrEmpty(explicitResultsPath)
+            string ts = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string resultsPath = string.IsNullOrEmpty(explicitResultsPath)
                 ? Path.Combine(debugDir, $"TestResults_{ts}.xml")
                 : explicitResultsPath;
 
@@ -71,7 +71,7 @@ namespace TinyWalnutGames.Tools.Editor
                     {
                     try
                         {
-                        var logPath = Path.ChangeExtension(_resultsPath, ".log");
+                        string logPath = Path.ChangeExtension(_resultsPath, ".log");
                         File.WriteAllText(logPath, e.ToString());
                         }
                     catch { /* ignore secondary failures */ }
@@ -108,7 +108,7 @@ namespace TinyWalnutGames.Tools.Editor
                 {
                 if (node.HasChildren)
                     {
-                    foreach (var child in node.Children)
+                    foreach (ITestResultAdaptor child in node.Children)
                         CountResults(child, ref passed, ref failed, ref skipped, ref inconclusive);
                     }
                 else
@@ -147,10 +147,10 @@ namespace TinyWalnutGames.Tools.Editor
             categories = null;
             try
                 {
-                var args = Environment.GetCommandLineArgs();
+                string[] args = Environment.GetCommandLineArgs();
                 for (int i = 0; i < args.Length; i++)
                     {
-                    var a = args[i];
+                    string a = args[i];
                     if (string.Equals(a, "-testResults", StringComparison.OrdinalIgnoreCase))
                         {
                         if (i + 1 < args.Length) resultsPath = args[++i];
@@ -160,7 +160,7 @@ namespace TinyWalnutGames.Tools.Editor
                         {
                         if (i + 1 < args.Length)
                             {
-                            var raw = args[++i];
+                            string raw = args[++i];
                             testNames = raw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                             }
                         continue;
@@ -169,7 +169,7 @@ namespace TinyWalnutGames.Tools.Editor
                         {
                         if (i + 1 < args.Length)
                             {
-                            var raw = args[++i];
+                            string raw = args[++i];
                             categories = raw.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                             }
                         continue;

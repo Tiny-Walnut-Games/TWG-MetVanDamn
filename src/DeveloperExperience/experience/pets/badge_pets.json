@@ -1,0 +1,79 @@
+{
+  "pets": {
+    "17230a81-a0ae-4ce9-b3db-18981957029b": {
+      "pet_id": "17230a81-a0ae-4ce9-b3db-18981957029b",
+      "pet_name": "KeeperT",
+      "species": "scrollhound",
+      "current_stage": "egg",
+      "developer_name": "TestDeveloper",
+      "birth_date": "2025-09-02T03:14:46.349660",
+      "traits": [],
+      "metrics": {
+        "total_xp_earned": 0,
+        "contributions_witnessed": 0,
+        "bugs_helped_squash": 0,
+        "documentation_assisted": 0,
+        "innovations_inspired": 0,
+        "scroll_integrity_checks": 0,
+        "tldl_reactions": 0,
+        "days_active": 0
+      },
+      "genre_theme": "fantasy",
+      "personality_quirks": [
+        "loyal",
+        "studious",
+        "observant"
+      ],
+      "favorite_activities": [
+        "scroll_reading",
+        "documentation_review",
+        "knowledge_seeking"
+      ],
+      "lore_summary": "",
+      "contributor_id_hash": "e70978272b24fb52",
+      "behavioral_dna": "a8f86bffa379a176026929cec4537318",
+      "scroll_integrity_score": 0.0,
+      "evolution_complete": false,
+      "nft_metadata_hash": "",
+      "copilot_personality_traits": {}
+    },
+    "82ff0afd-466f-4213-b412-5193c1efd1dc": {
+      "pet_id": "82ff0afd-466f-4213-b412-5193c1efd1dc",
+      "pet_name": "SageT",
+      "species": "scrollhound",
+      "current_stage": "egg",
+      "developer_name": "TestDeveloper",
+      "birth_date": "2025-09-02T03:20:54.898668",
+      "traits": [],
+      "metrics": {
+        "total_xp_earned": 75,
+        "contributions_witnessed": 1,
+        "bugs_helped_squash": 0,
+        "documentation_assisted": 0,
+        "innovations_inspired": 0,
+        "scroll_integrity_checks": 0,
+        "tldl_reactions": 0,
+        "days_active": 0
+      },
+      "genre_theme": "fantasy",
+      "personality_quirks": [
+        "loyal",
+        "studious",
+        "observant"
+      ],
+      "favorite_activities": [
+        "scroll_reading",
+        "documentation_review",
+        "knowledge_seeking"
+      ],
+      "lore_summary": "",
+      "contributor_id_hash": "0f5a83417cd50934",
+      "behavioral_dna": "d0316c8ea6ee443c5b5decde17bbef5f",
+      "scroll_integrity_score": 0.0,
+      "evolution_complete": false,
+      "nft_metadata_hash": "",
+      "copilot_personality_traits": {}
+    }
+  },
+  "last_updated": "2025-09-02T03:20:54.899138"
+}

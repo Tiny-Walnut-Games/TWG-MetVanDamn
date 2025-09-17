@@ -13,7 +13,7 @@ Comprehensive validation of the agent profile system with the following test cas
 3. **Valid Field Values** - Verifies field values are from expected sets (tone, mode, etc.)
 4. **LDA CLI Tool Availability** - Confirms the LDA CLI tool exists and can show help
 5. **LDA CLI Basic Commands** - Tests basic CLI functionality (init, profile creation)
-6. **Pipeline Preferences Validation** - Validates rendering pipeline preferences 
+6. **Pipeline Preferences Validation** - Validates rendering pipeline preferences
 7. **CLI Integration Commands** - Verifies CLI command definitions are properly formatted
 8. **Project Context Validation** - Ensures project context metadata is valid
 

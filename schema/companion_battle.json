@@ -1,0 +1,209 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Companion Battle Schema",
+  "description": "Schema for TLDA/Warbler companion battle system with semantic DNA",
+  "type": "object",
+  "properties": {
+    "companion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique companion identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Companion display name"
+        },
+        "species": {
+          "type": "string",
+          "enum": [
+            "scrollhound", "chrono_cat", "debugger_ferret", "code_phoenix", "wisdom_owl",
+            "data_sprite", "hack_hound", "cipher_cat", "void_whale", "star_fox", "quantum_quail"
+          ],
+          "description": "Companion species from TLDA sprite pipeline"
+        },
+        "element": {
+          "type": "string",
+          "enum": ["logic", "creativity", "order", "chaos", "balance"],
+          "description": "Elemental affinity affecting battle effectiveness"
+        },
+        "archetype": {
+          "type": "string",
+          "enum": ["guardian", "striker", "support", "controller", "hybrid"],
+          "description": "Battle role defining abilities and stats focus"
+        },
+        "temperament": {
+          "type": "string",
+          "enum": ["aggressive", "defensive", "tactical", "intuitive", "loyal"],
+          "description": "Personality affecting battle AI behavior"
+        },
+        "bond_level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Bond with developer affecting battle performance"
+        },
+        "evolution_stage": {
+          "type": "string",
+          "enum": ["egg", "hatchling", "juvenile", "adult", "elder", "legendary"],
+          "description": "Current evolution stage"
+        },
+        "sprite_data": {
+          "type": "object",
+          "properties": {
+            "sprite_sheet_path": {
+              "type": "string",
+              "description": "Path to TLDA/Warbler generated sprite sheet"
+            },
+            "animation_sets": {
+              "type": "object",
+              "properties": {
+                "idle": {"type": "array", "items": {"type": "string"}},
+                "attack": {"type": "array", "items": {"type": "string"}},
+                "defend": {"type": "array", "items": {"type": "string"}},
+                "special": {"type": "array", "items": {"type": "string"}},
+                "evolve": {"type": "array", "items": {"type": "string"}}
+              },
+              "description": "Animation frame sequences for battle actions"
+            },
+            "theme_variants": {
+              "type": "object",
+              "description": "Multi-theme sprite variants (fantasy, cyberpunk, space_opera)"
+            },
+            "rarity_indicators": {
+              "type": "object",
+              "description": "Visual rarity markers and effects"
+            }
+          }
+        }
+      },
+      "required": ["id", "name", "species", "element", "archetype", "temperament"]
+    },
+    "battle_stats": {
+      "type": "object",
+      "properties": {
+        "health": {"type": "integer", "minimum": 1},
+        "max_health": {"type": "integer", "minimum": 1},
+        "energy": {"type": "integer", "minimum": 0},
+        "max_energy": {"type": "integer", "minimum": 1},
+        "attack": {"type": "integer", "minimum": 1},
+        "defense": {"type": "integer", "minimum": 1},
+        "speed": {"type": "integer", "minimum": 1},
+        "battles_won": {"type": "integer", "minimum": 0},
+        "battles_lost": {"type": "integer", "minimum": 0},
+        "damage_dealt": {"type": "integer", "minimum": 0},
+        "damage_taken": {"type": "integer", "minimum": 0}
+      },
+      "required": ["health", "max_health", "energy", "max_energy", "attack", "defense", "speed"]
+    },
+    "abilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "energy_cost": {"type": "integer", "minimum": 0},
+          "cooldown": {"type": "integer", "minimum": 0},
+          "effect_type": {
+            "type": "string",
+            "enum": ["damage", "heal", "buff", "debuff", "status", "synergy"]
+          },
+          "base_power": {"type": "number"},
+          "target_type": {
+            "type": "string", 
+            "enum": ["self", "ally", "enemy", "all_allies", "all_enemies", "all"]
+          },
+          "archetype_bonus": {"type": "number", "description": "Bonus effectiveness for matching archetype"},
+          "warbler_quips": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Personality-driven battle quotes for this ability"
+          }
+        },
+        "required": ["id", "name", "energy_cost", "effect_type", "target_type"]
+      }
+    },
+    "status_effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "duration": {"type": "integer", "minimum": 1},
+          "effect_type": {"type": "string", "enum": ["buff", "debuff", "dot", "hot", "stun", "shield"]},
+          "magnitude": {"type": "number"},
+          "stacks": {"type": "integer", "minimum": 1, "default": 1}
+        },
+        "required": ["id", "name", "duration", "effect_type"]
+      }
+    },
+    "warbler_personality": {
+      "type": "object",
+      "properties": {
+        "personality_type": {"type": "string"},
+        "battle_quips": {
+          "type": "object",
+          "properties": {
+            "battle_start": {"type": "array", "items": {"type": "string"}},
+            "victory": {"type": "array", "items": {"type": "string"}},
+            "defeat": {"type": "array", "items": {"type": "string"}},
+            "low_health": {"type": "array", "items": {"type": "string"}},
+            "critical_hit": {"type": "array", "items": {"type": "string"}},
+            "evolution_ready": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "memory_hooks": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Developer-specific memories affecting battle dialogue"
+        },
+        "conversation_context": {
+          "type": "object",
+          "description": "Context for Warbler pack integration during battles"
+        }
+      }
+    },
+    "synergy_combos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "required_companions": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Companion species/archetypes required for combo"
+          },
+          "effect": {"type": "string"},
+          "power_multiplier": {"type": "number", "minimum": 1.0},
+          "description": {"type": "string"}
+        },
+        "required": ["id", "name", "required_companions", "effect"]
+      }
+    },
+    "nft_metadata": {
+      "type": "object",
+      "properties": {
+        "battle_proven": {"type": "boolean", "description": "Has companion proven itself in battle"},
+        "victory_count": {"type": "integer", "minimum": 0},
+        "legendary_battles": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Records of significant battle achievements"
+        },
+        "battle_dna": {"type": "string", "description": "Cryptographic hash of battle history"},
+        "provenance_chain": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Off-chain provenance tracking"
+        }
+      }
+    }
+  },
+  "required": ["companion", "battle_stats", "abilities"]
+}
