@@ -357,7 +357,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                     if (playerInventory != null)
                     {
                         // Reveal map by dramatically increasing scan range
-                        float currentScanRange = effectApplicator.GetCurrentStat("scanrange");
+                        float currentScanRange = GetCurrentStat("scanrange");
                         float newScanRange = currentScanRange + upgrade.Value * 10f; // Multiply effect for map reveal
                         
                         // Apply the enhanced scan range
