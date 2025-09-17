@@ -1,5 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Entities;
+using Unity.Mathematics;
+using TinyWalnutGames.MetVD.Core;
+using TinyWalnutGames.MetVD.Authoring;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring
 {
@@ -173,9 +177,21 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private float patrolWaitTimer;
         private AIState currentState = AIState.Patrol;
         
-        // Components
-        private Rigidbody2D rb2D;
-        private Rigidbody rb3D;
+        // Navigation system integration
+        private Entity navigationEntity;
+        private EntityManager entityManager;
+        private World defaultWorld;
+        private AINavigationState navState;
+        private DynamicBuffer<PathNodeBufferElement> pathBuffer;
+        private AgentCapabilities agentCapabilities;
+        private uint currentTargetNodeId;
+        private bool navigationInitialized;
+        
+        // Enhanced movement tracking
+        private Vector3 lastPosition;
+        private float stuckTimer;
+        private const float StuckThreshold = 0.1f;
+        private const float StuckTimeout = 2f;
 
         public bool IsDead => currentHealth <= 0;
 
@@ -185,10 +201,149 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             aiManager = manager;
             currentHealth = maxHealth;
             patrolCenter = transform.position;
-            patrolTarget = GetRandomPatrolPoint();
+            lastPosition = transform.position;
             
-            rb2D = GetComponent<Rigidbody2D>();
-            rb3D = GetComponent<Rigidbody>();
+            // Initialize ECS navigation
+            InitializeNavigationSystem();
+            
+            // Setup agent capabilities based on AI type
+            SetupAgentCapabilities();
+            
+            // Find initial navigation nodes
+            FindNearestNavigationNode();
+            
+            // Legacy physics setup (fallback for non-navigation movement)
+            SetupPhysicsComponents();
+        }
+        
+        /// <summary>
+        /// Initialize ECS navigation system integration
+        /// </summary>
+        private void InitializeNavigationSystem()
+        {
+            defaultWorld = World.DefaultGameObjectInjectionWorld;
+            if (defaultWorld != null && defaultWorld.IsCreated)
+            {
+                entityManager = defaultWorld.EntityManager;
+                
+                // Create navigation entity for this AI
+                navigationEntity = entityManager.CreateEntity();
+                entityManager.SetName(navigationEntity, $"AI_Nav_{gameObject.name}");
+                
+                // Add navigation components
+                navState = new AINavigationState(0, 0);
+                entityManager.AddComponentData(navigationEntity, navState);
+                entityManager.AddComponentData(navigationEntity, agentCapabilities);
+                entityManager.AddBuffer<PathNodeBufferElement>(navigationEntity);
+                
+                pathBuffer = entityManager.GetBuffer<PathNodeBufferElement>(navigationEntity);
+                navigationInitialized = true;
+                
+                Debug.Log($"🤖 AI Navigation initialized for {gameObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"⚠️ ECS World not available for {gameObject.name} - falling back to basic movement");
+                navigationInitialized = false;
+            }
+        }
+        
+        /// <summary>
+        /// Setup agent capabilities based on AI type and configuration
+        /// </summary>
+        private void SetupAgentCapabilities()
+        {
+            // Configure capabilities based on AI type
+            Polarity availablePolarity = Polarity.Any; // Most enemies can traverse any polarity
+            Ability availableAbilities = Ability.BasicMovement;
+            float skillLevel = 0.5f;
+            
+            switch (aiType)
+            {
+                case AIType.PatrolChase:
+                    availableAbilities |= Ability.Jump | Ability.Dash;
+                    skillLevel = 0.3f;
+                    break;
+                    
+                case AIType.RangedKite:
+                    availableAbilities |= Ability.Jump | Ability.GlideSpeed;
+                    availablePolarity = Polarity.Sun | Polarity.Moon; // Prefer open areas
+                    skillLevel = 0.6f;
+                    break;
+                    
+                case AIType.MeleeBrute:
+                    availableAbilities |= Ability.ChargedJump | Ability.WallJump;
+                    skillLevel = 0.4f;
+                    break;
+                    
+                case AIType.SupportCaster:
+                    availableAbilities |= Ability.ArcJump | Ability.TeleportArc;
+                    availablePolarity = Polarity.Heat | Polarity.Cold; // Magical biomes
+                    skillLevel = 0.8f;
+                    break;
+            }
+            
+            agentCapabilities = new AgentCapabilities(
+                availablePolarity, 
+                availableAbilities, 
+                skillLevel, 
+                aiType.ToString(), 
+                true
+            );
+        }
+        
+        /// <summary>
+        /// Find the nearest navigation node to this AI's position
+        /// </summary>
+        private void FindNearestNavigationNode()
+        {
+            if (!navigationInitialized) return;
+            
+            uint nearestNodeId = 0;
+            float nearestDistance = float.MaxValue;
+            float3 aiPosition = transform.position;
+            
+            // Query for all navigation nodes
+            using (var nodeQuery = entityManager.CreateEntityQuery(typeof(NavNode), typeof(NodeId)))
+            {
+                var entities = nodeQuery.ToEntityArray(Allocator.Temp);
+                
+                foreach (var entity in entities)
+                {
+                    var nodeId = entityManager.GetComponentData<NodeId>(entity);
+                    var navNode = entityManager.GetComponentData<NavNode>(entity);
+                    
+                    if (!navNode.IsActive) continue;
+                    
+                    float distance = math.distance(aiPosition, navNode.WorldPosition);
+                    if (distance < nearestDistance)
+                    {
+                        nearestDistance = distance;
+                        nearestNodeId = nodeId._value;
+                    }
+                }
+                
+                entities.Dispose();
+            }
+            
+            if (nearestNodeId != 0)
+            {
+                navState.CurrentNodeId = nearestNodeId;
+                if (navigationInitialized && entityManager.Exists(navigationEntity))
+                {
+                    entityManager.SetComponentData(navigationEntity, navState);
+                }
+                Debug.Log($"🎯 AI {gameObject.name} assigned to navigation node {nearestNodeId}");
+            }
+        }
+        
+        /// <summary>
+        /// Legacy physics setup for fallback movement
+        /// </summary>
+        private void SetupPhysicsComponents()
+        {
+            var rb2D = GetComponent<Rigidbody2D>();
+            var rb3D = GetComponent<Rigidbody>();
 
             // Add rigidbody if none exists
             if (!rb2D && !rb3D)
@@ -247,21 +402,20 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private void PatrolBehavior()
         {
-            float distanceToPatrolTarget = Vector3.Distance(transform.position, patrolTarget);
-            
-            if (distanceToPatrolTarget < 1f)
+            // Use navigation-aware patrol target selection
+            if (patrolTarget == Vector3.zero || Vector3.Distance(transform.position, patrolTarget) < 1f)
             {
-                // Reached patrol point, wait then choose new one
                 patrolWaitTimer += Time.deltaTime;
                 if (patrolWaitTimer >= patrolWaitTime)
                 {
                     patrolTarget = GetRandomPatrolPoint();
                     patrolWaitTimer = 0f;
+                    Debug.Log($"🚶 AI {gameObject.name} chose new patrol target: {patrolTarget}");
                 }
             }
             else
             {
-                // Move toward patrol target
+                // Move toward patrol target using enhanced navigation
                 MoveTowards(patrolTarget, moveSpeed * 0.5f);
             }
         }
@@ -351,9 +505,196 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             TryCastSupportSpell();
         }
 
+        /// <summary>
+        /// Enhanced movement using navigation system with fallback to direct movement
+        /// </summary>
         private void MoveTowards(Vector3 targetPosition, float speed)
         {
+            if (navigationInitialized && UseNavigationPathfinding(targetPosition))
+            {
+                // Use ECS navigation system for pathfinding
+                NavigateWithPathfinding(targetPosition, speed);
+            }
+            else
+            {
+                // Fallback to direct movement
+                DirectMovement(targetPosition, speed);
+            }
+            
+            // Track stuck detection
+            if (Vector3.Distance(transform.position, lastPosition) < StuckThreshold)
+            {
+                stuckTimer += Time.deltaTime;
+                if (stuckTimer > StuckTimeout)
+                {
+                    HandleStuckSituation(targetPosition);
+                }
+            }
+            else
+            {
+                stuckTimer = 0f;
+                lastPosition = transform.position;
+            }
+        }
+        
+        /// <summary>
+        /// Determine if navigation pathfinding should be used
+        /// </summary>
+        private bool UseNavigationPathfinding(Vector3 targetPosition)
+        {
+            // Use navigation for longer distances or when obstacles likely
+            float distance = Vector3.Distance(transform.position, targetPosition);
+            return distance > 5f || (currentState == AIState.Patrol);
+        }
+        
+        /// <summary>
+        /// Navigate using ECS pathfinding system
+        /// </summary>
+        private void NavigateWithPathfinding(Vector3 targetPosition, float speed)
+        {
+            // Find target navigation node
+            uint targetNodeId = FindNearestNavigationNodeToPosition(targetPosition);
+            
+            if (targetNodeId != 0 && targetNodeId != currentTargetNodeId)
+            {
+                currentTargetNodeId = targetNodeId;
+                RequestPathfinding(targetNodeId);
+            }
+            
+            // Follow current path if available
+            FollowNavigationPath(speed);
+        }
+        
+        /// <summary>
+        /// Find nearest navigation node to given position
+        /// </summary>
+        private uint FindNearestNavigationNodeToPosition(Vector3 position)
+        {
+            if (!navigationInitialized) return 0;
+            
+            uint nearestNodeId = 0;
+            float nearestDistance = float.MaxValue;
+            float3 targetPosition = position;
+            
+            using (var nodeQuery = entityManager.CreateEntityQuery(typeof(NavNode), typeof(NodeId)))
+            {
+                var entities = nodeQuery.ToEntityArray(Allocator.Temp);
+                
+                foreach (var entity in entities)
+                {
+                    var nodeId = entityManager.GetComponentData<NodeId>(entity);
+                    var navNode = entityManager.GetComponentData<NavNode>(entity);
+                    
+                    if (!navNode.IsActive || !navNode.IsCompatibleWith(agentCapabilities)) continue;
+                    
+                    float distance = math.distance(targetPosition, navNode.WorldPosition);
+                    if (distance < nearestDistance)
+                    {
+                        nearestDistance = distance;
+                        nearestNodeId = nodeId._value;
+                    }
+                }
+                
+                entities.Dispose();
+            }
+            
+            return nearestNodeId;
+        }
+        
+        /// <summary>
+        /// Request pathfinding to target node
+        /// </summary>
+        private void RequestPathfinding(uint targetNodeId)
+        {
+            if (!navigationInitialized || !entityManager.Exists(navigationEntity)) return;
+            
+            navState.TargetNodeId = targetNodeId;
+            navState.Status = PathfindingStatus.Idle; // Trigger new pathfinding
+            entityManager.SetComponentData(navigationEntity, navState);
+        }
+        
+        /// <summary>
+        /// Follow the calculated navigation path
+        /// </summary>
+        private void FollowNavigationPath(float speed)
+        {
+            if (!navigationInitialized || !entityManager.Exists(navigationEntity)) return;
+            
+            // Update navigation state
+            navState = entityManager.GetComponentData<AINavigationState>(navigationEntity);
+            
+            if (navState.Status == PathfindingStatus.PathFound && navState.PathLength > 0)
+            {
+                pathBuffer = entityManager.GetBuffer<PathNodeBufferElement>(navigationEntity);
+                
+                if (navState.CurrentPathStep < pathBuffer.Length)
+                {
+                    // Get next waypoint
+                    uint nextNodeId = pathBuffer[navState.CurrentPathStep].NodeId;
+                    Vector3 nextWaypoint = GetNodeWorldPosition(nextNodeId);
+                    
+                    if (nextWaypoint != Vector3.zero)
+                    {
+                        // Move towards next waypoint
+                        float distanceToWaypoint = Vector3.Distance(transform.position, nextWaypoint);
+                        
+                        if (distanceToWaypoint < 2f) // Reached waypoint
+                        {
+                            navState.CurrentPathStep++;
+                            entityManager.SetComponentData(navigationEntity, navState);
+                        }
+                        else
+                        {
+                            DirectMovement(nextWaypoint, speed);
+                        }
+                    }
+                }
+            }
+            else if (navState.Status == PathfindingStatus.NoPathFound || navState.Status == PathfindingStatus.TargetUnreachable)
+            {
+                // Fallback to direct movement
+                if (target)
+                {
+                    DirectMovement(target.position, speed * 0.5f);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Get world position of navigation node
+        /// </summary>
+        private Vector3 GetNodeWorldPosition(uint nodeId)
+        {
+            using (var nodeQuery = entityManager.CreateEntityQuery(typeof(NavNode), typeof(NodeId)))
+            {
+                var entities = nodeQuery.ToEntityArray(Allocator.Temp);
+                
+                foreach (var entity in entities)
+                {
+                    var id = entityManager.GetComponentData<NodeId>(entity);
+                    if (id._value == nodeId)
+                    {
+                        var navNode = entityManager.GetComponentData<NavNode>(entity);
+                        entities.Dispose();
+                        return navNode.WorldPosition;
+                    }
+                }
+                
+                entities.Dispose();
+            }
+            
+            return Vector3.zero;
+        }
+        
+        /// <summary>
+        /// Direct movement implementation (legacy fallback)
+        /// </summary>
+        private void DirectMovement(Vector3 targetPosition, float speed)
+        {
             Vector3 direction = (targetPosition - transform.position).normalized;
+            
+            var rb2D = GetComponent<Rigidbody2D>();
+            var rb3D = GetComponent<Rigidbody>();
             
             if (rb2D)
             {
@@ -372,6 +713,100 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             if (direction.x != 0)
             {
                 transform.localScale = new Vector3(Mathf.Sign(direction.x), 1, 1);
+            }
+        }
+        
+        /// <summary>
+        /// Handle situation where AI is stuck
+        /// </summary>
+        private void HandleStuckSituation(Vector3 targetPosition)
+        {
+            Debug.Log($"🚫 AI {gameObject.name} is stuck, attempting recovery...");
+            
+            // Try random movement to unstick
+            Vector3 randomDirection = Random.insideUnitSphere;
+            randomDirection.y = 0; // Keep on ground level
+            Vector3 unstickPosition = transform.position + randomDirection.normalized * 2f;
+            
+            DirectMovement(unstickPosition, moveSpeed);
+            
+            // Reset navigation if stuck too long
+            if (stuckTimer > StuckTimeout * 2)
+            {
+                FindNearestNavigationNode();
+                stuckTimer = 0f;
+            }
+        }
+        
+        /// <summary>
+        /// Enhanced patrol behavior using navigation waypoints
+        /// </summary>
+        private Vector3 GetRandomPatrolPoint()
+        {
+            if (navigationInitialized)
+            {
+                // Use navigation nodes for patrol points
+                uint randomNodeId = GetRandomNearbyNavigationNode();
+                if (randomNodeId != 0)
+                {
+                    Vector3 nodePosition = GetNodeWorldPosition(randomNodeId);
+                    if (nodePosition != Vector3.zero)
+                    {
+                        return nodePosition;
+                    }
+                }
+            }
+            
+            // Fallback to random point around patrol center
+            Vector2 randomDirection = Random.insideUnitCircle.normalized;
+            return patrolCenter + (Vector3)randomDirection * Random.Range(1f, patrolRadius);
+        }
+        
+        /// <summary>
+        /// Get a random nearby navigation node for patrol
+        /// </summary>
+        private uint GetRandomNearbyNavigationNode()
+        {
+            var nearbyNodes = new List<uint>();
+            float3 aiPosition = transform.position;
+            
+            using (var nodeQuery = entityManager.CreateEntityQuery(typeof(NavNode), typeof(NodeId)))
+            {
+                var entities = nodeQuery.ToEntityArray(Allocator.Temp);
+                
+                foreach (var entity in entities)
+                {
+                    var nodeId = entityManager.GetComponentData<NodeId>(entity);
+                    var navNode = entityManager.GetComponentData<NavNode>(entity);
+                    
+                    if (!navNode.IsActive || !navNode.IsCompatibleWith(agentCapabilities)) continue;
+                    
+                    float distance = math.distance(aiPosition, navNode.WorldPosition);
+                    if (distance <= patrolRadius && distance >= 2f) // Not too close, not too far
+                    {
+                        nearbyNodes.Add(nodeId._value);
+                    }
+                }
+                
+                entities.Dispose();
+            }
+            
+            if (nearbyNodes.Count > 0)
+            {
+                return nearbyNodes[Random.Range(0, nearbyNodes.Count)];
+            }
+            
+            return 0;
+        }
+        
+        /// <summary>
+        /// Cleanup navigation entity when AI is destroyed
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (navigationInitialized && entityManager.IsCreated && entityManager.Exists(navigationEntity))
+            {
+                entityManager.DestroyEntity(navigationEntity);
             }
         }
 
