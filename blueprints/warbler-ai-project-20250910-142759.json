@@ -1,0 +1,43 @@
+{
+  "game_type": "custom",
+  "complexity_level": "moderate",
+  "required_systems": [
+    "PlayerController",
+    "GameManager",
+    "UIManager"
+  ],
+  "recommended_folders": [
+    "Scripts/Player",
+    "Scripts/Managers",
+    "Scripts/UI"
+  ],
+  "unity_packages": [
+    "InputSystem"
+  ],
+  "estimated_dev_time": "4-6 weeks",
+  "key_mechanics": [
+    "basic_gameplay",
+    "ui_interaction"
+  ],
+  "technical_considerations": [
+    "performance",
+    "maintainability"
+  ],
+  "suggested_architecture": "Component-based",
+  "warbler_insights": "Fallback analysis - AI unavailable",
+  "warbler_enhancement": {
+    "development_milestones": [
+      "Setup (Week 1)",
+      "Core features (Week 2-3)",
+      "Polish (Week 4)"
+    ],
+    "testing_strategy": [
+      "Basic functionality testing",
+      "Performance validation"
+    ],
+    "suggested_tldl_tags": [
+      "fallback-generation",
+      "basic-template"
+    ]
+  }
+}

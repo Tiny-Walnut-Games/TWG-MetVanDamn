@@ -21,6 +21,7 @@ class LDAConfig:
         self.project_root = self.find_project_root()
         self.agent_profile_path = self.project_root / "agent-profile.yaml"
         self.profiles_dir = self.project_root / ".github" / "agents"
+        self.overlord_script_path = self.project_root / "scripts" / "cid-faculty" / "overlord-sentinel.js"
         
     def find_project_root(self) -> Path:
         """Find the project root directory"""
@@ -317,6 +318,138 @@ class LDACLICommands:
         except:
             return "unknown"
             
+    def sanitize(self, args):
+        """Sanitize project by cleaning up temporary files and debug artifacts"""
+        print("🧹 Living Dev Agent Sanitization")
+        print("================================")
+        
+        if args.dry_run:
+            print("🔍 DRY RUN: Showing what would be cleaned")
+        
+        cleaned_items = []
+        
+        # Clean up common temporary files and directories
+        temp_patterns = [
+            "__pycache__",
+            "*.pyc", 
+            "*.pyo",
+            ".pytest_cache",
+            "node_modules",
+            ".cache",
+            "*.tmp",
+            "*.temp",
+            ".DS_Store",
+            "Thumbs.db",
+            "*.log"
+        ]
+        
+        # DevTimeTravel temporary files
+        devtimetravel_temp_dirs = [
+            ".devtimetravel/temp",
+            ".devtimetravel/cache"
+        ]
+        
+        # LDA specific temp files
+        lda_temp_patterns = [
+            ".lda_cache",
+            "validation-report.json",
+            "*.meta"  # Unity meta files if they exist
+        ]
+        
+        for pattern in temp_patterns + lda_temp_patterns:
+            if pattern.startswith("."):
+                # Directory patterns
+                pattern_path = self.config.project_root / pattern
+                if pattern_path.exists():
+                    if args.dry_run:
+                        print(f"Would remove: {pattern}")
+                    else:
+                        import shutil
+                        if pattern_path.is_dir():
+                            shutil.rmtree(pattern_path)
+                        else:
+                            pattern_path.unlink()
+                        cleaned_items.append(pattern)
+            else:
+                # File patterns using glob
+                import glob
+                for file_path in glob.glob(str(self.config.project_root / "**" / pattern), recursive=True):
+                    file_path_obj = Path(file_path)
+                    if file_path_obj.exists():
+                        if args.dry_run:
+                            print(f"Would remove: {file_path_obj.relative_to(self.config.project_root)}")
+                        else:
+                            if file_path_obj.is_dir():
+                                import shutil
+                                shutil.rmtree(file_path_obj)
+                            else:
+                                file_path_obj.unlink()
+                            cleaned_items.append(str(file_path_obj.relative_to(self.config.project_root)))
+        
+        # Clean DevTimeTravel temp directories
+        for temp_dir in devtimetravel_temp_dirs:
+            temp_path = self.config.project_root / temp_dir
+            if temp_path.exists():
+                if args.dry_run:
+                    print(f"Would remove: {temp_dir}")
+                else:
+                    import shutil
+                    shutil.rmtree(temp_path)
+                    cleaned_items.append(temp_dir)
+        
+        # Sanitize snapshots if requested
+        if args.sanitize_secrets:
+            print("🔒 Sanitizing secrets from snapshots...")
+            snapshots_dir = self.config.project_root / ".devtimetravel" / "snapshots"
+            if snapshots_dir.exists():
+                for snapshot_file in snapshots_dir.rglob("*.yaml"):
+                    if args.dry_run:
+                        print(f"Would sanitize: {snapshot_file.relative_to(self.config.project_root)}")
+                    else:
+                        self._sanitize_secrets_from_file(snapshot_file)
+                        cleaned_items.append(f"sanitized: {snapshot_file.relative_to(self.config.project_root)}")
+        
+        if args.dry_run:
+            print(f"🔍 Would clean {len(temp_patterns + lda_temp_patterns + devtimetravel_temp_dirs)} patterns")
+        elif cleaned_items:
+            print(f"✅ Cleaned {len(cleaned_items)} items:")
+            for item in cleaned_items[:10]:  # Show first 10 items
+                print(f"   - {item}")
+            if len(cleaned_items) > 10:
+                print(f"   ... and {len(cleaned_items) - 10} more items")
+        else:
+            print("✨ Project already clean - no items to remove")
+            
+        return 0
+    
+    def _sanitize_secrets_from_file(self, file_path: Path):
+        """Remove potential secrets from YAML/JSON files"""
+        try:
+            with open(file_path, 'r') as f:
+                content = f.read()
+            
+            # Simple patterns for common secrets
+            import re
+            secret_patterns = [
+                (r'password\s*[:=]\s*["\']([^"\']+)["\']', 'password: "[REDACTED]"'),
+                (r'token\s*[:=]\s*["\']([^"\']+)["\']', 'token: "[REDACTED]"'),
+                (r'key\s*[:=]\s*["\']([^"\']+)["\']', 'key: "[REDACTED]"'),
+                (r'secret\s*[:=]\s*["\']([^"\']+)["\']', 'secret: "[REDACTED]"'),
+            ]
+            
+            modified = False
+            for pattern, replacement in secret_patterns:
+                if re.search(pattern, content, re.IGNORECASE):
+                    content = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
+                    modified = True
+            
+            if modified:
+                with open(file_path, 'w') as f:
+                    f.write(content)
+                    
+        except Exception as e:
+            print(f"⚠️  Warning: Could not sanitize {file_path}: {e}")
+
     def dtt(self, args):
         """Dev Time Travel Vault operations"""
         print("🏛️ Dev Time Travel Vault")
@@ -372,6 +505,9 @@ Examples:
   lda init                          # Initialize LDA in current project
   lda init --quiet                  # Initialize with defaults, no prompts
   lda snapshot --id "feature-xyz"   # Create named snapshot
+  lda sanitize                      # Clean up temporary files and debug artifacts
+  lda sanitize --dry-run            # Preview what would be cleaned
+  lda sanitize --sanitize-secrets   # Remove secrets from snapshots
   lda profile list                  # List available profiles
   lda profile switch validator      # Switch to validator profile
   lda profile create custom         # Create new profile
@@ -398,6 +534,11 @@ Examples:
     snapshot_parser.add_argument('--id', help='Snapshot identifier')
     snapshot_parser.add_argument('--description', help='Snapshot description')
     snapshot_parser.add_argument('--dry-run', action='store_true', help='Show what would be done')
+    
+    # Sanitize command
+    sanitize_parser = subparsers.add_parser('sanitize', help='Clean up temporary files and debug artifacts')
+    sanitize_parser.add_argument('--dry-run', action='store_true', help='Show what would be cleaned without removing')
+    sanitize_parser.add_argument('--sanitize-secrets', action='store_true', help='Remove potential secrets from snapshots')
     
     # Profile command
     profile_parser = subparsers.add_parser('profile', help='Manage agent profiles')
@@ -501,6 +642,8 @@ def main():
             return commands.init(args)
         elif args.command == 'snapshot':
             return commands.snapshot(args)
+        elif args.command == 'sanitize':
+            return commands.sanitize(args)
         elif args.command == 'profile':
             return commands.profile(args)
         elif args.command == 'template':

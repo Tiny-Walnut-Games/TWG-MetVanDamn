@@ -1,0 +1,121 @@
+{
+  "project_info": {
+    "name": "Warbler-Generated-Survivor.Io",
+    "created_date": "2025-09-10T16:07:10.147212",
+    "user_request": "Create a survivor.io game with automatic weapons and upgrade system",
+    "warbler_analysis": {
+      "game_type": "survivor.io",
+      "complexity_level": "moderate",
+      "required_systems": [
+        "PlayerController",
+        "EnemySpawner",
+        "WeaponSystem",
+        "UpgradeManager",
+        "WaveManager",
+        "ExperienceManager",
+        "HealthSystem",
+        "DamageSystem"
+      ],
+      "recommended_folders": [
+        "Scripts/Player",
+        "Scripts/Enemies",
+        "Scripts/Weapons",
+        "Scripts/Upgrades",
+        "Scripts/Managers",
+        "Scripts/UI",
+        "Scripts/Projectiles"
+      ],
+      "unity_packages": [
+        "InputSystem",
+        "2D Sprite",
+        "Cinemachine"
+      ],
+      "estimated_dev_time": "3-5 weeks",
+      "key_mechanics": [
+        "top-down movement",
+        "automatic shooting",
+        "enemy waves",
+        "experience collection",
+        "upgrade selection",
+        "damage numbers",
+        "procedural spawning"
+      ],
+      "technical_considerations": [
+        "object pooling for projectiles",
+        "efficient enemy spawning",
+        "performance with 100+ entities",
+        "mobile-friendly controls"
+      ],
+      "suggested_architecture": "Component-based with ScriptableObject configs",
+      "warbler_insights": "Survivor.io games require efficient spawning, object pooling, and scalable upgrade systems. Focus on performance optimization and clear visual feedback.",
+      "warbler_enhancement": {
+        "tlda_integration": true,
+        "auto_documentation": true,
+        "performance_monitoring": true,
+        "suggested_tldl_tags": [
+          "project-setup",
+          "warbler-generated",
+          "survivor.io",
+          "wave-defense",
+          "upgrades",
+          "survival"
+        ],
+        "development_milestones": [
+          "Player movement and basic shooting (Week 1)",
+          "Enemy spawning and collision (Week 2)",
+          "Upgrade system and UI (Week 3)",
+          "Wave progression and balance (Week 4)",
+          "Polish and optimization (Week 5)"
+        ],
+        "testing_strategy": [
+          "Performance testing with 100+ enemies",
+          "Upgrade balance testing",
+          "Wave difficulty progression",
+          "Mobile input responsiveness"
+        ]
+      }
+    }
+  },
+  "development_plan": {
+    "milestones": [
+      "Player movement and basic shooting (Week 1)",
+      "Enemy spawning and collision (Week 2)",
+      "Upgrade system and UI (Week 3)",
+      "Wave progression and balance (Week 4)",
+      "Polish and optimization (Week 5)"
+    ],
+    "testing_strategy": [
+      "Performance testing with 100+ enemies",
+      "Upgrade balance testing",
+      "Wave difficulty progression",
+      "Mobile input responsiveness"
+    ],
+    "estimated_timeline": "3-5 weeks"
+  },
+  "technical_specs": {
+    "unity_version": "2022.3 LTS or later",
+    "target_platforms": [
+      "PC",
+      "Mobile"
+    ],
+    "required_packages": [
+      "InputSystem",
+      "2D Sprite",
+      "Cinemachine"
+    ],
+    "architecture": "Component-based with ScriptableObject configs"
+  },
+  "tlda_integration": {
+    "auto_documentation": true,
+    "performance_monitoring": true,
+    "suggested_tags": [
+      "project-setup",
+      "warbler-generated",
+      "survivor.io",
+      "wave-defense",
+      "upgrades",
+      "survival"
+    ],
+    "warbler_insights": "Survivor.io games require efficient spawning, object pooling, and scalable upgrade systems. Focus on performance optimization and clear visual feedback."
+  }
+}

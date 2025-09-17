@@ -1,0 +1,383 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jmeyer1980/TWG-TLDA/schemas/baseline_set.json",
+  "title": "Alchemist Baseline Set Schema",
+  "description": "JSON schema for baseline_set.json files used in Alchemist experiments for defining experimental baseline configurations and reference metrics",
+  "type": "object",
+  "required": [
+    "metadata",
+    "baseline_metrics",
+    "experiment_context"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Metadata about the baseline set",
+      "required": [
+        "version",
+        "created_at",
+        "baseline_id",
+        "description"
+      ],
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version of the baseline set schema",
+          "examples": ["1.0.0", "1.2.3"]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when baseline set was created"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time", 
+          "description": "ISO 8601 timestamp when baseline set was last updated"
+        },
+        "baseline_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Unique identifier for this baseline set",
+          "examples": ["cognitive_baseline_v1", "intervention_baseline_2025"]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "description": "Human-readable description of the baseline set purpose"
+        },
+        "author": {
+          "type": "string",
+          "description": "Author or creator of the baseline set"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "uniqueItems": true,
+          "description": "Tags for categorizing the baseline set",
+          "examples": [["cognitive", "intervention"], ["performance", "regression"]]
+        },
+        "alchemist_version": {
+          "type": "string",
+          "description": "Version of Alchemist that created/uses this baseline set"
+        }
+      },
+      "additionalProperties": false
+    },
+    "baseline_metrics": {
+      "type": "object",
+      "description": "Core baseline metrics and thresholds",
+      "required": [
+        "primary_metrics"
+      ],
+      "properties": {
+        "primary_metrics": {
+          "type": "object",
+          "description": "Primary metrics that define the baseline",
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+              "type": "object",
+              "required": ["value", "unit"],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "description": "Baseline value for this metric"
+                },
+                "unit": {
+                  "type": "string",
+                  "description": "Unit of measurement",
+                  "examples": ["percent", "seconds", "count", "ratio"]
+                },
+                "threshold_upper": {
+                  "type": "number",
+                  "description": "Upper threshold for regression detection"
+                },
+                "threshold_lower": {
+                  "type": "number", 
+                  "description": "Lower threshold for regression detection"
+                },
+                "tolerance": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Tolerance as percentage (0.0-1.0) for acceptable variance"
+                },
+                "confidence_interval": {
+                  "type": "object",
+                  "properties": {
+                    "lower": {"type": "number"},
+                    "upper": {"type": "number"},
+                    "confidence_level": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "default": 0.95
+                    }
+                  },
+                  "required": ["lower", "upper"]
+                },
+                "sample_size": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Number of samples used to establish this baseline"
+                },
+                "statistical_method": {
+                  "type": "string",
+                  "enum": ["mean", "median", "mode", "percentile_95", "percentile_99"],
+                  "description": "Statistical method used to compute baseline value"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "minProperties": 1
+        },
+        "secondary_metrics": {
+          "type": "object",
+          "description": "Secondary metrics for additional context",
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+              "$ref": "#/properties/baseline_metrics/properties/primary_metrics/patternProperties/^[a-zA-Z_][a-zA-Z0-9_]*$"
+            }
+          }
+        },
+        "derived_metrics": {
+          "type": "object",
+          "description": "Metrics computed from primary/secondary metrics",
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+              "type": "object",
+              "required": ["formula", "unit"],
+              "properties": {
+                "formula": {
+                  "type": "string",
+                  "description": "Formula to compute derived metric (references other metrics)"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "experiment_context": {
+      "type": "object",
+      "description": "Context information for experiments using this baseline",
+      "required": [
+        "experiment_type"
+      ],
+      "properties": {
+        "experiment_type": {
+          "type": "string",
+          "enum": [
+            "cognitive_performance",
+            "behavioral_alignment", 
+            "intervention_effectiveness",
+            "system_performance",
+            "regression_detection",
+            "ab_testing",
+            "custom"
+          ],
+          "description": "Type of experiments this baseline supports"
+        },
+        "applicable_conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["condition_name"],
+            "properties": {
+              "condition_name": {
+                "type": "string",
+                "description": "Name of experimental condition"
+              },
+              "condition_values": {
+                "type": "array",
+                "description": "Allowed values for this condition"
+              },
+              "default_value": {
+                "description": "Default value for this condition"
+              }
+            }
+          },
+          "description": "Experimental conditions this baseline applies to"
+        },
+        "environment_requirements": {
+          "type": "object",
+          "properties": {
+            "min_corpus_size": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Minimum corpus size for meaningful comparison"
+            },
+            "required_features": {
+              "type": "array", 
+              "items": {"type": "string"},
+              "description": "Features that must be enabled for baseline comparison"
+            },
+            "incompatible_features": {
+              "type": "array",
+              "items": {"type": "string"}, 
+              "description": "Features that invalidate baseline comparison"
+            }
+          }
+        },
+        "validation_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule_type", "parameters"],
+            "properties": {
+              "rule_type": {
+                "type": "string",
+                "enum": ["range_check", "trend_analysis", "statistical_significance", "custom"],
+                "description": "Type of validation rule"
+              },
+              "parameters": {
+                "type": "object",
+                "description": "Rule-specific parameters"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["error", "warning", "info"],
+                "default": "warning"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Information about baseline establishment and lineage",
+      "properties": {
+        "source_experiments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["experiment_id"],
+            "properties": {
+              "experiment_id": {
+                "type": "string",
+                "description": "ID of experiment used to establish baseline"
+              },
+              "run_ids": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Specific run IDs from the experiment"
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Weight of this experiment in baseline calculation"
+              }
+            }
+          },
+          "description": "Experiments used to establish this baseline"
+        },
+        "establishment_method": {
+          "type": "string",
+          "enum": ["single_experiment", "aggregated_experiments", "historical_analysis", "manual_definition"],
+          "description": "Method used to establish baseline values"
+        },
+        "git_context": {
+          "type": "object",
+          "properties": {
+            "commit_sha": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}$",
+              "description": "Git commit SHA when baseline was established"
+            },
+            "branch": {
+              "type": "string",
+              "description": "Git branch when baseline was established"
+            },
+            "repository_url": {
+              "type": "string",
+              "format": "uri",
+              "description": "Repository URL"
+            }
+          }
+        },
+        "gu_pot_origin": {
+          "type": "object",
+          "description": "Origin binding to Gu Pot issue (if applicable)",
+          "required": ["issue_number"],
+          "properties": {
+            "issue_number": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "issue_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "stage_at_establishment": {
+              "type": "string",
+              "enum": ["larva", "fermenting", "distilled"]
+            },
+            "logline_hash": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            },
+            "tension_hash": {
+              "type": "string", 
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "usage_notes": {
+      "type": "object",
+      "description": "Documentation for baseline usage",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Detailed description of when and how to use this baseline"
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenario": {"type": "string"},
+              "expected_delta": {"type": "number"},
+              "interpretation": {"type": "string"}
+            }
+          }
+        },
+        "known_limitations": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Known limitations or caveats for this baseline"
+        },
+        "migration_notes": {
+          "type": "string",
+          "description": "Notes for migrating from previous baseline versions"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

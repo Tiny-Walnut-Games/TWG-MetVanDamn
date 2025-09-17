@@ -1,0 +1,22 @@
+name: "discourse_tracker"
+version: "1.0.0"
+author: "TWG-TLDA Plugin System"
+description: "Tracks discourse markers and conversation patterns in cognitive events"
+capabilities:
+  - "event_listener"
+  - "discourse_tracking"
+  - "data_processor"
+  - "analytics"
+dependencies: []
+min_engine_version: "0.9.0"
+max_memory_mb: 40
+max_execution_time_ms: 600
+event_subscriptions:
+  - "anchor_activated"
+  - "summary_generated"
+  - "cognitive_cycle_start"
+  - "cognitive_cycle_end"
+configuration:
+  track_transitions: true
+  analyze_coherence: true
+  detect_topic_shifts: true

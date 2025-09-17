@@ -1,0 +1,71 @@
+{
+  "version": "0.1.0",
+  "description": "RitualBot configuration for automated update management across Living Dev Agent phases",
+  "phase_0": {
+    "enabled": true,
+    "dependabot_integration": true,
+    "auto_merge_default": false,
+    "security_updates_auto_approve": true
+  },
+  "phase_1": {
+    "enabled": false,
+    "enable_template_sync": false,
+    "template_source": "",
+    "template_branch": "main",
+    "sync_schedule": "weekly",
+    "dry_run": true,
+    "auto_create_prs": false
+  },
+  "phase_2": {
+    "enabled": false,
+    "multi_repo_sync": false,
+    "target_repositories": [],
+    "coordination_strategy": "sequential",
+    "rollback_on_failure": true
+  },
+  "global_settings": {
+    "reviewers": [
+      "jmeyer1980"
+    ],
+    "required_labels": [
+      "ritual-auto"
+    ],
+    "blocking_labels": [
+      "no-automerge"
+    ],
+    "notification_channels": [],
+    "max_concurrent_prs": 10,
+    "merge_strategy": "squash"
+  },
+  "safety_controls": {
+    "require_ci_success": true,
+    "require_human_approval_for_major": true,
+    "emergency_stop_enabled": true,
+    "rollback_window_hours": 24
+  },
+  "ecosystem_overrides": {
+    "pip": {
+      "group_minor_patch": true,
+      "security_auto_merge": true
+    },
+    "npm": {
+      "group_dev_dependencies": true,
+      "ignore_patterns": ["@playwright/mcp"]
+    },
+    "github-actions": {
+      "pin_to_sha": true,
+      "security_auto_merge": true
+    }
+  },
+  "experimental_features": {
+    "ai_powered_pr_analysis": false,
+    "predictive_conflict_detection": false,
+    "semantic_version_intelligence": false
+  },
+  "metadata": {
+    "created_at": "2025-01-02T00:00:00Z",
+    "schema_version": "0.1.0",
+    "last_updated": "2025-01-02T00:00:00Z",
+    "author": "RitualBot Phase 0 Implementation"
+  }
+}

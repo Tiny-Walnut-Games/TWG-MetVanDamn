@@ -1,0 +1,1336 @@
+[
+  {
+    "id": "TLDA-MOCK-001",
+    "source": "Seeder",
+    "text": "Contributor breakthrough: First successful TLDL entry submission. Chronicle Keeper notified.",
+    "emotional_weight": 0.53,
+    "tags": [
+      "faculty",
+      "breakthrough",
+      "first-submission"
+    ],
+    "unix_millis": 1756830588162,
+    "provenance_hash": "4f576a5ef787b3915cf3ec6318f7873413875ca6a74b35ae018f4a42e1fa7a28"
+  },
+  {
+    "id": "TLDA-MOCK-002",
+    "source": "Seeder",
+    "text": "Memory castle graph expanded with 12 new concept nodes. Relationship mapping updated.",
+    "emotional_weight": 0.41,
+    "tags": [
+      "castle",
+      "graph",
+      "expansion",
+      "refactor"
+    ],
+    "unix_millis": 1756830590010,
+    "provenance_hash": "bf3b17520a842707c2c11bf3385d1b4915c700d7ff3d5643a5fac46389ff3a57"
+  },
+  {
+    "id": "TLDA-MOCK-003",
+    "source": "Seeder",
+    "text": "Contributor breakthrough: First successful TLDL entry submission. Chronicle Keeper notified.",
+    "emotional_weight": 0.55,
+    "tags": [
+      "faculty",
+      "breakthrough",
+      "first-submission"
+    ],
+    "unix_millis": 1756830590592,
+    "provenance_hash": "95a40460a2ba2aef635995f9603c92f42ff2633f5ac9d91ec9143e33a85c012b"
+  },
+  {
+    "id": "TLDA-MOCK-004",
+    "source": "Seeder",
+    "text": "Open source doctrine validation passed. MIT license terms properly preserved.",
+    "emotional_weight": 0.35,
+    "tags": [
+      "licensing",
+      "doctrine",
+      "mit",
+      "routine"
+    ],
+    "unix_millis": 1756830591763,
+    "provenance_hash": "184114e61b356829a31805aafe9799525e6ec4d7d4843724d1e3d8ffc4f070c0"
+  },
+  {
+    "id": "TLDA-MOCK-005",
+    "source": "Seeder",
+    "text": "Section naming validator triggered on 'Discoveries' plural form. Manual correction required.",
+    "emotional_weight": 0.77,
+    "tags": [
+      "validator",
+      "naming",
+      "manual-fix"
+    ],
+    "unix_millis": 1756830592166,
+    "provenance_hash": "5097dfe125c0cfb2c060bca5fa998827a8006277a206faa4b4f472c63fbc3121"
+  },
+  {
+    "id": "TLDA-MOCK-006",
+    "source": "Seeder",
+    "text": "License header injection completed across 247 source files. Copyright notices updated.",
+    "emotional_weight": 0.41,
+    "tags": [
+      "licensing",
+      "headers",
+      "copyright"
+    ],
+    "unix_millis": 1756830593862,
+    "provenance_hash": "fbf189fa1b7a6e104d49a7b842f4d7de106ea6f73bbe9e4e8fe7bc1fcd0447bb"
+  },
+  {
+    "id": "TLDA-MOCK-007",
+    "source": "Seeder",
+    "text": "Debug overlay validation returned 85.7% health score. C# parsing issues acknowledged.",
+    "emotional_weight": 0.55,
+    "tags": [
+      "validator",
+      "debug-overlay",
+      "health-score"
+    ],
+    "unix_millis": 1756830594732,
+    "provenance_hash": "9975c7d2dc7578ef84f31ca2b6b128a3bfcd1aa53ec6fa634579e5814bdbf7f9"
+  },
+  {
+    "id": "TLDA-MOCK-008",
+    "source": "Seeder",
+    "text": "DevTimeTravel snapshot restored to quarantine branch. Safety protocols observed.",
+    "emotional_weight": 0.63,
+    "tags": [
+      "dtt",
+      "snapshot",
+      "quarantine"
+    ],
+    "unix_millis": 1756830595905,
+    "provenance_hash": "610a8708085040aa727b7c04174732553285b5b85821a501e446d409acdcb237"
+  },
+  {
+    "id": "TLDA-MOCK-009",
+    "source": "Seeder",
+    "text": "Unity Editor TLDL Scribe Window crashed during markdown rendering. Memory leak suspected.",
+    "emotional_weight": 0.74,
+    "tags": [
+      "unity",
+      "editor",
+      "crash"
+    ],
+    "unix_millis": 1756830596633,
+    "provenance_hash": "7a8219b7dc4245249304ef632de5c78c4048b63695526b7e1bfaf2bd178a4ecc"
+  },
+  {
+    "id": "TLDA-MOCK-010",
+    "source": "Seeder",
+    "text": "Warbler cloud humidity reached critical threshold. Evaporation cycle acceleration required.",
+    "emotional_weight": 0.67,
+    "tags": [
+      "warbler",
+      "humidity",
+      "critical"
+    ],
+    "unix_millis": 1756830597377,
+    "provenance_hash": "0bbdcdfe5c93f9b0fcd45da4b15802fdfb2326fe96a5e195e9d7ed018704b132"
+  },
+  {
+    "id": "TLDA-MOCK-011",
+    "source": "Seeder",
+    "text": "Cloud formation anomaly detected during selector synthesis. Pattern recognition failed.",
+    "emotional_weight": 0.86,
+    "tags": [
+      "warbler",
+      "anomaly",
+      "selector",
+      "feature"
+    ],
+    "unix_millis": 1756830598422,
+    "provenance_hash": "fbaedd1879bc22025ec992e37690f046f78c20038b975b7f5c9d0590f5cd20a5"
+  },
+  {
+    "id": "TLDA-MOCK-012",
+    "source": "Seeder",
+    "text": "Castle memory nodes reached thermal equilibrium. Room heat distribution stabilized.",
+    "emotional_weight": 0.37,
+    "tags": [
+      "castle",
+      "memory",
+      "thermal"
+    ],
+    "unix_millis": 1756830599531,
+    "provenance_hash": "b2fec07c4e84c4bf0a5b2f1315a7f37e6f47773188e46111f21d432b6d63252f"
+  },
+  {
+    "id": "TLDA-MOCK-013",
+    "source": "Seeder",
+    "text": "Unity 2022.3 compatibility verified across all TLDA components. Upgrade path secured.",
+    "emotional_weight": 0.27,
+    "tags": [
+      "unity",
+      "compatibility",
+      "upgrade",
+      "complex"
+    ],
+    "unix_millis": 1756830600341,
+    "provenance_hash": "070703bd5c1205cdcedf29ad261d080465ba8975e4eeebab714af9eccf02f6b9"
+  },
+  {
+    "id": "TLDA-MOCK-014",
+    "source": "Seeder",
+    "text": "Memory castle graph expanded with 12 new concept nodes. Relationship mapping updated.",
+    "emotional_weight": 0.56,
+    "tags": [
+      "castle",
+      "graph",
+      "expansion",
+      "complex"
+    ],
+    "unix_millis": 1756830601927,
+    "provenance_hash": "2771edde0772ef4311d9dcb4330a21e8a59f3578553b7a2e3c1572a683e84d12"
+  },
+  {
+    "id": "TLDA-MOCK-015",
+    "source": "Seeder",
+    "text": "Open source doctrine validation passed. MIT license terms properly preserved.",
+    "emotional_weight": 0.22,
+    "tags": [
+      "licensing",
+      "doctrine",
+      "mit",
+      "milestone"
+    ],
+    "unix_millis": 1756830602670,
+    "provenance_hash": "fd54dae9b6d0e06517405d59870b840e734d326cc0f6ec6a1bc66ba5c6857f04"
+  },
+  {
+    "id": "TLDA-MOCK-016",
+    "source": "Seeder",
+    "text": "Archive wall continuity ritual completed successfully. Historical integrity preserved.",
+    "emotional_weight": 0.29,
+    "tags": [
+      "chronicle",
+      "archive-wall",
+      "continuity",
+      "urgent"
+    ],
+    "unix_millis": 1756830603347,
+    "provenance_hash": "2a009398073176258fae015b5c33dd0bedc0e3acab44f8946d49b7dd1ff014e8"
+  },
+  {
+    "id": "TLDA-MOCK-017",
+    "source": "Seeder",
+    "text": "Licensing compliance audit revealed 3 dependency violations. Legal review initiated.",
+    "emotional_weight": 0.78,
+    "tags": [
+      "licensing",
+      "compliance",
+      "violations"
+    ],
+    "unix_millis": 1756830604221,
+    "provenance_hash": "e58cfc18646a3643ddc7f80411a91fee22efa38e69910f0bc69ca5ae4b938fa1"
+  },
+  {
+    "id": "TLDA-MOCK-018",
+    "source": "Seeder",
+    "text": "Chronicle Keeper automation triggered capsule scroll generation. Archive continuity maintained.",
+    "emotional_weight": 0.39,
+    "tags": [
+      "chronicle",
+      "automation",
+      "capsule"
+    ],
+    "unix_millis": 1756830605245,
+    "provenance_hash": "6286c351d8dc8f2ea75c8698ec62694ad4fb60172d040c847a7d87fd148697fc"
+  },
+  {
+    "id": "TLDA-MOCK-019",
+    "source": "Seeder",
+    "text": "Monthly TLDL archive generation failed. Decision index population incomplete.",
+    "emotional_weight": 0.78,
+    "tags": [
+      "chronicle",
+      "archive",
+      "generation-failed"
+    ],
+    "unix_millis": 1756830606176,
+    "provenance_hash": "45bc1ebca781826b14699926a3d284f69896a426fc55b1a4a1ff199cb7e66840"
+  },
+  {
+    "id": "TLDA-MOCK-020",
+    "source": "Seeder",
+    "text": "Giant compressor processed 47 fragments into 3 clusters. Tetrino slam successful.",
+    "emotional_weight": 0.5,
+    "tags": [
+      "giant",
+      "compression",
+      "tetrino-slam"
+    ],
+    "unix_millis": 1756830607454,
+    "provenance_hash": "8dae32165c30adf5c202f4abb93920b84239abad626bf9c91e7dcc5222f2f7ac"
+  },
+  {
+    "id": "TLDA-MOCK-021",
+    "source": "Seeder",
+    "text": "Magma store overflow triggered emergency melt budget protocols. Heat dissipation required.",
+    "emotional_weight": 0.77,
+    "tags": [
+      "magma",
+      "overflow",
+      "emergency"
+    ],
+    "unix_millis": 1756830608609,
+    "provenance_hash": "5beb8d64568cefb4c69cbd35fdab6dc18fe393a1db34c4b9d38d9e156470b346"
+  },
+  {
+    "id": "TLDA-MOCK-022",
+    "source": "Seeder",
+    "text": "Cloud formation anomaly detected during selector synthesis. Pattern recognition failed.",
+    "emotional_weight": 0.75,
+    "tags": [
+      "warbler",
+      "anomaly",
+      "selector",
+      "simple"
+    ],
+    "unix_millis": 1756830609538,
+    "provenance_hash": "b8b691147ef5c4b88e6eb103ecdcbe7b2995a9e9c0fb38719ee778f484555ba8"
+  },
+  {
+    "id": "TLDA-MOCK-023",
+    "source": "Seeder",
+    "text": "Unity 2022.3 compatibility verified across all TLDA components. Upgrade path secured.",
+    "emotional_weight": 0.27,
+    "tags": [
+      "unity",
+      "compatibility",
+      "upgrade",
+      "milestone"
+    ],
+    "unix_millis": 1756830610700,
+    "provenance_hash": "7444887e21e35fca6c34217f0a641720b313c8c760ed81acb2c9ab8b35612382"
+  },
+  {
+    "id": "TLDA-MOCK-024",
+    "source": "Seeder",
+    "text": "Validator failed due to 'Discoveries' vs 'Discovery'. Contributor annotated the breach.",
+    "emotional_weight": 0.79,
+    "tags": [
+      "validator",
+      "scroll-integrity",
+      "ritual"
+    ],
+    "unix_millis": 1756830611633,
+    "provenance_hash": "3b5564fa96039f983c95fab919005e018df07591302b227004e2a08469288634"
+  },
+  {
+    "id": "TLDA-MOCK-025",
+    "source": "Seeder",
+    "text": "Chronicle Keeper automation triggered capsule scroll generation. Archive continuity maintained.",
+    "emotional_weight": 0.5,
+    "tags": [
+      "chronicle",
+      "automation",
+      "capsule",
+      "complex"
+    ],
+    "unix_millis": 1756830612941,
+    "provenance_hash": "7411617876d0213cd08865a1d8423a5b2b7648afe31efd6ab4c9a75befd3f771"
+  },
+  {
+    "id": "TLDA-MOCK-026",
+    "source": "Seeder",
+    "text": "Chronicle Keeper automation triggered capsule scroll generation. Archive continuity maintained.",
+    "emotional_weight": 0.41,
+    "tags": [
+      "chronicle",
+      "automation",
+      "capsule"
+    ],
+    "unix_millis": 1756830613619,
+    "provenance_hash": "7c870d5fbd303aa4ceb14a0ca90044b4585b3ae05995a0877abee90ae6cdfab4"
+  },
+  {
+    "id": "TLDA-MOCK-027",
+    "source": "Seeder",
+    "text": "New faculty member completed TLDA initiation ritual. Scroll access permissions granted.",
+    "emotional_weight": 0.3,
+    "tags": [
+      "faculty",
+      "onboarding",
+      "initiation"
+    ],
+    "unix_millis": 1756830614333,
+    "provenance_hash": "a2e7fbb3198a82ea67054a7d6611550858dbb1efa326d4068af58050683e07a4"
+  },
+  {
+    "id": "TLDA-MOCK-028",
+    "source": "Seeder",
+    "text": "Castle memory nodes reached thermal equilibrium. Room heat distribution stabilized.",
+    "emotional_weight": 0.44,
+    "tags": [
+      "castle",
+      "memory",
+      "thermal",
+      "milestone"
+    ],
+    "unix_millis": 1756830615452,
+    "provenance_hash": "844256b58ebcd18e117dbd8c7517678952b6fc2c315b0d8f254a57de21401088"
+  },
+  {
+    "id": "TLDA-MOCK-029",
+    "source": "Seeder",
+    "text": "Sediment compression created new strata layer. Molten glyphs await evaporation cycle.",
+    "emotional_weight": 0.51,
+    "tags": [
+      "giant",
+      "sediment",
+      "compression",
+      "feature"
+    ],
+    "unix_millis": 1756830616515,
+    "provenance_hash": "82fb67d70039c3f6edabfe429df71de96b389746500aa2b458dbe55c717a2276"
+  },
+  {
+    "id": "TLDA-MOCK-030",
+    "source": "Seeder",
+    "text": "Unity Editor TLDL Scribe Window crashed during markdown rendering. Memory leak suspected.",
+    "emotional_weight": 0.72,
+    "tags": [
+      "unity",
+      "editor",
+      "crash",
+      "routine"
+    ],
+    "unix_millis": 1756830617453,
+    "provenance_hash": "742830e816128fed02fe6280cd480b47501812b3371f6f05799a55d6508cf2fb"
+  },
+  {
+    "id": "TLDA-MOCK-031",
+    "source": "Seeder",
+    "text": "Architectural integrity breach detected in east wing. Emergency sealing protocols engaged.",
+    "emotional_weight": 0.87,
+    "tags": [
+      "castle",
+      "integrity",
+      "emergency"
+    ],
+    "unix_millis": 1756830618465,
+    "provenance_hash": "9e1bedd61d863a645b3f0d4dda26fb30d708c3565787c9149d360b4d37bc7982"
+  },
+  {
+    "id": "TLDA-MOCK-032",
+    "source": "Seeder",
+    "text": "License header injection completed across 247 source files. Copyright notices updated.",
+    "emotional_weight": 0.36,
+    "tags": [
+      "licensing",
+      "headers",
+      "copyright"
+    ],
+    "unix_millis": 1756830619286,
+    "provenance_hash": "c1fb86be7dfc93ed1a01dc3053ee4c8a111439e3bdb35c4f16e5733f4e83e160"
+  },
+  {
+    "id": "TLDA-MOCK-033",
+    "source": "Seeder",
+    "text": "Content addressing collision detected in brick storage. Reference counting updated.",
+    "emotional_weight": 0.6,
+    "tags": [
+      "dtt",
+      "addressing",
+      "collision"
+    ],
+    "unix_millis": 1756830621017,
+    "provenance_hash": "9695f48f1f5877b63bb0bfac3e017bb5cddd57cb9600c3bc15303ca5afff225e"
+  },
+  {
+    "id": "TLDA-MOCK-034",
+    "source": "Seeder",
+    "text": "The Giant stomped a broken refactor. Magma pressure rose. Castle corridor sealed.",
+    "emotional_weight": 0.87,
+    "tags": [
+      "giant",
+      "magma",
+      "castle",
+      "milestone"
+    ],
+    "unix_millis": 1756830621469,
+    "provenance_hash": "b1c0670429c973770d1e0ab95cb327f31836edb1fad7997fc3ae6cce6591d93b"
+  },
+  {
+    "id": "TLDA-MOCK-035",
+    "source": "Seeder",
+    "text": "The Giant stomped a broken refactor. Magma pressure rose. Castle corridor sealed.",
+    "emotional_weight": 0.87,
+    "tags": [
+      "giant",
+      "magma",
+      "castle",
+      "feature"
+    ],
+    "unix_millis": 1756830622389,
+    "provenance_hash": "b74241947267ce7c1bc6c36255a07ec80172e1fa27fec4dbe00fc0ed942edda3"
+  },
+  {
+    "id": "TLDA-MOCK-036",
+    "source": "Seeder",
+    "text": "Monthly TLDL archive generation failed. Decision index population incomplete.",
+    "emotional_weight": 0.72,
+    "tags": [
+      "chronicle",
+      "archive",
+      "generation-failed"
+    ],
+    "unix_millis": 1756830623507,
+    "provenance_hash": "a675a6908d331c4f479311454d7a523707f639ff875bf122dcc118dd160d473a"
+  },
+  {
+    "id": "TLDA-MOCK-037",
+    "source": "Seeder",
+    "text": "Content addressing collision detected in brick storage. Reference counting updated.",
+    "emotional_weight": 0.62,
+    "tags": [
+      "dtt",
+      "addressing",
+      "collision",
+      "refactor"
+    ],
+    "unix_millis": 1756830624098,
+    "provenance_hash": "dcc27ff8b9d86f76b20dc8e0365cb9215b205f64bc24eba6f449d4b9c3365ad3"
+  },
+  {
+    "id": "TLDA-MOCK-038",
+    "source": "Seeder",
+    "text": "Architectural integrity breach detected in east wing. Emergency sealing protocols engaged.",
+    "emotional_weight": 0.88,
+    "tags": [
+      "castle",
+      "integrity",
+      "emergency"
+    ],
+    "unix_millis": 1756830625664,
+    "provenance_hash": "2e5fb62489e95d78973b61ab58476382a83fd1d16f5b6d656ac1451ce6632660"
+  },
+  {
+    "id": "TLDA-MOCK-039",
+    "source": "Seeder",
+    "text": "Senior developer ascended to Oracle status. Wisdom transmission protocols activated.",
+    "emotional_weight": 0.27,
+    "tags": [
+      "faculty",
+      "ascension",
+      "oracle"
+    ],
+    "unix_millis": 1756830627015,
+    "provenance_hash": "a5422126c9d8585cc73552e906cd9cf182ec01f3f1e568cae5a0715effa0489f"
+  },
+  {
+    "id": "TLDA-MOCK-040",
+    "source": "Seeder",
+    "text": "Third-party attribution scanning detected unlicensed code fragment. Removal scheduled.",
+    "emotional_weight": 0.88,
+    "tags": [
+      "licensing",
+      "attribution",
+      "unlicensed",
+      "complex"
+    ],
+    "unix_millis": 1756830627126,
+    "provenance_hash": "34fe3715748d4a071a52282a5e2091e99b07038205617d9130ec9ca7d5973b34"
+  },
+  {
+    "id": "TLDA-MOCK-041",
+    "source": "Seeder",
+    "text": "Local agent detected cognitive overflow event. Sluice activation recommended.",
+    "emotional_weight": 0.55,
+    "tags": [
+      "agents",
+      "cognitive",
+      "overflow"
+    ],
+    "unix_millis": 1756830628174,
+    "provenance_hash": "51aa3d90a90b33b143b264b26e8a7b536666044813bc173b41d8bc3aaab4e72e"
+  },
+  {
+    "id": "TLDA-MOCK-042",
+    "source": "Seeder",
+    "text": "Senior developer ascended to Oracle status. Wisdom transmission protocols activated.",
+    "emotional_weight": 0.27,
+    "tags": [
+      "faculty",
+      "ascension",
+      "oracle"
+    ],
+    "unix_millis": 1756830629497,
+    "provenance_hash": "812f98e2cfcf96ebfc8d7b8afe414b3a29d61e2a40cfdede99effa683b0d87bd"
+  },
+  {
+    "id": "TLDA-MOCK-043",
+    "source": "Seeder",
+    "text": "Image insertion workflow failed during markdown cursor positioning. Manual correction applied.",
+    "emotional_weight": 0.73,
+    "tags": [
+      "unity",
+      "image",
+      "workflow"
+    ],
+    "unix_millis": 1756830630277,
+    "provenance_hash": "45b96278e33e8796938cd333a4ef9a5cb542fdf0551668dd607ccc78eba24928"
+  },
+  {
+    "id": "TLDA-MOCK-044",
+    "source": "Seeder",
+    "text": "Magma store overflow triggered emergency melt budget protocols. Heat dissipation required.",
+    "emotional_weight": 0.83,
+    "tags": [
+      "magma",
+      "overflow",
+      "emergency"
+    ],
+    "unix_millis": 1756830631451,
+    "provenance_hash": "f2c1b204a25c9d35c8ea15878d8db8aae61c8726c6e80e4a57c6e6f1201dc159"
+  },
+  {
+    "id": "TLDA-MOCK-045",
+    "source": "Seeder",
+    "text": "Style bias calibration completed. Mythic weight: 0.8, Technical precision: 0.6.",
+    "emotional_weight": 0.45,
+    "tags": [
+      "warbler",
+      "style-bias",
+      "calibration"
+    ],
+    "unix_millis": 1756830632433,
+    "provenance_hash": "1aa1bb64839cbfacdc35c44aaae0fc12e3a8ae70502ebc08859285442e341762"
+  },
+  {
+    "id": "TLDA-MOCK-046",
+    "source": "Seeder",
+    "text": "Unity 2022.3 compatibility verified across all TLDA components. Upgrade path secured.",
+    "emotional_weight": 0.27,
+    "tags": [
+      "unity",
+      "compatibility",
+      "upgrade"
+    ],
+    "unix_millis": 1756830633997,
+    "provenance_hash": "8804f9de68d71024f3629f74de05e699273eba602de5cae7808efedc95beb757"
+  },
+  {
+    "id": "TLDA-MOCK-047",
+    "source": "Seeder",
+    "text": "Assembly definition validation passed for LivingDevAgent.Runtime. Package integrity confirmed.",
+    "emotional_weight": 0.42,
+    "tags": [
+      "unity",
+      "assembly",
+      "validation"
+    ],
+    "unix_millis": 1756830634484,
+    "provenance_hash": "afe34cecfbc8229831eb12c2b57aa4271381e981bec32010521557fc0e02f9fa"
+  },
+  {
+    "id": "TLDA-MOCK-048",
+    "source": "Seeder",
+    "text": "Agent telemetry showed 127% efficiency gain after Chronicle Keeper integration.",
+    "emotional_weight": 0.26,
+    "tags": [
+      "agents",
+      "telemetry",
+      "efficiency",
+      "simple"
+    ],
+    "unix_millis": 1756830635528,
+    "provenance_hash": "4c54b32d55abd436e16849dedbecf6264e62a857ee62b70d70f32e8609ce9d24"
+  },
+  {
+    "id": "TLDA-MOCK-049",
+    "source": "Seeder",
+    "text": "Chronicle Keeper experienced temporal paradox during timestamp reconciliation.",
+    "emotional_weight": 0.8,
+    "tags": [
+      "chronicle",
+      "temporal",
+      "paradox"
+    ],
+    "unix_millis": 1756830636890,
+    "provenance_hash": "0c50ec6e438d406d08729390a0f1c0a3bf3619355a253d89ee6523077490d96c"
+  },
+  {
+    "id": "TLDA-MOCK-050",
+    "source": "Seeder",
+    "text": "Unity Editor TLDL Scribe Window crashed during markdown rendering. Memory leak suspected.",
+    "emotional_weight": 0.73,
+    "tags": [
+      "unity",
+      "editor",
+      "crash"
+    ],
+    "unix_millis": 1756830637854,
+    "provenance_hash": "451aae53c900d2734f93af4d0cf85d13e9eaecdab02223023703c39a5ee0e0e1"
+  },
+  {
+    "id": "TLDA-MOCK-051",
+    "source": "Seeder",
+    "text": "Architectural integrity breach detected in east wing. Emergency sealing protocols engaged.",
+    "emotional_weight": 0.82,
+    "tags": [
+      "castle",
+      "integrity",
+      "emergency",
+      "urgent"
+    ],
+    "unix_millis": 1756830638394,
+    "provenance_hash": "a0b63b3b884a149008d6e3a49a850afee38a26099b21400ddfb7ace328ee4cb7"
+  },
+  {
+    "id": "TLDA-MOCK-052",
+    "source": "Seeder",
+    "text": "Local agent detected cognitive overflow event. Sluice activation recommended.",
+    "emotional_weight": 0.7,
+    "tags": [
+      "agents",
+      "cognitive",
+      "overflow",
+      "complex"
+    ],
+    "unix_millis": 1756830639777,
+    "provenance_hash": "7b648ff9ed0b5d588d4b4e6cf459f25e9a68a3e1369e49f068ec038b6fe9834d"
+  },
+  {
+    "id": "TLDA-MOCK-053",
+    "source": "Seeder",
+    "text": "Open source doctrine validation passed. MIT license terms properly preserved.",
+    "emotional_weight": 0.3,
+    "tags": [
+      "licensing",
+      "doctrine",
+      "mit"
+    ],
+    "unix_millis": 1756830640555,
+    "provenance_hash": "921bf5ecef7d02e3a215e52756ec324e225b1b4de04c6a5c7161ba2b6dcfe807"
+  },
+  {
+    "id": "TLDA-MOCK-054",
+    "source": "Seeder",
+    "text": "Giant compressor processed 47 fragments into 3 clusters. Tetrino slam successful.",
+    "emotional_weight": 0.7,
+    "tags": [
+      "giant",
+      "compression",
+      "tetrino-slam"
+    ],
+    "unix_millis": 1756830641688,
+    "provenance_hash": "e85ae5b709965c36f797044ec525089844f1670bc9399a9ffc98526245630c7c"
+  },
+  {
+    "id": "TLDA-MOCK-055",
+    "source": "Seeder",
+    "text": "Section naming validator triggered on 'Discoveries' plural form. Manual correction required.",
+    "emotional_weight": 0.63,
+    "tags": [
+      "validator",
+      "naming",
+      "manual-fix"
+    ],
+    "unix_millis": 1756830642714,
+    "provenance_hash": "81af2e43243e59ae8b3f8283cfc16ece9d209b305ebe02a44774f16683f47833"
+  },
+  {
+    "id": "TLDA-MOCK-056",
+    "source": "Seeder",
+    "text": "Chronicle Keeper experienced temporal paradox during timestamp reconciliation.",
+    "emotional_weight": 0.83,
+    "tags": [
+      "chronicle",
+      "temporal",
+      "paradox"
+    ],
+    "unix_millis": 1756830643323,
+    "provenance_hash": "5bc731486905ca45b00d7ef38223c565fc03dc3edbb39a57c7ca0e02307a42e4"
+  },
+  {
+    "id": "TLDA-MOCK-057",
+    "source": "Seeder",
+    "text": "Mist line generation produced 47 ephemeral knowledge fragments. Castle infusion pending.",
+    "emotional_weight": 0.47,
+    "tags": [
+      "warbler",
+      "mist-lines",
+      "knowledge"
+    ],
+    "unix_millis": 1756830644735,
+    "provenance_hash": "d8d5cac4133af3fc07da435f9d1da0faf01d7d9b1b95e1b50232cf09a7d05056"
+  },
+  {
+    "id": "TLDA-MOCK-058",
+    "source": "Seeder",
+    "text": "Unity Editor TLDL Scribe Window crashed during markdown rendering. Memory leak suspected.",
+    "emotional_weight": 0.77,
+    "tags": [
+      "unity",
+      "editor",
+      "crash",
+      "complex"
+    ],
+    "unix_millis": 1756830646038,
+    "provenance_hash": "71fefb66be80cdcf47bc8f22b70909651c7a6225e115c982acb885a7edea306e"
+  },
+  {
+    "id": "TLDA-MOCK-059",
+    "source": "Seeder",
+    "text": "Chronicle Keeper automation triggered capsule scroll generation. Archive continuity maintained.",
+    "emotional_weight": 0.47,
+    "tags": [
+      "chronicle",
+      "automation",
+      "capsule",
+      "refactor"
+    ],
+    "unix_millis": 1756830646794,
+    "provenance_hash": "bc2be8c09525ad6436d7a3febb2d4aacc7f846235948f49ad61c8718eb38ab52"
+  },
+  {
+    "id": "TLDA-MOCK-060",
+    "source": "Seeder",
+    "text": "Agent telemetry showed 127% efficiency gain after Chronicle Keeper integration.",
+    "emotional_weight": 0.23,
+    "tags": [
+      "agents",
+      "telemetry",
+      "efficiency"
+    ],
+    "unix_millis": 1756830647171,
+    "provenance_hash": "19f1db5c14ba93afdf995369f5f117fd0b6c785231921197ff2c9e361362c70e"
+  },
+  {
+    "id": "TLDA-MOCK-061",
+    "source": "Seeder",
+    "text": "TLDL symbolic linter caught parse errors in Python files. Expected behavior confirmed.",
+    "emotional_weight": 0.53,
+    "tags": [
+      "validator",
+      "symbolic-linter",
+      "expected"
+    ],
+    "unix_millis": 1756830648771,
+    "provenance_hash": "11250a51b03303a4cc4e354b66b67d55e3f2844b33ddc07f1ed3cd6b0e3120b5"
+  },
+  {
+    "id": "TLDA-MOCK-062",
+    "source": "Seeder",
+    "text": "TLDL symbolic linter caught parse errors in Python files. Expected behavior confirmed.",
+    "emotional_weight": 0.49,
+    "tags": [
+      "validator",
+      "symbolic-linter",
+      "expected"
+    ],
+    "unix_millis": 1756830649984,
+    "provenance_hash": "2cce4bd43464a91933531cfae4255bd22bc81b1af20bb260fa7a79364495a81c"
+  },
+  {
+    "id": "TLDA-MOCK-063",
+    "source": "Seeder",
+    "text": "Molten glyph retirement ceremony completed. Ancient knowledge preserved in liquid form.",
+    "emotional_weight": 0.4,
+    "tags": [
+      "magma",
+      "retirement",
+      "preservation"
+    ],
+    "unix_millis": 1756830650803,
+    "provenance_hash": "bf276612318fdeb356cbf3239569ed426f5218143826e543dfa31109e7dbd003"
+  },
+  {
+    "id": "TLDA-MOCK-064",
+    "source": "Seeder",
+    "text": "Warbler cloud humidity reached critical threshold. Evaporation cycle acceleration required.",
+    "emotional_weight": 0.69,
+    "tags": [
+      "warbler",
+      "humidity",
+      "critical"
+    ],
+    "unix_millis": 1756830651264,
+    "provenance_hash": "e046349397d8b78d3c6e9cf32d185b6e222bdc5db9b8fe7ba55051c5c3725227"
+  },
+  {
+    "id": "TLDA-MOCK-065",
+    "source": "Seeder",
+    "text": "Pet evolution triggered by significant IDEA charter milestone. New abilities unlocked.",
+    "emotional_weight": 0.41,
+    "tags": [
+      "pets",
+      "evolution",
+      "idea-charter"
+    ],
+    "unix_millis": 1756830652787,
+    "provenance_hash": "90e1723e86e45ef7e7a1e268c5140d0868e4eb5afaf582071189da4e923988d2"
+  },
+  {
+    "id": "TLDA-MOCK-066",
+    "source": "Seeder",
+    "text": "Contributor license agreement verification failed. Signature authenticity questioned.",
+    "emotional_weight": 0.71,
+    "tags": [
+      "licensing",
+      "cla",
+      "verification"
+    ],
+    "unix_millis": 1756830653838,
+    "provenance_hash": "0b2b9f8716ca1f865f7ee0133d1567078b62e1bbea03f8344af4766f7d481f8a"
+  },
+  {
+    "id": "TLDA-MOCK-067",
+    "source": "Seeder",
+    "text": "Open source doctrine validation passed. MIT license terms properly preserved.",
+    "emotional_weight": 0.25,
+    "tags": [
+      "licensing",
+      "doctrine",
+      "mit"
+    ],
+    "unix_millis": 1756830654954,
+    "provenance_hash": "4b9015bc62f3a09528a38bc9b74afac6a4954553d98b8e22df3357b3f4c3bc73"
+  },
+  {
+    "id": "TLDA-MOCK-068",
+    "source": "Seeder",
+    "text": "Layer promotion ceremony elevated 23 snapshots to cold storage. Archive depth increased.",
+    "emotional_weight": 0.38,
+    "tags": [
+      "dtt",
+      "promotion",
+      "cold-storage"
+    ],
+    "unix_millis": 1756830655229,
+    "provenance_hash": "4822b2d0add76c161755841f158c9b4f702b8671e8377dfa0153aefe7e17460e"
+  },
+  {
+    "id": "TLDA-MOCK-069",
+    "source": "Seeder",
+    "text": "Third-party attribution scanning detected unlicensed code fragment. Removal scheduled.",
+    "emotional_weight": 0.89,
+    "tags": [
+      "licensing",
+      "attribution",
+      "unlicensed",
+      "urgent"
+    ],
+    "unix_millis": 1756830656267,
+    "provenance_hash": "ff65b56adb8caafe69d22c6b8036aee1f70d1521a3b596fe27437205bea7bfac"
+  },
+  {
+    "id": "TLDA-MOCK-070",
+    "source": "Seeder",
+    "text": "Layer promotion ceremony elevated 23 snapshots to cold storage. Archive depth increased.",
+    "emotional_weight": 0.48,
+    "tags": [
+      "dtt",
+      "promotion",
+      "cold-storage",
+      "bugfix"
+    ],
+    "unix_millis": 1756830657303,
+    "provenance_hash": "3beb3f5dd30236a60e0d60fc8850ec72e330d5ee9dec7b9a7e80e1651680c6a7"
+  },
+  {
+    "id": "TLDA-MOCK-071",
+    "source": "Seeder",
+    "text": "Chronicle Keeper automation triggered capsule scroll generation. Archive continuity maintained.",
+    "emotional_weight": 0.34,
+    "tags": [
+      "chronicle",
+      "automation",
+      "capsule"
+    ],
+    "unix_millis": 1756830658635,
+    "provenance_hash": "cf9838f543c987d307ba2682104c38f24b0fe36cbf24cb333da8532bdd07874a"
+  },
+  {
+    "id": "TLDA-MOCK-072",
+    "source": "Seeder",
+    "text": "Evaporation engine achieved 94% efficiency rating. Thermal optimization successful.",
+    "emotional_weight": 0.3,
+    "tags": [
+      "warbler",
+      "evaporation",
+      "optimization"
+    ],
+    "unix_millis": 1756830659375,
+    "provenance_hash": "f6f668e8ab1b1f057d385b3e96d8400dea3620b04f1741ea0b5173a4c04e08ec"
+  },
+  {
+    "id": "TLDA-MOCK-073",
+    "source": "Seeder",
+    "text": "Faculty orientation failed at badge verification stage. Cryptographic signature mismatch.",
+    "emotional_weight": 0.77,
+    "tags": [
+      "faculty",
+      "orientation",
+      "verification-failed"
+    ],
+    "unix_millis": 1756830660359,
+    "provenance_hash": "2a193e9439cc9886186c996e0e582bcf0ae803ef35db6fae56e9624078cad08f"
+  },
+  {
+    "id": "TLDA-MOCK-074",
+    "source": "Seeder",
+    "text": "Chronicle Keeper automation triggered capsule scroll generation. Archive continuity maintained.",
+    "emotional_weight": 0.42,
+    "tags": [
+      "chronicle",
+      "automation",
+      "capsule",
+      "routine"
+    ],
+    "unix_millis": 1756830661206,
+    "provenance_hash": "d1c7c8742d5be3da1a3ad5728b53805115b9df367439d2fd8be4a2e52ab2760f"
+  },
+  {
+    "id": "TLDA-MOCK-075",
+    "source": "Seeder",
+    "text": "Licensing compliance audit revealed 3 dependency violations. Legal review initiated.",
+    "emotional_weight": 0.76,
+    "tags": [
+      "licensing",
+      "compliance",
+      "violations"
+    ],
+    "unix_millis": 1756830662751,
+    "provenance_hash": "198df153ee012bcf5b45e93d5058efc290751c374148f9eaa77af833d85faca2"
+  },
+  {
+    "id": "TLDA-MOCK-076",
+    "source": "Seeder",
+    "text": "Validator failed due to 'Discoveries' vs 'Discovery'. Contributor annotated the breach.",
+    "emotional_weight": 0.77,
+    "tags": [
+      "validator",
+      "scroll-integrity",
+      "ritual"
+    ],
+    "unix_millis": 1756830663911,
+    "provenance_hash": "0ee0eddfd1c76a9c2ded902acc09fc9491afe560405287a694011cac211964d2"
+  },
+  {
+    "id": "TLDA-MOCK-077",
+    "source": "Seeder",
+    "text": "DTT Vault brick layer compaction initiated. Tetrino slam algorithm engaged.",
+    "emotional_weight": 0.55,
+    "tags": [
+      "dtt",
+      "vault",
+      "compaction"
+    ],
+    "unix_millis": 1756830664628,
+    "provenance_hash": "cfbcde271f524ddc30ce2f0c1f9cd0b43c4dfdc48ceb16abf4e57e9384bab13c"
+  },
+  {
+    "id": "TLDA-MOCK-078",
+    "source": "Seeder",
+    "text": "The Giant stomped a broken refactor. Magma pressure rose. Castle corridor sealed.",
+    "emotional_weight": 0.9,
+    "tags": [
+      "giant",
+      "magma",
+      "castle"
+    ],
+    "unix_millis": 1756830665706,
+    "provenance_hash": "373b9ffac9c8258ebed210663c5c3b6128dfe4b5c6bc6708d541ab457745eb2e"
+  },
+  {
+    "id": "TLDA-MOCK-079",
+    "source": "Seeder",
+    "text": "Lore integration detected semantic drift in knowledge artifacts. Recalibration scheduled.",
+    "emotional_weight": 0.57,
+    "tags": [
+      "chronicle",
+      "lore",
+      "semantic-drift"
+    ],
+    "unix_millis": 1756830666728,
+    "provenance_hash": "a0b776bade86f368ee52b44a5c80a49c0b49e0a1e1f34be312af19f5b2de0beb"
+  },
+  {
+    "id": "TLDA-MOCK-080",
+    "source": "Seeder",
+    "text": "Badge pet system registered new sponsor. Cryptographic verification completed successfully.",
+    "emotional_weight": 0.35,
+    "tags": [
+      "pets",
+      "badge",
+      "sponsor",
+      "milestone"
+    ],
+    "unix_millis": 1756830668054,
+    "provenance_hash": "7fdf923f87dfa949fbb87ae13053ef8ed3c534a6f18a907a75913932d5a9faac"
+  },
+  {
+    "id": "TLDA-MOCK-081",
+    "source": "Seeder",
+    "text": "Magma store overflow triggered emergency melt budget protocols. Heat dissipation required.",
+    "emotional_weight": 0.73,
+    "tags": [
+      "magma",
+      "overflow",
+      "emergency"
+    ],
+    "unix_millis": 1756830668099,
+    "provenance_hash": "10fae28726056c828c685edd908e0bfcb7a5d70afcd374d99aa4e2cc1a0dce23"
+  },
+  {
+    "id": "TLDA-MOCK-082",
+    "source": "Seeder",
+    "text": "New faculty member completed TLDA initiation ritual. Scroll access permissions granted.",
+    "emotional_weight": 0.32,
+    "tags": [
+      "faculty",
+      "onboarding",
+      "initiation"
+    ],
+    "unix_millis": 1756830669482,
+    "provenance_hash": "f1300c8d32954c31931df705b1b239b235e412bc9f6bc0a2628138ceacc7c046"
+  },
+  {
+    "id": "TLDA-MOCK-083",
+    "source": "Seeder",
+    "text": "Unity 2022.3 compatibility verified across all TLDA components. Upgrade path secured.",
+    "emotional_weight": 0.4,
+    "tags": [
+      "unity",
+      "compatibility",
+      "upgrade",
+      "complex"
+    ],
+    "unix_millis": 1756830670217,
+    "provenance_hash": "a200c1ccd87e4598468ead94a585d9d24f275088b8bb0fd6400a2a72138a158c"
+  },
+  {
+    "id": "TLDA-MOCK-084",
+    "source": "Seeder",
+    "text": "Giant compressor processed 47 fragments into 3 clusters. Tetrino slam successful.",
+    "emotional_weight": 0.5,
+    "tags": [
+      "giant",
+      "compression",
+      "tetrino-slam",
+      "milestone"
+    ],
+    "unix_millis": 1756830671365,
+    "provenance_hash": "ba9eae00d142ea99a248b449dfd96d1b5338f43bc8e9646a2ca4645544fe8568"
+  },
+  {
+    "id": "TLDA-MOCK-085",
+    "source": "Seeder",
+    "text": "Senior developer ascended to Oracle status. Wisdom transmission protocols activated.",
+    "emotional_weight": 0.27,
+    "tags": [
+      "faculty",
+      "ascension",
+      "oracle",
+      "simple"
+    ],
+    "unix_millis": 1756830672924,
+    "provenance_hash": "5ecb6a957e1915bd88e9c2818ffdecb9f74abf12f8e99bac3c71e2f17a63e7df"
+  },
+  {
+    "id": "TLDA-MOCK-086",
+    "source": "Seeder",
+    "text": "Senior developer ascended to Oracle status. Wisdom transmission protocols activated.",
+    "emotional_weight": 0.35,
+    "tags": [
+      "faculty",
+      "ascension",
+      "oracle",
+      "milestone"
+    ],
+    "unix_millis": 1756830673178,
+    "provenance_hash": "870cbb71a7829b0f704dfc107131bc01bd8d84fbff5d9e3b35d787e373648d75"
+  },
+  {
+    "id": "TLDA-MOCK-087",
+    "source": "Seeder",
+    "text": "Badge pet system registered new sponsor. Cryptographic verification completed successfully.",
+    "emotional_weight": 0.38,
+    "tags": [
+      "pets",
+      "badge",
+      "sponsor"
+    ],
+    "unix_millis": 1756830674907,
+    "provenance_hash": "b47defb27ea19f24c9e77a82f2a7af4f8668e17646bc5b94b6dde6e2c21525b3"
+  },
+  {
+    "id": "TLDA-MOCK-088",
+    "source": "Seeder",
+    "text": "Image insertion workflow failed during markdown cursor positioning. Manual correction applied.",
+    "emotional_weight": 0.75,
+    "tags": [
+      "unity",
+      "image",
+      "workflow",
+      "complex"
+    ],
+    "unix_millis": 1756830675176,
+    "provenance_hash": "2abc853f78bde2c31fa35fc62530d7ea55b8b3f639145264ac964d94b90e6eb4"
+  },
+  {
+    "id": "TLDA-MOCK-089",
+    "source": "Seeder",
+    "text": "Castle's top rooms rotated based on heat metrics. Knowledge access patterns shifted.",
+    "emotional_weight": 0.67,
+    "tags": [
+      "castle",
+      "rotation",
+      "heat-metrics"
+    ],
+    "unix_millis": 1756830676591,
+    "provenance_hash": "e05a8c6a20d055a6ff50b9d3bb10d4054ce692ced1259185068ec79a4aee891e"
+  },
+  {
+    "id": "TLDA-MOCK-090",
+    "source": "Seeder",
+    "text": "Chronicle Keeper automation triggered capsule scroll generation. Archive continuity maintained.",
+    "emotional_weight": 0.42,
+    "tags": [
+      "chronicle",
+      "automation",
+      "capsule"
+    ],
+    "unix_millis": 1756830677102,
+    "provenance_hash": "cabc0e69a7fe6fe0c3bfb0b200e406fde66ea670c690573684eeb83529325a1c"
+  },
+  {
+    "id": "TLDA-MOCK-091",
+    "source": "Seeder",
+    "text": "Sediment compression created new strata layer. Molten glyphs await evaporation cycle.",
+    "emotional_weight": 0.54,
+    "tags": [
+      "giant",
+      "sediment",
+      "compression",
+      "routine"
+    ],
+    "unix_millis": 1756830678331,
+    "provenance_hash": "2a0fbaedae5991aa104cd3d51c667077a16ad2f9b31f2727c8dc07492ab84ee0"
+  },
+  {
+    "id": "TLDA-MOCK-092",
+    "source": "Seeder",
+    "text": "Architectural integrity breach detected in east wing. Emergency sealing protocols engaged.",
+    "emotional_weight": 0.82,
+    "tags": [
+      "castle",
+      "integrity",
+      "emergency"
+    ],
+    "unix_millis": 1756830679642,
+    "provenance_hash": "b8e7dce5e586ba0a3690b7ad3777f41b4b209a49087f9758d67bd05c1791d2c6"
+  },
+  {
+    "id": "TLDA-MOCK-093",
+    "source": "Seeder",
+    "text": "Cloud formation anomaly detected during selector synthesis. Pattern recognition failed.",
+    "emotional_weight": 0.88,
+    "tags": [
+      "warbler",
+      "anomaly",
+      "selector"
+    ],
+    "unix_millis": 1756830680796,
+    "provenance_hash": "ad5c1ae129c109ed1062c0bdc311a92bcdc811c6e06dda6726da3ec39425c925"
+  },
+  {
+    "id": "TLDA-MOCK-094",
+    "source": "Seeder",
+    "text": "Onboarding wizard crashed during Unity package installation. Manual intervention required.",
+    "emotional_weight": 0.75,
+    "tags": [
+      "faculty",
+      "wizard",
+      "unity-crash",
+      "complex"
+    ],
+    "unix_millis": 1756830681793,
+    "provenance_hash": "5201d0f0c73884e44a833568dc69680ae8d50bbee93e307d43548e69f1c92d20"
+  },
+  {
+    "id": "TLDA-MOCK-095",
+    "source": "Seeder",
+    "text": "Pet evolution triggered by significant IDEA charter milestone. New abilities unlocked.",
+    "emotional_weight": 0.35,
+    "tags": [
+      "pets",
+      "evolution",
+      "idea-charter",
+      "feature"
+    ],
+    "unix_millis": 1756830682717,
+    "provenance_hash": "b72914bd3fb8e79aa80339965b7d35687534cc4d1decde2faf8f36748d86c03f"
+  },
+  {
+    "id": "TLDA-MOCK-096",
+    "source": "Seeder",
+    "text": "Castle memory nodes reached thermal equilibrium. Room heat distribution stabilized.",
+    "emotional_weight": 0.43,
+    "tags": [
+      "castle",
+      "memory",
+      "thermal"
+    ],
+    "unix_millis": 1756830683200,
+    "provenance_hash": "fa2840fcbc7bd2d1c0c1322cdae48567c8259d43c25d7c450e0cbe9fbd4699c8"
+  },
+  {
+    "id": "TLDA-MOCK-097",
+    "source": "Seeder",
+    "text": "Warbler cloud humidity reached critical threshold. Evaporation cycle acceleration required.",
+    "emotional_weight": 0.66,
+    "tags": [
+      "warbler",
+      "humidity",
+      "critical"
+    ],
+    "unix_millis": 1756830684117,
+    "provenance_hash": "8630cd94f8fa12520bf9807cab21e70a87860abfe937973656e2a9878ca2da97"
+  },
+  {
+    "id": "TLDA-MOCK-098",
+    "source": "Seeder",
+    "text": "TLDL symbolic linter caught parse errors in Python files. Expected behavior confirmed.",
+    "emotional_weight": 0.59,
+    "tags": [
+      "validator",
+      "symbolic-linter",
+      "expected"
+    ],
+    "unix_millis": 1756830685744,
+    "provenance_hash": "117706aab8bba3bee41c1b8316188b649315d25d8aade910d534aad617493781"
+  },
+  {
+    "id": "TLDA-MOCK-099",
+    "source": "Seeder",
+    "text": "Monthly TLDL archive generation failed. Decision index population incomplete.",
+    "emotional_weight": 0.77,
+    "tags": [
+      "chronicle",
+      "archive",
+      "generation-failed"
+    ],
+    "unix_millis": 1756830686566,
+    "provenance_hash": "fb61ca7124d249e9630d1fde105be5fb7d17d0c822a56b82c44b12269de0734c"
+  },
+  {
+    "id": "TLDA-MOCK-100",
+    "source": "Seeder",
+    "text": "Onboarding wizard crashed during Unity package installation. Manual intervention required.",
+    "emotional_weight": 0.7,
+    "tags": [
+      "faculty",
+      "wizard",
+      "unity-crash"
+    ],
+    "unix_millis": 1756830687470,
+    "provenance_hash": "c811a5f7741c3f160854889c5b251dbeecb25103399702817469d7f2bf934096"
+  }
+]

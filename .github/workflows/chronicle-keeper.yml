@@ -22,8 +22,8 @@ jobs:
     name: Chronicle Keeper - Why the Scribe Slumbers
     # Only run when Chronicle Keeper would be skipped
     if: >
-      !((github.event_name == 'issues' && (contains(github.event.issue.title, '🧠') || contains(github.event.issue.title, '🧠📜'))) ||
-      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, 'TLDL:') || contains(github.event.comment.body, '📜') || contains(github.event.comment.body, 'chronicle') || contains(github.event.comment.body, 'lore'))) ||
+      !((github.event_name == 'issues' && (contains(github.event.issue.title, '🧠') || contains(github.event.issue.title, '🧠📜') || contains(github.event.issue.title, '💸'))) ||
+      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, 'TLDL:') || contains(github.event.comment.body, '📜') || contains(github.event.comment.body, 'chronicle') || contains(github.event.comment.body, 'lore') || contains(github.event.comment.body, '💸'))) ||
       (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success') ||
       (github.event_name == 'workflow_dispatch') ||
@@ -38,7 +38,8 @@ jobs:
           echo "⚡ This mystical scribe only awakens for truly lore-worthy events:"
           echo ""
           echo "🧠 Brain Emoji Issues: '${{ github.event_name }}' ≠ issues with 🧠"
-          echo "💬 Lore Comments: No sacred keywords detected (TLDL:, 📜, chronicle, lore)" 
+          echo "💸 XP Refactoring Issues: '${{ github.event_name }}' ≠ issues with 💸"
+          echo "💬 Lore Comments: No sacred keywords detected (TLDL:, 📜, chronicle, lore, 💸)" 
           echo "🔀 Merged PRs: '${{ github.event_name }}' ≠ merged pull_request"
           echo "💥 Failed Workflows: '${{ github.event_name }}' ≠ failed workflow_run"
           echo ""
@@ -54,8 +55,8 @@ jobs:
     name: Chronicle Keeper - Preserve the Lore
     # Run for lore-worthy events or manual dispatch
     if: >
-      (github.event_name == 'issues' && (contains(github.event.issue.title, '🧠') || contains(github.event.issue.title, '🧠📜'))) ||
-      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, 'TLDL:') || contains(github.event.comment.body, '📜') || contains(github.event.comment.body, 'chronicle') || contains(github.event.comment.body, 'lore'))) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.title, '🧠') || contains(github.event.issue.title, '🧠📜') || contains(github.event.issue.title, '💸'))) ||
+      (github.event_name == 'issue_comment' && (contains(github.event.comment.body, 'TLDL:') || contains(github.event.comment.body, '📜') || contains(github.event.comment.body, 'chronicle') || contains(github.event.comment.body, 'lore') || contains(github.event.comment.body, '💸'))) ||
       (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true) ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success') ||
       (github.event_name == 'workflow_dispatch') ||
@@ -63,29 +64,21 @@ jobs:
     
     steps:
       - name: 🧙‍♂️ Summon the Repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
+        uses: actions/checkout@v5
         with:
           # Need write access to create TLDL entries
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: 🐍 Prepare the Scrolls (Setup Python)
-        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: '3.11'
 
       - name: 🟢 Prepare the Chronicles (Setup Node.js)
-        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398 # v4
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-
-      # ⚡ Cache NPM dependencies for faster installs (Phase 3 optimization)
-      - name: Cache NPM dependencies
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ hashFiles('package.json', 'package-lock.json') }}
-          restore-keys: npm-${{ runner.os }}-
 
       - name: 📦 Gather Dependencies  
         run: |
@@ -105,8 +98,36 @@ jobs:
           echo "🕒 Adding startup buffer for MCP server stability..."
           sleep 2
 
+      - name: 🕐 Chronicle Keeper Cooldown Check
+        id: cooldown_check
+        if: github.event_name == 'issue_comment'
+        run: |
+          echo "🕐 Checking Chronicle Keeper cooldown protection..."
+          
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          EVENT_NAME="${{ github.event_name }}"
+          
+          # Check cooldown to prevent loops
+          cd scripts/chronicle-keeper
+          
+          COOLDOWN_EXIT_CODE=0
+          node cooldown-check.js --issue="$ISSUE_NUMBER" --event="$EVENT_NAME" --comment="$COMMENT_BODY" || COOLDOWN_EXIT_CODE=$?
+          
+          if [ $COOLDOWN_EXIT_CODE -eq 42 ]; then
+            echo "cooldown_active=true" >> $GITHUB_OUTPUT
+            echo "🚫 Chronicle Keeper in cooldown, skipping execution to prevent loops"
+          elif [ $COOLDOWN_EXIT_CODE -eq 0 ]; then
+            echo "cooldown_active=false" >> $GITHUB_OUTPUT
+            echo "✅ No cooldown active, proceeding with Chronicle Keeper"
+          else
+            echo "cooldown_active=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Cooldown check had issues but proceeding (exit code: $COOLDOWN_EXIT_CODE)"
+          fi
+
       - name: 🔍 Chronicle Keeper Analysis
         id: parse-content
+        if: steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           set -Eeuo pipefail
           trap 'echo "💥 Script failure near line $LINENO"' ERR
@@ -287,7 +308,7 @@ jobs:
 
       - name: 🧪 Chronicle Keeper Parsing
         id: scribe-parse
-        if: steps.parse-content.outputs.content-type != 'null'
+        if: steps.parse-content.outputs.content-type != 'null' && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           # Test the scribe parser with actual content
           echo "🔍 Running Chronicle Keeper parser..."
@@ -333,6 +354,15 @@ jobs:
               // Write result for next step
               fs.writeFileSync('/tmp/parsed-content.json', JSON.stringify(result, null, 2));
               process.exit(0);
+            } else if (result && result.rff_message) {
+              console.log('📋 Content rejected - RFF Protocol activated');
+              console.log('📊 Parse stats:', JSON.stringify(parser.getStats()));
+              
+              // Write RFF message for posting
+              fs.writeFileSync('/tmp/rff-message.json', JSON.stringify(result.rff_message, null, 2));
+              
+              // Signal that RFF should be posted instead of TLDL generation
+              process.exit(79); // RFF required
             } else {
               console.log('ℹ️ Content not lore-worthy, skipping TLDL generation');
               process.exit(78); // Skip remaining steps
@@ -344,15 +374,49 @@ jobs:
           EOF
           
           # Run the parser          
-          if node test-parse.js; then
+          PARSER_EXIT_CODE=0
+          node test-parse.js || PARSER_EXIT_CODE=$?
+          
+          if [ $PARSER_EXIT_CODE -eq 0 ]; then
             echo "parse-success=true" >> $GITHUB_OUTPUT
+            echo "rff-required=false" >> $GITHUB_OUTPUT
+          elif [ $PARSER_EXIT_CODE -eq 79 ]; then
+            echo "parse-success=false" >> $GITHUB_OUTPUT
+            echo "rff-required=true" >> $GITHUB_OUTPUT
+            echo "📋 RFF Protocol activated - content needs formatting guidance"
           else
             echo "parse-success=false" >> $GITHUB_OUTPUT
+            echo "rff-required=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📋 Post RFF Message
+        id: post-rff
+        if: steps.scribe-parse.outputs.rff-required == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
+        run: |
+          echo "📋 Posting Request-for-Format message..."
+          
+          # Read the RFF message
+          if [[ -f /tmp/rff-message.json ]]; then
+            cat /tmp/rff-message.json | jq .
+            
+            # For now, just log the RFF message
+            # In a full implementation, this would post as a comment or create an issue
+            echo "🧙‍♂️ RFF Protocol Message Generated:"
+            echo "$(cat /tmp/rff-message.json | jq -r '.resubmissionPrompt')"
+            echo ""
+            echo "📜 Keeper Quote:"
+            echo "$(cat /tmp/rff-message.json | jq -r '.keeperQuote')"
+            
+            # Save RFF for potential artifact upload
+            echo "rff-posted=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ No RFF message found"
+            echo "rff-posted=false" >> $GITHUB_OUTPUT
           fi
 
       - name: 📜 Generate TLDL Scroll
         id: generate-scroll
-        if: steps.scribe-parse.outputs.parse-success == 'true'
+        if: steps.scribe-parse.outputs.parse-success == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           echo "📜 Generating TLDL scroll..."
           
@@ -392,7 +456,7 @@ jobs:
 
       - name: 🧠📜 Generate Capsule Scroll (Archive Wall Detection)
         id: generate-capsule-scroll
-        if: steps.generate-scroll.outputs.scroll-generated == 'true' && contains(github.event.issue.title, '🧠📜')
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' && contains(github.event.issue.title, '🧠📜') && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           echo "🧠📜 Archive Wall detected! Generating Capsule Scroll..."
           
@@ -464,7 +528,7 @@ jobs:
           echo "capsule-generated=true" >> $GITHUB_OUTPUT
 
       - name: ✍️ Write TLDL Entry
-        if: steps.generate-scroll.outputs.scroll-generated == 'true'
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           echo "✍️ Writing TLDL entry to chronicle..."
           
@@ -481,7 +545,7 @@ jobs:
       # Links: Backward/forward to previous/next ledger to maintain unbroken chain.
       - name: 📓 Generate Daily Ledger Entry
         id: generate-daily-ledger
-        if: steps.generate-scroll.outputs.scroll-generated == 'true'
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           echo "📓 Generating Daily Ledger entry..."
           
@@ -591,7 +655,7 @@ jobs:
           fi
 
       - name: 🛡️ Validate TLDL Chronicle
-        if: steps.generate-scroll.outputs.scroll-generated == 'true'
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           echo "🛡️ Validating TLDL chronicle..."
           
@@ -600,7 +664,7 @@ jobs:
           
           # Run existing validation if available
           if [[ -f src/SymbolicLinter/validate_docs.py ]]; then
-            python3 src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/ --config-path docs/ || echo "⚠️ Some validation issues detected"
+            python3 src/SymbolicLinter/validate_docs.py --tldl-path TLDL/ || echo "⚠️ Some validation issues detected"
           fi
           
           # 🔒 Validate MCP configuration for security compliance (addresses issue #50)
@@ -609,9 +673,103 @@ jobs:
             python3 scripts/validate_mcp_config.py || echo "⚠️ MCP configuration issues detected"
           fi
 
+      - name: 💸 Faculty Standards Auto-Refactoring Analysis
+        id: refactoring-analysis  
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
+        run: |
+          echo "💸 Analyzing generated TLDL for Faculty standards compliance..."
+          
+          # Find the most recently generated TLDL file
+          LATEST_TLDL=$(find TLDL/entries/ -name "*.md" -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2- || echo "")
+          
+          if [[ -n "$LATEST_TLDL" && -f "$LATEST_TLDL" ]]; then
+            echo "📋 Analyzing: $LATEST_TLDL"
+            
+            # Run Faculty Standards analysis
+            if [[ -f scripts/chronicle-keeper/auto-refactoring.py ]]; then
+              echo "🔍 Running Faculty Standards analysis..."
+              
+              # Use Chronicle Keeper as the developer for auto-generated content
+              ANALYSIS_OUTPUT="/tmp/refactoring-analysis.json"
+              
+              python3 scripts/chronicle-keeper/auto-refactoring.py \
+                --analyze "$LATEST_TLDL" \
+                --developer "chronicle-keeper" \
+                --output "$ANALYSIS_OUTPUT" || echo "⚠️ Faculty analysis encountered issues"
+              
+              if [[ -f "$ANALYSIS_OUTPUT" ]]; then
+                # Extract key metrics from analysis
+                TOTAL_ISSUES=$(jq -r '.total_issues // 0' "$ANALYSIS_OUTPUT")
+                TOTAL_COST=$(jq -r '.total_cost // 0' "$ANALYSIS_OUTPUT")
+                AFFORDABLE=$(jq -r '.affordable // false' "$ANALYSIS_OUTPUT")
+                
+                echo "📊 Faculty Standards Analysis Results:"
+                echo "  Issues found: $TOTAL_ISSUES"
+                echo "  Total refactoring cost: $TOTAL_COST XP"
+                echo "  Auto-refactoring affordable: $AFFORDABLE"
+                
+                # Set outputs for potential auto-refactoring
+                echo "analysis-available=true" >> $GITHUB_OUTPUT
+                echo "issues-found=$TOTAL_ISSUES" >> $GITHUB_OUTPUT
+                echo "refactoring-cost=$TOTAL_COST" >> $GITHUB_OUTPUT
+                echo "affordable=$AFFORDABLE" >> $GITHUB_OUTPUT
+                echo "analyzed-file=$LATEST_TLDL" >> $GITHUB_OUTPUT
+                
+                # Create refactoring recommendation comment content
+                if [[ $TOTAL_ISSUES -gt 0 ]]; then
+                  echo "🧙‍♂️ **Faculty Standards Refactoring Available**" > /tmp/refactoring-comment.md
+                  echo "" >> /tmp/refactoring-comment.md
+                  echo "📜 *\"Every refactor is a gamble: clarity gained, XP drained.\"* — **Faculty Doctrine, Vol. VII**" >> /tmp/refactoring-comment.md
+                  echo "" >> /tmp/refactoring-comment.md
+                  echo "**Analysis Results for \`$(basename "$LATEST_TLDL")\`:**" >> /tmp/refactoring-comment.md
+                  echo "- Issues detected: **$TOTAL_ISSUES**" >> /tmp/refactoring-comment.md
+                  echo "- Refactoring cost: **$TOTAL_COST XP**" >> /tmp/refactoring-comment.md
+                  echo "- Auto-refactoring: **$( [[ "$AFFORDABLE" == "true" ]] && echo "✅ Affordable" || echo "❌ Exceeds budget" )**" >> /tmp/refactoring-comment.md
+                  echo "" >> /tmp/refactoring-comment.md
+                  
+                  if [[ "$AFFORDABLE" == "true" && $TOTAL_COST -le 100 ]]; then
+                    echo "💡 **Recommendation**: Low-cost fixes detected! Consider automatic refactoring:" >> /tmp/refactoring-comment.md
+                    echo "\`\`\`bash" >> /tmp/refactoring-comment.md
+                    echo "./scripts/chronicle-keeper/refactor-docs fix \"$LATEST_TLDL\" YourDeveloperName affordable" >> /tmp/refactoring-comment.md
+                    echo "\`\`\`" >> /tmp/refactoring-comment.md
+                  elif [[ $TOTAL_COST -le 300 ]]; then
+                    echo "⚠️ **Recommendation**: Moderate refactoring cost - strategic timing recommended:" >> /tmp/refactoring-comment.md
+                    echo "\`\`\`bash" >> /tmp/refactoring-comment.md
+                    echo "./scripts/chronicle-keeper/refactor-docs analyze \"$LATEST_TLDL\" YourDeveloperName" >> /tmp/refactoring-comment.md
+                    echo "\`\`\`" >> /tmp/refactoring-comment.md
+                  else
+                    echo "🚨 **Recommendation**: High-cost refactoring detected - consider Faculty intervention:" >> /tmp/refactoring-comment.md
+                    echo "\`\`\`bash" >> /tmp/refactoring-comment.md
+                    echo "./scripts/chronicle-keeper/refactor-docs emergency \"$LATEST_TLDL\" YourDeveloperName comprehensive" >> /tmp/refactoring-comment.md
+                    echo "\`\`\`" >> /tmp/refactoring-comment.md
+                  fi
+                  
+                  echo "" >> /tmp/refactoring-comment.md
+                  echo "📖 **Learn more**: [Costly Automatic Doc Refactoring Guide](docs/costly-automatic-refactoring.md)" >> /tmp/refactoring-comment.md
+                  echo "" >> /tmp/refactoring-comment.md
+                  echo "*This analysis was performed automatically by the Chronicle Keeper Faculty Standards system.*" >> /tmp/refactoring-comment.md
+                  
+                  echo "refactoring-comment-ready=true" >> $GITHUB_OUTPUT
+                else
+                  echo "✅ Faculty standards compliant - no refactoring needed!"
+                  echo "refactoring-comment-ready=false" >> $GITHUB_OUTPUT
+                fi
+              else
+                echo "⚠️ Faculty analysis output not available"
+                echo "analysis-available=false" >> $GITHUB_OUTPUT
+              fi
+            else
+              echo "⚠️ Faculty Standards auto-refactoring system not available"
+              echo "analysis-available=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "ℹ️ No recent TLDL file found for Faculty analysis"
+            echo "analysis-available=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: 📦 Upload Generated TLDL as Artifact
-        if: steps.generate-scroll.outputs.scroll-generated == 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: steps.generate-scroll.outputs.scroll-generated == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
+        uses: actions/upload-artifact@v4
         with:
           name: chronicle-keeper-tldl-entry
           path: |
@@ -621,9 +779,28 @@ jobs:
             /tmp/scroll-entry.json
           retention-days: 30
 
+      - name: 📋 Upload RFF Message as Artifact
+        if: steps.post-rff.outputs.rff-posted == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: chronicle-keeper-rff-message
+          path: |
+            /tmp/rff-message.json
+          retention-days: 7
+
+      - name: 💸 Upload Faculty Standards Analysis
+        if: steps.refactoring-analysis.outputs.analysis-available == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: faculty-standards-analysis
+          path: |
+            /tmp/refactoring-analysis.json
+            /tmp/refactoring-comment.md
+          retention-days: 30
+
       - name: 📤 Commit TLDL Chronicle
-        if: steps.generate-scroll.outputs.scroll-generated == 'true' || steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated == 'true'
-        uses: stefanzweifel/git-auto-commit-action@917f9af49ac20b51c69c1be66de3ba2b4c6b5dd0 # v6
+        if: (steps.generate-scroll.outputs.scroll-generated == 'true' || steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated == 'true') && steps.cooldown_check.outputs.cooldown_active != 'true'
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "📜 Chronicle Keeper: Auto-generated TLDL entry and Daily Ledger"
           commit_author: "Chronicle Keeper <chronicle-keeper@living-dev-agent.local>"
@@ -631,8 +808,8 @@ jobs:
           skip_dirty_check: false
 
       - name: 🧠📜 Commit Capsule Scroll
-        if: steps.generate-capsule-scroll.outputs.capsule-generated == 'true'
-        uses: stefanzweifel/git-auto-commit-action@917f9af49ac20b51c69c1be66de3ba2b4c6b5dd0 # v6
+        if: steps.generate-capsule-scroll.outputs.capsule-generated == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "🧠📜 Archive Wall Capsule: Auto-generated context preservation scroll"
           commit_author: "Chronicle Keeper <chronicle-keeper@living-dev-agent.local>"
@@ -640,7 +817,7 @@ jobs:
           skip_dirty_check: false
 
       - name: 🎉 Chronicle Complete
-        if: steps.generate-scroll.outputs.scroll-generated == 'true' || steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated == 'true'
+        if: (steps.generate-scroll.outputs.scroll-generated == 'true' || steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated == 'true') && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           if [[ "${{ steps.generate-scroll.outputs.scroll-generated }}" == "true" ]]; then
             echo "🎉 Chronicle Keeper has successfully preserved the lore!"
@@ -650,6 +827,21 @@ jobs:
           if [[ "${{ steps.generate-daily-ledger.outputs.ledger-generated }}" == "true" || "${{ steps.scheduled-daily-ledger.outputs.scheduled-ledger-generated }}" == "true" ]]; then
             echo "📓 Daily Ledger entry has been created or updated"
             echo "🔗 Navigation links have been updated to maintain the unbroken chain"
+          fi
+          
+          # Faculty Standards Refactoring Summary
+          if [[ "${{ steps.refactoring-analysis.outputs.analysis-available }}" == "true" ]]; then
+            echo ""
+            echo "💸 Faculty Standards Analysis:"
+            echo "  Issues detected: ${{ steps.refactoring-analysis.outputs.issues-found }}"
+            echo "  Refactoring cost: ${{ steps.refactoring-analysis.outputs.refactoring-cost }} XP"
+            echo "  Auto-refactoring: ${{ steps.refactoring-analysis.outputs.affordable == 'true' && '✅ Affordable' || '❌ Strategic timing needed' }}"
+            
+            if [[ "${{ steps.refactoring-analysis.outputs.refactoring-comment-ready }}" == "true" ]]; then
+              echo "📋 Refactoring recommendations available in artifacts"
+            fi
+            
+            echo "📖 Learn more: docs/costly-automatic-refactoring.md"
           fi
           
           if [[ "${{ github.event_name }}" == "schedule" ]]; then

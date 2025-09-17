@@ -111,7 +111,7 @@ namespace TinyWalnutGames.Tools.Editor
                 {
                 EditorGUILayout.LabelField($"Selected Spritesheets ({spritesheets.Count}):");
                 EditorGUI.indentLevel++;
-                foreach (var sheet in spritesheets)
+                foreach (Texture2D sheet in spritesheets)
                     {
                     EditorGUILayout.ObjectField(sheet, typeof(Texture2D), false);
                     }
@@ -176,7 +176,7 @@ namespace TinyWalnutGames.Tools.Editor
 
                 for (int i = 0; i < detectedBiomes.Count; i++)
                     {
-                    var biome = detectedBiomes[i];
+                    BiomeMapping biome = detectedBiomes[i];
 
                     EditorGUILayout.BeginHorizontal();
 
@@ -230,7 +230,7 @@ namespace TinyWalnutGames.Tools.Editor
                 EditorGUILayout.HelpBox($"{validationWarnings.Count} validation issues found:", MessageType.Warning);
 
                 validationScrollPos = EditorGUILayout.BeginScrollView(validationScrollPos, GUILayout.Height(80));
-                foreach (var warning in validationWarnings)
+                foreach (string warning in validationWarnings)
                     {
                     EditorGUILayout.LabelField("• " + warning, EditorStyles.wordWrappedLabel);
                     }
@@ -253,10 +253,10 @@ namespace TinyWalnutGames.Tools.Editor
 
                 previewScrollPos = EditorGUILayout.BeginScrollView(previewScrollPos, GUILayout.Height(200));
 
-                var firstSheet = spritesheets[0];
+                Texture2D firstSheet = spritesheets[0];
                 if (firstSheet != null)
                     {
-                    var rect = GUILayoutUtility.GetRect(
+                    Rect rect = GUILayoutUtility.GetRect(
                         firstSheet.width * previewZoom,
                         firstSheet.height * previewZoom);
 
@@ -286,7 +286,7 @@ namespace TinyWalnutGames.Tools.Editor
             outputFolderPath = EditorGUILayout.TextField(outputFolderPath);
             if (GUILayout.Button("Browse", GUILayout.Width(60)))
                 {
-                var path = EditorUtility.SaveFolderPanel("Select Output Folder", outputFolderPath, "");
+                string path = EditorUtility.SaveFolderPanel("Select Output Folder", outputFolderPath, "");
                 if (!string.IsNullOrEmpty(path) && path.StartsWith(Application.dataPath))
                     {
                     outputFolderPath = "Assets" + path[Application.dataPath.Length..];
@@ -326,7 +326,7 @@ namespace TinyWalnutGames.Tools.Editor
 
             if (isProcessing)
                 {
-                var progressRect = EditorGUILayout.GetControlRect();
+                Rect progressRect = EditorGUILayout.GetControlRect();
                 EditorGUI.ProgressBar(progressRect, processProgress, $"Processing {currentProcessingBiome}...");
 
                 if (GUILayout.Button("Cancel"))
@@ -378,7 +378,7 @@ namespace TinyWalnutGames.Tools.Editor
                         Color maskPixel = maskTexture.GetPixel(maskX, maskY);
 
                         // Find matching biome
-                        var matchingBiome = detectedBiomes.FirstOrDefault(b =>
+                        BiomeMapping matchingBiome = detectedBiomes.FirstOrDefault(b =>
                             IsCellInBiome(maskTexture, maskX, maskY, b.maskColor) && b.includeInExport);
 
                         if (matchingBiome != null)
@@ -448,7 +448,7 @@ namespace TinyWalnutGames.Tools.Editor
 
         private void SelectSpritesheetsFromProject()
             {
-            var selected = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
+            UnityEngine.Object[] selected = Selection.GetFiltered(typeof(Texture2D), SelectionMode.Assets);
             spritesheets.Clear();
 
             foreach (UnityEngine.Object obj in selected)
@@ -490,7 +490,7 @@ namespace TinyWalnutGames.Tools.Editor
         private void DetectBiomesFromColorMask(Texture2D maskTexture)
             {
             // Make texture readable temporarily
-            var path = AssetDatabase.GetAssetPath(maskTexture);
+            string path = AssetDatabase.GetAssetPath(maskTexture);
             var importer = TextureImporter.GetAtPath(path) as TextureImporter;
             bool wasReadable = importer.isReadable;
 
@@ -503,7 +503,7 @@ namespace TinyWalnutGames.Tools.Editor
             try
                 {
                 // Sample colors from the mask to detect unique biome colors
-                var colors = maskTexture.GetPixels();
+                Color[] colors = maskTexture.GetPixels();
                 var uniqueColors = new HashSet<Color>();
 
                 // Sample at regular intervals to improve performance on large textures
@@ -517,7 +517,7 @@ namespace TinyWalnutGames.Tools.Editor
                         int idx = y * width + x;
                         if (idx < colors.Length)
                             {
-                            var color = colors[idx];
+                            Color color = colors[idx];
                             // Skip transparent pixels
                             if (color.a > 0.1f)
                                 {
@@ -535,7 +535,7 @@ namespace TinyWalnutGames.Tools.Editor
 
                 // Create biome mappings from unique colors
                 int biomeIndex = 0;
-                foreach (var color in uniqueColors)
+                foreach (Color color in uniqueColors)
                     {
                     detectedBiomes.Add(new BiomeMapping
                         {
@@ -564,11 +564,11 @@ namespace TinyWalnutGames.Tools.Editor
             {
             try
                 {
-                var jsonData = JsonUtility.FromJson<BiomeMapData>(jsonAsset.text);
+                BiomeMapData jsonData = JsonUtility.FromJson<BiomeMapData>(jsonAsset.text);
                 if (jsonData != null && jsonData.biomes != null)
                     {
                     detectedBiomes.Clear();
-                    foreach (var biomeDef in jsonData.biomes)
+                    foreach (BiomeDefinition biomeDef in jsonData.biomes)
                         {
                         var biomeMapping = new BiomeMapping
                             {
@@ -621,7 +621,7 @@ namespace TinyWalnutGames.Tools.Editor
                 return;
                 }
 
-            var firstSpritesheet = spritesheets[0];
+            Texture2D firstSpritesheet = spritesheets[0];
             string path = AssetDatabase.GetAssetPath(firstSpritesheet);
             TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
 
@@ -656,7 +656,7 @@ namespace TinyWalnutGames.Tools.Editor
                             if (cellColor.a > 0.1f)
                                 {
                                 // Quantize colors to reduce variation
-                                var quantized = QuantizeColor(cellColor);
+                                Color quantized = QuantizeColor(cellColor);
                                 uniqueColors.Add(quantized);
                                 }
                             }
@@ -665,7 +665,7 @@ namespace TinyWalnutGames.Tools.Editor
 
                 // Create biome mappings from detected colors
                 int biomeIndex = 0;
-                foreach (var color in uniqueColors)
+                foreach (Color color in uniqueColors)
                     {
                     detectedBiomes.Add(new BiomeMapping
                         {
@@ -743,7 +743,7 @@ namespace TinyWalnutGames.Tools.Editor
                 }
 
             // Check spritesheet dimensions against cell size
-            foreach (var sheet in spritesheets)
+            foreach (Texture2D sheet in spritesheets)
                 {
                 if (sheet.width % cellSize.x != 0 || sheet.height % cellSize.y != 0)
                     {
@@ -781,7 +781,7 @@ namespace TinyWalnutGames.Tools.Editor
             // Check biome mask dimensions if provided
             if (biomeMaskAsset is Texture2D maskTexture && spritesheets.Count > 0)
                 {
-                var firstSheet = spritesheets[0];
+                Texture2D firstSheet = spritesheets[0];
                 if (maskTexture.width != firstSheet.width || maskTexture.height != firstSheet.height)
                     {
                     validationWarnings.Add($"Biome mask dimensions ({maskTexture.width}x{maskTexture.height}) " +
@@ -791,8 +791,8 @@ namespace TinyWalnutGames.Tools.Editor
 
             // Check for duplicate biome names
             var biomeNames = detectedBiomes.Where(b => b.includeInExport).Select(b => b.biomeName).ToList();
-            var duplicates = biomeNames.GroupBy(name => name).Where(g => g.Count() > 1).Select(g => g.Key);
-            foreach (var duplicate in duplicates)
+            IEnumerable<string> duplicates = biomeNames.GroupBy(name => name).Where(g => g.Count() > 1).Select(g => g.Key);
+            foreach (string duplicate in duplicates)
                 {
                 validationWarnings.Add($"Duplicate biome name detected: '{duplicate}'. Each biome must have a unique name.");
                 }
@@ -846,11 +846,11 @@ namespace TinyWalnutGames.Tools.Editor
             float totalSteps = biomesToProcess.Count * spritesheets.Count;
             float currentStep = 0f;
 
-            foreach (var biome in biomesToProcess)
+            foreach (BiomeMapping biome in biomesToProcess)
                 {
                 currentProcessingBiome = biome.biomeName;
 
-                foreach (var spritesheet in spritesheets)
+                foreach (Texture2D spritesheet in spritesheets)
                     {
                     ProcessSpritesheetForBiome(spritesheet, biome);
 
@@ -1055,7 +1055,7 @@ namespace TinyWalnutGames.Tools.Editor
                 // Use sprite editor data provider to set sprite rects
                 var factory = new SpriteDataProviderFactories();
                 factory.Init();
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(newImporter);
+                ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(newImporter);
                 dataProvider.InitSpriteEditorDataProvider();
 
                 // Set the sprite rectangles

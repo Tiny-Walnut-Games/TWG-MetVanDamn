@@ -216,7 +216,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					EditorGUILayout.LabelField($"🎲 Current Seed: {_cachedCurrentSeed}");
 					}
 
-				EditorGUILayout.LabelField($"📊 Next update in: {Mathf.Ceil(UPDATE_INTERVAL - (currentTime - _lastUpdateTime))}s", EditorStyles.miniLabel);
+				EditorGUILayout.LabelField($"📊 Next update in: {Mathf.Max(0, Mathf.Ceil(UPDATE_INTERVAL - (currentTime - _lastUpdateTime)))}s", EditorStyles.miniLabel);
 				EditorGUILayout.EndVertical();
 				}
 			else
@@ -360,40 +360,44 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Clear World Seed entities
 			using (EntityQuery worldSeedQuery = entityManager.CreateEntityQuery(typeof(WorldSeed)))
 				{
-				if (worldSeedQuery.CalculateEntityCount() > 0)
+				int countBeforeDestroy = worldSeedQuery.CalculateEntityCount();
+				if (countBeforeDestroy > 0)
 					{
 					entityManager.DestroyEntity(worldSeedQuery);
-					destroyedCount += worldSeedQuery.CalculateEntityCount();
+					destroyedCount += countBeforeDestroy;
 					}
 				}
 
 			// Clear District entities (NodeId components)
 			using (EntityQuery districtQuery = entityManager.CreateEntityQuery(typeof(NodeId)))
 				{
-				if (districtQuery.CalculateEntityCount() > 0)
+				int countBeforeDestroy = districtQuery.CalculateEntityCount();
+				if (countBeforeDestroy > 0)
 					{
 					entityManager.DestroyEntity(districtQuery);
-					destroyedCount += districtQuery.CalculateEntityCount();
+					destroyedCount += countBeforeDestroy;
 					}
 				}
 
 			// Clear Polarity Field entities
 			using (EntityQuery polarityQuery = entityManager.CreateEntityQuery(typeof(PolarityFieldData)))
 				{
-				if (polarityQuery.CalculateEntityCount() > 0)
+				int countBeforeDestroy = polarityQuery.CalculateEntityCount();
+				if (countBeforeDestroy > 0)
 					{
 					entityManager.DestroyEntity(polarityQuery);
-					destroyedCount += polarityQuery.CalculateEntityCount();
+					destroyedCount += countBeforeDestroy;
 					}
 				}
 
 			// Clear World Config entities
 			using (EntityQuery worldConfigQuery = entityManager.CreateEntityQuery(typeof(WorldSeedData)))
 				{
-				if (worldConfigQuery.CalculateEntityCount() > 0)
+				int countBeforeDestroy = worldConfigQuery.CalculateEntityCount();
+				if (countBeforeDestroy > 0)
 					{
 					entityManager.DestroyEntity(worldConfigQuery);
-					destroyedCount += worldConfigQuery.CalculateEntityCount();
+					destroyedCount += countBeforeDestroy;
 					}
 				}
 

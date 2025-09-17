@@ -1,0 +1,59 @@
+{
+    "dotnet.defaultSolution": "TWG-MetVanDamn.sln",
+    "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+    "dotnet.symbolSearch.searchReferenceAssemblies": true,
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.organizeImportsOnFormat": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/node_modules": true,
+        "Library/": true,
+        "Temp/": true,
+        "obj/": true,
+        "**/*.meta": true,
+        "**/*.tmp": true,
+        "**/*.temp": true
+    },
+    "search.exclude": {
+        "Library/": true,
+        "Temp/": true,
+        "obj/": true,
+        "**/*.meta": true
+    },
+    "dotnet.unitTests.runSettingsPath": "${workspaceFolder}/.vscode/test.runsettings",
+    "csharp.semanticHighlighting.enabled": true,
+    "editor.semanticHighlighting.enabled": true,
+    "unity.logLevel": "info",
+    "unity.projectPath": "${workspaceFolder}",
+    "files.associations": {
+        "*.asmdef": "json",
+        "*.inputactions": "json"
+    },
+    "editor.rulers": [80, 120],
+    "editor.insertSpaces": false,
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4,
+    "csharp.format.enable": true,
+    "csharp.inlayHints.enableInlayHintsForTypes": true,
+    "csharp.inlayHints.enableInlayHintsForParameters": true,
+    "dotnet.inlayHints.enableInlayHintsForLiteralParameters": true,
+    "dotnet.inlayHints.enableInlayHintsForIndexerParameters": true,
+    "dotnet.inlayHints.enableInlayHintsForObjectCreationParameters": true,
+    "dotnet.inlayHints.enableInlayHintsForOtherParameters": true,
+    "csharp.unitTests.enableCodeLens": true,
+    "dotnet.unitTests.enableCodeLens": true,
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        }
+    },
+    "tasks.saveBeforeRun": "always"
+}

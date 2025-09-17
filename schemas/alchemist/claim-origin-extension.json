@@ -1,0 +1,439 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://livingdevagent.com/schemas/alchemist/v1/claim-origin-extension.json",
+  "title": "Alchemist Claim Origin Extension Schema",
+  "description": "Extended schema for binding experimental claims to their Gu Pot narrative origins with full provenance tracking",
+  "version": "0.1.0",
+  "type": "object",
+  "required": [
+    "origin",
+    "experimental_context",
+    "validation_metadata",
+    "alchemist_metadata"
+  ],
+  "properties": {
+    "origin": {
+      "type": "object",
+      "description": "Core origin binding from base Alchemist faculty schema",
+      "required": [
+        "type",
+        "issue_number",
+        "issue_url",
+        "stage_at_evaluation",
+        "logline_hash",
+        "tension_hash",
+        "irreversible_shift_declared",
+        "extracted_on",
+        "alchemist_version"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["gu_pot"],
+          "description": "Origin type identifier"
+        },
+        "issue_number": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "GitHub issue number for the Gu Pot narrative"
+        },
+        "issue_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://github\\.com/[^/]+/[^/]+/issues/\\d+$",
+          "description": "Full GitHub URL to the source issue"
+        },
+        "stage_at_evaluation": {
+          "type": "string",
+          "enum": ["larva", "fermenting", "distilled", "serum", "antitoxin", "compost"],
+          "description": "Gu Pot stage when claim was generated"
+        },
+        "logline_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "SHA-256 hash of normalized logline text"
+        },
+        "tension_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "SHA-256 hash of normalized tension description"
+        },
+        "irreversible_shift_declared": {
+          "type": "boolean",
+          "description": "Whether irreversible shift was declared in the Gu Pot"
+        },
+        "extracted_on": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when claim was extracted"
+        },
+        "alchemist_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Version of Alchemist faculty used for extraction"
+        }
+      },
+      "additionalProperties": false
+    },
+    "experimental_context": {
+      "type": "object",
+      "description": "Detailed experimental context and execution metadata",
+      "required": [
+        "experiment_id",
+        "manifest_path",
+        "run_id",
+        "baseline_snapshot",
+        "reproducibility_hash"
+      ],
+      "properties": {
+        "experiment_id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",
+          "description": "UUID identifying the specific experiment run"
+        },
+        "manifest_path": {
+          "type": "string",
+          "description": "Relative path to the experiment manifest file"
+        },
+        "run_id": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}-\\d{2}-\\d{2}Z$",
+          "description": "Timestamp-based run identifier (ISO 8601 format with hyphens)"
+        },
+        "baseline_snapshot": {
+          "type": "object",
+          "description": "Captured baseline metrics before experiment execution",
+          "required": ["captured_at", "metrics"],
+          "properties": {
+            "captured_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "When baseline was captured"
+            },
+            "metrics": {
+              "type": "object",
+              "description": "Baseline metric values",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "environment": {
+              "type": "object",
+              "description": "Environment context for baseline",
+              "properties": {
+                "platform": {"type": "string"},
+                "unity_version": {"type": "string"},
+                "git_commit": {"type": "string"},
+                "git_branch": {"type": "string"}
+              }
+            }
+          }
+        },
+        "reproducibility_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Hash ensuring experiment reproducibility"
+        },
+        "seed_configuration": {
+          "type": "object",
+          "description": "Deterministic seed configuration for reproducibility",
+          "properties": {
+            "global_seed": {"type": "integer"},
+            "corpus_seed": {"type": "integer"},
+            "processing_seed": {"type": "integer"},
+            "random_seeds": {
+              "type": "array",
+              "items": {"type": "integer"}
+            }
+          }
+        },
+        "execution_environment": {
+          "type": "object",
+          "description": "Execution environment details",
+          "properties": {
+            "unity_version": {"type": "string"},
+            "platform": {"type": "string"},
+            "hardware_id": {"type": "string"},
+            "resource_limits": {
+              "type": "object",
+              "properties": {
+                "max_memory_mb": {"type": "integer"},
+                "max_cpu_cores": {"type": "integer"},
+                "max_duration_minutes": {"type": "integer"}
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "validation_metadata": {
+      "type": "object",
+      "description": "Validation and promotion decision metadata",
+      "required": [
+        "confidence_method",
+        "confidence_score",
+        "promotion_decision",
+        "validation_timestamp"
+      ],
+      "properties": {
+        "confidence_method": {
+          "type": "object",
+          "description": "Methodology used for confidence scoring",
+          "required": ["algorithm", "factors", "weights"],
+          "properties": {
+            "algorithm": {
+              "type": "string",
+              "enum": ["multi_factor_weighted", "statistical_consensus", "expert_review", "hybrid"],
+              "description": "Confidence calculation algorithm used"
+            },
+            "factors": {
+              "type": "array",
+              "description": "Factors considered in confidence calculation",
+              "items": {
+                "type": "string",
+                "enum": ["success_rate", "consistency", "metadata_completeness", "baseline_delta", "statistical_significance"]
+              }
+            },
+            "weights": {
+              "type": "object",
+              "description": "Weight assigned to each factor",
+              "additionalProperties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "parameters": {
+              "type": "object",
+              "description": "Algorithm-specific parameters",
+              "additionalProperties": true
+            }
+          }
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Final confidence score (0-1)"
+        },
+        "confidence_breakdown": {
+          "type": "object",
+          "description": "Detailed breakdown of confidence scoring",
+          "properties": {
+            "success_rate": {"type": "number", "minimum": 0, "maximum": 1},
+            "consistency_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "completeness_score": {"type": "number", "minimum": 0, "maximum": 1},
+            "baseline_improvement": {"type": "number"},
+            "statistical_significance": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "promotion_decision": {
+          "type": "string",
+          "enum": ["validated", "regression", "anomaly", "insufficient_data"],
+          "description": "Final promotion decision category"
+        },
+        "promotion_rationale": {
+          "type": "string",
+          "description": "Human-readable rationale for promotion decision"
+        },
+        "validation_timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When validation was performed"
+        },
+        "validation_criteria": {
+          "type": "object",
+          "description": "Criteria used for validation",
+          "properties": {
+            "min_confidence_threshold": {"type": "number"},
+            "min_baseline_improvement": {"type": "number"},
+            "max_error_rate": {"type": "number"},
+            "required_consistency": {"type": "number"}
+          }
+        },
+        "quality_gates": {
+          "type": "array",
+          "description": "Quality gates that were checked",
+          "items": {
+            "type": "object",
+            "required": ["gate_name", "status", "checked_at"],
+            "properties": {
+              "gate_name": {"type": "string"},
+              "status": {"type": "string", "enum": ["passed", "failed", "skipped"]},
+              "checked_at": {"type": "string", "format": "date-time"},
+              "details": {"type": "string"}
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "alchemist_metadata": {
+      "type": "object",
+      "description": "Alchemist faculty-specific metadata and tracking",
+      "required": [
+        "faculty_version",
+        "processing_stage",
+        "artifact_inventory"
+      ],
+      "properties": {
+        "faculty_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Version of Alchemist faculty specification"
+        },
+        "processing_stage": {
+          "type": "string",
+          "enum": ["scaffold_generation", "experiment_execution", "validation", "synthesis", "archival"],
+          "description": "Current processing stage in Alchemist pipeline"
+        },
+        "artifact_inventory": {
+          "type": "object",
+          "description": "Complete inventory of generated artifacts",
+          "required": ["manifest_files", "run_artifacts", "claim_files"],
+          "properties": {
+            "manifest_files": {
+              "type": "array",
+              "description": "Experiment manifest files",
+              "items": {
+                "type": "object",
+                "required": ["path", "checksum", "size_bytes"],
+                "properties": {
+                  "path": {"type": "string"},
+                  "checksum": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+                  "size_bytes": {"type": "integer", "minimum": 0},
+                  "created_at": {"type": "string", "format": "date-time"}
+                }
+              }
+            },
+            "run_artifacts": {
+              "type": "array",
+              "description": "Experiment run artifacts",
+              "items": {
+                "type": "object",
+                "required": ["path", "type", "checksum"],
+                "properties": {
+                  "path": {"type": "string"},
+                  "type": {"type": "string", "enum": ["metrics", "logs", "metadata", "results"]},
+                  "checksum": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+                  "size_bytes": {"type": "integer", "minimum": 0},
+                  "created_at": {"type": "string", "format": "date-time"}
+                }
+              }
+            },
+            "claim_files": {
+              "type": "array",
+              "description": "Generated claim files",
+              "items": {
+                "type": "object",
+                "required": ["path", "category", "checksum"],
+                "properties": {
+                  "path": {"type": "string"},
+                  "category": {"type": "string", "enum": ["hypotheses", "validated", "regressions", "anomalies"]},
+                  "checksum": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+                  "size_bytes": {"type": "integer", "minimum": 0},
+                  "created_at": {"type": "string", "format": "date-time"}
+                }
+              }
+            },
+            "report_files": {
+              "type": "array",
+              "description": "Synthesis reports",
+              "items": {
+                "type": "object",
+                "required": ["path", "format", "checksum"],
+                "properties": {
+                  "path": {"type": "string"},
+                  "format": {"type": "string", "enum": ["markdown", "json", "yaml", "html"]},
+                  "checksum": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+                  "size_bytes": {"type": "integer", "minimum": 0},
+                  "created_at": {"type": "string", "format": "date-time"}
+                }
+              }
+            }
+          }
+        },
+        "lineage_tracking": {
+          "type": "object",
+          "description": "Complete lineage tracking for auditability",
+          "properties": {
+            "parent_claims": {
+              "type": "array",
+              "description": "Parent claims that influenced this claim",
+              "items": {"type": "string"}
+            },
+            "derived_claims": {
+              "type": "array",
+              "description": "Claims derived from this claim",
+              "items": {"type": "string"}
+            },
+            "experimental_lineage": {
+              "type": "array",
+              "description": "Chain of experiments leading to this claim",
+              "items": {
+                "type": "object",
+                "required": ["experiment_id", "timestamp", "outcome"],
+                "properties": {
+                  "experiment_id": {"type": "string"},
+                  "timestamp": {"type": "string", "format": "date-time"},
+                  "outcome": {"type": "string", "enum": ["success", "failure", "inconclusive"]},
+                  "notes": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "integration_metadata": {
+          "type": "object",
+          "description": "Integration metadata for TWG-TLDA ecosystem",
+          "properties": {
+            "chronicle_keeper": {
+              "type": "object",
+              "properties": {
+                "tldl_entry_id": {"type": "string"},
+                "chronicle_timestamp": {"type": "string", "format": "date-time"},
+                "preserved_context": {"type": "object"}
+              }
+            },
+            "pet_events": {
+              "type": "object",
+              "properties": {
+                "triggered_events": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "evolution_triggers": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                }
+              }
+            },
+            "github_integration": {
+              "type": "object",
+              "properties": {
+                "labels_applied": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "automated_comments": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "comment_id": {"type": "integer"},
+                      "timestamp": {"type": "string", "format": "date-time"},
+                      "content_type": {"type": "string"}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

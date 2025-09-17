@@ -1,0 +1,8 @@
+{
+  "melt_max_per_day": 2,
+  "humidity_limit": 0.7,
+  "sluice_retention_days": 7,
+  "journal_enabled": true,
+  "auto_rollover": true,
+  "cognitive_sensitivity_auto": true
+}

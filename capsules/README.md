@@ -9,7 +9,7 @@
 
 ## Directory Structure
 
-```
+```md
 capsules/
 ├── README.md                    # This file
 ├── templates/                   # Template files for different scroll types
@@ -27,13 +27,14 @@ Each Capsule Scroll captures:
 2. **Timeframe** - When the conversation occurred  
 3. **Core Decisions** - Key choices and rationale
 4. **Key Artifacts & Commits** - Links to relevant code/PRs
-5. **Glyphs & Running Jokes** - Cultural context and humor 
+5. **Glyphs & Running Jokes** - Cultural context and humor
 6. **Unresolved Threads** - Open questions and TODOs
 7. **Re‑entry Spell** - 3-sentence context snapshot for quick understanding
 
 ## Usage
 
 ### Manual Creation
+
 ```bash
 # Copy template
 cp capsules/templates/arc-capsule.md capsules/active/my-conversation-arc.md
@@ -43,6 +44,7 @@ cp capsules/templates/arc-capsule.md capsules/active/my-conversation-arc.md
 ```
 
 ### Automated Creation (via Chronicle Keeper)
+
 When an issue title contains 🧠📜 emoji combination, the Chronicle Keeper automatically generates a Capsule Scroll.
 
 ## Integration with TLDL
@@ -52,14 +54,15 @@ Capsule Scrolls link to TLDL entries and vice versa, creating a web of preserved
 ---
 
 **🍑 Buttsafe Impact Assessment** 🍑  
+
 - [x] **Prevents Context Loss** - Preserves critical decisions across sessions
 - [x] **Improves Continuity** - Enables smooth conversation restart
 - [x] **Saves Developer Sanity** - No more "what were we talking about?" moments
 - [x] **Strengthens Lore** - Builds institutional memory
 
-*May your context never truncate, your decisions always preserve, and your butts stay safe from confusion.*
-=======
-# 📜 Capsule Scrolls — Conversation Context Anchors
+## *May your context never truncate, your decisions always preserve, and your butts stay safe from confusion.*
+
+## 📜 Capsule Scrolls — Conversation Context Anchors
 
 > *"Memory is the palace where wisdom lives, but archives are where it survives."* — **Chronicle Keeper's Manual, Vol. II**
 
@@ -71,30 +74,38 @@ Capsule Scrolls preserve conversation threads and development contexts that exte
 
 Each Capsule Scroll follows this format:
 
-### **Arc Name** 
+### **Arc Name**
+
 The thematic title of the development period or conversation thread.
 
 ### **Timeframe**
+
 Start and end dates, or ongoing status.
 
 ### **Core Decisions**
+
 Key technical, architectural, or process decisions made during this arc.
 
 ### **Key Artifacts & Commits**
+
 Links to issues, PRs, commits, and other tangible outputs.
 
 ### **Glyphs & Running Jokes**
+
 Cultural elements, terminology, and humor that provide conversational context.
 
 ### **Unresolved Threads**
+
 Open questions, pending decisions, or incomplete work that carries forward.
 
-### **Re-entry Spell** 
+### **Re-entry Spell**
+
 A 3-sentence tone/context snapshot that enables instant scene reset for future conversations.
 
 ## Automation
 
 Capsule Scrolls can be generated:
+
 - **Automatically**: Via Chronicle Keeper triggers when conversations reach certain thresholds
 - **Manually**: Using the `capsule-scroll` CLI command
 - **On Archive**: When conversation threads are about to be truncated

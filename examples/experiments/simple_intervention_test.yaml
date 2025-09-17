@@ -1,0 +1,88 @@
+# Simple Intervention Effectiveness Experiment
+# Tests basic intervention strategies with small corpus
+
+metadata:
+  name: "Simple Intervention Test"
+  description: "Basic test of intervention effectiveness"
+  version: "1.0.0"
+  author: "Bootstrap Sentinel"
+  created: "2025-01-15T10:30:00Z"
+  tags: ["intervention", "simple", "test"]
+
+model:
+  type: "behavioral_governance"
+  instance_config:
+    enable_intervention_tracking: true
+    intervention_threshold: 0.7
+    style_adaptation_enabled: true
+  performance_profile: "dev"
+
+conditions:
+  intervention_types:
+    - "soft_suggestion"
+    - "rewrite"
+  
+  confidence_thresholds:
+    - 0.5
+    - 0.8
+
+corpus:
+  type: "synthetic"
+  size: 100
+  shuffle: true
+  seed: 42
+
+processing:
+  batch_size: 10
+  mode: "sequential"
+  max_workers: 1
+  timeout_seconds: 60
+
+metrics:
+  behavioral_metrics:
+    - "intervention_acceptance_rate"
+    - "response_quality_score"
+    - "processing_time_ms"
+    
+  performance_metrics:
+    - "throughput_items_per_sec"
+    - "success_rate_pct"
+
+output:
+  base_path: "experiments/results"
+  formats: ["json"]
+  
+  artifacts:
+    save_raw_results: true
+    save_processed_metrics: true
+
+execution:
+  random_seeds:
+    global_seed: 42
+    corpus_seed: 123
+    
+  retry_policy:
+    max_retries: 1
+    
+  resource_limits:
+    max_memory_mb: 512
+    max_duration_minutes: 5
+
+validation:
+  success_criteria:
+    min_processed_items: 80
+    max_error_rate: 0.1
+    min_acceptance_rate: 0.2
+
+integration:
+  chronicle_integration:
+    enabled: true
+    auto_generate_tldl: false
+    
+  pet_events:
+    enabled: false
+    
+  telemetry:
+    enabled: true
+    track_developer_state: false
+    include_system_metrics: true

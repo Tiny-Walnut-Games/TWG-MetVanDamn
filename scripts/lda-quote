@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 #
-# Scroll Quote CLI - Easy access to the Secret Art of the Living Dev
+# 🎭 Enhanced Scroll Quote CLI - Access the Secret Art of the Living Dev
+# Now with Warbler-powered dynamic wisdom generation!
 #
 # Usage examples:
 #   ./lda-quote                     # Random quote
 #   ./lda-quote --context readme   # Context-appropriate quote
-#   ./lda-quote --buttsafe          # Buttsafe certified quote
+#   ./lda-quote --warbler           # Include generated quotes
+#   ./lda-quote --generate 3        # Generate 3 new quotes
 #   ./lda-quote --markdown          # Markdown formatted quote
 #
 set -e
@@ -18,11 +20,16 @@ CONTEXT=""
 CATEGORY=""
 FORMAT="cli"
 BUTTSAFE_ONLY=false
+USE_WARBLER=false
+GENERATE_COUNT=""
+SHOW_STATS=false
+VALIDATE=false
 
 # Colors
 BLUE='\033[0;34m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+PURPLE='\033[0;35m'
 NC='\033[0m'
 
 # ---------- Python bootstrap (cross-platform, non-interactive) ----------
@@ -54,28 +61,39 @@ export PY
 # ---------- end Python bootstrap ----------
 
 show_help() {
-    echo "🪶 Scroll Quote CLI - Access the Secret Art of the Living Dev"
+    echo -e "${PURPLE}🎭 Enhanced Scroll Quote CLI - The Living Oracle${NC}"
+    echo -e "${PURPLE}   Access the Secret Art of the Living Dev with Warbler power!${NC}"
     echo ""
     echo "Usage: $0 [options]"
     echo ""
-    echo "Options:"
+    echo "Quote Selection:"
     echo "  --context <context>     Get quote for specific context (readme, tldl, ci, etc.)"
     echo "  --category <category>   Get quote from specific category"
     echo "                         (general, development, debugging, documentation, commits,"
     echo "                          ci_cd, buttsafe, workflow, lore)"
     echo "  --format <format>       Output format: cli, markdown, plain (default: cli)"
     echo "  --buttsafe             Only show buttsafe certified quotes"
-    echo "  --stats                Show database statistics"
-    echo "  --validate             Validate quote database"
+    echo ""
+    echo "Warbler Integration:"
+    echo "  --warbler              Include Warbler-generated quotes in selection"
+    echo "  --generate <count>     Generate new quotes using Warbler (1-10)"
+    echo "  --classic              Use only classic static quotes (default)"
+    echo ""
+    echo "Information:"
+    echo "  --stats                Show enhanced database statistics"
+    echo "  --validate             Validate quote databases"
     echo "  --help, -h             Show this help"
     echo ""
     echo "Examples:"
-    echo "  $0                                    # Random quote"
-    echo "  $0 --context readme                  # Quote for README"
+    echo "  $0                                    # Random classic quote"
+    echo "  $0 --warbler                         # Random quote (classic or generated)"
+    echo "  $0 --generate 5                      # Generate 5 new wisdom quotes"
+    echo "  $0 --context readme --warbler        # README quote with generated options"
     echo "  $0 --category buttsafe --markdown    # Buttsafe quote in markdown"
-    echo "  $0 --stats                          # Show quote statistics"
+    echo "  $0 --stats                          # Enhanced quote statistics"
     echo ""
-    echo "🍑 Part of the Living Dev Agent ecosystem - Save the butts!"
+    echo -e "${GREEN}🍑 Part of the Living Dev Agent ecosystem - Save the butts!${NC}"
+    echo -e "${YELLOW}✨ Enhanced with Warbler-powered dynamic wisdom generation${NC}"
 }
 
 # Parse command line arguments
@@ -97,21 +115,26 @@ while [[ $# -gt 0 ]]; do
             BUTTSAFE_ONLY=true
             shift
             ;;
+        --warbler)
+            USE_WARBLER=true
+            shift
+            ;;
+        --classic)
+            USE_WARBLER=false
+            shift
+            ;;
+        --generate)
+            USE_WARBLER=true
+            GENERATE_COUNT="$2"
+            shift 2
+            ;;
         --stats)
-            if [[ -z "$PY" ]]; then
-              echo -e "${YELLOW}⚠️  Python not available. Cannot access the Secret Art.${NC}"
-              exit 1
-            fi
-            "$PY" "$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py" --stats
-            exit 0
+            SHOW_STATS=true
+            shift
             ;;
         --validate)
-            if [[ -z "$PY" ]]; then
-              echo -e "${YELLOW}⚠️  Python not available. Cannot access the Secret Art.${NC}"
-              exit 1
-            fi
-            "$PY" "$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py" --validate
-            exit 0
+            VALIDATE=true
+            shift
             ;;
         --help|-h)
             show_help
@@ -130,19 +153,72 @@ if [[ "$BUTTSAFE_ONLY" == true && -z "$CATEGORY" ]]; then
     CATEGORY="buttsafe"
 fi
 
-# Check if Python and quote engine are available
+# Check if Python is available
 if [[ -z "$PY" ]] || ! command -v "$PY" &> /dev/null; then
     echo -e "${YELLOW}⚠️  Python not available. Cannot access the Secret Art.${NC}"
     exit 1
 fi
 
-if [[ ! -f "$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py" ]]; then
-    echo -e "${YELLOW}⚠️  Quote engine not found. The scrolls may be missing.${NC}"
-    exit 1
+# Determine which engine to use
+if [[ "$USE_WARBLER" == true ]]; then
+    QUOTE_ENGINE="$PROJECT_ROOT/src/ScrollQuoteEngine/warbler_quote_engine.py"
+    ENGINE_NAME="Warbler-Powered Oracle"
+else
+    QUOTE_ENGINE="$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py"
+    ENGINE_NAME="Classic Scroll Engine"
 fi
 
-# Build the command
-CMD="\"$PY\" $PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py"
+# Check if selected engine exists
+if [[ ! -f "$QUOTE_ENGINE" ]]; then
+    echo -e "${YELLOW}⚠️  $ENGINE_NAME not found. The scrolls may be missing.${NC}"
+    
+    # Fallback to classic if Warbler not found
+    if [[ "$USE_WARBLER" == true ]]; then
+        echo -e "${BLUE}🔄 Falling back to classic quote engine...${NC}"
+        QUOTE_ENGINE="$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py"
+        USE_WARBLER=false
+        
+        if [[ ! -f "$QUOTE_ENGINE" ]]; then
+            echo -e "${YELLOW}⚠️  Classic quote engine also missing.${NC}"
+            exit 1
+        fi
+    else
+        exit 1
+    fi
+fi
+
+# Handle special commands
+if [[ "$SHOW_STATS" == true ]]; then
+    if [[ "$USE_WARBLER" == true ]]; then
+        echo -e "${PURPLE}🎭 Warbler-Powered Oracle Statistics:${NC}"
+        "$PY" "$QUOTE_ENGINE" --stats
+    else
+        echo -e "${BLUE}📚 Classic Scroll Database Statistics:${NC}"
+        "$PY" "$QUOTE_ENGINE" --stats
+    fi
+    exit 0
+fi
+
+if [[ "$VALIDATE" == true ]]; then
+    if [[ "$USE_WARBLER" == true ]]; then
+        echo -e "${PURPLE}🎭 Validating Warbler Oracle...${NC}"
+        # Warbler engine doesn't have validate yet, fall back to classic
+        "$PY" "$PROJECT_ROOT/src/ScrollQuoteEngine/quote_engine.py" --validate
+    else
+        echo -e "${BLUE}📚 Validating Classic Scrolls...${NC}"
+        "$PY" "$QUOTE_ENGINE" --validate
+    fi
+    exit 0
+fi
+
+if [[ -n "$GENERATE_COUNT" ]]; then
+    echo -e "${PURPLE}🎭 Generating $GENERATE_COUNT new wisdom quotes...${NC}"
+    "$PY" "$QUOTE_ENGINE" --generate "$GENERATE_COUNT"
+    exit 0
+fi
+
+# Build the quote retrieval command
+CMD="\"$PY\" \"$QUOTE_ENGINE\""
 
 if [[ -n "$CONTEXT" ]]; then
     CMD="$CMD --context '$CONTEXT'"
@@ -154,6 +230,18 @@ fi
 
 if [[ "$FORMAT" != "cli" ]]; then
     CMD="$CMD --format '$FORMAT'"
+fi
+
+# Add Warbler-specific options
+if [[ "$USE_WARBLER" == false ]]; then
+    CMD="$CMD --no-generated"
+fi
+
+# Show engine indicator for clarity
+if [[ "$USE_WARBLER" == true ]]; then
+    echo -e "${PURPLE}🎭 Consulting the Warbler Oracle...${NC}" >&2
+else
+    echo -e "${BLUE}📚 Reading from the Classic Scrolls...${NC}" >&2
 fi
 
 # Execute the command

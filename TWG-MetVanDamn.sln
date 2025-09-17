@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDevAgent.Editor", "LivingDevAgent.Editor.csproj", "{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Core", "TinyWalnutGames.MetVD.Core.csproj", "{4C65C270-6B4A-86F0-414F-15C2B74B3280}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Authoring.Editor", "TinyWalnutGames.MetVD.Authoring.Editor.csproj", "{2DDE79F6-EE58-C055-E19C-8CF00E5B0F1D}"
@@ -8,8 +10,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Authoring", "TinyWalnutGames.MetVD.Authoring.csproj", "{1C947371-7B21-A5C5-A553-6A4F3D0F5CFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Authoring.Tests", "TinyWalnutGames.MetVD.Authoring.Tests.csproj", "{642C44E6-7C9C-5F7F-6526-BAAAA0DCA5B4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivingDevAgent.Editor", "LivingDevAgent.Editor.csproj", "{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Utility", "TinyWalnutGames.MetVD.Utility.csproj", "{B929F59F-9716-BF18-93BC-E56A67BCECDE}"
 EndProject
@@ -43,6 +43,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4C65C270-6B4A-86F0-414F-15C2B74B3280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4C65C270-6B4A-86F0-414F-15C2B74B3280}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C65C270-6B4A-86F0-414F-15C2B74B3280}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -59,10 +63,6 @@ Global
 		{642C44E6-7C9C-5F7F-6526-BAAAA0DCA5B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{642C44E6-7C9C-5F7F-6526-BAAAA0DCA5B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{642C44E6-7C9C-5F7F-6526-BAAAA0DCA5B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AF0432E-5C35-DAB2-FF2D-D23F282C74C6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B929F59F-9716-BF18-93BC-E56A67BCECDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B929F59F-9716-BF18-93BC-E56A67BCECDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B929F59F-9716-BF18-93BC-E56A67BCECDE}.Release|Any CPU.ActiveCfg = Release|Any CPU

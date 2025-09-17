@@ -216,7 +216,7 @@ namespace TinyWalnutGames.Tools.Editor
 
             var factory = new SpriteDataProviderFactories();
             factory.Init();
-            var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+            ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
             dataProvider.InitSpriteEditorDataProvider();
 
             var rects = new List<SpriteRect>(dataProvider.GetSpriteRects());
@@ -228,10 +228,10 @@ namespace TinyWalnutGames.Tools.Editor
 
             // Store outlines using GUID as key
             copiedOutlines.Clear();
-            var outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
-            foreach (var rect in rects)
+            ISpritePhysicsOutlineDataProvider outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
+            foreach (SpriteRect rect in rects)
                 {
-                var outlines = outlineProvider.GetOutlines(rect.spriteID);
+                List<Vector2[]> outlines = outlineProvider.GetOutlines(rect.spriteID);
                 // Deep copy the outlines to avoid reference issues
                 copiedOutlines[rect.spriteID.ToString()] = outlines != null
                     ? outlines.Select(arr => arr.ToArray()).ToList()
@@ -279,7 +279,7 @@ namespace TinyWalnutGames.Tools.Editor
 
                 var factory = new SpriteDataProviderFactories();
                 factory.Init();
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
+                ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer);
                 dataProvider.InitSpriteEditorDataProvider();
 
                 // Scale rects to fit new texture size
@@ -290,9 +290,9 @@ namespace TinyWalnutGames.Tools.Editor
                 // Map from old rect GUID to new rect for outline assignment
                 Dictionary<string, SpriteRect> guidToNewRect = new();
 
-                foreach (var srcRect in copiedRects)
+                foreach (SpriteRect srcRect in copiedRects)
                     {
-                    var r = srcRect.rect;
+                    Rect r = srcRect.rect;
                     var scaledRect = new Rect(
                         Mathf.RoundToInt(r.x * scaleX),
                         Mathf.RoundToInt(r.y * scaleY),
@@ -319,21 +319,21 @@ namespace TinyWalnutGames.Tools.Editor
                 dataProvider.Apply();
 
                 // Set outlines (physics shapes)
-                var outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
-                foreach (var srcRect in copiedRects)
+                ISpritePhysicsOutlineDataProvider outlineProvider = dataProvider.GetDataProvider<ISpritePhysicsOutlineDataProvider>();
+                foreach (SpriteRect srcRect in copiedRects)
                     {
-                    if (!guidToNewRect.TryGetValue(srcRect.spriteID.ToString(), out var newRect))
+                    if (!guidToNewRect.TryGetValue(srcRect.spriteID.ToString(), out SpriteRect newRect))
                         continue;
 
-                    if (copiedOutlines.TryGetValue(srcRect.spriteID.ToString(), out var outlines) && outlines != null && outlines.Count > 0)
+                    if (copiedOutlines.TryGetValue(srcRect.spriteID.ToString(), out List<Vector2[]> outlines) && outlines != null && outlines.Count > 0)
                         {
-                        var srcRectRect = srcRect.rect;
-                        var newRectRect = newRect.rect;
+                        Rect srcRectRect = srcRect.rect;
+                        Rect newRectRect = newRect.rect;
                         float outlineScaleX = newRectRect.width / srcRectRect.width;
                         float outlineScaleY = newRectRect.height / srcRectRect.height;
 
                         List<Vector2[]> scaledOutlines = new();
-                        foreach (var outline in outlines)
+                        foreach (Vector2[] outline in outlines)
                             {
                             Vector2[] scaled = new Vector2[outline.Length];
                             for (int i = 0; i < outline.Length; i++)
@@ -378,7 +378,7 @@ namespace TinyWalnutGames.Tools.Editor
 
                 var factory = new SpriteDataProviderFactories(); // Create a new instance of SpriteDataProviderFactories to access sprite data providers
                 factory.Init(); // Initialize the factory to ensure it can provide data providers
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); // Get the sprite editor data provider for the texture importer
+                ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); // Get the sprite editor data provider for the texture importer
                 dataProvider.InitSpriteEditorDataProvider(); // Initialize the sprite editor data provider to access sprite data
 
                 var rects = new List<SpriteRect>(dataProvider.GetSpriteRects()); // Get all sprite rectangles from the data provider
@@ -462,7 +462,7 @@ namespace TinyWalnutGames.Tools.Editor
 
                 var factory = new SpriteDataProviderFactories(); // Create a new instance of SpriteDataProviderFactories to access sprite data providers
                 factory.Init(); // Initialize the factory to ensure it can provide data providers
-                var dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); // Get the sprite editor data provider for the texture importer
+                ISpriteEditorDataProvider dataProvider = factory.GetSpriteEditorDataProviderFromObject(importer); // Get the sprite editor data provider for the texture importer
                 dataProvider.InitSpriteEditorDataProvider(); // Initialize the sprite editor data provider to access sprite data
 
                 List<SpriteRect> spriteRects = new(); // Create a list to hold the sprite rectangles
@@ -525,7 +525,7 @@ namespace TinyWalnutGames.Tools.Editor
                             isEmpty = true;
 
                             // Iterate through the pixels to check if any pixel is not fully transparent
-                            foreach (var pixel in pixels)
+                            foreach (Color pixel in pixels)
                                 {
                                 if (pixel.a > 0f)
                                     {

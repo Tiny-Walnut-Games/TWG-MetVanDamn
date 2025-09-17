@@ -104,7 +104,6 @@ class OverlordSentinel {
         
         // Validate security settings
         const security = config.overlord.security;
-        if (security.max_daily_approvals < 1 || security.max_daily_approvals > 1000) {
         if (security.max_daily_approvals < MIN_DAILY_APPROVALS || security.max_daily_approvals > MAX_DAILY_APPROVALS) {
             throw new Error(`Invalid max_daily_approvals: must be between ${MIN_DAILY_APPROVALS} and ${MAX_DAILY_APPROVALS}`);
         }

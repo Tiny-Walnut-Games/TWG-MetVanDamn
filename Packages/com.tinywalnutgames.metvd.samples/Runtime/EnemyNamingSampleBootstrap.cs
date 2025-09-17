@@ -1,6 +1,7 @@
 using Unity.Entities;
 using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
+using Unity.Collections;
 
 namespace TinyWalnutGames.MetVD.Samples
 	{
@@ -47,12 +48,12 @@ namespace TinyWalnutGames.MetVD.Samples
 			EnemyAffixDatabase.InitializeDatabase(entityManager);
 
 			// Set global configuration
-			var query = entityManager.CreateEntityQuery(typeof(EnemyNamingConfig));
-			var configEntities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+			EntityQuery query = entityManager.CreateEntityQuery(typeof(EnemyNamingConfig));
+			NativeArray<Entity> configEntities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			if (configEntities.Length > 0)
 				{
-				var config = entityManager.GetComponentData<EnemyNamingConfig>(configEntities[0]);
+				EnemyNamingConfig config = entityManager.GetComponentData<EnemyNamingConfig>(configEntities[0]);
 				config.GlobalDisplayMode = displayMode;
 				entityManager.SetComponentData(configEntities[0], config);
 				}
@@ -101,7 +102,7 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// </summary>
 		private void CreateSampleEnemy(RarityType rarity, string baseType, uint seed)
 			{
-			var enemyEntity = entityManager.CreateEntity();
+			Entity enemyEntity = entityManager.CreateEntity();
 
 			// Add enemy profile
 			entityManager.AddComponentData(enemyEntity, new EnemyProfile(rarity, baseType, seed));
@@ -150,20 +151,20 @@ namespace TinyWalnutGames.MetVD.Samples
 				entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 				}
 
-			var query = entityManager.CreateEntityQuery(typeof(EnemyProfile), typeof(EnemyNaming));
-			var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+			EntityQuery query = entityManager.CreateEntityQuery(typeof(EnemyProfile), typeof(EnemyNaming));
+			NativeArray<Entity> entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			Debug.Log($"🎭 Displaying names for {entities.Length} enemies:");
 
-			foreach (var entity in entities)
+			foreach (Entity entity in entities)
 				{
-				var profile = entityManager.GetComponentData<EnemyProfile>(entity);
-				var naming = entityManager.GetComponentData<EnemyNaming>(entity);
+				EnemyProfile profile = entityManager.GetComponentData<EnemyProfile>(entity);
+				EnemyNaming naming = entityManager.GetComponentData<EnemyNaming>(entity);
 
 				string affixInfo = "";
 				if (entityManager.HasBuffer<EnemyAffixBufferElement>(entity))
 					{
-					var affixes = entityManager.GetBuffer<EnemyAffixBufferElement>(entity);
+					DynamicBuffer<EnemyAffixBufferElement> affixes = entityManager.GetBuffer<EnemyAffixBufferElement>(entity);
 					affixInfo = $" (Affixes: {affixes.Length})";
 					}
 
@@ -189,15 +190,15 @@ namespace TinyWalnutGames.MetVD.Samples
 					AffixDisplayMode.IconsOnly => AffixDisplayMode.NamesAndIcons,
 					AffixDisplayMode.NamesAndIcons => AffixDisplayMode.NamesOnly,
 					_ => AffixDisplayMode.NamesAndIcons
-				};
+					};
 
 			// Update global configuration
-			var query = entityManager.CreateEntityQuery(typeof(EnemyNamingConfig));
-			var configEntities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+			EntityQuery query = entityManager.CreateEntityQuery(typeof(EnemyNamingConfig));
+			NativeArray<Entity> configEntities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			if (configEntities.Length > 0)
 				{
-				var config = entityManager.GetComponentData<EnemyNamingConfig>(configEntities[0]);
+				EnemyNamingConfig config = entityManager.GetComponentData<EnemyNamingConfig>(configEntities[0]);
 				config.GlobalDisplayMode = displayMode;
 				entityManager.SetComponentData(configEntities[0], config);
 				}
@@ -219,16 +220,16 @@ namespace TinyWalnutGames.MetVD.Samples
 				}
 
 			// Example: Common "Crawler" + [Shuffler icon]
-			var commonCrawler = CreateExampleEnemy(RarityType.Common, "Crawler", new[] { "shuffling" });
+			Entity commonCrawler = CreateExampleEnemy(RarityType.Common, "Crawler", new[] { "shuffling" });
 
-			// Example: Uncommon "Archer" + [Teleport icon] [Poison icon]  
-			var uncommonArcher = CreateExampleEnemy(RarityType.Uncommon, "Archer", new[] { "teleporting", "poisonous" });
+			// Example: Uncommon "Archer" + [Teleport icon] [Poison icon]
+			Entity uncommonArcher = CreateExampleEnemy(RarityType.Uncommon, "Archer", new[] { "teleporting", "poisonous" });
 
 			// Example: Rare "Venomous Archer of Fury" + [Poison icon] [Berserker icon]
-			var rareArcher = CreateExampleEnemy(RarityType.Rare, "Archer", new[] { "poisonous", "berserker" });
+			Entity rareArcher = CreateExampleEnemy(RarityType.Rare, "Archer", new[] { "poisonous", "berserker" });
 
 			// Example: Boss with Berserker + Summoner + should create "Bermonzedd" or similar
-			var boss = CreateExampleEnemy(RarityType.Boss, "Guardian", new[] { "berserker", "summoner" });
+			Entity boss = CreateExampleEnemy(RarityType.Boss, "Guardian", new[] { "berserker", "summoner" });
 
 			Debug.Log("📚 Created problem statement examples:");
 			Debug.Log("  - Common Crawler with Shuffling");
@@ -242,21 +243,21 @@ namespace TinyWalnutGames.MetVD.Samples
 		/// </summary>
 		private Entity CreateExampleEnemy(RarityType rarity, string baseType, string[] affixIds)
 			{
-			var enemyEntity = entityManager.CreateEntity();
+			Entity enemyEntity = entityManager.CreateEntity();
 
 			// Add enemy profile
 			entityManager.AddComponentData(enemyEntity, new EnemyProfile(rarity, baseType, 99999));
 
 			// Add specific affixes
-			var affixBuffer = entityManager.AddBuffer<EnemyAffixBufferElement>(enemyEntity);
-			var affixQuery = entityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
-			var affixEntities = affixQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+			DynamicBuffer<EnemyAffixBufferElement> affixBuffer = entityManager.AddBuffer<EnemyAffixBufferElement>(enemyEntity);
+			EntityQuery affixQuery = entityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
+			NativeArray<Entity> affixEntities = affixQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
-			foreach (var affixId in affixIds)
+			foreach (string affixId in affixIds)
 				{
-				foreach (var affixEntity in affixEntities)
+				foreach (Entity affixEntity in affixEntities)
 					{
-					var affix = entityManager.GetComponentData<EnemyAffix>(affixEntity);
+					EnemyAffix affix = entityManager.GetComponentData<EnemyAffix>(affixEntity);
 					if (affix.Id.ToString() == affixId)
 						{
 						affixBuffer.Add(affix);

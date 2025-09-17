@@ -1,0 +1,368 @@
+name: 📚 Documentation & Architecture Validation
+
+# Jerry's legendary documentation quality system
+# Ensures all docs are scroll-worthy and architecture is sound
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'TLDL/**'
+      - '*.md'
+      - '.github/**'
+
+# Documentation-focused concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 📋 Documentation quality assessment
+  docs-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python for documentation validation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'scripts/requirements.txt'
+
+      - name: Install documentation tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+          # Install additional documentation tools
+          pip install markdown beautifulsoup4 requests || echo "⚠️ Some doc tools failed to install"
+
+      - name: TLDL Documentation Validation
+        run: |
+          echo "📚 Validating TLDL documentation quality..."
+          python src/SymbolicLinter/validate_docs.py --tldl-path TLDL/entries/ --verbose
+
+      - name: Documentation Structure Validation
+        run: |
+          echo "🏗️ Validating documentation structure..."
+          
+          # Check for required documentation files
+          required_docs=("README.md" "CONTRIBUTING.md")
+          missing_docs=()
+          
+          for doc in "${required_docs[@]}"; do
+            if [ ! -f "$doc" ]; then
+              missing_docs+=("$doc")
+            fi
+          done
+          
+          if [ ${#missing_docs[@]} -gt 0 ]; then
+            echo "⚠️ Missing required documentation: ${missing_docs[*]}"
+          else
+            echo "✅ Required documentation files present"
+          fi
+
+      - name: Markdown Quality Check
+        run: |
+          echo "📝 Checking Markdown quality..."
+          
+          # Find all markdown files
+          markdown_files=$(find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*")
+          
+          if [ -z "$markdown_files" ]; then
+            echo "⚠️ No Markdown files found"
+            exit 0
+          fi
+          
+          issues_found=false
+          
+          for file in $markdown_files; do
+            echo "Checking: $file"
+            
+            # Check for basic markdown issues
+            if grep -q "^#\{7,\}" "$file"; then
+              echo "⚠️ $file: Headers deeper than 6 levels found"
+              issues_found=true
+            fi
+            
+            # Check for empty links
+            if grep -q "\[\](" "$file" || grep -q "\[.*\]()" "$file"; then
+              echo "⚠️ $file: Empty or malformed links found"
+              issues_found=true
+            fi
+            
+            # Check for TODO/FIXME in documentation
+            if grep -i "TODO\|FIXME" "$file"; then
+              echo "⚠️ $file: TODO/FIXME items found - consider completing"
+            fi
+          done
+          
+          if [ "$issues_found" = false ]; then
+            echo "✅ Markdown quality check passed"
+          fi
+
+      - name: Documentation Completeness Check
+        run: |
+          echo "📋 Checking documentation completeness..."
+          
+          # Check if README has basic sections
+          if [ -f "README.md" ]; then
+            sections=("Installation" "Usage" "Contributing" "License")
+            missing_sections=()
+            
+            for section in "${sections[@]}"; do
+              if ! grep -qi "##.*$section\|#.*$section" README.md; then
+                missing_sections+=("$section")
+              fi
+            done
+            
+            if [ ${#missing_sections[@]} -gt 0 ]; then
+              echo "⚠️ README.md missing recommended sections: ${missing_sections[*]}"
+            else
+              echo "✅ README.md has all recommended sections"
+            fi
+          fi
+
+  # 🏗️ Architecture documentation validation
+  architecture-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Architecture Documentation Check
+        run: |
+          echo "🏗️ Validating architecture documentation..."
+          
+          # Look for architecture documentation
+          arch_docs=$(find . -name "*architecture*" -o -name "*design*" -type f -name "*.md" 2>/dev/null || true)
+          
+          if [ -z "$arch_docs" ]; then
+            echo "💡 Consider adding architecture documentation for better maintainability"
+          else
+            echo "✅ Architecture documentation found:"
+            echo "$arch_docs"
+          fi
+
+      - name: Code Documentation Coverage
+        run: |
+          echo "📖 Checking code documentation coverage..."
+          
+          # Count documented vs undocumented Python files
+          python_files=$(find src/ -name "*.py" 2>/dev/null | wc -l || echo "0")
+          documented_files=$(find src/ -name "*.py" -exec grep -l '"""' {} \; 2>/dev/null | wc -l || echo "0")
+          
+          if [ "$python_files" -gt 0 ]; then
+            coverage_percent=$((documented_files * 100 / python_files))
+            echo "Python documentation coverage: $coverage_percent% ($documented_files/$python_files files)"
+            
+            if [ "$coverage_percent" -lt 50 ]; then
+              echo "⚠️ Low documentation coverage - consider adding more docstrings"
+            else
+              echo "✅ Good documentation coverage"
+            fi
+          fi
+
+  # 📊 Documentation metrics and reporting
+  docs-metrics:
+    runs-on: ubuntu-latest
+    needs: [docs-quality, architecture-docs]
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Generate Documentation Metrics
+        run: |
+          echo "📊 Generating documentation metrics..."
+          
+          # Count different types of documentation
+          total_md=$(find . -name "*.md" -not -path "./.git/*" | wc -l)
+          tldl_entries=$(find TLDL/ -name "*.md" 2>/dev/null | wc -l || echo "0")
+          readme_files=$(find . -name "README.md" -not -path "./.git/*" | wc -l)
+          
+          echo "Documentation Metrics:"
+          echo "======================"
+          echo "Total Markdown files: $total_md"
+          echo "TLDL entries: $tldl_entries"
+          echo "README files: $readme_files"
+          
+          # Calculate total documentation size
+          total_size=$(find . -name "*.md" -not -path "./.git/*" -exec wc -c {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
+          total_size_kb=$((total_size / 1024))
+          
+          echo "Total documentation size: ${total_size_kb}KB"
+          
+          # Generate recommendations
+          echo ""
+          echo "Recommendations:"
+          echo "==============="
+          
+          if [ "$tldl_entries" -lt 5 ]; then
+            echo "💡 Consider creating more TLDL entries to document development journey"
+          fi
+          
+          if [ "$total_md" -lt 10 ]; then
+            echo "💡 Consider expanding documentation for better project understanding"
+          fi
+          
+          if [ "$readme_files" -eq 0 ]; then
+            echo "❌ No README.md found - this is critical for project onboarding"
+          fi
+
+      - name: Documentation Health Score
+        run: |
+          echo "🏥 Calculating documentation health score..."
+          
+          # Start with base score
+          health_score=100
+          
+          # Penalties for missing elements
+          if [ ! -f "README.md" ]; then
+            health_score=$((health_score - 30))
+            echo "❌ No README.md (-30 points)"
+          fi
+          
+          if [ ! -f "CONTRIBUTING.md" ]; then
+            health_score=$((health_score - 10))
+            echo "⚠️ No CONTRIBUTING.md (-10 points)"
+          fi
+          
+          # Check TLDL entries
+          tldl_count=$(find TLDL/ -name "*.md" 2>/dev/null | wc -l || echo "0")
+          if [ "$tldl_count" -lt 3 ]; then
+            health_score=$((health_score - 15))
+            echo "⚠️ Few TLDL entries ($tldl_count) (-15 points)"
+          fi
+          
+          # Bonus for good practices
+          if [ -f ".github/copilot-instructions.md" ]; then
+            health_score=$((health_score + 10))
+            echo "✅ Copilot instructions present (+10 points)"
+          fi
+          
+          # Ensure score doesn't go below 0
+          if [ "$health_score" -lt 0 ]; then
+            health_score=0
+          fi
+          
+          echo ""
+          echo "📊 Documentation Health Score: $health_score/100"
+          
+          if [ "$health_score" -ge 90 ]; then
+            echo "🏆 Excellent documentation! Scroll-worthy achievement!"
+          elif [ "$health_score" -ge 70 ]; then
+            echo "✅ Good documentation coverage"
+          elif [ "$health_score" -ge 50 ]; then
+            echo "⚠️ Documentation needs improvement"
+          else
+            echo "❌ Documentation requires significant attention"
+          fi
+          
+          # Export score for badge/status
+          echo "DOCS_HEALTH_SCORE=$health_score" >> $GITHUB_ENV
+
+  # 📚 Link validation and accessibility
+  link-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Extract and Validate Links
+        run: |
+          echo "🔗 Validating documentation links..."
+          
+          # Find all markdown files
+          markdown_files=$(find . -name "*.md" -not -path "./.git/*")
+          
+          if [ -z "$markdown_files" ]; then
+            echo "⚠️ No Markdown files found for link validation"
+            exit 0
+          fi
+          
+          # Extract links from markdown files
+          all_links=$(grep -oh 'http[s]*://[^)]*' $markdown_files 2>/dev/null || true)
+          internal_links=$(grep -oh '\[.*\]([^h][^t][^t][^p][^)]*\.md)' $markdown_files 2>/dev/null || true)
+          
+          echo "Found $(echo "$all_links" | wc -l) external links"
+          echo "Found $(echo "$internal_links" | wc -l) internal links"
+          
+          # Check internal links
+          broken_internal=0
+          if [ ! -z "$internal_links" ]; then
+            echo "Checking internal links..."
+            for link in $internal_links; do
+              # Extract the file path from markdown link
+              file_path=$(echo "$link" | sed 's/.*(\([^)]*\)).*/\1/')
+              if [ ! -f "$file_path" ]; then
+                echo "❌ Broken internal link: $file_path"
+                broken_internal=$((broken_internal + 1))
+              fi
+            done
+          fi
+          
+          if [ "$broken_internal" -eq 0 ]; then
+            echo "✅ All internal links valid"
+          else
+            echo "⚠️ $broken_internal broken internal links found"
+          fi
+
+  # 🎯 Final documentation certification
+  docs-certification:
+    runs-on: ubuntu-latest
+    needs: [docs-quality, architecture-docs, docs-metrics, link-validation]
+    if: always()
+    steps:
+      - name: Documentation Assessment Summary
+        run: |
+          echo "📚 Documentation Assessment Complete"
+          echo "===================================="
+          
+          # Check individual job results
+          quality_status="${{ needs.docs-quality.result }}"
+          architecture_status="${{ needs.architecture-docs.result }}"
+          metrics_status="${{ needs.docs-metrics.result }}"
+          links_status="${{ needs.link-validation.result }}"
+          
+          echo "Individual Results:"
+          echo "- Documentation Quality: $quality_status"
+          echo "- Architecture Docs: $architecture_status"
+          echo "- Documentation Metrics: $metrics_status"
+          echo "- Link Validation: $links_status"
+          
+          # Determine overall status
+          if [[ "$quality_status" == "success" && "$metrics_status" == "success" && "$links_status" == "success" ]]; then
+            echo ""
+            echo "📚 DOCUMENTATION CERTIFICATION: SCROLL-WORTHY ✅"
+            echo "Documentation meets high quality standards!"
+          elif [[ "$quality_status" == "failure" ]]; then
+            echo ""
+            echo "📚 DOCUMENTATION CERTIFICATION: NEEDS IMPROVEMENT ⚠️"
+            echo "Core documentation quality issues detected"
+          else
+            echo ""
+            echo "📚 DOCUMENTATION CERTIFICATION: ACCEPTABLE ✅"
+            echo "Documentation is functional with minor areas for improvement"
+          fi
+
+      - name: Documentation Badge Status
+        run: |
+          if [[ "${{ needs.docs-quality.result }}" == "success" && "${{ needs.docs-metrics.result }}" == "success" ]]; then
+            echo "DOCS_STATUS=passing" >> $GITHUB_ENV
+          else
+            echo "DOCS_STATUS=needs-improvement" >> $GITHUB_ENV
+          fi
+          
+          echo "📊 Documentation badge status: $DOCS_STATUS"

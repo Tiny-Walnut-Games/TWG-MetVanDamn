@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &706666766
+--- !u!1 &87950481
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,79 +127,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 706666768}
-  - component: {fileID: 706666767}
-  m_Layer: 0
-  m_Name: ECS Prefab Registry
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &706666767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 706666766}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a20f5a4a56d35ff46869791363fee22f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVanDAMN.Authoring.EcsPrefabRegistryAuthoring
-  Entries:
-  - Key: spawn_boss
-    Prefab: {fileID: 0}
-  - Key: spawn_enemy_melee
-    Prefab: {fileID: 0}
-  - Key: spawn_enemy_ranged
-    Prefab: {fileID: 0}
-  - Key: pickup_health
-    Prefab: {fileID: 0}
-  - Key: pickup_coin
-    Prefab: {fileID: 0}
-  - Key: pickup_weapon
-    Prefab: {fileID: 0}
-  - Key: spawn_door_locked
-    Prefab: {fileID: 0}
-  - Key: spawn_door_timed
-    Prefab: {fileID: 0}
-  - Key: spawn_portal_biome
-    Prefab: {fileID: 0}
-  - Key: setpiece_crashed_ship
-    Prefab: {fileID: 0}
-  EnableGizmoPrefabGeneration: 1
-  GeneratedGizmoShape: 0
-  GeneratedGizmoSize: 1
-  GeneratedGizmoColor: {r: 0.2, g: 0.9, b: 0.3, a: 0.9}
-  GeneratedPrefabsFolder: Assets/MetVanDAMN/Debug/GizmoPrefabs
-  OverwriteExistingWithGizmos: 0
---- !u!4 &706666768
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 706666766}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &756953845
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 756953847}
-  - component: {fileID: 756953846}
+  - component: {fileID: 87950483}
+  - component: {fileID: 87950482}
   m_Layer: 0
   m_Name: SmokeTestSceneSetup
   m_TagString: Untagged
@@ -207,13 +136,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &756953846
+--- !u!114 &87950482
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 756953845}
+  m_GameObject: {fileID: 87950481}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d925fd7c338e4454a87c6eeada28e376, type: 3}
@@ -228,13 +157,13 @@ MonoBehaviour:
   enableDebugVisualization: 1
   logGenerationSteps: 1
   createdFallbackWorld: 0
---- !u!4 &756953847
+--- !u!4 &87950483
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 756953845}
+  m_GameObject: {fileID: 87950481}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -243,7 +172,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1312748837
+--- !u!1 &179585176
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -251,104 +180,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1312748839}
-  - component: {fileID: 1312748838}
-  m_Layer: 0
-  m_Name: WorldAuthoring
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1312748838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1312748837}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90521ed7d3795674db856fb06a7bda46, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVanDAMN.Authoring.WorldAuthoring
-  worldSeed: 42
-  worldSize: {x: 50, y: 50, z: 0}
-  targetSectorCount: 5
-  biomeTransitionRadius: 10
-  enableDebugVisualization: 1
-  logGenerationSteps: 1
---- !u!4 &1312748839
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1312748837}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1474259958
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1474259960}
-  - component: {fileID: 1474259959}
-  m_Layer: 0
-  m_Name: BiomeArtProfileLibrary
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1474259959
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1474259958}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52975f4dc763c274a9f3c909b5b39269, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVD.Authoring.BiomeArtProfileLibraryAuthoring
-  library: {fileID: 0}
---- !u!4 &1474259960
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1474259958}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1993078562
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1993078565}
-  - component: {fileID: 1993078564}
-  - component: {fileID: 1993078563}
+  - component: {fileID: 179585179}
+  - component: {fileID: 179585178}
+  - component: {fileID: 179585177}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -356,21 +190,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &1993078563
+--- !u!81 &179585177
 AudioListener:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1993078562}
+  m_GameObject: {fileID: 179585176}
   m_Enabled: 1
---- !u!20 &1993078564
+--- !u!20 &179585178
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1993078562}
+  m_GameObject: {fileID: 179585176}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
@@ -415,16 +249,182 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!4 &1993078565
+--- !u!4 &179585179
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1993078562}
+  m_GameObject: {fileID: 179585176}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 8, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1885704333
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1885704335}
+  - component: {fileID: 1885704334}
+  m_Layer: 0
+  m_Name: WorldAuthoring
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1885704334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885704333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90521ed7d3795674db856fb06a7bda46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVanDAMN.Authoring.WorldAuthoring
+  worldSeed: 42
+  worldSize: {x: 50, y: 50, z: 0}
+  targetSectorCount: 5
+  biomeTransitionRadius: 10
+  enableDebugVisualization: 1
+  logGenerationSteps: 1
+--- !u!4 &1885704335
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885704333}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2053999598
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2053999600}
+  - component: {fileID: 2053999599}
+  m_Layer: 0
+  m_Name: BiomeArtProfileLibrary
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2053999599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053999598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52975f4dc763c274a9f3c909b5b39269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVD.Authoring.BiomeArtProfileLibraryAuthoring
+  library: {fileID: 11400000, guid: ce2bb23cbb6595848bd667c33f5f6b02, type: 2}
+--- !u!4 &2053999600
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053999598}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2145114494
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2145114496}
+  - component: {fileID: 2145114495}
+  m_Layer: 0
+  m_Name: ECS Prefab Registry
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2145114495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2145114494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a20f5a4a56d35ff46869791363fee22f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVanDAMN.Authoring.EcsPrefabRegistryAuthoring
+  Entries:
+  - Key: spawn_boss
+    Prefab: {fileID: 0}
+  - Key: spawn_enemy_melee
+    Prefab: {fileID: 0}
+  - Key: spawn_enemy_ranged
+    Prefab: {fileID: 0}
+  - Key: pickup_health
+    Prefab: {fileID: 0}
+  - Key: pickup_coin
+    Prefab: {fileID: 0}
+  - Key: pickup_weapon
+    Prefab: {fileID: 0}
+  - Key: spawn_door_locked
+    Prefab: {fileID: 0}
+  - Key: spawn_door_timed
+    Prefab: {fileID: 0}
+  - Key: spawn_portal_biome
+    Prefab: {fileID: 0}
+  - Key: setpiece_crashed_ship
+    Prefab: {fileID: 0}
+  EnableGizmoPrefabGeneration: 1
+  GeneratedGizmoShape: 0
+  GeneratedGizmoSize: 1
+  GeneratedGizmoColor: {r: 0.2, g: 0.9, b: 0.3, a: 0.9}
+  GeneratedPrefabsFolder: Assets/MetVanDAMN/Debug/GizmoPrefabs
+  OverwriteExistingWithGizmos: 0
+--- !u!4 &2145114496
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2145114494}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -434,8 +434,8 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1993078565}
-  - {fileID: 706666768}
-  - {fileID: 1312748839}
-  - {fileID: 1474259960}
-  - {fileID: 756953847}
+  - {fileID: 179585179}
+  - {fileID: 2145114496}
+  - {fileID: 1885704335}
+  - {fileID: 2053999600}
+  - {fileID: 87950483}

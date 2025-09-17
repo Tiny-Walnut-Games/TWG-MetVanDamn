@@ -230,9 +230,67 @@ else {
             exit 3
         }
     }
-    Write-Host "ERROR: Test results file not found after fallback at $testResults" -ForegroundColor Red
-    if (Test-Path $logPath2) { Write-Host "See log: $logPath2" -ForegroundColor Yellow }
-    exit 4
+    Write-Host "ERROR: Test results file not found after fallback. Trying enhanced methods..." -ForegroundColor Red
+    $ts3 = Get-Date -Format 'yyyyMMdd_HHmmss'
+    $testResults3 = Join-Path $resultsDir "TestResults_$ts3.xml"
+    $logPath3 = Join-Path $resultsDir "unity_powershell_test_${ts3}_enhanced.log"
+    
+    # Try the enhanced methods based on test platform
+    $enhancedMethod = switch ($testPlatform) {
+        "EditMode" { "TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunEditMode" }
+        "PlayMode" { "TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunPlayMode" }
+        default { "TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunAll" }
+    }
+    
+    Write-Host "Trying enhanced method: $enhancedMethod" -ForegroundColor Cyan
+    $argsList3 = @(
+        '-batchmode', '-nographics',
+        '-projectPath', $projectPath,
+        '-executeMethod', $enhancedMethod,
+        '-testResults', $testResults3,
+        '-logFile', $logPath3,
+        '-quit'
+    )
+    # Propagate env filter/category if present
+    if ($env:UNITY_TEST_FILTER) { $argsList3 += @('-testFilter', $env:UNITY_TEST_FILTER) }
+    if ($env:UNITY_TEST_CATEGORY) { $argsList3 += @('-testCategory', $env:UNITY_TEST_CATEGORY) }
+    $argsList3 = $argsList3 | ForEach-Object { [string]$_ }
+    $proc3 = Start-Process -FilePath $unityPath -ArgumentList $argsList3 -NoNewWindow -PassThru -Wait
+    $exit3 = $proc3.ExitCode; if ($null -eq $exit3) { $exit3 = 1 }
+    if ($exit3 -ne 0) { Write-Host "Unity enhanced method exited with code $exit3" -ForegroundColor Yellow }
+    
+    # Use the enhanced results
+    $testResults = $testResults3
+    if (-not (Test-Path $testResults)) {
+        $found3 = Get-ChildItem -LiteralPath $resultsDir -Filter 'TestResults_*.xml' -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if ($found3) { $testResults = $found3.FullName }
+    }
+    
+    if (Test-Path $testResults) {
+        try {
+            [xml]$xml = Get-Content -LiteralPath $testResults
+            $tr = $xml.'test-run'
+            if ($tr) {
+                Write-Host "\nTest Summary (Enhanced)" -ForegroundColor Cyan
+                Write-Host ("   Total: {0}" -f $tr.total)
+                Write-Host ("   Passed: {0}" -f $tr.passed) -ForegroundColor Green
+                Write-Host ("   Failed: {0}" -f $tr.failed) -ForegroundColor Red
+                Write-Host ("   Duration: {0}s" -f $tr.duration)
+                if ([int]$tr.failed -gt 0) { exit 2 } else { exit 0 }
+            }
+        }
+        catch {
+            Write-Host "ERROR: Could not parse enhanced test results XML: $($_.Exception.Message)" -ForegroundColor Red
+            exit 3
+        }
+    }
+    else {
+        Write-Host "ERROR: No test results found after all attempts" -ForegroundColor Red
+        if (Test-Path $logPath3) { Write-Host "See enhanced log: $logPath3" -ForegroundColor Yellow }
+        if (Test-Path $logPath2) { Write-Host "See fallback log: $logPath2" -ForegroundColor Yellow }
+        if (Test-Path $logPath) { Write-Host "See original log: $logPath" -ForegroundColor Yellow }
+        exit 4
+    }
 }
 
 Write-Host "\nTest run complete!" -ForegroundColor Green

@@ -199,7 +199,7 @@ namespace LivingDevAgent.Core.Validation
         {
             // Try to find existing debug system implementation
             // This allows the validation to work with different debug systems
-            var existing = FindFirstObjectByType<MonoBehaviour>() as IDebugOverlaySystem;
+            var existing = FindObjectOfType<MonoBehaviour>() as IDebugOverlaySystem;
             return existing ?? new MockDebugSystem();
         }
         

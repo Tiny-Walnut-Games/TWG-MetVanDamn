@@ -1,0 +1,291 @@
+# Pet System Schema
+# Jerry's legendary pet evolution and event tracking system
+
+schema_version: "1.0.0"
+created: "2025-01-15"
+last_updated: "2025-01-15"
+
+# Pet Event Types
+event_types:
+  # Core Pet Events
+  BIRTH:
+    description: "Pet spawns into existence"
+    required_fields:
+      - pet_id
+      - pet_type
+      - spawn_condition
+      - timestamp
+    optional_fields:
+      - origin_context
+      - initial_traits
+
+  EVOLUTION:
+    description: "Pet evolves to new form or gains abilities"
+    required_fields:
+      - pet_id
+      - evolution_trigger
+      - new_form
+      - timestamp
+    optional_fields:
+      - previous_form
+      - evolution_conditions_met
+      - new_abilities
+
+  ACHIEVEMENT_UNLOCK:
+    description: "Pet unlocks new achievement or badge"
+    required_fields:
+      - pet_id
+      - achievement_id
+      - achievement_type
+      - timestamp
+    optional_fields:
+      - achievement_description
+      - unlock_conditions
+      - reward_granted
+
+  # Idea Charter System Events  
+  CONCEPT_SEED:
+    description: "Pet gains concept seed from triaged idea charter"
+    required_fields:
+      - pet_id
+      - charter_id
+      - charter_title
+      - seed_type
+      - timestamp
+    optional_fields:
+      - charter_path
+      - implementation_status
+      - synergy_score
+      - integrity_boost_potential
+    validation:
+      charter_id_format: "IDEA-YYYY-MM-DD-*"
+      seed_types:
+        - "innovation"
+        - "optimization" 
+        - "integration"
+        - "experimentation"
+        - "architectural"
+    chronicle_keeper_triggers:
+      - charter_completion
+      - implementation_milestone
+      - concept_integration
+
+  IMPLEMENTATION_SUCCESS:
+    description: "Pet celebrates successful idea implementation"
+    required_fields:
+      - pet_id
+      - charter_id
+      - implementation_type
+      - success_metrics
+      - timestamp
+    optional_fields:
+      - duration_days
+      - synergy_achieved
+      - integrity_boost_realized
+
+  IMPLEMENTATION_FAILURE:
+    description: "Pet processes abandoned idea according to kill criteria"
+    required_fields:
+      - pet_id
+      - charter_id
+      - failure_reason
+      - kill_criteria_met
+      - timestamp
+    optional_fields:
+      - lessons_learned
+      - salvage_value
+      - next_iteration_ideas
+
+  # Badge and XP Events
+  XP_GAIN:
+    description: "Pet gains experience points"
+    required_fields:
+      - pet_id
+      - xp_amount
+      - xp_source
+      - timestamp
+    optional_fields:
+      - activity_type
+      - multiplier_applied
+      - total_xp
+
+  BADGE_EARNED:
+    description: "Pet earns new badge"
+    required_fields:
+      - pet_id
+      - badge_id
+      - badge_type
+      - timestamp
+    optional_fields:
+      - badge_description
+      - earning_criteria
+      - rarity_level
+
+  # Social and Collaboration Events
+  COLLABORATION:
+    description: "Pet participates in collaborative work"
+    required_fields:
+      - pet_id
+      - collaboration_type
+      - participants
+      - timestamp
+    optional_fields:
+      - project_context
+      - contribution_type
+      - synergy_created
+
+  MENTORSHIP:
+    description: "Pet provides or receives mentorship"
+    required_fields:
+      - pet_id
+      - mentorship_role
+      - context
+      - timestamp
+    optional_fields:
+      - knowledge_transferred
+      - skill_developed
+      - relationship_type
+
+# Pet Types and Characteristics
+pet_types:
+  ARCHIVIST_FAMILIAR:
+    description: "Tracks idea streaks and documentation completeness"
+    unlock_conditions:
+      - min_idea_charters: 3
+      - min_tldl_entries: 10
+      - documentation_quality_score: 80
+    special_abilities:
+      - idea_streak_tracking
+      - charter_completeness_validation
+      - lore_preservation_enhancement
+    evolution_paths:
+      - CHRONICLE_KEEPER_ASSISTANT
+      - WISDOM_CURATOR
+
+  INNOVATION_SPRITE:
+    description: "Celebrates creative breakthrough and novel solutions"
+    unlock_conditions:
+      - concept_seeds_collected: 5
+      - innovation_implementations: 2
+      - synergy_score_total: 100
+    special_abilities:
+      - concept_synthesis
+      - innovation_pattern_recognition
+      - creative_spark_amplification
+    evolution_paths:
+      - BREAKTHROUGH_PHOENIX
+      - SYNERGY_WEAVER
+
+  INTEGRITY_GUARDIAN:
+    description: "Monitors system health and quality improvements"
+    unlock_conditions:
+      - integrity_boosts_delivered: 3
+      - code_quality_improvements: 5
+      - buttsafe_assessments_completed: 10
+    special_abilities:
+      - system_health_monitoring
+      - quality_metric_tracking
+      - risk_assessment_enhancement
+    evolution_paths:
+      - SENTINEL_OVERLORD
+      - QUALITY_ORACLE
+
+# Streak Monitoring Configuration
+streak_monitoring:
+  idea_streak_thresholds:
+    healthy: 0.3  # 30% implementation rate
+    concerning: 0.15  # 15% implementation rate  
+    critical: 0.05  # 5% implementation rate
+  
+  evaluation_windows:
+    short_term: 14  # days
+    medium_term: 30  # days
+    long_term: 90   # days
+  
+  streak_events:
+    STREAK_HEALTHY:
+      condition: "implementation_ratio >= healthy_threshold"
+      pet_rewards:
+        - xp_bonus: 25
+        - special_ability_unlock: true
+    
+    STREAK_CONCERNING:
+      condition: "implementation_ratio < healthy_threshold"
+      actions:
+        - warning_notification: true
+        - charter_review_trigger: true
+    
+    STREAK_CRITICAL:
+      condition: "implementation_ratio < critical_threshold"
+      actions:
+        - alert_notification: true
+        - mandatory_charter_audit: true
+        - kill_criteria_review: true
+
+# Integration Points
+integrations:
+  chronicle_keeper:
+    auto_lore_triggers:
+      - CONCEPT_SEED with high synergy_score
+      - IMPLEMENTATION_SUCCESS with significant integrity_boost
+      - EVOLUTION events for Archivist Familiar
+    
+  tldl_system:
+    auto_tldl_triggers:
+      - streak_health_changes
+      - major_evolution_events
+      - concept_seed_chains
+    
+  github_workflows:
+    webhook_events:
+      - charter_completion
+      - implementation_milestones
+      - streak_threshold_changes
+
+# Data Storage Schema
+data_storage:
+  event_log_format:
+    timestamp: "ISO 8601 format"
+    event_type: "string from event_types"
+    pet_id: "uuid4 format"
+    data: "JSON object matching event schema"
+    
+  pet_state_format:
+    pet_id: "uuid4 format"
+    pet_type: "string from pet_types"
+    current_level: "integer"
+    total_xp: "integer"
+    badges: "array of badge_ids"
+    traits: "object with trait_name: trait_value"
+    creation_timestamp: "ISO 8601 format"
+    last_activity: "ISO 8601 format"
+
+# Validation Rules
+validation_rules:
+  charter_eligibility:
+    - "Charter must have status 'Triaged' or higher"
+    - "Charter must contain all required fields"
+    - "Charter must pass idea_tag validation"
+    
+  concept_seed_requirements:
+    - "Only triaged charters eligible for concept seed events"
+    - "Concept seeds must have valid synergy mappings"
+    - "Implementation tracking required for seed events"
+    
+  streak_calculation:
+    - "Count implementations completed in evaluation window"
+    - "Count total charters created in same window"
+    - "Ratio = implementations / total_charters"
+    - "Apply thresholds based on evaluation_windows"
+
+# Migration and Versioning
+versioning:
+  schema_updates:
+    - "Backward compatibility required for event logs"
+    - "Migration scripts for schema changes"
+    - "Version validation in all tools"
+    
+  deprecation_policy:
+    - "6 month notice for breaking changes"
+    - "Legacy event type support during transition"
+    - "Clear migration documentation"

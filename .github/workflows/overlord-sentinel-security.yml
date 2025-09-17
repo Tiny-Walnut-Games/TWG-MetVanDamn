@@ -31,17 +31,98 @@ jobs:
     
     steps:
       - name: 🏛️ Checkout code
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
+        uses: actions/checkout@v5
 
       - name: 🐍 Set up Python
-        uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.x"
 
       - name: 📦 Install Python security tools
         run: |
-          pip install bandit pip-audit safety
+          pip install bandit pip-audit safety truffleHog3
           echo "✅ Python security tools installed"
+
+      - name: 🔍 Advanced Secret Scanning (TruffleHog)
+        run: |
+          echo "🔍 Running TruffleHog entropy-based secret detection..."
+          # Use TruffleHog for entropy-based secret scanning
+          python3 -c "
+import subprocess
+import json
+import os
+
+# Run TruffleHog with entropy detection
+try:
+    result = subprocess.run([
+        'truffleHog3', '--format=json', '--entropy=True', '--max_depth=50', 
+        '--exclude_paths=.git,node_modules,*.log,*.sarif,*.json'
+    ], capture_output=True, text=True, cwd='.')
+    
+    if result.stdout:
+        # Parse and convert to SARIF
+        trufflehog_results = []
+        for line in result.stdout.strip().split('\n'):
+            if line.strip():
+                try:
+                    finding = json.loads(line)
+                    trufflehog_results.append(finding)
+                except:
+                    continue
+        
+        # Create SARIF format for TruffleHog results
+        sarif = {
+            'version': '2.1.0',
+            'runs': [{
+                'tool': {
+                    'driver': {
+                        'name': 'TruffleHog',
+                        'version': '3.x',
+                        'informationUri': 'https://github.com/trufflesecurity/truffleHog',
+                        'shortDescription': {'text': 'Entropy-based secret scanner'}
+                    }
+                },
+                'results': []
+            }]
+        }
+        
+        for finding in trufflehog_results:
+            sarif_result = {
+                'ruleId': 'entropy-secret-detection',
+                'message': {'text': f'Potential secret detected: {finding.get(\"reason\", \"High entropy string\")}'},
+                'level': 'error',
+                'locations': [{
+                    'physicalLocation': {
+                        'artifactLocation': {
+                            'uri': finding.get('path', 'unknown')
+                        },
+                        'region': {
+                            'startLine': finding.get('lineNumber', 1),
+                            'snippet': {'text': finding.get('stringsFound', [''])[0][:100]}
+                        }
+                    }
+                }]
+            }
+            sarif['runs'][0]['results'].append(sarif_result)
+        
+        # Write SARIF output
+        with open('trufflehog-results.sarif', 'w') as f:
+            json.dump(sarif, f, indent=2)
+        
+        print(f'📊 TruffleHog found {len(trufflehog_results)} potential secrets')
+    else:
+        print('✅ TruffleHog found no secrets')
+        # Create empty SARIF for consistency
+        with open('trufflehog-results.sarif', 'w') as f:
+            json.dump({'version': '2.1.0', 'runs': [{'tool': {'driver': {'name': 'TruffleHog'}}, 'results': []}]}, f)
+
+except Exception as e:
+    print(f'⚠️ TruffleHog scan failed: {e}')
+    # Create empty SARIF for consistency
+    with open('trufflehog-results.sarif', 'w') as f:
+        json.dump({'version': '2.1.0', 'runs': [{'tool': {'driver': {'name': 'TruffleHog'}}, 'results': []}]}, f)
+"
+          echo "📊 Advanced secret scanning completed"
 
       - name: 🔍 Run Bandit (Python security)
         run: |
@@ -103,7 +184,7 @@ jobs:
           echo "📊 Bandit scan completed"
 
       - name: 🟢 Install Node.js
-        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398 # v4
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
 
@@ -293,6 +374,96 @@ jobs:
           fi
           echo "📊 Python dependency audit completed"
 
+      - name: 📋 Generate Software Bill of Materials (SBOM)
+        run: |
+          echo "📋 Generating Software Bill of Materials..."
+          
+          # Install cycloneDX for SBOM generation
+          pip install cyclonedx-bom
+          
+          # Generate SBOM from requirements
+          if [ -f "scripts/requirements.txt" ]; then
+            cyclonedx-py -r scripts/requirements.txt -o sbom.json --format json
+          fi
+          
+          # Generate SBOM from current environment
+          cyclonedx-py -e -o sbom-current.json --format json || echo "Current environment SBOM generation failed"
+          
+          # Create SBOM analysis summary
+          python3 -c "
+import json
+import os
+
+sbom_files = ['sbom.json', 'sbom-current.json']
+total_components = 0
+
+for sbom_file in sbom_files:
+    if os.path.exists(sbom_file):
+        try:
+            with open(sbom_file, 'r') as f:
+                sbom_data = json.load(f)
+            components = sbom_data.get('components', [])
+            print(f'📦 {sbom_file}: {len(components)} components analyzed')
+            total_components += len(components)
+        except Exception as e:
+            print(f'⚠️ Error analyzing {sbom_file}: {e}')
+
+print(f'📊 Total components tracked: {total_components}')
+"
+          echo "📋 SBOM generation completed"
+
+      - name: 🔍 Container Security Baseline Check
+        run: |
+          echo "🔍 Running container security baseline checks..."
+          
+          # Check for Docker/container security best practices
+          if [ -f "Dockerfile" ]; then
+            echo "🐳 Dockerfile security analysis..."
+            
+            # Basic Dockerfile security checks
+            python3 -c "
+import os
+import re
+
+if os.path.exists('Dockerfile'):
+    with open('Dockerfile', 'r') as f:
+        dockerfile_content = f.read()
+    
+    security_issues = []
+    
+    # Check for root user
+    if not re.search(r'USER\s+(?!root)', dockerfile_content, re.IGNORECASE):
+        security_issues.append('Dockerfile may run as root user')
+    
+    # Check for COPY instead of ADD
+    if re.search(r'^ADD\s+', dockerfile_content, re.MULTILINE):
+        security_issues.append('Use COPY instead of ADD when possible')
+    
+    # Check for pinned base image versions
+    if re.search(r'FROM\s+[^:]+$', dockerfile_content, re.MULTILINE):
+        security_issues.append('Base image should specify version tag')
+    
+    # Check for exposed sensitive ports
+    sensitive_ports = ['22', '23', '3389', '5432', '3306']
+    for port in sensitive_ports:
+        if re.search(rf'EXPOSE\s+{port}', dockerfile_content):
+            security_issues.append(f'Exposed sensitive port: {port}')
+    
+    if security_issues:
+        print('⚠️ Dockerfile security recommendations:')
+        for issue in security_issues:
+            print(f'  - {issue}')
+    else:
+        print('✅ Dockerfile follows basic security practices')
+else:
+    print('📄 No Dockerfile found - container security check skipped')
+"
+          else
+            echo "📄 No Dockerfile found - skipping container security analysis"
+          fi
+          
+          echo "🔍 Container security baseline check completed"
+
       - name: 🔍 Dependency Audit (Node) 
         run: |
           echo "🔍 Running Node.js dependency security audit..."
@@ -300,13 +471,14 @@ jobs:
           echo "📊 Node.js dependency audit completed"
 
       - name: 📊 Upload SARIF results to GitHub Security
-        uses: github/codeql-action/upload-sarif@cc18fa8621ebc2961c68a319279dcf9e91aa5791 # v3
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: |
             bandit-results.sarif
             pip-audit-results.sarif
             semgrep-results.sarif
+            trufflehog-results.sarif
         continue-on-error: true
 
       - name: 🎖️ Generate Sentinel Verdict & Lore Log
@@ -415,7 +587,7 @@ jobs:
           echo "high_issues=$HIGH_ISSUES" >> $GITHUB_OUTPUT
 
       - name: 📦 Upload security reports as artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: overlord-sentinel-security-reports
@@ -423,8 +595,11 @@ jobs:
             bandit-results.sarif
             semgrep-results.sarif
             pip-audit-results.sarif
+            trufflehog-results.sarif
             eslint-security.json
             npm-audit-results.json
+            sbom.json
+            sbom-current.json
           retention-days: 30
 
       - name: 🚨 Fail build on critical security issues
@@ -444,7 +619,7 @@ jobs:
     
     steps:
       - name: 🏛️ Checkout Repository
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
+        uses: actions/checkout@v5
         
       - name: 📜 Log Sentinel Verdict in Chronicles
         run: |

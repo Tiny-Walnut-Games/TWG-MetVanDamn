@@ -1,0 +1,113 @@
+{
+  "packInfo": {
+    "name": "warbler-pack-core",
+    "version": "0.1.0",
+    "description": "Core conversation templates for essential NPC interactions",
+    "author": "TWG Team",
+    "compatibleEngine": "^0.1.0"
+  },
+  "templates": [
+    {
+      "id": "greeting_friendly",
+      "version": "1.0.0",
+      "title": "Friendly Greeting",
+      "description": "A warm, welcoming greeting for friendly NPCs",
+      "content": "Hello there, {{user_name}}! Welcome to {{location}}. It's a beautiful {{time_of_day}} today, isn't it?",
+      "requiredSlots": [
+        { "name": "user_name", "type": "string", "required": false, "description": "Name to address the user" },
+        { "name": "location", "type": "string", "required": false, "description": "Current location name" },
+        { "name": "time_of_day", "type": "string", "required": false, "description": "Current time period" }
+      ],
+      "tags": ["greeting", "friendly", "casual", "general"],
+      "maxLength": 150
+    },
+    {
+      "id": "greeting_formal",
+      "version": "1.0.0", 
+      "title": "Formal Greeting",
+      "description": "A polite, formal greeting for official NPCs",
+      "content": "Good {{time_of_day}}, {{user_title}}. I am {{npc_name}}, {{npc_role}} of {{location}}. How may I assist you today?",
+      "requiredSlots": [
+        { "name": "user_title", "type": "string", "required": false, "description": "Formal title for the user" },
+        { "name": "npc_name", "type": "string", "required": true, "description": "Name of the speaking NPC" },
+        { "name": "npc_role", "type": "string", "required": false, "description": "Role or position of the NPC" },
+        { "name": "location", "type": "string", "required": false, "description": "Current location name" },
+        { "name": "time_of_day", "type": "string", "required": false, "description": "Current time period" }
+      ],
+      "tags": ["greeting", "formal", "official", "polite"],
+      "maxLength": 200
+    },
+    {
+      "id": "farewell_friendly",
+      "version": "1.0.0",
+      "title": "Friendly Farewell", 
+      "description": "A warm goodbye for friendly interactions",
+      "content": "It was great talking with you, {{user_name}}! Safe travels on your journey. May you find what you seek!",
+      "requiredSlots": [
+        { "name": "user_name", "type": "string", "required": false, "description": "Name to address the user" }
+      ],
+      "tags": ["farewell", "friendly", "blessing", "journey"],
+      "maxLength": 120
+    },
+    {
+      "id": "farewell_formal",
+      "version": "1.0.0",
+      "title": "Formal Farewell",
+      "description": "A polite, formal goodbye",
+      "content": "Thank you for your visit, {{user_title}}. Should you require further assistance, please do not hesitate to return.",
+      "requiredSlots": [
+        { "name": "user_title", "type": "string", "required": false, "description": "Formal title for the user" }
+      ],
+      "tags": ["farewell", "formal", "polite", "business"],
+      "maxLength": 150
+    },
+    {
+      "id": "help_general",
+      "version": "1.0.0",
+      "title": "General Help Offer",
+      "description": "A helpful response offering assistance",
+      "content": "Of course! I'd be happy to help you, {{user_name}}. What specifically can I assist you with today? I know quite a bit about {{location}} and the surrounding area.",
+      "requiredSlots": [
+        { "name": "user_name", "type": "string", "required": false, "description": "Name to address the user" },
+        { "name": "location", "type": "string", "required": false, "description": "Current location name" }
+      ],
+      "tags": ["help_request", "assistance", "general", "knowledge"],
+      "maxLength": 200
+    },
+    {
+      "id": "trade_inquiry_welcome",
+      "version": "1.0.0",
+      "title": "Trade Welcome",
+      "description": "Welcoming response to trade inquiries",
+      "content": "Ah, a fellow trader! You've come to the right place. I have {{item_types}} available for trade. What interests you, or perhaps you have something to sell?",
+      "requiredSlots": [
+        { "name": "item_types", "type": "string", "required": false, "description": "Types of items available for trade" }
+      ],
+      "tags": ["trade_inquiry", "merchant", "commerce", "welcome"],
+      "maxLength": 180
+    },
+    {
+      "id": "general_conversation",
+      "version": "1.0.0",
+      "title": "General Conversation",
+      "description": "Fallback template for general conversation",
+      "content": "That's interesting. {{location}} has seen many travelers like yourself. Each one has their own story to tell. What brings you to our {{location_type}}?",
+      "requiredSlots": [
+        { "name": "location", "type": "string", "required": false, "description": "Current location name" },
+        { "name": "location_type", "type": "string", "required": false, "description": "Type of location (town, village, city, etc.)" }
+      ],
+      "tags": ["general_conversation", "fallback", "storytelling", "inquiry"],
+      "maxLength": 160
+    },
+    {
+      "id": "unknown_response",
+      "version": "1.0.0",
+      "title": "Unknown Response Handler",
+      "description": "Fallback for unclear or unrecognized input",
+      "content": "I'm not quite sure I understand what you mean. Could you perhaps rephrase that? I want to make sure I can help you properly.",
+      "requiredSlots": [],
+      "tags": ["general", "fallback", "clarification", "unknown"],
+      "maxLength": 140
+    }
+  ]
+}
