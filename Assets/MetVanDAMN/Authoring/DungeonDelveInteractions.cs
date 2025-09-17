@@ -86,9 +86,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             Debug.Log($"🔑 Press E to interact with {lockName}");
             
             // Create actual UI prompt
-            if (GameObject.FindObjectOfType<Canvas>() != null)
+            var canvas = GameObject.FindObjectOfType<Canvas>();
+            if (canvas != null)
             {
-                var canvas = GameObject.FindObjectOfType<Canvas>();
                 var promptGO = new GameObject("LockInteractionPrompt");
                 promptGO.transform.SetParent(canvas.transform, false);
                 
