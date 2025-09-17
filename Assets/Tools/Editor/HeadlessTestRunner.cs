@@ -91,8 +91,8 @@ namespace TinyWalnutGames.Tools.Editor
                 _startTime = DateTime.Now;
                 }
 
-            public void RunStarted(ITestAdaptor testsToRun) 
-                { 
+            public void RunStarted(ITestAdaptor testsToRun)
+                {
                 Debug.Log($"HeadlessTestRunner: Test run started for {_testMode}");
                 }
 
@@ -100,9 +100,9 @@ namespace TinyWalnutGames.Tools.Editor
                 {
                 var endTime = DateTime.Now;
                 var duration = (endTime - _startTime).TotalSeconds;
-                
+
                 Debug.Log($"HeadlessTestRunner: Test run finished for {_testMode} in {duration:F2} seconds");
-                
+
                 try
                     {
                     WriteEnhancedNUnitXml(result, _resultsPath, _startTime, endTime, _testMode);
@@ -121,7 +121,7 @@ namespace TinyWalnutGames.Tools.Editor
                 finally
                     {
                     try { AssetDatabase.SaveAssets(); } catch { }
-                    
+
                     // Schedule exit on the next editor update to give Unity enough time to flush logs to disk.
                     // In most cases, this is sufficient for log flushing, but on slower machines or under heavy load,
                     // consider waiting for multiple frames or using a longer delay if logs are missing.
@@ -129,13 +129,13 @@ namespace TinyWalnutGames.Tools.Editor
                     }
                 }
 
-            public void TestStarted(ITestAdaptor test) 
-                { 
+            public void TestStarted(ITestAdaptor test)
+                {
                 Debug.Log($"HeadlessTestRunner: Starting test: {test.FullName}");
                 }
-                
-            public void TestFinished(ITestResultAdaptor result) 
-                { 
+
+            public void TestFinished(ITestResultAdaptor result)
+                {
                 var status = result.ResultState == "Passed" ? "[PASS]" : "[FAIL]";
                 Debug.Log($"HeadlessTestRunner: {status} {result.FullName} - {result.ResultState}");
                 if (!string.IsNullOrEmpty(result.Message))
@@ -149,25 +149,25 @@ namespace TinyWalnutGames.Tools.Editor
                 int total = CountTotalTestCases(result);
                 int passed = 0, failed = 0, skipped = 0, inconclusive = 0;
                 CountResults(result, ref passed, ref failed, ref skipped, ref inconclusive);
-                
+
                 var duration = (endTime - startTime).TotalSeconds;
 
                 var sb = new StringBuilder();
                 sb.Append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
                 sb.AppendFormat("<test-run id=\"1\" testcasecount=\"{0}\" total=\"{0}\" passed=\"{1}\" failed=\"{2}\" inconclusive=\"{3}\" skipped=\"{4}\" result=\"{5}\" start-time=\"{6}\" end-time=\"{7}\" duration=\"{8:F6}\">\n",
-                    total, passed, failed, inconclusive, skipped, 
+                    total, passed, failed, inconclusive, skipped,
                     failed == 0 ? "Passed" : "Failed",
                     startTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture),
                     endTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture),
                     duration);
-                    
+
                 sb.AppendFormat("  <command-line><![CDATA[Unity {0} Tests via HeadlessTestRunner]]></command-line>\n", testMode);
                 sb.Append("  <test-suite type=\"Assembly\" id=\"0-1000\" name=\"Unity.TestRunner\" fullname=\"Unity.TestRunner\">\n");
                 sb.AppendFormat("    <result>{0}</result>\n", failed == 0 ? "Passed" : "Failed");
-                
+
                 // Add detailed test results
                 WriteTestSuiteDetails(result, sb, "    ");
-                
+
                 sb.Append("  </test-suite>\n");
                 sb.Append("</test-run>\n");
 
@@ -180,7 +180,7 @@ namespace TinyWalnutGames.Tools.Editor
                     {
                     foreach (var child in node.Children)
                         {
-                        sb.AppendFormat("{0}<test-suite type=\"TestFixture\" name=\"{1}\" fullname=\"{2}\">\n", 
+                        sb.AppendFormat("{0}<test-suite type=\"TestFixture\" name=\"{1}\" fullname=\"{2}\">\n",
                             indent, EscapeXml(child.Name), EscapeXml(child.FullName));
                         sb.AppendFormat("{0}  <result>{1}</result>\n", indent, child.FailCount == 0 ? "Passed" : "Failed");
                         WriteTestSuiteDetails(child, sb, indent + "  ");
@@ -190,14 +190,14 @@ namespace TinyWalnutGames.Tools.Editor
                 else
                     {
                     // Individual test case
-                    sb.AppendFormat("{0}<test-case name=\"{1}\" fullname=\"{2}\" result=\"{3}\"", 
+                    sb.AppendFormat("{0}<test-case name=\"{1}\" fullname=\"{2}\" result=\"{3}\"",
                         indent, EscapeXml(node.Name), EscapeXml(node.FullName), node.ResultState);
-                    
-                    if (node.Duration.HasValue)
+
+                    if (node.Duration > 0)
                         {
-                        sb.AppendFormat(" duration=\"{0:F6}\"", node.Duration.Value);
+                        sb.AppendFormat(" duration=\"{0:F6}\"", node.Duration);
                         }
-                    
+
                     if (!string.IsNullOrEmpty(node.Message) || !string.IsNullOrEmpty(node.StackTrace))
                         {
                         sb.Append(">\n");

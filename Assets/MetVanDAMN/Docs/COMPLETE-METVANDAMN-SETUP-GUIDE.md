@@ -1,7 +1,11 @@
 # 🗺️ The Complete MetVanDAMN Setup & Experience Guide
 ## *From Fresh Clone to "Holy Cosmic Cheeks, This Actually Works!" in 15 Minutes*
 
+<<<<<<< HEAD
 > **"In the realm of procedural MetroidVania generation, there are no accidents - only adventures waiting to unfold."**  
+=======
+> **"In the realm of procedural MetroidVania generation, there are no accidents - only adventures waiting to unfold."**
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 > — The Sacred Scrolls of MetVanDAMN, Chapter 3, Verse 42
 
 ---
@@ -10,9 +14,15 @@
 
 **Goal**: Take you from repository clone to successfully experiencing procedural MetVanDAMN world generation with visual feedback and complete understanding.
 
+<<<<<<< HEAD
 **Success Criteria**: 
 - ✅ Unity opens project without errors
 - ✅ You can press Play and see immediate world generation 
+=======
+**Success Criteria**:
+- ✅ Unity opens project without errors
+- ✅ You can press Play and see immediate world generation
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 - ✅ Visual feedback shows districts, rooms, and biome fields
 - ✅ You can regenerate worlds with different seeds
 - ✅ You understand how to customize and extend the system
@@ -62,32 +72,20 @@ scripts/init_agent_context.sh
 **Windows Users**: Run these commands in Git Bash or WSL for best results.
 
 ### **Step 3: Install Development Dependencies**
-```bash
 # Install Python dependencies for validation tools
 pip install -r scripts/requirements.txt
 
 # Note: Network timeouts are acceptable - core dependencies are typically pre-installed
 ```
 
----
-
-## 🏗️ **Phase 2: Unity Project Setup (5 minutes)**
-
-### **Step 1: Open in Unity**
 1. **Launch Unity Hub**
-2. **Click "Add"** and navigate to your cloned `TWG-MetVanDamn` folder
 3. **Select Unity 6000.2.0f1** (or latest Unity 6.x version)
 4. **Click "Open"**
 
 Unity will automatically:
-- Import all packages and dependencies
-- Compile scripts (may take 2-3 minutes on first import)
-- Initialize DOTS systems
-
 ### **Step 2: Verify DOTS Packages**
 Open **Window > Package Manager** and confirm these packages are installed:
-- ✅ **Entities** (1.2.0+)
-- ✅ **Collections** (1.2.4+)  
+- ✅ **Collections** (1.2.4+)
 - ✅ **Mathematics** (1.2.6+)
 - ✅ **Burst** (1.8.0+)
 
@@ -124,26 +122,22 @@ Open **Window > General > Console** and verify:
 
 #### **Create Custom Scene**
 1. **File > New Scene** 
+=======
+1. **File > New Scene**
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 2. **Save As**: `Assets/Scenes/MyMetVanDAMN.unity`
 3. **Add GameObject** and name it "MetVanDAMN_Setup"
 4. **Add Component**: `SmokeTestSceneSetup` (from TinyWalnutGames.MetVD.Samples)
 
 #### **Configure World Parameters**
 ```yaml
-World Seed: 42                    # Reproducible worlds
-World Size: (50, 50)             # Reasonable for testing  
-Target Sector Count: 5           # Number of districts
-Biome Transition Radius: 10.0    # Polarity field influence
-Enable Debug Visualization: ✅   # See world bounds
-Log Generation Steps: ✅         # Track progress
+=======
+World Size: (50, 50)             # Reasonable for testing
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 ```
 
 #### **Test Generation**
-1. **Press Play** ▶️
-2. **Inspector shows**: Runtime regeneration controls
-3. **Scene View shows**: Green wireframe world bounds
 
----
 
 ## 🎨 **Phase 4: Visual Feedback & Debugging (3 minutes)**
 
@@ -189,40 +183,30 @@ Log Generation Steps: ✅         # Track progress
 ## 🔧 **Phase 5: Validation & Testing (2 minutes)**
 
 ### **Run Validation Tools**
-```bash
 # Validate documentation structure (~60ms)
 python3 src/SymbolicLinter/validate_docs.py --tldl-path docs/
 
+<<<<<<< HEAD
 # Validate debug overlay system (~56ms) 
-python3 src/DebugOverlayValidation/debug_overlay_validator.py --path src/
-
+=======
 # Run symbolic linting (~68ms - may show expected parse errors)
 python3 src/SymbolicLinter/symbolic_linter.py --path src/
-```
-
-### **Expected Results**
-- **✅ TLDL validation**: PASS (potential warnings about entry ID format)
 - **⚠️ Debug overlay validation**: 85.7% health score (C# parsing issues are expected)
 - **⚠️ Symbolic linting**: Parse errors for Python files (expected behavior)
 
 ### **Manual Verification Checklist**
 - [ ] Unity console shows successful world generation
 - [ ] Scene view displays green debug bounds
+<<<<<<< HEAD
 - [ ] Entity Debugger shows hub + district entities  
+=======
+- [ ] Entity Debugger shows hub + district entities
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 - [ ] Inspector regeneration buttons work during Play mode
 - [ ] Different seeds produce different debug visualizations
-- [ ] No compilation errors in Console
-
----
-
 ## ⚔️ **Troubleshooting Common Issues**
 
-### **"No Entities Created"**
-**Symptoms**: Console shows generation logs but Entity Debugger is empty
-**Solutions**:
-1. Verify `SmokeTestSceneSetup` component is **active and enabled**
 2. Check **Window > Entities > Entity Debugger** is set to correct world
-3. Ensure **World.DefaultGameObjectInjectionWorld** exists
 
 ### **"Debug Visualization Not Showing"**
 **Symptoms**: No green wireframes or colored shapes in Scene view
@@ -239,19 +223,9 @@ python3 src/SymbolicLinter/symbolic_linter.py --path src/
 3. Verify **EntityManager** is valid (inspector shows this)
 
 ### **"Compilation Errors"**
-**Symptoms**: Red error messages in Console
-**Solutions**:
-1. **Restart Unity** (clears cached compilation issues)
 2. **Reimport All**: Assets > Reimport All
 3. **Verify DOTS packages** are properly installed
-
-### **"Performance Issues"**
-**Symptoms**: Gizmos redraw constantly, inspector lags
-**Solutions**:
-1. Our **performance fix** reduces redraw frequency to 0.5s intervals
-2. **Disable Debug Visualization** when not needed
 3. **Close Entity Debugger** when not actively debugging
-
 ---
 
 ## 🧙‍♂️ **Understanding MetVanDAMN Architecture**
@@ -290,96 +264,72 @@ WorldSeed → Districts → Rooms → Biome Fields → Gate Conditions
 - **Generation Logging**: Enable/disable console progress output
 - **Entity Information**: Live counts and current seed display
 
----
 
 ## 📚 **Next Steps & Advanced Usage**
 
 ### **Expand Your MetVanDAMN Knowledge**
 1. **Study the Code**: Explore `Packages/com.tinywalnutgames.metvd.*` directories
+<<<<<<< HEAD
 2. **Read TLDL Entries**: Check `docs/` for development chronicles  
+=======
+2. **Read TLDL Entries**: Check `docs/` for development chronicles
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 3. **Examine Test Cases**: Look at `Assets/MetVanDAMN/Authoring/Tests/`
 4. **Join the Community**: Contribute to Living Dev Agent workflow
 
-### **Create Your First Custom World**
-1. **Modify Parameters**: Try different seeds, sizes, and sector counts
-2. **Add Biome Fields**: Create custom polarity field configurations
-3. **Extend Room Types**: Add new room generation patterns
 4. **Implement Features**: Build on the MetVanDAMN foundation
 
-### **Living Dev Agent Workflow**
-```bash
-# Create development entries for your discoveries
-scripts/init_agent_context.sh --create-tldl "MyMetVanDAMNExperiments"
 
 # Document your journey for future adventurers
 # Follow the TLDL template in docs/tldl_template.yaml
 ```
 
----
-
-## 🏆 **Achievement Unlocked: MetVanDAMN Master**
-
 **🎉 Congratulations, fellow Buttguard!** You've successfully:
-
-- ✅ **Set up MetVanDAMN** from fresh repository clone
 - ✅ **Experienced procedural generation** with immediate visual feedback  
+- ✅ **Experienced procedural generation** with immediate visual feedback
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 - ✅ **Understood the architecture** and customization options
 - ✅ **Mastered troubleshooting** common setup issues
 - ✅ **Validated your installation** with comprehensive testing
 
 **You are now ready to:**
 - 🌍 **Generate infinite procedural worlds** with confidence
+<<<<<<< HEAD
 - 🛠️ **Customize and extend** the MetVanDAMN system  
+=======
+- 🛠️ **Customize and extend** the MetVanDAMN system
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 - 🧙‍♂️ **Contribute to the community** through TLDL documentation
 - 🍑 **Maintain butt comfort** while coding awesome features
 
 ---
 
+<<<<<<< HEAD
 ## 🎮 **Phase 6: Full Playable Demo Experience (10 minutes)**
 
 ### **🎯 Creating a Complete Game Demo**
 
 **Goal**: Transform the basic world generation into a fully playable MetroidVania experience with player character, combat, inventory, and progression systems.
-
 #### **Step 1: Player Character Setup**
 ```csharp
 // Add to your scene or create prefab
 GameObject player = new GameObject("Player");
 player.AddComponent<CharacterController>();
-player.AddComponent<PlayerMovementController>();
-player.AddComponent<PlayerInventorySystem>();
-player.AddComponent<PlayerAbilityManager>();
-
-// Configure basic movement
 var movement = player.GetComponent<PlayerMovementController>();
 movement.moveSpeed = 5.0f;
-movement.jumpHeight = 2.0f;
-movement.doubleJumpEnabled = true; // Classic MetroidVania ability
-```
-
 #### **Step 2: Demo Skills & Abilities**
-```csharp
 // Essential MetroidVania abilities
 var abilities = player.GetComponent<PlayerAbilityManager>();
 abilities.UnlockAbility("DoubleJump");
 abilities.UnlockAbility("WallJump");
-abilities.UnlockAbility("DashAbility");
-abilities.UnlockAbility("BasicCombat");
-
 // Progression-gated abilities (unlocked by exploration)
 abilities.SetProgressionGate("SuperJump", "SunBiome_KeyItem");
-abilities.SetProgressionGate("FireResistance", "HeatBiome_PowerCore");
-```
-
-#### **Step 3: Demo Inventory System**
 ```csharp
-// Equippable items and upgrades
 var inventory = player.GetComponent<PlayerInventorySystem>();
 inventory.AddItem("BasicSword", ItemType.Weapon, true); // equipped
 inventory.AddItem("LeatherArmor", ItemType.Armor, true);
 inventory.AddItem("HealthPotion", ItemType.Consumable, 3);
 inventory.AddItem("EnergyCell", ItemType.KeyItem, 1);
-
 // Upgrade progression
 inventory.AddUpgrade("WeaponDamage", 1);
 inventory.AddUpgrade("MovementSpeed", 1);
@@ -391,16 +341,6 @@ inventory.AddUpgrade("HealthCapacity", 2);
 // Spawn demo enemies in generated districts
 foreach(var district in generatedDistricts) {
     if(district.BiomeType == BiomeType.Heat) {
-        SpawnEnemy("FireElemental", district.CenterPosition);
-        SpawnEnemy("LavaSlime", district.RandomRoom());
-    }
-    if(district.BiomeType == BiomeType.Cold) {
-        SpawnEnemy("IceGolem", district.CenterPosition);
-        SpawnEnemy("FrostSpider", district.RandomRoom());
-    }
-}
-
-// Demo boss encounter
 if(generatedDistricts.Count >= 3) {
     var bossDistrict = generatedDistricts.Last();
     SpawnBoss("ElementalArchon", bossDistrict.BossRoom);
@@ -470,6 +410,8 @@ public class DemoVictoryConditions {
 
 ---
 
+=======
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 ## 🤝 **Community & Support**
 
 ### **Getting Help**
@@ -493,6 +435,7 @@ public class DemoVictoryConditions {
 
 ## 📄 **Document Information**
 
+<<<<<<< HEAD
 **Version**: 2.0 - Complete Setup & Full Demo Guide  
 **Created**: January 2025  
 **Updated**: January 2025 - Enhanced for Full Playable Demo Requirements  
@@ -513,3 +456,12 @@ public class DemoVictoryConditions {
 - ✅ Playable start to finish experience
 
 *This guide is living documentation - it evolves with community feedback and discoveries.*
+=======
+**Version**: 1.0 - Complete Setup Guide
+**Created**: January 2025
+**Author**: Living Dev Agent Community
+**Sacred Commitment**: Save The Butts! Manifesto Compliance
+**Purpose**: Eliminate setup frustration and enable immediate MetVanDAMN success
+
+*This guide is living documentation - it evolves with community feedback and discoveries.*
+>>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)

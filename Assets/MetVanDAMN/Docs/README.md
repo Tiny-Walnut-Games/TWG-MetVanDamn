@@ -105,7 +105,7 @@ This is the **definitive documentation hub** for all MetVanDAMN namespace conten
 
 ---
 
-## 🔍 **Finding What You Need**
+##  **Finding What You Need**
 
 ### **📍 Quick Navigation by Purpose**
 
@@ -132,7 +132,7 @@ This is the **definitive documentation hub** for all MetVanDAMN namespace conten
 
 ---
 
-## 📞 **Support & Community**
+##  **Support & Community**
 
 ### **🤝 Getting Help**
 1. **Check this documentation hub** for existing guides

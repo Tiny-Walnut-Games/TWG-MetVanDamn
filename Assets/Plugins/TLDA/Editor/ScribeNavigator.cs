@@ -20,6 +20,21 @@ namespace LivingDevAgent.Editor.Scribe
         private readonly Dictionary<string, bool> _folderExpanded = new();
         private Vector2 _scrollPosition;
 
+        // Performance: cache directory listings to avoid expensive rescans each OnGUI
+        private class DirListing
+            {
+            public string[] Dirs;
+            public List<string> Files;
+            public double LastScan;
+            }
+        private readonly Dictionary<string, DirListing> _dirCache = new();
+        private const double DirRescanInterval = 5.0; // seconds
+        private static readonly string[] SupportedPatterns = new[]
+            {
+                "*.asset", "*.md", "*.py", "*.sh", "*.js", "*.mjs", "*.cs", "*.yaml", "*.yml", "*.json", "*.txt",
+                "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.tga"
+            };
+
         // 🔧 ENHANCEMENT READY - Multi-format file support for Spellsmith integration
         private readonly Dictionary<string, Color> _fileTypeColors = new()
         {
@@ -85,6 +100,10 @@ namespace LivingDevAgent.Editor.Scribe
             // 🔧 Quick access buttons for common locations
             EditorGUILayout.BeginHorizontal();
                 {
+                if (GUILayout.Button("↻", GUILayout.Width(24)))
+                    {
+                    _dirCache.Clear();
+                    }
                 if (GUILayout.Button("📜 Docs", GUILayout.Width(50)))
                     {
                     string docsPath = Path.Combine(Application.dataPath, "../docs");
@@ -172,35 +191,58 @@ namespace LivingDevAgent.Editor.Scribe
 
             if (_folderExpanded[path])
                 {
+                // Use cached listing for performance
+                DirListing listing = GetOrBuildListing(path);
+
                 // Draw subdirectories
-                string[] dirs = Directory.GetDirectories(path);
-                System.Array.Sort(dirs);
-                foreach (string dir in dirs)
+                foreach (string dir in listing.Dirs)
                     {
                     DrawDirectoryNode(dir, depth + 1);
                     }
 
-                // 🔧 ENHANCEMENT READY - Multi-format file support
-                // Current: Text files and images
-                // Enhancement path: All development-related files with proper thumbnails
-                string[] supportedExtensions = new[] {
-                    "*.asset", "*.md", "*.py", "*.sh", "*.js", "*.mjs", "*.cs", "*.yaml", "*.yml", "*.json", "*.txt",
-                    "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.tga" // 🖼️ Image files
-                };
-                var allFiles = new List<string>();
-
-                foreach (string pattern in supportedExtensions)
-                    {
-                    string[] files = Directory.GetFiles(path, pattern);
-                    allFiles.AddRange(files);
-                    }
-
-                System.Array.Sort(allFiles.ToArray());
-                foreach (string file in allFiles)
+                // Files
+                foreach (string file in listing.Files)
                     {
                     DrawFileNode(file, depth + 1);
                     }
                 }
+            }
+
+        DirListing GetOrBuildListing(string path)
+            {
+            double now = EditorApplication.timeSinceStartup;
+
+            if (_dirCache.TryGetValue(path, out var cached))
+                {
+                if (now - cached.LastScan < DirRescanInterval) return cached;
+                }
+
+            var listing = new DirListing();
+            try
+                {
+                string[] dirs = Directory.GetDirectories(path);
+                System.Array.Sort(dirs);
+                listing.Dirs = dirs;
+
+                var files = new List<string>();
+                foreach (string pattern in SupportedPatterns)
+                    {
+                    string[] found = Directory.GetFiles(path, pattern);
+                    files.AddRange(found);
+                    }
+                files.Sort(System.StringComparer.OrdinalIgnoreCase);
+                listing.Files = files;
+                listing.LastScan = now;
+                }
+            catch
+                {
+                listing.Dirs = System.Array.Empty<string>();
+                listing.Files = new List<string>();
+                listing.LastScan = now;
+                }
+
+            _dirCache[path] = listing;
+            return listing;
             }
 
         void DrawFileNode(string path, int depth)

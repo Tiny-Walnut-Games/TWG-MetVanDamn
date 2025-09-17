@@ -1,7 +1,7 @@
 # 🗺️ The Complete MetVanDAMN Setup & Experience Guide
 ## *From Fresh Clone to "Holy Cosmic Cheeks, This Actually Works!" in 15 Minutes*
 
-> **"In the realm of procedural MetroidVania generation, there are no accidents - only adventures waiting to unfold."**  
+> **"In the realm of procedural MetroidVania generation, there are no accidents - only adventures waiting to unfold."**
 > — The Sacred Scrolls of MetVanDAMN, Chapter 3, Verse 42
 
 ---
@@ -10,9 +10,9 @@
 
 **Goal**: Take you from repository clone to successfully experiencing procedural MetVanDAMN world generation with visual feedback and complete understanding.
 
-**Success Criteria**: 
+**Success Criteria**:
 - ✅ Unity opens project without errors
-- ✅ You can press Play and see immediate world generation 
+- ✅ You can press Play and see immediate world generation
 - ✅ Visual feedback shows districts, rooms, and biome fields
 - ✅ You can regenerate worlds with different seeds
 - ✅ You understand how to customize and extend the system
@@ -87,7 +87,7 @@ Unity will automatically:
 ### **Step 2: Verify DOTS Packages**
 Open **Window > Package Manager** and confirm these packages are installed:
 - ✅ **Entities** (1.2.0+)
-- ✅ **Collections** (1.2.4+)  
+- ✅ **Collections** (1.2.4+)
 - ✅ **Mathematics** (1.2.6+)
 - ✅ **Burst** (1.8.0+)
 
@@ -123,7 +123,7 @@ Open **Window > General > Console** and verify:
 ### **Option B: Manual Scene Setup**
 
 #### **Create Custom Scene**
-1. **File > New Scene** 
+1. **File > New Scene**
 2. **Save As**: `Assets/Scenes/MyMetVanDAMN.unity`
 3. **Add GameObject** and name it "MetVanDAMN_Setup"
 4. **Add Component**: `SmokeTestSceneSetup` (from TinyWalnutGames.MetVD.Samples)
@@ -131,7 +131,7 @@ Open **Window > General > Console** and verify:
 #### **Configure World Parameters**
 ```yaml
 World Seed: 42                    # Reproducible worlds
-World Size: (50, 50)             # Reasonable for testing  
+World Size: (50, 50)             # Reasonable for testing
 Target Sector Count: 5           # Number of districts
 Biome Transition Radius: 10.0    # Polarity field influence
 Enable Debug Visualization: ✅   # See world bounds
@@ -193,7 +193,7 @@ Log Generation Steps: ✅         # Track progress
 # Validate documentation structure (~60ms)
 python3 src/SymbolicLinter/validate_docs.py --tldl-path docs/
 
-# Validate debug overlay system (~56ms) 
+# Validate debug overlay system (~56ms)
 python3 src/DebugOverlayValidation/debug_overlay_validator.py --path src/
 
 # Run symbolic linting (~68ms - may show expected parse errors)
@@ -208,7 +208,7 @@ python3 src/SymbolicLinter/symbolic_linter.py --path src/
 ### **Manual Verification Checklist**
 - [ ] Unity console shows successful world generation
 - [ ] Scene view displays green debug bounds
-- [ ] Entity Debugger shows hub + district entities  
+- [ ] Entity Debugger shows hub + district entities
 - [ ] Inspector regeneration buttons work during Play mode
 - [ ] Different seeds produce different debug visualizations
 - [ ] No compilation errors in Console
@@ -296,7 +296,7 @@ WorldSeed → Districts → Rooms → Biome Fields → Gate Conditions
 
 ### **Expand Your MetVanDAMN Knowledge**
 1. **Study the Code**: Explore `Packages/com.tinywalnutgames.metvd.*` directories
-2. **Read TLDL Entries**: Check `docs/` for development chronicles  
+2. **Read TLDL Entries**: Check `docs/` for development chronicles
 3. **Examine Test Cases**: Look at `Assets/MetVanDAMN/Authoring/Tests/`
 4. **Join the Community**: Contribute to Living Dev Agent workflow
 
@@ -322,14 +322,14 @@ scripts/init_agent_context.sh --create-tldl "MyMetVanDAMNExperiments"
 **🎉 Congratulations, fellow Buttguard!** You've successfully:
 
 - ✅ **Set up MetVanDAMN** from fresh repository clone
-- ✅ **Experienced procedural generation** with immediate visual feedback  
+- ✅ **Experienced procedural generation** with immediate visual feedback
 - ✅ **Understood the architecture** and customization options
 - ✅ **Mastered troubleshooting** common setup issues
 - ✅ **Validated your installation** with comprehensive testing
 
 **You are now ready to:**
 - 🌍 **Generate infinite procedural worlds** with confidence
-- 🛠️ **Customize and extend** the MetVanDAMN system  
+- 🛠️ **Customize and extend** the MetVanDAMN system
 - 🧙‍♂️ **Contribute to the community** through TLDL documentation
 - 🍑 **Maintain butt comfort** while coding awesome features
 
@@ -358,10 +358,10 @@ scripts/init_agent_context.sh --create-tldl "MyMetVanDAMNExperiments"
 
 ## 📄 **Document Information**
 
-**Version**: 1.0 - Complete Setup Guide  
-**Created**: January 2025  
-**Author**: Living Dev Agent Community  
-**Sacred Commitment**: Save The Butts! Manifesto Compliance  
-**Purpose**: Eliminate setup frustration and enable immediate MetVanDAMN success  
+**Version**: 1.0 - Complete Setup Guide
+**Created**: January 2025
+**Author**: Living Dev Agent Community
+**Sacred Commitment**: Save The Butts! Manifesto Compliance
+**Purpose**: Eliminate setup frustration and enable immediate MetVanDAMN success
 
 *This guide is living documentation - it evolves with community feedback and discoveries.*

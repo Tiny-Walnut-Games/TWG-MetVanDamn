@@ -25,7 +25,7 @@ MonoBehaviour:
   biomeRadius: 4
   labelColor: {r: 1, g: 1, b: 1, a: 1}
   labelFontSize: 20
-  gridCellSize: 11.38
+  gridCellSize: 16.94
   gridOriginOffset: {x: 0, y: 0, z: 0}
   useGridCoordinatesForGizmos: 1
   enableTransformSnapUtility: 1
