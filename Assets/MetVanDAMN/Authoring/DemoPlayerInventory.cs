@@ -383,14 +383,168 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             // Update player combat with new stats
             if (playerCombat)
             {
-                // This would need methods in DemoPlayerCombat to update max health, defense, etc.
+                // Apply stat bonuses from equipped items to combat system
+                ApplyStatBonusesToCombat();
             }
         }
 
         private void ApplyBuff(DemoItem item)
         {
-            // Apply temporary buff effects
-            // This would integrate with a buff system
+            // Apply temporary buff effects from consumable items
+            if (item.type == ItemType.Consumable)
+            {
+                Debug.Log($"🧪 Applying buff from {item.name}");
+                
+                // Apply different buffs based on item properties
+                if (item.name.ToLower().Contains("health"))
+                {
+                    ApplyHealthBuff(item);
+                }
+                else if (item.name.ToLower().Contains("damage"))
+                {
+                    ApplyDamageBuff(item);
+                }
+                else if (item.name.ToLower().Contains("speed"))
+                {
+                    ApplySpeedBuff(item);
+                }
+                else if (item.name.ToLower().Contains("defense"))
+                {
+                    ApplyDefenseBuff(item);
+                }
+                else
+                {
+                    // Generic buff
+                    ApplyGenericBuff(item);
+                }
+            }
+        }
+        
+        private void ApplyHealthBuff(DemoItem item)
+        {
+            // Restore health based on item potency
+            float healAmount = item.armorStats.healthBonus;
+            if (healAmount <= 0) healAmount = 25f; // Default heal amount
+            
+            if (playerCombat)
+            {
+                playerCombat.Heal(healAmount);
+                Debug.Log($"💚 Healed for {healAmount} HP");
+            }
+        }
+        
+        private void ApplyDamageBuff(DemoItem item)
+        {
+            // Temporary damage increase
+            float damageBonus = item.weaponStats.damage;
+            if (damageBonus <= 0) damageBonus = 10f; // Default damage bonus
+            
+            StartCoroutine(ApplyTemporaryDamageBuff(damageBonus, 30f)); // 30 second duration
+        }
+        
+        private void ApplySpeedBuff(DemoItem item)
+        {
+            // Temporary speed increase
+            var playerMovement = GetComponent<DemoPlayerMovement>();
+            if (playerMovement)
+            {
+                StartCoroutine(ApplyTemporarySpeedBuff(playerMovement, 1.5f, 20f)); // 50% speed boost for 20 seconds
+            }
+        }
+        
+        private void ApplyDefenseBuff(DemoItem item)
+        {
+            // Temporary defense increase
+            float defenseBonus = item.armorStats.defense;
+            if (defenseBonus <= 0) defenseBonus = 5f; // Default defense bonus
+            
+            StartCoroutine(ApplyTemporaryDefenseBuff(defenseBonus, 60f)); // 1 minute duration
+        }
+        
+        private void ApplyGenericBuff(DemoItem item)
+        {
+            // Apply a small bonus to all stats
+            Debug.Log($"✨ Applied generic buff from {item.name}");
+            
+            StartCoroutine(ApplyTemporaryDamageBuff(5f, 20f));
+            
+            var playerMovement = GetComponent<DemoPlayerMovement>();
+            if (playerMovement)
+            {
+                StartCoroutine(ApplyTemporarySpeedBuff(playerMovement, 1.2f, 20f));
+            }
+        }
+        
+        private System.Collections.IEnumerator ApplyTemporaryDamageBuff(float damageBonus, float duration)
+        {
+            if (playerCombat)
+            {
+                playerCombat.AddDamageBonus(damageBonus);
+                Debug.Log($"⚔️ Damage increased by {damageBonus} for {duration} seconds");
+                
+                yield return new WaitForSeconds(duration);
+                
+                playerCombat.RemoveDamageBonus(damageBonus);
+                Debug.Log($"⚔️ Damage buff expired");
+            }
+        }
+        
+        private System.Collections.IEnumerator ApplyTemporarySpeedBuff(DemoPlayerMovement movement, float speedMultiplier, float duration)
+        {
+            movement.ApplySpeedMultiplier(speedMultiplier);
+            Debug.Log($"💨 Speed increased by {(speedMultiplier - 1) * 100}% for {duration} seconds");
+            
+            yield return new WaitForSeconds(duration);
+            
+            movement.RemoveSpeedMultiplier(speedMultiplier);
+            Debug.Log($"💨 Speed buff expired");
+        }
+        
+        private System.Collections.IEnumerator ApplyTemporaryDefenseBuff(float defenseBonus, float duration)
+        {
+            if (playerCombat)
+            {
+                playerCombat.AddDefenseBonus(defenseBonus);
+                Debug.Log($"🛡️ Defense increased by {defenseBonus} for {duration} seconds");
+                
+                yield return new WaitForSeconds(duration);
+                
+                playerCombat.RemoveDefenseBonus(defenseBonus);
+                Debug.Log($"🛡️ Defense buff expired");
+            }
+        }
+        
+        private void ApplyStatBonusesToCombat()
+        {
+            // Calculate total stat bonuses from all equipped items
+            float totalHealthBonus = 0f;
+            float totalDefenseBonus = 0f;
+            float totalDamageBonus = 0f;
+            
+            if (equippedArmor)
+            {
+                totalHealthBonus += equippedArmor.armorStats.healthBonus;
+                totalDefenseBonus += equippedArmor.armorStats.defense;
+            }
+            
+            if (equippedWeapon)
+            {
+                totalDamageBonus += equippedWeapon.weaponStats.damage * 0.1f; // 10% of weapon damage as bonus
+            }
+            
+            if (equippedTrinket)
+            {
+                // Trinkets provide small bonuses to all stats
+                totalHealthBonus += equippedTrinket.armorStats.healthBonus;
+                totalDefenseBonus += equippedTrinket.armorStats.defense;
+                totalDamageBonus += equippedTrinket.weaponStats.damage * 0.05f; // 5% damage bonus
+            }
+            
+            // Apply bonuses to combat system
+            if (playerCombat)
+            {
+                playerCombat.SetEquipmentBonuses(totalHealthBonus, totalDefenseBonus, totalDamageBonus);
+            }
         }
 
         private WeaponType GetWeaponType(DemoItem weapon)
@@ -425,12 +579,55 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private void ToggleInventoryUI()
         {
-            // This would toggle the inventory UI
+            // Full implementation for inventory UI toggle
             var inventoryUI = FindObjectOfType<DemoInventoryUI>();
             if (inventoryUI)
             {
                 inventoryUI.ToggleInventory();
+                Debug.Log($"🎒 Inventory UI toggled: {(inventoryUI.IsVisible ? "Open" : "Closed")}");
             }
+            else
+            {
+                // Create inventory UI if it doesn't exist
+                CreateInventoryUI();
+            }
+        }
+        
+        private void CreateInventoryUI()
+        {
+            Debug.Log("🎒 Creating inventory UI...");
+            
+            // Find or create canvas
+            var canvas = FindObjectOfType<Canvas>();
+            if (!canvas)
+            {
+                var canvasObj = new GameObject("InventoryCanvas");
+                canvas = canvasObj.AddComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.sortingOrder = 100;
+                canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+                
+                // Add EventSystem if not present
+                if (!FindObjectOfType<UnityEngine.EventSystems.EventSystem>())
+                {
+                    var eventSystemObj = new GameObject("EventSystem");
+                    eventSystemObj.AddComponent<UnityEngine.EventSystems.EventSystem>();
+                    eventSystemObj.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+                }
+            }
+            
+            // Create inventory UI GameObject
+            var inventoryUIObj = new GameObject("DemoInventoryUI");
+            inventoryUIObj.transform.SetParent(canvas.transform, false);
+            
+            var inventoryUI = inventoryUIObj.AddComponent<DemoInventoryUI>();
+            inventoryUI.playerInventory = this;
+            
+            // Initialize and show
+            inventoryUI.Initialize();
+            inventoryUI.ToggleInventory();
+            
+            Debug.Log("🎒 Inventory UI created and opened");
         }
 
         // Public API

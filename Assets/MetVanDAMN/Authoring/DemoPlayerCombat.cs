@@ -570,6 +570,71 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         public bool IsCharging => isCharging;
         public int ComboCount => comboCount;
         public bool CanUseSpecialSkill => canUseSpecialSkill;
+        
+        // Equipment bonus system for inventory integration
+        private float equipmentDamageBonus = 0f;
+        private float equipmentDefenseBonus = 0f;
+        private float equipmentHealthBonus = 0f;
+        private float temporaryDamageBonus = 0f;
+        private float temporaryDefenseBonus = 0f;
+        
+        public void SetEquipmentBonuses(float healthBonus, float defenseBonus, float damageBonus)
+        {
+            equipmentHealthBonus = healthBonus;
+            equipmentDefenseBonus = defenseBonus;
+            equipmentDamageBonus = damageBonus;
+            
+            // Update max health if health bonus changed
+            int newMaxHealth = Mathf.RoundToInt(maxHealth + equipmentHealthBonus);
+            if (newMaxHealth != maxHealth + equipmentHealthBonus)
+            {
+                maxHealth = newMaxHealth;
+                currentHealth = Mathf.Min(currentHealth, maxHealth);
+                OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            }
+            
+            Debug.Log($"🎯 Equipment bonuses applied: +{healthBonus} HP, +{defenseBonus} DEF, +{damageBonus} DMG");
+        }
+        
+        public void AddDamageBonus(float bonus)
+        {
+            temporaryDamageBonus += bonus;
+            Debug.Log($"⚔️ Temporary damage bonus added: +{bonus} (Total: +{temporaryDamageBonus})");
+        }
+        
+        public void RemoveDamageBonus(float bonus)
+        {
+            temporaryDamageBonus = Mathf.Max(0f, temporaryDamageBonus - bonus);
+            Debug.Log($"⚔️ Temporary damage bonus removed: -{bonus} (Remaining: +{temporaryDamageBonus})");
+        }
+        
+        public void AddDefenseBonus(float bonus)
+        {
+            temporaryDefenseBonus += bonus;
+            Debug.Log($"🛡️ Temporary defense bonus added: +{bonus} (Total: +{temporaryDefenseBonus})");
+        }
+        
+        public void RemoveDefenseBonus(float bonus)
+        {
+            temporaryDefenseBonus = Mathf.Max(0f, temporaryDefenseBonus - bonus);
+            Debug.Log($"🛡️ Temporary defense bonus removed: -{bonus} (Remaining: +{temporaryDefenseBonus})");
+        }
+        
+        public float GetTotalDamageBonus()
+        {
+            return equipmentDamageBonus + temporaryDamageBonus;
+        }
+        
+        public float GetTotalDefenseBonus()
+        {
+            return equipmentDefenseBonus + temporaryDefenseBonus;
+        }
+        
+        // Override Heal method to accept float for inventory compatibility
+        public void Heal(float amount)
+        {
+            Heal(Mathf.RoundToInt(amount));
+        }
     }
 
     [System.Serializable]

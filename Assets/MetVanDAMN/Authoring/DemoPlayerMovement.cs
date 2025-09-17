@@ -128,7 +128,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             if (isDashing || isLedgeGrabbing) return;
 
             // Determine movement speed
-            float currentSpeed = runPressed ? runSpeed : walkSpeed;
+            float currentSpeed = GetModifiedSpeed(runPressed ? runSpeed : walkSpeed);
             
             if (rb2D)
             {
@@ -249,12 +249,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                     if (rb2D)
                     {
                         rb2D.gravityScale = 1;
-                        rb2D.velocity = new Vector2(transform.localScale.x * walkSpeed, jumpForce * 0.8f);
+                        rb2D.velocity = new Vector2(transform.localScale.x * GetModifiedSpeed(walkSpeed), jumpForce * 0.8f);
                     }
                     else if (rb3D)
                     {
                         rb3D.useGravity = true;
-                        rb3D.velocity = new Vector3(transform.localScale.x * walkSpeed, jumpForce * 0.8f, 0);
+                        rb3D.velocity = new Vector3(transform.localScale.x * GetModifiedSpeed(walkSpeed), jumpForce * 0.8f, 0);
                     }
                 }
                 else if (moveInput.x == 0 || Mathf.Sign(moveInput.x) != transform.localScale.x)
@@ -323,7 +323,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         public bool IsDashing => isDashing;
         public bool IsLedgeGrabbing => isLedgeGrabbing;
         public Vector2 MoveInput => moveInput;
-        public float CurrentSpeed => runPressed ? runSpeed : walkSpeed;
+        public float CurrentSpeed => GetModifiedSpeed(runPressed ? runSpeed : walkSpeed);
 
         private void OnDrawGizmosSelected()
         {
@@ -343,6 +343,36 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawRay(transform.position, (Vector3)moveInput.normalized * 2f);
             }
+        }
+        
+        // Speed multiplier system for inventory buffs
+        private float speedMultiplier = 1f;
+        
+        public void ApplySpeedMultiplier(float multiplier)
+        {
+            speedMultiplier *= multiplier;
+            Debug.Log($"💨 Speed multiplier applied: x{multiplier} (Total: x{speedMultiplier})");
+        }
+        
+        public void RemoveSpeedMultiplier(float multiplier)
+        {
+            if (speedMultiplier > 0)
+            {
+                speedMultiplier /= multiplier;
+                speedMultiplier = Mathf.Max(0.1f, speedMultiplier); // Prevent negative speed
+                Debug.Log($"💨 Speed multiplier removed: ÷{multiplier} (Total: x{speedMultiplier})");
+            }
+        }
+        
+        public float GetCurrentSpeedMultiplier()
+        {
+            return speedMultiplier;
+        }
+        
+        // Helper method for applying speed multiplier to movement
+        private float GetModifiedSpeed(float baseSpeed)
+        {
+            return baseSpeed * speedMultiplier;
         }
     }
 
