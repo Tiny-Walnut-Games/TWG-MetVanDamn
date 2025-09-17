@@ -157,11 +157,12 @@ TWG-MetVanDamn/
 ├── Assets/
 │   ├── MetVanDAMN/                    # Core game systems
 │   │   ├── Authoring/                 # Scene authoring tools
+│   │   ├── Docs/                      # **NEW** - Consolidated MetVanDAMN documentation hub
 │   │   └── Utility/                   # Generic ECS utilities
 │   ├── Plugins/TLDA/                  # Living Dev Agent Unity integration
 │   │   ├── Editor/                    # TLDL editor tools
 │   │   ├── Runtime/                   # Runtime TLDA components
-│   │   └── docs/                      # TLDA documentation
+│   │   └── docs/                      # TLDA-specific documentation
 │   ├── Scenes/                        # Example and test scenes
 │   └── Settings/                      # Unity project settings
 ├── Packages/                          # Custom packages
@@ -176,7 +177,7 @@ TWG-MetVanDamn/
 │   ├── clone-and-clean.sh           # Template setup
 │   └── cid-faculty/                  # CI/CD automation
 ├── src/                              # Validation and linting tools
-├── docs/                             # Evergreen documentation
+├── docs/                             # Legacy documentation (being phased out)
 ├── TLDL/                             # Living Dev Log entries
 ├── MANIFESTO.md                      # Project philosophy
 ├── CONTRIBUTING.md                   # Contribution guidelines
@@ -329,8 +330,8 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### **Quick Contribution Checklist**
 
 - [ ] Read the [MANIFESTO.md](MANIFESTO.md) and embrace the **Save The Butts!** philosophy
-- [ ] **NEW**: Follow the [Complete MetVanDAMN Setup Guide](docs/COMPLETE-METVANDAMN-SETUP-GUIDE.md) for immediate success
-- [ ] Browse the [Documentation Hub](docs/README.md) for comprehensive guides and references
+- [ ] **NEW**: Follow the [Complete MetVanDAMN Setup Guide](Assets/MetVanDAMN/Docs/COMPLETE-METVANDAMN-SETUP-GUIDE.md) for immediate success
+- [ ] Browse the [MetVanDAMN Documentation Hub](Assets/MetVanDAMN/Docs/README.md) for comprehensive guides and references
 - [ ] Create TLDL entries documenting your work
 - [ ] Follow ECS/DOTS best practices
 - [ ] Add tests for new functionality
@@ -343,16 +344,20 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ### **Essential Documentation**
 
-- **[📚 Documentation Hub](docs/README.md)**: Comprehensive guide index and navigation
-- **[🗺️ Complete Setup Guide](docs/COMPLETE-METVANDAMN-SETUP-GUIDE.md)**: From clone to working world in 15 minutes
+- **[📚 MetVanDAMN Documentation Hub](Assets/MetVanDAMN/Docs/README.md)**: **NEW** - Complete consolidated documentation hub with GitBook structure
+- **[🗺️ Complete Setup Guide](Assets/MetVanDAMN/Docs/COMPLETE-METVANDAMN-SETUP-GUIDE.md)**: From clone to full playable demo in 25 minutes
+- **[⚡ Quick Start Guide](Assets/MetVanDAMN/Docs/MetVanDAMN-Quick-Start-Guide.md)**: Rapid developer introduction
+- **[🏛️ Project Overview](Assets/MetVanDAMN/Docs/MetVanDAMN-Project-Overview.md)**: Complete system architecture overview
+- **[📋 Technical Specification](Assets/MetVanDAMN/Docs/MetVanDAMN-Technical-Specification.md)**: Comprehensive API and system documentation
 - **[MANIFESTO.md](MANIFESTO.md)**: Project philosophy and "Save The Butts!" doctrine
 - **[CONTRIBUTING.md](CONTRIBUTING.md)**: Comprehensive contribution guidelines
 - **[CHANGELOG.md](CHANGELOG.md)**: Release history and feature evolution
 
 ### **Living Dev Log Archives**
 
-- **[TLDL/entries/](TLDL/entries/)**: Development chronicles and technical discoveries
-- **[docs/](docs/)**: Evergreen documentation and templates
+- **[MetVanDAMN TLDL Chronicles](Assets/MetVanDAMN/Docs/TLDL/)**: Development chronicles and technical discoveries
+- **[TLDL/entries/](TLDL/entries/)**: General development chronicles
+- **[Legacy docs/](docs/)**: Legacy documentation (being phased out)
 
 ### **External Resources**
 
