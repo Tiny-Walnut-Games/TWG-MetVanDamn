@@ -427,10 +427,96 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         [Header("Room Masking")]
         public bool enableRoomMasking = true;
         public LayerMask roomLayers = 1;
+        public LayerMask backgroundLayers = 2;
+        public LayerMask uiLayers = 32;
+        
+        [Header("Room State Management")]
+        public int maxVisibleRooms = 3;
+        public bool useAdjacentRoomMasking = true;
+        
+        // State tracking for active rooms
+        private HashSet<int> activeRooms = new HashSet<int>();
+        private Dictionary<int, LayerMask> roomLayerMap = new Dictionary<int, LayerMask>();
+        private int currentPlayerRoom = -1;
+        
+        // Public property for API access
+        public HashSet<int> ActiveRooms => new HashSet<int>(activeRooms);
+        
+        // Layer management
+        private LayerMask defaultLayers;
+        private LayerMask alwaysVisibleLayers;
 
         private void Start()
         {
             Debug.Log("🏠 Demo Room Masking Manager initialized");
+            InitializeRoomLayerSystem();
+        }
+        
+        private void InitializeRoomLayerSystem()
+        {
+            // Store default camera settings
+            var mainCamera = Camera.main;
+            if (mainCamera != null)
+            {
+                defaultLayers = mainCamera.cullingMask;
+            }
+            
+            // Setup always visible layers (UI, background, etc.)
+            alwaysVisibleLayers = backgroundLayers | uiLayers;
+            
+            // Initialize room layer mappings
+            InitializeRoomLayerMappings();
+            
+            Debug.Log($"🔧 Room masking system initialized with {roomLayerMap.Count} room layer mappings");
+        }
+        
+        private void InitializeRoomLayerMappings()
+        {
+            // Auto-detect rooms and assign layer masks
+            var roomIdentifiers = FindObjectsOfType<RoomIdentifier>();
+            int layerOffset = 8; // Start from layer 8 to avoid Unity defaults
+            
+            foreach (var room in roomIdentifiers)
+            {
+                if (!roomLayerMap.ContainsKey(room.roomId))
+                {
+                    // Assign unique layer mask for each room
+                    LayerMask roomMask = 1 << (layerOffset + (room.roomId % 20)); // Cycle through available layers
+                    roomLayerMap[room.roomId] = roomMask;
+                    
+                    // Assign room objects to the appropriate layer
+                    AssignRoomObjectsToLayer(room.roomId, layerOffset + (room.roomId % 20));
+                }
+            }
+        }
+        
+        private void AssignRoomObjectsToLayer(int roomId, int layer)
+        {
+            var roomObjects = FindRoomObjects(roomId);
+            foreach (var obj in roomObjects)
+            {
+                // Recursively set layer for all child objects
+                SetLayerRecursively(obj, layer);
+            }
+        }
+        
+        private void SetLayerRecursively(GameObject obj, int layer)
+        {
+            obj.layer = layer;
+            for (int i = 0; i < obj.transform.childCount; i++)
+            {
+                SetLayerRecursively(obj.transform.GetChild(i).gameObject, layer);
+            }
+        }
+        
+        public void SetPlayerRoom(int roomId)
+        {
+            if (currentPlayerRoom != roomId)
+            {
+                Debug.Log($"🚶 Player moved to room {roomId}");
+                currentPlayerRoom = roomId;
+                UpdateActiveRooms();
+            }
         }
 
         public void ShowRoom(int roomId)
@@ -550,42 +636,160 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         
         private void UpdateRoomLayers(int roomId, bool visible)
         {
-            // Update culling mask for cameras to show/hide room layers
-            var cameras = FindObjectsOfType<Camera>();
-            
-            foreach (var camera in cameras)
+            // Update the active rooms set based on visibility changes
+            if (visible)
             {
-                if (visible)
-                {
-                    // Add room layers to culling mask
-                    camera.cullingMask |= roomLayers;
-                }
-                else
-                {
-                    // Remove specific room layers (more complex logic needed for multiple rooms)
-                    // For demo, we'll keep it simple
-                    if (enableRoomMasking)
-                    {
-                        // Apply masking based on current active rooms
-                        UpdateCameraCullingMask(camera);
-                    }
-                }
+                activeRooms.Add(roomId);
             }
+            else
+            {
+                activeRooms.Remove(roomId);
+            }
+            
+            // Update culling mask for all cameras to reflect room visibility changes
+            UpdateAllCameraCullingMasks();
+            
+            Debug.Log($"🎭 Room {roomId} layers updated: {(visible ? "visible" : "hidden")}. Active rooms: [{string.Join(", ", activeRooms)}]");
         }
         
         private void UpdateCameraCullingMask(Camera camera)
         {
-            // Determine which room layers should be visible
-            // This would integrate with a room state manager in a full implementation
-            var activeRoomLayers = CalculateActiveRoomLayers();
-            camera.cullingMask = activeRoomLayers;
+            if (!enableRoomMasking)
+            {
+                camera.cullingMask = defaultLayers;
+                return;
+            }
+            
+            // Calculate comprehensive layer visibility based on room state
+            var visibleLayers = CalculateActiveRoomLayers();
+            camera.cullingMask = visibleLayers;
+            
+            Debug.Log($"📷 Updated camera culling mask: {System.Convert.ToString(visibleLayers, 2)} (active rooms: {string.Join(", ", activeRooms)})");
         }
         
         private LayerMask CalculateActiveRoomLayers()
         {
-            // Calculate which layers should be visible based on current room state
-            // For demo, return the configured room layers
-            return roomLayers;
+            // Start with always visible layers (UI, background, etc.)
+            LayerMask visibleLayers = alwaysVisibleLayers;
+            
+            if (!enableRoomMasking)
+            {
+                return defaultLayers;
+            }
+            
+            // Add layers for all active rooms
+            foreach (var roomId in activeRooms)
+            {
+                if (roomLayerMap.TryGetValue(roomId, out LayerMask roomMask))
+                {
+                    visibleLayers |= roomMask;
+                }
+            }
+            
+            // If no rooms are active, show default room layers
+            if (activeRooms.Count == 0)
+            {
+                visibleLayers |= roomLayers;
+            }
+            
+            return visibleLayers;
+        }
+        
+        private void UpdateActiveRooms()
+        {
+            if (currentPlayerRoom == -1)
+            {
+                return;
+            }
+            
+            var newActiveRooms = new HashSet<int>();
+            
+            // Always include current player room
+            newActiveRooms.Add(currentPlayerRoom);
+            
+            if (useAdjacentRoomMasking)
+            {
+                // Add adjacent rooms for seamless transitions
+                var adjacentRooms = GetAdjacentRooms(currentPlayerRoom);
+                foreach (var adjacentRoom in adjacentRooms)
+                {
+                    newActiveRooms.Add(adjacentRoom);
+                    
+                    // Limit total visible rooms for performance
+                    if (newActiveRooms.Count >= maxVisibleRooms)
+                    {
+                        break;
+                    }
+                }
+            }
+            
+            // Update active rooms if changed
+            if (!activeRooms.SetEquals(newActiveRooms))
+            {
+                var previousRooms = new HashSet<int>(activeRooms);
+                activeRooms = newActiveRooms;
+                
+                // Show newly active rooms
+                foreach (var roomId in activeRooms.Except(previousRooms))
+                {
+                    ShowRoom(roomId);
+                }
+                
+                // Hide previously active rooms
+                foreach (var roomId in previousRooms.Except(activeRooms))
+                {
+                    HideRoom(roomId);
+                }
+                
+                // Update camera culling for all cameras
+                UpdateAllCameraCullingMasks();
+            }
+        }
+        
+        private List<int> GetAdjacentRooms(int roomId)
+        {
+            var adjacentRooms = new List<int>();
+            
+            // Find rooms that are spatially adjacent to the current room
+            var currentRoomIdentifier = FindRoomIdentifier(roomId);
+            if (currentRoomIdentifier == null)
+            {
+                return adjacentRooms;
+            }
+            
+            var allRooms = FindObjectsOfType<RoomIdentifier>();
+            var currentPosition = currentRoomIdentifier.transform.position;
+            var currentBounds = currentRoomIdentifier.roomBounds;
+            
+            foreach (var room in allRooms)
+            {
+                if (room.roomId == roomId) continue;
+                
+                var distance = Vector3.Distance(currentPosition, room.transform.position);
+                var maxDistance = (currentBounds.magnitude + room.roomBounds.magnitude) * 0.75f;
+                
+                if (distance <= maxDistance)
+                {
+                    adjacentRooms.Add(room.roomId);
+                }
+            }
+            
+            return adjacentRooms;
+        }
+        
+        private RoomIdentifier FindRoomIdentifier(int roomId)
+        {
+            var rooms = FindObjectsOfType<RoomIdentifier>();
+            return System.Array.Find(rooms, r => r.roomId == roomId);
+        }
+        
+        private void UpdateAllCameraCullingMasks()
+        {
+            var cameras = FindObjectsOfType<Camera>();
+            foreach (var camera in cameras)
+            {
+                UpdateCameraCullingMask(camera);
+            }
         }
         
         private void TriggerRoomEvents(int roomId, bool entering)
@@ -667,6 +871,86 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
     {
         void OnRoomEnter(int roomId);
         void OnRoomExit(int roomId);
+    }
+    
+    // Public API for external systems to interact with room masking
+    public class DemoRoomMaskingAPI : MonoBehaviour
+    {
+        private DemoRoomMaskingManager roomManager;
+        
+        private void Awake()
+        {
+            roomManager = FindObjectOfType<DemoRoomMaskingManager>();
+            if (roomManager == null)
+            {
+                Debug.LogWarning("⚠️ DemoRoomMaskingManager not found. Room masking API will not function.");
+            }
+        }
+        
+        /// <summary>
+        /// Call this when the player enters a new room to update visibility
+        /// </summary>
+        public void OnPlayerEnterRoom(int roomId)
+        {
+            if (roomManager != null)
+            {
+                roomManager.SetPlayerRoom(roomId);
+            }
+        }
+        
+        /// <summary>
+        /// Get the list of currently active (visible) rooms
+        /// </summary>
+        public HashSet<int> GetActiveRooms()
+        {
+            if (roomManager != null)
+            {
+                return roomManager.ActiveRooms;
+            }
+            return new HashSet<int>();
+        }
+        
+        /// <summary>
+        /// Check if a specific room is currently visible
+        /// </summary>
+        public bool IsRoomVisible(int roomId)
+        {
+            return roomManager != null && roomManager.ActiveRooms.Contains(roomId);
+        }
+        
+        /// <summary>
+        /// Force show a specific room (for debugging or special effects)
+        /// </summary>
+        public void ForceShowRoom(int roomId)
+        {
+            if (roomManager != null)
+            {
+                roomManager.ShowRoom(roomId);
+            }
+        }
+        
+        /// <summary>
+        /// Force hide a specific room (for debugging or special effects)
+        /// </summary>
+        public void ForceHideRoom(int roomId)
+        {
+            if (roomManager != null)
+            {
+                roomManager.HideRoom(roomId);
+            }
+        }
+        
+        /// <summary>
+        /// Toggle room masking on/off
+        /// </summary>
+        public void SetRoomMaskingEnabled(bool enabled)
+        {
+            if (roomManager != null)
+            {
+                roomManager.enableRoomMasking = enabled;
+                roomManager.UpdateAllCameraCullingMasks();
+            }
+        }
     }
     }
 
