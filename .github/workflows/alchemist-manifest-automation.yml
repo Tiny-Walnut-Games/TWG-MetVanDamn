@@ -1,0 +1,327 @@
+name: 'Alchemist Faculty - Automated Manifest Creation'
+
+on:
+  issues:
+    types: [labeled, unlabeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  detect-gu-pot-stage:
+    name: 'Detect Gu Pot Stage Changes'
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'gu-pot') || contains(github.event.issue.title, 'Gu Pot')
+    
+    outputs:
+      should-process: ${{ steps.check-stage.outputs.should-process }}
+      stage: ${{ steps.check-stage.outputs.stage }}
+      issue-number: ${{ github.event.issue.number }}
+      
+    steps:
+      - name: Check Gu Pot Stage
+        id: check-stage
+        run: |
+          echo "Checking Gu Pot issue stage..."
+          
+          # Check if issue has distilled label
+          if echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[].name' | grep -q "gu-pot:distilled"; then
+            echo "should-process=true" >> $GITHUB_OUTPUT
+            echo "stage=distilled" >> $GITHUB_OUTPUT
+            echo "Issue is in distilled stage - ready for manifest creation"
+          elif echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[].name' | grep -q "gu-pot:"; then
+            echo "should-process=false" >> $GITHUB_OUTPUT
+            echo "stage=$(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[].name' | grep 'gu-pot:' | head -1)" >> $GITHUB_OUTPUT
+            echo "Issue is in $(echo '${{ toJson(github.event.issue.labels) }}' | jq -r '.[].name' | grep 'gu-pot:' | head -1) stage - not ready for manifest creation"
+          else
+            echo "should-process=false" >> $GITHUB_OUTPUT
+            echo "stage=unknown" >> $GITHUB_OUTPUT
+            echo "Issue stage unknown - skipping manifest creation"
+          fi
+
+  generate-manifest:
+    name: 'Generate Alchemist Manifest'
+    runs-on: ubuntu-latest
+    needs: detect-gu-pot-stage
+    if: needs.detect-gu-pot-stage.outputs.should-process == 'true'
+    
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install Dependencies
+        run: |
+          pip install PyYAML requests argparse
+          
+      - name: Create Output Directory
+        run: |
+          mkdir -p gu_pot/issue-${{ needs.detect-gu-pot-stage.outputs.issue-number }}
+          
+      - name: Generate Experiment Manifest
+        id: generate
+        run: |
+          echo "Generating manifest for issue #${{ needs.detect-gu-pot-stage.outputs.issue-number }}..."
+          
+          python scripts/alchemist-faculty/generate_manifest.py \
+            --issue-number ${{ needs.detect-gu-pot-stage.outputs.issue-number }} \
+            --repo ${{ github.repository }} \
+            --output gu_pot/issue-${{ needs.detect-gu-pot-stage.outputs.issue-number }}/ \
+            --github-token ${{ secrets.GITHUB_TOKEN }} \
+            --format yaml \
+            --verbose
+            
+          if [ $? -eq 0 ]; then
+            echo "manifest-created=true" >> $GITHUB_OUTPUT
+            echo "manifest-path=gu_pot/issue-${{ needs.detect-gu-pot-stage.outputs.issue-number }}/manifest_v1.yaml" >> $GITHUB_OUTPUT
+          else
+            echo "manifest-created=false" >> $GITHUB_OUTPUT
+            echo "❌ Manifest generation failed"
+            exit 1
+          fi
+          
+      - name: Validate Generated Manifest
+        if: steps.generate.outputs.manifest-created == 'true'
+        run: |
+          echo "Validating generated manifest..."
+          
+          manifest_file="gu_pot/issue-${{ needs.detect-gu-pot-stage.outputs.issue-number }}/manifest_v1.yaml"
+          
+          if [ ! -f "$manifest_file" ]; then
+            echo "❌ Manifest file not found: $manifest_file"
+            exit 1
+          fi
+          
+          # Basic YAML validation
+          python -c "import yaml; yaml.safe_load(open('$manifest_file'))" || {
+            echo "❌ Manifest YAML validation failed"
+            exit 1
+          }
+          
+          echo "✅ Manifest validation passed"
+          
+      - name: Create Experiment Directory Structure
+        if: steps.generate.outputs.manifest-created == 'true'
+        run: |
+          issue_dir="gu_pot/issue-${{ needs.detect-gu-pot-stage.outputs.issue-number }}"
+          
+          # Create standard experiment directory structure
+          mkdir -p "${issue_dir}/claims/validated"
+          mkdir -p "${issue_dir}/claims/hypotheses"
+          mkdir -p "${issue_dir}/claims/regressions"
+          mkdir -p "${issue_dir}/claims/anomalies"
+          mkdir -p "${issue_dir}/claims/improvements"
+          mkdir -p "${issue_dir}/claims/new_phenomena"
+          mkdir -p "${issue_dir}/runs"
+          mkdir -p "${issue_dir}/report"
+          
+          # Create GitHub integration metadata
+          cat > "${issue_dir}/claims/github_integration.json" << EOF
+          {
+            "issue_number": ${{ needs.detect-gu-pot-stage.outputs.issue-number }},
+            "repository": "${{ github.repository }}",
+            "manifest_created": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "workflow_run": "${{ github.run_id }}",
+            "alchemist_version": "0.1.0",
+            "stage_at_creation": "${{ needs.detect-gu-pot-stage.outputs.stage }}"
+          }
+          EOF
+          
+          echo "✅ Experiment directory structure created"
+          
+      - name: Create Baseline Metrics Placeholder
+        if: steps.generate.outputs.manifest-created == 'true'
+        run: |
+          issue_dir="gu_pot/issue-${{ needs.detect-gu-pot-stage.outputs.issue-number }}"
+          
+          # Create baseline metrics placeholder
+          cat > "${issue_dir}/baseline_metrics.json" << EOF
+          {
+            "baseline_captured": false,
+            "metrics": {},
+            "capture_timestamp": null,
+            "notes": "Baseline metrics should be captured before experiment execution"
+          }
+          EOF
+          
+      - name: Commit Generated Files
+        if: steps.generate.outputs.manifest-created == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Alchemist Faculty Automation"
+          
+          git add gu_pot/issue-${{ needs.detect-gu-pot-stage.outputs.issue-number }}/
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🧪 Auto-generated Alchemist manifest for issue #${{ needs.detect-gu-pot-stage.outputs.issue-number }}
+
+            - Generated experiment manifest from Gu Pot issue
+            - Created standard directory structure for claims and results
+            - Issue stage: ${{ needs.detect-gu-pot-stage.outputs.stage }}
+            - Workflow: ${{ github.workflow }} (${{ github.run_id }})"
+            
+            git push
+          fi
+          
+      - name: Update Issue with Manifest Links
+        if: steps.generate.outputs.manifest-created == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = ${{ needs.detect-gu-pot-stage.outputs.issue-number }};
+            const manifestPath = `gu_pot/issue-${issueNumber}/manifest_v1.yaml`;
+            const repositoryUrl = `${{ github.server_url }}/${{ github.repository }}`;
+            
+            // Get current issue
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber
+            });
+            
+            // Create manifest links section
+            const manifestSection = `
+            
+            ## 🧪 Alchemist Faculty Automation
+            
+            **Experiment Manifest**: [\`manifest_v1.yaml\`](${repositoryUrl}/blob/main/${manifestPath})  
+            **Experiment Directory**: [\`gu_pot/issue-${issueNumber}/\`](${repositoryUrl}/tree/main/gu_pot/issue-${issueNumber})  
+            **Generated**: ${new Date().toISOString()}
+            
+            ### Next Steps
+            1. **Capture Baseline**: Run baseline metrics collection
+            2. **Execute Experiment**: Process manifest with validation pipeline  
+            3. **Review Claims**: Validate generated claims and evidence
+            4. **Update Issue**: Automated linkback will update this issue with results
+            
+            ---
+            `;
+            
+            // Check if automation section already exists
+            let updatedBody = issue.body;
+            if (updatedBody.includes('🧪 Alchemist Faculty Automation')) {
+              // Replace existing section
+              updatedBody = updatedBody.replace(
+                /## 🧪 Alchemist Faculty Automation[\s\S]*?---\s*/,
+                manifestSection
+              );
+            } else {
+              // Append new section
+              updatedBody += manifestSection;
+            }
+            
+            // Update issue
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: updatedBody
+            });
+            
+            // Add workflow label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              labels: ['alchemist:manifest-ready']
+            });
+            
+            // Post status comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `🧪 **Alchemist Faculty Automation Completed**
+              
+              ✅ Experiment manifest generated successfully
+              📁 Directory structure created: \`gu_pot/issue-${issueNumber}/\`
+              📋 Manifest file: \`${manifestPath}\`
+              
+              The issue is now ready for experiment execution. Run the validation pipeline to generate claims and evidence.
+              
+              *Automated by Alchemist Faculty v0.1.0*`
+            });
+
+  setup-experiment-monitoring:
+    name: 'Setup Experiment Monitoring'
+    runs-on: ubuntu-latest
+    needs: [detect-gu-pot-stage, generate-manifest]
+    if: needs.generate-manifest.result == 'success'
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Configure Experiment Monitoring
+        run: |
+          echo "Setting up monitoring for issue #${{ needs.detect-gu-pot-stage.outputs.issue-number }}..."
+          
+          # Create monitoring configuration
+          monitoring_file="gu_pot/issue-${{ needs.detect-gu-pot-stage.outputs.issue-number }}/.alchemist-monitoring"
+          
+          cat > "$monitoring_file" << EOF
+          # Alchemist Faculty Monitoring Configuration
+          issue_number: ${{ needs.detect-gu-pot-stage.outputs.issue-number }}
+          repository: ${{ github.repository }}
+          created: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+          workflow_id: ${{ github.run_id }}
+          monitoring_enabled: true
+          
+          # Monitoring triggers
+          triggers:
+            - claims_directory_changes
+            - manifest_updates
+            - baseline_metrics_updates
+            
+          # Notification settings
+          notifications:
+            github_comments: true
+            issue_labels: true
+            linkback_automation: true
+          EOF
+          
+          echo "✅ Experiment monitoring configured"
+
+  failure-notification:
+    name: 'Notify on Failure'
+    runs-on: ubuntu-latest
+    needs: [detect-gu-pot-stage, generate-manifest]
+    if: always() && needs.generate-manifest.result == 'failure'
+    
+    steps:
+      - name: Notify Failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = ${{ needs.detect-gu-pot-stage.outputs.issue-number }};
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `❌ **Alchemist Faculty Automation Failed**
+              
+              The automated manifest generation encountered an error. Please check the [workflow logs](${context.payload.repository.html_url}/actions/runs/${{ github.run_id }}) for details.
+              
+              **Common Issues:**
+              - Issue format may not match Gu Pot schema
+              - Missing required sections (Logline, Tension, etc.)
+              - GitHub API rate limiting
+              
+              You can manually generate the manifest using:
+              \`\`\`bash
+              python scripts/alchemist-faculty/generate_manifest.py --issue-number ${issueNumber} --repo ${{ github.repository }}
+              \`\`\`
+              
+              *Automated by Alchemist Faculty v0.1.0*`
+            });

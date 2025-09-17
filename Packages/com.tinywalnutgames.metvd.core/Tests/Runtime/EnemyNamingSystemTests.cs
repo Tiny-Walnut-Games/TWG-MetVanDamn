@@ -29,7 +29,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 
 			// Ensure Initialization group exists and register the naming system
 			initGroup = world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-			var namingSystemHandle = world.GetOrCreateSystem<EnemyNamingSystem>();
+			SystemHandle namingSystemHandle = world.GetOrCreateSystem<EnemyNamingSystem>();
 			initGroup.AddSystemToUpdateList(namingSystemHandle);
 			// Important: sort systems after modifying the update list so the group actually runs them
 			initGroup.SortSystems();
@@ -39,7 +39,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 
 			// Capture the singleton config created by the DB initializer to allow tests to edit it
 			// (avoid creating a duplicate config which would break GetSingleton usage in systems)
-			var configQuery = m_Manager.CreateEntityQuery(typeof(EnemyNamingConfig));
+			EntityQuery configQuery = m_Manager.CreateEntityQuery(typeof(EnemyNamingConfig));
 			if (configQuery.CalculateEntityCount() == 0)
 				{
 				// Fallback: create one if DB init didn't (should not normally happen)
@@ -77,7 +77,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 
 			// Assert
 			Assert.IsTrue(m_Manager.HasComponent<EnemyNaming>(testEnemyEntity));
-			var naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
+			EnemyNaming naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
 
 			Assert.AreEqual("Crawler", naming.DisplayName.ToString());
 			Assert.IsFalse(naming.ShowFullName);
@@ -94,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			initGroup.Update();
 
 			// Assert
-			var naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
+			EnemyNaming naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
 
 			Assert.AreEqual("Archer", naming.DisplayName.ToString());
 			Assert.IsFalse(naming.ShowFullName);
@@ -112,7 +112,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			initGroup.Update();
 
 			// Assert
-			var naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
+			EnemyNaming naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
 
 			Assert.IsTrue(naming.ShowFullName);
 			Assert.IsTrue(naming.ShowIcons);
@@ -133,12 +133,12 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			initGroup.Update();
 
 			// Assert
-			var naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
+			EnemyNaming naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
 
 			Assert.IsTrue(naming.ShowFullName);
 			Assert.IsTrue(naming.ShowIcons);
 
-			var name = naming.DisplayName.ToString();
+			string name = naming.DisplayName.ToString();
 			// Should be procedural, not contain base type for bosses
 			Assert.IsFalse(name.Contains("Guardian"));
 			// Should contain syllables from affixes
@@ -149,8 +149,8 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 		public void MiniBoss_Uses_Fewer_Syllables_Than_Boss()
 			{
 			// Arrange
-			var miniBossEntity = CreateTestEnemy(RarityType.MiniBoss, "Lieutenant");
-			var bossEntity = CreateTestEnemy(RarityType.Boss, "Commander");
+			Entity miniBossEntity = CreateTestEnemy(RarityType.MiniBoss, "Lieutenant");
+			Entity bossEntity = CreateTestEnemy(RarityType.Boss, "Commander");
 
 			// Add multiple affixes to both
 			AddTestAffixWithSyllables(miniBossEntity, "berserker", "Berserker", new[] { "Ber", "Zerk" });
@@ -165,8 +165,8 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			initGroup.Update();
 
 			// Assert
-			var miniBossNaming = m_Manager.GetComponentData<EnemyNaming>(miniBossEntity);
-			var bossNaming = m_Manager.GetComponentData<EnemyNaming>(bossEntity);
+			EnemyNaming miniBossNaming = m_Manager.GetComponentData<EnemyNaming>(miniBossEntity);
+			EnemyNaming bossNaming = m_Manager.GetComponentData<EnemyNaming>(bossEntity);
 
 			// MiniBoss should generally have shorter names than Boss
 			// This is probabilistic but with fixed seed should be consistent
@@ -182,7 +182,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 
 			initGroup.Update();
 
-			var naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
+			EnemyNaming naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
 			Assert.IsFalse(naming.ShowIcons);
 
 			// Test IconsOnly mode
@@ -209,9 +209,9 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 		public void Affix_Assignment_Respects_Rarity_Rules()
 			{
 			// Test different rarities get appropriate affix counts
-			var commonEntity = m_Manager.CreateEntity();
-			var rareEntity = m_Manager.CreateEntity();
-			var bossEntity = m_Manager.CreateEntity();
+			Entity commonEntity = m_Manager.CreateEntity();
+			Entity rareEntity = m_Manager.CreateEntity();
+			Entity bossEntity = m_Manager.CreateEntity();
 
 			EnemyAffixDatabase.AssignRandomAffixes(m_Manager, commonEntity, RarityType.Common, 123);
 			EnemyAffixDatabase.AssignRandomAffixes(m_Manager, rareEntity, RarityType.Rare, 456);
@@ -220,21 +220,21 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			// Common should have 1 affix
 			if (m_Manager.HasBuffer<EnemyAffixBufferElement>(commonEntity))
 				{
-				var commonAffixes = m_Manager.GetBuffer<EnemyAffixBufferElement>(commonEntity);
+				DynamicBuffer<EnemyAffixBufferElement> commonAffixes = m_Manager.GetBuffer<EnemyAffixBufferElement>(commonEntity);
 				Assert.AreEqual(1, commonAffixes.Length);
 				}
 
 			// Rare should have 2 affixes
 			if (m_Manager.HasBuffer<EnemyAffixBufferElement>(rareEntity))
 				{
-				var rareAffixes = m_Manager.GetBuffer<EnemyAffixBufferElement>(rareEntity);
+				DynamicBuffer<EnemyAffixBufferElement> rareAffixes = m_Manager.GetBuffer<EnemyAffixBufferElement>(rareEntity);
 				Assert.AreEqual(2, rareAffixes.Length);
 				}
 
 			// Boss should have 3 affixes
 			if (m_Manager.HasBuffer<EnemyAffixBufferElement>(bossEntity))
 				{
-				var bossAffixes = m_Manager.GetBuffer<EnemyAffixBufferElement>(bossEntity);
+				DynamicBuffer<EnemyAffixBufferElement> bossAffixes = m_Manager.GetBuffer<EnemyAffixBufferElement>(bossEntity);
 				Assert.AreEqual(3, bossAffixes.Length);
 				}
 			}
@@ -251,8 +251,8 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			initGroup.Update();
 
 			// Assert
-			var naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
-			var name = naming.DisplayName.ToString();
+			EnemyNaming naming = m_Manager.GetComponentData<EnemyNaming>(testEnemyEntity);
+			string name = naming.DisplayName.ToString();
 
 			// Should have some connective vowels inserted for readability
 			Assert.IsTrue(name.Length > 6); // Should be longer than just concatenated syllables
@@ -263,8 +263,8 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 		public void Database_Initialization_Creates_All_Expected_Affixes()
 			{
 			// Test that the database initialization worked correctly
-			var query = m_Manager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
-			var affixEntities = query.ToEntityArray(Allocator.Temp);
+			EntityQuery query = m_Manager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
+			NativeArray<Entity> affixEntities = query.ToEntityArray(Allocator.Temp);
 
 			// Should have all the predefined affixes (5 combat + 5 movement + 4 behavior + 5 boss + 5 unique = 24)
 			Assert.GreaterOrEqual(affixEntities.Length, 20); // At least 20 affixes
@@ -272,9 +272,9 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 			// Check that we have affixes from different categories
 			bool hasCombat = false, hasMovement = false, hasBehavior = false, hasBoss = false, hasUnique = false;
 
-			foreach (var entity in affixEntities)
+			foreach (Entity entity in affixEntities)
 				{
-				var affix = m_Manager.GetComponentData<EnemyAffix>(entity);
+				EnemyAffix affix = m_Manager.GetComponentData<EnemyAffix>(entity);
 				switch (affix.Category)
 					{
 					case TraitCategory.Combat:
@@ -308,7 +308,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 
 		private Entity CreateTestEnemy(RarityType rarity, string baseType)
 			{
-			var entity = m_Manager.CreateEntity();
+			Entity entity = m_Manager.CreateEntity();
 			m_Manager.AddComponentData(entity, new EnemyProfile(rarity, new FixedString64Bytes(baseType), 12345));
 			m_Manager.AddComponentData(entity, new NeedsNameGeneration());
 			return entity;
@@ -321,7 +321,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 				m_Manager.AddBuffer<EnemyAffixBufferElement>(entity);
 				}
 
-			var buffer = m_Manager.GetBuffer<EnemyAffixBufferElement>(entity);
+			DynamicBuffer<EnemyAffixBufferElement> buffer = m_Manager.GetBuffer<EnemyAffixBufferElement>(entity);
 			var affix = new EnemyAffix(
 				new FixedString64Bytes(id),
 				new FixedString64Bytes(displayName),
@@ -341,7 +341,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 				m_Manager.AddBuffer<EnemyAffixBufferElement>(entity);
 				}
 
-			var buffer = m_Manager.GetBuffer<EnemyAffixBufferElement>(entity);
+			DynamicBuffer<EnemyAffixBufferElement> buffer = m_Manager.GetBuffer<EnemyAffixBufferElement>(entity);
 			var affix = new EnemyAffix(
 				new FixedString64Bytes(id),
 				new FixedString64Bytes(displayName),
@@ -351,7 +351,7 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 				new FixedString128Bytes($"Test affix: {displayName}")
 			);
 
-			foreach (var syllable in syllables)
+			foreach (string syllable in syllables)
 				{
 				affix.AddBossSyllable(new FixedString32Bytes(syllable));
 				}

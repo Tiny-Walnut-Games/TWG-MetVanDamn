@@ -15,17 +15,17 @@ namespace TinyWalnutGames.MetVD.Core
 		public static void InitializeDatabase(EntityManager entityManager)
 			{
 			// If database already initialized in this world, exit
-			var dbQuery = entityManager.CreateEntityQuery(typeof(AffixDatabaseTag));
+			EntityQuery dbQuery = entityManager.CreateEntityQuery(typeof(AffixDatabaseTag));
 			if (dbQuery.CalculateEntityCount() > 0)
 				{
 				return;
 				}
 
 			// Ensure a single config exists
-			var configQuery = entityManager.CreateEntityQuery(typeof(EnemyNamingConfig));
+			EntityQuery configQuery = entityManager.CreateEntityQuery(typeof(EnemyNamingConfig));
 			if (configQuery.CalculateEntityCount() == 0)
 				{
-				var configEntity = entityManager.CreateEntity();
+				Entity configEntity = entityManager.CreateEntity();
 				// Explicitly set sensible defaults: show names and icons, allow procedural boss names
 				entityManager.AddComponentData(
 					configEntity,
@@ -39,7 +39,7 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Create database tag entity
-			var databaseEntity = entityManager.CreateEntity();
+			Entity databaseEntity = entityManager.CreateEntity();
 			entityManager.AddComponentData(databaseEntity, new AffixDatabaseTag());
 
 			// Add all predefined affixes
@@ -207,7 +207,7 @@ namespace TinyWalnutGames.MetVD.Core
 									   TraitCategory category, byte weight, byte toxicityScore, string description,
 									   string[] bossSyllables)
 			{
-			var entity = entityManager.CreateEntity();
+			Entity entity = entityManager.CreateEntity();
 
 			var affix = new EnemyAffix(
 				new FixedString64Bytes(id),
@@ -220,7 +220,7 @@ namespace TinyWalnutGames.MetVD.Core
 			);
 
 			// Add boss syllables
-			foreach (var syllable in bossSyllables)
+			foreach (string syllable in bossSyllables)
 				{
 				affix.AddBossSyllable(new FixedString32Bytes(syllable));
 				}
@@ -234,13 +234,13 @@ namespace TinyWalnutGames.MetVD.Core
 		/// </summary>
 		public static NativeArray<Entity> GetAffixesByCategory(EntityManager entityManager, TraitCategory category, Allocator allocator)
 			{
-			var query = entityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
-			var entities = query.ToEntityArray(allocator);
+			EntityQuery query = entityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
+			NativeArray<Entity> entities = query.ToEntityArray(allocator);
 			var results = new NativeList<Entity>(allocator);
 
-			foreach (var entity in entities)
+			foreach (Entity entity in entities)
 				{
-				var affix = entityManager.GetComponentData<EnemyAffix>(entity);
+				EnemyAffix affix = entityManager.GetComponentData<EnemyAffix>(entity);
 				if (affix.Category == category)
 					{
 					results.Add(entity);
@@ -265,8 +265,8 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Get all available affixes
-			var query = entityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
-			var affixEntities = query.ToEntityArray(Allocator.Temp);
+			EntityQuery query = entityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
+			NativeArray<Entity> affixEntities = query.ToEntityArray(Allocator.Temp);
 
 			if (affixEntities.Length == 0)
 				{
@@ -275,18 +275,18 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Create affix buffer on enemy
-			var affixBuffer = entityManager.AddBuffer<EnemyAffixBufferElement>(enemyEntity);
+			DynamicBuffer<EnemyAffixBufferElement> affixBuffer = entityManager.AddBuffer<EnemyAffixBufferElement>(enemyEntity);
 
 			// Select random affixes
 			for (int i = 0; i < affixCount && i < affixEntities.Length; i++)
 				{
 				int randomIndex = random.NextInt(0, affixEntities.Length);
-				var affixEntity = affixEntities[randomIndex];
-				var affix = entityManager.GetComponentData<EnemyAffix>(affixEntity);
+				Entity affixEntity = affixEntities[randomIndex];
+				EnemyAffix affix = entityManager.GetComponentData<EnemyAffix>(affixEntity);
 
 				// Check if we already have this affix
 				bool alreadyHasAffix = false;
-				foreach (var existingAffix in affixBuffer)
+				foreach (EnemyAffixBufferElement existingAffix in affixBuffer)
 					{
 					if (existingAffix.Value.Id.Equals(affix.Id))
 						{

@@ -12,6 +12,7 @@ const { SmartUsageMeter } = require('./usage.js');
 const { ContextCache } = require('./shared/context-cache.js');
 const { VisionQueue } = require('./vision-queue.js');
 const { VisionArchive } = require('./vision-archive.js');
+const { SeededAnalysis } = require('./seeded-analysis.js');
 
 // Constants for probability calculations
 const PROBABILITY_LOWER_BOUND = 0.1;
@@ -34,6 +35,9 @@ class Oracle {
         // Initialize Vision Queue and Archive for formal Faculty operations
         this.visionQueue = new VisionQueue();
         this.visionArchive = new VisionArchive();
+        
+        // Initialize seeded analysis for enhanced strategic forecasting
+        this.seededAnalysis = new SeededAnalysis();
         
         console.log(`🔮 The Oracle has manifested - peering into possible futures`);
     }
@@ -179,12 +183,15 @@ class Oracle {
         
         this.synthesizeVisions(context);
         
-        const report = this.generateOracularReport();
+        const baseReport = this.generateOracularReport();
+        
+        // Apply seeded analysis enhancements if applicable
+        const enhancedReport = this.seededAnalysis.enhanceOracleReport(baseReport, context);
         
         // Cache the results
-        this.cache.setCachedFacultyResults(cacheKey, 'oracle', report);
+        this.cache.setCachedFacultyResults(cacheKey, 'oracle', enhancedReport);
         
-        return this.addTelemetryToReport(report);
+        return this.addTelemetryToReport(enhancedReport);
     }
 
     /**

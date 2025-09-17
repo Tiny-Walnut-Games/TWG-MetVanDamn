@@ -1,0 +1,234 @@
+{
+  "packInfo": {
+    "name": "warbler-pack-wisdom-scrolls",
+    "version": "1.0.0",
+    "description": "Mystical wisdom generation templates for the Secret Art of the Living Dev quote system",
+    "author": "TWG Scroll Quote Engine",
+    "created": "2025-01-20",
+    "compatibleEngine": "^0.1.0"
+  },
+  "templates": [
+    {
+      "id": "wisdom_development_insight",
+      "version": "1.0.0",
+      "title": "Development Wisdom Generator",
+      "description": "Generates profound development insights in the style of the Secret Art",
+      "content": "{{action}} is not {{misconception}}; it's {{deeper_truth}}. Like {{metaphor}}, but for {{domain}}.",
+      "intent": "wisdom_generation",
+      "requiredSlots": [
+        {
+          "name": "action",
+          "type": "string",
+          "required": true,
+          "description": "A development practice or activity (e.g., 'Refactoring', 'Code review')"
+        },
+        {
+          "name": "misconception",
+          "type": "string",
+          "required": true,
+          "description": "Common misconception about the action (e.g., 'admitting failure', 'wasted time')"
+        },
+        {
+          "name": "deeper_truth",
+          "type": "string",
+          "required": true,
+          "description": "The profound reality (e.g., 'evolution of understanding', 'investment in clarity')"
+        },
+        {
+          "name": "metaphor",
+          "type": "string",
+          "required": true,
+          "description": "Poetic comparison (e.g., 'pruning a garden', 'sharpening a blade')"
+        },
+        {
+          "name": "domain",
+          "type": "string",
+          "required": true,
+          "description": "The technical domain (e.g., 'algorithms', 'architecture', 'documentation')"
+        }
+      ],
+      "tags": ["wisdom", "development", "philosophy", "metaphor"],
+      "maxLength": 200,
+      "category": "development"
+    },
+    {
+      "id": "scroll_attribution_template",
+      "version": "1.0.0",
+      "title": "Sacred Scroll Attribution",
+      "description": "Generates mystical attribution for wisdom quotes",
+      "content": "— **{{author_title}}**, {{source_title}}, {{volume_designation}}",
+      "intent": "attribution",
+      "requiredSlots": [
+        {
+          "name": "author_title",
+          "type": "string",
+          "required": true,
+          "description": "Mystical author title (e.g., 'The Great Validator', 'Code Whisperer')"
+        },
+        {
+          "name": "source_title",
+          "type": "string",
+          "required": true,
+          "description": "Source publication name (e.g., 'Secret Art of the Living Dev', 'Scrolls of Cheekdom')"
+        },
+        {
+          "name": "volume_designation",
+          "type": "string",
+          "required": true,
+          "description": "Volume reference (e.g., 'Vol. III', 'Chapter 4, Verse 2')"
+        }
+      ],
+      "tags": ["attribution", "source", "mystical"],
+      "maxLength": 150,
+      "category": "attribution"
+    },
+    {
+      "id": "debugging_proverb_template",
+      "version": "1.0.0",
+      "title": "Debugging Proverb Generator",
+      "description": "Creates humorous debugging wisdom in proverb form",
+      "content": "The {{problem_type}} you can't {{action_verb}} is like the {{creature}} under the {{location}}—{{reality_statement}}.",
+      "intent": "debugging_wisdom",
+      "requiredSlots": [
+        {
+          "name": "problem_type",
+          "type": "string",
+          "required": true,
+          "description": "Type of elusive problem (e.g., 'bug', 'memory leak', 'race condition')"
+        },
+        {
+          "name": "action_verb",
+          "type": "string",
+          "required": true,
+          "description": "Action you can't perform (e.g., 'reproduce', 'capture', 'isolate')"
+        },
+        {
+          "name": "creature",
+          "type": "string",
+          "required": true,
+          "description": "Elusive creature (e.g., 'monster', 'shadow', 'whisper')"
+        },
+        {
+          "name": "location",
+          "type": "string",
+          "required": true,
+          "description": "Hiding place (e.g., 'bed', 'staircase', 'closet')"
+        },
+        {
+          "name": "reality_statement",
+          "type": "string",
+          "required": true,
+          "description": "The humorous truth (e.g., 'real, but only when no one\\'s looking')"
+        }
+      ],
+      "tags": ["debugging", "humor", "proverb", "mystery"],
+      "maxLength": 180,
+      "category": "debugging"
+    },
+    {
+      "id": "documentation_philosophy",
+      "version": "1.0.0",
+      "title": "Documentation Philosophy",
+      "description": "Profound insights about documentation practices",
+      "content": "Documentation is not {{what_its_not}}; it's {{what_it_really_is}}.",
+      "intent": "documentation_wisdom",
+      "requiredSlots": [
+        {
+          "name": "what_its_not",
+          "type": "string",
+          "required": true,
+          "description": "Common misconception (e.g., 'what you write for others', 'a necessary evil')"
+        },
+        {
+          "name": "what_it_really_is",
+          "type": "string",
+          "required": true,
+          "description": "The deeper truth (e.g., 'what you write for the you of six months from now')"
+        }
+      ],
+      "tags": ["documentation", "philosophy", "truth"],
+      "maxLength": 150,
+      "category": "documentation"
+    },
+    {
+      "id": "cheekdom_lore_template",
+      "version": "1.0.0",
+      "title": "Cheekdom Lore Generator",
+      "description": "Generates epic lore about the Cheekdom and its sacred mission",
+      "content": "In the {{realm}} of {{domain}}, the {{guardian_class}} stands between {{civilization}} and {{threat_type}}.",
+      "intent": "lore_generation",
+      "requiredSlots": [
+        {
+          "name": "realm",
+          "type": "string",
+          "required": true,
+          "description": "Mystical realm name (e.g., 'kingdom', 'sacred lands', 'digital territories')"
+        },
+        {
+          "name": "domain",
+          "type": "string",
+          "required": true,
+          "description": "Technical domain (e.g., 'Software Development', 'Code Repositories')"
+        },
+        {
+          "name": "guardian_class",
+          "type": "string",
+          "required": true,
+          "description": "Protector class (e.g., 'Buttwarden', 'Code Guardian', 'Comfort Sentinel')"
+        },
+        {
+          "name": "civilization",
+          "type": "string",
+          "required": true,
+          "description": "What is protected (e.g., 'comfortable development', 'ergonomic harmony')"
+        },
+        {
+          "name": "threat_type",
+          "type": "string",
+          "required": true,
+          "description": "The enemy (e.g., 'runtime catastrophe', 'documentation destruction')"
+        }
+      ],
+      "tags": ["lore", "cheekdom", "epic", "guardian"],
+      "maxLength": 200,
+      "category": "lore"
+    },
+    {
+      "id": "buttsafe_wisdom",
+      "version": "1.0.0",
+      "title": "Buttsafe Wisdom Generator",
+      "description": "Creates wisdom about ergonomic development practices",
+      "content": "Every developer's {{body_part}} is {{sacred_designation}}. {{protection_action}} with {{protection_means}}.",
+      "intent": "buttsafe_wisdom",
+      "requiredSlots": [
+        {
+          "name": "body_part",
+          "type": "string",
+          "required": true,
+          "description": "Body part to protect (e.g., 'posterior', 'back', 'wrists')"
+        },
+        {
+          "name": "sacred_designation",
+          "type": "string",
+          "required": true,
+          "description": "Sacred description (e.g., 'sacred', 'a temple of productivity', 'precious')"
+        },
+        {
+          "name": "protection_action",
+          "type": "string",
+          "required": true,
+          "description": "How to protect (e.g., 'Protect it', 'Honor it', 'Preserve it')"
+        },
+        {
+          "name": "protection_means",
+          "type": "string",
+          "required": true,
+          "description": "Method of protection (e.g., 'ergonomic wisdom', 'proper equipment', 'mindful practices')"
+        }
+      ],
+      "tags": ["buttsafe", "ergonomic", "sacred", "protection"],
+      "maxLength": 160,
+      "category": "buttsafe"
+    }
+  ]
+}

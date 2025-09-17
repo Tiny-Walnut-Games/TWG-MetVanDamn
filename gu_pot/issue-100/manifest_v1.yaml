@@ -1,0 +1,20 @@
+﻿# Alchemist Faculty Experiment Manifest
+# Generated on: 2025-09-06 18:38:48 UTC
+# Alchemist Version: 0.1.0
+
+metadata:
+  name: "Alchemist Experiment - Issue #100"
+  description: "Combat system narrative integration - Issue #100"
+  version: "1.0.0"
+  experiment_id: "de3b815c-38e4-447b-84a7-427b8f218373"
+
+origin:
+  type: "gu_pot"
+  issue_number: 100
+  issue_url: "https://github.com/jmeyer1980/TWG-TLDA/issues/100"
+  stage_at_evaluation: "distilled"
+  logline_hash: "sha256:15218ef59a0d143ffd4fd7c56bc02050603f860ae8ac66f27f294af32487137d"
+  tension_hash: "sha256:b24a711549ff5a5538ddda7c89dead59b094c9994dc934ba7ef09ec450b6adce"
+  irreversible_shift_declared: true
+  extracted_on: "2025-09-06T18:38:30Z"
+  alchemist_version: "0.1.0"

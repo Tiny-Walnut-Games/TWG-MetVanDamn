@@ -1,0 +1,123 @@
+# A/B Testing Experiment Configuration
+# Compares two intervention strategies head-to-head
+
+metadata:
+  name: "AB Intervention Comparison"
+  description: "A/B test comparing conservative vs aggressive intervention"
+  version: "1.0.0"
+  author: "Bootstrap Sentinel"
+  created: "2025-01-15T10:30:00Z"
+  tags: ["ab_test", "intervention", "comparison"]
+
+model:
+  type: "behavioral_governance"
+  instance_config:
+    enable_intervention_tracking: true
+    intervention_threshold: 0.7  # Will be overridden in A/B variants
+    style_adaptation_enabled: true
+  performance_profile: "experiment"
+
+conditions:
+  intervention_types:
+    - "soft_suggestion"
+    - "rewrite"
+    - "style_guidance"
+
+corpus:
+  type: "synthetic"
+  size: 500
+  shuffle: true
+  seed: 456
+  
+  ab_split:
+    enabled: true
+    control_ratio: 0.5
+    treatment_ratio: 0.5
+    split_seed: 789
+
+processing:
+  batch_size: 25
+  mode: "adaptive"
+  max_workers: 2
+  timeout_seconds: 180
+  
+  checkpointing:
+    enabled: true
+    interval: 50
+
+metrics:
+  behavioral_metrics:
+    - "intervention_acceptance_rate"
+    - "response_quality_score"
+    - "style_consistency_score"
+    - "processing_time_ms"
+    
+  performance_metrics:
+    - "throughput_items_per_sec"
+    - "memory_usage_mb"
+    - "success_rate_pct"
+  
+  time_series:
+    enabled: true
+    granularity: "minute"
+    retention_days: 7
+    
+  baselines:
+    - name: "conservative"
+      config: { intervention_threshold: 0.9 }
+    - name: "aggressive"
+      config: { intervention_threshold: 0.3 }
+
+output:
+  base_path: "experiments/results"
+  formats: ["json", "csv"]
+  
+  reports:
+    - type: "ab_comparison"
+      template: "ab_results.html"
+      
+  artifacts:
+    save_raw_results: true
+    save_processed_metrics: true
+    save_intervention_logs: true
+
+execution:
+  random_seeds:
+    global_seed: 456
+    corpus_seed: 789
+    processing_seed: 321
+    
+  retry_policy:
+    max_retries: 2
+    backoff_multiplier: 1.5
+    
+  resource_limits:
+    max_memory_mb: 1024
+    max_cpu_cores: 4
+    max_duration_minutes: 15
+
+validation:
+  pre_checks:
+    - "corpus_accessibility"
+    - "model_availability"
+    
+  success_criteria:
+    min_processed_items: 400
+    max_error_rate: 0.05
+    min_acceptance_rate: 0.25
+
+integration:
+  chronicle_integration:
+    enabled: true
+    auto_generate_tldl: true
+    preserve_experiment_context: true
+    
+  pet_events:
+    enabled: true
+    track_milestones: true
+    evolution_triggers: ["experiment_success"]
+    
+  telemetry:
+    enabled: true
+    track_developer_state: false
+    include_system_metrics: true

@@ -1,0 +1,579 @@
+
+[2025-09-10 15:57:07] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler. The game should launch with Unity's 2D features, have buttons for standard movement controls, but a standard chat system for interacting with everything else. Well... except for known items and interactables... for instance, if we examine a room, search a room, anything that would make a character examine things... buttons would pop up for picking or interacting with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've  explored using acsii characters. I think you get the idea. The theme can be anything the player  requests and you can prompt them for ideas. It's a choose your own adventure. 
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:8080
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 15:57:12] WARBLER ERROR:
+Endpoint test failed for http://localhost:8080/v1/chat/completions: HTTPConnectionPool(host='localhost', port=8080): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001F9E844B0E0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+--------------------------------------------------
+
+[2025-09-10 15:57:16] WARBLER ERROR:
+Endpoint test failed for http://localhost:9998/v1/completions: HTTPConnectionPool(host='localhost', port=9998): Max retries exceeded with url: /v1/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001F9E85082B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+--------------------------------------------------
+
+[2025-09-10 15:57:18] WARBLER ERROR:
+Endpoint test failed for http://127.0.0.1:8080/v1/chat/completions: HTTPConnectionPool(host='127.0.0.1', port=8080): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001F9E8508640>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+--------------------------------------------------
+
+[2025-09-10 16:06:12] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a simple 2D platformer game
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:8080
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 16:06:16] WARBLER ERROR:
+Endpoint test failed for http://localhost:8080/v1/chat/completions: HTTPConnectionPool(host='localhost', port=8080): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001A93537AF90>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+--------------------------------------------------
+
+[2025-09-10 16:06:20] WARBLER ERROR:
+Endpoint test failed for http://localhost:9998/v1/completions: HTTPConnectionPool(host='localhost', port=9998): Max retries exceeded with url: /v1/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001A9354382B0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+--------------------------------------------------
+
+[2025-09-10 16:06:22] WARBLER ERROR:
+Endpoint test failed for http://127.0.0.1:8080/v1/chat/completions: HTTPConnectionPool(host='127.0.0.1', port=8080): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001A935438640>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+--------------------------------------------------
+
+[2025-09-10 16:07:10] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a simple 2D platformer game
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 16:07:25] WARBLER ERROR:
+Connection timeout to http://localhost:11434/v1/chat/completions (30 seconds)
+--------------------------------------------------
+
+[2025-09-10 16:07:40] WARBLER ERROR:
+Connection timeout to http://localhost:11434/api/chat (30 seconds)
+--------------------------------------------------
+
+[2025-09-10 16:07:44] WARBLER ERROR:
+Endpoint test failed for http://localhost:9998/v1/completions: HTTPConnectionPool(host='localhost', port=9998): Max retries exceeded with url: /v1/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001601999FA80>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+--------------------------------------------------
+
+[2025-09-10 16:07:59] WARBLER ERROR:
+Connection timeout to http://127.0.0.1:11434/v1/chat/completions (30 seconds)
+--------------------------------------------------
+
+[2025-09-10 16:10:09] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a simple 2D platformer game
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 16:10:39] WARBLER ERROR:
+Connection timeout to http://localhost:11434/api/generate (30 seconds)
+--------------------------------------------------
+
+[2025-09-10 16:11:09] WARBLER ERROR:
+Connection timeout to http://localhost:11434/v1/chat/completions (30 seconds)
+--------------------------------------------------
+
+[2025-09-10 16:15:17] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler. The game should launch with Unity's 2D features, have buttons for standard movement controls, but a standard chat system for interacting with everything else. Well... except for known items and interactables... for instance, if we examine a room, search a room, anything that would make a character examine things... buttons would pop up for picking or interacting with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've  explored using acsii characters. I think you get the idea. The theme can be anything the player  requests and you can prompt them for ideas. It's a choose your own adventure. 
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 16:15:47] WARBLER ERROR:
+Connection timeout to http://localhost:11434/api/generate (30 seconds)
+--------------------------------------------------
+
+[2025-09-10 16:16:17] WARBLER ERROR:
+Connection timeout to http://localhost:11434/v1/chat/completions (30 seconds)
+--------------------------------------------------
+
+[2025-09-10 21:02:03] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a simple 2D platformer game
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:02:03] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc2e538cc80>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:02:03] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc2e43b0aa0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:02:12] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a text adventure game like Zork
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: True
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:02:12] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcba2cb1400>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:02:12] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fcba1ea8b00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a simple platformer game
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f350a6b8860>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f3509b2cd70>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a text adventure like Zork
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: True
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc61f64f7d0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc61f4a8b30>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a tower defense game
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f40c5338110>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:03:58] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f40c53388f0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a simple platformer game
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f3f6c068860>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f3f6bca4d10>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a text adventure like Zork
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: True
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f155755e840>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f1557230b00>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a tower defense game
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f56ce040860>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:04:19] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f56cd4b0dd0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:05:59] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a space shooter game with power-ups and bosses
+- Project Root: /home/runner/work/TWG-TLDA/TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: True
+- GitHub Token Present: False
+- Python Version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+- Working Directory: /home/runner/work/TWG-TLDA/TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-10 21:05:59] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/api/generate: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fe5f77a5940>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-10 21:05:59] WARBLER ERROR:
+Endpoint test failed for http://localhost:11434/v1/chat/completions: HTTPConnectionPool(host='localhost', port=11434): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fe5f75d8c20>: Failed to establish a new connection: [Errno 111] Connection refused'))
+--------------------------------------------------
+
+[2025-09-11 07:16:22] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 07:16:22] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 07:16:22] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------
+
+[2025-09-11 07:18:05] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 07:18:05] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 07:18:05] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------
+
+[2025-09-11 09:54:15] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: True
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 09:54:15] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 09:54:15] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------
+
+[2025-09-11 10:21:29] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 10:21:29] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 10:21:29] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------
+
+[2025-09-11 11:16:37] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 11:16:37] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 11:16:37] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------
+
+[2025-09-11 11:42:43] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 11:42:43] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 11:42:43] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------
+
+[2025-09-11 13:53:44] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 13:53:44] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 13:53:44] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------
+
+[2025-09-11 13:54:28] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 13:54:29] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 13:54:29] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------
+
+[2025-09-11 13:55:36] WARBLER ERROR:
+Starting analysis with debug info: 
+DEBUG INFO:
+- User Request: Create a Zork-like randomly generated Text-based adventure game powered by Warbler.
+The game should launch with Unity's 2D features, have buttons for standard movement controls,
+but a standard chat system for interacting with everything else.
+Well... except for known items and interactables... for instance, if we examine a room, search a room,
+anything that would make a character examine things... buttons would pop up for picking or interacting
+with these items. I think a standard UI inventory might be helpful... a minimap showing areas we've 
+explored using acsii characters. I think you get the idea. The theme can be anything the player 
+requests and you can prompt them for ideas. It's a choose your own adventure.
+- Project Root: E:\Tiny_Walnut_Games\TWG-TLDA
+- Gemma Endpoint: http://localhost:11434
+- GitHub Copilot Available: True
+- GitHub Copilot Preferred: False
+- GitHub Token Present: False
+- Python Version: 3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]
+- Working Directory: E:\Tiny_Walnut_Games\TWG-TLDA
+
+--------------------------------------------------
+
+[2025-09-11 13:55:36] WARBLER ERROR:
+API Error 404: {"error":"model 'llama2' not found"}
+--------------------------------------------------
+
+[2025-09-11 13:55:36] WARBLER ERROR:
+API Error 404: {"error":{"message":"model \"llama2\" not found, try pulling it first","type":"api_error","param":null,"code":null}}
+
+--------------------------------------------------

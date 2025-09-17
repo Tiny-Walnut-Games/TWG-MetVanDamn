@@ -1,0 +1,185 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created_at": "2025-01-15T10:30:00Z",
+    "updated_at": "2025-01-15T10:30:00Z",
+    "baseline_id": "cognitive_baseline_v1",
+    "description": "Baseline metrics for cognitive performance experiments testing intervention strategies and behavioral alignment",
+    "author": "Bootstrap Sentinel",
+    "tags": ["cognitive", "intervention", "behavioral_alignment"],
+    "alchemist_version": "0.1.0"
+  },
+  "baseline_metrics": {
+    "primary_metrics": {
+      "intervention_acceptance_rate": {
+        "value": 0.72,
+        "unit": "ratio",
+        "threshold_upper": 0.85,
+        "threshold_lower": 0.60,
+        "tolerance": 0.05,
+        "confidence_interval": {
+          "lower": 0.68,
+          "upper": 0.76,
+          "confidence_level": 0.95
+        },
+        "sample_size": 1000,
+        "statistical_method": "mean"
+      },
+      "response_quality_score": {
+        "value": 4.2,
+        "unit": "score",
+        "threshold_upper": 5.0,
+        "threshold_lower": 3.5,
+        "tolerance": 0.1,
+        "confidence_interval": {
+          "lower": 4.0,
+          "upper": 4.4,
+          "confidence_level": 0.95
+        },
+        "sample_size": 1000,
+        "statistical_method": "mean"
+      },
+      "processing_time_ms": {
+        "value": 250.0,
+        "unit": "milliseconds",
+        "threshold_upper": 400.0,
+        "threshold_lower": 100.0,
+        "tolerance": 0.15,
+        "confidence_interval": {
+          "lower": 220.0,
+          "upper": 280.0,
+          "confidence_level": 0.95
+        },
+        "sample_size": 1000,
+        "statistical_method": "median"
+      }
+    },
+    "secondary_metrics": {
+      "style_consistency_score": {
+        "value": 0.84,
+        "unit": "ratio",
+        "threshold_upper": 0.95,
+        "threshold_lower": 0.70,
+        "tolerance": 0.05,
+        "sample_size": 1000,
+        "statistical_method": "mean"
+      },
+      "error_rate": {
+        "value": 0.03,
+        "unit": "ratio",
+        "threshold_upper": 0.10,
+        "threshold_lower": 0.01,
+        "tolerance": 0.02,
+        "sample_size": 1000,
+        "statistical_method": "mean"
+      }
+    },
+    "derived_metrics": {
+      "quality_per_second": {
+        "formula": "response_quality_score / (processing_time_ms / 1000)",
+        "unit": "score_per_second",
+        "description": "Quality efficiency metric combining response quality and processing speed"
+      },
+      "intervention_effectiveness": {
+        "formula": "intervention_acceptance_rate * response_quality_score",
+        "unit": "composite_score",
+        "description": "Combined metric measuring both acceptance and quality of interventions"
+      }
+    }
+  },
+  "experiment_context": {
+    "experiment_type": "cognitive_performance",
+    "applicable_conditions": [
+      {
+        "condition_name": "intervention_type",
+        "condition_values": ["soft_suggestion", "rewrite", "style_guidance", "none"],
+        "default_value": "soft_suggestion"
+      },
+      {
+        "condition_name": "confidence_threshold",
+        "condition_values": [0.5, 0.7, 0.9],
+        "default_value": 0.7
+      },
+      {
+        "condition_name": "style_context",
+        "condition_values": ["technical_documentation", "code_review", "casual_conversation"],
+        "default_value": "technical_documentation"
+      }
+    ],
+    "environment_requirements": {
+      "min_corpus_size": 500,
+      "required_features": ["intervention_tracking", "style_adaptation"],
+      "incompatible_features": ["batch_mode", "legacy_scoring"]
+    },
+    "validation_rules": [
+      {
+        "rule_type": "range_check",
+        "parameters": {
+          "metric": "intervention_acceptance_rate",
+          "min": 0.0,
+          "max": 1.0
+        },
+        "severity": "error",
+        "description": "Intervention acceptance rate must be between 0 and 1"
+      },
+      {
+        "rule_type": "statistical_significance",
+        "parameters": {
+          "alpha": 0.05,
+          "power": 0.8,
+          "effect_size": 0.1
+        },
+        "severity": "warning",
+        "description": "Require statistical significance for baseline comparison"
+      }
+    ]
+  },
+  "provenance": {
+    "source_experiments": [
+      {
+        "experiment_id": "cognitive_baseline_establishment_2025_01_10",
+        "run_ids": ["run_0001", "run_0002", "run_0003", "run_0004", "run_0005"],
+        "weight": 0.8
+      },
+      {
+        "experiment_id": "intervention_validation_2025_01_12",
+        "run_ids": ["run_0001", "run_0002"],
+        "weight": 0.2
+      }
+    ],
+    "establishment_method": "aggregated_experiments",
+    "git_context": {
+      "commit_sha": "a1b2c3d4e5f6789012345678901234567890abcd",
+      "branch": "main",
+      "repository_url": "https://github.com/jmeyer1980/TWG-TLDA"
+    },
+    "gu_pot_origin": {
+      "issue_number": 42,
+      "issue_url": "https://github.com/jmeyer1980/TWG-TLDA/issues/42",
+      "stage_at_establishment": "distilled",
+      "logline_hash": "sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      "tension_hash": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321"
+    }
+  },
+  "usage_notes": {
+    "description": "This baseline represents optimal cognitive performance metrics for intervention experiments. Use for comparing behavioral alignment strategies and measuring intervention effectiveness.",
+    "examples": [
+      {
+        "scenario": "Testing new intervention strategy",
+        "expected_delta": 0.05,
+        "interpretation": "5% improvement in acceptance rate indicates successful intervention"
+      },
+      {
+        "scenario": "Performance regression detection",
+        "expected_delta": -0.10,
+        "interpretation": "10% decrease should trigger investigation and potential rollback"
+      }
+    ],
+    "known_limitations": [
+      "Baseline established from technical documentation context primarily",
+      "May not be representative for casual conversation scenarios",
+      "Sample size may be insufficient for rare edge cases"
+    ],
+    "migration_notes": "This is the first version of the cognitive baseline. No migration required."
+  }
+}

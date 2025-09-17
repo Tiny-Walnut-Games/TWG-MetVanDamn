@@ -34,23 +34,15 @@ jobs:
             role_desc: "Future Sight"
     steps:
       - name: Checkout
-        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v5
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup Node and Python
-        uses: actions/setup-node@5e2628c959b9ade56971c0afcebbe5332d44b398 # v4
+        uses: actions/setup-node@v4
         with: { node-version: 18 }
-      - uses: actions/setup-python@9322b3ca74000aeb2c01eb777b646334015ddd72 # v5.6.0
+      - uses: actions/setup-python@v5.6.0
         with: { python-version: '3.11' }
-
-      # ⚡ Cache NPM dependencies for faster installs (Phase 3 optimization)
-      - name: Cache NPM dependencies
-        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
-        with:
-          path: ~/.npm
-          key: npm-${{ runner.os }}-${{ hashFiles('package.json', 'package-lock.json') }}
-          restore-keys: npm-${{ runner.os }}-
 
       - name: Install dependencies
         run: |
@@ -58,12 +50,42 @@ jobs:
           pip install PyYAML argparse
           npm install --no-audit --no-fund
 
+      - name: Check Faculty Cooldown Protection
+        id: cooldown_check
+        if: github.event_name == 'issue_comment'
+        run: |
+          # Check if workflow is in cooldown to prevent loops
+          echo "🕐 Checking workflow cooldown protection..."
+          
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          
+          # Use the cooldown system to check if we should skip
+          cd scripts/cid-faculty
+          
+          COOLDOWN_EXIT_CODE=0
+          node shared/workflow-cooldown.js status cid-faculty "$ISSUE_NUMBER" || COOLDOWN_EXIT_CODE=$?
+          
+          if [ $COOLDOWN_EXIT_CODE -eq 0 ]; then
+            echo "cooldown_active=false" >> $GITHUB_OUTPUT
+            echo "✅ No cooldown active, proceeding with faculty consultation"
+          else
+            echo "cooldown_active=true" >> $GITHUB_OUTPUT
+            echo "🚫 Faculty workflow in cooldown, skipping execution to prevent loops"
+            
+            # Show cooldown status for debugging
+            echo "📊 Cooldown status:"
+            node shared/workflow-cooldown.js status cid-faculty "$ISSUE_NUMBER" || true
+          fi
+
       - name: Initialize Faculty Infrastructure  
+        if: steps.cooldown_check.outputs.cooldown_active != 'true'  
         run: |
           mkdir -p scripts/cid-faculty out/cid/cache
           echo '{}' > out/cid/context.json
 
       - name: Parse Faculty Configuration
+        if: steps.cooldown_check.outputs.cooldown_active != 'true'
         id: config
         run: |
           # Parse issue body for configuration
@@ -106,6 +128,7 @@ jobs:
           fi
 
       - name: Check Faculty Role Filter
+        if: steps.cooldown_check.outputs.cooldown_active != 'true'
         id: role_filter
         run: |
           FACULTY_ROLE="${{ matrix.faculty }}"
@@ -119,13 +142,14 @@ jobs:
           fi
 
       - name: Learn Repository Context (Shared)
-        if: steps.role_filter.outputs.should_run == 'true'
+        if: steps.role_filter.outputs.should_run == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
-          # Use existing CID Schoolhouse learning infrastructure
-          node scripts/cid-schoolhouse/learn.js --out=out/cid/context.json
+          # Use new faculty context gathering
+          mkdir -p out/cid
+          echo "📋 Gathering repository context for faculty consultation..."
 
       - name: Check Budget and Escalation Requirements
-        if: steps.role_filter.outputs.should_run == 'true'
+        if: steps.role_filter.outputs.should_run == 'true' && steps.cooldown_check.outputs.cooldown_active != 'true'
         id: budget_check
         run: |
           BUDGET_MINUTES="${{ steps.config.outputs.budget_minutes }}"
@@ -141,7 +165,7 @@ jobs:
           fi
 
       - name: Execute Faculty Analysis - ${{ matrix.faculty }}
-        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false' && steps.cooldown_check.outputs.cooldown_active != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -149,22 +173,25 @@ jobs:
           BUDGET_MINUTES="${{ steps.config.outputs.budget_minutes }}"
           DRY_RUN="${{ steps.config.outputs.dry_run }}"
           
-          # Set up faculty-specific parameters
-          FACULTY_ARGS="--context=out/cid/context.json --out=out/cid/${FACULTY_ROLE}-report.json"
+          # Use new enhanced faculty system
+          FACULTY_ARGS="--issue=${{ github.event.issue.number }} --budget=$BUDGET_MINUTES"
           
           if [ "$DRY_RUN" = "true" ]; then
             FACULTY_ARGS="$FACULTY_ARGS --dry-run"
           fi
           
-          # Execute the specific faculty role
-          echo "🎓 Executing ${{ matrix.role_name }} analysis..."
-          node "scripts/cid-faculty/${FACULTY_ROLE}.js" $FACULTY_ARGS \
-            --budget-minutes="$BUDGET_MINUTES" \
-            --github-api-limit=60 \
-            --other-service-limit=20
+          if [ "$FACULTY_ROLE" = "advisor" ]; then
+            FACULTY_ARGS="$FACULTY_ARGS --advisor-only"
+          elif [ "$FACULTY_ROLE" = "oracle" ]; then
+            FACULTY_ARGS="$FACULTY_ARGS --oracle-only"
+          fi
+          
+          # Execute the enhanced faculty consultation system
+          echo "🎓 Executing ${{ matrix.role_name }} analysis via enhanced faculty system..."
+          node scripts/cid-faculty/index.js $FACULTY_ARGS --out=out/cid/${FACULTY_ROLE}-report.json
 
       - name: Generate Faculty TLDL Entry
-        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false' && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           # Wait for all faculty roles to complete before generating combined TLDL
           # This step only runs once for the advisor role in the matrix
@@ -190,7 +217,7 @@ jobs:
           fi
 
       - name: Write Faculty TLDL via Chronicle Keeper
-        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false' && steps.cooldown_check.outputs.cooldown_active != 'true'
         run: |
           FACULTY_ROLE="${{ matrix.faculty }}"
           
@@ -200,7 +227,7 @@ jobs:
           fi
 
       - name: Post Faculty Comment
-        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false' && steps.cooldown_check.outputs.cooldown_active != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -254,7 +281,7 @@ jobs:
           fi
 
       - name: Award Faculty Badges
-        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false' && steps.cooldown_check.outputs.cooldown_active != 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -280,8 +307,8 @@ jobs:
           fi
 
       - name: Upload Faculty Artifacts
-        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: steps.role_filter.outputs.should_run == 'true' && steps.budget_check.outputs.needs_escalation == 'false' && steps.cooldown_check.outputs.cooldown_active != 'true'
+        uses: actions/upload-artifact@v4
         with:
           name: cid-faculty-${{ matrix.faculty }}-artifacts
           path: |
@@ -290,7 +317,10 @@ jobs:
             TLDL/entries/*${{ matrix.faculty }}*.md
 
       - name: Clean Up Cache (Maintenance)
-        if: steps.role_filter.outputs.should_run == 'true'
+        if: steps.role_filter.outputs.should_run == 'true' || steps.cooldown_check.outputs.cooldown_active == 'true'
         run: |
           # Clean old cache files to prevent storage bloat
           node scripts/cid-faculty/shared/context-cache.js cleanup
+          
+          # Also clean cooldown files to prevent storage bloat
+          node scripts/cid-faculty/shared/workflow-cooldown.js cleanup

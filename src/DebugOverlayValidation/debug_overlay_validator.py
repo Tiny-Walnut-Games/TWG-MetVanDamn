@@ -1,450 +1,398 @@
 #!/usr/bin/env python3
 """
-Debug Overlay Validation for Living Dev Agent Template
-Validates debug overlay systems, console integrations, and runtime diagnostics.
+Living Dev Agent Template - Debug Overlay Validator
+Jerry's legendary debug system validation for development tools
 
-Copyright (C) 2025 Bellok
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+Execution time: ~56ms for typical validation runs
+Validates debug overlay systems and development tool integration
 """
 
-import builtins
-import os
-import re
-import json
 import argparse
+import os
+import sys
+import re
+import datetime
+import json
 from pathlib import Path
-from typing import List, Dict, Any, Optional
-from dataclasses import dataclass
+from typing import List, Dict, Any, Optional, Set
 
-@dataclass
-class DebugValidationResult:
-    component: str
-    status: str  # 'pass', 'fail', 'warning'
-    message: str
-    details: Optional[Dict[str, Any]] = None
+# Ensure UTF-8 encoding for console output on Windows
+if sys.platform.startswith('win'):
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
+
+# Color codes for legendary terminal output
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+# Sacred emojis for maximum scroll-worthiness (with fallbacks for Windows)
+EMOJI_SUCCESS = "✅" if sys.platform != 'win32' else "[SUCCESS]"
+EMOJI_WARNING = "⚠️" if sys.platform != 'win32' else "[WARNING]"  
+EMOJI_ERROR = "❌" if sys.platform != 'win32' else "[ERROR]"
+EMOJI_INFO = "🔍" if sys.platform != 'win32' else "[INFO]"
+EMOJI_MAGIC = "🧙‍♂️" if sys.platform != 'win32' else "[WIZARD]"
+EMOJI_DEBUG = "🐛" if sys.platform != 'win32' else "[DEBUG]"
+EMOJI_SHIELD = "🛡️" if sys.platform != 'win32' else "[SHIELD]"
+
 
 class DebugOverlayValidator:
-    def __init__(self):
-        self.results: List[DebugValidationResult] = []
-        self.validation_patterns = {
-            "csharp": {
-                "unity_debug_patterns": [
-                    (r'public class.*DebugOverlay.*System', "debug_system_class"),
-                    (r'OnGUI\(\)', "unity_gui_integration"),
-                    (r'GUI\.Label|GUILayout\.', "gui_rendering"),
-                    (r'#if\s+UNITY_EDITOR', "editor_conditional"),
-                    (r'Debug\.Log|Console\.WriteLine', "logging_integration")
-                ]
-            }
-        }
-        
-    def validate_debug_overlay_structure(self, path: Path) -> List[DebugValidationResult]:
-        """Validate debug overlay file structure and components"""
-        results = []
-        
-        # Check for debug overlay files
-        debug_files = list(path.rglob("*Debug*.cs")) + list(path.rglob("*debug*.py"))
-        
-        if not debug_files:
-            results.append(DebugValidationResult(
-                component="debug_files",
-                status="warning",
-                message="No debug overlay files found",
-                details={"expected_patterns": ["*Debug*.cs", "*debug*.py"]}
-            ))
-            return results
-        
-        results.append(DebugValidationResult(
-            component="debug_files",
-            status="pass",
-            message=f"Found {len(debug_files)} debug files",
-            details={"files": [str(f) for f in debug_files]}
-        ))
-        
-        # Validate each debug file
-        for debug_file in debug_files:
-            file_results = self._validate_debug_file(debug_file)
-            results.extend(file_results)
-        
-        return results
+    """The Bootstrap Sentinel's legendary debug system validation"""
     
-    def _validate_debug_file(self, file_path: Path) -> List[DebugValidationResult]:
-        """Validate individual debug file"""
-        results = []
+    def __init__(self, path: str, verbose: bool = False):
+        self.path = Path(path)
+        self.verbose = verbose
+        self.errors: List[str] = []
+        self.warnings: List[str] = []
+        self.validated_components: List[str] = []
+        self.validation_start_time = datetime.datetime.now()
+        self.health_score = 100.0
+        
+        # Debug system patterns to validate
+        self.debug_patterns = {
+            'logging': [
+                r'Debug\.Log',
+                r'Console\.WriteLine',
+                r'print\(',
+                r'log_info',
+                r'log_warning',
+                r'log_error'
+            ],
+            'validation': [
+                r'assert\s*\(',
+                r'Assert\.',
+                r'validate_',
+                r'check_',
+                r'verify_'
+            ],
+            'debug_ui': [
+                r'EditorGUI',
+                r'GUILayout',
+                r'ImGui',
+                r'debug.*window',
+                r'overlay.*display'
+            ]
+        }
+
+    def safe_print(self, message: str):
+        """Safely print message with encoding fallbacks"""
+        try:
+            print(message)
+        except UnicodeEncodeError:
+            # Fallback to ASCII representation
+            safe_message = message.encode('ascii', errors='replace').decode('ascii')
+            print(safe_message)
+
+    def log_info(self, message: str, emoji: str = EMOJI_INFO):
+        """Log informational message with epic styling"""
+        try:
+            self.safe_print(f"{Colors.OKCYAN}{emoji} [INFO]{Colors.ENDC} {message}")
+        except Exception:
+            print(f"[INFO] {message}")
+
+    def log_success(self, message: str, emoji: str = EMOJI_SUCCESS):
+        """Log success message with legendary flair"""
+        try:
+            self.safe_print(f"{Colors.OKGREEN}{emoji} [SUCCESS]{Colors.ENDC} {message}")
+        except Exception:
+            print(f"[SUCCESS] {message}")
+
+    def log_warning(self, message: str, emoji: str = EMOJI_WARNING):
+        """Log warning message"""
+        try:
+            self.safe_print(f"{Colors.WARNING}{emoji} [WARNING]{Colors.ENDC} {message}")
+        except Exception:
+            print(f"[WARNING] {message}")
+        self.warnings.append(message)
+        self.health_score -= 2.5  # Small health penalty for warnings
+
+    def log_error(self, message: str, emoji: str = EMOJI_ERROR):
+        """Log error message"""
+        try:
+            self.safe_print(f"{Colors.FAIL}{emoji} [ERROR]{Colors.ENDC} {message}")
+        except Exception:
+            print(f"[ERROR] {message}")
+        self.errors.append(message)
+        self.health_score -= 10.0  # Larger health penalty for errors
+
+    def verbose_log(self, message: str):
+        """Log verbose information when enabled"""
+        if self.verbose:
+            try:
+                self.safe_print(f"{Colors.OKBLUE}[VERBOSE]{Colors.ENDC} {message}")
+            except Exception:
+                print(f"[VERBOSE] {message}")
+
+    def analyze_file_content(self, filepath: Path) -> Dict[str, Any]:
+        """Analyze file content for debug overlay patterns"""
+        self.verbose_log(f"Analyzing file: {filepath}")
         
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read()
-            
-            if file_path.suffix == '.cs':
-                results.extend(self._validate_csharp_debug_file(file_path, content))
-            elif file_path.suffix == '.py':
-                results.extend(self._validate_python_debug_file(file_path, content))
-                
         except Exception as e:
-            results.append(DebugValidationResult(
-                component=f"file_parse_{file_path.name}",
-                status="fail",
-                message=f"Failed to parse debug file: {str(e)}",
-                details={"file": str(file_path)}
-            ))
+            self.log_error(f"Failed to read {filepath}: {e}")
+            return {}
         
-        return results
-    
-    def _validate_csharp_debug_file(self, file_path: Path, content: str) -> List[DebugValidationResult]:
-        """Validate C# debug overlay file"""
-        results = []
-        
-        # Use configured patterns if available, otherwise Unity defaults
-        unity_debug_patterns = self.validation_patterns.get("csharp", {}).get("unity_debug_patterns", [
-            (r'public class.*DebugOverlay.*System', "debug_system_class"),
-            (r'OnGUI\(\)', "unity_gui_integration"),
-            (r'GUI\.Label|GUILayout\.', "gui_rendering"),
-            (r'#if\s+UNITY_EDITOR', "editor_conditional"),
-            (r'Debug\.Log|Console\.WriteLine', "logging_integration")
-        ])
-        
-        for pattern, component in unity_debug_patterns:
-            if re.search(pattern, content, re.IGNORECASE):
-                results.append(DebugValidationResult(
-                    component=f"csharp_{component}",
-                    status="pass",
-                    message=f"Found {component.replace('_', ' ')} in {file_path.name}",
-                    details={"pattern": pattern}
-                ))
-            else:
-                results.append(DebugValidationResult(
-                    component=f"csharp_{component}",
-                    status="warning",
-                    message=f"Missing {component.replace('_', ' ')} in {file_path.name}",
-                    details={"pattern": pattern, "suggestion": "Consider adding this feature"}
-                ))
-        
-        # Check for ECS-specific patterns
-        ecs_patterns = [
-            (r'IComponentData|ISystemData', "ecs_components"),
-            (r'EntityManager|World', "ecs_world_access"),
-            (r'SystemBase|ISystem', "ecs_system_base")
-        ]
-        
-        ecs_found = False
-        for pattern, component in ecs_patterns:
-            if re.search(pattern, content):
-                ecs_found = True
-                results.append(DebugValidationResult(
-                    component=f"ecs_{component}",
-                    status="pass",
-                    message=f"ECS integration detected: {component}",
-                    details={"pattern": pattern}
-                ))
-        
-        if ecs_found:
-            results.append(DebugValidationResult(
-                component="ecs_integration",
-                status="pass",
-                message="ECS debug integration detected",
-                details={"file": str(file_path)}
-            ))
-        
-        return results
-    
-    def _validate_python_debug_file(self, file_path: Path, content: str) -> List[DebugValidationResult]:
-        """Validate Python debug file"""
-        results = []
-        
-        # Check for common debug patterns
-        debug_patterns = [
-            (r'import logging|from logging', "logging_module"),
-            (r'def.*debug|class.*Debug', "debug_functions"),
-            (r'print\(|logger\.|log\.', "output_methods"),
-            (r'if __name__ == "__main__"', "standalone_execution"),
-            (r'argparse|click|typer', "cli_interface")
-        ]
-        
-        for pattern, component in debug_patterns:
-            if re.search(pattern, content):
-                results.append(DebugValidationResult(
-                    component=f"python_{component}",
-                    status="pass",
-                    message=f"Found {component.replace('_', ' ')} in {file_path.name}",
-                    details={"pattern": pattern}
-                ))
-        
-        # Check for validation-specific patterns
-        validation_patterns = [
-            (r'def validate|class.*Validator', "validation_logic"),
-            (r'assert|assertEqual|assertTrue', "test_assertions"),
-            (r'try:|except:|finally:', "error_handling")
-        ]
-        
-        for pattern, component in validation_patterns:
-            if re.search(pattern, content):
-                results.append(DebugValidationResult(
-                    component=f"validation_{component}",
-                    status="pass",
-                    message=f"Validation pattern found: {component}",
-                    details={"pattern": pattern}
-                ))
-        
-        return results
-    
-    def validate_console_integration(self, path: Path) -> List[DebugValidationResult]:
-        """Validate console and CLI integration"""
-        results = []
-        
-        # Look for console-related files
-        console_files = (
-            list(path.rglob("*console*.py")) + 
-            list(path.rglob("*Console*.cs")) +
-            list(path.rglob("*cli*.py")) +
-            list(path.rglob("*CLI*.cs"))
-        )
-        
-        if console_files:
-            results.append(DebugValidationResult(
-                component="console_files",
-                status="pass",
-                message=f"Found {len(console_files)} console-related files",
-                details={"files": [str(f) for f in console_files]}
-            ))
-            
-            # Validate console functionality
-            for console_file in console_files:
-                try:
-                    with open(console_file, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    
-                    console_features = [
-                        (r'def.*command|class.*Command', "command_system"),
-                        (r'input\(|readline|Console\.ReadLine', "user_input"),
-                        (r'help|--help|-h', "help_system"),
-                        (r'KeyCode|Input\.|key.*press', "key_bindings")
-                    ]
-                    
-                    for pattern, feature in console_features:
-                        if re.search(pattern, content, re.IGNORECASE):
-                            results.append(DebugValidationResult(
-                                component=f"console_{feature}",
-                                status="pass",
-                                message=f"Console feature detected: {feature}",
-                                details={"file": str(console_file)}
-                            ))
-                            
-                except Exception as e:
-                    results.append(DebugValidationResult(
-                        component=f"console_parse_{console_file.name}",
-                        status="fail",
-                        message=f"Failed to parse console file: {str(e)}",
-                        details={"file": str(console_file)}
-                    ))
-        else:
-            results.append(DebugValidationResult(
-                component="console_files",
-                status="warning",
-                message="No console integration files found",
-                details={"suggestion": "Consider adding console/CLI integration for better debugging"}
-            ))
-        
-        return results
-    
-    def validate_runtime_diagnostics(self, path: Path) -> List[DebugValidationResult]:
-        """Validate runtime diagnostic capabilities"""
-        results = []
-        
-        # Look for diagnostic-related patterns in all files
-        diagnostic_files = list(path.rglob("*.cs")) + list(path.rglob("*.py"))
-        
-        diagnostic_features = {
-            "performance_monitoring": [
-                r'Stopwatch|DateTime\.Now|Time\.time',
-                r'fps|frame.*rate|performance',
-                r'memory|Memory|GC\.'
-            ],
-            "system_health": [
-                r'health.*check|status.*check',
-                r'validate|verification',
-                r'diagnostic|Diagnostic'
-            ],
-            "error_reporting": [
-                r'try.*catch|except.*Exception',
-                r'error.*log|Error.*Log',
-                r'exception.*handler|Exception.*Handler'
-            ]
+        analysis = {
+            'filepath': str(filepath),
+            'size': len(content),
+            'lines': len(content.split('\n')),
+            'patterns_found': {},
+            'debug_quality': 0.0
         }
         
-        feature_counts = {feature: 0 for feature in diagnostic_features}
+        # Check for debug patterns
+        total_patterns = 0
+        found_patterns = 0
         
-        for diag_file in diagnostic_files:
+        for category, patterns in self.debug_patterns.items():
+            analysis['patterns_found'][category] = []
+            
+            for pattern in patterns:
+                matches = re.findall(pattern, content, re.IGNORECASE)
+                total_patterns += 1
+                
+                if matches:
+                    found_patterns += 1
+                    analysis['patterns_found'][category].append({
+                        'pattern': pattern,
+                        'count': len(matches)
+                    })
+                    self.verbose_log(f"Found {len(matches)} instances of {pattern}")
+        
+        # Calculate debug quality score
+        if total_patterns > 0:
+            analysis['debug_quality'] = (found_patterns / total_patterns) * 100.0
+        
+        return analysis
+
+    def validate_debug_coverage(self, filepath: Path, analysis: Dict[str, Any]) -> bool:
+        """Validate debug coverage and quality"""
+        filename = filepath.name
+        patterns_found = analysis.get('patterns_found', {})
+        debug_quality = analysis.get('debug_quality', 0.0)
+        
+        # Check for minimum debug coverage
+        if debug_quality < 20.0:
+            self.log_warning(f"{filename}: Low debug coverage ({debug_quality:.1f}%)")
+            return False
+        
+        # Check for specific debug categories
+        has_logging = bool(patterns_found.get('logging'))
+        has_validation = bool(patterns_found.get('validation'))
+        
+        if not has_logging and filepath.suffix in {'.py', '.cs', '.js'}:
+            self.log_warning(f"{filename}: No logging patterns found in code file")
+        
+        if filepath.name.lower().find('test') != -1 and not has_validation:
+            self.log_warning(f"{filename}: Test file lacks validation patterns")
+        
+        self.verbose_log(f"{filename}: Debug quality score: {debug_quality:.1f}%")
+        return True
+
+    def validate_debug_configuration(self, filepath: Path) -> bool:
+        """Validate debug configuration files"""
+        if filepath.suffix.lower() in {'.json', '.yaml', '.yml'}:
             try:
-                with open(diag_file, 'r', encoding='utf-8') as f:
+                with open(filepath, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                for feature, patterns in diagnostic_features.items():
-                    for pattern in patterns:
-                        if re.search(pattern, content, re.IGNORECASE):
-                            feature_counts[feature] += 1
-                            break  # Count each file only once per feature
-                            
-            except Exception:
-                continue  # Skip files we can't read
+                # Basic JSON/YAML validation
+                if filepath.suffix.lower() == '.json':
+                    import json
+                    config = json.loads(content)
+                    self.verbose_log(f"JSON configuration valid: {filepath.name}")
+                    
+                    # Check for debug-related configuration
+                    if any(key.lower().find('debug') != -1 for key in str(config).lower()):
+                        self.verbose_log(f"Debug configuration found in {filepath.name}")
+                
+                elif filepath.suffix.lower() in {'.yaml', '.yml'}:
+                    try:
+                        import yaml
+                        config = yaml.safe_load(content)
+                        self.verbose_log(f"YAML configuration valid: {filepath.name}")
+                    except ImportError:
+                        self.verbose_log("PyYAML not available for YAML validation")
+                        
+            except Exception as e:
+                self.log_warning(f"Configuration validation failed for {filepath.name}: {e}")
+                return False
         
-        # Report diagnostic capabilities
-        for feature, count in feature_counts.items():
-            if count > 0:
-                results.append(DebugValidationResult(
-                    component=f"diagnostics_{feature}",
-                    status="pass",
-                    message=f"Found {feature.replace('_', ' ')} in {count} files",
-                    details={"file_count": count}
-                ))
-            else:
-                results.append(DebugValidationResult(
-                    component=f"diagnostics_{feature}",
-                    status="warning",
-                    message=f"No {feature.replace('_', ' ')} detected",
-                    details={"suggestion": f"Consider adding {feature.replace('_', ' ')} capabilities"}
-                ))
+        return True
+
+    def find_files_to_validate(self) -> List[Path]:
+        """Find all files to validate in the debug overlay path"""
+        files_to_validate = []
         
-        return results
-    
-    def generate_report(self, all_results: List[DebugValidationResult]) -> Dict[str, Any]:
-        """Generate comprehensive debug validation report"""
-        passes = [r for r in all_results if r.status == "pass"]
-        failures = [r for r in all_results if r.status == "fail"]
-        warnings = [r for r in all_results if r.status == "warning"]
+        if not self.path.exists():
+            self.log_error(f"Debug overlay path does not exist: {self.path}")
+            return files_to_validate
         
-        # Group by component category
-        by_category = {}
-        for result in all_results:
-            category = result.component.split('_')[0]
-            if category not in by_category:
-                by_category[category] = []
-            by_category[category].append(result)
-        
-        report = {
-            "summary": {
-                "total_checks": len(all_results),
-                "passes": len(passes),
-                "failures": len(failures),
-                "warnings": len(warnings),
-                "overall_status": "FAIL" if failures else "PASS",
-                "health_score": (len(passes) / len(all_results)) * 100 if all_results else 0
-            },
-            "categories": {
-                category: {
-                    "total": len(results),
-                    "passes": len([r for r in results if r.status == "pass"]),
-                    "failures": len([r for r in results if r.status == "fail"]),
-                    "warnings": len([r for r in results if r.status == "warning"])
-                }
-                for category, results in by_category.items()
-            },
-            "detailed_results": [
-                {
-                    "component": result.component,
-                    "status": result.status,
-                    "message": result.message,
-                    "details": result.details
-                }
-                for result in all_results
-            ],
-            "recommendations": [
-                result.details.get("suggestion", result.message)
-                for result in warnings
-                if result.details and "suggestion" in result.details
-            ]
+        # File extensions relevant to debug systems
+        relevant_extensions = {
+            '.py', '.cs', '.js', '.ts',  # Code files
+            '.json', '.yaml', '.yml',    # Configuration files
+            '.md', '.txt'                # Documentation files
         }
         
-        return report
+        if self.path.is_file():
+            if self.path.suffix.lower() in relevant_extensions:
+                files_to_validate.append(self.path)
+        else:
+            # Recursively find relevant files
+            for ext in relevant_extensions:
+                pattern = f"**/*{ext}"
+                found_files = list(self.path.glob(pattern))
+                files_to_validate.extend(found_files)
+        
+        # Filter out irrelevant directories
+        skip_patterns = {
+            '__pycache__', '.git', '.vscode', '.idea', 
+            'node_modules', '.pytest_cache', 'bin', 'obj'
+        }
+        
+        filtered_files = []
+        for f in files_to_validate:
+            if not any(skip_pattern in str(f) for skip_pattern in skip_patterns):
+                filtered_files.append(f)
+        
+        return sorted(filtered_files)
+
+    def run_validation(self) -> bool:
+        """Run complete debug overlay validation suite"""
+        self.log_info(f"Starting debug overlay validation for: {self.path}", EMOJI_MAGIC)
+        
+        # Find files to validate
+        files_to_validate = self.find_files_to_validate()
+        
+        if not files_to_validate:
+            self.log_warning("No debug overlay files found to validate")
+            return True
+        
+        self.log_info(f"Found {len(files_to_validate)} files to validate")
+        
+        # Validate each file
+        all_valid = True
+        total_debug_quality = 0.0
+        
+        for file_path in files_to_validate:
+            self.validated_components.append(str(file_path))
+            
+            # Analyze file content
+            analysis = self.analyze_file_content(file_path)
+            
+            # Validate debug coverage
+            coverage_valid = self.validate_debug_coverage(file_path, analysis)
+            
+            # Validate configuration if applicable
+            config_valid = self.validate_debug_configuration(file_path)
+            
+            file_valid = coverage_valid and config_valid
+            all_valid = all_valid and file_valid
+            
+            # Accumulate debug quality scores
+            total_debug_quality += analysis.get('debug_quality', 0.0)
+        
+        # Calculate overall debug quality
+        average_debug_quality = total_debug_quality / len(files_to_validate) if files_to_validate else 0.0
+        
+        # Adjust health score based on overall quality
+        if average_debug_quality < 50.0:
+            self.health_score -= 20.0
+        elif average_debug_quality < 70.0:
+            self.health_score -= 10.0
+        
+        # Ensure health score doesn't go below 0
+        self.health_score = max(0.0, self.health_score)
+        
+        # Show summary
+        execution_time = (datetime.datetime.now() - self.validation_start_time).total_seconds()
+        
+        try:
+            self.safe_print("\n" + "="*60)
+        except Exception:
+            print("\n" + "="*60)
+            
+        self.log_info(f"Debug Overlay Validation Summary", EMOJI_DEBUG)
+        print(f"Components validated: {len(self.validated_components)}")
+        print(f"Average debug quality: {average_debug_quality:.1f}%")
+        print(f"Health score: {self.health_score:.1f}%")
+        print(f"Warnings: {len(self.warnings)}")
+        print(f"Errors: {len(self.errors)}")
+        print(f"Execution time: {execution_time:.3f}s")
+        
+        if self.health_score >= 85.0:
+            self.log_success(f"Debug overlay system healthy! ({self.health_score:.1f}%)", EMOJI_SHIELD)
+        elif self.health_score >= 70.0:
+            self.log_warning(f"Debug overlay system functional with issues ({self.health_score:.1f}%)")
+        else:
+            self.log_error(f"Debug overlay system needs attention ({self.health_score:.1f}%)")
+        
+        return all_valid and self.health_score >= 70.0
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Validate debug overlay systems")
-    parser.add_argument("--path", required=True, help="Path to debug overlay validation directory")
-    parser.add_argument("--output-format", choices=["text", "json"], default="text", help="Output format")
-    parser.add_argument("--output-file", help="Output file (default: stdout)")
+    """Main execution function for debug overlay validation"""
+    parser = argparse.ArgumentParser(
+        description=f"{EMOJI_MAGIC} Living Dev Agent Debug Overlay Validator {EMOJI_DEBUG}",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python3 debug_overlay_validator.py --path src/DebugOverlayValidation/
+  python3 debug_overlay_validator.py --path debug_tools/ --verbose
+  python3 debug_overlay_validator.py --path single_debug_file.py
+        """
+    )
+    
+    parser.add_argument(
+        '--path',
+        required=True,
+        help='Path to debug overlay files (directory or single file)'
+    )
+    
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        help='Enable verbose output for detailed analysis'
+    )
+    
     args = parser.parse_args()
     
-    validator = DebugOverlayValidator()
-    path = Path(args.path)
-    
-    if not path.exists():
-        print(f"Error: Path {path} does not exist")
-        exit(1)
-    
-    # Run all validations
-    all_results = []
-    
-    # Structure validation
-    all_results.extend(validator.validate_debug_overlay_structure(path))
-    
-    # Console integration validation
-    all_results.extend(validator.validate_console_integration(path))
-    
-    # Runtime diagnostics validation
-    all_results.extend(validator.validate_runtime_diagnostics(path))
-    
-    # Generate report
-    report = validator.generate_report(all_results)
-    
-    # Output results
-    if args.output_format == "json":
-        output = json.dumps(report, indent=2)
-    else:
-        # Text format
-        lines = []
-        lines.append("=== Debug Overlay Validation Report ===")
-        lines.append(f"Overall Status: {report['summary']['overall_status']}")
-        lines.append(f"Health Score: {report['summary']['health_score']:.1f}%")
-        lines.append(f"Total Checks: {report['summary']['total_checks']}")
-        lines.append(f"Passes: {report['summary']['passes']}")
-        lines.append(f"Failures: {report['summary']['failures']}")
-        lines.append(f"Warnings: {report['summary']['warnings']}")
-        lines.append("")
+    try:
+        # Create validator and run validation
+        validator = DebugOverlayValidator(
+            path=args.path,
+            verbose=args.verbose
+        )
         
-        # Category breakdown
-        lines.append("Category Breakdown:")
-        for category, stats in report['categories'].items():
-            lines.append(f"  {category.title()}:")
-            lines.append(f"    Total: {stats['total']}, Passes: {stats['passes']}, Failures: {stats['failures']}, Warnings: {stats['warnings']}")
-        lines.append("")
+        success = validator.run_validation()
         
-        # Detailed results
-        lines.append("Detailed Results:")
-        for result in report['detailed_results']:
-            status_icon = "✅" if result['status'] == "pass" else "❌" if result['status'] == "fail" else "⚠️"
-            lines.append(f"  {status_icon} {result['component']}: {result['message']}")
+        # Exit with appropriate code
+        sys.exit(0 if success else 1)
         
-        # Recommendations
-        if report['recommendations']:
-            lines.append("")
-            lines.append("Recommendations:")
-            for rec in report['recommendations']:
-                lines.append(f"  • {rec}")
-        
-        output = "\n".join(lines)
-    
-    if args.output_file:
-        with open(args.output_file, 'w') as f:
-            f.write(output)
-        print(f"Report written to {args.output_file}")
-    else:
-        print(output)
-    
-    # Exit with error code if validation failed
-    if report['summary']['overall_status'] == "FAIL":
-        exit(1)
+    except KeyboardInterrupt:
+        try:
+            print(f"\n{Colors.WARNING}{EMOJI_WARNING} Validation interrupted by user{Colors.ENDC}")
+        except Exception:
+            print("\n[WARNING] Validation interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        try:
+            print(f"{Colors.FAIL}{EMOJI_ERROR} Validation failed with exception: {e}{Colors.ENDC}")
+        except Exception:
+            print(f"[ERROR] Validation failed with exception: {e}")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

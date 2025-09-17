@@ -1,0 +1,248 @@
+name: "🐍 Narrative Incubation / Gu Pot Candidate"
+description: "Capture, evolve, and graduate an idea using narrative + selective survival (Gu) framing."
+title: "[Idea]: <concise-story-title>"
+labels:
+  - incubation
+  - needs-triage
+assignees:
+  - jmeyer1980
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🔬 Purpose
+        Single template for the entire lifecycle: raw fragment → narrative validation → micro‑experiment → field report → graduation or compost.
+
+        Use iterative edits instead of opening new issues. Preserve lineage in the History section.
+
+        Stages: `larva` → `fermenting` → `distilled` → `serum` (validated) → `antitoxin` (neutralizes recurring toxic pattern) → `compost` (archived but explain why).
+
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Current Stage
+      description: Promote only when the previous stage’s narrative gate is satisfied.
+      options:
+        - larva
+        - fermenting
+        - distilled
+        - serum
+        - antitoxin
+        - compost
+    validations:
+      required: true
+
+  - type: input
+    id: logline
+    attributes:
+      label: Logline (1 sentence narrative spine)
+      description: Protagonist + goal + obstacle + twist + outcome potential.
+      placeholder: "A modular dev-agent seeks graduation signals but memory drift sabotages faculty trials until a ladder emerges."
+    validations:
+      required: true
+
+  - type: textarea
+    id: cast
+    attributes:
+      label: Cast & Forces
+      description: Identify narrative actors and pressures.
+      value: |
+        Protagonist:
+        Antagonist (concrete constraint, not abstract 'complexity'):
+        Supporting Systems:
+        External Pressure / Time Constraint:
+    validations:
+      required: true
+
+  - type: textarea
+    id: world_before
+    attributes:
+      label: World State (Before)
+      description: Snapshot of the system status quo; measurable baselines if any.
+      placeholder: "Faculties exist, but there is no coherent progression or retention measurement..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: tension
+    attributes:
+      label: Instigating Tension (Core Contradiction)
+      description: The unresolved contradiction driving this story.
+      placeholder: "We want emergent skill progression, but we have no artifact that encodes advancement triggers."
+    validations:
+      required: true
+
+  - type: textarea
+    id: stakes
+    attributes:
+      label: Stakes
+      description: Consequences of acting vs not acting.
+      value: |
+        If Successful (positive leverage):
+        If Ignored / Fails (cost / degradation):
+    validations:
+      required: true
+
+  - type: textarea
+    id: irreversible_shift
+    attributes:
+      label: Irreversible Shift (Graduation Criterion)
+      description: Describe what can never go back once achieved (structural, behavioral, artifact-level).
+      placeholder: "A reproducible faculty ladder + metrics become canonical in evaluation pipeline."
+    validations:
+      required: true
+
+  - type: textarea
+    id: measurable_residue
+    attributes:
+      label: Measurable Residue (Artifacts / Metrics)
+      description: Tangible proof the narrative occurred (files, dashboards, metrics, logs).
+      placeholder: |
+        - docs/faculty_ladder.md
+        - metric: recall_accuracy_before vs after
+        - trial transcripts annotated with rungs
+    validations:
+      required: true
+
+  - type: textarea
+    id: arc_beats
+    attributes:
+      label: Arc Beats (3–5)
+      description: Minimal narrative skeleton from setup → turning point(s) → resolution candidate.
+      value: |
+        1. Setup:
+        2. First Pressure Test:
+        3. Emergent Pattern:
+        4. Consolidation:
+        5. Resolution / Shift:
+    validations:
+      required: true
+
+  - type: textarea
+    id: micro_experiment
+    attributes:
+      label: Smallest Micro-Experiment (≤3 Steps)
+      description: Define the first actionable scene (not a plan essay).
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Instruments & Metrics
+      description: Define or stub metrics used as “props” in the story (even if rough initially).
+      value: |
+        Tension Index (1–5):
+        Drift Delta (%):
+        Faculty Cohesion Score (# cross-faculty handoffs / trial):
+        Other:
+    validations:
+      required: true
+
+  - type: textarea
+    id: abort_signals
+    attributes:
+      label: Abort / Kill Signals
+      description: Explicit conditions to stop (prevent zombie venom).
+      placeholder: "After 2 trials, no new behaviors; tension score <2; residue remains undefined..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: recombination_sources
+    attributes:
+      label: Recombination Sources / Lineage
+      description: Reference prior idea fragments, related issues, or merged narratives.
+      placeholder: "#12 (memory scaffolding), #33 (capability ladders), raw note dated 2025-09-01"
+
+  - type: textarea
+    id: toxic_patterns
+    attributes:
+      label: Anti-Toxin Notes (Patterns This Counters)
+      description: Call out seductive but harmful recurring ideas this story neutralizes.
+      placeholder: "Ad hoc evaluation scripts; uncontrolled faculty sprawl..."
+
+  - type: checkboxes
+    id: readiness_gates
+    attributes:
+      label: Readiness Gate Checklist (Promote to 'distilled' only when all checked)
+      options:
+        - label: Logline stable (no major wording changes across 2 reviews)
+        - label: Concrete antagonist (measurable constraint)
+        - label: Irreversible shift clearly stated
+        - label: Measurable residue enumerated
+        - label: Micro-experiment defined and runnable in ≤1 hour
+        - label: Abort signals explicit
+
+  - type: textarea
+    id: field_report
+    attributes:
+      label: Field Report (Post-Execution)
+      description: Fill after running micro-experiment or trials; narrate unexpected behaviors.
+      placeholder: |
+        Scene Summary:
+        Observed Deviation:
+        Emergent Behavior:
+        Metric Changes:
+        Interpretation:
+        Sequel Hook:
+    validations:
+      required: false
+
+  - type: textarea
+    id: evolution_history
+    attributes:
+      label: Evolution / Edit History
+      description: Append chronological notes; do not erase prior context (lightweight lineage).
+      value: |
+        [YYYY-MM-DD] Created (stage=larva)
+        [YYYY-MM-DD] Promoted to fermenting after antagonist clarified
+        [YYYY-MM-DD] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: sequel
+    attributes:
+      label: Sequel / Unlocks
+      description: What new class of story or capability does success enable?
+      placeholder: "Automated faculty graduation harness; cross-trial comparative analyzer..."
+
+  - type: dropdown
+    id: promotion_intent
+    attributes:
+      label: Promotion Intent (Next Stage Target)
+      description: Where you intend to move this next (optional; for planning).
+      options:
+        - (none)
+        - fermenting
+        - distilled
+        - serum
+        - antitoxin
+        - compost
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### Promotion Rules
+        - To move to fermenting: Must have logline + antagonist + stakes.
+        - To move to distilled: All readiness gate checkboxes satisfied.
+        - To move to serum: Field report completed with residue artifacts committed.
+        - To become antitoxin: Demonstrated neutralization of at least one recurring toxic pattern.
+        - Compost only with explicit reason (supports future archeology).
+
+        ### Editing Guidance
+        - Prefer additive history entries over silent rewrites.
+        - Keep logline stable once distilled; changes after that may indicate story fracture → reassess.
+
+        ### Reminder
+        If you cannot express: Protagonist wants X but Y blocks it, so Z changes the world producing residue R, the idea returns to the jar.
+
+        Happy incubating. 🧪

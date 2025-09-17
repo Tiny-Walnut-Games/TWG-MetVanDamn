@@ -166,16 +166,30 @@ class ContextCache {
     }
 
     /**
-     * Calculate diff between current and cached context
+     * Calculate enhanced diff between current and cached context
+     * Now with granular change tracking and performance metrics
      */
     calculateContextDiff(currentContext, cachedContext) {
         if (!cachedContext) {
-            return { hasChanges: true, changeRatio: 1.0, changes: ['no cache'] };
+            return { 
+                hasChanges: true, 
+                changeRatio: 1.0, 
+                changes: ['no cache'],
+                diffType: 'initial_state',
+                performanceMetrics: {
+                    diffTimeMs: 0,
+                    compressionRatio: 0.0,
+                    changeMagnitude: 1.0
+                }
+            };
         }
 
+        const startTime = Date.now();
         const changes = [];
+        const detailedChanges = []; // Granular change tracking
         let totalFields = 0;
         let changedFields = 0;
+        let totalMagnitude = 0;
 
         const compareObjects = (current, cached, path = '') => {
             const currentKeys = Object.keys(current || {});
@@ -188,9 +202,32 @@ class ContextCache {
                 const cachedVal = cached?.[key];
                 const keyPath = path ? `${path}.${key}` : key;
 
-                if (JSON.stringify(currentVal) !== JSON.stringify(cachedVal)) {
+                // Skip timestamp fields for performance
+                if (key.includes('timestamp') || key.includes('last_updated')) {
+                    return;
+                }
+
+                const currentStr = JSON.stringify(currentVal);
+                const cachedStr = JSON.stringify(cachedVal);
+                
+                if (currentStr !== cachedStr) {
                     changedFields++;
                     changes.push(keyPath);
+                    
+                    // Calculate change magnitude
+                    let magnitude = this.calculateChangeMagnitude(cachedVal, currentVal);
+                    totalMagnitude += magnitude;
+                    
+                    // Detailed change tracking
+                    const changeType = this.determineChangeType(cachedVal, currentVal);
+                    detailedChanges.push({
+                        path: keyPath,
+                        type: changeType,
+                        oldValue: cachedVal,
+                        newValue: currentVal,
+                        magnitude: magnitude,
+                        timestamp: Date.now()
+                    });
                 }
 
                 if (typeof currentVal === 'object' && currentVal !== null && 
@@ -202,15 +239,97 @@ class ContextCache {
 
         compareObjects(currentContext, cachedContext?.context);
 
+        const diffTimeMs = Date.now() - startTime;
         const changeRatio = totalFields > 0 ? changedFields / totalFields : 0;
+        const avgMagnitude = changedFields > 0 ? totalMagnitude / changedFields : 0;
+        
+        // Calculate compression ratio (how much smaller the diff is vs full context)
+        const fullContextSize = JSON.stringify(currentContext).length;
+        const diffSize = JSON.stringify(detailedChanges).length;
+        const compressionRatio = fullContextSize > 0 ? 1 - (diffSize / fullContextSize) : 0;
 
         return {
             hasChanges: changes.length > 0,
             changeRatio,
-            changes: changes.slice(0, 10), // Limit to first 10 changes
+            changes: changes.slice(0, 10), // Limit to first 10 changes for compatibility
+            detailedChanges: detailedChanges.slice(0, 50), // More detailed tracking
             totalChanges: changes.length,
-            totalFields
+            totalFields,
+            diffType: this.categorizeDiffType(changeRatio, avgMagnitude),
+            performanceMetrics: {
+                diffTimeMs,
+                compressionRatio,
+                changeMagnitude: avgMagnitude,
+                changedFields,
+                totalFields
+            }
         };
+    }
+
+    /**
+     * Calculate magnitude of change between two values
+     */
+    calculateChangeMagnitude(oldVal, newVal) {
+        if (oldVal === null && newVal !== null) return 1.0;
+        if (oldVal !== null && newVal === null) return 1.0;
+        
+        // Numeric changes
+        if (typeof oldVal === 'number' && typeof newVal === 'number') {
+            if (oldVal === 0) return newVal !== 0 ? 1.0 : 0.0;
+            const ratio = Math.abs(newVal - oldVal) / Math.abs(oldVal);
+            return Math.min(ratio, 1.0);
+        }
+        
+        // String changes
+        if (typeof oldVal === 'string' && typeof newVal === 'string') {
+            if (oldVal.length === 0 && newVal.length === 0) return 0.0;
+            if (oldVal.length === 0 || newVal.length === 0) return 1.0;
+            
+            // Simple character-based similarity
+            const maxLen = Math.max(oldVal.length, newVal.length);
+            let commonChars = 0;
+            for (let i = 0; i < Math.min(oldVal.length, newVal.length); i++) {
+                if (oldVal[i] === newVal[i]) commonChars++;
+            }
+            return 1.0 - (commonChars / maxLen);
+        }
+        
+        // Array changes
+        if (Array.isArray(oldVal) && Array.isArray(newVal)) {
+            const maxLen = Math.max(oldVal.length, newVal.length);
+            if (maxLen === 0) return 0.0;
+            const sizeDiff = Math.abs(oldVal.length - newVal.length);
+            return Math.min(sizeDiff / maxLen, 1.0);
+        }
+        
+        // Default for other types
+        return oldVal !== newVal ? 0.5 : 0.0;
+    }
+
+    /**
+     * Determine the type of change
+     */
+    determineChangeType(oldVal, newVal) {
+        if (oldVal === null || oldVal === undefined) return 'added';
+        if (newVal === null || newVal === undefined) return 'removed';
+        if (typeof oldVal !== typeof newVal) return 'type_changed';
+        if (Array.isArray(oldVal) && Array.isArray(newVal)) {
+            if (oldVal.length !== newVal.length) return 'array_resized';
+            return 'array_modified';
+        }
+        if (typeof oldVal === 'object') return 'object_modified';
+        return 'value_changed';
+    }
+
+    /**
+     * Categorize the overall diff type
+     */
+    categorizeDiffType(changeRatio, avgMagnitude) {
+        if (changeRatio === 0) return 'no_changes';
+        if (changeRatio < 0.1) return 'minimal_changes';
+        if (changeRatio < 0.3) return 'moderate_changes';
+        if (avgMagnitude > 0.7) return 'major_changes';
+        return 'significant_changes';
     }
 
     /**

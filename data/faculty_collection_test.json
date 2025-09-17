@@ -1,0 +1,833 @@
+{
+  "test_metadata": {
+    "generated_at": "2025-09-04 15:48:47 UTC",
+    "total_tokens": 8,
+    "test_version": "1.0.0"
+  },
+  "results": [
+    {
+      "ritual_event": {
+        "id": "TEST-RITUAL-1757000927052-760",
+        "source": "SpriteForgeTestHarness",
+        "text": "Musical patterns emerge from the chaos of compilation - Scribe faculty recognition ritual",
+        "ritual_type": "warbler_song",
+        "emotional_weight": 0.755198050541583,
+        "tags": [
+          "test",
+          "spriteforge",
+          "nft_generation",
+          "music",
+          "harmony",
+          "faculty"
+        ],
+        "unix_millis": 1757000927052,
+        "provenance_hash": "fbccfd16660517bd2bd271f93f0075471bee0cb93692d1226be47ea3a201d818"
+      },
+      "sprite_seed": "e1fe8a3d3ffc0aa9",
+      "token_specification": {
+        "category": "faculty_ultra_rare",
+        "faculty_role": "warbler",
+        "archetype": "wisp",
+        "genre": "mythic",
+        "rarity": "oneofone",
+        "size": [
+          32,
+          32
+        ],
+        "animation_frames": 12
+      },
+      "sprite_result": {
+        "sprite_sheet_size": [
+          384,
+          32
+        ],
+        "frame_count": 12,
+        "frame_size": [
+          32,
+          32
+        ],
+        "generation_time_ms": 124,
+        "quality_score": 0.909347718377895,
+        "color_palette": [
+          "#3366cc",
+          "#1a99e6",
+          "#66ccff",
+          "#4db3ff"
+        ],
+        "special_effects": true
+      },
+      "nft_metadata": {
+        "name": "Warbler \u2022 Wisp of the Divine",
+        "description": "Faculty ultra-rare 1/1. Born from the warbler song ritual on 2025-09-04. Forged from TLDA verdicts and faculty wisdom.",
+        "image": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.png",
+        "animation_url": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.mp4",
+        "attributes": [
+          {
+            "trait_type": "Category",
+            "value": "Faculty Ultra Rare"
+          },
+          {
+            "trait_type": "Rarity",
+            "value": "Oneofone"
+          },
+          {
+            "trait_type": "Ritual Type",
+            "value": "Warbler Song"
+          },
+          {
+            "trait_type": "Emotional Weight",
+            "value": 0.755198050541583,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Generation Quality",
+            "value": 0.909347718377895,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Faculty Role",
+            "value": "Warbler"
+          },
+          {
+            "trait_type": "Uniqueness",
+            "value": "1/1"
+          },
+          {
+            "trait_type": "Animation Frames",
+            "value": 12,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Sprite Size",
+            "value": "32x32"
+          },
+          {
+            "trait_type": "Special Effects",
+            "value": "Yes"
+          }
+        ]
+      }
+    },
+    {
+      "ritual_event": {
+        "id": "TEST-RITUAL-1757000927052-433",
+        "source": "SpriteForgeTestHarness",
+        "text": "Musical patterns emerge from the chaos of compilation - Creator faculty recognition ritual",
+        "ritual_type": "warbler_song",
+        "emotional_weight": 0.5750789956466738,
+        "tags": [
+          "test",
+          "spriteforge",
+          "nft_generation",
+          "music",
+          "harmony",
+          "faculty"
+        ],
+        "unix_millis": 1757000927052,
+        "provenance_hash": "07f8b32afecae59ea69f96a177b044c8f00fae568dadfdc29bfd08aaac1b780c"
+      },
+      "sprite_seed": "bc72df7b65a4bc13",
+      "token_specification": {
+        "category": "faculty_ultra_rare",
+        "faculty_role": "warbler",
+        "archetype": "wisp",
+        "genre": "mythic",
+        "rarity": "oneofone",
+        "size": [
+          32,
+          32
+        ],
+        "animation_frames": 12
+      },
+      "sprite_result": {
+        "sprite_sheet_size": [
+          384,
+          32
+        ],
+        "frame_count": 12,
+        "frame_size": [
+          32,
+          32
+        ],
+        "generation_time_ms": 124,
+        "quality_score": 0.8955395744624418,
+        "color_palette": [
+          "#3366cc",
+          "#1a99e6",
+          "#66ccff",
+          "#4db3ff"
+        ],
+        "special_effects": true
+      },
+      "nft_metadata": {
+        "name": "Warbler \u2022 Wisp of the Divine",
+        "description": "Faculty ultra-rare 1/1. Born from the warbler song ritual on 2025-09-04. Forged from TLDA verdicts and faculty wisdom.",
+        "image": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.png",
+        "animation_url": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.mp4",
+        "attributes": [
+          {
+            "trait_type": "Category",
+            "value": "Faculty Ultra Rare"
+          },
+          {
+            "trait_type": "Rarity",
+            "value": "Oneofone"
+          },
+          {
+            "trait_type": "Ritual Type",
+            "value": "Warbler Song"
+          },
+          {
+            "trait_type": "Emotional Weight",
+            "value": 0.5750789956466738,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Generation Quality",
+            "value": 0.8955395744624418,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Faculty Role",
+            "value": "Warbler"
+          },
+          {
+            "trait_type": "Uniqueness",
+            "value": "1/1"
+          },
+          {
+            "trait_type": "Animation Frames",
+            "value": 12,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Sprite Size",
+            "value": "32x32"
+          },
+          {
+            "trait_type": "Special Effects",
+            "value": "Yes"
+          }
+        ]
+      }
+    },
+    {
+      "ritual_event": {
+        "id": "TEST-RITUAL-1757000927052-573",
+        "source": "SpriteForgeTestHarness",
+        "text": "Harmonic resonance detected in the code architecture - Archivist faculty recognition ritual",
+        "ritual_type": "warbler_song",
+        "emotional_weight": 0.8750225236982767,
+        "tags": [
+          "test",
+          "spriteforge",
+          "nft_generation",
+          "music",
+          "harmony",
+          "faculty"
+        ],
+        "unix_millis": 1757000927052,
+        "provenance_hash": "c783b13ca1adf9035176778b0459489eb8e176a1d25423554119034b66ff9392"
+      },
+      "sprite_seed": "20667f83f1e265b7",
+      "token_specification": {
+        "category": "faculty_ultra_rare",
+        "faculty_role": "warbler",
+        "archetype": "wisp",
+        "genre": "mythic",
+        "rarity": "oneofone",
+        "size": [
+          32,
+          32
+        ],
+        "animation_frames": 12
+      },
+      "sprite_result": {
+        "sprite_sheet_size": [
+          384,
+          32
+        ],
+        "frame_count": 12,
+        "frame_size": [
+          32,
+          32
+        ],
+        "generation_time_ms": 159,
+        "quality_score": 0.9618621444315021,
+        "color_palette": [
+          "#3366cc",
+          "#1a99e6",
+          "#66ccff",
+          "#4db3ff"
+        ],
+        "special_effects": true
+      },
+      "nft_metadata": {
+        "name": "Warbler \u2022 Wisp of the Divine",
+        "description": "Faculty ultra-rare 1/1. Born from the warbler song ritual on 2025-09-04. Forged from TLDA verdicts and faculty wisdom.",
+        "image": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.png",
+        "animation_url": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.mp4",
+        "attributes": [
+          {
+            "trait_type": "Category",
+            "value": "Faculty Ultra Rare"
+          },
+          {
+            "trait_type": "Rarity",
+            "value": "Oneofone"
+          },
+          {
+            "trait_type": "Ritual Type",
+            "value": "Warbler Song"
+          },
+          {
+            "trait_type": "Emotional Weight",
+            "value": 0.8750225236982767,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Generation Quality",
+            "value": 0.9618621444315021,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Faculty Role",
+            "value": "Warbler"
+          },
+          {
+            "trait_type": "Uniqueness",
+            "value": "1/1"
+          },
+          {
+            "trait_type": "Animation Frames",
+            "value": 12,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Sprite Size",
+            "value": "32x32"
+          },
+          {
+            "trait_type": "Special Effects",
+            "value": "Yes"
+          }
+        ]
+      }
+    },
+    {
+      "ritual_event": {
+        "id": "TEST-RITUAL-1757000927052-423",
+        "source": "SpriteForgeTestHarness",
+        "text": "Harmonic resonance detected in the code architecture - Creator faculty recognition ritual",
+        "ritual_type": "warbler_song",
+        "emotional_weight": 0.5438558434507481,
+        "tags": [
+          "test",
+          "spriteforge",
+          "nft_generation",
+          "music",
+          "harmony",
+          "faculty"
+        ],
+        "unix_millis": 1757000927052,
+        "provenance_hash": "52139eca2a72afa376101f1ef4771af26aac238b39e26f42fdf0a0b197172d73"
+      },
+      "sprite_seed": "b0d1b346fc69aeea",
+      "token_specification": {
+        "category": "faculty_ultra_rare",
+        "faculty_role": "warbler",
+        "archetype": "wisp",
+        "genre": "mythic",
+        "rarity": "oneofone",
+        "size": [
+          32,
+          32
+        ],
+        "animation_frames": 12
+      },
+      "sprite_result": {
+        "sprite_sheet_size": [
+          384,
+          32
+        ],
+        "frame_count": 12,
+        "frame_size": [
+          32,
+          32
+        ],
+        "generation_time_ms": 192,
+        "quality_score": 0.9036544689512865,
+        "color_palette": [
+          "#3366cc",
+          "#1a99e6",
+          "#66ccff",
+          "#4db3ff"
+        ],
+        "special_effects": true
+      },
+      "nft_metadata": {
+        "name": "Warbler \u2022 Wisp of the Divine",
+        "description": "Faculty ultra-rare 1/1. Born from the warbler song ritual on 2025-09-04. Forged from TLDA verdicts and faculty wisdom.",
+        "image": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.png",
+        "animation_url": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.mp4",
+        "attributes": [
+          {
+            "trait_type": "Category",
+            "value": "Faculty Ultra Rare"
+          },
+          {
+            "trait_type": "Rarity",
+            "value": "Oneofone"
+          },
+          {
+            "trait_type": "Ritual Type",
+            "value": "Warbler Song"
+          },
+          {
+            "trait_type": "Emotional Weight",
+            "value": 0.5438558434507481,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Generation Quality",
+            "value": 0.9036544689512865,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Faculty Role",
+            "value": "Warbler"
+          },
+          {
+            "trait_type": "Uniqueness",
+            "value": "1/1"
+          },
+          {
+            "trait_type": "Animation Frames",
+            "value": 12,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Sprite Size",
+            "value": "32x32"
+          },
+          {
+            "trait_type": "Special Effects",
+            "value": "Yes"
+          }
+        ]
+      }
+    },
+    {
+      "ritual_event": {
+        "id": "TEST-RITUAL-1757000927053-966",
+        "source": "SpriteForgeTestHarness",
+        "text": "The Warbler's song echoes through the development halls - Warbler faculty recognition ritual",
+        "ritual_type": "warbler_song",
+        "emotional_weight": 0.6016121734895088,
+        "tags": [
+          "test",
+          "spriteforge",
+          "nft_generation",
+          "music",
+          "harmony",
+          "faculty"
+        ],
+        "unix_millis": 1757000927053,
+        "provenance_hash": "0baf9c9736b4a97a2201b3967d23a7c9ebe2574f0800db5723d568efddc145dd"
+      },
+      "sprite_seed": "8c73f32713357d4d",
+      "token_specification": {
+        "category": "faculty_ultra_rare",
+        "faculty_role": "warbler",
+        "archetype": "wisp",
+        "genre": "mythic",
+        "rarity": "oneofone",
+        "size": [
+          32,
+          32
+        ],
+        "animation_frames": 12
+      },
+      "sprite_result": {
+        "sprite_sheet_size": [
+          384,
+          32
+        ],
+        "frame_count": 12,
+        "frame_size": [
+          32,
+          32
+        ],
+        "generation_time_ms": 145,
+        "quality_score": 0.951713490567121,
+        "color_palette": [
+          "#3366cc",
+          "#1a99e6",
+          "#66ccff",
+          "#4db3ff"
+        ],
+        "special_effects": true
+      },
+      "nft_metadata": {
+        "name": "Warbler \u2022 Wisp of the Divine",
+        "description": "Faculty ultra-rare 1/1. Born from the warbler song ritual on 2025-09-04. Forged from TLDA verdicts and faculty wisdom.",
+        "image": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.png",
+        "animation_url": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.mp4",
+        "attributes": [
+          {
+            "trait_type": "Category",
+            "value": "Faculty Ultra Rare"
+          },
+          {
+            "trait_type": "Rarity",
+            "value": "Oneofone"
+          },
+          {
+            "trait_type": "Ritual Type",
+            "value": "Warbler Song"
+          },
+          {
+            "trait_type": "Emotional Weight",
+            "value": 0.6016121734895088,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Generation Quality",
+            "value": 0.951713490567121,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Faculty Role",
+            "value": "Warbler"
+          },
+          {
+            "trait_type": "Uniqueness",
+            "value": "1/1"
+          },
+          {
+            "trait_type": "Animation Frames",
+            "value": 12,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Sprite Size",
+            "value": "32x32"
+          },
+          {
+            "trait_type": "Special Effects",
+            "value": "Yes"
+          }
+        ]
+      }
+    },
+    {
+      "ritual_event": {
+        "id": "TEST-RITUAL-1757000927053-609",
+        "source": "SpriteForgeTestHarness",
+        "text": "The Warbler's song echoes through the development halls - Creator faculty recognition ritual",
+        "ritual_type": "warbler_song",
+        "emotional_weight": 0.3772189875108218,
+        "tags": [
+          "test",
+          "spriteforge",
+          "nft_generation",
+          "music",
+          "harmony",
+          "faculty"
+        ],
+        "unix_millis": 1757000927053,
+        "provenance_hash": "589d31c76a5c1980b6a3c96e60453db6fd93bba8103471fcb2fb116ada99148d"
+      },
+      "sprite_seed": "ce94b601341939c9",
+      "token_specification": {
+        "category": "faculty_ultra_rare",
+        "faculty_role": "warbler",
+        "archetype": "wisp",
+        "genre": "mythic",
+        "rarity": "oneofone",
+        "size": [
+          32,
+          32
+        ],
+        "animation_frames": 12
+      },
+      "sprite_result": {
+        "sprite_sheet_size": [
+          384,
+          32
+        ],
+        "frame_count": 12,
+        "frame_size": [
+          32,
+          32
+        ],
+        "generation_time_ms": 191,
+        "quality_score": 0.9671533499164806,
+        "color_palette": [
+          "#3366cc",
+          "#1a99e6",
+          "#66ccff",
+          "#4db3ff"
+        ],
+        "special_effects": true
+      },
+      "nft_metadata": {
+        "name": "Warbler \u2022 Wisp of the Divine",
+        "description": "Faculty ultra-rare 1/1. Born from the warbler song ritual on 2025-09-04. Forged from TLDA verdicts and faculty wisdom.",
+        "image": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.png",
+        "animation_url": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.mp4",
+        "attributes": [
+          {
+            "trait_type": "Category",
+            "value": "Faculty Ultra Rare"
+          },
+          {
+            "trait_type": "Rarity",
+            "value": "Oneofone"
+          },
+          {
+            "trait_type": "Ritual Type",
+            "value": "Warbler Song"
+          },
+          {
+            "trait_type": "Emotional Weight",
+            "value": 0.3772189875108218,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Generation Quality",
+            "value": 0.9671533499164806,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Faculty Role",
+            "value": "Warbler"
+          },
+          {
+            "trait_type": "Uniqueness",
+            "value": "1/1"
+          },
+          {
+            "trait_type": "Animation Frames",
+            "value": 12,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Sprite Size",
+            "value": "32x32"
+          },
+          {
+            "trait_type": "Special Effects",
+            "value": "Yes"
+          }
+        ]
+      }
+    },
+    {
+      "ritual_event": {
+        "id": "TEST-RITUAL-1757000927053-238",
+        "source": "SpriteForgeTestHarness",
+        "text": "Musical patterns emerge from the chaos of compilation - Wrangler faculty recognition ritual",
+        "ritual_type": "warbler_song",
+        "emotional_weight": 0.7009944722792024,
+        "tags": [
+          "test",
+          "spriteforge",
+          "nft_generation",
+          "music",
+          "harmony",
+          "faculty"
+        ],
+        "unix_millis": 1757000927053,
+        "provenance_hash": "4ce1019c1c63bdbceded5e2779b5a50a59346841eda26bf1b8c7180c74ecf96f"
+      },
+      "sprite_seed": "c40a433aee08440d",
+      "token_specification": {
+        "category": "faculty_ultra_rare",
+        "faculty_role": "warbler",
+        "archetype": "wisp",
+        "genre": "mythic",
+        "rarity": "oneofone",
+        "size": [
+          32,
+          32
+        ],
+        "animation_frames": 12
+      },
+      "sprite_result": {
+        "sprite_sheet_size": [
+          384,
+          32
+        ],
+        "frame_count": 12,
+        "frame_size": [
+          32,
+          32
+        ],
+        "generation_time_ms": 99,
+        "quality_score": 0.8587428563508779,
+        "color_palette": [
+          "#3366cc",
+          "#1a99e6",
+          "#66ccff",
+          "#4db3ff"
+        ],
+        "special_effects": true
+      },
+      "nft_metadata": {
+        "name": "Warbler \u2022 Wisp of the Divine",
+        "description": "Faculty ultra-rare 1/1. Born from the warbler song ritual on 2025-09-04. Forged from TLDA verdicts and faculty wisdom.",
+        "image": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.png",
+        "animation_url": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.mp4",
+        "attributes": [
+          {
+            "trait_type": "Category",
+            "value": "Faculty Ultra Rare"
+          },
+          {
+            "trait_type": "Rarity",
+            "value": "Oneofone"
+          },
+          {
+            "trait_type": "Ritual Type",
+            "value": "Warbler Song"
+          },
+          {
+            "trait_type": "Emotional Weight",
+            "value": 0.7009944722792024,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Generation Quality",
+            "value": 0.8587428563508779,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Faculty Role",
+            "value": "Warbler"
+          },
+          {
+            "trait_type": "Uniqueness",
+            "value": "1/1"
+          },
+          {
+            "trait_type": "Animation Frames",
+            "value": 12,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Sprite Size",
+            "value": "32x32"
+          },
+          {
+            "trait_type": "Special Effects",
+            "value": "Yes"
+          }
+        ]
+      }
+    },
+    {
+      "ritual_event": {
+        "id": "TEST-RITUAL-1757000927053-280",
+        "source": "SpriteForgeTestHarness",
+        "text": "The Warbler's song echoes through the development halls - Oracle faculty recognition ritual",
+        "ritual_type": "warbler_song",
+        "emotional_weight": 0.7625735548739797,
+        "tags": [
+          "test",
+          "spriteforge",
+          "nft_generation",
+          "music",
+          "harmony",
+          "faculty"
+        ],
+        "unix_millis": 1757000927053,
+        "provenance_hash": "dd90f1070fa90fed9d45c5f39b51d6cf45777c14dc7bcd6ca835a4aefea70da3"
+      },
+      "sprite_seed": "af5013e0b9df5afc",
+      "token_specification": {
+        "category": "faculty_ultra_rare",
+        "faculty_role": "warbler",
+        "archetype": "wisp",
+        "genre": "mythic",
+        "rarity": "oneofone",
+        "size": [
+          32,
+          32
+        ],
+        "animation_frames": 12
+      },
+      "sprite_result": {
+        "sprite_sheet_size": [
+          384,
+          32
+        ],
+        "frame_count": 12,
+        "frame_size": [
+          32,
+          32
+        ],
+        "generation_time_ms": 62,
+        "quality_score": 0.8795043477427446,
+        "color_palette": [
+          "#3366cc",
+          "#1a99e6",
+          "#66ccff",
+          "#4db3ff"
+        ],
+        "special_effects": true
+      },
+      "nft_metadata": {
+        "name": "Warbler \u2022 Wisp of the Divine",
+        "description": "Faculty ultra-rare 1/1. Born from the warbler song ritual on 2025-09-04. Forged from TLDA verdicts and faculty wisdom.",
+        "image": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.png",
+        "animation_url": "ipfs://placeholder/Warbler_\u2022_Wisp_of_the_Divine/sheet.mp4",
+        "attributes": [
+          {
+            "trait_type": "Category",
+            "value": "Faculty Ultra Rare"
+          },
+          {
+            "trait_type": "Rarity",
+            "value": "Oneofone"
+          },
+          {
+            "trait_type": "Ritual Type",
+            "value": "Warbler Song"
+          },
+          {
+            "trait_type": "Emotional Weight",
+            "value": 0.7625735548739797,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Generation Quality",
+            "value": 0.8795043477427446,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Faculty Role",
+            "value": "Warbler"
+          },
+          {
+            "trait_type": "Uniqueness",
+            "value": "1/1"
+          },
+          {
+            "trait_type": "Animation Frames",
+            "value": 12,
+            "display_type": "number"
+          },
+          {
+            "trait_type": "Sprite Size",
+            "value": "32x32"
+          },
+          {
+            "trait_type": "Special Effects",
+            "value": "Yes"
+          }
+        ]
+      }
+    }
+  ]
+}

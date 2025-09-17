@@ -1,0 +1,162 @@
+#!/bin/bash
+# 
+# Chronicler Refactoring CLI - Easy access to costly automatic doc refactoring
+# 
+# Usage examples:
+#   ./refactor-docs analyze file.md TestDeveloper
+#   ./refactor-docs fix file.md TestDeveloper affordable
+#   ./refactor-docs emergency file.md TestDeveloper comprehensive
+#
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REFACTOR_SCRIPT="$SCRIPT_DIR/auto-refactoring.py"
+
+# Color codes for epic refactoring notifications
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+show_help() {
+    echo -e "${PURPLE}🧙‍♂️ Chronicler Refactoring CLI - Costly Automatic Doc Refactoring${NC}"
+    echo ""
+    echo -e "${CYAN}📜 *\"Every refactor is a gamble: clarity gained, XP drained.\"* — Faculty Doctrine, Vol. VII${NC}"
+    echo ""
+    echo "Usage:"
+    echo "  $0 analyze <file> <developer>                     # Analyze refactoring needs and costs"
+    echo "  $0 fix <file> <developer> [affordable|selective|comprehensive] # Execute refactoring"
+    echo "  $0 emergency <file> <developer> [type]            # Emergency refactoring (2x cost)"
+    echo "  $0 afford <developer> <xp_cost>                   # Check if developer can afford cost"
+    echo "  $0 profile <developer>                            # Show developer XP profile"
+    echo ""
+    echo "Refactoring Types:"
+    echo "  affordable    - Only fixes that cost ≤25% of current XP"
+    echo "  selective     - Affordable fixes + moderate stretch fixes (default)"
+    echo "  comprehensive - All affordable and stretch fixes"
+    echo ""
+    echo "Strategic XP Management:"
+    echo "  • Low cost (≤25% XP): Excellent value, immediate clarity gains"
+    echo "  • Moderate cost (25-75% XP): Strategic timing considerations"
+    echo "  • High cost (≥75% XP): Evaluate critical importance first"
+    echo "  • Emergency multiplier: 2x cost for urgent Faculty compliance"
+    echo ""
+    echo "Examples:"
+    echo "  $0 analyze TLDL/entries/problematic-file.md Alice"
+    echo "  $0 fix README.md Bob selective"
+    echo "  $0 emergency docs/critical.md Carol comprehensive"
+}
+
+if [ $# -eq 0 ]; then
+    show_help
+    exit 0
+fi
+
+COMMAND="$1"
+shift
+
+case "$COMMAND" in
+    "analyze")
+        if [ $# -lt 2 ]; then
+            echo -e "${RED}❌ Error: analyze requires <file> <developer>${NC}"
+            exit 1
+        fi
+        
+        FILE="$1"
+        DEVELOPER="$2"
+        
+        if [ ! -f "$FILE" ]; then
+            echo -e "${RED}❌ Error: File not found: $FILE${NC}"
+            exit 1
+        fi
+        
+        echo -e "${PURPLE}🔍 Analyzing Faculty standards compliance...${NC}"
+        python3 "$REFACTOR_SCRIPT" --analyze "$FILE" --developer "$DEVELOPER"
+        ;;
+        
+    "fix")
+        if [ $# -lt 2 ]; then
+            echo -e "${RED}❌ Error: fix requires <file> <developer> [type]${NC}"
+            exit 1
+        fi
+        
+        FILE="$1"
+        DEVELOPER="$2"
+        TYPE="${3:-selective}"
+        
+        if [ ! -f "$FILE" ]; then
+            echo -e "${RED}❌ Error: File not found: $FILE${NC}"
+            exit 1
+        fi
+        
+        echo -e "${BLUE}🔧 Executing $TYPE refactoring...${NC}"
+        python3 "$REFACTOR_SCRIPT" --refactor "$FILE" --developer "$DEVELOPER" --type "$TYPE"
+        ;;
+        
+    "emergency")
+        if [ $# -lt 2 ]; then
+            echo -e "${RED}❌ Error: emergency requires <file> <developer> [type]${NC}"
+            exit 1
+        fi
+        
+        FILE="$1"
+        DEVELOPER="$2"
+        TYPE="${3:-selective}"
+        
+        if [ ! -f "$FILE" ]; then
+            echo -e "${RED}❌ Error: File not found: $FILE${NC}"
+            exit 1
+        fi
+        
+        echo -e "${RED}🚨 EMERGENCY REFACTORING (2x cost multiplier)${NC}"
+        echo -e "${YELLOW}⚠️ This will cost double XP due to urgency!${NC}"
+        read -p "Continue? (y/N): " -n 1 -r
+        echo
+        
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            python3 "$REFACTOR_SCRIPT" --refactor "$FILE" --developer "$DEVELOPER" --type "$TYPE" --urgency emergency
+        else
+            echo -e "${YELLOW}🛡️ Emergency refactoring cancelled - cheeks preserved!${NC}"
+        fi
+        ;;
+        
+    "afford")
+        if [ $# -lt 2 ]; then
+            echo -e "${RED}❌ Error: afford requires <developer> <xp_cost>${NC}"
+            exit 1
+        fi
+        
+        DEVELOPER="$1"
+        XP_COST="$2"
+        
+        echo -e "${CYAN}💰 Checking refactoring affordability...${NC}"
+        python3 "$SCRIPT_DIR/../../src/DeveloperExperience/dev_experience.py" --check-afford "$DEVELOPER" "$XP_COST"
+        ;;
+        
+    "profile")
+        if [ $# -lt 1 ]; then
+            echo -e "${RED}❌ Error: profile requires <developer>${NC}"
+            exit 1
+        fi
+        
+        DEVELOPER="$1"
+        
+        echo -e "${GREEN}👤 Developer profile for $DEVELOPER:${NC}"
+        python3 "$SCRIPT_DIR/../../src/DeveloperExperience/dev_experience.py" --profile "$DEVELOPER"
+        ;;
+        
+    "help"|"--help"|"-h")
+        show_help
+        ;;
+        
+    *)
+        echo -e "${RED}❌ Unknown command: $COMMAND${NC}"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac

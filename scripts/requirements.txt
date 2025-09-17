@@ -1,41 +1,31 @@
-# Living Dev Agent Template - Python Dependencies
-# Install with: pip install -r scripts/requirements.txt
+# Living Dev Agent Template Requirements
+# Jerry's legendary Python dependencies for ultimate development power
 
-# Core dependencies for linting and validation
+# Core dependencies for validation and linting
 PyYAML>=6.0
-# argparse is built into Python 3.2+ - no need to install separately
+argparse>=1.4.0
 
-# Optional dependencies for enhanced functionality
-# Uncomment as needed for your specific use case
+# Optional but recommended for enhanced functionality
+# (These are typically pre-installed but listed for completeness)
 
-# Code analysis and linting
-# pylint>=2.17.0
-# flake8>=6.0.0
-# black>=23.0.0
-# mypy>=1.5.0
+# For improved YAML processing
+ruamel.yaml>=0.17.0
 
-# Documentation generation
-# sphinx>=7.0.0
-# mkdocs>=1.5.0
+# For advanced file operations and path handling
+pathlib2>=2.3.0; python_version<"3.4"
 
-# Testing frameworks
-# pytest>=7.4.0
-# pytest-cov>=4.1.0
+# For colored terminal output (used in validation scripts)
+colorama>=0.4.0
 
-# Development utilities
-# rich>=13.5.0  # For enhanced console output
-# click>=8.1.0  # For CLI development
-# gitpython>=3.1.0  # For Git integration
+# For JSON schema validation (if needed for configuration files)
+jsonschema>=4.0.0
 
-# DevTimeTravel specific (if implementing advanced features)
-# watchdog>=3.0.0  # For file system monitoring
-# psutil>=5.9.0  # For system metrics
+# For markdown processing and validation
+markdown>=3.0.0
 
-# MCP server dependencies (required for MCP integration)
-fastapi>=0.110.0
-uvicorn>=0.23.0
-pydantic>=2.3.0
+# For regular expression utilities
+regex>=2022.0.0
 
-# Development and debugging
-# ipdb>=0.13.0
-# jupyter>=1.0.0
+# Note: Most of these dependencies are optional and the template will work
+# with just PyYAML and argparse, which are typically pre-installed.
+# Install failures due to network timeouts are acceptable and expected.

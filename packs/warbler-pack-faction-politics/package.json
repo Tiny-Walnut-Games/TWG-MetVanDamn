@@ -1,0 +1,58 @@
+{
+  "name": "warbler-pack-faction-politics",
+  "version": "0.1.0",
+  "description": "Political intrigue and faction conversation pack for Warbler NPC system",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./templates": "./pack/templates.json"
+  },
+  "files": [
+    "dist/**/*",
+    "pack/templates.json",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Info: Content pack - no tests required\"",
+    "validate": "node ../../scripts/validate-warbler-pack.mjs pack/templates.json",
+    "prepublishOnly": "npm run build && npm run validate"
+  },
+  "keywords": [
+    "warbler",
+    "npc",
+    "conversation",
+    "politics",
+    "intrigue",
+    "faction",
+    "diplomacy"
+  ],
+  "author": "TWG Team",
+  "license": "MIT",
+  "dependencies": {
+    "warbler-core": "^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmeyer1980/TWG-TLDA.git",
+    "directory": "packs/warbler-pack-faction-politics"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "warbler": {
+    "packType": "specialist",
+    "templateCount": 6,
+    "compatibleEngine": "^0.1.0",
+    "themes": ["politics", "intrigue", "diplomacy", "factions"]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "intervention_thresholds": {
+    "soft_suggestion": 0.3,
+    "rewrite": 0.6,
+    "block": 0.9,
+    "style_guidance": 0.4,
+    "safety_intervention": 0.8
+  },
+  "style_adaptation": {
+    "learning_phase_duration": 604800,
+    "adapting_phase_duration": 1209600,
+    "patience_decay_rate": 0.1,
+    "tolerance_adjustment_rate": 0.05,
+    "min_tolerance": 0.1,
+    "max_tolerance": 0.9,
+    "min_patience": 0.1,
+    "max_patience": 0.9
+  },
+  "reflective_templates": {
+    "soft_suggestion": "I suggested '{suggestion}' because {reasoning}. The user's {context} indicated {pattern}, suggesting a gentle guidance approach would be most effective.",
+    "rewrite": "I recommended rewriting because {reasoning}. The original '{input}' could be improved by {improvement}, enhancing clarity and effectiveness.",
+    "block": "I blocked this action because {safety_concern}. The {context} presented {risk_level} risk to system integrity or user well-being.",
+    "style_guidance": "I provided style guidance because {style_issue}. The user's preference for {preference} suggests {adaptation} would improve their workflow.",
+    "safety_intervention": "I intervened for safety because {reasoning}. The context '{context}' indicated potential harm or violation of safety protocols."
+  },
+  "safety_event_thresholds": {
+    "notice": 0.1,
+    "warn": 0.4,
+    "block": 0.7,
+    "escalate": 0.9
+  },
+  "redaction_settings": {
+    "enable_by_default": true,
+    "strict_mode_triggers": ["safety_intervention", "block"],
+    "transparency_mode": "full"
+  },
+  "acceptance_tracking": {
+    "response_timeout_ms": 300000,
+    "auto_timeout_status": "ignored",
+    "track_partial_acceptance": true,
+    "similarity_threshold": 0.7
+  },
+  "behavioral_flags": {
+    "high_rejection_rate": 0.7,
+    "low_engagement_threshold": 0.3,
+    "adaptation_success_threshold": 0.8,
+    "intervention_burnout_threshold": 10
+  },
+  "policy_versioning": {
+    "version": "1.0.0",
+    "last_updated": "2025-09-05T17:16:00Z",
+    "schema_version": "1.0",
+    "update_frequency": "monthly"
+  },
+  "governance_integration": {
+    "enable_governance_scoring": true,
+    "intervention_weight": 0.2,
+    "acceptance_weight": 0.3,
+    "style_adaptation_weight": 0.5,
+    "feedback_loop_enabled": true
+  }
+}

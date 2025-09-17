@@ -1,0 +1,49 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-09-02T03:20:54.899937",
+  "profiles": {
+    "TestDeveloper": {
+      "developer_name": "TestDeveloper",
+      "total_xp": 75,
+      "level": 1,
+      "title": "🌱 Seedling Apprentice",
+      "copilot_coins": 22,
+      "contributions": [
+        {
+          "contribution_id": "79bbdc33",
+          "developer_name": "TestDeveloper",
+          "contribution_type": "code_contribution",
+          "quality_level": "excellent",
+          "description": "Test integration feature",
+          "files_affected": [
+            "test.py"
+          ],
+          "timestamp": "2025-09-02T03:20:54.898471",
+          "base_xp": 50,
+          "quality_multiplier": 1.5,
+          "total_xp": 75,
+          "coins_earned": 22,
+          "metrics": {}
+        }
+      ],
+      "achievements": [
+        {
+          "achievement_id": "first_steps",
+          "name": "First Steps",
+          "description": "🧙‍♂️ Apprentice Awakening - Cast your first spell in the codebase",
+          "emoji": "🏆",
+          "badge_color": "green",
+          "date_earned": "2025-09-02T03:20:54.898576",
+          "contribution_id": "79bbdc33",
+          "faculty_signature": "🧙‍♂️ Bootstrap Sentinel"
+        }
+      ],
+      "faculty_badges": [],
+      "badge_pets": [
+        "82ff0afd-466f-4213-b412-5193c1efd1dc"
+      ],
+      "created_date": "2025-09-02T03:20:54.898482",
+      "last_active": "2025-09-02T03:20:54.898484"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "_comment": "Molten glyph store (append-only). Glyphs are created by MeltLayer.retire_cluster().",
+  "version": 1,
+  "last_melt_epoch": 0,
+  "molten_glyphs": []
+}

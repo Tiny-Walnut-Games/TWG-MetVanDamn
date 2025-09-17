@@ -6,6 +6,7 @@ using TinyWalnutGames.MetVanDAMN.Authoring;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
     {
@@ -31,12 +32,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             {
             EnsureFolder(ScenesFolder);
 
-            var newScene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+            Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
             newScene.name = sceneName;
 
             // 1) ECS Prefab Registry with useful keys
             var registryGO = new GameObject("ECS Prefab Registry");
-            var reg = registryGO.AddComponent<EcsPrefabRegistryAuthoring>();
+            EcsPrefabRegistryAuthoring reg = registryGO.AddComponent<EcsPrefabRegistryAuthoring>();
             reg.Entries = new System.Collections.Generic.List<EcsPrefabRegistryAuthoring.Entry>
             {
                 new() { Key = "spawn_boss" },
@@ -62,7 +63,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             // 2) World + Biome art authoring placeholders if available
             // World defaults via authoring component
             var worldGO = new GameObject("WorldAuthoring");
-            var world = worldGO.AddComponent<WorldAuthoring>();
+            WorldAuthoring world = worldGO.AddComponent<WorldAuthoring>();
             world.worldSeed = 42;
             world.worldSize = new Vector3(50f, 50f, 0f);
             world.targetSectorCount = 5;
@@ -73,21 +74,21 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
             // 3) Smoke test bootstrap to guarantee playable world
             var bootstrapGO = new GameObject("SmokeTestSceneSetup");
-            var setup = bootstrapGO.AddComponent<SmokeTestSceneSetup>();
+            SmokeTestSceneSetup setup = bootstrapGO.AddComponent<SmokeTestSceneSetup>();
             // Configure minimal overrides via SerializedObject (private [SerializeField] fields)
             var so = new SerializedObject(setup);
-            var seedProp = so.FindProperty("worldSeed");
+            SerializedProperty seedProp = so.FindProperty("worldSeed");
             if (seedProp != null) seedProp.uintValue = 42;
-            var sizeProp = so.FindProperty("worldSize");
+            SerializedProperty sizeProp = so.FindProperty("worldSize");
             if (sizeProp != null) sizeProp.FindPropertyRelative("x").intValue = 50;
             if (sizeProp != null) sizeProp.FindPropertyRelative("y").intValue = 50;
-            var sectorProp = so.FindProperty("targetSectorCount");
+            SerializedProperty sectorProp = so.FindProperty("targetSectorCount");
             if (sectorProp != null) sectorProp.intValue = 5;
-            var radiusProp = so.FindProperty("biomeTransitionRadius");
+            SerializedProperty radiusProp = so.FindProperty("biomeTransitionRadius");
             if (radiusProp != null) radiusProp.floatValue = 10f;
-            var debugProp = so.FindProperty("enableDebugVisualization");
+            SerializedProperty debugProp = so.FindProperty("enableDebugVisualization");
             if (debugProp != null) debugProp.boolValue = true;
-            var logProp = so.FindProperty("logGenerationSteps");
+            SerializedProperty logProp = so.FindProperty("logGenerationSteps");
             if (logProp != null) logProp.boolValue = true;
             so.ApplyModifiedPropertiesWithoutUndo();
 
@@ -103,7 +104,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
         private static void SetupCameraForProjection(SceneProjection projection)
             {
-            var cam = Object.FindFirstObjectByType<Camera>();
+            Camera cam = Object.FindFirstObjectByType<Camera>();
             if (!cam)
                 {
                 var camGO = new GameObject("Main Camera");
@@ -136,8 +137,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             {
             if (!AssetDatabase.IsValidFolder(path))
                 {
-                var parent = System.IO.Path.GetDirectoryName(path).Replace('\\', '/');
-                var leaf = System.IO.Path.GetFileName(path);
+                string parent = System.IO.Path.GetDirectoryName(path).Replace('\\', '/');
+                string leaf = System.IO.Path.GetFileName(path);
                 if (!AssetDatabase.IsValidFolder(parent))
                     {
                     AssetDatabase.CreateFolder("Assets", "Scenes");

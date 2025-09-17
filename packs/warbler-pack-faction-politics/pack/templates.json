@@ -1,0 +1,99 @@
+{
+  "packInfo": {
+    "name": "warbler-pack-faction-politics",
+    "version": "0.1.0",
+    "description": "Specialized templates for political intrigue, faction diplomacy, and court machinations",
+    "author": "TWG Team",
+    "compatibleEngine": "^0.1.0"
+  },
+  "templates": [
+    {
+      "id": "warning_political_threat",
+      "version": "1.0.0",
+      "title": "Political Threat Warning",
+      "description": "A veiled warning about political consequences or faction displeasure",
+      "content": "{{user_name}}, I would tread carefully if I were you. The {{faction_name}} has long memories, and {{faction_leader}} does not forget those who cross {{faction_pronoun}}. Your recent actions in {{location}} have not gone unnoticed.",
+      "requiredSlots": [
+        { "name": "user_name", "type": "string", "required": false, "description": "Name to address the target" },
+        { "name": "faction_name", "type": "string", "required": true, "description": "Name of the political faction" },
+        { "name": "faction_leader", "type": "string", "required": true, "description": "Leader of the faction" },
+        { "name": "faction_pronoun", "type": "string", "required": false, "description": "Pronoun for the faction leader" },
+        { "name": "location", "type": "string", "required": false, "description": "Location where actions occurred" }
+      ],
+      "tags": ["warning", "politics", "threat", "faction", "intrigue"],
+      "maxLength": 300
+    },
+    {
+      "id": "intrigue_information_trade",
+      "version": "1.0.0",
+      "title": "Information Trading",
+      "description": "Offering to trade political information or secrets",
+      "content": "Information is the most valuable currency in {{location}}, {{user_name}}. I know things about {{target_faction}} that could prove... useful to someone in your position. But such knowledge comes at a price. What do you offer in return?",
+      "requiredSlots": [
+        { "name": "user_name", "type": "string", "required": false, "description": "Name to address the contact" },
+        { "name": "location", "type": "string", "required": false, "description": "Current political center" },
+        { "name": "target_faction", "type": "string", "required": true, "description": "Faction being discussed" }
+      ],
+      "tags": ["intrigue", "information", "trade", "secrets", "politics"],
+      "maxLength": 280
+    },
+    {
+      "id": "alliance_proposal",
+      "version": "1.0.0",
+      "title": "Alliance Proposal",
+      "description": "Diplomatic overture suggesting political alliance or cooperation",
+      "content": "The times ahead will test us all, {{user_title}}. {{our_faction}} and your people share common interests against {{threat_description}}. Perhaps it is time we discussed a more... formal arrangement between our houses?",
+      "requiredSlots": [
+        { "name": "user_title", "type": "string", "required": false, "description": "Formal address for the target" },
+        { "name": "our_faction", "type": "string", "required": true, "description": "Faction making the proposal" },
+        { "name": "threat_description", "type": "string", "required": true, "description": "Common threat or enemy" }
+      ],
+      "tags": ["alliance", "diplomacy", "proposal", "cooperation", "politics"],
+      "maxLength": 250
+    },
+    {
+      "id": "betrayal_revelation",
+      "version": "1.0.0",
+      "title": "Betrayal Revelation",
+      "description": "Revealing a political betrayal or double-cross",
+      "content": "You seem surprised, {{user_name}}. Did you truly believe {{betrayer_name}} was loyal to your cause? {{betrayer_pronoun}} has been feeding information to {{rival_faction}} for months. The raid on {{location}} was no coincidence.",
+      "requiredSlots": [
+        { "name": "user_name", "type": "string", "required": false, "description": "Name of the betrayed party" },
+        { "name": "betrayer_name", "type": "string", "required": true, "description": "Name of the betrayer" },
+        { "name": "betrayer_pronoun", "type": "string", "required": false, "description": "Pronoun for the betrayer" },
+        { "name": "rival_faction", "type": "string", "required": true, "description": "Faction benefiting from betrayal" },
+        { "name": "location", "type": "string", "required": false, "description": "Location of the incident" }
+      ],
+      "tags": ["betrayal", "revelation", "politics", "conspiracy", "shock"],
+      "maxLength": 320
+    },
+    {
+      "id": "faction_loyalty_test",
+      "version": "1.0.0",
+      "title": "Loyalty Test",
+      "description": "Testing political allegiance or commitment to a faction",
+      "content": "Your words speak of loyalty to {{faction_name}}, but words are cheap in the halls of power. {{faction_leader}} requires proof of your commitment. There is a task that needs... discrete handling. Are you prepared to serve?",
+      "requiredSlots": [
+        { "name": "faction_name", "type": "string", "required": true, "description": "Name of the faction" },
+        { "name": "faction_leader", "type": "string", "required": true, "description": "Leader requiring proof" }
+      ],
+      "tags": ["loyalty", "test", "faction", "commitment", "politics", "mission"],
+      "maxLength": 280
+    },
+    {
+      "id": "diplomatic_immunity_claim",
+      "version": "1.0.0",
+      "title": "Diplomatic Immunity Claim",
+      "description": "Claiming diplomatic protection or political immunity",
+      "content": "Hold your accusations, {{user_title}}! I am {{diplomatic_title}} {{npc_name}}, official representative of {{faction_name}}. Any action against me would be considered an act of aggression against my people. I trust you understand the implications?",
+      "requiredSlots": [
+        { "name": "user_title", "type": "string", "required": false, "description": "Title for the accuser" },
+        { "name": "diplomatic_title", "type": "string", "required": false, "description": "Diplomatic rank or position" },
+        { "name": "npc_name", "type": "string", "required": true, "description": "Name of the diplomat" },
+        { "name": "faction_name", "type": "string", "required": true, "description": "Faction being represented" }
+      ],
+      "tags": ["diplomacy", "immunity", "protection", "politics", "threat", "official"],
+      "maxLength": 300
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created_at": "2025-01-20T14:15:00Z",
+    "baseline_id": "system_performance_baseline",
+    "description": "System performance baseline for throughput and resource utilization experiments",
+    "author": "Performance Engineering Team",
+    "tags": ["performance", "system", "throughput", "memory"],
+    "alchemist_version": "0.1.0"
+  },
+  "baseline_metrics": {
+    "primary_metrics": {
+      "throughput_items_per_sec": {
+        "value": 125.5,
+        "unit": "items_per_second",
+        "threshold_upper": 200.0,
+        "threshold_lower": 80.0,
+        "tolerance": 0.10,
+        "confidence_interval": {
+          "lower": 115.0,
+          "upper": 136.0,
+          "confidence_level": 0.95
+        },
+        "sample_size": 500,
+        "statistical_method": "mean"
+      },
+      "memory_usage_mb": {
+        "value": 512.0,
+        "unit": "megabytes",
+        "threshold_upper": 1024.0,
+        "threshold_lower": 256.0,
+        "tolerance": 0.20,
+        "confidence_interval": {
+          "lower": 480.0,
+          "upper": 544.0,
+          "confidence_level": 0.95
+        },
+        "sample_size": 500,
+        "statistical_method": "percentile_95"
+      },
+      "cpu_utilization_pct": {
+        "value": 45.2,
+        "unit": "percent",
+        "threshold_upper": 80.0,
+        "threshold_lower": 20.0,
+        "tolerance": 0.15,
+        "confidence_interval": {
+          "lower": 40.0,
+          "upper": 50.4,
+          "confidence_level": 0.95
+        },
+        "sample_size": 500,
+        "statistical_method": "mean"
+      }
+    },
+    "secondary_metrics": {
+      "gc_frequency_per_min": {
+        "value": 2.3,
+        "unit": "events_per_minute",
+        "threshold_upper": 10.0,
+        "threshold_lower": 0.5,
+        "tolerance": 0.25,
+        "sample_size": 500,
+        "statistical_method": "mean"
+      },
+      "disk_io_mb_per_sec": {
+        "value": 12.8,
+        "unit": "megabytes_per_second",
+        "threshold_upper": 50.0,
+        "threshold_lower": 5.0,
+        "tolerance": 0.30,
+        "sample_size": 500,
+        "statistical_method": "median"
+      }
+    },
+    "derived_metrics": {
+      "efficiency_score": {
+        "formula": "throughput_items_per_sec / (memory_usage_mb / 100)",
+        "unit": "items_per_100mb",
+        "description": "Memory efficiency metric relating throughput to memory consumption"
+      },
+      "resource_utilization_index": {
+        "formula": "(cpu_utilization_pct / 100) * (memory_usage_mb / 1024)",
+        "unit": "utilization_index",
+        "description": "Combined CPU and memory utilization index"
+      }
+    }
+  },
+  "experiment_context": {
+    "experiment_type": "system_performance",
+    "applicable_conditions": [
+      {
+        "condition_name": "batch_size",
+        "condition_values": [10, 25, 50, 100],
+        "default_value": 50
+      },
+      {
+        "condition_name": "worker_count",
+        "condition_values": [1, 2, 4, 8],
+        "default_value": 4
+      },
+      {
+        "condition_name": "memory_profile",
+        "condition_values": ["conservative", "balanced", "aggressive"],
+        "default_value": "balanced"
+      }
+    ],
+    "environment_requirements": {
+      "min_corpus_size": 1000,
+      "required_features": ["performance_monitoring", "resource_tracking"],
+      "incompatible_features": ["debug_mode", "verbose_logging"]
+    },
+    "validation_rules": [
+      {
+        "rule_type": "range_check",
+        "parameters": {
+          "metric": "cpu_utilization_pct",
+          "min": 0.0,
+          "max": 100.0
+        },
+        "severity": "error",
+        "description": "CPU utilization must be between 0% and 100%"
+      },
+      {
+        "rule_type": "trend_analysis",
+        "parameters": {
+          "metric": "memory_usage_mb",
+          "window_size": 10,
+          "max_growth_rate": 0.05
+        },
+        "severity": "warning",
+        "description": "Memory usage should not grow more than 5% per window"
+      }
+    ]
+  },
+  "provenance": {
+    "source_experiments": [
+      {
+        "experiment_id": "performance_baseline_2025_01_18",
+        "run_ids": ["perf_run_001", "perf_run_002", "perf_run_003"],
+        "weight": 1.0
+      }
+    ],
+    "establishment_method": "single_experiment",
+    "git_context": {
+      "commit_sha": "def4567890123456789012345678901234567890",
+      "branch": "performance-optimization",
+      "repository_url": "https://github.com/jmeyer1980/TWG-TLDA"
+    }
+  },
+  "usage_notes": {
+    "description": "Performance baseline for system throughput and resource utilization experiments. Use for regression detection and performance optimization validation.",
+    "examples": [
+      {
+        "scenario": "Performance optimization validation",
+        "expected_delta": 15.0,
+        "interpretation": "15% throughput improvement indicates successful optimization"
+      },
+      {
+        "scenario": "Memory leak detection",
+        "expected_delta": -50.0,
+        "interpretation": "50% memory usage increase signals potential memory leak"
+      }
+    ],
+    "known_limitations": [
+      "Baseline established on specific hardware configuration",
+      "May not be representative for different deployment environments",
+      "GC patterns may vary with different workload characteristics"
+    ],
+    "migration_notes": "Initial system performance baseline. Ensure hardware specifications match baseline environment."
+  }
+}

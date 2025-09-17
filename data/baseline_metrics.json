@@ -1,0 +1,152 @@
+{
+  "metadata": {
+    "captured_at": "2025-09-02T11:40:13.714710",
+    "capture_version": "1.0.0",
+    "phase": "self_care_phase_1",
+    "purpose": "Baseline metrics for Self-Care Phase 1 exit criteria"
+  },
+  "metrics": {
+    "idea_catalog": {
+      "raw_output": "📊 Idea Catalog Statistics:\n==============================\nTotal Ideas: 52\nPromoted Ideas: 0\nBy Tag: {None: 50, '!': 1, '?': 1}\nCreated: 2025-01-02T09:00:00Z\nLast Updated: 2025-09-02T11:40:13.767216\n",
+      "total_ideas": 52,
+      "promoted_ideas": 0,
+      "catalog_created": "2025-01-02T09",
+      "last_updated": "2025-09-02T11",
+      "schema_version": "1.0.0",
+      "ideas_count_raw": 52,
+      "tag_distribution": {
+        "null": 50,
+        "!": 1,
+        "?": 1
+      }
+    },
+    "cognitive_state": {
+      "enabled": true,
+      "last_check": "2025-09-02T11:38:56.770163",
+      "violations": 0,
+      "last_violation": null
+    },
+    "melt_budget": {
+      "enabled": true,
+      "last_check": "2025-09-02T11:38:56.769992",
+      "violations": 0,
+      "last_violation": null,
+      "budget_utilization_percent": 0.0
+    },
+    "development_telemetry": {
+      "schema_version": "1.0.0",
+      "created_at": "2025-09-02T09:46:20.838837",
+      "last_updated": "2025-09-02T11:38:56.634633",
+      "sleep_tracking": {
+        "enabled": true,
+        "entries": [
+          {
+            "date": "2025-09-02",
+            "timestamp": "2025-09-02T09:46:20.838847",
+            "hours": 7.5,
+            "quality": "good",
+            "notes": "",
+            "low_sleep_flag": false
+          },
+          {
+            "date": "2025-09-02",
+            "timestamp": "2025-09-02T09:47:11.937560",
+            "hours": 8.0,
+            "quality": "excellent",
+            "notes": "",
+            "low_sleep_flag": false
+          },
+          {
+            "date": "2025-09-02",
+            "timestamp": "2025-09-02T09:51:10.301076",
+            "hours": 8.0,
+            "quality": "excellent",
+            "notes": "",
+            "low_sleep_flag": false
+          },
+          {
+            "date": "2025-09-02",
+            "timestamp": "2025-09-02T11:33:26.885700",
+            "hours": 8.0,
+            "quality": "excellent",
+            "notes": "",
+            "low_sleep_flag": false
+          },
+          {
+            "date": "2025-09-02",
+            "timestamp": "2025-09-02T11:33:44.990058",
+            "hours": 8.0,
+            "quality": "excellent",
+            "notes": "",
+            "low_sleep_flag": false
+          },
+          {
+            "date": "2025-09-02",
+            "timestamp": "2025-09-02T11:37:11.214557",
+            "hours": 8.0,
+            "quality": "excellent",
+            "notes": "",
+            "low_sleep_flag": false
+          },
+          {
+            "date": "2025-09-02",
+            "timestamp": "2025-09-02T11:38:21.908840",
+            "hours": 8.0,
+            "quality": "excellent",
+            "notes": "",
+            "low_sleep_flag": false
+          },
+          {
+            "date": "2025-09-02",
+            "timestamp": "2025-09-02T11:38:56.634599",
+            "hours": 8.0,
+            "quality": "excellent",
+            "notes": "",
+            "low_sleep_flag": false
+          }
+        ]
+      },
+      "energy_tracking": {
+        "enabled": true,
+        "entries": []
+      },
+      "flags": {
+        "low_sleep": false,
+        "low_energy": false,
+        "cognitive_sensitivity": false
+      },
+      "daily_stats": {
+        "2025-09-02": {
+          "sleep": {
+            "hours": 8.0,
+            "quality": "excellent",
+            "low_sleep": false
+          }
+        }
+      },
+      "hours_slept_last_night": 8.0
+    },
+    "sluice_overflow": {
+      "sluice_files": [
+        {
+          "filename": "2025-09-02.md",
+          "size_bytes": 783,
+          "modified": "2025-09-02T11:38:56.405182",
+          "line_count": 25
+        }
+      ],
+      "total_files": 1,
+      "total_lines": 25
+    },
+    "system_health": {
+      "data_directory_exists": true,
+      "selfcare_module_exists": true,
+      "test_suite_passes": true,
+      "journal_privacy_protected": true,
+      "test_output_summary": [
+        "📊 Test Results: 8/8 passed",
+        "🎉 All tests passed! Self-care system is working correctly."
+      ]
+    }
+  }
+}

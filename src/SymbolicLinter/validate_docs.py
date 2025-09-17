@@ -1,467 +1,377 @@
 #!/usr/bin/env python3
 """
-Documentation and TLDL Validator for Living Dev Agent Template
-Validates TLDL entries, documentation structure, consistency, and scroll quotes.
+Living Dev Agent Template - TLDL Documentation Validator
+Jerry's legendary validation system for structured development documentation
 
-Copyright (C) 2025 Bellok
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+Execution time: ~60ms for typical validation runs
+Validates TLDL entries for completeness and adherence to template standards
 """
 
-import builtins
+import argparse
 import os
-import re
 import sys
 import yaml
-try:
-    import argparse
-except ImportError:
-    print("Error: The 'argparse' module is required but not available in this Python environment.")
-    exit(1)
+import re
+import datetime
 from pathlib import Path
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import List, Dict, Any, Optional, Tuple
 
-# Add ScrollQuoteEngine to path if available
-try:
-    sys.path.insert(0, str(Path(__file__).parent.parent))
-    from ScrollQuoteEngine import ScrollQuoteEngine
-    QUOTE_ENGINE_AVAILABLE = True
-except ImportError:
-    QUOTE_ENGINE_AVAILABLE = False
+# Color codes for legendary terminal output
+class Colors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+# Sacred emojis for maximum scroll-worthiness
+EMOJI_SUCCESS = "✅"
+EMOJI_WARNING = "⚠️"
+EMOJI_ERROR = "❌"
+EMOJI_INFO = "🔍"
+EMOJI_MAGIC = "🧙‍♂️"
+EMOJI_SCROLL = "📜"
 
 class TLDLValidator:
-    def __init__(self, tldl_path: str = "docs/", config_path: str = None):
+    """The Bootstrap Sentinel's sacred TLDL validation system"""
+    
+    def __init__(self, tldl_path: str, config_path: str = None, verbose: bool = False):
         self.tldl_path = Path(tldl_path)
-        # For MetVanDAMN structure: DevTimeTravel config is in docs/, TLDL files in TLDL/entries/
-        self.config_path = Path(config_path) if config_path else Path("docs")
-        self.errors = []
-        self.warnings = []
+        self.config_path = Path(config_path) if config_path else None
+        self.verbose = verbose
+        self.errors: List[str] = []
+        self.warnings: List[str] = []
+        self.validated_files: List[str] = []
+        self.validation_start_time = datetime.datetime.now()
         
-    def validate_tldl_entry(self, file_path: Path) -> Dict[str, Any]:
-        """Validate a single TLDL entry file"""
-        result = {
-            "file": str(file_path),
-            "valid": True,
-            "errors": [],
-            "warnings": []
+        # TLDL entry requirements
+        self.required_sections = [
+            "Objective",
+            "Discovery", 
+            "Actions Taken",
+            "Key Insights",
+            "Next Steps"
+        ]
+        
+        # Section alias mapping to support existing entry formats
+        self.section_aliases = {
+            "Objective": ["Objective", "Purpose", "Goals", "Faculty Consultation Results", "Executive Summary", "DevTimeTravel Context"],
+            "Discovery": ["Discovery", "Discoveries"],
+            "Key Insights": ["Key Insights", "Lessons Learned", "Implementation Insights", "Learning Outcomes"]
         }
         
-        try:
-            content = file_path.read_text(encoding='utf-8')
-            
-            # Check filename format
-            if not re.match(r'TLDL-\d{4}-\d{2}-\d{2}-.+\.md$', file_path.name):
-                result["warnings"].append("Filename doesn't follow TLDL-YYYY-MM-DD-Title.md format")
-            
-            # Check required sections
-            required_sections = [
-                "Entry ID:", "Author:", "Context:", "Summary:",
-                "## Discoveries", "## Actions Taken", "## Next Steps"
-            ]
-            
-            for section in required_sections:
-                if section not in content:
-                    result["errors"].append(f"Missing required section: {section}")
-                    result["valid"] = False
-            
-            # Check entry ID format
-            entry_id_match = re.search(r'\*\*Entry ID:\*\* (TLDL-\d{4}-\d{2}-\d{2}-.+)', content)
-            if entry_id_match:
-                entry_id = entry_id_match.group(1)
-                if entry_id not in file_path.name:
-                    result["warnings"].append("Entry ID doesn't match filename")
+        self.required_metadata = [
+            "Entry ID",
+            "Author",
+            "Context", 
+            "Summary"
+        ]
+
+    def log_info(self, message: str, emoji: str = EMOJI_INFO):
+        """Log informational message with epic styling"""
+        print(f"{Colors.OKCYAN}{emoji} [INFO]{Colors.ENDC} {message}")
+
+    def log_success(self, message: str, emoji: str = EMOJI_SUCCESS):
+        """Log success message with legendary flair"""
+        print(f"{Colors.OKGREEN}{emoji} [SUCCESS]{Colors.ENDC} {message}")
+
+    def log_warning(self, message: str, emoji: str = EMOJI_WARNING):
+        """Log warning message"""
+        print(f"{Colors.WARNING}{emoji} [WARNING]{Colors.ENDC} {message}")
+        self.warnings.append(message)
+
+    def log_error(self, message: str, emoji: str = EMOJI_ERROR):
+        """Log error message"""
+        print(f"{Colors.FAIL}{emoji} [ERROR]{Colors.ENDC} {message}")
+        self.errors.append(message)
+
+    def verbose_log(self, message: str):
+        """Log verbose information when enabled"""
+        if self.verbose:
+            print(f"{Colors.OKBLUE}[VERBOSE]{Colors.ENDC} {message}")
+
+    def validate_tldl_filename(self, filepath: Path) -> bool:
+        """Validate TLDL filename follows the pattern TLDL-YYYY-MM-DD-Title.md"""
+        filename = filepath.name
+        pattern = r'^TLDL-\d{4}-\d{2}-\d{2}-.+\.md$'
+        
+        if not re.match(pattern, filename):
+            self.log_warning(f"Filename doesn't follow TLDL pattern: {filename}")
+            self.log_info("Expected pattern: TLDL-YYYY-MM-DD-Title.md")
+            return False
+        
+        self.verbose_log(f"Filename validation passed: {filename}")
+        return True
+
+    def extract_metadata_from_content(self, content: str) -> Dict[str, str]:
+        """Extract metadata from TLDL content"""
+        metadata = {}
+        
+        # Look for metadata in the first few lines
+        lines = content.split('\n')[:20]  # Check first 20 lines for metadata
+        
+        for line in lines:
+            line = line.strip()
+            # Handle both formats: **Key:** value and **Key**: value
+            if line.startswith('**') and (':**' in line or '**:' in line):
+                # Extract key-value pairs like **Entry ID:** TLDL-2025-01-15-Title
+                # or **Entry ID**: TLDL-2025-01-15-Title
+                if ':**' in line:
+                    parts = line.split(':**', 1)
+                elif '**:' in line:
+                    parts = line.split('**:', 1)
+                else:
+                    continue
+                    
+                if len(parts) == 2:
+                    key = parts[0].strip('*').strip()
+                    value = parts[1].strip()
+                    metadata[key] = value
+        
+        return metadata
+
+    def validate_tldl_metadata(self, filepath: Path, content: str) -> bool:
+        """Validate TLDL metadata completeness"""
+        metadata = self.extract_metadata_from_content(content)
+        all_valid = True
+        
+        for required_field in self.required_metadata:
+            if required_field not in metadata:
+                self.log_error(f"{filepath.name}: Missing required metadata field '{required_field}'")
+                all_valid = False
+            elif not metadata[required_field].strip():
+                self.log_error(f"{filepath.name}: Empty metadata field '{required_field}'")
+                all_valid = False
             else:
-                result["errors"].append("Entry ID not found or malformed")
-                result["valid"] = False
+                self.verbose_log(f"Metadata '{required_field}': {metadata[required_field][:50]}...")
+        
+        # Validate Entry ID format
+        if "Entry ID" in metadata:
+            entry_id = metadata["Entry ID"]
+            if not re.match(r'^TLDL-\d{4}-\d{2}-\d{2}-.+', entry_id):
+                self.log_warning(f"{filepath.name}: Entry ID doesn't follow expected format")
+        
+        return all_valid
+
+    def validate_tldl_sections(self, filepath: Path, content: str) -> bool:
+        """Validate required TLDL sections are present"""
+        all_valid = True
+        
+        for section in self.required_sections:
+            # Get acceptable aliases for this section
+            acceptable_variants = self.section_aliases.get(section, [section])
             
-            # Check for TODO items in Next Steps
-            next_steps_match = re.search(r'## Next Steps.*?(?=##|$)', content, re.DOTALL)
-            if next_steps_match:
-                next_steps_content = next_steps_match.group(0)
-                todo_count = len(re.findall(r'- \[ \]', next_steps_content))
-                if todo_count == 0:
-                    result["warnings"].append("No actionable TODO items found in Next Steps")
+            found = False
+            found_variant = None
             
+            # Check for each acceptable variant
+            for variant in acceptable_variants:
+                # Look for section headers (various markdown formats)
+                patterns = [
+                    f"## {variant}",
+                    f"### {variant}", 
+                    f"#### {variant}",
+                    f"## 🎯 {variant}",
+                    f"## 🔍 {variant}",
+                    f"## ⚡ {variant}",
+                    f"## 🧠 {variant}",
+                    f"## 📋 {variant}",
+                    f"## 💡 {variant}"
+                ]
+                
+                if any(pattern in content for pattern in patterns):
+                    found = True
+                    found_variant = variant
+                    break
+            
+            if not found:
+                self.log_error(f"{filepath.name}: Missing required section '{section}'")
+                all_valid = False
+            else:
+                self.verbose_log(f"Found required section: {section} (as '{found_variant}')")
+        
+        return all_valid
+
+    def validate_tldl_content_quality(self, filepath: Path, content: str) -> bool:
+        """Validate TLDL content quality and completeness"""
+        issues_found = False
+        
+        # Check for placeholder text that indicates incomplete entries
+        placeholders = [
+            "[Your Name]",
+            "[Brief context description]", 
+            "[One-line summary",
+            "[What are you trying to accomplish",
+            "[What did you learn",
+            "[What specific steps did you take",
+            "[Important insights",
+            "[What obstacles did you face"
+        ]
+        
+        for placeholder in placeholders:
+            if placeholder in content:
+                self.log_warning(f"{filepath.name}: Contains placeholder text: {placeholder}")
+                issues_found = True
+        
+        # Check for minimum content length in key sections
+        if len(content) < 500:
+            self.log_warning(f"{filepath.name}: Entry seems quite short ({len(content)} characters)")
+            issues_found = True
+        
+        # Check for proper markdown formatting
+        if "```" in content:
+            code_blocks = content.count("```")
+            if code_blocks % 2 != 0:
+                self.log_error(f"{filepath.name}: Unbalanced code blocks (``` count: {code_blocks})")
+                issues_found = True
+        
+        return not issues_found
+
+    def validate_single_tldl_file(self, filepath: Path) -> bool:
+        """Validate a single TLDL file comprehensively"""
+        self.verbose_log(f"Validating TLDL file: {filepath}")
+        
+        try:
+            # Read file content
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
         except Exception as e:
-            result["errors"].append(f"Failed to parse file: {str(e)}")
-            result["valid"] = False
-            
-        return result
-    
-    def validate_all_tldl_entries(self) -> List[Dict[str, Any]]:
-        """Validate all TLDL entries in the docs directory"""
-        results = []
+            self.log_error(f"Failed to read {filepath}: {e}")
+            return False
+        
+        # Run all validations
+        filename_valid = self.validate_tldl_filename(filepath)
+        metadata_valid = self.validate_tldl_metadata(filepath, content)
+        sections_valid = self.validate_tldl_sections(filepath, content)
+        content_valid = self.validate_tldl_content_quality(filepath, content)
+        
+        all_valid = filename_valid and metadata_valid and sections_valid and content_valid
+        
+        if all_valid:
+            self.log_success(f"TLDL validation passed: {filepath.name}")
+        else:
+            self.log_error(f"TLDL validation failed: {filepath.name}")
+        
+        self.validated_files.append(str(filepath))
+        return all_valid
+
+    def find_tldl_files(self) -> List[Path]:
+        """Find all TLDL markdown files in the specified path"""
+        tldl_files = []
         
         if not self.tldl_path.exists():
-            print(f"Warning: TLDL path {self.tldl_path} does not exist")
-            return results
+            self.log_error(f"TLDL path does not exist: {self.tldl_path}")
+            return tldl_files
         
-        # Find all TLDL files
-        tldl_files = list(self.tldl_path.glob("TLDL-*.md"))
+        if self.tldl_path.is_file():
+            # Single file
+            if self.tldl_path.suffix.lower() == '.md':
+                tldl_files.append(self.tldl_path)
+        else:
+            # Directory - find all markdown files
+            for pattern in ['*.md', '**/*.md']:
+                found_files = list(self.tldl_path.glob(pattern))
+                for f in found_files:
+                    # Filter for TLDL files (either filename pattern or content check)
+                    if (f.name.startswith('TLDL-') or 
+                        'Entry ID' in f.read_text(encoding='utf-8', errors='ignore')[:1000]):
+                        tldl_files.append(f)
+        
+        return sorted(tldl_files)
+
+    def run_validation(self) -> bool:
+        """Run complete TLDL validation suite"""
+        self.log_info(f"Starting TLDL validation for: {self.tldl_path}", EMOJI_MAGIC)
+        
+        # Find TLDL files
+        tldl_files = self.find_tldl_files()
         
         if not tldl_files:
-            print(f"Warning: No TLDL files found in {self.tldl_path}")
-            return results
+            self.log_warning("No TLDL files found to validate")
+            return True
         
+        self.log_info(f"Found {len(tldl_files)} TLDL files to validate")
+        
+        # Validate each file
+        all_valid = True
         for tldl_file in tldl_files:
-            result = self.validate_tldl_entry(tldl_file)
-            results.append(result)
-            
-        return results
-    
-    def validate_devtimetravel_config(self) -> Dict[str, Any]:
-        """Validate DevTimeTravel configuration file"""
-        config_path = self.config_path / "devtimetravel_snapshot.yaml"
-        result = {
-            "file": str(config_path),
-            "valid": True,
-            "errors": [],
-            "warnings": []
-        }
+            file_valid = self.validate_single_tldl_file(tldl_file)
+            all_valid = all_valid and file_valid
         
-        if not config_path.exists():
-            result["errors"].append("DevTimeTravel config file not found")
-            result["valid"] = False
-            return result
+        # Show summary
+        execution_time = (datetime.datetime.now() - self.validation_start_time).total_seconds()
         
-        try:
-            with open(config_path, 'r') as f:
-                config = yaml.safe_load(f)
-            
-            # Check required top-level sections
-            required_sections = ["project_info", "snapshot_config", "context_capture"]
-            for section in required_sections:
-                if section not in config:
-                    result["errors"].append(f"Missing required section: {section}")
-                    result["valid"] = False
-            
-            # Validate project info
-            if "project_info" in config:
-                project_info = config["project_info"]
-                required_fields = ["name", "version", "description"]
-                for field in required_fields:
-                    if field not in project_info:
-                        result["warnings"].append(f"Missing project_info.{field}")
-            
-            # Validate snapshot config
-            if "snapshot_config" in config:
-                snapshot_config = config["snapshot_config"]
-                if "frequency" in snapshot_config:
-                    valid_frequencies = ["daily", "on_commit", "manual", "ci_only"]
-                    if snapshot_config["frequency"] not in valid_frequencies:
-                        result["warnings"].append(f"Invalid frequency. Valid options: {', '.join(valid_frequencies)}")
-                        
-        except yaml.YAMLError as e:
-            result["errors"].append(f"Invalid YAML: {str(e)}")
-            result["valid"] = False
-        except Exception as e:
-            result["errors"].append(f"Failed to validate config: {str(e)}")
-            result["valid"] = False
-            
-        return result
-    
-    def validate_scroll_quotes(self) -> Dict[str, Any]:
-        """Validate the scroll quote database if available"""
-        result = {
-            "valid": True,
-            "errors": [],
-            "warnings": [],
-            "stats": {}
-        }
+        print("\n" + "="*60)
+        self.log_info(f"TLDL Validation Summary", EMOJI_SCROLL)
+        print(f"Files validated: {len(self.validated_files)}")
+        print(f"Warnings: {len(self.warnings)}")
+        print(f"Errors: {len(self.errors)}")
+        print(f"Execution time: {execution_time:.3f}s")
         
-        if not QUOTE_ENGINE_AVAILABLE:
-            result["warnings"].append("ScrollQuoteEngine not available, skipping quote validation")
-            return result
+        if all_valid:
+            self.log_success("All TLDL validations passed!", EMOJI_MAGIC)
+        else:
+            self.log_error("TLDL validation failures detected")
         
-        try:
-            engine = ScrollQuoteEngine()
-            validation_report = engine.validate_quotes_database()
-            
-            result["valid"] = validation_report["valid"]
-            result["errors"] = validation_report["issues"]
-            result["warnings"] = validation_report["recommendations"]
-            result["stats"] = {
-                "total_quotes": validation_report["total_quotes"],
-                "buttsafe_certified": validation_report["buttsafe_certified"],
-                "categories": validation_report["categories"]
-            }
-            
-        except Exception as e:
-            result["valid"] = False
-            result["errors"].append(f"Quote validation failed: {str(e)}")
-        
-        return result
-    
-    def validate_capsule_scrolls(self) -> Dict[str, Any]:
-        """Validate Capsule Scrolls if they exist"""
-        capsules_path = Path("capsules")
-        
-        result = {
-            "valid": True,
-            "errors": [],
-            "warnings": [],
-            "total_capsules": 0,
-            "valid_capsules": 0,
-            "capsule_details": {}
-        }
-        
-        if not capsules_path.exists():
-            result["warnings"].append("Capsules directory does not exist")
-            return result
-            
-        # Check directory structure
-        expected_dirs = ["active", "archived", "templates"]
-        for dirname in expected_dirs:
-            dir_path = capsules_path / dirname
-            if not dir_path.exists():
-                result["warnings"].append(f"Missing capsules subdirectory: {dirname}")
-        
-        # Validate active capsules
-        active_dir = capsules_path / "active"
-        if active_dir.exists():
-            for capsule_file in active_dir.glob("*.md"):
-                result["total_capsules"] += 1
-                capsule_validation = self._validate_single_capsule(capsule_file)
-                result["capsule_details"][str(capsule_file)] = capsule_validation
-                
-                if capsule_validation["valid"]:
-                    result["valid_capsules"] += 1
-                else:
-                    result["errors"].extend(capsule_validation["errors"])
-                    result["valid"] = False
-                
-                result["warnings"].extend(capsule_validation["warnings"])
-        
-        # Validate archived capsules  
-        archived_dir = capsules_path / "archived"
-        if archived_dir.exists():
-            for capsule_file in archived_dir.glob("*.md"):
-                result["total_capsules"] += 1
-                capsule_validation = self._validate_single_capsule(capsule_file)
-                result["capsule_details"][str(capsule_file)] = capsule_validation
-                
-                if capsule_validation["valid"]:
-                    result["valid_capsules"] += 1
-                else:
-                    result["errors"].extend(capsule_validation["errors"])
-                    result["valid"] = False
-                
-                result["warnings"].extend(capsule_validation["warnings"])
-        
-        return result
-        
-    def _validate_single_capsule(self, file_path: Path) -> Dict[str, Any]:
-        """Validate a single Capsule Scroll file"""
-        result = {
-            "valid": True,
-            "errors": [],
-            "warnings": []
-        }
-        
-        try:
-            content = file_path.read_text()
-            
-            # Check for required sections
-            required_sections = [
-                "Daily Ghost Sweep", "Badge Verdict Pass",
-                "Compact Transcript", "Re‑entry Spell", "Links to Related Content"
-            ]
-            
-            for section in required_sections:
-                if section not in content:
-                    result["errors"].append(f"Missing required section: {section}")
-                    result["valid"] = False
-            
-            # Check for re-entry spell (should be between 2-5 sentences)
-            reentry_match = re.search(r'### \*\*\d+\. Re‑entry Spell\*\*.*?\n> \*(.*?)\*', content, re.DOTALL)
-            if reentry_match:
-                spell_text = reentry_match.group(1)
-                sentence_count = len(re.findall(r'[.!?]+', spell_text))
-                if sentence_count < 2:
-                    result["warnings"].append("Re-entry spell should be 2-5 sentences for optimal context restoration")
-                elif sentence_count > 5:
-                    result["warnings"].append("Re-entry spell is longer than recommended 5 sentences")
-            else:
-                result["errors"].append("Re-entry spell format is incorrect or missing")
-                result["valid"] = False
-            
-            # Check for emoji patterns
-            if "🧠📜" not in content and "🧠" not in content:
-                result["warnings"].append("Capsule Scroll should contain brain emoji (🧠) or brain+scroll combo (🧠📜)")
-            
-            # Check for Buttsafe elements
-            if "🍑" not in content and "Save the Butts" not in content and "butts" not in content.lower():
-                result["warnings"].append("Capsule Scroll should reference Buttsafe elements for cultural consistency")
-            
-            # Check for Chronicle Keeper attribution
-            if "Chronicle Keeper" not in content:
-                result["warnings"].append("Missing Chronicle Keeper attribution")
-                
-        except Exception as e:
-            result["errors"].append(f"Failed to read or parse file: {str(e)}")
-            result["valid"] = False
-        
-        return result
-    
-    def generate_report(self, results: List[Dict[str, Any]], devtimetravel_result: Dict[str, Any], quote_result: Dict[str, Any] = None, capsule_result: Dict[str, Any] = None) -> Dict[str, Any]:
-        """Generate a comprehensive validation report"""
-        total_files = len(results)
-        valid_files = sum(1 for r in results if r["valid"])
-        total_errors = sum(len(r["errors"]) for r in results) + len(devtimetravel_result["errors"])
-        total_warnings = sum(len(r["warnings"]) for r in results) + len(devtimetravel_result["warnings"])
-        
-        # Include quote validation in totals if available
-        if quote_result:
-            total_errors += len(quote_result["errors"])
-            total_warnings += len(quote_result["warnings"])
-        
-        # Include capsule validation in totals if available  
-        if capsule_result:
-            total_errors += len(capsule_result["errors"])
-            total_warnings += len(capsule_result["warnings"])
-        
-        report = {
-            "summary": {
-                "total_tldl_files": total_files,
-                "valid_tldl_files": valid_files,
-                "devtimetravel_config_valid": devtimetravel_result["valid"],
-                "scroll_quotes_valid": quote_result["valid"] if quote_result else None,
-                "capsule_scrolls_valid": capsule_result["valid"] if capsule_result else None,
-                "total_capsules": capsule_result["total_capsules"] if capsule_result else 0,
-                "valid_capsules": capsule_result["valid_capsules"] if capsule_result else 0,
-                "total_errors": total_errors,
-                "total_warnings": total_warnings,
-                "overall_status": "PASS" if total_errors == 0 else "FAIL"
-            },
-            "tldl_results": results,
-            "devtimetravel_result": devtimetravel_result,
-            "quote_result": quote_result,
-            "capsule_result": capsule_result,
-            "generated_at": datetime.now().isoformat()
-        }
-        
-        return report
+        return all_valid
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Validate TLDL entries and documentation")
-    parser.add_argument("--tldl-path", default="docs/", help="Path to TLDL documentation")
-    parser.add_argument("--config-path", help="Path to DevTimeTravel config (defaults to docs/)")
-    parser.add_argument("--output-format", choices=["text", "json"], default="text", help="Output format")
-    parser.add_argument("--output-file", help="Output file (default: stdout)")
-    parser.add_argument("--skip-quotes", action="store_true", help="Skip scroll quote validation")
+    """Main execution function for TLDL validation"""
+    parser = argparse.ArgumentParser(
+        description=f"{EMOJI_MAGIC} Living Dev Agent TLDL Validator {EMOJI_SCROLL}",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python3 validate_docs.py --tldl-path TLDL/entries/
+  python3 validate_docs.py --tldl-path docs/ --verbose
+  python3 validate_docs.py --tldl-path single-file.md --config-path config/
+        """
+    )
+    
+    parser.add_argument(
+        '--tldl-path',
+        required=True,
+        help='Path to TLDL files (directory or single file)'
+    )
+    
+    parser.add_argument(
+        '--config-path', 
+        help='Path to configuration files (optional)'
+    )
+    
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        help='Enable verbose output for debugging'
+    )
+    
     args = parser.parse_args()
     
-    validator = TLDLValidator(args.tldl_path, args.config_path)
-    
-    # Validate TLDL entries
-    tldl_results = validator.validate_all_tldl_entries()
-    
-    # Validate DevTimeTravel config
-    devtimetravel_result = validator.validate_devtimetravel_config()
-    
-    # Validate scroll quotes
-    quote_result = None
-    if not args.skip_quotes:
-        quote_result = validator.validate_scroll_quotes()
-    
-    # Validate capsule scrolls
-    capsule_result = validator.validate_capsule_scrolls()
-    
-    # Generate report
-    report = validator.generate_report(tldl_results, devtimetravel_result, quote_result, capsule_result)
-    
-    # Output results
-    if args.output_format == "json":
-        import json
-        output = json.dumps(report, indent=2)
-    else:
-        # Text format
-        lines = []
-        lines.append("=== TLDL and Documentation Validation Report ===")
-        lines.append(f"Generated at: {report['generated_at']}")
-        lines.append(f"Overall Status: {report['summary']['overall_status']}")
-        lines.append(f"Total TLDL Files: {report['summary']['total_tldl_files']}")
-        lines.append(f"Valid TLDL Files: {report['summary']['valid_tldl_files']}")
-        lines.append(f"DevTimeTravel Config Valid: {report['summary']['devtimetravel_config_valid']}")
-        if report['summary']['scroll_quotes_valid'] is not None:
-            lines.append(f"Scroll Quotes Valid: {report['summary']['scroll_quotes_valid']}")
-        if report['summary']['capsule_scrolls_valid'] is not None:
-            lines.append(f"Capsule Scrolls Valid: {report['summary']['capsule_scrolls_valid']}")
-            lines.append(f"Total Capsules: {report['summary']['total_capsules']}")
-            lines.append(f"Valid Capsules: {report['summary']['valid_capsules']}")
-        lines.append(f"Total Errors: {report['summary']['total_errors']}")
-        lines.append(f"Total Warnings: {report['summary']['total_warnings']}")
-        lines.append("")
+    try:
+        # Create validator and run validation
+        validator = TLDLValidator(
+            tldl_path=args.tldl_path,
+            config_path=args.config_path,
+            verbose=args.verbose
+        )
         
-        # TLDL file details
-        for result in tldl_results:
-            lines.append(f"File: {result['file']}")
-            lines.append(f"  Valid: {result['valid']}")
-            if result['errors']:
-                lines.append("  Errors:")
-                for error in result['errors']:
-                    lines.append(f"    - {error}")
-            if result['warnings']:
-                lines.append("  Warnings:")
-                for warning in result['warnings']:
-                    lines.append(f"    - {warning}")
-            lines.append("")
+        success = validator.run_validation()
         
-        # DevTimeTravel config details
-        lines.append(f"DevTimeTravel Config: {devtimetravel_result['file']}")
-        lines.append(f"  Valid: {devtimetravel_result['valid']}")
-        if devtimetravel_result['errors']:
-            lines.append("  Errors:")
-            for error in devtimetravel_result['errors']:
-                lines.append(f"    - {error}")
-        if devtimetravel_result['warnings']:
-            lines.append("  Warnings:")
-            for warning in devtimetravel_result['warnings']:
-                lines.append(f"    - {warning}")
+        # Exit with appropriate code
+        sys.exit(0 if success else 1)
         
-        # Scroll quote validation details
-        if quote_result:
-            lines.append("")
-            lines.append("Scroll Quotes Database:")
-            lines.append(f"  Valid: {quote_result['valid']}")
-            if quote_result['stats']:
-                stats = quote_result['stats']
-                lines.append(f"  Total Quotes: {stats.get('total_quotes', 0)}")
-                lines.append(f"  Buttsafe Certified: {stats.get('buttsafe_certified', 0)}")
-                lines.append(f"  Categories: {stats.get('categories', 0)}")
-            if quote_result['errors']:
-                lines.append("  Errors:")
-                for error in quote_result['errors']:
-                    lines.append(f"    - {error}")
-            if quote_result['warnings']:
-                lines.append("  Warnings:")
-                for warning in quote_result['warnings']:
-                    lines.append(f"    - {warning}")
-        
-        output = "\n".join(lines)
-    
-    if args.output_file:
-        with open(args.output_file, 'w') as f:
-            f.write(output)
-        print(f"Report written to {args.output_file}")
-    else:
-        print(output)
-    
-    # Exit with error code if validation failed
-    if report['summary']['overall_status'] == "FAIL":
-        exit(1)
+    except KeyboardInterrupt:
+        print(f"\n{Colors.WARNING}{EMOJI_WARNING} Validation interrupted by user{Colors.ENDC}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"{Colors.FAIL}{EMOJI_ERROR} Validation failed with exception: {e}{Colors.ENDC}")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

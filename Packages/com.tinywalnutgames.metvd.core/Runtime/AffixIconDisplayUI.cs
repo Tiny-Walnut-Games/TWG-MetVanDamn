@@ -89,7 +89,7 @@ namespace TinyWalnutGames.MetVD.Core
 				return;
 				}
 
-			var naming = entityManager.GetComponentData<EnemyNaming>(targetEntity);
+			EnemyNaming naming = entityManager.GetComponentData<EnemyNaming>(targetEntity);
 			if (!naming.ShowIcons || naming.DisplayMode == AffixDisplayMode.NamesOnly)
 				{
 				HideAllIcons();
@@ -103,7 +103,7 @@ namespace TinyWalnutGames.MetVD.Core
 				return;
 				}
 
-			var affixBuffer = entityManager.GetBuffer<EnemyAffixBufferElement>(targetEntity);
+			DynamicBuffer<EnemyAffixBufferElement> affixBuffer = entityManager.GetBuffer<EnemyAffixBufferElement>(targetEntity);
 			DisplayAffixIcons(affixBuffer);
 			}
 
@@ -124,7 +124,7 @@ namespace TinyWalnutGames.MetVD.Core
 				GameObject iconGO = iconPrefab != null ? Instantiate(iconPrefab, iconContainer) : new GameObject($"Icon_{i}");
 				iconGO.transform.SetParent(iconContainer);
 
-				if (!iconGO.TryGetComponent<RectTransform>(out var rectTransform))
+				if (!iconGO.TryGetComponent<RectTransform>(out RectTransform rectTransform))
 					{
 					rectTransform = iconGO.AddComponent<RectTransform>();
 					}
@@ -133,7 +133,7 @@ namespace TinyWalnutGames.MetVD.Core
 				rectTransform.anchoredPosition = new Vector2(i * iconSpacing, 0);
 				rectTransform.sizeDelta = new Vector2(20, 20);
 
-				if (!iconGO.TryGetComponent<Image>(out var image))
+				if (!iconGO.TryGetComponent<Image>(out Image image))
 					{
 					image = iconGO.AddComponent<Image>();
 					}
@@ -156,8 +156,8 @@ namespace TinyWalnutGames.MetVD.Core
 
 			for (int i = 0; i < iconsToShow; i++)
 				{
-				var affix = affixes[i].Value;
-				var sprite = GetSpriteForAffix(affix.IconRef.ToString());
+				EnemyAffix affix = affixes[i].Value;
+				Sprite sprite = GetSpriteForAffix(affix.IconRef.ToString());
 
 				if (sprite != null && i < iconImages.Length)
 					{
@@ -174,7 +174,7 @@ namespace TinyWalnutGames.MetVD.Core
 			{
 			if (iconImages != null)
 				{
-				foreach (var icon in iconImages)
+				foreach (Image icon in iconImages)
 					{
 					if (icon != null)
 						{
@@ -194,7 +194,7 @@ namespace TinyWalnutGames.MetVD.Core
 			// In production, this would load from Resources, Addressables, or an asset database
 			if (affixIcons != null)
 				{
-				foreach (var sprite in affixIcons)
+				foreach (Sprite sprite in affixIcons)
 					{
 					if (sprite != null && sprite.name.Contains(iconRef.Replace("icon_", "").Replace(".png", "")))
 						{
@@ -225,7 +225,7 @@ namespace TinyWalnutGames.MetVD.Core
 			{
 			if (iconImages != null)
 				{
-				foreach (var icon in iconImages)
+				foreach (Image icon in iconImages)
 					{
 					if (icon != null && icon.gameObject != null)
 						{
@@ -246,7 +246,7 @@ namespace TinyWalnutGames.MetVD.Core
 		protected override void OnUpdate()
 			{
 			// Find all AffixIconDisplayUI components and update them
-			foreach (var displayUI in Object.FindObjectsByType<AffixIconDisplayUI>(FindObjectsSortMode.None))
+			foreach (AffixIconDisplayUI displayUI in Object.FindObjectsByType<AffixIconDisplayUI>(FindObjectsSortMode.None))
 				{
 				if (displayUI != null)
 					{

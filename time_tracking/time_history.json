@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-09-02T10:23:50.798294",
+  "time_cards": [
+    {
+      "task_name": "Test integration task",
+      "start_time": "2025-09-02T10:23:30.187645",
+      "end_time": "2025-09-02T10:23:50.797847",
+      "duration_seconds": 20.610202,
+      "notes": "Integration testing completed successfully",
+      "category": "development",
+      "project": "Integration Testing"
+    }
+  ]
+}

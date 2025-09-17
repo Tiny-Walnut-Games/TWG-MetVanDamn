@@ -1,0 +1,7 @@
+{
+  "_comment": "Castle memory graph. Nodes gain heat via infusion; edges capture conceptual relations.",
+  "version": 1,
+  "nodes": {},
+  "edges": [],
+  "updated_epoch": 0
+}

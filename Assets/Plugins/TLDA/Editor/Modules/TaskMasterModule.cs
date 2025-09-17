@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Linq;
+using LivingDevAgent.Editor.Scribe;
 using UnityEditor;
 using UnityEngine;
 
@@ -277,7 +278,7 @@ namespace LivingDevAgent.Editor.Modules
 					{
 					try
 						{
-						TLDLScribeWindow.ShowWindow();
+						ScribeCore.ShowWindow();
 						// TODO: Switch to TaskMaster tab programmatically
 						Event.current.Use(); // Consume the event
 						}

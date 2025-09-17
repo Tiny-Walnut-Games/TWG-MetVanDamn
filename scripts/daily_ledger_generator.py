@@ -169,6 +169,7 @@ class DailyLedgerGenerator:
         validation_files = [
             'validation-report.json',
             'TLDL/validation-report.json'
+        ]
         # Dynamically discover all validation-report.json files in project_root
         validation_files = []
         for root, dirs, files in os.walk(self.project_root):

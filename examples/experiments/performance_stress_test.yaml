@@ -1,0 +1,96 @@
+# Performance Stress Test Configuration
+# Tests system performance under load
+
+metadata:
+  name: "Performance Stress Test"
+  description: "High-load performance and stability testing"
+  version: "1.0.0"
+  author: "Bootstrap Sentinel"
+  created: "2025-01-15T10:30:00Z"
+  tags: ["performance", "stress", "load_test"]
+
+model:
+  type: "batch_evaluation"
+  performance_profile: "perf"
+
+conditions:
+  batch_sizes:
+    - 50
+    - 100
+    - 200
+  
+  worker_counts:
+    - 2
+    - 4
+    - 8
+    
+  corpus_sizes:
+    - 1000
+    - 2000
+
+corpus:
+  type: "synthetic"
+  size: 2000  # Will be overridden by conditions
+  shuffle: true
+  seed: 999
+
+processing:
+  mode: "parallel"
+  timeout_seconds: 600
+  
+  checkpointing:
+    enabled: true
+    interval: 200
+
+metrics:
+  performance_metrics:
+    - "throughput_items_per_sec"
+    - "memory_usage_mb"
+    - "cpu_utilization_pct"
+    - "success_rate_pct"
+    - "processing_time_ms"
+  
+  time_series:
+    enabled: true
+    granularity: "second"
+    retention_days: 1
+
+output:
+  base_path: "experiments/results"
+  formats: ["json", "csv"]
+  
+  reports:
+    - type: "summary"
+      template: "performance_summary.md"
+      
+  artifacts:
+    save_raw_results: true
+    save_processed_metrics: true
+
+execution:
+  random_seeds:
+    global_seed: 999
+    
+  retry_policy:
+    max_retries: 1
+    retry_on_timeout: false
+    
+  resource_limits:
+    max_memory_mb: 4096
+    max_cpu_cores: 8
+    max_duration_minutes: 30
+
+validation:
+  success_criteria:
+    min_processed_items: 1800
+    max_error_rate: 0.02
+    min_throughput_items_per_sec: 20.0
+
+integration:
+  chronicle_integration:
+    enabled: true
+    auto_generate_tldl: true
+    
+  telemetry:
+    enabled: true
+    include_system_metrics: true

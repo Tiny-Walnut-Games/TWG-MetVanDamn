@@ -1,0 +1,378 @@
+#!/usr/bin/env python3
+"""
+Badge Pet CLI - User-friendly interface for managing NFT Badge Pets
+Part of the Living Dev Agent Template ecosystem
+
+Usage:
+  badge-pets list <developer>              # List pets for developer
+  badge-pets generate <developer> [genre]  # Generate new pet
+  badge-pets status <pet-id>               # Show pet details
+  badge-pets export-nft <pet-id>           # Export NFT metadata
+  badge-pets copilot-profile <developer>   # Generate Copilot personality
+  badge-pets evolution-stats               # Show evolution stats
+"""
+
+import sys
+import os
+import argparse
+import json
+from pathlib import Path
+
+# Add the DeveloperExperience module to path
+script_dir = Path(__file__).parent
+dev_exp_dir = script_dir.parent / "src" / "DeveloperExperience"
+sys.path.insert(0, str(dev_exp_dir))
+
+try:
+    from badge_pet_system import BadgePetManager, PetSpecies, PetStage, DeveloperGenre
+    from dev_experience import DeveloperExperienceManager
+    SYSTEM_AVAILABLE = True
+except ImportError as e:
+    print(f"❌ Badge Pet System not available: {e}")
+    SYSTEM_AVAILABLE = False
+    sys.exit(1)
+
+class BadgePetCLI:
+    """Command-line interface for Badge Pet System"""
+    
+    def __init__(self, workspace_path: str = "."):
+        self.workspace_path = Path(workspace_path)
+        self.pet_manager = BadgePetManager(workspace_path)
+        self.dev_manager = DeveloperExperienceManager(workspace_path)
+    
+    def list_pets(self, developer_name: str):
+        """List all pets for a developer"""
+        pets = self.dev_manager.get_developer_pets(developer_name)
+        
+        if not pets:
+            print(f"🐾 No badge pets found for {developer_name}")
+            print(f"💡 Create contributions to generate your first pet!")
+            return
+        
+        print(f"🐾 Badge Pets for {developer_name}:")
+        print("=" * 60)
+        
+        for pet in pets:
+            progress, xp_needed = pet.get_evolution_progress()
+            
+            print(f"📛 {pet.pet_name} the {pet.species.value.replace('_', ' ').title()}")
+            print(f"   🎭 Genre: {pet.genre_theme.value.replace('_', ' ').title()}")
+            print(f"   📈 Stage: {pet.current_stage.value.title()}")
+            print(f"   ⭐ XP: {pet.metrics.total_xp_earned:,}")
+            print(f"   📊 Evolution: {progress:.1%} complete")
+            
+            if xp_needed > 0:
+                print(f"   🎯 Next stage: {xp_needed:,} XP needed")
+            
+            print(f"   🎂 Age: {pet.metrics.days_active} days")
+            print(f"   🔥 Contributions: {pet.metrics.contributions_witnessed}")
+            
+            if pet.traits:
+                trait_names = [trait.value.replace('_', ' ').title() for trait in pet.traits]
+                print(f"   ✨ Traits: {', '.join(trait_names)}")
+            
+            if pet.evolution_complete:
+                print(f"   🏆 LEGENDARY - Ready for NFT minting!")
+                print(f"   📜 Scroll Integrity: {pet.scroll_integrity_score:.1%}")
+            
+            print(f"   🆔 Pet ID: {pet.pet_id}")
+            print()
+    
+    def generate_pet(self, developer_name: str, genre: str = "fantasy"):
+        """Generate a new pet for a developer"""
+        try:
+            genre_enum = DeveloperGenre(genre.lower())
+        except ValueError:
+            print(f"❌ Invalid genre: {genre}")
+            print(f"Available genres: {', '.join([g.value for g in DeveloperGenre])}")
+            return
+        
+        # Check if developer already has pets
+        existing_pets = self.dev_manager.get_developer_pets(developer_name)
+        if existing_pets:
+            print(f"⚠️ {developer_name} already has {len(existing_pets)} pet(s)")
+            print(f"💡 Pets are automatically generated on first contribution")
+            return
+        
+        # Generate pet
+        pet = self.pet_manager.generate_random_pet(developer_name, genre_enum)
+        self.pet_manager.register_pet(pet)
+        
+        # Add to developer profile
+        profile = self.dev_manager.get_developer_profile(developer_name)
+        if not profile:
+            # Create minimal profile if needed
+            from dev_experience import DeveloperProfile
+            profile = DeveloperProfile(developer_name=developer_name)
+            self.dev_manager.developer_profiles[developer_name] = profile
+        
+        profile.badge_pets.append(pet.pet_id)
+        self.dev_manager.save_profiles()
+        
+        print(f"🎉 Generated new badge pet!")
+        print(f"📛 {pet.pet_name} the {pet.species.value.replace('_', ' ').title()}")
+        print(f"🎭 Genre: {pet.genre_theme.value.replace('_', ' ').title()}")
+        print(f"🆔 Pet ID: {pet.pet_id}")
+        print(f"💡 Start contributing to help {pet.pet_name} evolve!")
+    
+    def show_pet_status(self, pet_id: str):
+        """Show detailed status for a specific pet"""
+        pet = self.pet_manager.get_pet_by_id(pet_id)
+        
+        if not pet:
+            print(f"❌ Pet not found: {pet_id}")
+            return
+        
+        progress, xp_needed = pet.get_evolution_progress()
+        
+        print(f"🐾 Badge Pet Status Report")
+        print("=" * 50)
+        print(f"📛 Name: {pet.pet_name}")
+        print(f"🔬 Species: {pet.species.value.replace('_', ' ').title()}")
+        print(f"🎭 Genre: {pet.genre_theme.value.replace('_', ' ').title()}")
+        print(f"👤 Developer: {pet.developer_name}")
+        print(f"🎂 Born: {pet.birth_date.strftime('%Y-%m-%d')}")
+        print(f"📈 Current Stage: {pet.current_stage.value.title()}")
+        print(f"📊 Evolution Progress: {progress:.1%}")
+        
+        if xp_needed > 0:
+            print(f"🎯 XP Needed for Next Stage: {xp_needed:,}")
+        
+        print()
+        print("📊 Performance Metrics:")
+        print(f"   ⭐ Total XP: {pet.metrics.total_xp_earned:,}")
+        print(f"   🔥 Contributions Witnessed: {pet.metrics.contributions_witnessed}")
+        print(f"   🐛 Bugs Helped Squash: {pet.metrics.bugs_helped_squash}")
+        print(f"   📚 Documentation Assisted: {pet.metrics.documentation_assisted}")
+        print(f"   💡 Innovations Inspired: {pet.metrics.innovations_inspired}")
+        print(f"   📜 TLDL Reactions: {pet.metrics.tldl_reactions}")
+        print(f"   🛡️ Scroll Integrity Checks: {pet.metrics.scroll_integrity_checks}")
+        print(f"   📅 Days Active: {pet.metrics.days_active}")
+        
+        if pet.traits:
+            print()
+            print("✨ Developed Traits:")
+            for trait in pet.traits:
+                trait_name = trait.value.replace('_', ' ').title()
+                print(f"   • {trait_name}")
+        
+        print()
+        print("🎯 Personality Quirks:")
+        for quirk in pet.personality_quirks:
+            print(f"   • {quirk.title()}")
+        
+        print()
+        print("🎮 Favorite Activities:")
+        for activity in pet.favorite_activities:
+            activity_name = activity.replace('_', ' ').title()
+            print(f"   • {activity_name}")
+        
+        if pet.evolution_complete:
+            print()
+            print("🏆 LEGENDARY STATUS ACHIEVED!")
+            print(f"📜 Scroll Integrity Score: {pet.scroll_integrity_score:.1%}")
+            print(f"🔮 Behavioral DNA: {pet.behavioral_dna[:16]}...")
+            print(f"🆔 Contributor ID Hash: {pet.contributor_id_hash}")
+            print("🎊 Ready for NFT minting!")
+        
+        print()
+        print(f"🆔 Pet ID: {pet.pet_id}")
+    
+    def export_nft(self, pet_id: str):
+        """Export NFT metadata for a pet"""
+        pet = self.pet_manager.get_pet_by_id(pet_id)
+        
+        if not pet:
+            print(f"❌ Pet not found: {pet_id}")
+            return
+        
+        if not pet.evolution_complete:
+            print(f"❌ {pet.pet_name} is not ready for NFT minting")
+            print(f"📈 Current stage: {pet.current_stage.value}")
+            print(f"🎯 Legendary status required for NFT minting")
+            return
+        
+        export_path = self.pet_manager.export_nft_metadata(pet)
+        
+        if export_path:
+            print(f"🏆 NFT metadata exported successfully!")
+            print(f"📁 File: {export_path}")
+            print()
+            
+            # Load and show preview
+            with open(export_path, 'r') as f:
+                nft_data = json.load(f)
+            
+            print(f"📜 NFT Metadata Preview:")
+            print(f"   🏷️ Name: {nft_data['name']}")
+            print(f"   📖 Description: {nft_data['description'][:100]}...")
+            print(f"   🏷️ Attributes: {len(nft_data['attributes'])} traits")
+            print(f"   🔐 Metadata Hash: {pet.nft_metadata_hash[:16]}...")
+            
+            print()
+            print("🎯 Key Attributes:")
+            for attr in nft_data['attributes'][:8]:
+                print(f"   • {attr['trait_type']}: {attr['value']}")
+            
+        else:
+            print(f"❌ Failed to export NFT metadata")
+    
+    def generate_copilot_profile(self, developer_name: str):
+        """Generate Copilot personality profile for developer"""
+        personality = self.dev_manager.generate_copilot_personality(developer_name)
+        
+        if not personality:
+            print(f"❌ No pets found for {developer_name}")
+            print(f"💡 Create contributions and evolve pets to unlock Copilot personality customization")
+            return
+        
+        print(f"🤖 Copilot Personality Profile for {developer_name}")
+        print("=" * 60)
+        
+        for key, value in personality.items():
+            if key != 'pet_companion':
+                key_name = key.replace('_', ' ').title()
+                print(f"🎯 {key_name}: {value}")
+        
+        if 'pet_companion' in personality:
+            pet_info = personality['pet_companion']
+            print()
+            print(f"🐾 Pet Companion: {pet_info['name']} {pet_info['favorite_emoji']}")
+            print(f"📈 Pet Stage: {pet_info['stage'].title()}")
+            print(f"🔬 Species: {pet_info['species'].replace('_', ' ').title()}")
+            print(f"✨ Quirks: {', '.join(pet_info['personality_quirks'])}")
+        
+        # Export to .github/copilot-personality.json if desired
+        copilot_dir = self.workspace_path / ".github"
+        if copilot_dir.exists() or input("\n💾 Save to .github/copilot-personality.json? (y/n): ").lower() == 'y':
+            copilot_dir.mkdir(exist_ok=True)
+            copilot_file = copilot_dir / "copilot-personality.json"
+            
+            with open(copilot_file, 'w') as f:
+                json.dump(personality, f, indent=2)
+            
+            print(f"✅ Copilot personality saved to: {copilot_file}")
+    
+    def show_evolution_stats(self):
+        """Show evolution statistics across all pets"""
+        all_pets = list(self.pet_manager.badge_pets.values())
+        
+        if not all_pets:
+            print("🐾 No badge pets found in system")
+            return
+        
+        print("📊 Badge Pet Evolution Statistics")
+        print("=" * 50)
+        
+        # Stage distribution
+        stage_counts = {}
+        for pet in all_pets:
+            stage = pet.current_stage.value
+            stage_counts[stage] = stage_counts.get(stage, 0) + 1
+        
+        print("📈 Stage Distribution:")
+        for stage in PetStage:
+            count = stage_counts.get(stage.value, 0)
+            print(f"   {stage.value.title()}: {count} pets")
+        
+        # Species distribution
+        species_counts = {}
+        for pet in all_pets:
+            species = pet.species.value
+            species_counts[species] = species_counts.get(species, 0) + 1
+        
+        print()
+        print("🔬 Species Distribution:")
+        for species, count in species_counts.items():
+            species_name = species.replace('_', ' ').title()
+            print(f"   {species_name}: {count} pets")
+        
+        # Legendary pets ready for NFT
+        legendary_pets = [pet for pet in all_pets if pet.evolution_complete]
+        print()
+        print(f"🏆 Legendary Pets: {len(legendary_pets)} ready for NFT minting")
+        
+        if legendary_pets:
+            avg_integrity = sum(pet.scroll_integrity_score for pet in legendary_pets) / len(legendary_pets)
+            print(f"📜 Average Scroll Integrity: {avg_integrity:.1%}")
+        
+        # Top contributors
+        developer_pet_counts = {}
+        for pet in all_pets:
+            dev = pet.developer_name
+            developer_pet_counts[dev] = developer_pet_counts.get(dev, 0) + 1
+        
+        print()
+        print("👥 Top Pet Collectors:")
+        sorted_devs = sorted(developer_pet_counts.items(), key=lambda x: x[1], reverse=True)
+        for i, (dev, count) in enumerate(sorted_devs[:5], 1):
+            print(f"   {i}. {dev}: {count} pet{'s' if count != 1 else ''}")
+
+def main():
+    """Main CLI entry point"""
+    parser = argparse.ArgumentParser(
+        description="🐾 Badge Pet System - NFT Companions for Developers",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  badge-pets list alice                    # List Alice's pets
+  badge-pets generate bob fantasy          # Generate fantasy pet for Bob
+  badge-pets status pet-123-abc            # Show detailed pet status
+  badge-pets export-nft pet-123-abc       # Export NFT metadata
+  badge-pets copilot-profile alice        # Generate Copilot personality
+  badge-pets evolution-stats              # Show system statistics
+        """
+    )
+    
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    
+    # List command
+    list_parser = subparsers.add_parser('list', help='List pets for developer')
+    list_parser.add_argument('developer', help='Developer name')
+    
+    # Generate command
+    gen_parser = subparsers.add_parser('generate', help='Generate new pet')
+    gen_parser.add_argument('developer', help='Developer name')
+    gen_parser.add_argument('genre', nargs='?', default='fantasy', help='Pet genre (default: fantasy)')
+    
+    # Status command
+    status_parser = subparsers.add_parser('status', help='Show pet details')
+    status_parser.add_argument('pet_id', help='Pet ID')
+    
+    # Export NFT command
+    nft_parser = subparsers.add_parser('export-nft', help='Export NFT metadata')
+    nft_parser.add_argument('pet_id', help='Pet ID')
+    
+    # Copilot profile command
+    copilot_parser = subparsers.add_parser('copilot-profile', help='Generate Copilot personality')
+    copilot_parser.add_argument('developer', help='Developer name')
+    
+    # Evolution stats command
+    subparsers.add_parser('evolution-stats', help='Show evolution statistics')
+    
+    # Parse arguments
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        return
+    
+    # Initialize CLI
+    cli = BadgePetCLI()
+    
+    # Execute command
+    if args.command == 'list':
+        cli.list_pets(args.developer)
+    elif args.command == 'generate':
+        cli.generate_pet(args.developer, args.genre)
+    elif args.command == 'status':
+        cli.show_pet_status(args.pet_id)
+    elif args.command == 'export-nft':
+        cli.export_nft(args.pet_id)
+    elif args.command == 'copilot-profile':
+        cli.generate_copilot_profile(args.developer)
+    elif args.command == 'evolution-stats':
+        cli.show_evolution_stats()
+
+if __name__ == "__main__":
+    main()

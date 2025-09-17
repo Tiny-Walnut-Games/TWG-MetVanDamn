@@ -1,0 +1,623 @@
+name: 'Alchemist Faculty - Determinism Smoke Test Pipeline'
+
+on:
+  push:
+    paths:
+      - 'gu_pot/**/manifest*.yaml'
+      - 'gu_pot/**/manifest*.json'
+      - 'assets/experiments/**/*.yaml'
+      - 'scripts/alchemist-faculty/**'
+      - 'schemas/alchemist/**'
+      - 'engine/experiment_harness.py'
+  pull_request:
+    paths:
+      - 'gu_pot/**/manifest*.yaml'
+      - 'gu_pot/**/manifest*.json'
+      - 'assets/experiments/**/*.yaml'
+      - 'scripts/alchemist-faculty/**'
+      - 'schemas/alchemist/**'
+      - 'engine/experiment_harness.py'
+  schedule:
+    # Run determinism tests daily at 2 AM UTC for comprehensive monitoring
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      experiment_pattern:
+        description: 'Pattern for experiments to test (e.g., issue-* or issue-123)'
+        default: 'issue-*'
+        required: false
+      test_iterations:
+        description: 'Number of determinism test iterations'
+        default: '3'
+        required: false
+
+jobs:
+  discover-experiments:
+    name: 'Discover Experiments for Testing'
+    runs-on: ubuntu-latest
+    outputs:
+      experiments: ${{ steps.find-experiments.outputs.experiments }}
+      experiment-count: ${{ steps.find-experiments.outputs.count }}
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Find Experiments
+        id: find-experiments
+        run: |
+          echo "🔍 Discovering experiments for determinism testing..."
+          
+          pattern="${{ github.event.inputs.experiment_pattern || 'issue-*' }}"
+          experiments=()
+          
+          if [ -d "gu_pot" ]; then
+            for exp_dir in gu_pot/${pattern}; do
+              if [ -d "$exp_dir" ] && ([ -f "$exp_dir/manifest_v1.yaml" ] || [ -f "$exp_dir/manifest_v1.json" ]); then
+                exp_name=$(basename "$exp_dir")
+                experiments+=("$exp_name")
+                echo "Found experiment: $exp_name"
+              fi
+            done
+          fi
+          
+          # Convert to JSON array
+          experiments_json=$(printf '%s\n' "${experiments[@]}" | jq -R . | jq -s .)
+          
+          echo "experiments=$experiments_json" >> $GITHUB_OUTPUT
+          echo "count=${#experiments[@]}" >> $GITHUB_OUTPUT
+          
+          echo "📊 Found ${#experiments[@]} experiments for testing"
+
+  validate-determinism:
+    name: 'Validate Determinism'
+    runs-on: ubuntu-latest
+    needs: discover-experiments
+    if: needs.discover-experiments.outputs.experiment-count > 0
+    strategy:
+      matrix:
+        experiment: ${{ fromJson(needs.discover-experiments.outputs.experiments) }}
+      fail-fast: false
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install Dependencies
+        run: |
+          pip install PyYAML requests jsonschema argparse
+          
+      - name: Validate Experiment Structure
+        id: validate-structure
+        run: |
+          echo "🧪 Validating experiment structure for ${{ matrix.experiment }}..."
+          
+          exp_dir="gu_pot/${{ matrix.experiment }}"
+          
+          # Check for manifest file
+          manifest_file=""
+          if [ -f "$exp_dir/manifest_v1.yaml" ]; then
+            manifest_file="$exp_dir/manifest_v1.yaml"
+          elif [ -f "$exp_dir/manifest_v1.json" ]; then
+            manifest_file="$exp_dir/manifest_v1.json"
+          else
+            echo "❌ No manifest file found"
+            exit 1
+          fi
+          
+          echo "manifest-file=$manifest_file" >> $GITHUB_OUTPUT
+          
+          # Validate manifest syntax
+          if [[ "$manifest_file" == *.yaml ]]; then
+            python -c "import yaml; yaml.safe_load(open('$manifest_file'))" || {
+              echo "❌ Manifest YAML validation failed"
+              exit 1
+            }
+          else
+            python -c "import json; json.load(open('$manifest_file'))" || {
+              echo "❌ Manifest JSON validation failed"
+              exit 1
+            }
+          fi
+          
+          echo "✅ Experiment structure validation passed"
+          
+      - name: Test Manifest Generation Determinism
+        id: test-manifest-determinism
+        run: |
+          echo "🔄 Testing manifest generation determinism..."
+          
+          iterations=${{ github.event.inputs.test_iterations || '3' }}
+          temp_dir=$(mktemp -d)
+          
+          # Extract issue number from experiment name
+          issue_number=$(echo "${{ matrix.experiment }}" | sed 's/issue-//')
+          
+          # Generate manifest multiple times
+          for i in $(seq 1 $iterations); do
+            echo "Generation iteration $i..."
+            
+            python scripts/alchemist-faculty/generate_manifest.py \
+              --issue-number "$issue_number" \
+              --repo ${{ github.repository }} \
+              --output "$temp_dir/iteration_$i/" \
+              --github-token ${{ secrets.GITHUB_TOKEN }} \
+              --format yaml \
+              --dry-run || {
+              echo "❌ Manifest generation failed on iteration $i"
+              exit 1
+            }
+          done
+          
+          # Compare generated manifests for determinism
+          echo "🔍 Comparing generated manifests..."
+          
+          reference_manifest="$temp_dir/iteration_1/manifest_v1.yaml"
+          deterministic=true
+          
+          for i in $(seq 2 $iterations); do
+            compare_manifest="$temp_dir/iteration_$i/manifest_v1.yaml"
+            
+            # Compare excluding timestamp fields
+            if ! python scripts/alchemist-faculty/compare_manifests.py \
+                --reference "$reference_manifest" \
+                --compare "$compare_manifest" \
+                --ignore-timestamps; then
+              echo "❌ Manifest generation is not deterministic (iteration $i differs)"
+              deterministic=false
+            fi
+          done
+          
+          if [ "$deterministic" = true ]; then
+            echo "✅ Manifest generation is deterministic across $iterations iterations"
+          else
+            echo "❌ Manifest generation failed determinism test"
+            exit 1
+          fi
+          
+          # Cleanup
+          rm -rf "$temp_dir"
+          
+      - name: Test Claims Classification Determinism
+        id: test-classification-determinism
+        run: |
+          echo "🏷️ Testing claims classification determinism..."
+          
+          exp_dir="gu_pot/${{ matrix.experiment }}"
+          claims_dir="$exp_dir/claims"
+          
+          if [ ! -d "$claims_dir" ] || [ -z "$(find "$claims_dir" -name "*.json" -type f)" ]; then
+            echo "ℹ️ No claims found for classification testing - skipping"
+            exit 0
+          fi
+          
+          iterations=${{ github.event.inputs.test_iterations || '3' }}
+          temp_dir=$(mktemp -d)
+          
+          # Run classification multiple times
+          for i in $(seq 1 $iterations); do
+            echo "Classification iteration $i..."
+            
+            python scripts/alchemist-faculty/claims_classifier.py \
+              --claims-dir "$claims_dir" \
+              --output-dir "$temp_dir/iteration_$i" \
+              --reorganize || {
+              echo "❌ Claims classification failed on iteration $i"
+              exit 1
+            }
+          done
+          
+          # Compare classification results
+          echo "🔍 Comparing classification results..."
+          
+          deterministic=true
+          
+          for i in $(seq 2 $iterations); do
+            if ! python scripts/alchemist-faculty/compare_classifications.py \
+                --reference "$temp_dir/iteration_1" \
+                --compare "$temp_dir/iteration_$i"; then
+              echo "❌ Claims classification is not deterministic (iteration $i differs)"
+              deterministic=false
+            fi
+          done
+          
+          if [ "$deterministic" = true ]; then
+            echo "✅ Claims classification is deterministic across $iterations iterations"
+          else
+            echo "❌ Claims classification failed determinism test"
+            exit 1
+          fi
+          
+          # Cleanup
+          rm -rf "$temp_dir"
+          
+      - name: Test Baseline Validation Determinism
+        id: test-baseline-determinism
+        run: |
+          echo "📊 Testing baseline validation determinism..."
+          
+          exp_dir="gu_pot/${{ matrix.experiment }}"
+          
+          # Look for baseline files
+          baseline_files=$(find "$exp_dir" -name "*baseline*.json" -type f)
+          
+          if [ -z "$baseline_files" ]; then
+            echo "ℹ️ No baseline files found - skipping baseline validation test"
+            exit 0
+          fi
+          
+          iterations=${{ github.event.inputs.test_iterations || '3' }}
+          
+          # Test validation determinism for each baseline file
+          for baseline_file in $baseline_files; do
+            echo "Testing baseline file: $baseline_file"
+            
+            # Run validation multiple times and capture outputs
+            outputs=()
+            for i in $(seq 1 $iterations); do
+              output=$(python scripts/alchemist-faculty/validate_baseline_set.py \
+                --file "$baseline_file" 2>&1)
+              outputs+=("$output")
+            done
+            
+            # Compare outputs (excluding timestamps)
+            reference_output="${outputs[0]}"
+            for i in $(seq 1 $((iterations - 1))); do
+              compare_output="${outputs[$i]}"
+              
+              # Normalize outputs for comparison (remove timestamps)
+              normalized_ref=$(echo "$reference_output" | sed 's/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}.*Z//g')
+              normalized_comp=$(echo "$compare_output" | sed 's/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}.*Z//g')
+              
+              if [ "$normalized_ref" != "$normalized_comp" ]; then
+                echo "❌ Baseline validation is not deterministic for $baseline_file"
+                exit 1
+              fi
+            done
+          done
+          
+          echo "✅ Baseline validation is deterministic across $iterations iterations"
+          
+      - name: Generate Determinism Report
+        if: always()
+        run: |
+          echo "📋 Generating determinism test report for ${{ matrix.experiment }}..."
+          
+          report_file="determinism_report_${{ matrix.experiment }}.md"
+          
+          cat > "$report_file" << EOF
+          # Determinism Test Report - ${{ matrix.experiment }}
+          
+          **Generated**: $(date -u +"%Y-%m-%d %H:%M UTC")  
+          **Workflow**: ${{ github.workflow }} (${{ github.run_id }})  
+          **Test Iterations**: ${{ github.event.inputs.test_iterations || '3' }}
+          
+          ## Test Results
+          
+          | Component | Status | Notes |
+          |-----------|--------|-------|
+          | Experiment Structure | ${{ steps.validate-structure.outcome == 'success' && '✅ Pass' || '❌ Fail' }} | Manifest validation |
+          | Manifest Generation | ${{ steps.test-manifest-determinism.outcome == 'success' && '✅ Pass' || steps.test-manifest-determinism.outcome == 'skipped' && 'ℹ️ Skipped' || '❌ Fail' }} | Deterministic manifest creation |
+          | Claims Classification | ${{ steps.test-classification-determinism.outcome == 'success' && '✅ Pass' || steps.test-classification-determinism.outcome == 'skipped' && 'ℹ️ Skipped' || '❌ Fail' }} | Consistent claim categorization |
+          | Baseline Validation | ${{ steps.test-baseline-determinism.outcome == 'success' && '✅ Pass' || steps.test-baseline-determinism.outcome == 'skipped' && 'ℹ️ Skipped' || '❌ Fail' }} | Repeatable validation results |
+          
+          ## Summary
+          
+          EOF
+          
+          # Add summary based on results
+          if [[ "${{ steps.validate-structure.outcome }}" == "success" && \
+                ("${{ steps.test-manifest-determinism.outcome }}" == "success" || "${{ steps.test-manifest-determinism.outcome }}" == "skipped") && \
+                ("${{ steps.test-classification-determinism.outcome }}" == "success" || "${{ steps.test-classification-determinism.outcome }}" == "skipped") && \
+                ("${{ steps.test-baseline-determinism.outcome }}" == "success" || "${{ steps.test-baseline-determinism.outcome }}" == "skipped") ]]; then
+            echo "✅ **All determinism tests passed** - Experiment ${{ matrix.experiment }} demonstrates reproducible behavior across all tested components." >> "$report_file"
+          else
+            echo "❌ **Determinism tests failed** - Experiment ${{ matrix.experiment }} shows non-deterministic behavior in one or more components. Review failed tests and ensure consistent seeding and environment setup." >> "$report_file"
+          fi
+          
+          echo "" >> "$report_file"
+          echo "*Generated by Alchemist Faculty Determinism Smoke Test Pipeline v${{ env.SCRIPT_VERSION || '0.1.0' }}*" >> "$report_file"
+          
+          echo "📄 Determinism report generated: $report_file"
+          
+      - name: Upload Determinism Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: determinism-report-${{ matrix.experiment }}
+          path: determinism_report_${{ matrix.experiment }}.md
+          retention-days: 30
+
+  create-helper-scripts:
+    name: 'Create Helper Scripts'
+    runs-on: ubuntu-latest
+    if: needs.discover-experiments.outputs.experiment-count > 0
+    needs: discover-experiments
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: Create Manifest Comparison Script
+        run: |
+          mkdir -p scripts/alchemist-faculty/helpers
+          
+          cat > scripts/alchemist-faculty/compare_manifests.py << 'EOF'
+          #!/usr/bin/env python3
+          """
+          Helper script to compare Alchemist manifests for determinism testing
+          """
+          import argparse
+          import json
+          import yaml
+          import sys
+          from pathlib import Path
+          
+          def load_manifest(file_path):
+              """Load manifest file (YAML or JSON)"""
+              with open(file_path, 'r') as f:
+                  if file_path.endswith('.yaml') or file_path.endswith('.yml'):
+                      return yaml.safe_load(f)
+                  else:
+                      return json.load(f)
+          
+          def normalize_manifest(data, ignore_timestamps=True):
+              """Normalize manifest for comparison"""
+              if ignore_timestamps:
+                  # Remove timestamp fields that are expected to vary
+                  timestamp_fields = ['timestamp', 'created', 'generated', 'extracted_on']
+                  
+                  def remove_timestamps(obj):
+                      if isinstance(obj, dict):
+                          return {k: remove_timestamps(v) for k, v in obj.items() 
+                                 if k not in timestamp_fields}
+                      elif isinstance(obj, list):
+                          return [remove_timestamps(item) for item in obj]
+                      else:
+                          return obj
+                  
+                  return remove_timestamps(data)
+              return data
+          
+          def main():
+              parser = argparse.ArgumentParser(description="Compare Alchemist manifests")
+              parser.add_argument('--reference', required=True, help='Reference manifest file')
+              parser.add_argument('--compare', required=True, help='Manifest file to compare')
+              parser.add_argument('--ignore-timestamps', action='store_true', 
+                                help='Ignore timestamp fields in comparison')
+              
+              args = parser.parse_args()
+              
+              try:
+                  ref_data = load_manifest(args.reference)
+                  comp_data = load_manifest(args.compare)
+                  
+                  ref_normalized = normalize_manifest(ref_data, args.ignore_timestamps)
+                  comp_normalized = normalize_manifest(comp_data, args.ignore_timestamps)
+                  
+                  if ref_normalized == comp_normalized:
+                      print("✅ Manifests are identical (after normalization)")
+                      return 0
+                  else:
+                      print("❌ Manifests differ")
+                      # Could add detailed diff output here
+                      return 1
+                      
+              except Exception as e:
+                  print(f"❌ Error comparing manifests: {e}")
+                  return 1
+          
+          if __name__ == '__main__':
+              sys.exit(main())
+          EOF
+          
+          chmod +x scripts/alchemist-faculty/compare_manifests.py
+          
+      - name: Create Classification Comparison Script
+        run: |
+          cat > scripts/alchemist-faculty/compare_classifications.py << 'EOF'
+          #!/usr/bin/env python3
+          """
+          Helper script to compare claims classification results for determinism testing
+          """
+          import argparse
+          import json
+          import sys
+          from pathlib import Path
+          
+          def load_classification_results(dir_path):
+              """Load all classification results from directory"""
+              results = {}
+              
+              for json_file in Path(dir_path).glob("*_classified.json"):
+                  with open(json_file, 'r') as f:
+                      data = json.load(f)
+                      # Use claim_id as key
+                      results[data.get('claim_id', json_file.stem)] = data
+              
+              return results
+          
+          def normalize_classification(data):
+              """Normalize classification result for comparison"""
+              # Remove timestamp fields
+              normalized = data.copy()
+              if 'timestamp' in normalized:
+                  del normalized['timestamp']
+              if 'classification_metadata' in normalized:
+                  metadata = normalized['classification_metadata'].copy()
+                  if 'classification_timestamp' in metadata:
+                      del metadata['classification_timestamp']
+                  normalized['classification_metadata'] = metadata
+              
+              return normalized
+          
+          def main():
+              parser = argparse.ArgumentParser(description="Compare claims classification results")
+              parser.add_argument('--reference', required=True, help='Reference results directory')
+              parser.add_argument('--compare', required=True, help='Results directory to compare')
+              
+              args = parser.parse_args()
+              
+              try:
+                  ref_results = load_classification_results(args.reference)
+                  comp_results = load_classification_results(args.compare)
+                  
+                  if set(ref_results.keys()) != set(comp_results.keys()):
+                      print("❌ Different claims found in results")
+                      return 1
+                  
+                  for claim_id in ref_results:
+                      ref_norm = normalize_classification(ref_results[claim_id])
+                      comp_norm = normalize_classification(comp_results[claim_id])
+                      
+                      if ref_norm != comp_norm:
+                          print(f"❌ Classification differs for claim {claim_id}")
+                          return 1
+                  
+                  print("✅ Classification results are identical")
+                  return 0
+                  
+              except Exception as e:
+                  print(f"❌ Error comparing classifications: {e}")
+                  return 1
+          
+          if __name__ == '__main__':
+              sys.exit(main())
+          EOF
+          
+          chmod +x scripts/alchemist-faculty/compare_classifications.py
+
+  summary-report:
+    name: 'Generate Summary Report'
+    runs-on: ubuntu-latest
+    needs: [discover-experiments, validate-determinism]
+    if: always() && needs.discover-experiments.outputs.experiment-count > 0
+    
+    steps:
+      - name: Download All Reports
+        uses: actions/download-artifact@v4
+        with:
+          path: determinism-reports/
+          
+      - name: Generate Summary Report
+        run: |
+          echo "📊 Generating determinism test summary..."
+          
+          total_experiments=${{ needs.discover-experiments.outputs.experiment-count }}
+          
+          # Count successes and failures
+          success_count=0
+          failure_count=0
+          
+          for report_dir in determinism-reports/determinism-report-*; do
+            if [ -d "$report_dir" ]; then
+              report_file="$report_dir/determinism_report_*.md"
+              if grep -q "✅ **All determinism tests passed**" $report_file 2>/dev/null; then
+                ((success_count++))
+              else
+                ((failure_count++))
+              fi
+            fi
+          done
+          
+          # Create summary report
+          cat > determinism_summary.md << EOF
+          # Alchemist Faculty Determinism Test Summary
+          
+          **Generated**: $(date -u +"%Y-%m-%d %H:%M UTC")  
+          **Workflow**: ${{ github.workflow }} (${{ github.run_id }})  
+          **Repository**: ${{ github.repository }}  
+          **Branch**: ${{ github.ref_name }}
+          
+          ## Overall Results
+          
+          | Metric | Value |
+          |--------|-------|
+          | Total Experiments Tested | $total_experiments |
+          | Experiments Passed | $success_count |
+          | Experiments Failed | $failure_count |
+          | Success Rate | $(( total_experiments > 0 ? (success_count * 100) / total_experiments : 0 ))% |
+          
+          ## Status by Experiment
+          
+          EOF
+          
+          # Add individual experiment results
+          for report_dir in determinism-reports/determinism-report-*; do
+            if [ -d "$report_dir" ]; then
+              exp_name=$(basename "$report_dir" | sed 's/determinism-report-//')
+              report_file="$report_dir/determinism_report_*.md"
+              
+              if grep -q "✅ **All determinism tests passed**" $report_file 2>/dev/null; then
+                echo "- ✅ **$exp_name** - All tests passed" >> determinism_summary.md
+              else
+                echo "- ❌ **$exp_name** - Some tests failed" >> determinism_summary.md
+              fi
+            fi
+          done
+          
+          cat >> determinism_summary.md << EOF
+          
+          ## Recommendations
+          
+          EOF
+          
+          if [ $failure_count -eq 0 ]; then
+            echo "🎉 **Excellent!** All experiments demonstrate deterministic behavior. The Alchemist Faculty automation pipeline is operating consistently and reproducibly." >> determinism_summary.md
+          else
+            echo "⚠️ **Action Required** - Some experiments show non-deterministic behavior. Please:" >> determinism_summary.md
+            echo "" >> determinism_summary.md
+            echo "1. Review individual experiment reports for specific failures" >> determinism_summary.md
+            echo "2. Check for proper random seed initialization in experiment code" >> determinism_summary.md
+            echo "3. Verify consistent environment setup across test runs" >> determinism_summary.md
+            echo "4. Consider adding determinism safeguards to affected components" >> determinism_summary.md
+          fi
+          
+          echo "" >> determinism_summary.md
+          echo "*For detailed results, see individual experiment reports in the workflow artifacts.*" >> determinism_summary.md
+          
+          echo "📄 Summary report generated"
+          
+      - name: Upload Summary Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: determinism-summary-report
+          path: determinism_summary.md
+          retention-days: 90
+          
+      - name: Post Summary Comment (PR)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summaryContent = fs.readFileSync('determinism_summary.md', 'utf8');
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🧪 Alchemist Faculty Determinism Test Results
+              
+              ${summaryContent}
+              
+              **Workflow Run**: [${context.runId}](${context.payload.repository.html_url}/actions/runs/${context.runId})`
+            });
+
+  cleanup:
+    name: 'Cleanup Test Artifacts'
+    runs-on: ubuntu-latest
+    needs: [validate-determinism, summary-report]
+    if: always()
+    
+    steps:
+      - name: Cleanup Temporary Files
+        run: |
+          echo "🧹 Cleaning up temporary test files..."
+          # Any cleanup operations would go here
+          echo "✅ Cleanup completed"

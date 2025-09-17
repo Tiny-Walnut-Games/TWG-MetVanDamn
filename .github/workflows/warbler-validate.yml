@@ -1,0 +1,110 @@
+name: 🎭 Warbler Validation
+
+on:
+  pull_request:
+    paths:
+      - 'packages/warbler-core/**'
+      - 'packs/warbler-pack-**'
+      - 'scripts/validate-warbler-pack.mjs'
+      - 'scripts/simulate-warble.mjs'
+      - 'package.json'
+      - 'tsconfig.base.json'
+  push:
+    branches: [ main ]
+    paths:
+      - 'packages/warbler-core/**'
+      - 'packs/warbler-pack-**'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  warbler-validate:
+    name: 🔍 Validate Warbler System
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout repository
+      uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v3.6.0
+      
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.0.1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: 📦 Install dependencies
+      run: |
+        npm ci
+        echo "📊 Dependency installation complete"
+        
+    - name: 🔨 Build warbler-core
+      run: |
+        cd packages/warbler-core
+        npm run build
+        echo "✅ Warbler core built successfully"
+        
+    - name: 🧪 Test warbler-core
+      run: |
+        cd packages/warbler-core
+        npm test
+        echo "✅ Warbler core tests passed"
+        
+    - name: 🔨 Build content packs
+      run: |
+        echo "Building warbler-pack-core..."
+        cd packs/warbler-pack-core
+        npm run build
+        echo "✅ Core pack built successfully"
+        
+        echo "Building warbler-pack-faction-politics..."
+        cd ../warbler-pack-faction-politics
+        npm run build
+        echo "✅ Politics pack built successfully"
+        
+    - name: ✅ Validate pack templates
+      run: |
+        echo "🔍 Validating warbler-pack-core templates..."
+        node scripts/validate-warbler-pack.mjs packs/warbler-pack-core/pack/templates.json
+        
+        echo "🔍 Validating warbler-pack-faction-politics templates..."
+        node scripts/validate-warbler-pack.mjs packs/warbler-pack-faction-politics/pack/templates.json
+        
+        echo "✅ All pack validations passed"
+        
+    - name: 🎭 Run conversation simulation
+      run: |
+        echo "🚀 Running warbler simulation..."
+        node scripts/simulate-warble.mjs
+        echo "✅ Simulation completed successfully"
+        
+    - name: 📋 System health check
+      run: |
+        echo "🔍 Checking workspace configuration..."
+        npm run build --if-present
+        npm run test --if-present
+        
+        echo "📊 Warbler ecosystem status:"
+        echo "- warbler-core: $(cd packages/warbler-core && node -e "console.log(require('./package.json').version)")"
+        echo "- warbler-pack-core: $(cd packs/warbler-pack-core && node -e "console.log(require('./package.json').version)")" 
+        echo "- warbler-pack-faction-politics: $(cd packs/warbler-pack-faction-politics && node -e "console.log(require('./package.json').version)")"
+        
+        echo "🎯 Foundation for auto-merge gating by RitualBot Phase 0 is ready!"
+        
+    - name: 🎉 Success notification
+      if: success()
+      run: |
+        echo "🎭✨ Warbler validation workflow completed successfully!"
+        echo "Ready for Dependabot automation and RitualBot Phase 0 auto-merge gating."
+        echo "All conversation templates validated and runtime simulation passed."
+        
+    - name: 📤 Upload simulation artifacts
+      if: always()
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.4.3  
+      with:
+        name: warbler-simulation-results
+        path: |
+          packages/warbler-core/dist/
+          packs/*/dist/
+        retention-days: 7

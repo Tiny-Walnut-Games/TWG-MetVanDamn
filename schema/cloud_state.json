@@ -1,0 +1,10 @@
+{
+  "_comment": "Warbler cloud state: ephemeral mist lines derived from molten glyphs (evaporation phase).",
+  "version": 1,
+  "warbler_cloud": {
+    "mist_lines": [],
+    "humidity_index": 0.0,
+    "generation_mode": "balanced",
+    "style_bias": {"mythic": 0.8, "technical": 0.6, "concise": 0.5}
+  }
+}

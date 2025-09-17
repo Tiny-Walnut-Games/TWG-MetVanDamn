@@ -1,0 +1,38 @@
+{
+  "developer_name": "integration_demo_dev",
+  "active_pets": [
+    {
+      "pet_id": "2eb82d3d-88c3-49a8-829d-d36de3aed0b5",
+      "archetype": "scrollhound",
+      "current_level": "baby",
+      "xp": 387,
+      "abilities": [
+        "basic_documentation",
+        "tldl_reading"
+      ],
+      "achievements": [],
+      "adoption_date": "2025-09-02T03:01:39.420363",
+      "last_activity": "2025-09-02T03:01:39.421959",
+      "evolution_history": []
+    },
+    {
+      "pet_id": "29e510cc-13f1-4391-84e3-ba391f66f0e9",
+      "archetype": "chronocat",
+      "current_level": "baby",
+      "xp": 237,
+      "abilities": [
+        "basic_scheduling",
+        "deadline_awareness"
+      ],
+      "achievements": [],
+      "adoption_date": "2025-09-02T03:01:39.421495",
+      "last_activity": "2025-09-02T03:01:39.421967",
+      "evolution_history": []
+    }
+  ],
+  "total_pet_xp": 624,
+  "achievements": [],
+  "opt_out": false,
+  "created_date": "2025-09-02T03:01:39.420336",
+  "last_active": "2025-09-02T03:01:39.421971"
+}
