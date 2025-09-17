@@ -380,25 +380,66 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             var playerInventory = FindObjectOfType<DemoPlayerInventory>();
             var playerCombat = FindObjectOfType<DemoPlayerCombat>();
             
-            // Currency reward
+            // Currency reward - create currency item and add to inventory
             if (currencyReward > 0)
             {
                 Debug.Log($"💰 Gained {currencyReward} currency from secret!");
-                // In full implementation, would add to player inventory
+                
+                if (playerInventory != null)
+                {
+                    var currencyItem = new DemoItem
+                    {
+                        id = "gold_coins",
+                        name = "Gold Coins",
+                        description = $"Valuable gold coins worth {currencyReward} value",
+                        type = ItemType.Material,
+                        rarity = ItemRarity.Common,
+                        stackSize = 99,
+                        currentStack = currencyReward,
+                        value = currencyReward
+                    };
+                    playerInventory.AddItem(currencyItem);
+                }
             }
             
-            // Health bonus
+            // Health bonus - permanent max health increase
             if (grantsHealthBonus)
             {
                 Debug.Log("❤️ Gained permanent health bonus from secret!");
-                // In full implementation, would increase max health
+                
+                if (playerCombat != null)
+                {
+                    // Increase max health permanently by 10
+                    int healthBonus = 10;
+                    playerCombat.maxHealth += healthBonus;
+                    playerCombat.Heal(healthBonus); // Also heal for the bonus amount
+                    Debug.Log($"❤️ Max health increased by {healthBonus}! New max: {playerCombat.maxHealth}");
+                }
             }
             
-            // Mana bonus
+            // Mana bonus - add mana restoration consumable (since there's no mana system, use energy potion)
             if (grantsManaBonus)
             {
                 Debug.Log("💙 Gained permanent mana bonus from secret!");
-                // In full implementation, would increase max mana
+                
+                if (playerInventory != null)
+                {
+                    var energyPotion = new DemoItem
+                    {
+                        id = "energy_potion",
+                        name = "Energy Potion",
+                        description = "Restores energy and provides a speed boost",
+                        type = ItemType.Consumable,
+                        rarity = ItemRarity.Uncommon,
+                        stackSize = 3,
+                        currentStack = 1,
+                        value = 75,
+                        consumableEffect = ConsumableEffect.SpeedBuff,
+                        effectValue = 30 // 30 second speed boost
+                    };
+                    playerInventory.AddItem(energyPotion, 2); // Give 2 energy potions
+                    Debug.Log($"💙 Added {energyPotion.name} x2 to inventory!");
+                }
             }
             
             // Biome-specific rewards based on floor
@@ -407,16 +448,105 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         
         private void ApplyBiomeSpecificReward()
         {
+            var playerInventory = FindObjectOfType<DemoPlayerInventory>();
+            var playerCombat = FindObjectOfType<DemoPlayerCombat>();
+            
             switch (floorIndex)
             {
                 case 0: // Crystal Caverns
                     Debug.Log("💎 Crystal power enhances your defenses!");
+                    if (playerCombat != null)
+                    {
+                        // Grant temporary defense bonus
+                        playerCombat.AddDefenseBonus(5f); // 5 points defense bonus
+                        Debug.Log("🛡️ Crystal defense bonus applied (+5 DEF)!");
+                    }
+                    
+                    // Also give a crystal shard as material
+                    if (playerInventory != null)
+                    {
+                        var crystalShard = new DemoItem
+                        {
+                            id = "crystal_shard",
+                            name = "Crystal Shard",
+                            description = "A sharp crystal fragment that gleams with inner light",
+                            type = ItemType.Material,
+                            rarity = ItemRarity.Rare,
+                            stackSize = 10,
+                            currentStack = 1,
+                            value = 100
+                        };
+                        playerInventory.AddItem(crystalShard);
+                        Debug.Log("💎 Added Crystal Shard to inventory!");
+                    }
                     break;
+                    
                 case 1: // Molten Depths
                     Debug.Log("🔥 Flame essence increases your attack power!");
+                    if (playerCombat != null)
+                    {
+                        // Grant temporary damage bonus
+                        playerCombat.AddDamageBonus(10f); // 10 points damage bonus
+                        Debug.Log("⚔️ Flame damage bonus applied (+10 DMG)!");
+                    }
+                    
+                    // Also give molten essence as material
+                    if (playerInventory != null)
+                    {
+                        var moltenEssence = new DemoItem
+                        {
+                            id = "molten_essence",
+                            name = "Molten Essence",
+                            description = "Liquid fire contained in a crystalline vessel",
+                            type = ItemType.Material,
+                            rarity = ItemRarity.Epic,
+                            stackSize = 5,
+                            currentStack = 1,
+                            value = 200
+                        };
+                        playerInventory.AddItem(moltenEssence);
+                        Debug.Log("🔥 Added Molten Essence to inventory!");
+                    }
                     break;
+                    
                 case 2: // Void Sanctum
                     Debug.Log("🌌 Void energy grants mystical abilities!");
+                    
+                    // Grant a powerful void trinket
+                    if (playerInventory != null)
+                    {
+                        var voidTrinket = new DemoItem
+                        {
+                            id = "void_trinket",
+                            name = "Void Heart",
+                            description = "A mysterious artifact that pulses with otherworldly energy",
+                            type = ItemType.Trinket,
+                            rarity = ItemRarity.Legendary,
+                            stackSize = 1,
+                            currentStack = 1,
+                            value = 500,
+                            trinketStats = new TrinketStats 
+                            { 
+                                healthBonus = 25f, 
+                                damageBonus = 15f, 
+                                defenseBonus = 10f,
+                                speedBonus = 1.2f
+                            }
+                        };
+                        playerInventory.AddItem(voidTrinket);
+                        
+                        // Auto-equip if no trinket equipped
+                        var currentTrinket = playerInventory.GetEquippedItem(EquipmentSlot.Trinket);
+                        if (currentTrinket == null)
+                        {
+                            playerInventory.EquipItem(voidTrinket);
+                            Debug.Log("🌌 Void Heart equipped! All stats increased!");
+                        }
+                        else
+                        {
+                            Debug.Log("🌌 Added Void Heart to inventory!");
+                        }
+                    }
                     break;
             }
         }
@@ -571,29 +701,250 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
                 case PickupType.Health:
                     Debug.Log($"❤️ Restored {value} health points!");
-                    // In full implementation: playerCombat.RestoreHealth(value);
+                    if (playerCombat != null)
+                    {
+                        playerCombat.Heal(value);
+                    }
                     break;
                     
                 case PickupType.Mana:
                     Debug.Log($"💙 Restored {value} mana points!");
-                    // In full implementation: playerCombat.RestoreMana(value);
+                    // Since there's no mana system, give speed boost instead as "energy"
+                    if (playerCombat != null)
+                    {
+                        playerCombat.AddDamageBonus(value * 0.5f); // Convert mana to temporary damage bonus
+                        Debug.Log($"💙 Energy boost applied! +{value * 0.5f} damage for 30 seconds");
+                    }
                     break;
                     
                 case PickupType.Currency:
                     Debug.Log($"💰 Gained {value} currency!");
-                    // In full implementation: playerInventory.AddCurrency(value);
+                    if (playerInventory != null)
+                    {
+                        var goldCoins = new DemoItem
+                        {
+                            id = "gold_coins",
+                            name = "Gold Coins",
+                            description = $"Shiny gold coins worth {value} value",
+                            type = ItemType.Material,
+                            rarity = ItemRarity.Common,
+                            stackSize = 99,
+                            currentStack = value,
+                            value = value
+                        };
+                        playerInventory.AddItem(goldCoins);
+                    }
                     break;
                     
                 case PickupType.Equipment:
                     Debug.Log("⚔️ Found new equipment!");
-                    // In full implementation: playerInventory.AddEquipment(GenerateRandomEquipment());
+                    if (playerInventory != null)
+                    {
+                        var randomEquipment = GenerateRandomEquipment();
+                        playerInventory.AddItem(randomEquipment);
+                        Debug.Log($"⚔️ Added {randomEquipment.name} to inventory!");
+                    }
                     break;
                     
                 case PickupType.Consumable:
                     Debug.Log("🧪 Found consumable item!");
-                    // In full implementation: playerInventory.AddConsumable(GenerateRandomConsumable());
+                    if (playerInventory != null)
+                    {
+                        var randomConsumable = GenerateRandomConsumable();
+                        playerInventory.AddItem(randomConsumable);
+                        Debug.Log($"🧪 Added {randomConsumable.name} to inventory!");
+                    }
                     break;
             }
+        }
+        
+        private DemoItem GenerateRandomEquipment()
+        {
+            // Generate random equipment based on dungeon floor and pickup value
+            var equipmentTypes = new[] { ItemType.Weapon, ItemType.Armor, ItemType.Trinket };
+            var selectedType = equipmentTypes[Random.Range(0, equipmentTypes.Length)];
+            
+            var rarities = new[] { ItemRarity.Common, ItemRarity.Uncommon, ItemRarity.Rare };
+            var selectedRarity = rarities[Random.Range(0, rarities.Length)];
+            
+            switch (selectedType)
+            {
+                case ItemType.Weapon:
+                    return new DemoItem
+                    {
+                        id = $"random_weapon_{Random.Range(1000, 9999)}",
+                        name = GetRandomWeaponName(selectedRarity),
+                        description = "A weapon found in the dungeon depths",
+                        type = ItemType.Weapon,
+                        rarity = selectedRarity,
+                        stackSize = 1,
+                        value = value * GetRarityMultiplier(selectedRarity),
+                        weaponStats = new WeaponStats 
+                        { 
+                            damage = value + Random.Range(5, 15) * GetRarityMultiplier(selectedRarity),
+                            range = Random.Range(1.5f, 4f),
+                            attackSpeed = Random.Range(0.8f, 1.4f)
+                        }
+                    };
+                    
+                case ItemType.Armor:
+                    return new DemoItem
+                    {
+                        id = $"random_armor_{Random.Range(1000, 9999)}",
+                        name = GetRandomArmorName(selectedRarity),
+                        description = "Protective gear found in the dungeon",
+                        type = ItemType.Armor,
+                        rarity = selectedRarity,
+                        stackSize = 1,
+                        value = value * GetRarityMultiplier(selectedRarity),
+                        armorStats = new ArmorStats 
+                        { 
+                            defense = Random.Range(3, 8) * GetRarityMultiplier(selectedRarity),
+                            healthBonus = Random.Range(10, 25) * GetRarityMultiplier(selectedRarity)
+                        }
+                    };
+                    
+                case ItemType.Trinket:
+                    return new DemoItem
+                    {
+                        id = $"random_trinket_{Random.Range(1000, 9999)}",
+                        name = GetRandomTrinketName(selectedRarity),
+                        description = "A mystical trinket with magical properties",
+                        type = ItemType.Trinket,
+                        rarity = selectedRarity,
+                        stackSize = 1,
+                        value = value * GetRarityMultiplier(selectedRarity),
+                        trinketStats = new TrinketStats 
+                        { 
+                            healthBonus = Random.Range(5f, 15f),
+                            damageBonus = Random.Range(2f, 8f),
+                            defenseBonus = Random.Range(1f, 5f),
+                            speedBonus = Random.Range(1.05f, 1.15f)
+                        }
+                    };
+                    
+                default:
+                    return GenerateRandomEquipment(); // Fallback recursion
+            }
+        }
+        
+        private DemoItem GenerateRandomConsumable()
+        {
+            var consumableTypes = new[] 
+            { 
+                ConsumableEffect.Heal, 
+                ConsumableEffect.DamageBuff, 
+                ConsumableEffect.DefenseBuff, 
+                ConsumableEffect.SpeedBuff 
+            };
+            var selectedEffect = consumableTypes[Random.Range(0, consumableTypes.Length)];
+            
+            return new DemoItem
+            {
+                id = $"random_consumable_{Random.Range(1000, 9999)}",
+                name = GetConsumableName(selectedEffect),
+                description = GetConsumableDescription(selectedEffect),
+                type = ItemType.Consumable,
+                rarity = ItemRarity.Common,
+                stackSize = 5,
+                value = Random.Range(20, 60),
+                consumableEffect = selectedEffect,
+                effectValue = GetConsumableEffectValue(selectedEffect)
+            };
+        }
+        
+        private string GetRandomWeaponName(ItemRarity rarity)
+        {
+            var commonNames = new[] { "Iron Sword", "Bronze Axe", "Wooden Staff", "Stone Mace" };
+            var uncommonNames = new[] { "Steel Blade", "Silver Axe", "Mystical Staff", "Iron Hammer" };
+            var rareNames = new[] { "Enchanted Sword", "Dwarven Axe", "Arcane Staff", "Blessed Mace" };
+            
+            return rarity switch
+            {
+                ItemRarity.Common => commonNames[Random.Range(0, commonNames.Length)],
+                ItemRarity.Uncommon => uncommonNames[Random.Range(0, uncommonNames.Length)],
+                ItemRarity.Rare => rareNames[Random.Range(0, rareNames.Length)],
+                _ => "Unknown Weapon"
+            };
+        }
+        
+        private string GetRandomArmorName(ItemRarity rarity)
+        {
+            var commonNames = new[] { "Leather Vest", "Cloth Robes", "Chain Mail", "Hide Armor" };
+            var uncommonNames = new[] { "Steel Plate", "Reinforced Leather", "Mage Robes", "Scaled Armor" };
+            var rareNames = new[] { "Enchanted Plate", "Dragon Scale", "Archmage Robes", "Blessed Mail" };
+            
+            return rarity switch
+            {
+                ItemRarity.Common => commonNames[Random.Range(0, commonNames.Length)],
+                ItemRarity.Uncommon => uncommonNames[Random.Range(0, uncommonNames.Length)],
+                ItemRarity.Rare => rareNames[Random.Range(0, rareNames.Length)],
+                _ => "Unknown Armor"
+            };
+        }
+        
+        private string GetRandomTrinketName(ItemRarity rarity)
+        {
+            var commonNames = new[] { "Simple Ring", "Leather Pouch", "Bone Charm", "Iron Pendant" };
+            var uncommonNames = new[] { "Silver Ring", "Mystic Amulet", "Carved Idol", "Crystal Pendant" };
+            var rareNames = new[] { "Ring of Power", "Ancient Amulet", "Sacred Idol", "Void Crystal" };
+            
+            return rarity switch
+            {
+                ItemRarity.Common => commonNames[Random.Range(0, commonNames.Length)],
+                ItemRarity.Uncommon => uncommonNames[Random.Range(0, uncommonNames.Length)],
+                ItemRarity.Rare => rareNames[Random.Range(0, rareNames.Length)],
+                _ => "Unknown Trinket"
+            };
+        }
+        
+        private string GetConsumableName(ConsumableEffect effect)
+        {
+            return effect switch
+            {
+                ConsumableEffect.Heal => "Health Potion",
+                ConsumableEffect.DamageBuff => "Strength Potion",
+                ConsumableEffect.DefenseBuff => "Defense Potion",
+                ConsumableEffect.SpeedBuff => "Speed Potion",
+                _ => "Unknown Potion"
+            };
+        }
+        
+        private string GetConsumableDescription(ConsumableEffect effect)
+        {
+            return effect switch
+            {
+                ConsumableEffect.Heal => "Restores health when consumed",
+                ConsumableEffect.DamageBuff => "Temporarily increases damage output",
+                ConsumableEffect.DefenseBuff => "Temporarily increases defense",
+                ConsumableEffect.SpeedBuff => "Temporarily increases movement speed",
+                _ => "A mysterious potion with unknown effects"
+            };
+        }
+        
+        private int GetConsumableEffectValue(ConsumableEffect effect)
+        {
+            return effect switch
+            {
+                ConsumableEffect.Heal => Random.Range(30, 80),
+                ConsumableEffect.DamageBuff => Random.Range(15, 30),
+                ConsumableEffect.DefenseBuff => Random.Range(10, 20),
+                ConsumableEffect.SpeedBuff => Random.Range(20, 40), // Duration in seconds
+                _ => 25
+            };
+        }
+        
+        private int GetRarityMultiplier(ItemRarity rarity)
+        {
+            return rarity switch
+            {
+                ItemRarity.Common => 1,
+                ItemRarity.Uncommon => 2,
+                ItemRarity.Rare => 3,
+                ItemRarity.Epic => 4,
+                ItemRarity.Legendary => 5,
+                _ => 1
+            };
         }
         
         private void OnDrawGizmosSelected()
