@@ -117,9 +117,9 @@ python3 src/SymbolicLinter/symbolic_linter.py --path src/
 
 #### **4. First Time Setup**
 
-1. Open Unity and load the project
+1. **Follow the [Complete Setup Guide](docs/COMPLETE-METVANDAMN-SETUP-GUIDE.md)** - *The ultimate "clone to working world" experience*
 2. Navigate to `Assets/Scenes/` for example scenes
-3. Check `Assets/MetVanDAMN/Authoring/README.md` for authoring workflow
+3. Check [Documentation Hub](docs/README.md) for comprehensive guides
 4. Review `MANIFESTO.md` for project philosophy and development practices
 5. Create your first TLDL entry: `scripts/init_agent_context.sh --create-tldl "MyFirstAdventure"`
 
@@ -329,6 +329,8 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### **Quick Contribution Checklist**
 
 - [ ] Read the [MANIFESTO.md](MANIFESTO.md) and embrace the **Save The Butts!** philosophy
+- [ ] **NEW**: Follow the [Complete MetVanDAMN Setup Guide](docs/COMPLETE-METVANDAMN-SETUP-GUIDE.md) for immediate success
+- [ ] Browse the [Documentation Hub](docs/README.md) for comprehensive guides and references
 - [ ] Create TLDL entries documenting your work
 - [ ] Follow ECS/DOTS best practices
 - [ ] Add tests for new functionality
@@ -341,10 +343,11 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ### **Essential Documentation**
 
+- **[📚 Documentation Hub](docs/README.md)**: Comprehensive guide index and navigation
+- **[🗺️ Complete Setup Guide](docs/COMPLETE-METVANDAMN-SETUP-GUIDE.md)**: From clone to working world in 15 minutes
 - **[MANIFESTO.md](MANIFESTO.md)**: Project philosophy and "Save The Butts!" doctrine
 - **[CONTRIBUTING.md](CONTRIBUTING.md)**: Comprehensive contribution guidelines
 - **[CHANGELOG.md](CHANGELOG.md)**: Release history and feature evolution
-- **[Assets/Plugins/TLDA/docs/Copilot-Setup.md](Assets/Plugins/TLDA/docs/Copilot-Setup.md)**: AI collaboration setup
 
 ### **Living Dev Log Archives**
 
