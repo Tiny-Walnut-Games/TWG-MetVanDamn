@@ -76,7 +76,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             // 9. Room masking and transitions
             SetupRoomMaskingSystem(projection);
 
-            // 10. Demo-specific setup and validation
+            // 10. Map generation system
+            SetupMapGenerationSystem();
+
+            // 11. Demo-specific setup and validation
             SetupDemoValidation(sceneName, projection);
 
             // Save the scene
@@ -84,7 +87,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             EditorSceneManager.SaveScene(newScene, scenePath);
 
             Debug.Log($"✅ Complete demo scene created: {scenePath}");
-            Debug.Log($"🎮 Hit Play to experience the full MetVanDAMN demo with player movement, combat, AI, inventory, and world generation!");
+            Debug.Log($"🎮 Hit Play to experience the full MetVanDAMN demo with player movement, combat, AI, inventory, world generation, and interactive maps!");
         }
 
         /// <summary>
@@ -391,6 +394,27 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             var transitionGO = new GameObject("Room Transition Detector");
             transitionGO.transform.SetParent(maskingSystemGO.transform);
             var transitionDetector = transitionGO.AddComponent<DemoRoomTransitionDetector>();
+        }
+
+        /// <summary>
+        /// Sets up map generation system for world visualization
+        /// </summary>
+        private static void SetupMapGenerationSystem()
+        {
+            var mapSystemGO = new GameObject("Map Generation System");
+            
+            // Add the MetVanDAMN map generator
+            var mapGenerator = mapSystemGO.AddComponent<MetVanDAMNMapGenerator>();
+            
+            // Configure map settings for optimal demo experience
+            mapGenerator.autoGenerateOnWorldSetup = true;
+            mapGenerator.showMinimapInGame = true;
+            mapGenerator.generateDetailedWorldMap = true;
+            mapGenerator.exportMapAsImage = false; // Disabled by default in demo
+            
+            // Set reasonable map resolution for demo
+            mapGenerator.mapResolution = 512;
+            mapGenerator.minimapSize = 200;
         }
 
         /// <summary>

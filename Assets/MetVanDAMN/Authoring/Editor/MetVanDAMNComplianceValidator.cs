@@ -200,6 +200,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             
             // Validate inventory system
             ValidateInventorySystem();
+            
+            // Validate map generation system
+            ValidateMapGenerationSystem();
         }
 
         private void ValidateMovementSystem()
@@ -355,6 +358,32 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
                 {
                     lastReport.warningChecks.Add($"Demo scene not found (will be created on demand): {sceneName}");
                 }
+            }
+        }
+
+        private void ValidateMapGenerationSystem()
+        {
+            var mapSystemPath = "Assets/MetVanDAMN/Authoring/MetVanDAMNMapGenerator.cs";
+            if (File.Exists(mapSystemPath))
+            {
+                var content = File.ReadAllText(mapSystemPath);
+                
+                string[] requiredFeatures = { "minimap", "detailed", "export", "biome", "district", "room" };
+                foreach (var feature in requiredFeatures)
+                {
+                    if (content.ToLower().Contains(feature))
+                    {
+                        lastReport.passedChecks.Add($"✓ Map generation feature: {feature}");
+                    }
+                    else
+                    {
+                        lastReport.failedChecks.Add($"Missing map generation feature: {feature}");
+                    }
+                }
+            }
+            else
+            {
+                lastReport.failedChecks.Add("Missing map generation system: MetVanDAMNMapGenerator");
             }
         }
 
@@ -523,6 +552,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
         public bool requireInventorySystem = true;
         public bool requireLootSystem = true;
         public bool requireEnemyAI = true;
+        public bool requireMapGeneration = true;
 
         private void Start()
         {
@@ -568,6 +598,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             if (requireEnemyAI && !FindObjectOfType<DemoEnemyAI>() && !FindObjectOfType<DemoBossAI>())
             {
                 issues.Add("Missing enemy AI components (DemoEnemyAI or DemoBossAI)");
+                allPassed = false;
+            }
+
+            // Check for map generation system
+            if (requireMapGeneration && !FindObjectOfType<MetVanDAMNMapGenerator>())
+            {
+                issues.Add("Missing MetVanDAMNMapGenerator component - world map generation will not work");
                 allPassed = false;
             }
 
