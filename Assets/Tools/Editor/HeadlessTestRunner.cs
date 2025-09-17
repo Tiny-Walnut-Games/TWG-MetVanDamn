@@ -136,7 +136,7 @@ namespace TinyWalnutGames.Tools.Editor
                 
             public void TestFinished(ITestResultAdaptor result) 
                 { 
-                var status = result.ResultState == "Passed" ? "✅" : "❌";
+                var status = result.ResultState == "Passed" ? "[PASS]" : "[FAIL]";
                 Debug.Log($"HeadlessTestRunner: {status} {result.FullName} - {result.ResultState}");
                 if (!string.IsNullOrEmpty(result.Message))
                     {
