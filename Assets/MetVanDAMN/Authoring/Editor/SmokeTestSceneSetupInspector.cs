@@ -216,7 +216,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					EditorGUILayout.LabelField($"🎲 Current Seed: {_cachedCurrentSeed}");
 					}
 
-				EditorGUILayout.LabelField($"📊 Next update in: {Mathf.Ceil(UPDATE_INTERVAL - (currentTime - _lastUpdateTime))}s", EditorStyles.miniLabel);
+				EditorGUILayout.LabelField($"📊 Next update in: {Mathf.Max(0, Mathf.Ceil(UPDATE_INTERVAL - (currentTime - _lastUpdateTime)))}s", EditorStyles.miniLabel);
 				EditorGUILayout.EndVertical();
 				}
 			else
