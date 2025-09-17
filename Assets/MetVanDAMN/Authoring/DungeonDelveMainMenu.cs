@@ -561,7 +561,22 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             if (bossesDefeatedText)
             {
                 int defeated = 0;
-                // Count defeated bosses - simplified for demo
+                // Count actually defeated bosses from the dungeon mode
+                if (currentDungeonMode != null)
+                {
+                    // Access the dungeon mode's boss tracking to get actual count
+                    foreach (var boss in currentDungeonMode.ActiveBosses)
+                    {
+                        if (boss != null)
+                        {
+                            var bossAI = boss.GetComponent<DemoBossAI>();
+                            if (bossAI != null && bossAI.currentHealth <= 0)
+                            {
+                                defeated++;
+                            }
+                        }
+                    }
+                }
                 bossesDefeatedText.text = $"Bosses: {defeated}/3";
             }
             
@@ -575,7 +590,21 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             if (progressionLocksText)
             {
                 int unlockedCount = 0;
-                // Count unlocked locks - simplified for demo  
+                // Count actually unlocked progression locks from the dungeon mode
+                if (currentDungeonMode != null)
+                {
+                    foreach (var lockObj in currentDungeonMode.ActiveProgressionLocks)
+                    {
+                        if (lockObj != null)
+                        {
+                            var lockComponent = lockObj.GetComponent<DungeonProgressionLock>();
+                            if (lockComponent != null && lockComponent.IsUnlocked)
+                            {
+                                unlockedCount++;
+                            }
+                        }
+                    }
+                }
                 progressionLocksText.text = $"Locks: {unlockedCount}/3";
             }
         }
@@ -628,14 +657,32 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         
         private void ExitToMainMenu()
         {
-            // In a full game, this would return to the actual main menu
-            // For now, just reset the dungeon delve menu
+            // Properly handle exit to main menu with scene transition
             if (isInDungeon && currentDungeonMode)
             {
                 currentDungeonMode.AbortDungeon();
             }
-            ShowMainMenu();
-            UpdateStatusText("Thank you for playing MetVanDAMN Dungeon Delve Mode!");
+            
+            // Check if there's a specific main menu scene to load
+            var sceneManager = FindObjectOfType<DungeonDelveSceneManager>();
+            if (sceneManager != null)
+            {
+                sceneManager.LoadMainMenuScene();
+            }
+            else
+            {
+                // If no scene manager, try to load a main menu scene by name
+                try
+                {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+                }
+                catch (System.Exception)
+                {
+                    // If MainMenu scene doesn't exist, just reset current scene
+                    ShowMainMenu();
+                    UpdateStatusText("Returned to Dungeon Delve main menu. Thank you for playing MetVanDAMN!");
+                }
+            }
         }
         
         private void GenerateRandomSeed()

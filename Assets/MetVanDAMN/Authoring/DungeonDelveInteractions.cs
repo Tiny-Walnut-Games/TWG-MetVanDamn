@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring
 {
@@ -83,12 +84,40 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private void ShowInteractionPrompt()
         {
             Debug.Log($"🔑 Press E to interact with {lockName}");
-            // In a full implementation, this would show UI prompt
+            
+            // Create actual UI prompt
+            if (GameObject.FindObjectOfType<Canvas>() != null)
+            {
+                var canvas = GameObject.FindObjectOfType<Canvas>();
+                var promptGO = new GameObject("LockInteractionPrompt");
+                promptGO.transform.SetParent(canvas.transform, false);
+                
+                var promptText = promptGO.AddComponent<Text>();
+                promptText.text = $"Press E to unlock {lockName}";
+                promptText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                promptText.fontSize = 18;
+                promptText.color = Color.yellow;
+                promptText.alignment = TextAnchor.MiddleCenter;
+                
+                var rectTransform = promptText.GetComponent<RectTransform>();
+                rectTransform.anchorMin = new Vector2(0.5f, 0.8f);
+                rectTransform.anchorMax = new Vector2(0.5f, 0.8f);
+                rectTransform.anchoredPosition = Vector2.zero;
+                rectTransform.sizeDelta = new Vector2(300, 30);
+                
+                // Store reference for cleanup
+                promptGO.name = $"LockPrompt_{GetInstanceID()}";
+            }
         }
         
         private void HideInteractionPrompt()
         {
-            // Hide UI prompt
+            // Find and destroy the prompt UI element
+            var promptGO = GameObject.Find($"LockPrompt_{GetInstanceID()}");
+            if (promptGO != null)
+            {
+                DestroyImmediate(promptGO);
+            }
         }
         
         private void TryUnlock()
@@ -112,18 +141,56 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         
         private bool CheckUnlockConditions()
         {
-            // For demo purposes, allow unlocking if the previous floor boss is defeated
-            if (floorIndex == 0) return true; // First lock can always be unlocked
+            // First lock can always be unlocked (entry to dungeon)
+            if (floorIndex == 0) return true;
             
-            if (dungeonMode && floorIndex > 0)
+            if (dungeonMode)
             {
                 // Check if previous floor boss is defeated
-                // This is a simplified check - in a full implementation, 
-                // you might require specific items or achievements
-                return dungeonMode.CurrentFloor >= floorIndex;
+                // For floor 1 lock, need to be on floor 1 or higher
+                // For floor 2 lock, need to be on floor 2 or higher
+                bool floorProgressMet = dungeonMode.CurrentFloor >= floorIndex;
+                
+                // Also check that we have the required progression state
+                // This could include having collected specific items, defeating specific enemies, etc.
+                bool hasRequiredProgression = ValidateSpecificUnlockRequirements();
+                
+                return floorProgressMet && hasRequiredProgression;
             }
             
-            return true; // Allow unlocking for demo purposes
+            return false; // Cannot unlock without dungeon mode reference
+        }
+        
+        private bool ValidateSpecificUnlockRequirements()
+        {
+            switch (floorIndex)
+            {
+                case 0: // Crystal Key - always available at start
+                    return true;
+                    
+                case 1: // Flame Essence - requires completing Crystal Caverns
+                    // Check if player has explored sufficient areas on previous floor
+                    if (dungeonMode != null)
+                    {
+                        int secretsFound = dungeonMode.TotalSecretsFound;
+                        return secretsFound >= 1; // Must find at least 1 secret to prove exploration
+                    }
+                    return false;
+                    
+                case 2: // Void Core - requires completing Molten Depths
+                    // Check if player has demonstrated mastery (found multiple secrets, defeated bosses)
+                    if (dungeonMode != null)
+                    {
+                        int secretsFound = dungeonMode.TotalSecretsFound;
+                        bool sufficientExploration = secretsFound >= 3; // Must find secrets on multiple floors
+                        bool adequateProgress = dungeonMode.CurrentFloor >= 2;
+                        return sufficientExploration && adequateProgress;
+                    }
+                    return false;
+                    
+                default:
+                    return false;
+            }
         }
         
         private void ShowUnlockRequirements()
