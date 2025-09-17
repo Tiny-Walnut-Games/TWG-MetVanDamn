@@ -64,6 +64,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\DistrictBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\EcsPrefabRegistryGizmoGenerator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\ReadyDemoSceneMenu.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\CompleteDemoSceneGenerator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WfcTilePrototypeBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNAuthoringSampleCreator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\SceneEventTrace.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileEditor.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\SectorRoomHierarchyWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\SubSceneInternalScanner.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MapGenerationMenu.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\BiomeFieldBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldBootstrapBaker.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Bakers\WorldConfigurationBaker.cs" />
@@ -86,6 +88,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\Gizmos\MetVDGizmoSettings.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\WorldBootstrapDemo.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVDWorldDebugWindow.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\MetVanDAMNComplianceValidator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\BiomeArtProfileSamples.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\RitualLock.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\ProceduralLayoutPreview.cs" />

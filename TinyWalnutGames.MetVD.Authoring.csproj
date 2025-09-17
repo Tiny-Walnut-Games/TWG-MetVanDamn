@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\MetVanDAMN\Authoring\EnemyNamingAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoPlayerInventory.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\SudoActionDispatcherSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\DemoBossController.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\WorldConfigurationAuthoring.cs" />
@@ -68,11 +69,16 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfile.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\PrefabRegistry.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\WorldBootstrapAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoBossAI.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoInventoryUI.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoEnemyAI.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtAutoAssignmentSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\NavigationValidationSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoLootManager.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\GateConditionAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\NavigationGraphBuildSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\SpawnableAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoSceneValidator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileReference.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeTransitionSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\WorldAuthoring.cs" />
@@ -80,15 +86,20 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\BossAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\SudoActionRequestConsumerSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\WfcTilePrototypeAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoComponentPlaceholders.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileLibrary.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtIntegrationSystem.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\SudoCodeSnippetAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeElevationResolverSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoTreasureChest.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\MetVanDAMNMapGenerator.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoPlayerCombat.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeArtProfileLibraryAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\BiomeFieldAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\ConnectionAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\EcsPrefabRegistryAuthoring.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\DemoPlayerMovement.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\SudoActionHintAuthoring.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\DistrictAuthoring.cs" />
   </ItemGroup>
