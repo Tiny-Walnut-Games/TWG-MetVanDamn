@@ -362,7 +362,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                         
                         // Apply the enhanced scan range
                         var modifier = new StatModifier(upgrade.Id, "scanrange", ModifierType.Additive, upgrade.Value * 10f);
-                        activeModifiers.Add(modifier);
+                        ApplyStatModifier(modifier);
                         
                         // Also enable auto-discovery of nearby interactive elements
                         StartCoroutine(MapRevealCoroutine(newScanRange));
