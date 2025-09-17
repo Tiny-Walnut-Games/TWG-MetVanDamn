@@ -115,7 +115,7 @@ if ($unityAvailable) {
                     $summary = $trx.TestRun.ResultSummary
                     if ($summary) {
                         $passed = [int]$summary.Counters.passed
-                        $failed = [int]$summary.Counters.failed  
+                        $failed = [int]$summary.Counters.failed
                         $skipped = [int]$summary.Counters.inconclusive + [int]$summary.Counters.notExecuted
                         
                         $totalPassed += $passed
