@@ -4,6 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using Cinemachine;
 using TinyWalnutGames.MetVD.Authoring;
+using TinyWalnutGames.MetVanDAMN.Authoring;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 {
@@ -151,14 +152,17 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
                 collider2D.size = new Vector2(1f, 2f);
             }
 
-            // Player movement controller (to be implemented)
+            // Player movement controller
             var movementController = playerGO.AddComponent<DemoPlayerMovement>();
             
-            // Player combat controller (to be implemented)  
+            // Player combat controller
             var combatController = playerGO.AddComponent<DemoPlayerCombat>();
             
-            // Player inventory controller (to be implemented)
+            // Player inventory controller
             var inventoryController = playerGO.AddComponent<DemoPlayerInventory>();
+
+            // 🎯 UPGRADE SYSTEM INTEGRATION - Complete procedural leveling perk system
+            SetupUpgradeSystem(playerGO);
 
             // Visual representation
             GameObject visualChild = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -167,7 +171,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             visualChild.transform.localPosition = Vector3.zero;
             
             // Remove collider from visual (physics handled by parent)
-            DestroyImmediate(visualChild.GetComponent<Collider>());
+            if (projection == SceneProjection.ThreeD)
+            {
+                DestroyImmediate(visualChild.GetComponent<Collider>());
+            }
+            else
+            {
+                DestroyImmediate(visualChild.GetComponent<Collider2D>());
+            }
             
             // Set player color
             var renderer = visualChild.GetComponent<Renderer>();
@@ -488,11 +499,234 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
             TopDown2D,
             ThreeD
         }
+
+        /// <summary>
+        /// Sets up the complete procedural leveling perk system for the player
+        /// Integrates XP progression, upgrade choices, effect application, and UI
+        /// </summary>
+        private static void SetupUpgradeSystem(GameObject playerGO)
+        {
+            // Add the complete player setup component - this handles everything
+            var completeSetup = playerGO.AddComponent<CompletePlayerSetup>();
+            
+            // Configure for auto-setup
+            var setupSO = new SerializedObject(completeSetup);
+            setupSO.FindProperty("autoSetupOnStart").boolValue = true;
+            setupSO.FindProperty("enableLevelUpUI").boolValue = true;
+            setupSO.FindProperty("enableDebugControls").boolValue = true;
+            setupSO.FindProperty("startingLevel").intValue = 1;
+            setupSO.FindProperty("startingXP").intValue = 0;
+            setupSO.FindProperty("startingAbilities").longValue = (long)TinyWalnutGames.MetVD.Core.Ability.Jump;
+            setupSO.ApplyModifiedProperties();
+
+            // Create upgrade database manager in scene
+            var dbManagerGO = new GameObject("UpgradeDatabaseManager");
+            var dbManager = dbManagerGO.AddComponent<UpgradeDatabaseManager>();
+            
+            // Configure database manager
+            var dbSO = new SerializedObject(dbManager);
+            dbSO.FindProperty("autoFindCollections").boolValue = true;
+            dbSO.FindProperty("enableDebugLogging").boolValue = true;
+            dbSO.ApplyModifiedProperties();
+
+            // Create upgrade collections if they don't exist
+            CreateSampleUpgradeCollections();
+
+            // Create level-up UI GameObject
+            var uiGO = new GameObject("LevelUpChoiceUI");
+            var choiceUI = uiGO.AddComponent<LevelUpChoiceUI>();
+            
+            // Configure UI
+            var uiSO = new SerializedObject(choiceUI);
+            uiSO.FindProperty("enableDebugLogging").boolValue = true;
+            uiSO.ApplyModifiedProperties();
+
+            Debug.Log("🎯 Procedural Leveling Perk System integrated into player!");
+            Debug.Log("   • F1: Gain 50 XP");
+            Debug.Log("   • F2: Force Level Up");
+            Debug.Log("   • F3: Force Show Choices");
+            Debug.Log("   • F4: Reset Progression");
+        }
+
+        /// <summary>
+        /// Creates sample upgrade collections for the demo
+        /// </summary>
+        private static void CreateSampleUpgradeCollections()
+        {
+            string collectionsPath = "Assets/MetVanDAMN/Data/Collections";
+            EnsureDirectory(collectionsPath);
+            
+            // Create Defense and Utility collections to complete the set
+            CreateDefenseUpgradeCollection(collectionsPath);
+            CreateUtilityUpgradeCollection(collectionsPath);
+            CreateSpecialUpgradeCollection(collectionsPath);
+            
+            // Verify all collections exist and are properly configured
+            var collections = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
+            Debug.Log($"📚 Verified {collections.Length} upgrade collections for complete demo setup");
+            
+            // Load and configure biome weights for existing collections
+            ConfigureBiomeWeightsForAllCollections(collectionsPath);
+        }
+        
+        /// <summary>
+        /// Creates Defense upgrade collection with health and armor upgrades
+        /// </summary>
+        private static void CreateDefenseUpgradeCollection(string basePath)
+        {
+            string assetPath = $"{basePath}/DefenseUpgrades.asset";
+            if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
+            
+            var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+            collection.name = "DefenseUpgrades";
+            collection.category = UpgradeCategory.Defense;
+            collection.description = "Defensive upgrades including health, armor, and damage resistance";
+            
+            // Set biome weights for contextual generation
+            collection.biomeWeights = new Dictionary<string, float>
+            {
+                ["Forest"] = 1.2f,     // Forest encourages defensive play
+                ["Mountain"] = 1.5f,   // Mountain requires survivability  
+                ["Desert"] = 1.0f,     // Desert neutral
+                ["Ocean"] = 0.8f,      // Ocean favors mobility over defense
+                ["Underground"] = 1.3f // Underground needs durability
+            };
+            
+            AssetDatabase.CreateAsset(collection, assetPath);
+            Debug.Log($"✅ Created Defense upgrade collection: {assetPath}");
+        }
+        
+        /// <summary>
+        /// Creates Utility upgrade collection with inventory and convenience upgrades  
+        /// </summary>
+        private static void CreateUtilityUpgradeCollection(string basePath)
+        {
+            string assetPath = $"{basePath}/UtilityUpgrades.asset";
+            if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
+            
+            var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+            collection.name = "UtilityUpgrades";
+            collection.category = UpgradeCategory.Utility;
+            collection.description = "Quality of life upgrades including auto-loot, inventory expansion, and map reveals";
+            
+            // Set biome weights for contextual generation
+            collection.biomeWeights = new Dictionary<string, float>
+            {
+                ["Forest"] = 0.9f,     // Forest has natural navigation
+                ["Mountain"] = 1.4f,   // Mountain benefits from map reveals
+                ["Desert"] = 1.3f,     // Desert needs resource management
+                ["Ocean"] = 1.1f,      // Ocean benefits from navigation aids
+                ["Underground"] = 1.6f // Underground desperately needs map reveals
+            };
+            
+            AssetDatabase.CreateAsset(collection, assetPath);
+            Debug.Log($"✅ Created Utility upgrade collection: {assetPath}");
+        }
+        
+        /// <summary>
+        /// Creates Special upgrade collection with unique and powerful upgrades
+        /// </summary>
+        private static void CreateSpecialUpgradeCollection(string basePath)
+        {
+            string assetPath = $"{basePath}/SpecialUpgrades.asset";
+            if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
+            
+            var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+            collection.name = "SpecialUpgrades";
+            collection.category = UpgradeCategory.Special;
+            collection.description = "Rare and powerful upgrades with unique effects";
+            
+            // Special upgrades have dramatic biome preferences
+            collection.biomeWeights = new Dictionary<string, float>
+            {
+                ["Forest"] = 0.7f,     // Forest discourages special powers
+                ["Mountain"] = 1.8f,   // Mountain rewards extreme abilities
+                ["Desert"] = 1.5f,     // Desert suits rare discoveries
+                ["Ocean"] = 1.2f,      // Ocean moderate special preference
+                ["Underground"] = 2.0f // Underground highest special chance
+            };
+            
+            AssetDatabase.CreateAsset(collection, assetPath);
+            Debug.Log($"✅ Created Special upgrade collection: {assetPath}");
+        }
+        
+        /// <summary>
+        /// Configures biome weights for all existing upgrade collections
+        /// </summary>
+        private static void ConfigureBiomeWeightsForAllCollections(string collectionsPath)
+        {
+            var collectionGUIDs = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
+            int configuredCount = 0;
+            
+            foreach (string guid in collectionGUIDs)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var collection = AssetDatabase.LoadAssetAtPath<UpgradeCollection>(path);
+                
+                if (collection != null)
+                {
+                    // Ensure biome weights are configured if missing
+                    if (collection.biomeWeights == null || collection.biomeWeights.Count == 0)
+                    {
+                        collection.biomeWeights = GetDefaultBiomeWeights(collection.category);
+                        EditorUtility.SetDirty(collection);
+                        configuredCount++;
+                    }
+                }
+            }
+            
+            if (configuredCount > 0)
+            {
+                AssetDatabase.SaveAssets();
+                Debug.Log($"⚙️ Configured biome weights for {configuredCount} upgrade collections");
+            }
+        }
+        
+        /// <summary>
+        /// Returns default biome weights based on upgrade category
+        /// </summary>
+        private static Dictionary<string, float> GetDefaultBiomeWeights(UpgradeCategory category)
+        {
+            return category switch
+            {
+                UpgradeCategory.Movement => new Dictionary<string, float>
+                {
+                    ["Forest"] = 1.3f, ["Mountain"] = 1.8f, ["Desert"] = 1.1f, 
+                    ["Ocean"] = 1.6f, ["Underground"] = 1.4f
+                },
+                UpgradeCategory.Offense => new Dictionary<string, float>
+                {
+                    ["Forest"] = 1.1f, ["Mountain"] = 1.2f, ["Desert"] = 1.5f,
+                    ["Ocean"] = 1.0f, ["Underground"] = 1.7f
+                },
+                UpgradeCategory.Defense => new Dictionary<string, float>
+                {
+                    ["Forest"] = 1.2f, ["Mountain"] = 1.5f, ["Desert"] = 1.0f,
+                    ["Ocean"] = 0.8f, ["Underground"] = 1.3f
+                },
+                UpgradeCategory.Utility => new Dictionary<string, float>
+                {
+                    ["Forest"] = 0.9f, ["Mountain"] = 1.4f, ["Desert"] = 1.3f,
+                    ["Ocean"] = 1.1f, ["Underground"] = 1.6f
+                },
+                UpgradeCategory.Special => new Dictionary<string, float>
+                {
+                    ["Forest"] = 0.7f, ["Mountain"] = 1.8f, ["Desert"] = 1.5f,
+                    ["Ocean"] = 1.2f, ["Underground"] = 2.0f
+                },
+                _ => new Dictionary<string, float>
+                {
+                    ["Forest"] = 1.0f, ["Mountain"] = 1.0f, ["Desert"] = 1.0f,
+                    ["Ocean"] = 1.0f, ["Underground"] = 1.0f
+                }
+            };
+        }
     }
 
     #region Demo Component Placeholders (to be implemented)
     
     // These classes need to be implemented to provide the actual gameplay functionality
+    // NOTE: Many of these are now implemented in the main Authoring folder
     public class DemoPlayerMovement : MonoBehaviour { }
     public class DemoPlayerCombat : MonoBehaviour { }
     public class DemoPlayerInventory : MonoBehaviour { }

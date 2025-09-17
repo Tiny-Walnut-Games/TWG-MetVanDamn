@@ -155,19 +155,35 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private void HandleJump()
         {
-            if (jumpPressed && (isGrounded || canCoyoteJump) && !isLedgeGrabbing)
+            if (jumpPressed && !isLedgeGrabbing)
             {
-                if (rb2D)
+                // Regular jump (ground or coyote time)
+                if (isGrounded || canCoyoteJump)
                 {
-                    rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce);
-                }
-                else if (rb3D)
-                {
-                    rb3D.velocity = new Vector3(rb3D.velocity.x, jumpForce, rb3D.velocity.z);
-                }
+                    if (rb2D)
+                    {
+                        rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce);
+                    }
+                    else if (rb3D)
+                    {
+                        rb3D.velocity = new Vector3(rb3D.velocity.x, jumpForce, rb3D.velocity.z);
+                    }
 
-                canCoyoteJump = false;
-                isGrounded = false;
+                    canCoyoteJump = false;
+                    isGrounded = false;
+                    hasUsedDoubleJump = false; // Reset double jump on ground jump
+                }
+                // Double jump
+                else if (CanDoubleJump())
+                {
+                    PerformDoubleJump();
+                }
+                // Wall jump
+                else if (CanWallJump())
+                {
+                    PerformWallJump();
+                    hasUsedDoubleJump = false; // Reset double jump on wall jump
+                }
             }
         }
 
@@ -348,6 +364,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         // Speed multiplier system for inventory buffs
         private float speedMultiplier = 1f;
         
+        // Upgrade system support
+        private bool doubleJumpEnabled = false;
+        private bool wallJumpEnabled = false;
+        private bool aimedDashEnabled = false;
+        private bool hasUsedDoubleJump = false;
+        
         public void ApplySpeedMultiplier(float multiplier)
         {
             speedMultiplier *= multiplier;
@@ -373,6 +395,124 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private float GetModifiedSpeed(float baseSpeed)
         {
             return baseSpeed * speedMultiplier;
+        }
+
+        /// <summary>
+        /// Set movement stats from upgrade system
+        /// </summary>
+        public void SetStats(float newWalkSpeed, float newRunSpeed, float newJumpForce, float newDashForce, float newDashCooldown)
+        {
+            walkSpeed = newWalkSpeed;
+            runSpeed = newRunSpeed;
+            jumpForce = newJumpForce;
+            dashForce = newDashForce;
+            dashCooldown = newDashCooldown;
+        }
+
+        /// <summary>
+        /// Enable/disable double jump capability
+        /// </summary>
+        public void EnableDoubleJump(bool enabled)
+        {
+            doubleJumpEnabled = enabled;
+            if (!enabled)
+            {
+                hasUsedDoubleJump = false;
+            }
+        }
+
+        /// <summary>
+        /// Enable/disable wall jump capability
+        /// </summary>
+        public void EnableWallJump(bool enabled)
+        {
+            wallJumpEnabled = enabled;
+        }
+
+        /// <summary>
+        /// Enable/disable aimed dash capability
+        /// </summary>
+        public void EnableAimedDash(bool enabled)
+        {
+            aimedDashEnabled = enabled;
+        }
+
+        /// <summary>
+        /// Check if player can double jump
+        /// </summary>
+        private bool CanDoubleJump()
+        {
+            return doubleJumpEnabled && !isGrounded && !hasUsedDoubleJump && !isLedgeGrabbing;
+        }
+
+        /// <summary>
+        /// Check if player can wall jump
+        /// </summary>
+        private bool CanWallJump()
+        {
+            if (!wallJumpEnabled || isGrounded) return false;
+
+            // Simple wall detection - check for collision to either side
+            Vector3 leftCheck = transform.position + Vector3.left * 0.6f;
+            Vector3 rightCheck = transform.position + Vector3.right * 0.6f;
+
+            bool leftWall = rb2D ? Physics2D.OverlapCircle(leftCheck, 0.3f, groundLayer) : 
+                                 Physics.CheckSphere(leftCheck, 0.3f, groundLayer);
+            bool rightWall = rb2D ? Physics2D.OverlapCircle(rightCheck, 0.3f, groundLayer) : 
+                                  Physics.CheckSphere(rightCheck, 0.3f, groundLayer);
+
+            return leftWall || rightWall;
+        }
+
+        /// <summary>
+        /// Perform double jump
+        /// </summary>
+        private void PerformDoubleJump()
+        {
+            hasUsedDoubleJump = true;
+            
+            if (rb2D)
+            {
+                rb2D.velocity = new Vector2(rb2D.velocity.x, jumpForce * 0.9f); // Slightly less powerful than ground jump
+            }
+            else if (rb3D)
+            {
+                rb3D.velocity = new Vector3(rb3D.velocity.x, jumpForce * 0.9f, rb3D.velocity.z);
+            }
+
+            Debug.Log("🦘 Double jump!");
+        }
+
+        /// <summary>
+        /// Perform wall jump
+        /// </summary>
+        private void PerformWallJump()
+        {
+            Vector3 leftCheck = transform.position + Vector3.left * 0.6f;
+            Vector3 rightCheck = transform.position + Vector3.right * 0.6f;
+
+            bool leftWall = rb2D ? Physics2D.OverlapCircle(leftCheck, 0.3f, groundLayer) : 
+                                 Physics.CheckSphere(leftCheck, 0.3f, groundLayer);
+            bool rightWall = rb2D ? Physics2D.OverlapCircle(rightCheck, 0.3f, groundLayer) : 
+                                  Physics.CheckSphere(rightCheck, 0.3f, groundLayer);
+
+            Vector2 wallJumpDirection = Vector2.zero;
+            if (leftWall) wallJumpDirection = new Vector2(1, 1).normalized;
+            else if (rightWall) wallJumpDirection = new Vector2(-1, 1).normalized;
+
+            if (wallJumpDirection != Vector2.zero)
+            {
+                if (rb2D)
+                {
+                    rb2D.velocity = wallJumpDirection * jumpForce * 0.8f;
+                }
+                else if (rb3D)
+                {
+                    rb3D.velocity = new Vector3(wallJumpDirection.x * jumpForce * 0.8f, wallJumpDirection.y * jumpForce * 0.8f, 0);
+                }
+
+                Debug.Log("🧗 Wall jump!");
+            }
         }
     }
 

@@ -8,6 +8,8 @@
         "Unity.Entities.Hybrid",
         "Unity.Mathematics",
         "Unity.Transforms",
+        "Unity.TextMeshPro",
+        "Unity.ugui",
         "TinyWalnutGames.MetVD.Core",
         "TinyWalnutGames.MetVD.Shared",
         "TinyWalnutGames.MetVD.Graph",

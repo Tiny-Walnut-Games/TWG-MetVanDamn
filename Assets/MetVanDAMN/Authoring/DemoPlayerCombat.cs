@@ -129,6 +129,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
                 canUseSpecialSkill = true;
             }
+
+            // Update health regeneration
+            UpdateHealthRegeneration();
         }
 
         private void InitializeDefaultWeapons()
@@ -307,8 +310,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 DamageTarget(hit.gameObject, damage, attackType);
             }
 
-            // Visual effect (placeholder)
+            // Create comprehensive visual attack effect with particles and screen shake
             CreateAttackEffect(attackPosition, attackRadius, Color.red);
+            CreateParticleEffect(attackPosition, attackRadius, attackType);
+            TriggerScreenShake(attackRadius);
         }
 
         private void ExecuteRangedAttack(DemoWeapon weapon, float damage, AttackType attackType)
@@ -466,7 +471,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private void CreateAttackEffect(Vector3 position, float radius, Color color)
         {
-            // Simple visual effect (can be enhanced with particles/VFX)
+            // Complete visual effect system with multiple layers
             GameObject effect = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             effect.transform.position = position;
             effect.transform.localScale = Vector3.one * radius * 2f;
@@ -477,8 +482,184 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             // Remove collider
             DestroyImmediate(effect.GetComponent<Collider>());
             
-            // Destroy effect after short time
-            Destroy(effect, 0.3f);
+            // Add pulsing animation
+            var pulseAnimation = effect.AddComponent<AttackEffectPulse>();
+            pulseAnimation.Initialize(radius, color);
+            
+            // Destroy effect after animation completes
+            Destroy(effect, 0.8f);
+        }
+
+        /// <summary>
+        /// Creates particle effect for attack impacts
+        /// </summary>
+        private void CreateParticleEffect(Vector3 position, float radius, AttackType attackType)
+        {
+            // Create particle system for impact effects
+            var particleObj = new GameObject("AttackParticles");
+            particleObj.transform.position = position;
+            
+            var particleSystem = particleObj.AddComponent<ParticleSystem>();
+            var main = particleSystem.main;
+            var emission = particleSystem.emission;
+            var shape = particleSystem.shape;
+            var velocityOverLifetime = particleSystem.velocityOverLifetime;
+            var colorOverLifetime = particleSystem.colorOverLifetime;
+            
+            // Configure based on attack type
+            switch (attackType)
+            {
+                case AttackType.Light:
+                    main.startColor = Color.yellow;
+                    emission.SetBursts(new ParticleSystem.Burst[] { 
+                        new ParticleSystem.Burst(0f, 15) 
+                    });
+                    break;
+                case AttackType.Heavy:
+                    main.startColor = Color.red;
+                    emission.SetBursts(new ParticleSystem.Burst[] { 
+                        new ParticleSystem.Burst(0f, 25) 
+                    });
+                    break;
+                case AttackType.Charged:
+                    main.startColor = Color.cyan;
+                    emission.SetBursts(new ParticleSystem.Burst[] { 
+                        new ParticleSystem.Burst(0f, 40) 
+                    });
+                    break;
+                case AttackType.Special:
+                    main.startColor = Color.magenta;
+                    emission.SetBursts(new ParticleSystem.Burst[] { 
+                        new ParticleSystem.Burst(0f, 50) 
+                    });
+                    break;
+            }
+            
+            main.startLifetime = 0.5f;
+            main.startSpeed = 5f;
+            main.startSize = 0.1f;
+            
+            shape.enabled = true;
+            shape.shapeType = ParticleSystemShapeType.Circle;
+            shape.radius = radius;
+            
+            velocityOverLifetime.enabled = true;
+            velocityOverLifetime.radial = new ParticleSystem.MinMaxCurve(3f);
+            
+            colorOverLifetime.enabled = true;
+            var gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(main.startColor.color, 0f), new GradientColorKey(Color.white, 1f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) }
+            );
+            colorOverLifetime.color = gradient;
+            
+            // Auto-destroy when complete
+            Destroy(particleObj, main.startLifetime.constant + 0.1f);
+        }
+
+        /// <summary>
+        /// Triggers screen shake effect based on attack intensity
+        /// </summary>
+        private void TriggerScreenShake(float intensity)
+        {
+            // Find and trigger screen shake on cameras
+            var cameras = FindObjectsOfType<Camera>();
+            foreach (var camera in cameras)
+            {
+                var shakeComponent = camera.GetComponent<CameraShake>();
+                if (shakeComponent == null)
+                {
+                    shakeComponent = camera.gameObject.AddComponent<CameraShake>();
+                }
+                
+                float shakeIntensity = Mathf.Clamp(intensity * 0.1f, 0.1f, 1f);
+                shakeComponent.TriggerShake(shakeIntensity, 0.2f);
+            }
+        }
+
+        /// <summary>
+        /// Component for attack effect pulsing animation
+        /// </summary>
+        private class AttackEffectPulse : MonoBehaviour
+        {
+            private float baseRadius;
+            private Color baseColor;
+            private float pulseTimer;
+            private Renderer effectRenderer;
+
+            public void Initialize(float radius, Color color)
+            {
+                baseRadius = radius;
+                baseColor = color;
+                effectRenderer = GetComponent<Renderer>();
+                pulseTimer = 0f;
+            }
+
+            private void Update()
+            {
+                pulseTimer += Time.deltaTime;
+                
+                // Pulsing scale animation
+                float pulseScale = baseRadius * (1f + 0.3f * Mathf.Sin(pulseTimer * 15f));
+                transform.localScale = Vector3.one * pulseScale * 2f;
+                
+                // Fading alpha
+                float alpha = Mathf.Lerp(0.5f, 0f, pulseTimer / 0.8f);
+                effectRenderer.material.color = new Color(baseColor.r, baseColor.g, baseColor.b, alpha);
+            }
+        }
+
+        /// <summary>
+        /// Component for camera shake effects
+        /// </summary>
+        private class CameraShake : MonoBehaviour
+        {
+            private Vector3 originalPosition;
+            private float shakeIntensity;
+            private float shakeDuration;
+            private float shakeTimer;
+            private bool isShaking = false;
+
+            private void Start()
+            {
+                originalPosition = transform.localPosition;
+            }
+
+            public void TriggerShake(float intensity, float duration)
+            {
+                shakeIntensity = intensity;
+                shakeDuration = duration;
+                shakeTimer = 0f;
+                isShaking = true;
+                originalPosition = transform.localPosition;
+            }
+
+            private void Update()
+            {
+                if (!isShaking) return;
+
+                shakeTimer += Time.deltaTime;
+                
+                if (shakeTimer < shakeDuration)
+                {
+                    // Generate random shake offset
+                    Vector3 shakeOffset = Random.insideUnitSphere * shakeIntensity;
+                    shakeOffset.z = 0f; // Keep Z position stable for 2D games
+                    
+                    // Apply diminishing intensity over time
+                    float remainingIntensity = 1f - (shakeTimer / shakeDuration);
+                    shakeOffset *= remainingIntensity;
+                    
+                    transform.localPosition = originalPosition + shakeOffset;
+                }
+                else
+                {
+                    // End shake
+                    transform.localPosition = originalPosition;
+                    isShaking = false;
+                }
+            }
         }
 
         private void SwapWeapon()
@@ -578,6 +759,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private float temporaryDamageBonus = 0f;
         private float temporaryDefenseBonus = 0f;
         
+        // Upgrade system support
+        private bool chargeAttackEnabled = false;
+        private bool comboAttacksEnabled = false;
+        private bool healthRegenerationEnabled = false;
+        private float healthRegenRate = 0f;
+        private float lastRegenTime = 0f;
+        
         public void SetEquipmentBonuses(float healthBonus, float defenseBonus, float damageBonus)
         {
             equipmentHealthBonus = healthBonus;
@@ -634,6 +822,77 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         public void Heal(float amount)
         {
             Heal(Mathf.RoundToInt(amount));
+        }
+
+        /// <summary>
+        /// Set combat stats from upgrade system
+        /// </summary>
+        public void SetStats(int newMaxHealth, float newAttackDamage, float newAttackSpeed, float newCriticalChance, float newDamageReduction)
+        {
+            int oldMaxHealth = maxHealth;
+            maxHealth = newMaxHealth;
+            
+            // Scale current health proportionally if max health increased
+            if (newMaxHealth > oldMaxHealth)
+            {
+                currentHealth = Mathf.RoundToInt((float)currentHealth / oldMaxHealth * newMaxHealth);
+            }
+            else
+            {
+                currentHealth = Mathf.Min(currentHealth, maxHealth);
+            }
+
+            // Update attack stats
+            attackCooldown = 1f / newAttackSpeed; // Convert attack speed to cooldown
+            heavyAttackMultiplier = newAttackDamage / 25f; // Scale based on damage increase
+            
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        }
+
+        /// <summary>
+        /// Enable/disable charge attack capability
+        /// </summary>
+        public void EnableChargeAttack(bool enabled)
+        {
+            chargeAttackEnabled = enabled;
+        }
+
+        /// <summary>
+        /// Enable/disable combo attack system
+        /// </summary>
+        public void EnableComboAttacks(bool enabled)
+        {
+            comboAttacksEnabled = enabled;
+            if (!enabled)
+            {
+                ResetCombo();
+            }
+        }
+
+        /// <summary>
+        /// Enable health regeneration
+        /// </summary>
+        public void EnableHealthRegeneration(float regenPerSecond)
+        {
+            healthRegenerationEnabled = regenPerSecond > 0f;
+            healthRegenRate = regenPerSecond;
+            lastRegenTime = Time.time;
+        }
+
+        /// <summary>
+        /// Update health regeneration (call from Update)
+        /// </summary>
+        private void UpdateHealthRegeneration()
+        {
+            if (healthRegenerationEnabled && currentHealth < maxHealth && Time.time - lastRegenTime >= 1f)
+            {
+                int regenAmount = Mathf.RoundToInt(healthRegenRate);
+                if (regenAmount > 0)
+                {
+                    Heal(regenAmount);
+                    lastRegenTime = Time.time;
+                }
+            }
         }
     }
 
