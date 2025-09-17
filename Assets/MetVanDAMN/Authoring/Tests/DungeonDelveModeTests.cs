@@ -778,7 +778,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
         public void DungeonDelveMode_HasNoTODOsOrPlaceholders()
         {
             // Scan the DungeonDelveMode source code for placeholder implementations
-            var sourcePath = "/home/runner/work/TWG-MetVanDamn/TWG-MetVanDamn/Assets/MetVanDAMN/Authoring/DungeonDelveMode.cs";
+            var sourcePath = Path.Combine(Application.dataPath, "MetVanDAMN/Authoring/DungeonDelveMode.cs");
             var sourceCode = System.IO.File.ReadAllText(sourcePath);
             
             // Check for common placeholder patterns
