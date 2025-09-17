@@ -676,8 +676,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 {
                     UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
                 }
-                catch (System.Exception)
+                catch (System.Exception ex)
                 {
+                    Debug.LogError($"Failed to load MainMenu scene: {ex}");
                     // If MainMenu scene doesn't exist, just reset current scene
                     ShowMainMenu();
                     UpdateStatusText("Returned to Dungeon Delve main menu. Thank you for playing MetVanDAMN!");
