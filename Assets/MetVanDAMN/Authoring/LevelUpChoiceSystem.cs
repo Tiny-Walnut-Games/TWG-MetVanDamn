@@ -340,21 +340,87 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private Polarity GetCurrentBiomeContext()
         {
-            // Try to get current biome from player position or world state
-            // For now, return a default that can be enhanced later
             var playerTransform = playerProgression.transform;
+            Vector3 playerPos = playerTransform.position;
             
-            // Simple heuristic based on position
-            if (playerTransform.position.y > 50f)
-                return Polarity.Wind | Polarity.Cold;
-            else if (playerTransform.position.y < -20f)
-                return Polarity.Earth | Polarity.Heat;
-            else if (playerTransform.position.x > 100f)
-                return Polarity.Sun;
-            else if (playerTransform.position.x < -100f)
-                return Polarity.Moon;
+            // Multi-layer biome detection system with overlap support
+            Polarity detectedPolarity = Polarity.None;
             
-            return Polarity.Any; // Neutral context
+            // Layer 1: Elevation-based biomes
+            if (playerPos.y > 50f)
+            {
+                detectedPolarity |= Polarity.Wind | Polarity.Cold; // Mountain/Sky biome
+            }
+            else if (playerPos.y < -20f)
+            {
+                detectedPolarity |= Polarity.Earth; // Underground biome
+                // Check for heat signatures in deep areas
+                if (playerPos.y < -50f)
+                    detectedPolarity |= Polarity.Heat; // Deep underground/volcanic
+            }
+            
+            // Layer 2: Horizontal zone detection with distance-based intensity
+            float xDistance = Mathf.Abs(playerPos.x);
+            float zDistance = Mathf.Abs(playerPos.z);
+            
+            // Eastern/Western solar influence
+            if (playerPos.x > 75f)
+            {
+                detectedPolarity |= Polarity.Sun; // Eastern sun-blessed regions
+                if (xDistance > 150f) detectedPolarity |= Polarity.Heat; // Desert transition
+            }
+            else if (playerPos.x < -75f)
+            {
+                detectedPolarity |= Polarity.Moon; // Western moon-touched regions
+                if (xDistance > 150f) detectedPolarity |= Polarity.Cold; // Tundra transition
+            }
+            
+            // Layer 3: Regional climate detection based on combined coordinates
+            Vector2 regional = new Vector2(playerPos.x / 100f, playerPos.z / 100f);
+            float climateSeed = Mathf.PerlinNoise(regional.x + 0.5f, regional.y + 0.5f);
+            
+            // Perlin-based climate variation
+            if (climateSeed > 0.7f)
+                detectedPolarity |= Polarity.Heat; // Hot climate pockets
+            else if (climateSeed < 0.3f)
+                detectedPolarity |= Polarity.Cold; // Cold climate pockets
+            
+            // Layer 4: Proximity to water/ocean features
+            if (zDistance > 100f)
+            {
+                detectedPolarity |= Polarity.Water; // Ocean proximity
+                // Ocean depth simulation
+                if (zDistance > 200f && playerPos.y < 0f)
+                    detectedPolarity |= Polarity.Moon; // Deep ocean mystery
+            }
+            
+            // Layer 5: Special region detection using world seed influence
+            if (worldSeed != 0)
+            {
+                uint positionHash = (uint)(playerPos.x * 73 + playerPos.y * 179 + playerPos.z * 283) ^ worldSeed;
+                float specialChance = (positionHash % 1000) / 1000f;
+                
+                if (specialChance > 0.95f) // 5% chance for special biome modifiers
+                {
+                    // Add rare biome combinations
+                    if ((positionHash % 4) == 0) detectedPolarity |= Polarity.Sun | Polarity.Heat;
+                    else if ((positionHash % 4) == 1) detectedPolarity |= Polarity.Moon | Polarity.Cold;
+                    else if ((positionHash % 4) == 2) detectedPolarity |= Polarity.Earth | Polarity.Water;
+                    else detectedPolarity |= Polarity.Wind | Polarity.Water;
+                }
+            }
+            
+            // Fallback: Ensure we always have some biome context
+            if (detectedPolarity == Polarity.None)
+            {
+                // Default to balanced biome based on rough position
+                if (Mathf.Abs(playerPos.x) > Mathf.Abs(playerPos.z))
+                    detectedPolarity = (playerPos.x > 0) ? Polarity.Sun : Polarity.Moon;
+                else
+                    detectedPolarity = (playerPos.z > 0) ? Polarity.Wind : Polarity.Earth;
+            }
+            
+            return detectedPolarity;
         }
 
         /// <summary>

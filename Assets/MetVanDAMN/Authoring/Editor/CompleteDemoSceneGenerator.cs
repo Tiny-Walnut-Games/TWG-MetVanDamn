@@ -553,20 +553,173 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
         /// </summary>
         private static void CreateSampleUpgradeCollections()
         {
-            // This would normally load from Assets/MetVanDAMN/Data/Collections/
-            // For now, we rely on the auto-find functionality in UpgradeDatabaseManager
-            
             string collectionsPath = "Assets/MetVanDAMN/Data/Collections";
-            if (!AssetDatabase.IsValidFolder(collectionsPath))
+            EnsureDirectory(collectionsPath);
+            
+            // Create Defense and Utility collections to complete the set
+            CreateDefenseUpgradeCollection(collectionsPath);
+            CreateUtilityUpgradeCollection(collectionsPath);
+            CreateSpecialUpgradeCollection(collectionsPath);
+            
+            // Verify all collections exist and are properly configured
+            var collections = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
+            Debug.Log($"📚 Verified {collections.Length} upgrade collections for complete demo setup");
+            
+            // Load and configure biome weights for existing collections
+            ConfigureBiomeWeightsForAllCollections(collectionsPath);
+        }
+        
+        /// <summary>
+        /// Creates Defense upgrade collection with health and armor upgrades
+        /// </summary>
+        private static void CreateDefenseUpgradeCollection(string basePath)
+        {
+            string assetPath = $"{basePath}/DefenseUpgrades.asset";
+            if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
+            
+            var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+            collection.name = "DefenseUpgrades";
+            collection.category = UpgradeCategory.Defense;
+            collection.description = "Defensive upgrades including health, armor, and damage resistance";
+            
+            // Set biome weights for contextual generation
+            collection.biomeWeights = new Dictionary<string, float>
             {
-                Debug.LogWarning($"Upgrade collections folder not found: {collectionsPath}");
-                Debug.LogWarning("Create upgrade collections manually or run the upgrade system setup wizard");
-            }
-            else
+                ["Forest"] = 1.2f,     // Forest encourages defensive play
+                ["Mountain"] = 1.5f,   // Mountain requires survivability  
+                ["Desert"] = 1.0f,     // Desert neutral
+                ["Ocean"] = 0.8f,      // Ocean favors mobility over defense
+                ["Underground"] = 1.3f // Underground needs durability
+            };
+            
+            AssetDatabase.CreateAsset(collection, assetPath);
+            Debug.Log($"✅ Created Defense upgrade collection: {assetPath}");
+        }
+        
+        /// <summary>
+        /// Creates Utility upgrade collection with inventory and convenience upgrades  
+        /// </summary>
+        private static void CreateUtilityUpgradeCollection(string basePath)
+        {
+            string assetPath = $"{basePath}/UtilityUpgrades.asset";
+            if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
+            
+            var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+            collection.name = "UtilityUpgrades";
+            collection.category = UpgradeCategory.Utility;
+            collection.description = "Quality of life upgrades including auto-loot, inventory expansion, and map reveals";
+            
+            // Set biome weights for contextual generation
+            collection.biomeWeights = new Dictionary<string, float>
             {
-                var collections = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
-                Debug.Log($"📚 Found {collections.Length} upgrade collections for demo");
+                ["Forest"] = 0.9f,     // Forest has natural navigation
+                ["Mountain"] = 1.4f,   // Mountain benefits from map reveals
+                ["Desert"] = 1.3f,     // Desert needs resource management
+                ["Ocean"] = 1.1f,      // Ocean benefits from navigation aids
+                ["Underground"] = 1.6f // Underground desperately needs map reveals
+            };
+            
+            AssetDatabase.CreateAsset(collection, assetPath);
+            Debug.Log($"✅ Created Utility upgrade collection: {assetPath}");
+        }
+        
+        /// <summary>
+        /// Creates Special upgrade collection with unique and powerful upgrades
+        /// </summary>
+        private static void CreateSpecialUpgradeCollection(string basePath)
+        {
+            string assetPath = $"{basePath}/SpecialUpgrades.asset";
+            if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
+            
+            var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+            collection.name = "SpecialUpgrades";
+            collection.category = UpgradeCategory.Special;
+            collection.description = "Rare and powerful upgrades with unique effects";
+            
+            // Special upgrades have dramatic biome preferences
+            collection.biomeWeights = new Dictionary<string, float>
+            {
+                ["Forest"] = 0.7f,     // Forest discourages special powers
+                ["Mountain"] = 1.8f,   // Mountain rewards extreme abilities
+                ["Desert"] = 1.5f,     // Desert suits rare discoveries
+                ["Ocean"] = 1.2f,      // Ocean moderate special preference
+                ["Underground"] = 2.0f // Underground highest special chance
+            };
+            
+            AssetDatabase.CreateAsset(collection, assetPath);
+            Debug.Log($"✅ Created Special upgrade collection: {assetPath}");
+        }
+        
+        /// <summary>
+        /// Configures biome weights for all existing upgrade collections
+        /// </summary>
+        private static void ConfigureBiomeWeightsForAllCollections(string collectionsPath)
+        {
+            var collectionGUIDs = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
+            int configuredCount = 0;
+            
+            foreach (string guid in collectionGUIDs)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var collection = AssetDatabase.LoadAssetAtPath<UpgradeCollection>(path);
+                
+                if (collection != null)
+                {
+                    // Ensure biome weights are configured if missing
+                    if (collection.biomeWeights == null || collection.biomeWeights.Count == 0)
+                    {
+                        collection.biomeWeights = GetDefaultBiomeWeights(collection.category);
+                        EditorUtility.SetDirty(collection);
+                        configuredCount++;
+                    }
+                }
             }
+            
+            if (configuredCount > 0)
+            {
+                AssetDatabase.SaveAssets();
+                Debug.Log($"⚙️ Configured biome weights for {configuredCount} upgrade collections");
+            }
+        }
+        
+        /// <summary>
+        /// Returns default biome weights based on upgrade category
+        /// </summary>
+        private static Dictionary<string, float> GetDefaultBiomeWeights(UpgradeCategory category)
+        {
+            return category switch
+            {
+                UpgradeCategory.Movement => new Dictionary<string, float>
+                {
+                    ["Forest"] = 1.3f, ["Mountain"] = 1.8f, ["Desert"] = 1.1f, 
+                    ["Ocean"] = 1.6f, ["Underground"] = 1.4f
+                },
+                UpgradeCategory.Offense => new Dictionary<string, float>
+                {
+                    ["Forest"] = 1.1f, ["Mountain"] = 1.2f, ["Desert"] = 1.5f,
+                    ["Ocean"] = 1.0f, ["Underground"] = 1.7f
+                },
+                UpgradeCategory.Defense => new Dictionary<string, float>
+                {
+                    ["Forest"] = 1.2f, ["Mountain"] = 1.5f, ["Desert"] = 1.0f,
+                    ["Ocean"] = 0.8f, ["Underground"] = 1.3f
+                },
+                UpgradeCategory.Utility => new Dictionary<string, float>
+                {
+                    ["Forest"] = 0.9f, ["Mountain"] = 1.4f, ["Desert"] = 1.3f,
+                    ["Ocean"] = 1.1f, ["Underground"] = 1.6f
+                },
+                UpgradeCategory.Special => new Dictionary<string, float>
+                {
+                    ["Forest"] = 0.7f, ["Mountain"] = 1.8f, ["Desert"] = 1.5f,
+                    ["Ocean"] = 1.2f, ["Underground"] = 2.0f
+                },
+                _ => new Dictionary<string, float>
+                {
+                    ["Forest"] = 1.0f, ["Mountain"] = 1.0f, ["Desert"] = 1.0f,
+                    ["Ocean"] = 1.0f, ["Underground"] = 1.0f
+                }
+            };
         }
     }
 
