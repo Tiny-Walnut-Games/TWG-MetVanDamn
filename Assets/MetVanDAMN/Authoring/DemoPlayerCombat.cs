@@ -129,6 +129,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
                 canUseSpecialSkill = true;
             }
+
+            // Update health regeneration
+            UpdateHealthRegeneration();
         }
 
         private void InitializeDefaultWeapons()
@@ -578,6 +581,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private float temporaryDamageBonus = 0f;
         private float temporaryDefenseBonus = 0f;
         
+        // Upgrade system support
+        private bool chargeAttackEnabled = false;
+        private bool comboAttacksEnabled = false;
+        private bool healthRegenerationEnabled = false;
+        private float healthRegenRate = 0f;
+        private float lastRegenTime = 0f;
+        
         public void SetEquipmentBonuses(float healthBonus, float defenseBonus, float damageBonus)
         {
             equipmentHealthBonus = healthBonus;
@@ -634,6 +644,77 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         public void Heal(float amount)
         {
             Heal(Mathf.RoundToInt(amount));
+        }
+
+        /// <summary>
+        /// Set combat stats from upgrade system
+        /// </summary>
+        public void SetStats(int newMaxHealth, float newAttackDamage, float newAttackSpeed, float newCriticalChance, float newDamageReduction)
+        {
+            int oldMaxHealth = maxHealth;
+            maxHealth = newMaxHealth;
+            
+            // Scale current health proportionally if max health increased
+            if (newMaxHealth > oldMaxHealth)
+            {
+                currentHealth = Mathf.RoundToInt((float)currentHealth / oldMaxHealth * newMaxHealth);
+            }
+            else
+            {
+                currentHealth = Mathf.Min(currentHealth, maxHealth);
+            }
+
+            // Update attack stats
+            attackCooldown = 1f / newAttackSpeed; // Convert attack speed to cooldown
+            heavyAttackMultiplier = newAttackDamage / 25f; // Scale based on damage increase
+            
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        }
+
+        /// <summary>
+        /// Enable/disable charge attack capability
+        /// </summary>
+        public void EnableChargeAttack(bool enabled)
+        {
+            chargeAttackEnabled = enabled;
+        }
+
+        /// <summary>
+        /// Enable/disable combo attack system
+        /// </summary>
+        public void EnableComboAttacks(bool enabled)
+        {
+            comboAttacksEnabled = enabled;
+            if (!enabled)
+            {
+                ResetCombo();
+            }
+        }
+
+        /// <summary>
+        /// Enable health regeneration
+        /// </summary>
+        public void EnableHealthRegeneration(float regenPerSecond)
+        {
+            healthRegenerationEnabled = regenPerSecond > 0f;
+            healthRegenRate = regenPerSecond;
+            lastRegenTime = Time.time;
+        }
+
+        /// <summary>
+        /// Update health regeneration (call from Update)
+        /// </summary>
+        private void UpdateHealthRegeneration()
+        {
+            if (healthRegenerationEnabled && currentHealth < maxHealth && Time.time - lastRegenTime >= 1f)
+            {
+                int regenAmount = Mathf.RoundToInt(healthRegenRate);
+                if (regenAmount > 0)
+                {
+                    Heal(regenAmount);
+                    lastRegenTime = Time.time;
+                }
+            }
         }
     }
 

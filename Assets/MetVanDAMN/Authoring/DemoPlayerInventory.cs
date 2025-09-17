@@ -646,6 +646,62 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         public int GetInventorySpace() => maxInventorySize - inventoryItems.Count;
         public bool IsInventoryFull() => inventoryItems.Count >= maxInventorySize;
+
+        // Upgrade system support
+        private bool autoLootEnabled = false;
+
+        /// <summary>
+        /// Set inventory stats from upgrade system
+        /// </summary>
+        public void SetStats(int newInventorySlots, float newInteractionRange, float newScanRange, float newLootMagnetRange)
+        {
+            maxInventorySize = newInventorySlots;
+            interactionRange = newInteractionRange;
+            scanRange = newScanRange;
+            lootMagnetRange = newLootMagnetRange;
+        }
+
+        /// <summary>
+        /// Enable/disable automatic loot pickup
+        /// </summary>
+        public void EnableAutoLoot(bool enabled)
+        {
+            autoLootEnabled = enabled;
+            
+            if (enabled)
+            {
+                // Start auto-loot checking coroutine
+                StartCoroutine(AutoLootCoroutine());
+            }
+        }
+
+        /// <summary>
+        /// Auto-loot coroutine - automatically pickup nearby items
+        /// </summary>
+        private System.Collections.IEnumerator AutoLootCoroutine()
+        {
+            while (autoLootEnabled)
+            {
+                // Find nearby loot items
+                var nearbyItems = Physics.OverlapSphere(transform.position, lootMagnetRange);
+                
+                foreach (var item in nearbyItems)
+                {
+                    var lootComponent = item.GetComponent<DemoLootDrop>();
+                    if (lootComponent && !IsInventoryFull())
+                    {
+                        var lootItem = lootComponent.GetItem();
+                        if (lootItem != null)
+                        {
+                            AddItem(lootItem);
+                            Destroy(item.gameObject);
+                        }
+                    }
+                }
+
+                yield return new WaitForSeconds(0.5f); // Check every half second
+            }
+        }
     }
 
     [System.Serializable]
