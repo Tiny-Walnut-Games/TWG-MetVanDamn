@@ -1,0 +1,23 @@
+{
+    "name": "TinyWalnutGames.MetVD.QuadRig",
+    "rootNamespace": "TinyWalnutGames.MetVD.QuadRig",
+    "references": [
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Entities",
+        "Unity.Mathematics",
+        "Unity.Transforms",
+        "Unity.Rendering.Hybrid",
+        "TinyWalnutGames.MetVD.Core",
+        "TinyWalnutGames.MetVD.Shared"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
