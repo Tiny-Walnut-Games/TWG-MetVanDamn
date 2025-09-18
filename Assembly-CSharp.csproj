@@ -63,6 +63,7 @@
     <Compile Include="Assets\MetVanDAMN\debug_enum_test.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\debug\console.txt" />
     <None Include="Assets\DeveloperExperience.csc.rsp" />
     <None Include="Assets\Editor.csc.rsp" />
     <None Include="Assets\Tiny Walnut Games\MetVanDAMN\Docs\TestResults.xml" />
@@ -1558,7 +1559,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj" />
     <ProjectReference Include="TinyWalnutGames.GridLayerEditor.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Authoring.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Core.csproj" />
