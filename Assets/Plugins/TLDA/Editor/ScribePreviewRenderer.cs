@@ -3,6 +3,7 @@ using UnityEditor;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+#pragma warning disable CS0414
 
 namespace LivingDevAgent.Editor.Scribe
     {
@@ -16,12 +17,12 @@ namespace LivingDevAgent.Editor.Scribe
         private Vector2 _scrollPosition;
 
         // Styles
-        private GUIStyle _h1, _h2, _h3;
-        private GUIStyle _bodyText, _listItem;
-        private GUIStyle _codeBlock, _inlineCode;
+        private GUIStyle? _h1, _h2, _h3;
+        private GUIStyle? _bodyText, _listItem;
+        private GUIStyle? _codeBlock, _inlineCode;
         private bool _stylesInitialized = false;
-        private string _lastRenderedSource = null;
-        private System.Action _cachedRenderer = null; // replayable rendering lambda
+        private string? _lastRenderedSource = null;
+        private System.Action? _cachedRenderer = null; // replayable rendering lambda
 
         // Cached render operations to avoid re-parsing markdown each repaint
         private readonly List<System.Action> _renderOps = new(256);
@@ -47,12 +48,12 @@ namespace LivingDevAgent.Editor.Scribe
         private bool _livePreview = true;
         private bool _formattingEnabled = true;
         private bool _imagesEnabled = true;
-        private float _lastViewWidth = 0f; // to optionally rebake image sizes on resize in future
         private bool _virtualize = true;   // render only approximately visible ops
-                                           // Temp-save-on-preview option
+        private float _lastViewWidth = -1f; // track to invalidate cache on width change
+                                            // Temp-save-on-preview option
         private bool _tempSaveOnPreview = false;
         private const string TempSavePrefsKey = "LDA_Scribe_TempSaveOnPreview";
-        private string _tempPreviewPath;
+        private string? _tempPreviewPath;
 
         float AvailWidth()
             {
@@ -167,11 +168,25 @@ namespace LivingDevAgent.Editor.Scribe
                 };
 
             _stylesInitialized = true;
+            // Post-condition: all style fields initialized
+            System.Diagnostics.Debug.Assert(_h1 != null && _h2 != null && _h3 != null && _bodyText != null && _listItem != null && _codeBlock != null && _inlineCode != null);
             }
 
         public void Draw(string markdown)
             {
             InitializeStyles();
+
+            // Width-based cache invalidation (restored)
+            float currentWidth = EditorGUIUtility.currentViewWidth;
+            if (!Mathf.Approximately(currentWidth, _lastViewWidth))
+                {
+                // Only invalidate after first real width capture
+                if (_lastViewWidth >= 0f)
+                    {
+                    _lastRenderedSource = null; // force rebuild next time
+                    }
+                _lastViewWidth = currentWidth;
+                }
 
             EditorGUILayout.BeginVertical();
                 {
@@ -405,9 +420,9 @@ namespace LivingDevAgent.Editor.Scribe
                     string text = hMatch.Groups[2].Value;
                     switch (level)
                         {
-                        case 1: AddLabelOp(text, _h1, text); break;
-                        case 2: AddLabelOp(text, _h2, text); break;
-                        default: AddLabelOp(text, _h3, text); break; // use h3 style for 3-6
+                        case 1: AddLabelOp(text, _h1!, text); break;
+                        case 2: AddLabelOp(text, _h2!, text); break;
+                        default: AddLabelOp(text, _h3!, text); break; // use h3 style for 3-6
                         }
                     }
                 // Lists
@@ -415,7 +430,7 @@ namespace LivingDevAgent.Editor.Scribe
                     {
                     string formatted = _formattingEnabled ? ApplyInlineFormatting(line[2..]) : line[2..];
                     string renderText = "• " + formatted;
-                    AddLabelOp(renderText, _listItem, line[2..]);
+                    AddLabelOp(renderText, _listItem!, line[2..]);
                     }
                 // Numbered lists
                 else if (NumberedListPattern.IsMatch(line))
@@ -424,7 +439,7 @@ namespace LivingDevAgent.Editor.Scribe
                     string stripped = NumberedListPattern.Replace(line, "");
                     string formatted = _formattingEnabled ? ApplyInlineFormatting(stripped) : stripped;
                     string renderText = $"{number}. {formatted}";
-                    AddLabelOp(renderText, _listItem, stripped);
+                    AddLabelOp(renderText, _listItem!, stripped);
                     }
                 // Checkboxes
                 else if (CheckboxPattern.IsMatch(line))
@@ -444,7 +459,7 @@ namespace LivingDevAgent.Editor.Scribe
                 else if (line.StartsWith("> "))
                     {
                     string quoted = _formattingEnabled ? ApplyInlineFormatting(line[2..]) : line[2..];
-                    float h = _bodyText.CalcHeight(new GUIContent(quoted), AvailWidth() - 20f);
+                    float h = _bodyText!.CalcHeight(new GUIContent(quoted), AvailWidth() - 20f);
                     AddOp(() =>
                         {
                             EditorGUILayout.BeginHorizontal();
@@ -473,7 +488,7 @@ namespace LivingDevAgent.Editor.Scribe
                 else
                     {
                     string formatted = _formattingEnabled ? ApplyInlineFormatting(line) : line;
-                    AddLabelOp(formatted, _bodyText, line);
+                    AddLabelOp(formatted, _bodyText!, line);
                     }
                 }
             }
@@ -615,7 +630,7 @@ namespace LivingDevAgent.Editor.Scribe
             // This would render individual labels for each inline code segment
             var labelRect = new Rect(xPosition, yPosition,
                 GUI.skin.label.CalcSize(new GUIContent(codeText)).x,
-                _inlineCode.lineHeight);
+                _inlineCode!.lineHeight);
 
             GUI.Label(labelRect, codeText, _inlineCode);
 

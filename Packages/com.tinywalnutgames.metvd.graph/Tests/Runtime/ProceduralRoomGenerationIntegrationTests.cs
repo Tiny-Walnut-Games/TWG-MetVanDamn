@@ -1,4 +1,5 @@
 using NUnit.Framework;
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using Unity.Collections;
 using Unity.Entities;
@@ -13,8 +14,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 	/// </summary>
 	public class ProceduralRoomGenerationIntegrationTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
+		private World _testWorld = null!; // assigned in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

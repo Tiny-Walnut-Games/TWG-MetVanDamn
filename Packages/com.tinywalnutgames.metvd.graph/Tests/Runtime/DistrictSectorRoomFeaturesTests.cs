@@ -1,4 +1,5 @@
 using NUnit.Framework;
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Shared;
 using Unity.Entities;
@@ -13,8 +14,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 	/// </summary>
 	public class DistrictSectorRoomFeaturesTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
+		private World _testWorld = null!; // set in SetUp
+		private EntityManager _entityManager; // struct, assigned in SetUp
 
 		[SetUp]
 		public void SetUp()
@@ -44,12 +45,12 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			_entityManager.AddComponentData(configEntity, worldConfig);
 
 			// Create multiple unplaced districts (more than TargetSectors)
-			var districts = new Entity [ 12 ];
+			var districts = new Entity[12];
 			for (int i = 0; i < districts.Length; i++)
 				{
-				districts [ i ] = _entityManager.CreateEntity();
-				_entityManager.AddComponentData(districts [ i ], new NodeId((uint)(i + 1), 0, 0, int2.zero));
-				_entityManager.AddComponentData(districts [ i ], new WfcState());
+				districts[i] = _entityManager.CreateEntity();
+				_entityManager.AddComponentData(districts[i], new NodeId((uint)(i + 1), 0, 0, int2.zero));
+				_entityManager.AddComponentData(districts[i], new WfcState());
 				}
 
 			// Simulate DistrictLayoutSystem logic

@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tools\Editor\Tests\TinyWalnutGames.Tools.Editor.Tests.asmdef" />
+    <None Include="Assets\Tools\Editor\Tests\TinyWalnutGames.Tools.Editor.Tests.csc.rsp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

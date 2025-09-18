@@ -17,7 +17,8 @@ namespace LivingDevAgent.Editor.Scribe
         private Vector2 _scrollPosition;
 
         // Events
-        public event System.Action OnContentChanged;
+        private static readonly System.Action NoOpContentChanged = () => { };
+        public event System.Action OnContentChanged = NoOpContentChanged; // non-null default
 
         // Styles
         private GUIStyle _textAreaWrap;

@@ -12,7 +12,7 @@ namespace TinyWalnutGames.MetVD.Core
 		{
 		None = 0,
 		Sun = 1 << 0,    // Light polarity
-		Moon = 1 << 1,   // Dark polarity  
+		Moon = 1 << 1,   // Dark polarity
 		Heat = 1 << 2,   // Fire/energy polarity
 		Cold = 1 << 3,   // Ice/crystal polarity
 		Earth = 1 << 4,  // Ground/nature polarity
@@ -26,8 +26,9 @@ namespace TinyWalnutGames.MetVD.Core
 		EarthWind = Earth | Wind,
 		LifeTech = Life | Tech,
 
-		// Special markers  
-		Any = Sun | Moon | Heat | Cold | Earth | Wind | Life | Tech   // Matches any polarity (OR of all poles)
+		// Special markers
+		Any = Sun | Moon | Heat | Cold | Earth | Wind | Life | Tech,   // Matches any polarity (OR of all poles)
+		Water = 5
 		}
 
 	/// <summary>
@@ -77,7 +78,7 @@ namespace TinyWalnutGames.MetVD.Core
 		Ruins = 21,
 		AncientRuins = 22,
 
-		// Volcanic/Fire biomes  
+		// Volcanic/Fire biomes
 		Volcanic = 23,
 		Hell = 24, // Changed from Magma to Hell for clarity
 
@@ -407,7 +408,7 @@ namespace TinyWalnutGames.MetVD.Core
 			int distanceSum = math.abs(coordinates.x) + math.abs(coordinates.y);
 
 			// Check proximity to Fibonacci numbers
-			int [ ] fibonacci = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610 };
+			int[] fibonacci = { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610 };
 
 			int closestDistance = int.MaxValue;
 			foreach (int fib in fibonacci)

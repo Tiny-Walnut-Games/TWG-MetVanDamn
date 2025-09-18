@@ -72,10 +72,10 @@ scripts/init_agent_context.sh
 **Windows Users**: Run these commands in Git Bash or WSL for best results.
 
 ### **Step 3: Install Development Dependencies**
-# Install Python dependencies for validation tools
+## Install Python dependencies for validation tools
 pip install -r scripts/requirements.txt
 
-# Note: Network timeouts are acceptable - core dependencies are typically pre-installed
+## Note: Network timeouts are acceptable - core dependencies are typically pre-installed
 ```
 
 1. **Launch Unity Hub**
@@ -136,7 +136,7 @@ World Size: (50, 50)             # Reasonable for testing
 >>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 ```
 
-#### **Test Generation**
+### **Test Generation**
 
 ## 🎨 **Phase 4: Visual Feedback & Debugging (3 minutes)**
 
@@ -182,13 +182,11 @@ World Size: (50, 50)             # Reasonable for testing
 ## 🔧 **Phase 5: Validation & Testing (2 minutes)**
 
 ### **Run Validation Tools**
-# Validate documentation structure (~60ms)
+## Validate documentation structure (~60ms)
 python3 src/SymbolicLinter/validate_docs.py --tldl-path docs/
 
-<<<<<<< HEAD
-# Validate debug overlay system (~56ms)
-=======
-# Run symbolic linting (~68ms - may show expected parse errors)
+## Validate debug overlay system (~56ms)
+## Run symbolic linting (~68ms - may show expected parse errors)
 python3 src/SymbolicLinter/symbolic_linter.py --path src/
 - **⚠️ Debug overlay validation**: 85.7% health score (C# parsing issues are expected)
 - **⚠️ Symbolic linting**: Parse errors for Python files (expected behavior)
@@ -196,11 +194,7 @@ python3 src/SymbolicLinter/symbolic_linter.py --path src/
 ### **Manual Verification Checklist**
 - [ ] Unity console shows successful world generation
 - [ ] Scene view displays green debug bounds
-<<<<<<< HEAD
 - [ ] Entity Debugger shows hub + district entities
-=======
-- [ ] Entity Debugger shows hub + district entities
->>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 - [ ] Inspector regeneration buttons work during Play mode
 - [ ] Different seeds produce different debug visualizations
 ## ⚔️ **Troubleshooting Common Issues**
@@ -267,18 +261,14 @@ WorldSeed → Districts → Rooms → Biome Fields → Gate Conditions
 
 ### **Expand Your MetVanDAMN Knowledge**
 1. **Study the Code**: Explore `Packages/com.tinywalnutgames.metvd.*` directories
-<<<<<<< HEAD
 2. **Read TLDL Entries**: Check `docs/` for development chronicles
-=======
-2. **Read TLDL Entries**: Check `docs/` for development chronicles
->>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 3. **Examine Test Cases**: Look at `Assets/MetVanDAMN/Authoring/Tests/`
 4. **Join the Community**: Contribute to Living Dev Agent workflow
 
 4. **Implement Features**: Build on the MetVanDAMN foundation
 
-# Document your journey for future adventurers
-# Follow the TLDL template in docs/tldl_template.yaml
+## Document your journey for future adventurers
+## Follow the TLDL template in docs/tldl_template.yaml
 ```
 
 **🎉 Congratulations, fellow Buttguard!** You've successfully:
@@ -291,124 +281,12 @@ WorldSeed → Districts → Rooms → Biome Fields → Gate Conditions
 
 **You are now ready to:**
 - 🌍 **Generate infinite procedural worlds** with confidence
-<<<<<<< HEAD
 - 🛠️ **Customize and extend** the MetVanDAMN system
-=======
-- 🛠️ **Customize and extend** the MetVanDAMN system
->>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 - 🧙‍♂️ **Contribute to the community** through TLDL documentation
 - 🍑 **Maintain butt comfort** while coding awesome features
 
 ---
 
-<<<<<<< HEAD
-## 🎮 **Phase 6: Full Playable Demo Experience (10 minutes)**
-
-### **🎯 Creating a Complete Game Demo**
-
-**Goal**: Transform the basic world generation into a fully playable MetroidVania experience with player character, combat, inventory, and progression systems.
-#### **Step 1: Player Character Setup**
-```csharp
-// Add to your scene or create prefab
-GameObject player = new GameObject("Player");
-player.AddComponent<CharacterController>();
-var movement = player.GetComponent<PlayerMovementController>();
-movement.moveSpeed = 5.0f;
-#### **Step 2: Demo Skills & Abilities**
-// Essential MetroidVania abilities
-var abilities = player.GetComponent<PlayerAbilityManager>();
-abilities.UnlockAbility("DoubleJump");
-abilities.UnlockAbility("WallJump");
-// Progression-gated abilities (unlocked by exploration)
-abilities.SetProgressionGate("SuperJump", "SunBiome_KeyItem");
-```csharp
-var inventory = player.GetComponent<PlayerInventorySystem>();
-inventory.AddItem("BasicSword", ItemType.Weapon, true); // equipped
-inventory.AddItem("LeatherArmor", ItemType.Armor, true);
-inventory.AddItem("HealthPotion", ItemType.Consumable, 3);
-inventory.AddItem("EnergyCell", ItemType.KeyItem, 1);
-// Upgrade progression
-inventory.AddUpgrade("WeaponDamage", 1);
-inventory.AddUpgrade("MovementSpeed", 1);
-inventory.AddUpgrade("HealthCapacity", 2);
-```
-
-#### **Step 4: Combat & AI Enemies**
-```csharp
-// Spawn demo enemies in generated districts
-foreach(var district in generatedDistricts) {
-    if(district.BiomeType == BiomeType.Heat) {
-if(generatedDistricts.Count >= 3) {
-    var bossDistrict = generatedDistricts.Last();
-    SpawnBoss("ElementalArchon", bossDistrict.BossRoom);
-}
-```
-
-#### **Step 5: Treasure Chests & Item Pickups**
-```csharp
-// Procedural reward placement
-var rewardPlacer = new RewardPlacementSystem();
-rewardPlacer.PlaceChests(generatedDistricts, ChestDensity.Moderate);
-rewardPlacer.PlaceKeyItems(generatedDistricts, progressionKeys);
-rewardPlacer.PlaceUpgradeStations(generatedDistricts, UpgradeType.All);
-
-// Interactive treasure system
-public void OnChestInteract(TreasureChest chest) {
-    var reward = chest.GenerateReward(player.CurrentBiome, player.ProgressionLevel);
-    player.Inventory.AddItem(reward);
-    ShowRewardNotification(reward);
-}
-```
-
-#### **Step 6: Victory Conditions & Progression**
-```csharp
-// Demo completion criteria
-public class DemoVictoryConditions {
-    public bool AllBiomesExplored { get; set; }
-    public bool BossDefeated { get; set; }
-    public bool AllKeyItemsCollected { get; set; }
-    public bool MinimumUpgradesObtained { get; set; }
-
-    public bool IsDemoComplete =>
-        AllBiomesExplored && BossDefeated &&
-        AllKeyItemsCollected && MinimumUpgradesObtained;
-}
-```
-
-### **🎯 Success Validation Checklist**
-
-**Core Gameplay Loop** ✅
-- [ ] Player spawns in starting district with basic abilities
-- [ ] Movement feels responsive (WASD + Jump + Dash)
-- [ ] Can explore generated world freely
-- [ ] Encounters enemies in different biomes
-- [ ] Combat system works (attack, dodge, take damage)
-
-**Progression Systems** ✅
-- [ ] Inventory opens and shows equipped items
-- [ ] Can pick up and use consumables
-- [ ] Finding treasure chests provides rewards
-- [ ] Abilities unlock through exploration
-- [ ] Biome-specific progression gates function
-
-**MetroidVania Core** ✅
-- [ ] Backtracking enabled by new abilities
-- [ ] Interconnected world with multiple paths
-- [ ] Secrets accessible with right equipment
-- [ ] Boss encounter provides meaningful challenge
-- [ ] Victory screen shows completion stats
-
-**Technical Validation** ✅
-- [ ] 60fps stable during full gameplay
-- [ ] No memory leaks during extended play
-- [ ] Save/load system preserves progress
-- [ ] Art placement matches procedural generation
-- [ ] Audio systems function correctly
-
----
-
-=======
->>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)
 ## 🤝 **Community & Support**
 
 ### **Getting Help**
@@ -432,28 +310,6 @@ public class DemoVictoryConditions {
 
 ## 📄 **Document Information**
 
-<<<<<<< HEAD
-**Version**: 2.0 - Complete Setup & Full Demo Guide
-**Created**: January 2025
-**Updated**: January 2025 - Enhanced for Full Playable Demo Requirements
-**Author**: Living Dev Agent Community
-**Sacred Commitment**: Save The Butts! Manifesto Compliance
-**Purpose**: Eliminate setup frustration and enable complete MetVanDAMN demo experience from setup to victory
-
-**Full Demo Compliance**: ✅
-- ✅ Include smoke test scenes
-- ✅ Full process coverage from clone to play
-- ✅ No external assets required
-- ✅ Press play ready experience
-- ✅ Art placement correct for seed
-- ✅ Player character with demo skills
-- ✅ Demo inventory with equippable items
-- ✅ Combat against demo AI and bosses
-- ✅ Treasure chest and item pickup systems
-- ✅ Playable start to finish experience
-
-*This guide is living documentation - it evolves with community feedback and discoveries.*
-=======
 **Version**: 1.0 - Complete Setup Guide
 **Created**: January 2025
 **Author**: Living Dev Agent Community
@@ -461,4 +317,3 @@ public class DemoVictoryConditions {
 **Purpose**: Eliminate setup frustration and enable immediate MetVanDAMN success
 
 *This guide is living documentation - it evolves with community feedback and discoveries.*
->>>>>>> cd2a250 (feat(docs): Implement comprehensive documentation overhaul and performance enhancements for MetVanDAMN)

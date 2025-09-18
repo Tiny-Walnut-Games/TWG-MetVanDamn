@@ -1,6 +1,7 @@
 // This file is part of Metroidvania Dungeon (MetVD) by Tiny Walnut Games
 // Cleaned by @jmeyer1980
 using NUnit.Framework;
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Shared;
 using Unity.Entities;
@@ -15,8 +16,8 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 	/// </summary>
 	public class ProceduralRoomGenerationTests
 		{
-		private World _world;
-		private EntityManager _entityManager;
+		private World _world = null!; // initialized in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
 
 		[SetUp]
 		public void SetUp()
@@ -93,7 +94,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			bool hasJumpConnection = false;
 			for (int i = 0; i < navBuffer.Length; i++)
 				{
-				if ((navBuffer [ i ].RequiredMovement & Ability.Jump) != 0)
+				if ((navBuffer[i].RequiredMovement & Ability.Jump) != 0)
 					{
 					hasJumpConnection = true;
 					break;
@@ -145,7 +146,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 			// 🧙‍♂️ SACRED FIX: Initialize physics with proper values instead of all zeros!
 			var physics = new JumpArcPhysics(
 				height: 4.0f,      // Allow 4-unit jumps
-				distance: 6.0f,    // Allow 6-unit horizontal distance  
+				distance: 6.0f,    // Allow 6-unit horizontal distance
 				doubleBonus: 1.5f, // 50% bonus for double jump
 				gravity: 1.0f,     // Standard gravity
 				wallHeight: 3.0f,  // Wall jump capability

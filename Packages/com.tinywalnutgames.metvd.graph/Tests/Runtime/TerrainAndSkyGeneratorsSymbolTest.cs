@@ -1,4 +1,5 @@
 using NUnit.Framework;
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -10,7 +11,7 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 	/// </summary>
 	public class TerrainAndSkyGeneratorsSymbolTest
 		{
-		private World testWorld;
+		private World testWorld = null!; // assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

@@ -19,7 +19,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private EntityQuery _navigationGraphQuery;
 
 		// 🔥 ACTUAL ECB SYSTEM REFERENCE - NOT JUST COMMENTS
-		private EndInitializationEntityCommandBufferSystem _endInitEcbSystem;
+		private EndInitializationEntityCommandBufferSystem _endInitEcbSystem = null!; // set in OnCreate
 
 		protected override void OnCreate()
 			{
@@ -221,7 +221,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				DynamicBuffer<GateConditionBufferElement> sourceGates = SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
 				for (int i = 0; i < sourceGates.Length && i < 4; i++) // Limit to 4 conditions
 					{
-					gateConditions.Add(sourceGates [ i ].Value);
+					gateConditions.Add(sourceGates[i].Value);
 					}
 				}
 
@@ -231,7 +231,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				DynamicBuffer<GateConditionBufferElement> destGates = SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
 				for (int i = 0; i < destGates.Length && i < (4 - gateConditions.Count); i++)
 					{
-					gateConditions.Add(destGates [ i ].Value);
+					gateConditions.Add(destGates[i].Value);
 					}
 				}
 
@@ -248,7 +248,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			for (int i = 0; i < gates.Count; i++)
 				{
-				GateCondition gate = gates [ i ];
+				GateCondition gate = gates[i];
 				combinedPolarity |= gate.RequiredPolarity;
 				combinedAbilities |= gate.RequiredAbilities;
 
@@ -316,7 +316,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					}
 				}
 
-			public readonly GateCondition this [ int index ]
+			public readonly GateCondition this[int index]
 				{
 				get
 					{

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Autho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Authoring", "TinyWalnutGames.MetVD.Authoring.csproj", "{1C947371-7B21-A5C5-A553-6A4F3D0F5CFC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{6E8EEBA4-C2CF-FCA3-0C08-4A9C30C3497F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Authoring.Tests", "TinyWalnutGames.MetVD.Authoring.Tests.csproj", "{642C44E6-7C9C-5F7F-6526-BAAAA0DCA5B4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Utility", "TinyWalnutGames.MetVD.Utility.csproj", "{B929F59F-9716-BF18-93BC-E56A67BCECDE}"
@@ -22,8 +24,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Samples", "TinyWalnutGames.MetVD.Samples.csproj", "{077B9EBE-F88F-C8BA-6798-C73D2EAC959F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Core.Tests", "TinyWalnutGames.MetVD.Core.Tests.csproj", "{E9C4D347-2E1D-F368-39D1-5811E421A254}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-firstpass", "Assembly-CSharp-firstpass.csproj", "{31FF6201-9FC4-18C5-B7D7-D48004932EB3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyWalnutGames.MetVD.Biome", "TinyWalnutGames.MetVD.Biome.csproj", "{657EBCB1-E90D-F326-9D47-83652F99795B}"
 EndProject
@@ -59,6 +59,10 @@ Global
 		{1C947371-7B21-A5C5-A553-6A4F3D0F5CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C947371-7B21-A5C5-A553-6A4F3D0F5CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C947371-7B21-A5C5-A553-6A4F3D0F5CFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E8EEBA4-C2CF-FCA3-0C08-4A9C30C3497F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E8EEBA4-C2CF-FCA3-0C08-4A9C30C3497F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E8EEBA4-C2CF-FCA3-0C08-4A9C30C3497F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E8EEBA4-C2CF-FCA3-0C08-4A9C30C3497F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{642C44E6-7C9C-5F7F-6526-BAAAA0DCA5B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{642C44E6-7C9C-5F7F-6526-BAAAA0DCA5B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{642C44E6-7C9C-5F7F-6526-BAAAA0DCA5B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,10 +91,6 @@ Global
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9C4D347-2E1D-F368-39D1-5811E421A254}.Release|Any CPU.Build.0 = Release|Any CPU
-		{31FF6201-9FC4-18C5-B7D7-D48004932EB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{31FF6201-9FC4-18C5-B7D7-D48004932EB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{31FF6201-9FC4-18C5-B7D7-D48004932EB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{31FF6201-9FC4-18C5-B7D7-D48004932EB3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{657EBCB1-E90D-F326-9D47-83652F99795B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{657EBCB1-E90D-F326-9D47-83652F99795B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{657EBCB1-E90D-F326-9D47-83652F99795B}.Release|Any CPU.ActiveCfg = Release|Any CPU

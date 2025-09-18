@@ -18,11 +18,12 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 	/// Tests actual Unity physics integration, GameObject instantiation, and real-world performance!
 	/// Validates that our mathematical models work with actual Unity systems.
 	/// </summary>
+#nullable enable
 	public class UnityIntegrationAndPerformanceTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
-		private GameObject _testParent;
+		private World _testWorld = null!; // assigned in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
+		private GameObject _testParent = null!; // assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

@@ -16,11 +16,12 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 	/// Tests the actual player experience, progression validation, and end-to-end workflows!
 	/// Ensures that players get the intended MetVanDAMN experience.
 	/// </summary>
+#nullable enable
 	public class PlayerExperienceAndEndToEndTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
-		private GameObject _testPlayer;
+		private World _testWorld = null!; // assigned in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
+		private GameObject _testPlayer = null!; // assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

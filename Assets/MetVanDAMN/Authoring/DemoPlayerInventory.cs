@@ -1,3 +1,4 @@
+#nullable enable
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -16,11 +17,17 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         public KeyCode inventoryKey = KeyCode.I;
         public KeyCode quickUseKey = KeyCode.F;
 
-        // Equipment slots
-        private DemoItem equippedWeapon;
-        private DemoItem equippedOffhand;
-        private DemoItem equippedArmor;
-        private DemoItem equippedTrinket;
+        // Equipment slots (initialized with null-forgiving; populated via Equip methods)
+        private DemoItem? equippedWeapon; // Assigned when a weapon is equipped
+        private DemoItem? equippedOffhand;
+        private DemoItem? equippedArmor;
+        private DemoItem? equippedTrinket;
+
+        // Public accessors for equipped items (consumed by other systems)
+        public DemoItem? EquippedWeapon { get { return equippedWeapon; } }
+        public DemoItem? EquippedOffhand { get { return equippedOffhand; } }
+        public DemoItem? EquippedArmor { get { return equippedArmor; } }
+        public DemoItem? EquippedTrinket { get { return equippedTrinket; } }
 
         // Currency
         public int Coins { get; private set; } = 0;
@@ -33,11 +40,16 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private DemoPlayerCombat playerCombat;
         private DemoPlayerMovement playerMovement;
 
-        // Events
-        public System.Action OnInventoryChanged;
-        public System.Action<DemoItem> OnItemEquipped;
-        public System.Action<DemoItem> OnItemUnequipped;
-        public System.Action<DemoItem> OnItemUsed;
+        // Auto-loot and interaction ranges (configured via SetStats)
+        private float interactionRange = 1.5f;
+        private float scanRange = 10f;
+        private float lootMagnetRange = 3f;
+
+        // Events (nullable until one or more subscribers attach)
+        public System.Action? OnInventoryChanged;
+        public System.Action<DemoItem>? OnItemEquipped;
+        public System.Action<DemoItem>? OnItemUnequipped;
+        public System.Action<DemoItem>? OnItemUsed;
 
         private void Awake()
             {
@@ -240,7 +252,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         public bool UnequipItem(EquipmentSlot slot)
             {
-            DemoItem itemToUnequip = null;
+            DemoItem? itemToUnequip = null;
 
             switch (slot)
                 {
@@ -442,8 +454,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private void ApplyHealthBuff(DemoItem item)
             {
-            // Restore health based on item potency
-            float healAmount = item.armorStats.healthBonus;
+            // Restore health based on item potency (armorStats optional)
+            float healAmount = item.armorStats?.healthBonus ?? 0f;
             if (healAmount <= 0) healAmount = 25f; // Default heal amount
 
             if (playerCombat)
@@ -456,7 +468,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private void ApplyDamageBuff(DemoItem item)
             {
             // Temporary damage increase
-            float damageBonus = item.weaponStats.damage;
+            float damageBonus = item.weaponStats?.damage ?? 0f;
             if (damageBonus <= 0) damageBonus = 10f; // Default damage bonus
 
             StartCoroutine(ApplyTemporaryDamageBuff(damageBonus, 30f)); // 30 second duration
@@ -475,7 +487,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private void ApplyDefenseBuff(DemoItem item)
             {
             // Temporary defense increase
-            float defenseBonus = item.armorStats.defense;
+            float defenseBonus = item.armorStats?.defense ?? 0f;
             if (defenseBonus <= 0) defenseBonus = 5f; // Default defense bonus
 
             StartCoroutine(ApplyTemporaryDefenseBuff(defenseBonus, 60f)); // 1 minute duration
@@ -541,23 +553,29 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             float totalDefenseBonus = 0f;
             float totalDamageBonus = 0f;
 
-            if (equippedArmor != null)
+            if (equippedArmor?.armorStats != null)
                 {
                 totalHealthBonus += equippedArmor.armorStats.healthBonus;
                 totalDefenseBonus += equippedArmor.armorStats.defense;
                 }
 
-            if (equippedWeapon != null)
+            if (equippedWeapon?.weaponStats != null)
                 {
                 totalDamageBonus += equippedWeapon.weaponStats.damage * 0.1f; // 10% of weapon damage as bonus
                 }
 
             if (equippedTrinket != null)
                 {
-                // Trinkets provide small bonuses to all stats
-                totalHealthBonus += equippedTrinket.armorStats.healthBonus;
-                totalDefenseBonus += equippedTrinket.armorStats.defense;
-                totalDamageBonus += equippedTrinket.weaponStats.damage * 0.05f; // 5% damage bonus
+                // Trinkets provide small bonuses to all stats (stats objects optional)
+                if (equippedTrinket.armorStats != null)
+                    {
+                    totalHealthBonus += equippedTrinket.armorStats.healthBonus;
+                    totalDefenseBonus += equippedTrinket.armorStats.defense;
+                    }
+                if (equippedTrinket.weaponStats != null)
+                    {
+                    totalDamageBonus += equippedTrinket.weaponStats.damage * 0.05f; // 5% damage bonus
+                    }
                 }
 
             // Apply bonuses to combat system
@@ -570,7 +588,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private WeaponType GetWeaponType(DemoItem weapon)
             {
             // Determine weapon type based on weapon stats or item properties
-            if (weapon.weaponStats.range > 5f)
+            if (weapon.weaponStats != null && weapon.weaponStats.range > 5f)
                 {
                 return WeaponType.Ranged;
                 }
@@ -651,7 +669,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         // Public API
         public List<DemoItem> GetInventoryItems() => new(inventoryItems);
-        public DemoItem GetEquippedItem(EquipmentSlot slot)
+        public DemoItem? GetEquippedItem(EquipmentSlot slot)
             {
             switch (slot)
                 {
@@ -726,9 +744,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
     [System.Serializable]
     public class DemoItem
         {
-        public string id;
-        public string name;
-        public string description;
+        public string id = string.Empty;
+        public string name = string.Empty;
+        public string description = string.Empty;
         public ItemType type;
         public ItemRarity rarity;
         public int stackSize = 1;
@@ -736,9 +754,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         public int value;
 
         // Equipment stats
-        public WeaponStats weaponStats;
-        public ArmorStats armorStats;
-        public TrinketStats trinketStats;
+        public WeaponStats? weaponStats;
+        public ArmorStats? armorStats;
+        public TrinketStats? trinketStats;
 
         // Consumable properties
         public ConsumableEffect consumableEffect;
@@ -804,6 +822,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         {
         public int healthBonus;
         public int manaBonus;
+        public int damageBonus;
+        public int defenseBonus;
         public float speedBonus;
 
         public TrinketStats Clone()
@@ -850,6 +870,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         Heal,
         Mana,
         Buff,
+        DamageBuff,
+        DefenseBuff,
+        SpeedBuff,
         Debuff
         }
     }

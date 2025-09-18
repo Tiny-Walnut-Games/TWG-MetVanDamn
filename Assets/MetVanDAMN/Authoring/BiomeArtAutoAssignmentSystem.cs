@@ -6,6 +6,8 @@ using Unity.Entities;
 using Unity.Mathematics;
 using CoreBiome = TinyWalnutGames.MetVD.Core.Biome;
 
+#nullable enable
+
 namespace TinyWalnutGames.MetVD.Authoring
     {
     /// <summary>
@@ -42,7 +44,7 @@ namespace TinyWalnutGames.MetVD.Authoring
             Entity libEntity = _libraryQ.GetSingletonEntity();
             BiomeArtProfileLibraryRef libRef = state.EntityManager.GetComponentData<BiomeArtProfileLibraryRef>(libEntity);
             if (!libRef.Library.IsValid()) return;
-            BiomeArtProfileLibrary lib = libRef.Library.Value;
+            BiomeArtProfileLibrary? lib = libRef.Library.Value;
             if (lib == null) return;
 
             NativeArray<Entity> ents = _targetsQ.ToEntityArray(Allocator.Temp);
@@ -72,7 +74,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                         seed ^= e * 2246822519u; // mix elevation into RNG
                         rng = new Random(seed);
                         }
-                    BiomeArtProfile chosen = SelectProfileForTypeAndElevation(lib, biome.Type, elevation, ref rng);
+                    BiomeArtProfile? chosen = SelectProfileForTypeAndElevation(lib, biome.Type, elevation, ref rng);
                     if (chosen == null) continue;
 
                     // write back chosen profile; keep projection type as-is (from authoring if present)
@@ -89,7 +91,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 }
             }
 
-        private static BiomeArtProfile SelectProfileForTypeAndElevation(BiomeArtProfileLibrary lib, BiomeType type, BiomeElevation elevation, ref Random rng)
+        private static BiomeArtProfile? SelectProfileForTypeAndElevation(BiomeArtProfileLibrary lib, BiomeType type, BiomeElevation elevation, ref Random rng)
             {
             // Ask library for best matching profiles: type+elevation -> type -> global
             BiomeArtProfile[] pool = lib.GetProfiles(type, elevation);

@@ -1,3 +1,4 @@
+#nullable enable
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -11,29 +12,29 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
     public class DemoInventoryUI : MonoBehaviour
         {
         [Header("UI Panels")]
-        public GameObject inventoryPanel;
-        public Transform inventoryGrid;
-        public Transform equipmentPanel;
+        public GameObject? inventoryPanel;
+        public Transform? inventoryGrid;
+        public Transform? equipmentPanel;
 
         [Header("Equipment Slots")]
-        public DemoEquipmentSlot weaponSlot;
-        public DemoEquipmentSlot offhandSlot;
-        public DemoEquipmentSlot armorSlot;
-        public DemoEquipmentSlot trinketSlot;
+        public DemoEquipmentSlot? weaponSlot;
+        public DemoEquipmentSlot? offhandSlot;
+        public DemoEquipmentSlot? armorSlot;
+        public DemoEquipmentSlot? trinketSlot;
 
         [Header("Item Display")]
-        public GameObject itemSlotPrefab;
-        public GameObject tooltipPanel;
-        public Text tooltipText;
+        public GameObject? itemSlotPrefab;
+        public GameObject? tooltipPanel;
+        public Text? tooltipText;
 
         [Header("Player Info")]
-        public Slider healthBar;
-        public Text healthText;
-        public Text coinsText;
+        public Slider? healthBar;
+        public Text? healthText;
+        public Text? coinsText;
 
         // Bound player inventory (can be assigned by spawner/owner)
-        public DemoPlayerInventory playerInventory;
-        private DemoPlayerCombat playerCombat;
+        public DemoPlayerInventory? playerInventory;
+        private DemoPlayerCombat? playerCombat;
         private List<DemoInventorySlot> inventorySlots = new();
         private bool isInventoryOpen = false;
 
@@ -57,7 +58,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 }
 
             // Subscribe to inventory events
-            if (playerInventory)
+            if (playerInventory != null)
                 {
                 playerInventory.OnInventoryChanged += RefreshInventoryDisplay;
                 playerInventory.OnItemEquipped += OnItemEquipped;
@@ -97,7 +98,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 }
 
             // Rewire events to current playerInventory if not already set
-            if (playerInventory)
+            if (playerInventory != null)
                 {
                 playerInventory.OnInventoryChanged -= RefreshInventoryDisplay;
                 playerInventory.OnItemEquipped -= OnItemEquipped;
@@ -148,7 +149,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             // Create inventory grid
             GameObject gridObj = new GameObject("InventoryGrid");
-            gridObj.transform.SetParent(inventoryPanel.transform, false);
+            gridObj.transform.SetParent(inventoryPanel!.transform, false);
 
             var gridLayout = gridObj.AddComponent<GridLayoutGroup>();
             gridLayout.cellSize = new Vector2(60, 60);
@@ -169,7 +170,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             // Create equipment panel
             GameObject equipObj = new GameObject("EquipmentPanel");
-            equipObj.transform.SetParent(inventoryPanel.transform, false);
+            equipObj.transform.SetParent(inventoryPanel!.transform, false);
 
             var rectTransform = equipObj.GetComponent<RectTransform>();
             rectTransform.anchorMin = new Vector2(0.05f, 0.4f);
@@ -233,7 +234,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private void CreatePlayerInfoPanel()
             {
             GameObject infoObj = new GameObject("PlayerInfoPanel");
-            infoObj.transform.SetParent(inventoryPanel.transform, false);
+            infoObj.transform.SetParent(inventoryPanel!.transform, false);
 
             var rectTransform = infoObj.GetComponent<RectTransform>();
             rectTransform.anchorMin = new Vector2(0.05f, 0.05f);
@@ -292,7 +293,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         private void CreateTooltipPanel()
             {
             tooltipPanel = new GameObject("TooltipPanel");
-            tooltipPanel.transform.SetParent(inventoryPanel.transform, false);
+            tooltipPanel.transform.SetParent(inventoryPanel!.transform, false);
 
             var tooltipImage = tooltipPanel.AddComponent<Image>();
             tooltipImage.color = new Color(0, 0, 0, 0.9f);
@@ -333,7 +334,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             for (int i = 0; i < 20; i++) // Default inventory size
                 {
                 GameObject slotObj = new GameObject($"InventorySlot_{i}");
-                slotObj.transform.SetParent(inventoryGrid, false);
+                slotObj.transform.SetParent(inventoryGrid!, false);
 
                 var slotImage = slotObj.AddComponent<Image>();
                 slotImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
@@ -373,7 +374,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             // Clear all slots first
             foreach (var slot in inventorySlots)
                 {
-                slot.SetItem(null);
+                slot.SetItem(null!);
                 }
 
             // Fill slots with items
@@ -388,7 +389,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private void UpdateCoinsDisplay()
             {
-            if (!playerInventory || !coinsText) return;
+            if (playerInventory == null || coinsText == null) return;
 
             int coinCount = 0;
             var items = playerInventory.GetInventoryItems();
@@ -414,10 +415,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             // Clear equipment slot display
             var slot = GetEquipmentSlotForItem(item);
-            if (slot) { slot.SetItem(null); }
+            if (slot) { slot.SetItem(null!); }
             }
 
-        private DemoEquipmentSlot GetEquipmentSlotForItem(DemoItem item)
+        private DemoEquipmentSlot? GetEquipmentSlotForItem(DemoItem item)
             {
             return item.type switch
                 {
@@ -445,7 +446,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         public void ShowTooltip(DemoItem item, Vector3 position)
             {
-            if (!tooltipPanel || !tooltipText || item == null) return;
+            if (tooltipPanel == null || tooltipText == null || item == null) return;
 
             string tooltip = $"<b>{item.name}</b>\n{item.description}\nValue: {item.value}";
 
@@ -475,7 +476,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             }
 
         // Public API
-        public DemoPlayerInventory PlayerInventory => playerInventory;
+        public DemoPlayerInventory? PlayerInventory => playerInventory;
         public bool IsInventoryOpen => isInventoryOpen;
         }
 
@@ -485,10 +486,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
     public class DemoInventorySlot : MonoBehaviour
         {
         private int slotIndex;
-        private DemoItem currentItem;
-        private DemoInventoryUI inventoryUI;
-        private Image slotImage;
-        private Text stackText;
+        private DemoItem? currentItem;
+        private DemoInventoryUI? inventoryUI;
+        private Image slotImage = null!; // set in Initialize
+        private Text stackText = null!;  // set in Initialize
 
         public void Initialize(int index, DemoInventoryUI ui)
             {
@@ -517,7 +518,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             button.onClick.AddListener(OnSlotClicked);
             }
 
-        public void SetItem(DemoItem item)
+        public void SetItem(DemoItem? item)
             {
             currentItem = item;
 
@@ -563,16 +564,16 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             if (currentItem == null) return;
 
-            if (currentItem.type == ItemType.Consumable)
+            if (currentItem!.type == ItemType.Consumable)
                 {
                 // Use consumable
-                if (inventoryUI.PlayerInventory) inventoryUI.PlayerInventory.UseItem(currentItem);
+                if (inventoryUI!.PlayerInventory != null) inventoryUI.PlayerInventory.UseItem(currentItem!);
                 }
             else if (currentItem.type == ItemType.Weapon || currentItem.type == ItemType.Armor ||
                      currentItem.type == ItemType.Offhand || currentItem.type == ItemType.Trinket)
                 {
                 // Equip item
-                if (inventoryUI.PlayerInventory) inventoryUI.PlayerInventory.EquipItem(currentItem);
+                if (inventoryUI!.PlayerInventory != null) inventoryUI.PlayerInventory.EquipItem(currentItem!);
                 }
             }
 
@@ -581,13 +582,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             if (currentItem != null)
                 {
-                inventoryUI.ShowTooltip(currentItem, transform.position);
+                inventoryUI!.ShowTooltip(currentItem!, transform.position);
                 }
             }
 
         private void OnMouseExit()
             {
-            inventoryUI.HideTooltip();
+            inventoryUI!.HideTooltip();
             }
         }
 
@@ -597,9 +598,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
     public class DemoEquipmentSlot : MonoBehaviour
         {
         private EquipmentSlot slotType;
-        private DemoItem equippedItem;
-        private DemoInventoryUI inventoryUI;
-        private Image slotImage;
+        private DemoItem? equippedItem;
+        private DemoInventoryUI? inventoryUI;
+        private Image slotImage = null!; // set in Initialize
 
         public void Initialize(EquipmentSlot type, DemoInventoryUI ui)
             {
@@ -612,7 +613,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             button.onClick.AddListener(OnSlotClicked);
             }
 
-        public void SetItem(DemoItem item)
+        public void SetItem(DemoItem? item)
             {
             equippedItem = item;
 
@@ -641,10 +642,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
         private void OnSlotClicked()
             {
-            if (equippedItem != null)
+            if (equippedItem != null && inventoryUI != null && inventoryUI.PlayerInventory != null)
                 {
                 // Unequip item
-                if (inventoryUI.PlayerInventory) inventoryUI.PlayerInventory.UnequipItem(slotType);
+                inventoryUI.PlayerInventory.UnequipItem(slotType);
                 }
             }
 
@@ -653,13 +654,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             if (equippedItem != null)
                 {
-                inventoryUI.ShowTooltip(equippedItem, transform.position);
+                inventoryUI!.ShowTooltip(equippedItem, transform.position);
                 }
             }
 
         private void OnMouseExit()
             {
-            inventoryUI.HideTooltip();
+            inventoryUI!.HideTooltip();
             }
         }
     }

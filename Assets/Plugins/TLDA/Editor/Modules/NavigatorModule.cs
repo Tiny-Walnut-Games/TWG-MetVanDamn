@@ -1,3 +1,4 @@
+#nullable enable
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
@@ -180,14 +181,14 @@ namespace LivingDevAgent.Editor.Modules
 
 			if (!_data.FolderExpanded.ContainsKey(path))
 				{
-				_data.FolderExpanded [ path ] = depth <= 1; // expand root/top-level by default
+				_data.FolderExpanded[path] = depth <= 1; // expand root/top-level by default
 				}
 
 			string labelPrefix = indent ?? string.Empty;
 			using (new EditorGUILayout.HorizontalScope())
 				{
-				string folderIcon = _data.FolderExpanded [ path ] ? "📂" : "📁";
-				_data.FolderExpanded [ path ] = EditorGUILayout.Foldout(_data.FolderExpanded [ path ], $"{folderIcon} {labelPrefix}{folderName}", true);
+				string folderIcon = _data.FolderExpanded[path] ? "📂" : "📁";
+				_data.FolderExpanded[path] = EditorGUILayout.Foldout(_data.FolderExpanded[path], $"{folderIcon} {labelPrefix}{folderName}", true);
 
 				if (GUILayout.Button("✅", EditorStyles.miniButton, GUILayout.Width(25)))
 					{
@@ -196,12 +197,12 @@ namespace LivingDevAgent.Editor.Modules
 					}
 				}
 
-			if (!_data.FolderExpanded [ path ]) return; // @jmeyer1980 ⚠ Intention ⚠ - IL for legibility
+			if (!_data.FolderExpanded[path]) return; // @jmeyer1980 ⚠ Intention ⚠ - IL for legibility
 
 			try
 				{
 				// Sort subdirectories for stable nav
-				string [ ] subDirs = Directory.GetDirectories(path);
+				string[] subDirs = Directory.GetDirectories(path);
 				Array.Sort(subDirs, StringComparer.OrdinalIgnoreCase);
 				foreach (string d in subDirs)
 					{
@@ -211,7 +212,7 @@ namespace LivingDevAgent.Editor.Modules
 					}
 
 				// Sort files for stable nav
-				string [ ] files = Directory.GetFiles(path);
+				string[] files = Directory.GetFiles(path);
 				Array.Sort(files, StringComparer.OrdinalIgnoreCase);
 				foreach (string f in files)
 					{
@@ -270,7 +271,7 @@ namespace LivingDevAgent.Editor.Modules
 				{
 				try
 					{
-					byte [ ] bytes = File.ReadAllBytes(filePath);
+					byte[] bytes = File.ReadAllBytes(filePath);
 					if (bytes != null)
 						{
 						tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
@@ -356,11 +357,11 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			if (tex == null) return; // @jmeyer1980 ⚠ Intention ⚠ - IL for legibility
 
-			_data.ImageCache [ key ] = tex;
+			_data.ImageCache[key] = tex;
 			_data.ImageCacheOrder.Add(key);
 			if (_data.ImageCacheOrder.Count > TLDLScribeData.ImageCacheMax)
 				{
-				string oldest = _data.ImageCacheOrder [ 0 ];
+				string oldest = _data.ImageCacheOrder[0];
 				_data.ImageCacheOrder.RemoveAt(0);
 				if (_data.ImageCache.TryGetValue(oldest, out Texture2D oldTex) && oldTex != null)
 					{
@@ -545,17 +546,17 @@ namespace LivingDevAgent.Editor.Modules
 					{
 					if (line.StartsWith("**Author:"))
 						{
-						string v = line [ "**Author:**".Length.. ].Trim();
+						string v = line["**Author:**".Length..].Trim();
 						if (!string.IsNullOrEmpty(v)) _data.Author = v;
 						}
 					else if (line.StartsWith("**Summary:"))
 						{
-						string v = line [ "**Summary:**".Length.. ].Trim();
+						string v = line["**Summary:**".Length..].Trim();
 						if (!string.IsNullOrEmpty(v)) _data.Summary = v;
 						}
 					else if (line.StartsWith("**Context:"))
 						{
-						string v = line [ "**Context:**".Length.. ].Trim();
+						string v = line["**Context:**".Length..].Trim();
 						if (!string.IsNullOrEmpty(v)) _data.Context = v;
 						}
 					else if (line.StartsWith("**Tags"))
@@ -563,7 +564,7 @@ namespace LivingDevAgent.Editor.Modules
 						int idx = line.IndexOf(':');
 						if (idx >= 0)
 							{
-							string v = line [ (idx + 1).. ].Trim();
+							string v = line[(idx + 1)..].Trim();
 							if (!string.IsNullOrEmpty(v))
 								{
 								_data.TagsCsv = v.Replace('#', ' ').Replace("  ", " ").Trim().Replace(' ', ',');
@@ -579,7 +580,7 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			string projectRoot = Directory.GetParent(Application.dataPath)!.FullName.Replace('\\', '/');
 			string norm = absPath.Replace('\\', '/');
-			return norm.StartsWith(projectRoot) ? norm [ (projectRoot.Length + 1).. ] : absPath;
+			return norm.StartsWith(projectRoot) ? norm[(projectRoot.Length + 1)..] : absPath;
 			}
 
 		private static string GetRelativePath(string baseDir, string fullPath)
@@ -605,8 +606,8 @@ namespace LivingDevAgent.Editor.Modules
 			// @jmeyer1980 ⚠ Intention ⚠ - IL for legibility
 			if (string.IsNullOrEmpty(path)) return path;
 
-			char last = path [ ^1 ]; // range operator for last character
-									 // @jmeyer1980 ⚠ Intention ⚠ - Dual-L for legibility
+			char last = path[^1]; // range operator for last character
+								  // @jmeyer1980 ⚠ Intention ⚠ - Dual-L for legibility
 			return last == Path.DirectorySeparatorChar || last == Path.AltDirectorySeparatorChar ? path : path + Path.DirectorySeparatorChar;
 			}
 

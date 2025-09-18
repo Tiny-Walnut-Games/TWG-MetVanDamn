@@ -1,4 +1,5 @@
 using NUnit.Framework;
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Shared;
 using Unity.Entities;
@@ -11,9 +12,9 @@ namespace TinyWalnutGames.MetVD.Graph.Tests
 	/// </summary>
 	public class ProceduralLayoutSystemTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
-		private InitializationSystemGroup _initGroup;
+		private World _testWorld = null!; // initialized in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
+		private InitializationSystemGroup _initGroup = null!; // initialized in SetUp
 
 		[SetUp]
 		public void SetUp()

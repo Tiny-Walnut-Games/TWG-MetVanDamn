@@ -14,12 +14,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	/// Tests the sophisticated 2000+ line biome art system that was previously untested!
 	/// Validates multi-projection tilemap generation, advanced prop placement, and coordinate-aware materials.
 	/// </summary>
+#nullable enable
 	public class BiomeArtIntegrationSystemTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
-		private BiomeArtMainThreadSystem _biomeArtSystem;
-		private BeginInitializationEntityCommandBufferSystem _ecbSystem;
+		private World _testWorld = null!; // assigned in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
+		private BiomeArtMainThreadSystem _biomeArtSystem = null!; // assigned in SetUp
+		private BeginInitializationEntityCommandBufferSystem _ecbSystem = null!; // assigned in SetUp
 
 		[SetUp]
 		public void SetUp()
@@ -48,7 +49,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 		public void BiomeArtIntegrationSystem_CreatesCorrectTilemaps_ForAllProjectionTypes()
 			{
 			// Arrange - Test all 4 projection types: Platformer, TopDown, Isometric, Hexagonal
-			ProjectionType [ ] projectionTypes = new [ ] {
+			ProjectionType[] projectionTypes = new[] {
 				ProjectionType.Platformer,
 				ProjectionType.TopDown,
 				ProjectionType.Isometric,
@@ -91,7 +92,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			Assert.IsTrue(artRef.IsApplied, "Biome art should be successfully applied");
 
 			// For platformer projection, we expect specific layers like:
-			// Parallax5, Parallax4, Parallax3, Parallax2, Parallax1, Background2, Background1, 
+			// Parallax5, Parallax4, Parallax3, Parallax2, Parallax1, Background2, Background1,
 			// BackgroundProps, WalkableGround, WalkableProps, Hazards, Foreground, ForegroundProps, etc.
 			TestContext.WriteLine("✅ Grid layers generated successfully for Platformer projection");
 			TestContext.WriteLine("Expected layers: Parallax backgrounds, Walkable ground/props, Foreground elements");
@@ -203,7 +204,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			testProfile.debugColor = GetColorForBiome(biomeType);
 			testProfile.propSettings = new PropPlacementSettings
 				{
-				propPrefabs = new GameObject [ 0 ], // Empty for testing
+				propPrefabs = new GameObject[0], // Empty for testing
 				allowedPropLayers = new() { "FloorProps", "WalkableProps" },
 				strategy = PropPlacementStrategy.Random,
 				baseDensity = 0.1f

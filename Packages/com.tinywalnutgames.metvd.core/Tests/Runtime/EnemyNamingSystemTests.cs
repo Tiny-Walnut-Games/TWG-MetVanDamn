@@ -12,13 +12,14 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 	/// Covers name generation, boss syllable concatenation, icon assignment, and config behavior
 	/// </summary>
 	[TestFixture]
+#nullable enable
 	public class EnemyNamingSystemTests
 		{
-		private World world;
-		private EntityManager m_Manager;
-		private InitializationSystemGroup initGroup;
-		private Entity configEntity;
-		private Entity testEnemyEntity;
+		private World world = null!;
+		private EntityManager m_Manager; // struct, will be set in SetUp
+		private InitializationSystemGroup initGroup = null!;
+		private Entity configEntity; // value type
+		private Entity testEnemyEntity; // value type
 
 		[SetUp]
 		public void Setup()

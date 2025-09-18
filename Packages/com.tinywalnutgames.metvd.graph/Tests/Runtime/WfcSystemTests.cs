@@ -1,4 +1,5 @@
 using NUnit.Framework;
+#nullable enable
 using System.Collections;
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
@@ -12,8 +13,8 @@ namespace TinyWalnutGames.MetVD.Tests
 	/// </summary>
 	public class WfcSystemTests
 		{
-		private World testWorld;
-		private SimulationSystemGroup simGroup;
+		private World testWorld = null!; // initialized in SetUp
+		private SimulationSystemGroup simGroup = null!; // initialized in SetUp
 
 		[SetUp]
 		public void SetUp()

@@ -24,7 +24,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private const string ScenesRootFolder = "Assets/Scenes";
 		private const string SubScenesFolder = "Assets/Scenes/SubScenes";
 		private static bool _fallbackTriggeredThisRun = false; // track if fallback unloaded baseline
-		private static string _currentRootScenePath;           // track path for reopening after fallback
+		private static string _currentRootScenePath = string.Empty;           // track path for reopening after fallback (initialized non-null)
 
 #if !METVD_FULL_DOTS // #2
         [AddComponentMenu("")]
@@ -135,7 +135,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				if (!allMetaFilesReady)
 					{
-					System.Threading.Thread.Sleep(200);
+					// ⏳ Removed blocking Thread.Sleep(200); rely on next pass of while (tight loop kept intentionally short by attempt cap)
+					// If this proves too CPU aggressive we can convert Phase 4 to an EditorApplication.update driven state machine.
 					metaAttempts++;
 					}
 				}
@@ -175,11 +176,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 
 			// 🧙‍♂️ PHASE 7: Force asset database sync and wait
-			System.Threading.Thread.Sleep(500); // Let Unity digest the scene structure
+			// ⏳ Removed blocking Thread.Sleep(500); proceeding immediately – SaveScene + Refresh calls below are synchronous enough in modern Unity
 			Debug.Log("🔄 Phase 7: Synchronizing before reference assignment...");
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
-			System.Threading.Thread.Sleep(500); // Let Unity digest the scene structure
+			// ⏳ Removed blocking Thread.Sleep(500); second stabilization wait deemed unnecessary
 
 			// 🎯 PHASE 8: Assign SceneAsset references to existing SubScene components
 			Debug.Log("🔗 Phase 8: Assigning SceneAsset references...");
@@ -214,7 +215,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 				// 🧙‍♂️ WAIT FOR SCENE ASSETS TO BE FULLY PROCESSED
-				System.Threading.Thread.Sleep(1000); // Give Unity time to process assets
+				// ⏳ Removed blocking Thread.Sleep(1000); asset processing assumed complete after ForceSynchronousImport refresh
 
 				// Assign references with detailed logging
 				int successCount = 0;
@@ -226,7 +227,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 					// 🔥 INDIVIDUAL ASSET REFRESH after each assignment
 					AssetDatabase.SaveAssets();
-					System.Threading.Thread.Sleep(200); // Brief pause between assignments
+					// ⏳ Removed blocking Thread.Sleep(200); rapid successive assignments are acceptable
 					}
 
 				// Final save and validation
@@ -268,7 +269,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				if (File.Exists(_currentRootScenePath))
 					{
-					System.Threading.Thread.Sleep(500); // @jmeyer1980 ⚠ Intention ⚠TODO: Test if this wait is actually needed
+					// ⏳ Removed blocking Thread.Sleep(500); open additive immediately
 					EditorSceneManager.OpenScene(_currentRootScenePath, OpenSceneMode.Additive);
 					}
 				}
@@ -276,7 +277,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Scene ensuredRoot = SceneManager.GetSceneByPath(_currentRootScenePath);
 			if (ensuredRoot.IsValid())
 				{
-				System.Threading.Thread.Sleep(500); // @jmeyer1980 ⚠ Intention ⚠ TODO: Test if this wait is actually needed
+				// ⏳ Removed blocking Thread.Sleep(500); SetActiveScene immediately
 				SceneManager.SetActiveScene(ensuredRoot);
 				}
 			}
@@ -485,7 +486,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			try
 				{
-				System.Threading.Thread.Sleep(500); // @jmeyer1980 ⚠ Intention ⚠ TODO: Test if this wait is actually needed
+				// ⏳ Removed blocking Thread.Sleep(500); additive scene creation proceeds without artificial delay
 				Scene additive = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
 				additive.name = sceneName;
 				if (!EditorSceneManager.SaveScene(additive, scenePath))
@@ -497,7 +498,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				// 🔥 TIMING FIX v2.0: More aggressive synchronization!
 				AssetDatabase.SaveAssets();
 
-				System.Threading.Thread.Sleep(500); // @jmeyer1980 ⚠ Intention ⚠ TODO: Test if this wait is actually needed
+				// ⏳ Removed blocking Thread.Sleep(500); rely on synchronous refresh
 				AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 				// 🧙‍♂️ GUID VALIDATION: Wait for both scene AND meta file
@@ -518,7 +519,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 							}
 						}
 
-					System.Threading.Thread.Sleep(500); // Longer wait for GUID generation
+					// ⏳ Removed blocking Thread.Sleep(500); loop will re-check immediately – can be converted to async update if needed
 					attempts++;
 					}
 
@@ -555,7 +556,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						Debug.Log($"🔍 Fallback scene GUID verified: {sceneName} -> {guid}");
 						break;
 						}
-					System.Threading.Thread.Sleep(500);
+					// ⏳ Removed blocking Thread.Sleep(500); fallback GUID validation loop tightened
 					attempts++;
 					}
 

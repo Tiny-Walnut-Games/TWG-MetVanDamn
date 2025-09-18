@@ -1641,7 +1641,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj" />
     <ProjectReference Include="TinyWalnutGames.GridLayerEditor.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Authoring.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Core.csproj" />

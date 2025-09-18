@@ -1,3 +1,4 @@
+#nullable enable
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
@@ -260,7 +261,7 @@ namespace LivingDevAgent.Editor.Modules
 
 			// Performance optimization: Cache field info for repeated cloning
 			Type type = typeof(T);
-			FieldInfo [ ] fields = type.GetFields();
+			FieldInfo[] fields = type.GetFields();
 
 			foreach (FieldInfo field in fields)
 				{
@@ -291,7 +292,7 @@ namespace LivingDevAgent.Editor.Modules
 				{
 				// Cache miss: Store method for future use
 				cachedMethod = windowType.GetMethod("SetStatusLine");
-				_setStatusMethodCache [ windowType ] = cachedMethod;
+				_setStatusMethodCache[windowType] = cachedMethod;
 				_reflectionCacheMisses++;
 
 				// Future expansion: Could log cache performance for optimization analysis
@@ -304,7 +305,7 @@ namespace LivingDevAgent.Editor.Modules
 			// Enhanced error handling with meaningful feedback
 			try
 				{
-				cachedMethod?.Invoke(_window, new object [ ] { message });
+				cachedMethod?.Invoke(_window, new object[] { message });
 				}
 			catch (Exception)
 				{
@@ -361,7 +362,7 @@ namespace LivingDevAgent.Editor.Modules
 
 			// Create and cache new style
 			GUIStyle newStyle = styleFactory?.Invoke() ?? new GUIStyle(EditorStyles.label);
-			_customStyleCache [ styleName ] = newStyle;
+			_customStyleCache[styleName] = newStyle;
 
 			// Future expansion: Theme integration point
 			// Could apply theme-specific modifications here

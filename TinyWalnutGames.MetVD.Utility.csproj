@@ -63,6 +63,7 @@
     <Compile Include="Assets\MetVanDAMN\Utility\AggregatorSystem.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\MetVanDAMN\Utility\TinyWalnutGames.MetVD.Utility.csc.rsp" />
     <None Include="Assets\MetVanDAMN\Utility\TinyWalnutGames.MetVD.Utility.asmdef" />
   </ItemGroup>
   <ItemGroup>

@@ -334,7 +334,7 @@ MetVanDAMN includes a **fully functional procedural leveling perk system** that 
 1. **Press Play** ▶️ to enter the demo
 2. **Test Controls**:
    - **F1**: Gain 50 XP (debug)
-   - **F2**: Force level up (debug)  
+   - **F2**: Force level up (debug)
    - **F3**: Force show upgrade choices (debug)
    - **F4**: Reset progression (debug)
 
@@ -358,7 +358,7 @@ var effectApplicator = player.AddComponent<UpgradeEffectApplicator>();
 ```
 
 #### **Configure Upgrade Database**
-1. **Create GameObject**: "UpgradeDatabaseManager" 
+1. **Create GameObject**: "UpgradeDatabaseManager"
 2. **Add Component**: `UpgradeDatabaseManager`
 3. **Auto-Find Collections**: Enabled (finds upgrade assets automatically)
 
@@ -367,7 +367,7 @@ var effectApplicator = player.AddComponent<UpgradeEffectApplicator>();
 #### **Sample Upgrades Included**
 - **Movement**: Double Jump, Wall Jump, Speed Boost
 - **Offense**: Damage Boost, Charge Attack
-- **Defense**: Health Boost, Health Regeneration  
+- **Defense**: Health Boost, Health Regeneration
 - **Utility**: Auto Loot, Inventory Expansion
 - **Special**: *More coming in your custom collections*
 
@@ -407,7 +407,7 @@ var effectApplicator = player.AddComponent<UpgradeEffectApplicator>();
 3. **Add to Collection**: Drag to appropriate UpgradeCollection asset
 
 #### **Create New Collections**
-1. **Assets > Create > MetVanDAMN > Upgrade Collection** 
+1. **Assets > Create > MetVanDAMN > Upgrade Collection**
 2. **Set Category**: Movement/Offense/Defense/Utility/Special
 3. **Add Upgrades**: Reference your UpgradeDefinition assets
 4. **Configure Biome Weights**: Influence based on world context

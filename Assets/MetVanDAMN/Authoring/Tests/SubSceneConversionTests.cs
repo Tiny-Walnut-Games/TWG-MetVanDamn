@@ -22,12 +22,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	/// NOTE: Due to Unity Editor test limitations, we validate the logic and workflow
 	/// rather than creating actual scene files during test execution.
 	/// </summary>
+#nullable enable
 	public class SubSceneConversionTests
 		{
-		private World testWorld;
-		private EntityManager entityManager;
-		private GameObject smokeTestObject;
-		private SmokeTestSceneSetup smokeTestComponent;
+		private World testWorld = null!; // assigned in SetUp
+		private EntityManager entityManager; // struct assigned in SetUp
+		private GameObject smokeTestObject = null!; // assigned in SetUp
+		private SmokeTestSceneSetup smokeTestComponent = null!; // assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

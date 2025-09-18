@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using TinyWalnutGames.MetVD.Core;
 using Unity.Entities;
 using TinyWalnutGames.MetVD.Shared;
+using System; // For Array.Empty
+
+#nullable enable
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring
     {
@@ -39,7 +42,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 {
                 if (spawnPoints.Length == 0) return;
 
-                Vector3 spawnPos = spawnPoints[Random.Range(0, spawnPoints.Length)].position;
+                Vector3 spawnPos = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].position;
                 var lootManager = FindFirstObjectByType<DemoLootManager>();
                 if (lootManager)
                     {
@@ -125,9 +128,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 PlayerPrefs.Save();
                 }
 
-            private SerializableItem SerializeItem(DemoItem item)
+            private SerializableItem? SerializeItem(DemoItem? item)
                 {
                 if (item == null) return null;
+
+                // Guard nested stat containers which may be null for certain item archetypes
+                var weaponStats = item.weaponStats;
+                var armorStats = item.armorStats;
 
                 return new SerializableItem
                     {
@@ -136,17 +143,17 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                     type = (int)item.type,
                     rarity = (int)item.rarity,
                     stackSize = item.stackSize,
-                    weaponDamage = item.weaponStats.damage,
-                    weaponRange = item.weaponStats.range,
-                    weaponAttackSpeed = item.weaponStats.attackSpeed,
-                    armorDefense = item.armorStats.defense,
-                    armorHealth = item.armorStats.healthBonus
+                    weaponDamage = weaponStats != null ? weaponStats.damage : 0f,
+                    weaponRange = weaponStats != null ? weaponStats.range : 0f,
+                    weaponAttackSpeed = weaponStats != null ? weaponStats.attackSpeed : 0f,
+                    armorDefense = armorStats != null ? armorStats.defense : 0f,
+                    armorHealth = armorStats != null ? armorStats.healthBonus : 0f
                     };
                 }
 
-            private SerializableItem[] SerializeInventoryItems(System.Collections.Generic.List<DemoItem> items)
+            private SerializableItem?[] SerializeInventoryItems(System.Collections.Generic.List<DemoItem> items)
                 {
-                var serializedItems = new SerializableItem[items.Count];
+                var serializedItems = new SerializableItem?[items.Count];
                 for (int i = 0; i < items.Count; i++)
                     {
                     serializedItems[i] = SerializeItem(items[i]);
@@ -179,7 +186,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 if (saveData.equippedWeapon != null)
                     {
                     var weapon = DeserializeItem(saveData.equippedWeapon);
-                    inventory.EquipItem(weapon);
+                    if (weapon != null) inventory.EquipItem(weapon);
                     }
 
                 // Restore inventory items
@@ -188,13 +195,15 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                     if (serializedItem != null)
                         {
                         var item = DeserializeItem(serializedItem);
-                        inventory.AddItem(item);
+                        if (item != null) inventory.AddItem(item);
                         }
                     }
                 }
 
-            private DemoItem DeserializeItem(SerializableItem serialized)
+            private DemoItem? DeserializeItem(SerializableItem? serialized)
                 {
+                if (serialized == null) return null;
+
                 var item = new DemoItem
                     {
                     name = serialized.name,
@@ -221,19 +230,19 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             private class InventorySaveData
                 {
                 public int coins;
-                public SerializableItem equippedWeapon;
-                public SerializableItem equippedOffhand;
-                public SerializableItem equippedArmor;
-                public SerializableItem equippedTrinket;
-                public SerializableItem[] inventoryItems;
+                public SerializableItem? equippedWeapon;
+                public SerializableItem? equippedOffhand;
+                public SerializableItem? equippedArmor;
+                public SerializableItem? equippedTrinket;
+                public SerializableItem?[] inventoryItems = Array.Empty<SerializableItem?>();
                 public long saveTimestamp;
                 }
 
             [System.Serializable]
             private class SerializableItem
                 {
-                public string name;
-                public string description;
+                public string name = string.Empty;
+                public string description = string.Empty;
                 public int type;
                 public int rarity;
                 public int stackSize;
@@ -264,7 +273,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
                 for (int i = 0; i < treasureChestCount; i++)
                     {
-                    Vector3 spawnPos = transform.position + Random.insideUnitSphere * spawnRadius;
+                    Vector3 spawnPos = transform.position + UnityEngine.Random.insideUnitSphere * spawnRadius;
                     spawnPos.y = transform.position.y; // Keep at ground level
                     lootManager.SpawnTreasureChest(spawnPos);
                     }
@@ -1046,10 +1055,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
                 if (allRooms.Length > 0)
                     {
-                    return allRooms[Random.Range(0, allRooms.Length)];
+                    return allRooms[UnityEngine.Random.Range(0, allRooms.Length)];
                     }
 
-                return Random.Range(0, 5); // Fallback room ID
+                return UnityEngine.Random.Range(0, 5); // Fallback room ID
                 }
 
             private bool IsPlayerInRoom(Vector3 playerPosition, RoomIdentifier room)
@@ -1420,7 +1429,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
                 var complianceValidatorType = System.Type.GetType("MetVanDAMNComplianceValidator");
                 if (complianceValidatorType != null)
                     {
-                    MonoBehaviour complianceValidatorInstance = null;
+                    MonoBehaviour? complianceValidatorInstance = null;
                     var behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
                     foreach (var b in behaviours)
                         {
@@ -1488,7 +1497,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 
             private Vector3 direction;
             private float remainingLifetime;
-            private GameObject source;
+            private GameObject? source;
 
             public void Initialize(float projectileDamage, Vector3 projectileDirection, float range, GameObject sourceObject)
                 {
@@ -1527,11 +1536,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             private void HandleCollision(GameObject target)
                 {
                 // Don't hit the source
-                if (target == source) return;
+                if (source != null && target == source) return;
 
                 // Check for damageable target
                 if (target.TryGetComponent<IDemoDamageable>(out var damageable))
                     {
+                    if (source == null) return; // Source should be set during Initialize; guard for safety
                     damageable.TakeDamage(damage, source, AttackType.Light);
                     DestroyProjectile();
                     }

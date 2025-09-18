@@ -7,10 +7,11 @@ using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
     {
+#nullable enable
     public class SpawnableKeysEquipmentAndSetpiecesEcsPlayModeTests
         {
-        private World _world;
-        private EntityManager _em;
+        private World _world = null!; // assigned in SetUp
+        private EntityManager _em; // struct assigned in SetUp
 
         [SetUp]
         public void SetUp()
@@ -31,13 +32,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
         [Test]
         public void Registry_Spawns_Prefabs_For_Equipment_And_Setpiece_Keys()
             {
-			// Create prefab entities with appropriate tags
-			Entity weaponPrefab = MakePrefab<PickupWeaponTag>();
-			Entity setpieceShipPrefab = MakePrefab<SetpieceCrashedShipTag>();
+            // Create prefab entities with appropriate tags
+            Entity weaponPrefab = MakePrefab<PickupWeaponTag>();
+            Entity setpieceShipPrefab = MakePrefab<SetpieceCrashedShipTag>();
 
-			// Create registry
-			Entity reg = _em.CreateEntity(typeof(EcsPrefabRegistry));
-			DynamicBuffer<EcsPrefabEntry> buf = _em.AddBuffer<EcsPrefabEntry>(reg);
+            // Create registry
+            Entity reg = _em.CreateEntity(typeof(EcsPrefabRegistry));
+            DynamicBuffer<EcsPrefabEntry> buf = _em.AddBuffer<EcsPrefabEntry>(reg);
             buf.Add(new EcsPrefabEntry { Key = new FixedString64Bytes("pickup_weapon"), Prefab = weaponPrefab });
             buf.Add(new EcsPrefabEntry { Key = new FixedString64Bytes("setpiece_crashed_ship"), Prefab = setpieceShipPrefab });
 
@@ -45,7 +46,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
             EmitRequest("pickup_weapon", new float3(10, 0, 0));
             EmitRequest("setpiece_crashed_ship", new float3(20, 0, 0));
 
-			SimulationSystemGroup sim = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            SimulationSystemGroup sim = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
             _world.GetOrCreateSystem<SudoActionEcsConsumerSystem>();
             sim.Update();
 
@@ -59,14 +60,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
 
         private Entity MakePrefab<T>() where T : unmanaged, IComponentData
             {
-			Entity e = _em.CreateEntity(typeof(T));
+            Entity e = _em.CreateEntity(typeof(T));
             _em.AddComponent<Prefab>(e);
             return e;
             }
 
         private void EmitRequest(string key, float3 pos)
             {
-			Entity r = _em.CreateEntity(typeof(SudoActionRequest));
+            Entity r = _em.CreateEntity(typeof(SudoActionRequest));
             _em.SetComponentData(r, new SudoActionRequest
                 {
                 ActionKey = new FixedString64Bytes(key),
@@ -76,8 +77,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
 
         private void AssertSpawned<T>() where T : unmanaged, IComponentData
             {
-			EntityQuery q = _em.CreateEntityQuery(ComponentType.ReadOnly<T>());
-			NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
+            EntityQuery q = _em.CreateEntityQuery(ComponentType.ReadOnly<T>());
+            NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
             bool foundInstance = false;
             for (int i = 0; i < entities.Length; i++)
                 {

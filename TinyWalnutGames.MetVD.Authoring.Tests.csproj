@@ -63,6 +63,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\BiomeArtIntegrationSystemTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SceneSetupIntegrationTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WorldConfigAspectPlayModeTests.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Tests\DungeonDelveModeTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\SudoActionDispatcherAndResolverPlayModeTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\AuthoringBakeIntegrationTests.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Tests\WfcQuickTest.cs" />
@@ -83,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\MetVanDAMN\Authoring\Tests\TinyWalnutGames.MetVD.Authoring.Tests.asmdef" />
+    <None Include="Assets\MetVanDAMN\Authoring\Tests\TinyWalnutGames.MetVD.Authoring.Tests.csc.rsp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -61,8 +61,9 @@ namespace LivingDevAgent.Editor.Scribe
         private const int ThumbnailSize = 32;
 
         // Events
-        public event System.Action<string> OnFileSelected;
-        public event System.Action<string> OnDirectorySelected;
+        private static readonly System.Action<string> NoOpPathSelect = _ => { };
+        public event System.Action<string> OnFileSelected = NoOpPathSelect;
+        public event System.Action<string> OnDirectorySelected = NoOpPathSelect;
 
         public ScribeNavigator(ScribeFileOperations fileOps)
             {

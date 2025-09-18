@@ -9,10 +9,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	/// <summary>
 	/// Tests for WorldBootstrapSystem functionality
 	/// </summary>
+#nullable enable
 	public class WorldBootstrapTests
 		{
-		private World testWorld;
-		private EntityManager entityManager;
+		// Null-forgiving initialization; fields are assigned in SetUp.
+		private World testWorld = null!;
+		private EntityManager entityManager; // struct, assigned in SetUp
 
 		[SetUp]
 		public void SetUp()
@@ -142,7 +144,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 
 			Entity bootstrapEntity = this.entityManager.CreateEntity();
 			var biomeSettings = new BiomeGenerationSettings(
-				new int2(1, 3), // CountRange 
+				new int2(1, 3), // CountRange
 				1.0f            // Weight
 			);
 			var districtSettings = new DistrictGenerationSettings(
@@ -155,7 +157,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 				new int2(8, 8)  // GridSize
 			);
 			var roomSettings = new RoomGenerationSettings(
-				new int2(1, 8), // RoomsPerSectorRange  
+				new int2(1, 8), // RoomsPerSectorRange
 				0.2f            // TargetLoopDensity
 			);
 			var config = new WorldBootstrapConfiguration(
@@ -194,7 +196,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 			);
 			var districtSettings = new DistrictGenerationSettings(
 				new int2(5, 15), // DistrictCountRange
-				25f,             // DistrictMinDistance  
+				25f,             // DistrictMinDistance
 				0.9f             // DistrictWeight
 			);
 			var sectorSettings = new SectorGenerationSettings(

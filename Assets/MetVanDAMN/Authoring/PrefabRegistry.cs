@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#nullable enable
 
 namespace TinyWalnutGames.MetVD.Authoring
     {
@@ -11,7 +12,7 @@ namespace TinyWalnutGames.MetVD.Authoring
         public struct Entry
             {
             public string Key;
-            public GameObject Prefab;
+            public GameObject? Prefab; // allow null in authoring lists
             }
 
         [Tooltip("Mappings from action keys (e.g., 'spawn_boss') to prefabs.")]
@@ -36,7 +37,7 @@ namespace TinyWalnutGames.MetVD.Authoring
                 }
             }
 
-        public bool TryGet(string key, out GameObject prefab)
+        public bool TryGet(string key, out GameObject? prefab)
             {
             if (string.IsNullOrEmpty(key)) { prefab = null; return false; }
             // In Editor, cache can be stale when entries change without domain reload

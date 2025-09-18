@@ -20,7 +20,7 @@ python template/src/DeveloperExperience/dev_experience.py --record "Jerry" innov
 - **Keybindings**: Ctrl+Shift+X, Ctrl+Shift+D for debug session
 - **Files**: `.vscode/tasks.json`, `.vscode/keybindings.json`
 
-### Unity Editor  
+### Unity Editor
 - **Menu**: Tools > Developer Experience > ...
 - **Auto-tracking**: Play mode automatically awards test coverage XP
 - **File**: `Assets/Plugins/DeveloperExperience/Editor/UnityXPIntegration.cs`
@@ -42,7 +42,6 @@ python template/src/DeveloperExperience/dev_experience.py --record "Jerry" innov
 - **Batch file helpers**: Easy command-line access
 - **Git Bash compatibility**: Works with Git for Windows
 - **Path handling**: Automatic Windows path conversion
-
 
 ## 🧪 Test Your Setup
 

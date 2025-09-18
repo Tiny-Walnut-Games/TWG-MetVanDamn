@@ -1,3 +1,4 @@
+#nullable enable
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
@@ -391,7 +392,7 @@ namespace LivingDevAgent.Editor.Modules
 			if (_data.TimeSessions.Count > 0)
 				{
 				EditorGUILayout.Space(3);
-				TimeSession lastSession = _data.TimeSessions [ ^1 ];
+				TimeSession lastSession = _data.TimeSessions[^1];
 				EditorGUILayout.LabelField($"Last: {lastSession.StartTime:HH:mm}-{lastSession.EndTime:HH:mm} ({lastSession.DurationMinutes:F1}m)", EditorStyles.miniLabel);
 
 				if (_data.TimeSessions.Count > 1)
@@ -660,7 +661,7 @@ namespace LivingDevAgent.Editor.Modules
 				sb.AppendLine();
 
 				// Process image paths and embed them
-				string [ ] imagePaths = _data.ImagePaths.Split('\n');
+				string[] imagePaths = _data.ImagePaths.Split('\n');
 				foreach (string imagePath in imagePaths)
 					{
 					string trimmedPath = imagePath.Trim();
@@ -798,7 +799,7 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			string projectRoot = System.IO.Directory.GetParent(Application.dataPath)!.FullName.Replace('\\', '/');
 			string norm = absPath.Replace('\\', '/');
-			return norm.StartsWith(projectRoot) ? norm [ (projectRoot.Length + 1).. ] : absPath;
+			return norm.StartsWith(projectRoot) ? norm[(projectRoot.Length + 1)..] : absPath;
 			}
 		}
 	}

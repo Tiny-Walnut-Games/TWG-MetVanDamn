@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace TinyWalnutGames.MetVD.Core
 	{
+#nullable enable
 	/// <summary>
 	/// Component for UI representation of enemy affix icons
 	/// Integrates with health bar and enemy display systems
@@ -57,7 +58,7 @@ namespace TinyWalnutGames.MetVD.Core
 
 		private Entity targetEntity;
 		private EntityManager entityManager;
-		private Image[] iconImages;
+		private Image[] iconImages = System.Array.Empty<Image>(); // Initialized to satisfy nullability
 		private bool isInitialized;
 
 		/// <summary>
@@ -157,7 +158,7 @@ namespace TinyWalnutGames.MetVD.Core
 			for (int i = 0; i < iconsToShow; i++)
 				{
 				EnemyAffix affix = affixes[i].Value;
-				Sprite sprite = GetSpriteForAffix(affix.IconRef.ToString());
+				Sprite? sprite = GetSpriteForAffix(affix.IconRef.ToString());
 
 				if (sprite != null && i < iconImages.Length)
 					{
@@ -188,7 +189,7 @@ namespace TinyWalnutGames.MetVD.Core
 		/// Get sprite for affix icon reference
 		/// In a real implementation, this would load from Resources or an asset database
 		/// </summary>
-		private Sprite GetSpriteForAffix(string iconRef)
+		private Sprite? GetSpriteForAffix(string iconRef)
 			{
 			// Simple mapping for demo purposes
 			// In production, this would load from Resources, Addressables, or an asset database
@@ -204,7 +205,7 @@ namespace TinyWalnutGames.MetVD.Core
 				}
 
 			// Return a default icon or null
-			return null;
+			return null; // explicit null allowed with nullable return type
 			}
 
 		/// <summary>

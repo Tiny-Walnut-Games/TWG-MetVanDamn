@@ -12,11 +12,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
     /// <summary>
     /// Quick test to verify our WFC fix is working
     /// </summary>
+#nullable enable
     public class WfcQuickTest
         {
-        private World _testWorld;
-        private EntityManager _entityManager;
-        private SimulationSystemGroup _simGroup;
+        private World _testWorld = null!; // assigned in SetUp
+        private EntityManager _entityManager; // struct assigned in SetUp
+        private SimulationSystemGroup _simGroup = null!; // assigned in SetUp
 
         [SetUp]
         public void SetUp()
@@ -66,7 +67,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             // Create test district entities
             for (int i = 0; i < 3; i++)
                 {
-				Entity districtEntity = this._entityManager.CreateEntity();
+                Entity districtEntity = this._entityManager.CreateEntity();
                 this._entityManager.AddComponentData(districtEntity, new NodeId((uint)i, 0, 0, new int2(i - 1, 0)));
                 this._entityManager.AddComponentData(districtEntity, new WfcState(WfcGenerationState.Initialized));
                 this._entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);

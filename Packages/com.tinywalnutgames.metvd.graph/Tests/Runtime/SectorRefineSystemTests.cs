@@ -1,4 +1,5 @@
 using NUnit.Framework;
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using Unity.Entities;
@@ -41,8 +42,8 @@ namespace TinyWalnutGames.MetVD.Tests
 	/// </summary>
 	public class SectorRefineSystemTests
 		{
-		private World _world;
-		private SimulationSystemGroup _simGroup;
+		private World _world = null!; // initialized in SetUp
+		private SimulationSystemGroup _simGroup = null!; // initialized in SetUp
 
 		[SetUp]
 		public void SetUp()

@@ -1,3 +1,4 @@
+#nullable enable
 using UnityEngine;
 
 namespace LivingDevAgent.Editor.Modules
@@ -32,22 +33,22 @@ namespace LivingDevAgent.Editor.Modules
 		[HideInInspector] public System.DateTime canceledAt;
 		[HideInInspector] public string assignedTo;
 		[HideInInspector] public int priorityLevel; // 1 (highest) to 5 (lowest)
-		[HideInInspector] public string [ ] tags; // e.g., "bug", "
-		[HideInInspector] public string [ ] comments; // e.g., "Started working on this task."
-		[HideInInspector] public string [ ] attachments; // e.g., "screenshot.png"
-		[HideInInspector] public string [ ] subtasks; // e.g., "Design UI", "Implement feature"
-		[HideInInspector] public string [ ] relatedRefs; // e.g., "TaskID123", "Issue#456", "PR#789", etc.
-		[HideInInspector] public string [ ] dependencies; // e.g., "TaskID321", "Issue#654", "PR#987", etc.
-		[HideInInspector] public string [ ] blockers; // e.g., "Waiting for design approval."
-		[HideInInspector] public string [ ] watchers; // e.g., "user1", "user2", etc.
-		[HideInInspector] public string [ ] history; // e.g., "Task created.", "Status changed to In Progress."
-		[HideInInspector] public string [ ] customFields; // e.g., "Field1: Value1", "Field2: Value2"
-		[HideInInspector] public string [ ] auditLogs; // e.g., "User1 changed status to Completed."
-		[HideInInspector] public string [ ] notifications; // e.g., "Task assigned to User1."
-		[HideInInspector] public string [ ] reminders; // e.g., "Reminder set for tomorrow."
-		[HideInInspector] public string [ ] timeEstimates; // e.g., "2 hours", "30 minutes"
-		[HideInInspector] public string [ ] timeSpent; // e.g., "1 hour", "15 minutes"
-		[HideInInspector] public string [ ] billingCodes; // e.g., "BILL-123", "BILL-456"
+		[HideInInspector] public string[] tags; // e.g., "bug", "
+		[HideInInspector] public string[] comments; // e.g., "Started working on this task."
+		[HideInInspector] public string[] attachments; // e.g., "screenshot.png"
+		[HideInInspector] public string[] subtasks; // e.g., "Design UI", "Implement feature"
+		[HideInInspector] public string[] relatedRefs; // e.g., "TaskID123", "Issue#456", "PR#789", etc.
+		[HideInInspector] public string[] dependencies; // e.g., "TaskID321", "Issue#654", "PR#987", etc.
+		[HideInInspector] public string[] blockers; // e.g., "Waiting for design approval."
+		[HideInInspector] public string[] watchers; // e.g., "user1", "user2", etc.
+		[HideInInspector] public string[] history; // e.g., "Task created.", "Status changed to In Progress."
+		[HideInInspector] public string[] customFields; // e.g., "Field1: Value1", "Field2: Value2"
+		[HideInInspector] public string[] auditLogs; // e.g., "User1 changed status to Completed."
+		[HideInInspector] public string[] notifications; // e.g., "Task assigned to User1."
+		[HideInInspector] public string[] reminders; // e.g., "Reminder set for tomorrow."
+		[HideInInspector] public string[] timeEstimates; // e.g., "2 hours", "30 minutes"
+		[HideInInspector] public string[] timeSpent; // e.g., "1 hour", "15 minutes"
+		[HideInInspector] public string[] billingCodes; // e.g., "BILL-123", "BILL-456"
 
 		// Create a new TaskData instance
 		public static TaskData CreateTask(string name, string description, string assignedUser, int priority)
@@ -61,22 +62,22 @@ namespace LivingDevAgent.Editor.Modules
 			newTask.createdAt = System.DateTime.Now;
 			newTask.assignedTo = assignedUser;
 			newTask.priorityLevel = priority;
-			newTask.tags = new string [ ] { };
-			newTask.comments = new string [ ] { };
-			newTask.attachments = new string [ ] { };
-			newTask.subtasks = new string [ ] { };
-			newTask.relatedRefs = new string [ ] { };
-			newTask.dependencies = new string [ ] { };
-			newTask.blockers = new string [ ] { };
-			newTask.watchers = new string [ ] { };
-			newTask.history = new string [ ] { $"Task created at {newTask.createdAt}" };
-			newTask.customFields = new string [ ] { };
-			newTask.auditLogs = new string [ ] { };
-			newTask.notifications = new string [ ] { };
-			newTask.reminders = new string [ ] { };
-			newTask.timeEstimates = new string [ ] { };
-			newTask.timeSpent = new string [ ] { };
-			newTask.billingCodes = new string [ ] { };
+			newTask.tags = new string[] { };
+			newTask.comments = new string[] { };
+			newTask.attachments = new string[] { };
+			newTask.subtasks = new string[] { };
+			newTask.relatedRefs = new string[] { };
+			newTask.dependencies = new string[] { };
+			newTask.blockers = new string[] { };
+			newTask.watchers = new string[] { };
+			newTask.history = new string[] { $"Task created at {newTask.createdAt}" };
+			newTask.customFields = new string[] { };
+			newTask.auditLogs = new string[] { };
+			newTask.notifications = new string[] { };
+			newTask.reminders = new string[] { };
+			newTask.timeEstimates = new string[] { };
+			newTask.timeSpent = new string[] { };
+			newTask.billingCodes = new string[] { };
 			// Initialize the TimeCardData for this task
 			TimeCardData timeCardInstance = CreateInstance<TimeCardData>();
 			timeCardInstance.StartTimeCard(newTask);
@@ -118,11 +119,11 @@ namespace LivingDevAgent.Editor.Modules
 			}
 
 		// Helper method to append a string to a string array
-		private string [ ] AppendToArray(string [ ] array, string newItem)
+		private string[] AppendToArray(string[] array, string newItem)
 			{
-			string [ ] newArray = new string [ array.Length + 1 ];
+			string[] newArray = new string[array.Length + 1];
 			array.CopyTo(newArray, 0);
-			newArray [ array.Length ] = newItem;
+			newArray[array.Length] = newItem;
 			return newArray;
 			}
 		}

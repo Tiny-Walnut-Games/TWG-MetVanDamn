@@ -13,10 +13,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	/// Comprehensive bake and smoke tests for all authoring components
 	/// Validates the complete authoring->ECS conversion pipeline
 	/// </summary>
+#nullable enable
 	public class AuthoringBakeIntegrationTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
+		private World _testWorld = null!; // assigned in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
 
 		// Minimal runtime data components used by tests (lightweight extraction of baked state)
 		public struct DistrictData : IComponentData

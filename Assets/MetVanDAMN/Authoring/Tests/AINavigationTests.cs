@@ -13,10 +13,11 @@ namespace TinyWalnutGames.MetVD.Tests
 	/// Comprehensive tests for AI Navigation system with polarized gate handling
 	/// Covers navigation graph building, pathfinding, and reachability validation
 	/// </summary>
+#nullable enable
 	public class AINavigationTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
+		private World _testWorld = null!; // assigned in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

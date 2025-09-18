@@ -8,10 +8,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	/// <summary>
 	/// Tests for BiomeArtProfile integration with ECS systems
 	/// </summary>
+#nullable enable
 	public class BiomeArtProfileTests
 		{
-		private World testWorld;
-		private EntityManager entityManager;
+		private World testWorld = null!; // assigned in SetUp
+		private EntityManager entityManager; // struct assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

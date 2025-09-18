@@ -63,6 +63,8 @@
     <Compile Include="Assets\MetVanDAMN\debug_enum_test.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\DeveloperExperience.csc.rsp" />
+    <None Include="Assets\Editor.csc.rsp" />
     <None Include="Assets\Tiny Walnut Games\MetVanDAMN\Docs\TestResults.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -17,12 +17,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	/// Integration tests for scene setup and ECS system pipeline
 	/// Tests the complete flow from scene setup to ECS processing
 	/// </summary>
+#nullable enable
 	public class SceneSetupIntegrationTests
 		{
-		private World testWorld;
-		private EntityManager entityManager;
-		private GameObject sceneSetupObject;
-		private SmokeTestSceneSetup sceneSetup;
+		private World testWorld = null!; // assigned in SetUp
+		private EntityManager entityManager; // struct assigned in SetUp
+		private GameObject sceneSetupObject = null!; // assigned in SetUp
+		private SmokeTestSceneSetup sceneSetup = null!; // assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

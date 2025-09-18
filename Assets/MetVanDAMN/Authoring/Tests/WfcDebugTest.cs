@@ -12,11 +12,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
     /// <summary>
     /// Diagnostic test to debug WFC system behavior
     /// </summary>
+#nullable enable
     public class WfcDebugTest
         {
-        private World _testWorld;
-        private EntityManager _entityManager;
-        private SimulationSystemGroup _simGroup;
+        private World _testWorld = null!; // assigned in SetUp
+        private EntityManager _entityManager; // struct assigned in SetUp
+        private SimulationSystemGroup _simGroup = null!; // assigned in SetUp
 
         [SetUp]
         public void SetUp()
@@ -66,8 +67,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
             prototypes.Dispose();
             prototypeQuery.Dispose();
 
-			// Create one test district entity
-			Entity districtEntity = this._entityManager.CreateEntity();
+            // Create one test district entity
+            Entity districtEntity = this._entityManager.CreateEntity();
             this._entityManager.AddComponentData(districtEntity, new NodeId(1, 0, 0, new int2(0, 0)));
             this._entityManager.AddComponentData(districtEntity, new WfcState(WfcGenerationState.Initialized));
             this._entityManager.AddBuffer<WfcCandidateBufferElement>(districtEntity);
@@ -79,12 +80,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 {
                 UnityEngine.Debug.Log($"🔍 === FRAME {frame} ===");
 
-				// Check state before update
-				WfcState stateBefore = this._entityManager.GetComponentData<WfcState>(districtEntity);
+                // Check state before update
+                WfcState stateBefore = this._entityManager.GetComponentData<WfcState>(districtEntity);
                 UnityEngine.Debug.Log($"🔍 Before: State={stateBefore.State}, TileId={stateBefore.AssignedTileId}, Entropy={stateBefore.Entropy}");
 
-				// Check candidates buffer
-				DynamicBuffer<WfcCandidateBufferElement> candidatesBuffer = this._entityManager.GetBuffer<WfcCandidateBufferElement>(districtEntity);
+                // Check candidates buffer
+                DynamicBuffer<WfcCandidateBufferElement> candidatesBuffer = this._entityManager.GetBuffer<WfcCandidateBufferElement>(districtEntity);
                 UnityEngine.Debug.Log($"🔍 Candidates buffer length: {candidatesBuffer.Length}");
                 for (int i = 0; i < candidatesBuffer.Length && i < 5; i++)
                     {
@@ -94,8 +95,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                 // Update system
                 this._simGroup.Update();
 
-				// Check state after update
-				WfcState stateAfter = this._entityManager.GetComponentData<WfcState>(districtEntity);
+                // Check state after update
+                WfcState stateAfter = this._entityManager.GetComponentData<WfcState>(districtEntity);
                 UnityEngine.Debug.Log($"🔍 After: State={stateAfter.State}, TileId={stateAfter.AssignedTileId}, Entropy={stateAfter.Entropy}");
 
                 if (stateAfter.State == WfcGenerationState.Completed ||
@@ -107,7 +108,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
                     }
                 }
 
-			WfcState finalState = this._entityManager.GetComponentData<WfcState>(districtEntity);
+            WfcState finalState = this._entityManager.GetComponentData<WfcState>(districtEntity);
             UnityEngine.Debug.Log($"🔍 FINAL RESULT: State={finalState.State}, AssignedTileId={finalState.AssignedTileId}");
 
             // This test is for debugging, so we'll always pass but log everything

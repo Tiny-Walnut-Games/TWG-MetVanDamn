@@ -8,10 +8,11 @@ using Unity.Mathematics;
 
 namespace TinyWalnutGames.MetVD.Tests
 	{
+#nullable enable
 	public class DistrictWfcSystemTests
 		{
-		private World _world;
-		private SimulationSystemGroup _simGroup;
+		private World _world = null!;
+		private SimulationSystemGroup _simGroup = null!;
 
 		[SetUp]
 		public void SetUp()

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+#nullable enable
 using System.Linq;
 using TinyWalnutGames.MetVD.Core;
 using Unity.Burst;
@@ -626,7 +627,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 						}
 
 					// Create tilemap based on projection type
-					Grid grid = CreateBiomeSpecificTilemap(artProfileRef.ProjectionType, artProfile, biome, nodeId);
+					Grid? grid = CreateBiomeSpecificTilemap(artProfileRef.ProjectionType, artProfile, biome, nodeId);
+					if (grid == null)
+						{
+						// Unable to create or locate grid – skip processing this biome safely
+						return;
+						}
 
 					// Place props using the integrated AdvancedPropPlacer
 					PlaceBiomeProps(artProfile, biome, nodeId, grid);
@@ -741,7 +747,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private Grid CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+		private Grid? CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
 			{
 			// Get appropriate layer configuration based on projection type
 			string[] layerNames = GetLayerNamesForProjection(projectionType);
@@ -762,11 +768,23 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			if (createdGrid != null)
 				{
-				// 🔧 FIX: Position biome grid to match debug grid coordinate system
-				// Use same scaling logic as MetVDGizmoDrawer to align with debug visualization
-				// TODO: Load from MetVDGizmoSettings.asset instead of hardcoding
-				float gridCellSize = 11.38f; // From MetVDGizmoSettings.asset
-				Vector3 gridOriginOffset = Vector3.zero; // From MetVDGizmoSettings.asset
+				/*
+				 * NOTE: The original implementation referenced an Editor-only ScriptableObject (MetVDGizmoSettings)
+				 * that lives under an Editor assembly and is excluded from the standalone dotnet build used in CI.
+				 * That produced CS0234 (namespace .Editor not found) during "dotnet build" even though Unity would
+				 * compile it fine inside the editor with UNITY_EDITOR defined. To keep the authoring assembly
+				 * portable for headless compilation, we fall back to constants here. Unity editor play mode can
+				 * later patch this to dynamically read the asset via a small adapter (future incremental improvement).
+				 */
+#if UNITY_EDITOR
+				// If desired, reflection-based load could be added here without taking a compile-time dependency.
+				// For now, intentionally mirror the asset defaults:
+				const float gridCellSize = 11.38f;
+				Vector3 gridOriginOffset = Vector3.zero;
+#else
+				const float gridCellSize = 11.38f;
+				Vector3 gridOriginOffset = Vector3.zero;
+#endif
 				Vector3 biomeCenter = new Vector3(
 					nodeId.Coordinates.x * gridCellSize,
 					0f,
@@ -906,7 +924,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 		private void ApplyTileToLayer(Tilemap tilemap, TilemapRenderer renderer, string layerName, BiomeArtProfile artProfile)
 			{
-			TileBase tileToApply = null;
+			TileBase? tileToApply = null; // explicit nullable
 
 			// Determine which tile to use based on layer name
 			if (layerName.Contains("Floor") || layerName.Contains("Ground"))

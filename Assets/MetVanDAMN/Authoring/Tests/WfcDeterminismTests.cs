@@ -15,11 +15,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	/// Determinism validation tests ensuring consistent WFC generation across runs
 	/// Critical for reproducible world generation and debugging
 	/// </summary>
+#nullable enable
 	public class WfcDeterminismTests
 		{
-		private World _testWorld;
-		private EntityManager _entityManager;
-		private SimulationSystemGroup _simGroup;
+		private World _testWorld = null!; // assigned in SetUp
+		private EntityManager _entityManager; // struct assigned in SetUp
+		private SimulationSystemGroup _simGroup = null!; // assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

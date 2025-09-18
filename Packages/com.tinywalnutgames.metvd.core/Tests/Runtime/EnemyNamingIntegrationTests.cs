@@ -10,11 +10,12 @@ namespace TinyWalnutGames.MetVD.Core.Tests
 	/// Tests end-to-end functionality from enemy creation to final display
 	/// </summary>
 	[TestFixture]
+#nullable enable
 	public class EnemyNamingIntegrationTests
 		{
-		private World world;
-		private EntityManager m_Manager;
-		private InitializationSystemGroup initGroup;
+		private World world = null!;
+		private EntityManager m_Manager; // struct
+		private InitializationSystemGroup initGroup = null!;
 
 		[SetUp]
 		public void Setup()

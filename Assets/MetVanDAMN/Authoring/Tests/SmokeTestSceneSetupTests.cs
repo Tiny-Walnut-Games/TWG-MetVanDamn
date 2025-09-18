@@ -17,12 +17,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Tests
 	/// Comprehensive tests for SmokeTestSceneSetup component
 	/// Validates "hit Play -> see map" experience and immediate feedback
 	/// </summary>
+#nullable enable
 	public class SmokeTestSceneSetupTests
 		{
-		private World testWorld;
-		private EntityManager entityManager;
-		private GameObject testGameObject;
-		private SmokeTestSceneSetup smokeTestComponent;
+		// Use null-forgiving initialization; assigned in SetUp. This avoids CS8618 while keeping non-null contract in tests.
+		private World testWorld = null!; // Assigned in SetUp
+		private EntityManager entityManager; // Struct; will be set after world creation
+		private GameObject testGameObject = null!; // Assigned in SetUp
+		private SmokeTestSceneSetup smokeTestComponent = null!; // Assigned in SetUp
 
 		[SetUp]
 		public void SetUp()

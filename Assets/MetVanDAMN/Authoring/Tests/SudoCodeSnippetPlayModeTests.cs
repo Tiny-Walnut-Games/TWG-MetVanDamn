@@ -6,10 +6,11 @@ using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
     {
+#nullable enable
     public class SudoCodeSnippetPlayModeTests
         {
-        private World _world;
-        private EntityManager _em;
+        private World _world = null!; // assigned in SetUp
+        private EntityManager _em; // struct assigned in SetUp
 
         [SetUp]
         public void SetUp()
@@ -30,17 +31,17 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
         [Test]
         public void Snippet_Spawn_Emits_Request_And_EcsConsumer_Spawns()
             {
-			// Prefab with MarkerWaypointTag to validate spawn
-			Entity prefab = _em.CreateEntity(typeof(MarkerWaypointTag));
+            // Prefab with MarkerWaypointTag to validate spawn
+            Entity prefab = _em.CreateEntity(typeof(MarkerWaypointTag));
             _em.AddComponent<Prefab>(prefab);
 
-			// ECS registry with key -> prefab
-			Entity reg = _em.CreateEntity(typeof(EcsPrefabRegistry));
-			DynamicBuffer<EcsPrefabEntry> buf = _em.AddBuffer<EcsPrefabEntry>(reg);
+            // ECS registry with key -> prefab
+            Entity reg = _em.CreateEntity(typeof(EcsPrefabRegistry));
+            DynamicBuffer<EcsPrefabEntry> buf = _em.AddBuffer<EcsPrefabEntry>(reg);
             buf.Add(new EcsPrefabEntry { Key = new FixedString64Bytes("spawn_marker_waypoint"), Prefab = prefab });
 
-			// Add snippet
-			Entity snippet = _em.CreateEntity(typeof(SudoCodeSnippet));
+            // Add snippet
+            Entity snippet = _em.CreateEntity(typeof(SudoCodeSnippet));
             _em.SetComponentData(snippet, new SudoCodeSnippet
                 {
                 RunOnce = true,
@@ -48,9 +49,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
                 Code = new FixedString512Bytes("log Start;\nspawn spawn_marker_waypoint 1 2 3")
                 });
 
-			// Drive init (snippet executor) then sim (ECS consumer)
-			InitializationSystemGroup init = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
-			SimulationSystemGroup sim = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            // Drive init (snippet executor) then sim (ECS consumer)
+            InitializationSystemGroup init = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+            SimulationSystemGroup sim = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
             _world.GetOrCreateSystem<SudoCodeSnippetExecutorSystem>();
             _world.GetOrCreateSystem<SudoActionEcsConsumerSystem>();
 
@@ -60,9 +61,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
             // Request should be consumed
             Assert.AreEqual(0, _em.CreateEntityQuery(typeof(SudoActionRequest)).CalculateEntityCount());
 
-			// Spawned instance with tag should exist (non-prefab)
-			EntityQuery q = _em.CreateEntityQuery(typeof(MarkerWaypointTag));
-			NativeArray<Entity> ents = q.ToEntityArray(Allocator.Temp);
+            // Spawned instance with tag should exist (non-prefab)
+            EntityQuery q = _em.CreateEntityQuery(typeof(MarkerWaypointTag));
+            NativeArray<Entity> ents = q.ToEntityArray(Allocator.Temp);
             bool foundInstance = false;
             for (int i = 0; i < ents.Length; i++)
                 {

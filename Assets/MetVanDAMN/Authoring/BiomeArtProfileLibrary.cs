@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
 
+#nullable enable
+
 namespace TinyWalnutGames.MetVD.Authoring
 	{
 	/// <summary>
@@ -16,7 +18,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			public BiomeType type;
 			[Tooltip("Profiles available for this biome type.")]
-			public BiomeArtProfile[] profiles;
+			public BiomeArtProfile[] profiles = Array.Empty<BiomeArtProfile>();
 			}
 
 		[Serializable]
@@ -26,17 +28,17 @@ namespace TinyWalnutGames.MetVD.Authoring
 			[Tooltip("Allowed elevation layers for this bucket (multi-select mask).")]
 			public BiomeElevation elevations = BiomeElevation.Any;
 			[Tooltip("Profiles available for this biome type at the specified elevations.")]
-			public BiomeArtProfile[] profiles;
+			public BiomeArtProfile[] profiles = Array.Empty<BiomeArtProfile>();
 			}
 
 		[Tooltip("Profiles available for auto-assignment; selection is deterministic by biome type/seed.")]
-		public BiomeArtProfile[] profiles; // global fallback pool
+		public BiomeArtProfile[] profiles = Array.Empty<BiomeArtProfile>(); // global fallback pool
 
 		[Tooltip("Optional per-type profile buckets; preferred over the global pool when present.")]
-		public BiomeTypeBucket[] perTypeBuckets;
+		public BiomeTypeBucket[] perTypeBuckets = Array.Empty<BiomeTypeBucket>();
 
 		[Tooltip("Optional per-type + elevation buckets with multi-select elevation mask; preferred over type-only buckets.")]
-		public BiomeTypeElevationBucket[] perTypeElevationBuckets;
+		public BiomeTypeElevationBucket[] perTypeElevationBuckets = Array.Empty<BiomeTypeElevationBucket>();
 
 		public BiomeArtProfile[] GetProfiles(BiomeType type, BiomeElevation elevation)
 			{

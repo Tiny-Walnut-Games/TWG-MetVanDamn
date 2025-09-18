@@ -7,10 +7,11 @@ using TinyWalnutGames.MetVD.Core;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
     {
+#nullable enable
     public class SpawnableKeysEcsPlayModeTests
         {
-        private World _world;
-        private EntityManager _em;
+        private World _world = null!; // assigned in SetUp
+        private EntityManager _em; // struct assigned in SetUp
 
         [SetUp]
         public void SetUp()
@@ -31,14 +32,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
         [Test]
         public void Registry_Spawns_Prefabs_For_Common_Keys()
             {
-			// Create simple prefab entities
-			Entity enemyMeleePrefab = MakePrefab<EnemyMeleeTag>();
-			Entity pickupHealthPrefab = MakePrefab<PickupHealthTag>();
-			Entity doorLockedPrefab = MakePrefab<DoorLockedTag>();
+            // Create simple prefab entities
+            Entity enemyMeleePrefab = MakePrefab<EnemyMeleeTag>();
+            Entity pickupHealthPrefab = MakePrefab<PickupHealthTag>();
+            Entity doorLockedPrefab = MakePrefab<DoorLockedTag>();
 
-			// Create registry
-			Entity reg = _em.CreateEntity(typeof(EcsPrefabRegistry));
-			DynamicBuffer<EcsPrefabEntry> buf = _em.AddBuffer<EcsPrefabEntry>(reg);
+            // Create registry
+            Entity reg = _em.CreateEntity(typeof(EcsPrefabRegistry));
+            DynamicBuffer<EcsPrefabEntry> buf = _em.AddBuffer<EcsPrefabEntry>(reg);
             buf.Add(new EcsPrefabEntry { Key = new FixedString64Bytes("spawn_enemy_melee"), Prefab = enemyMeleePrefab });
             buf.Add(new EcsPrefabEntry { Key = new FixedString64Bytes("pickup_health"), Prefab = pickupHealthPrefab });
             buf.Add(new EcsPrefabEntry { Key = new FixedString64Bytes("spawn_door_locked"), Prefab = doorLockedPrefab });
@@ -48,7 +49,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
             EmitRequest("pickup_health", new float3(2, 0, 0));
             EmitRequest("spawn_door_locked", new float3(3, 0, 0));
 
-			SimulationSystemGroup sim = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
+            SimulationSystemGroup sim = _world.GetOrCreateSystemManaged<SimulationSystemGroup>();
             _world.GetOrCreateSystem<SudoActionEcsConsumerSystem>();
             sim.Update();
 
@@ -63,14 +64,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
 
         private Entity MakePrefab<T>() where T : unmanaged, IComponentData
             {
-			Entity e = _em.CreateEntity(typeof(T));
+            Entity e = _em.CreateEntity(typeof(T));
             _em.AddComponent<Prefab>(e);
             return e;
             }
 
         private void EmitRequest(string key, float3 pos)
             {
-			Entity r = _em.CreateEntity(typeof(SudoActionRequest));
+            Entity r = _em.CreateEntity(typeof(SudoActionRequest));
             _em.SetComponentData(r, new SudoActionRequest
                 {
                 ActionKey = new FixedString64Bytes(key),
@@ -80,8 +81,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Tests
 
         private void AssertSpawned<T>() where T : unmanaged, IComponentData
             {
-			EntityQuery q = _em.CreateEntityQuery(ComponentType.ReadOnly<T>());
-			NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
+            EntityQuery q = _em.CreateEntityQuery(ComponentType.ReadOnly<T>());
+            NativeArray<Entity> entities = q.ToEntityArray(Allocator.Temp);
             bool foundInstance = false;
             for (int i = 0; i < entities.Length; i++)
                 {

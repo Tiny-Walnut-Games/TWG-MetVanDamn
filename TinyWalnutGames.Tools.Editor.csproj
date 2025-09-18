@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tools\Editor\TinyWalnutGames.Tools.Editor.asmdef" />
+    <None Include="Assets\Tools\Editor\TinyWalnutGames.Tools.Editor.csc.rsp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

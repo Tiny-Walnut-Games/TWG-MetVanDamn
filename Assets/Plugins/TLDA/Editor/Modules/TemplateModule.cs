@@ -1,3 +1,4 @@
+#nullable enable
 #if UNITY_EDITOR
 using System;
 using System.IO;
@@ -62,10 +63,10 @@ namespace LivingDevAgent.Editor.Modules
 				return;
 				}
 
-			string [ ] items = new string [ _data.Templates.Count ];
+			string[] items = new string[_data.Templates.Count];
 			for (int i = 0; i < _data.Templates.Count; i++)
 				{
-				items [ i ] = string.IsNullOrEmpty(_data.Templates [ i ].Title) ? _data.Templates [ i ].Key : _data.Templates [ i ].Title;
+				items[i] = string.IsNullOrEmpty(_data.Templates[i].Title) ? _data.Templates[i].Key : _data.Templates[i].Title;
 				}
 			_data.SelectedTemplateIndex = EditorGUILayout.Popup("Template", _data.SelectedTemplateIndex, items);
 
@@ -101,7 +102,7 @@ namespace LivingDevAgent.Editor.Modules
 			for (int i = 0; i < _data.Templates.Count; i++)
 				{
 				int index = i; // Capture for closure
-				string displayName = string.IsNullOrEmpty(_data.Templates [ i ].Title) ? _data.Templates [ i ].Key : _data.Templates [ i ].Title;
+				string displayName = string.IsNullOrEmpty(_data.Templates[i].Title) ? _data.Templates[i].Key : _data.Templates[i].Title;
 				menu.AddItem(new GUIContent(displayName), _data.SelectedTemplateIndex == i, () =>
 				{
 					_data.SelectedTemplateIndex = index;
@@ -119,9 +120,9 @@ namespace LivingDevAgent.Editor.Modules
 				return;
 				}
 
-			string md = LoadTemplateMarkdown(_data.Templates [ _data.SelectedTemplateIndex ]);
+			string md = LoadTemplateMarkdown(_data.Templates[_data.SelectedTemplateIndex]);
 			_data.RawContent = md ?? string.Empty;
-			SetStatus($"📖 Loaded template: {_data.Templates [ _data.SelectedTemplateIndex ].Key}");
+			SetStatus($"📖 Loaded template: {_data.Templates[_data.SelectedTemplateIndex].Key}");
 			}
 
 		private void CreateIssueFromSelectedTemplate()
@@ -132,7 +133,7 @@ namespace LivingDevAgent.Editor.Modules
 				return;
 				}
 
-			CreateIssueFromTemplate(_data.Templates [ _data.SelectedTemplateIndex ]);
+			CreateIssueFromTemplate(_data.Templates[_data.SelectedTemplateIndex]);
 			}
 
 		private void RefreshTemplates()
@@ -156,7 +157,7 @@ namespace LivingDevAgent.Editor.Modules
 					return;
 					}
 
-				string [ ] lines = File.ReadAllLines(registry);
+				string[] lines = File.ReadAllLines(registry);
 				bool inTemplates = false;
 				string currentKey = null, currentFile = null, currentTitle = null;
 
@@ -179,7 +180,7 @@ namespace LivingDevAgent.Editor.Modules
 								AbsPath = Path.Combine(root, "templates", "comments", currentFile)
 								});
 							}
-						currentKey = keyMatch.Groups [ 1 ].Value;
+						currentKey = keyMatch.Groups[1].Value;
 						currentFile = null;
 						currentTitle = null;
 						continue;
@@ -188,14 +189,14 @@ namespace LivingDevAgent.Editor.Modules
 					Match fileMatch = Regex.Match(line, @"^\s{4}file:\s*(.+)$");
 					if (fileMatch.Success)
 						{
-						currentFile = fileMatch.Groups [ 1 ].Value.Trim();
+						currentFile = fileMatch.Groups[1].Value.Trim();
 						continue;
 						}
 
 					Match titleMatch = Regex.Match(line, @"^\s{4}title:\s*""?(.*?)""?$");
 					if (titleMatch.Success)
 						{
-						currentTitle = titleMatch.Groups [ 1 ].Value.Trim();
+						currentTitle = titleMatch.Groups[1].Value.Trim();
 						continue;
 						}
 					}
@@ -275,7 +276,7 @@ namespace LivingDevAgent.Editor.Modules
 					return null;
 					}
 
-				string [ ] yaml = File.ReadAllLines(info.AbsPath);
+				string[] yaml = File.ReadAllLines(info.AbsPath);
 				var md = new StringBuilder();
 				bool inBlock = false;
 
@@ -291,7 +292,7 @@ namespace LivingDevAgent.Editor.Modules
 						}
 					else
 						{
-						if (raw.Length > 0 && !char.IsWhiteSpace(raw [ 0 ]))
+						if (raw.Length > 0 && !char.IsWhiteSpace(raw[0]))
 							{
 							break; // out of block
 							}
@@ -299,7 +300,7 @@ namespace LivingDevAgent.Editor.Modules
 						string line = raw;
 						if (line.StartsWith("  "))
 							{
-							line = line [ 2.. ];
+							line = line[2..];
 							}
 
 						md.AppendLine(line);
@@ -357,7 +358,7 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			string projectRoot = Directory.GetParent(Application.dataPath)!.FullName.Replace('\\', '/');
 			string norm = absPath.Replace('\\', '/');
-			return norm.StartsWith(projectRoot) ? norm [ (projectRoot.Length + 1).. ] : absPath;
+			return norm.StartsWith(projectRoot) ? norm[(projectRoot.Length + 1)..] : absPath;
 			}
 
 		private void PostWriteImport(string absPath)
@@ -375,7 +376,7 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			string norm = absPath.Replace('\\', '/');
 			string dataPath = Application.dataPath.Replace('\\', '/');
-			return norm.StartsWith(dataPath, StringComparison.OrdinalIgnoreCase) ? "Assets" + norm [ dataPath.Length.. ] : null;
+			return norm.StartsWith(dataPath, StringComparison.OrdinalIgnoreCase) ? "Assets" + norm[dataPath.Length..] : null;
 			}
 		}
 	}

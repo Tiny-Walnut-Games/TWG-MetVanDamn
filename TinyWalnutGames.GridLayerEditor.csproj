@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tiny Walnut Games\TWG-GridLayerEditor-1.0.0\Scripts\Editor\TinyWalnutGames.GridLayerEditor.asmdef" />
+    <None Include="Assets\Tiny Walnut Games\TWG-GridLayerEditor-1.0.0\Scripts\Editor\TinyWalnutGames.GridLayerEditor.csc.rsp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Diagnostics;
 using System.IO;
+using System;
 
 namespace DeveloperExperience
     {
@@ -34,59 +35,31 @@ namespace DeveloperExperience
         [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/Record Debug Session")]
         public static void RecordDebugSession()
             {
-            string workspace = Directory.GetCurrentDirectory();
-            string pythonScript = Path.Combine(workspace, "template", "src", "DeveloperExperience", "dev_experience.py");
-
-            if (File.Exists(pythonScript))
-                {
-                string developerName = "Jerry";
-                string args = $"--record \"{developerName}\" debugging_session excellent \"Unity debugging session\" --metrics \"unity_session:1,platform:windows\"";
-                RunPythonScript(pythonScript, args);
-                }
-            else
-                {
-                UnityEngine.Debug.LogError("XP System not found. Make sure the Living Dev Agent template is properly installed.");
-                }
+            RecordQuick("debugging_session", "excellent", "Unity debugging session", "unity_session:1");
             }
 
         [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/Show My Profile")]
         public static void ShowProfile()
             {
-            string workspace = Directory.GetCurrentDirectory();
-            string pythonScript = Path.Combine(workspace, "template", "src", "DeveloperExperience", "dev_experience.py");
-
-            if (File.Exists(pythonScript))
-                {
-                string developerName = "Jerry";
-                string args = $"--profile \"{developerName}\"";
-                RunPythonScript(pythonScript, args);
-                }
+            var script = ResolveScript();
+            if (script == null) { WarnMissing(); return; }
+            RunPythonScript(script, $"--profile \"{ResolveDeveloper()}\"");
             }
 
         [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/Show Leaderboard")]
         public static void ShowLeaderboard()
             {
-            string workspace = Directory.GetCurrentDirectory();
-            string pythonScript = Path.Combine(workspace, "template", "src", "DeveloperExperience", "dev_experience.py");
-
-            if (File.Exists(pythonScript))
-                {
-                RunPythonScript(pythonScript, "--leaderboard");
-                }
+            var script = ResolveScript();
+            if (script == null) { WarnMissing(); return; }
+            RunPythonScript(script, "--leaderboard");
             }
 
         [MenuItem("Tiny Walnut Games/Living Dev Agent/Developer Experience/Daily Bonus")]
         public static void DailyBonus()
             {
-            string workspace = Directory.GetCurrentDirectory();
-            string pythonScript = Path.Combine(workspace, "template", "src", "DeveloperExperience", "dev_experience.py");
-
-            if (File.Exists(pythonScript))
-                {
-                string developerName = "Jerry";
-                string args = $"--daily-bonus \"{developerName}\"";
-                RunPythonScript(pythonScript, args);
-                }
+            var script = ResolveScript();
+            if (script == null) { WarnMissing(); return; }
+            RunPythonScript(script, $"--daily-bonus \"{ResolveDeveloper()}\"");
             }
 
         private void OnGUI()
@@ -143,54 +116,116 @@ namespace DeveloperExperience
                 return;
                 }
 
-            string workspace = Directory.GetCurrentDirectory();
-            string pythonScript = Path.Combine(workspace, "template", "src", "DeveloperExperience", "dev_experience.py");
-
-            if (File.Exists(pythonScript))
-                {
-                string args = $"--record \"{developerName}\" {contributionType} {qualityLevel} \"{description}\" --metrics \"unity_manual:1,platform:windows\"";
-                RunPythonScript(pythonScript, args);
-                }
-            else
+            var script = ResolveScript();
+            if (script == null)
                 {
                 EditorUtility.DisplayDialog("Error", "XP System not found.", "OK");
+                return;
                 }
+            string args = $"--record \"{developerName}\" {contributionType} {qualityLevel} \"{description}\" --metrics \"unity_manual:1,platform:{Application.platform.ToString().ToLower()}\"";
+            RunPythonScript(script, args);
             }
 
-        private static void RunPythonScript(string scriptPath, string arguments)
+        // ---------------- Helper / Consolidated Utilities ----------------
+        public static string ResolveDeveloper()
+            {
+            // Prefer explicit editor preference in future; for now use environment fallback.
+            return Environment.UserName ?? "UnknownDev";
+            }
+
+        public static string? ResolveScript()
+            {
+            string root = Directory.GetCurrentDirectory();
+            string[] candidates = new[]
+                {
+                Path.Combine(root, "src", "DeveloperExperience", "dev_experience.py"),
+                Path.Combine(root, "template", "src", "DeveloperExperience", "dev_experience.py")
+                };
+            foreach (var c in candidates)
+                if (File.Exists(c)) return c;
+            return null;
+            }
+
+        private static string? ResolvePython()
+            {
+            string[] candidates = { Environment.GetEnvironmentVariable("PYTHON") ?? string.Empty, "python3", "python" };
+            foreach (var c in candidates)
+                {
+                if (string.IsNullOrWhiteSpace(c)) continue;
+                try
+                    {
+                    var p = Process.Start(new ProcessStartInfo
+                        {
+                        FileName = c,
+                        Arguments = "--version",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                        });
+                    if (p != null)
+                        {
+                        p.WaitForExit(1000);
+                        if (p.ExitCode == 0) return c;
+                        }
+                    }
+                catch { }
+                }
+            return null;
+            }
+
+        private static void WarnMissing()
+            {
+            UnityEngine.Debug.LogWarning("XP Tracker: dev_experience.py not found (looked in src/ and template/src/). Skipping.");
+            }
+
+        public static void RunPythonScript(string scriptPath, string arguments)
             {
             try
                 {
+                var py = ResolvePython();
+                if (py == null)
+                    {
+                    UnityEngine.Debug.LogWarning("XP Tracker: No python interpreter found (python/python3). Skipping.");
+                    return;
+                    }
+                if (!File.Exists(scriptPath))
+                    {
+                    WarnMissing();
+                    return;
+                    }
                 var startInfo = new ProcessStartInfo
                     {
-                    FileName = "python",
+                    FileName = py,
                     Arguments = $"\"{scriptPath}\" {arguments}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     CreateNoWindow = true
                     };
-
-                var process = Process.Start(startInfo);
+                using var process = Process.Start(startInfo);
+                if (process == null)
+                    {
+                    UnityEngine.Debug.LogWarning("XP Tracker: Failed to start python process.");
+                    return;
+                    }
                 string output = process.StandardOutput.ReadToEnd();
                 string error = process.StandardError.ReadToEnd();
-
                 process.WaitForExit();
-
-                if (!string.IsNullOrEmpty(output))
-                    {
-                    UnityEngine.Debug.Log($"XP System: {output}");
-                    }
-
-                if (!string.IsNullOrEmpty(error))
-                    {
-                    UnityEngine.Debug.LogError($"XP System Error: {error}");
-                    }
+                if (!string.IsNullOrWhiteSpace(output)) UnityEngine.Debug.Log($"XP System: {output.Trim()}");
+                if (!string.IsNullOrWhiteSpace(error)) UnityEngine.Debug.LogError($"XP System Error: {error.Trim()}");
                 }
-            catch (System.Exception e)
+            catch (Exception e)
                 {
                 UnityEngine.Debug.LogError($"Failed to run XP system: {e.Message}");
                 }
+            }
+
+        private static void RecordQuick(string type, string quality, string desc, string metrics)
+            {
+            var script = ResolveScript();
+            if (script == null) { WarnMissing(); return; }
+            RunPythonScript(script, $"--record \"{ResolveDeveloper()}\" {type} {quality} \"{desc}\" --metrics \"{metrics}\"");
             }
         }
 
@@ -203,42 +238,29 @@ namespace DeveloperExperience
         static UnityXPAutoTracker()
             {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            BuildPlayerWindow.RegisterBuildPlayerHandler(OnBuildPlayer);
             }
 
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
             {
             if (state == PlayModeStateChange.EnteredPlayMode)
                 {
-                string workspace = Directory.GetCurrentDirectory();
-                string pythonScript = Path.Combine(workspace, "template", "src", "DeveloperExperience", "dev_experience.py");
-
-                if (File.Exists(pythonScript))
-                    {
-                    string developerName = "Jerry";
-                    string args = $"--record \"{developerName}\" test_coverage good \"Unity play mode testing\" --metrics \"play_mode_test:1,platform:windows\"";
-                    RunPythonScript(pythonScript, args);
-                    }
+                var script = UnityXPIntegrationEditor.ResolveScript();
+                if (script == null) return;
+                UnityXPIntegrationEditor.RunPythonScript(script, $"--record \"{Environment.UserName}\" test_coverage good \"Unity play mode testing\" --metrics \"play_mode_test:1\"");
                 }
             }
 
-        private static void RunPythonScript(string scriptPath, string arguments)
+        private static void OnBuildPlayer(BuildPlayerOptions options)
             {
-            try
+            var script = UnityXPIntegrationEditor.ResolveScript();
+            if (script != null)
                 {
-                var startInfo = new ProcessStartInfo
-                    {
-                    FileName = "python",
-                    Arguments = $"\"{scriptPath}\" {arguments}",
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                    };
-
-                Process.Start(startInfo);
+                UnityXPIntegrationEditor.RunPythonScript(script, $"--record \"{Environment.UserName}\" code_contribution excellent \"Unity build completion\" --metrics \"unity_build:1,target:{options.target}\"");
                 }
-            catch (System.Exception e)
-                {
-                UnityEngine.Debug.LogError($"Failed to track XP: {e.Message}");
-                }
+            BuildPlayerWindow.DefaultBuildMethods.BuildPlayer(options);
             }
+
+        // AutoTracker no longer needs its own RunPythonScript; uses editor's shared utilities.
         }
     }

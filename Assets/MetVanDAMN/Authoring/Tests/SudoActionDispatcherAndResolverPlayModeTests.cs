@@ -11,8 +11,9 @@ using TinyWalnutGames.MetVanDAMN.Authoring;
 
 public class SudoActionDispatcherAndResolverPlayModeTests
     {
-    private World _world;
-    private EntityManager _em;
+#nullable enable
+    private World _world = null!; // assigned in SetUp
+    private EntityManager _em; // struct assigned in SetUp
 
     [SetUp]
     public void SetUp()
@@ -34,7 +35,7 @@ public class SudoActionDispatcherAndResolverPlayModeTests
     [UnityTest]
     public System.Collections.IEnumerator Dispatcher_Emits_Once_For_OneOff_Hint()
         {
-		Entity hint = _em.CreateEntity(typeof(SudoActionHint));
+        Entity hint = _em.CreateEntity(typeof(SudoActionHint));
         _em.SetComponentData(hint, new SudoActionHint
             {
             ActionKey = new FixedString64Bytes("unit_test"),
@@ -46,12 +47,12 @@ public class SudoActionDispatcherAndResolverPlayModeTests
             Seed = 0
             });
 
-		InitializationSystemGroup init = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+        InitializationSystemGroup init = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
         _world.GetOrCreateSystem<SudoActionDispatcherSystem>();
         init.Update();
         yield return null;
 
-		EntityQuery reqQuery = _em.CreateEntityQuery(typeof(SudoActionRequest));
+        EntityQuery reqQuery = _em.CreateEntityQuery(typeof(SudoActionRequest));
         Assert.AreEqual(1, reqQuery.CalculateEntityCount(), "Should emit exactly one request");
 
         // Update again — request should not be re-emitted due to SudoActionDispatched tag
@@ -63,7 +64,7 @@ public class SudoActionDispatcherAndResolverPlayModeTests
     [UnityTest]
     public System.Collections.IEnumerator Dispatcher_Is_Deterministic_For_Same_Seed_And_Key()
         {
-		Entity hint = _em.CreateEntity(typeof(SudoActionHint));
+        Entity hint = _em.CreateEntity(typeof(SudoActionHint));
         var key = new FixedString64Bytes("determinism");
         _em.SetComponentData(hint, new SudoActionHint
             {
@@ -76,14 +77,14 @@ public class SudoActionDispatcherAndResolverPlayModeTests
             Seed = 1234
             });
 
-		InitializationSystemGroup init = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+        InitializationSystemGroup init = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
         _world.GetOrCreateSystem<SudoActionDispatcherSystem>();
         init.Update();
         yield return null;
 
-		NativeArray<SudoActionRequest> reqs = _em.CreateEntityQuery(typeof(SudoActionRequest)).ToComponentDataArray<SudoActionRequest>(Allocator.Temp);
+        NativeArray<SudoActionRequest> reqs = _em.CreateEntityQuery(typeof(SudoActionRequest)).ToComponentDataArray<SudoActionRequest>(Allocator.Temp);
         Assert.AreEqual(1, reqs.Length);
-		SudoActionRequest first = reqs[0];
+        SudoActionRequest first = reqs[0];
         reqs.Dispose();
 
         // Reset: delete prior request, update again, position should match
@@ -93,7 +94,7 @@ public class SudoActionDispatcherAndResolverPlayModeTests
 
         reqs = _em.CreateEntityQuery(typeof(SudoActionRequest)).ToComponentDataArray<SudoActionRequest>(Allocator.Temp);
         Assert.AreEqual(1, reqs.Length);
-		SudoActionRequest second = reqs[0];
+        SudoActionRequest second = reqs[0];
         reqs.Dispose();
 
         Assert.AreEqual(first.ResolvedPosition, second.ResolvedPosition, "Positions should be deterministic");
@@ -102,31 +103,31 @@ public class SudoActionDispatcherAndResolverPlayModeTests
     [UnityTest]
     public System.Collections.IEnumerator Resolver_ORs_Hints_And_Does_Not_Overwrite_Existing_Masks()
         {
-		// Two hints of the same type combine via OR
-		Entity h1 = _em.CreateEntity(typeof(BiomeElevationHint));
+        // Two hints of the same type combine via OR
+        Entity h1 = _em.CreateEntity(typeof(BiomeElevationHint));
         _em.SetComponentData(h1, new BiomeElevationHint { Type = BiomeType.SolarPlains, Mask = BiomeElevation.Surface });
-		Entity h2 = _em.CreateEntity(typeof(BiomeElevationHint));
+        Entity h2 = _em.CreateEntity(typeof(BiomeElevationHint));
         _em.SetComponentData(h2, new BiomeElevationHint { Type = BiomeType.SolarPlains, Mask = BiomeElevation.Subterranean });
 
-		// Biome entity missing mask
-		Entity biome = _em.CreateEntity(typeof(Biome), typeof(NodeId));
+        // Biome entity missing mask
+        Entity biome = _em.CreateEntity(typeof(Biome), typeof(NodeId));
         _em.SetComponentData(biome, new Biome(BiomeType.SolarPlains, Polarity.None, 1, Polarity.None, 1));
         _em.SetComponentData(biome, new NodeId { _value = 42 });
 
-		InitializationSystemGroup init = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
+        InitializationSystemGroup init = _world.GetOrCreateSystemManaged<InitializationSystemGroup>();
         _world.GetOrCreateSystem<BiomeElevationResolverSystem>();
         init.Update();
         yield return null;
 
         Assert.IsTrue(_em.HasComponent<BiomeElevationMask>(biome), "Mask should be added when missing");
-		BiomeElevation mask = _em.GetComponentData<BiomeElevationMask>(biome).Value;
+        BiomeElevation mask = _em.GetComponentData<BiomeElevationMask>(biome).Value;
         Assert.AreEqual(BiomeElevation.Surface | BiomeElevation.Subterranean, mask);
 
         // If mask already exists, resolver should not overwrite
         _em.SetComponentData(biome, new BiomeElevationMask(BiomeElevation.Sky));
         init.Update();
         yield return null;
-		BiomeElevation mask2 = _em.GetComponentData<BiomeElevationMask>(biome).Value;
+        BiomeElevation mask2 = _em.GetComponentData<BiomeElevationMask>(biome).Value;
         Assert.AreEqual(BiomeElevation.Sky, mask2, "Existing mask should be preserved");
         }
     }
