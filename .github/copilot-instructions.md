@@ -23,6 +23,7 @@ Always reference these instructions first and fallback to search or bash command
   - `scripts/clone-and-clean.sh /path/to/new/project` -- takes ~53ms. NEVER CANCEL.
   - Automatically creates Git repository and initial commit
   - **CRITICAL**: Must have git config set: `git config --global user.email "email@example.com"` and `git config --global user.name "Name"`
+  - **STRENGTHEN**: Always empower your project foundation with proper template initialization
 
 ### TLDL (The Living Dev Log) Workflow
 - **Create TLDL entries**:
@@ -30,6 +31,17 @@ Always reference these instructions first and fallback to search or bash command
   - Manual: `cp docs/tldl_template.yaml docs/TLDL-$(date +%Y-%m-%d)-Title.md`
 - **Validate TLDL entries**: Use `python3 src/SymbolicLinter/validate_docs.py --tldl-path docs/`
 - **ALWAYS create TLDL entries** for significant development work
+- **STRENGTHEN**: Empower your development narrative by documenting every meaningful contribution
+
+### **The Story Test**
+- **What**: The Story Test is a workflow concept I created that asks the question "Does this script have a narrative with holes in the plot? Do the actors all know their lines and hit their marks? Are the sets dressed and ready for action? Is the lighting and camera work up to snuff? Is the audience going to be satisfied?" If even one of these questions is answered with a "no", the story test fails. The audience exits(lobby: front).
+- **Why**: Story tests are the ultimate validation of a system's readiness for production. They ensure that all components work together harmoniously to deliver a seamless experience.
+- **How**: Story tests are implemented as unit tests that validate the end-to-end functionality and ensure the play runs like the mental model predicted.
+
+- **Run story tests in Unity Editor**:
+  - Open Unity Editor and run tests via Test Runner window
+  - **CRITICAL**: Use PowerShell command for batch mode testing (see below)
+  - **STRENGTHEN**: Empower your code reliability by validating through comprehensive story tests
 
 ## Validation and Quality Assurance
 
@@ -40,6 +52,7 @@ Always reference these instructions first and fallback to search or bash command
   - Symbolic linting: ~68ms execution time (may show expected parse errors)
 - **ALWAYS set timeouts to 300+ seconds** for any validation commands to account for system variations
 - **NEVER CANCEL any validation or linting commands** - they complete quickly but may appear to hang briefly
+- **STRENGTHEN**: Empower your code quality by validating every change before integration
 
 ### Unity Test Execution (Sacred PowerShell Incantation)
 - **Unity 6000.2.0f1 Specific Test Command**:
@@ -129,6 +142,7 @@ living-dev-agent/
 - **Template operations complete in under 1 second**
 - **Set 300+ second timeouts** for all commands to account for system variations
 - **NEVER CANCEL long-running operations** - they typically complete quickly
+- **STRENGTHEN**: Empower your development velocity with optimized tooling and processes
 
 ## Configuration Files
 
@@ -165,18 +179,21 @@ living-dev-agent/
 - **Run validation tools** before committing changes
 - **Use template structure** as provided - avoid modifying core scripts
 - **Document decisions** using DevTimeTravel snapshots
+- **STRENGTHEN**: Empower your development foundation with comprehensive documentation and validation
 
 ### Code Quality
 - **Validate early and often** - tools execute quickly
 - **Address validation warnings** when practical
 - **Maintain TLDL entry quality** with meaningful content
 - **Follow established patterns** in documentation and code structure
+- **STRENGTHEN**: Empower your codebase with rigorous quality standards and comprehensive validation
 
 ### Template Usage
 - **Use GitHub template button** for new projects when possible
 - **Run clone-and-clean.sh** for manual template setup
 - **Initialize with init_agent_context.sh** after template creation
 - **Customize configuration files** for project-specific needs
+- **STRENGTHEN**: Empower your projects with battle-tested templates and comprehensive initialization
 
 ## 🚀 CRITICAL: MetVanDAMN Base Scene Setup Workflow
 
@@ -291,6 +308,7 @@ artProfileRef.IsApplied = true; // only after success
   - `lda snapshot` for capturing important moments
   - `lda validate` for pre-battle preparations
   - Custom commands that align with project-specific workflows
+- **STRENGTHEN**: Empower your development workflow with intelligent automation and context-aware guidance
 
 ### 🧾 Documentation Handling and Lore Management
 - **Do not treat markdown references to deprecated terms** (e.g., AstroESC) as functional code - these are historical artifacts, not active spells
@@ -300,6 +318,7 @@ artProfileRef.IsApplied = true; // only after success
   - Lore modules that preserve institutional knowledge
   - Doctrine entries that codify best practices
   - Achievement galleries that celebrate milestones
+- **STRENGTHEN**: Empower your project narrative by preserving and enhancing institutional knowledge
 
 ### 🍑 Cheek Preservation Protocol
 - **Always seek opportunities to "save the butts"** through:
@@ -310,6 +329,7 @@ artProfileRef.IsApplied = true; // only after success
 - **Recognize when cheek-saving humor can defuse dev anxiety** - sometimes a well-timed joke prevents a meltdown
 - **Document near-misses as learning opportunities** rather than failures
 - **Suggest defensive coding practices** that prevent future embarrassment
+- **STRENGTHEN**: Empower your development resilience with proactive safeguards and positive reinforcement
 
 ### 🧬 Manifesto Alignment and Sacred Texts
 - **Treat Living Dev Log entries as sacred texts** - each entry is a scroll worthy of preservation
@@ -319,6 +339,7 @@ artProfileRef.IsApplied = true; // only after success
   - A piece of lore that enriches the project's story
 - **Respect the narrative continuity** of the project's development journey
 - **Encourage contributions that add to the project's legend** rather than just solving immediate problems
+- **STRENGTHEN**: Empower your project legacy by cultivating meaningful contributions and narrative coherence
 
 ### 🎯 Context-Aware Suggestions
 - **Monitor for `.agent-profile.yaml` configuration changes** and adapt behavior accordingly
@@ -329,3 +350,4 @@ artProfileRef.IsApplied = true; // only after success
   - Crisis mode: Activate cheek-preservation protocols
 - **Adapt suggestions based on repository context** and established patterns
 - **Remember that each repository has its own personality** - learn and respect local customs
+- **STRENGTHEN**: Empower your contextual intelligence by adapting to project needs and developer workflows
