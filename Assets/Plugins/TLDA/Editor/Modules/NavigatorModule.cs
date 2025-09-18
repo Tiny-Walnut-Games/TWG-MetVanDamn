@@ -184,7 +184,7 @@ namespace LivingDevAgent.Editor.Modules
 				_data.FolderExpanded[path] = depth <= 1; // expand root/top-level by default
 				}
 
-			string labelPrefix = indent ?? string.Empty;
+			string labelPrefix = indent; // indent guaranteed non-null from GetIndent
 			using (new EditorGUILayout.HorizontalScope())
 				{
 				string folderIcon = _data.FolderExpanded[path] ? "📂" : "📁";
@@ -234,7 +234,7 @@ namespace LivingDevAgent.Editor.Modules
 				{
 				EditorGUI.indentLevel++;
 				string fileName = Path.GetFileName(filePath);
-				string fileLabel = (indent ?? string.Empty) + "  " + fileName;
+				string fileLabel = indent + "  " + fileName; // indent non-null
 				bool isImage = TLDLScribeData.ImageExts.Contains(Path.GetExtension(filePath));
 
 				// File type emoji
@@ -373,6 +373,7 @@ namespace LivingDevAgent.Editor.Modules
 
 		private string GetIndent(int depth)
 			{
+			if (depth <= 0) return string.Empty;
 			return new string(' ', depth * 2);
 			}
 
@@ -611,7 +612,7 @@ namespace LivingDevAgent.Editor.Modules
 			return last == Path.DirectorySeparatorChar || last == Path.AltDirectorySeparatorChar ? path : path + Path.DirectorySeparatorChar;
 			}
 
-		private GUIStyle _navBackgroundStyle;
+		private GUIStyle? _navBackgroundStyle; // nullable: recreated on demand
 
 		private Texture2D CreateNavBackgroundTexture()
 			{

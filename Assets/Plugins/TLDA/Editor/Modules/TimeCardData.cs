@@ -20,10 +20,10 @@ namespace LivingDevAgent.Editor.Modules
 		// The duration is calculated as the difference between the end time and the start time.
 		// The duration is stored as a float in hours, but it can be easily converted to
 		// minutes or seconds if needed.
-		private TaskData taskName;
+		private TaskData taskName = null!; // set when StartTimeCard invoked
 		[HideInInspector] public int Sessions { get; set; } // Number of sessions logged for this time card
-		private DateTime startTime;
-		private DateTime endTime;
+		private DateTime startTime = DateTime.MinValue;
+		private DateTime endTime = DateTime.MinValue;
 		private float DurationInHours => (float)(endTime - startTime).TotalHours;
 		private float DurationInMinutes => (float)(endTime - startTime).TotalMinutes;
 		private float DurationInSeconds => (float)(endTime - startTime).TotalSeconds;
@@ -39,7 +39,7 @@ namespace LivingDevAgent.Editor.Modules
 		// This information is then used to generate a report for the task,
 		// using a private string to hold the parsed collection of data from this time card.
 		// This can be requested by Taskmaster, or other API, via public method(s) for reporting purposes.
-		private string reportData;
+		private string reportData = string.Empty;
 
 		public TaskData GetTask()
 			{

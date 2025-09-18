@@ -120,7 +120,7 @@ namespace LivingDevAgent.Editor.Modules
 				return;
 				}
 
-			string md = LoadTemplateMarkdown(_data.Templates[_data.SelectedTemplateIndex]);
+			string? md = LoadTemplateMarkdown(_data.Templates[_data.SelectedTemplateIndex]);
 			_data.RawContent = md ?? string.Empty;
 			SetStatus($"📖 Loaded template: {_data.Templates[_data.SelectedTemplateIndex].Key}");
 			}
@@ -267,7 +267,7 @@ namespace LivingDevAgent.Editor.Modules
 				}
 			}
 
-		private string LoadTemplateMarkdown(TemplateInfo info)
+		private string? LoadTemplateMarkdown(TemplateInfo info)
 			{
 			try
 				{
@@ -317,7 +317,7 @@ namespace LivingDevAgent.Editor.Modules
 
 		private string GetProjectRoot()
 			{
-			return Directory.GetParent(Application.dataPath)!.FullName;
+			return Directory.GetParent(Application.dataPath)!.FullName; // null-forgiving; Unity project always has parent
 			}
 
 		private string GetIssuesDirectory()
@@ -365,14 +365,14 @@ namespace LivingDevAgent.Editor.Modules
 			{
 			if (string.IsNullOrEmpty(absPath)) return;
 
-			string unityPath = MakeUnityPath(absPath);
+			string? unityPath = MakeUnityPath(absPath);
 			if (!string.IsNullOrEmpty(unityPath))
 				{
 				AssetDatabase.ImportAsset(unityPath, ImportAssetOptions.ForceSynchronousImport);
 				}
 			}
 
-		private string MakeUnityPath(string absPath)
+		private string? MakeUnityPath(string absPath)
 			{
 			string norm = absPath.Replace('\\', '/');
 			string dataPath = Application.dataPath.Replace('\\', '/');

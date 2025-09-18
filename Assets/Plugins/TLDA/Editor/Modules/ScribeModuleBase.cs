@@ -16,13 +16,13 @@ namespace LivingDevAgent.Editor.Modules
 	public abstract class ScribeModuleBase
 		{
 		protected TLDLScribeData _data;
-		protected object _window; // Use object to avoid circular dependency
+		protected object? _window; // Nullable: window may not be assigned until SetWindow is called
 
 		// Shared GUI styles - initialized once and reused with intelligent caching
-		protected static GUIStyle _labelWrap;
-		protected static GUIStyle _textAreaMonospace;
-		protected static GUIStyle _textAreaWrap;
-		protected static GUIStyle _h1, _h2, _h3, _bodyWrap, _listItem, _codeBlock;
+		protected static GUIStyle _labelWrap = null!;
+		protected static GUIStyle _textAreaMonospace = null!;
+		protected static GUIStyle _textAreaWrap = null!;
+		protected static GUIStyle _h1 = null!, _h2 = null!, _h3 = null!, _bodyWrap = null!, _listItem = null!, _codeBlock = null!;
 		protected static bool _stylesInitialized = false;
 
 		// Performance optimization: Cache reflection results for SetStatus
@@ -353,7 +353,7 @@ namespace LivingDevAgent.Editor.Modules
 		/// Theme customization system - demonstrates expansion potential
 		/// This shows how the base system can grow into a comprehensive theming solution
 		/// </summary>
-		protected static GUIStyle GetCustomStyle(string styleName, Func<GUIStyle> styleFactory = null)
+		protected static GUIStyle GetCustomStyle(string styleName, Func<GUIStyle>? styleFactory = null)
 			{
 			if (_customStyleCache.TryGetValue(styleName, out GUIStyle cachedStyle))
 				{

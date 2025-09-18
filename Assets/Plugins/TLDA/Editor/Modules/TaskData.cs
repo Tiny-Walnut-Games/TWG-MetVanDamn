@@ -17,38 +17,38 @@ namespace LivingDevAgent.Editor.Modules
 		// This class represents a task that can be tracked and managed by Taskmaster.
 		// It contains a name, description, and status for the task.
 		// It also contains a reference to a TimeCardData, which is used to track time spent on the task.
-		[HideInInspector] public string TaskName;
-		[HideInInspector] public string taskDescription;
+		[HideInInspector] public string TaskName = string.Empty;
+		[HideInInspector] public string taskDescription = string.Empty;
 		[HideInInspector] public bool isCompleted;
-		[HideInInspector] public TimeCardData timeCard;
-		// Additional properties and methods can be added as needed to manage tasks.
-		// Unlike TimeCardData, the TaskData is intended to be accessed and manipulated,
-		// not directly, but via Taskmaster API calls. Taskmaster being the... master.
-		// This means we're not going to be parsing it directly in this class.
-		// Taskmaster reports to the faculty directly, not the other way around.😉
+		[HideInInspector] public TimeCardData timeCard = null!; // set during CreateTask
+																// Additional properties and methods can be added as needed to manage tasks.
+																// Unlike TimeCardData, the TaskData is intended to be accessed and manipulated,
+																// not directly, but via Taskmaster API calls. Taskmaster being the... master.
+																// This means we're not going to be parsing it directly in this class.
+																// Taskmaster reports to the faculty directly, not the other way around.😉
 		[HideInInspector] public bool isFinished;
 		[HideInInspector] public bool isCanceled;
 		[HideInInspector] public System.DateTime createdAt;
 		[HideInInspector] public System.DateTime completedAt;
 		[HideInInspector] public System.DateTime canceledAt;
-		[HideInInspector] public string assignedTo;
+		[HideInInspector] public string assignedTo = string.Empty;
 		[HideInInspector] public int priorityLevel; // 1 (highest) to 5 (lowest)
-		[HideInInspector] public string[] tags; // e.g., "bug", "
-		[HideInInspector] public string[] comments; // e.g., "Started working on this task."
-		[HideInInspector] public string[] attachments; // e.g., "screenshot.png"
-		[HideInInspector] public string[] subtasks; // e.g., "Design UI", "Implement feature"
-		[HideInInspector] public string[] relatedRefs; // e.g., "TaskID123", "Issue#456", "PR#789", etc.
-		[HideInInspector] public string[] dependencies; // e.g., "TaskID321", "Issue#654", "PR#987", etc.
-		[HideInInspector] public string[] blockers; // e.g., "Waiting for design approval."
-		[HideInInspector] public string[] watchers; // e.g., "user1", "user2", etc.
-		[HideInInspector] public string[] history; // e.g., "Task created.", "Status changed to In Progress."
-		[HideInInspector] public string[] customFields; // e.g., "Field1: Value1", "Field2: Value2"
-		[HideInInspector] public string[] auditLogs; // e.g., "User1 changed status to Completed."
-		[HideInInspector] public string[] notifications; // e.g., "Task assigned to User1."
-		[HideInInspector] public string[] reminders; // e.g., "Reminder set for tomorrow."
-		[HideInInspector] public string[] timeEstimates; // e.g., "2 hours", "30 minutes"
-		[HideInInspector] public string[] timeSpent; // e.g., "1 hour", "15 minutes"
-		[HideInInspector] public string[] billingCodes; // e.g., "BILL-123", "BILL-456"
+		[HideInInspector] public string[] tags = System.Array.Empty<string>(); // e.g., "bug"
+		[HideInInspector] public string[] comments = System.Array.Empty<string>(); // e.g., "Started working on this task."
+		[HideInInspector] public string[] attachments = System.Array.Empty<string>(); // e.g., "screenshot.png"
+		[HideInInspector] public string[] subtasks = System.Array.Empty<string>(); // e.g., "Design UI"
+		[HideInInspector] public string[] relatedRefs = System.Array.Empty<string>();
+		[HideInInspector] public string[] dependencies = System.Array.Empty<string>();
+		[HideInInspector] public string[] blockers = System.Array.Empty<string>();
+		[HideInInspector] public string[] watchers = System.Array.Empty<string>();
+		[HideInInspector] public string[] history = System.Array.Empty<string>(); // seed history on creation
+		[HideInInspector] public string[] customFields = System.Array.Empty<string>();
+		[HideInInspector] public string[] auditLogs = System.Array.Empty<string>();
+		[HideInInspector] public string[] notifications = System.Array.Empty<string>();
+		[HideInInspector] public string[] reminders = System.Array.Empty<string>();
+		[HideInInspector] public string[] timeEstimates = System.Array.Empty<string>();
+		[HideInInspector] public string[] timeSpent = System.Array.Empty<string>();
+		[HideInInspector] public string[] billingCodes = System.Array.Empty<string>();
 
 		// Create a new TaskData instance
 		public static TaskData CreateTask(string name, string description, string assignedUser, int priority)
@@ -62,23 +62,8 @@ namespace LivingDevAgent.Editor.Modules
 			newTask.createdAt = System.DateTime.Now;
 			newTask.assignedTo = assignedUser;
 			newTask.priorityLevel = priority;
-			newTask.tags = new string[] { };
-			newTask.comments = new string[] { };
-			newTask.attachments = new string[] { };
-			newTask.subtasks = new string[] { };
-			newTask.relatedRefs = new string[] { };
-			newTask.dependencies = new string[] { };
-			newTask.blockers = new string[] { };
-			newTask.watchers = new string[] { };
-			newTask.history = new string[] { $"Task created at {newTask.createdAt}" };
-			newTask.customFields = new string[] { };
-			newTask.auditLogs = new string[] { };
-			newTask.notifications = new string[] { };
-			newTask.reminders = new string[] { };
-			newTask.timeEstimates = new string[] { };
-			newTask.timeSpent = new string[] { };
-			newTask.billingCodes = new string[] { };
-			// Initialize the TimeCardData for this task
+			newTask.history = new string[] { $"Task created at {newTask.createdAt}" }; // all other arrays already sentinel-initialized
+																					   // Initialize the TimeCardData for this task
 			TimeCardData timeCardInstance = CreateInstance<TimeCardData>();
 			timeCardInstance.StartTimeCard(newTask);
 			newTask.timeCard = timeCardInstance;
