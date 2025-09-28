@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-09-21T06:08:42.111192",
+  "last_updated": "2025-09-28T06:29:34.173018",
   "quotes": [
     {
       "text": "In the mystical realm of testing, the Debug Paladin stands between ergonomic harmony and documentation destruction.",
@@ -118,6 +118,80 @@
       "buttsafe_certified": true,
       "generation_date": "2025-09-21T06:08:42.111189",
       "template_id": "documentation_philosophy"
+    },
+    {
+      "text": "The race condition you can't capture is like the shadow under the closet—there, but only during production.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-09-28T06:29:34.172931",
+      "template_id": "debugging_proverb_template"
+    },
+    {
+      "text": "In the mystical realm of deployment, the Debug Paladin stands between peaceful coding and runtime catastrophe.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "lore",
+        "cheekdom",
+        "epic",
+        "guardian"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-09-28T06:29:34.172969",
+      "template_id": "cheekdom_lore_template"
+    },
+    {
+      "text": "Every developer's wrists is a temple of productivity. Cherish it with sacred tools.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "buttsafe",
+        "ergonomic",
+        "sacred",
+        "protection"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-09-28T06:29:34.172990",
+      "template_id": "buttsafe_wisdom"
+    },
+    {
+      "text": "Every developer's neck is sacred. Cherish it with ergonomic wisdom.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "buttsafe",
+        "ergonomic",
+        "sacred",
+        "protection"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-09-28T06:29:34.173003",
+      "template_id": "buttsafe_wisdom"
+    },
+    {
+      "text": "— **Architecture Mystic**, Sacred Scrolls, Chapter 4, Verse 7",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-09-28T06:29:34.173015",
+      "template_id": "scroll_attribution_template"
     }
   ]
 }
