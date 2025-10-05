@@ -1,3 +1,4 @@
+#nullable enable
 using TinyWalnutGames.MetVD.Shared;
 using Unity.Mathematics;
 using UnityEngine;
@@ -12,56 +13,45 @@ namespace TinyWalnutGames.MetVD.Authoring
 	[DisallowMultipleComponent]
 	public class WorldBootstrapAuthoring : MonoBehaviour
 		{
-		[Header("World Configuration")]
-		[Tooltip("Seed for deterministic world generation (0 = random)")]
+		[Header("World Configuration")] [Tooltip("Seed for deterministic world generation (0 = random)")]
 		public int seed = 0;
 
-		[Tooltip("World bounds size (X,Z)")]
-		public int2 worldSize = new(64, 64);
+		[Tooltip("World bounds size (X,Z)")] public int2 worldSize = new(64, 64);
 
 		[Tooltip("Randomization mode for adaptive rule generation")]
 		public RandomizationMode randomizationMode = RandomizationMode.Partial;
 
-		[Header("Biome Generation")]
-		[Tooltip("Number of different biomes to generate")]
+		[Header("Biome Generation")] [Tooltip("Number of different biomes to generate")]
 		public Vector2Int biomeCount = new(3, 6);
 
-		[Tooltip("Weight for biome placement (higher = more influence)")]
-		[Range(0.1f, 2.0f)]
+		[Tooltip("Weight for biome placement (higher = more influence)")] [Range(0.1f, 2.0f)]
 		public float biomeWeight = 1.0f;
 
-		[Header("District Generation")]
-		[Tooltip("Number of districts to generate")]
+		[Header("District Generation")] [Tooltip("Number of districts to generate")]
 		public Vector2Int districtCount = new(4, 12);
 
-		[Tooltip("Minimum distance between districts")]
-		[Range(5f, 50f)]
+		[Tooltip("Minimum distance between districts")] [Range(5f, 50f)]
 		public float districtMinDistance = 15f;
 
 		[Tooltip("Number of attempts to place each district")]
 		public int districtPlacementAttempts = 10;
 
-		[Tooltip("Weight for district placement")]
-		[Range(0.1f, 2.0f)]
+		[Tooltip("Weight for district placement")] [Range(0.1f, 2.0f)]
 		public float districtWeight = 1.0f;
 
-		[Header("Sector Generation")]
-		[Tooltip("Number of sectors per district")]
+		[Header("Sector Generation")] [Tooltip("Number of sectors per district")]
 		public Vector2Int sectorsPerDistrict = new(2, 8);
 
 		[Tooltip("Local grid size for sector subdivision")]
 		public int2 sectorGridSize = new(6, 6);
 
-		[Header("Room Generation")]
-		[Tooltip("Number of rooms per sector")]
+		[Header("Room Generation")] [Tooltip("Number of rooms per sector")]
 		public Vector2Int roomsPerSector = new(3, 12);
 
-		[Tooltip("Target loop density for room connections")]
-		[Range(0.1f, 1.0f)]
+		[Tooltip("Target loop density for room connections")] [Range(0.1f, 1.0f)]
 		public float targetLoopDensity = 0.3f;
 
-		[Header("Advanced Options")]
-		[Tooltip("Enable debug visualization during generation")]
+		[Header("Advanced Options")] [Tooltip("Enable debug visualization during generation")]
 		public bool enableDebugVisualization = true;
 
 		[Tooltip("Log generation steps to console")]

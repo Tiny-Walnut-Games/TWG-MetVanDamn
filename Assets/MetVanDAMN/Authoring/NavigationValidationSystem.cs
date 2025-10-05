@@ -1,3 +1,4 @@
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using Unity.Collections;
 using Unity.Entities;
@@ -13,8 +14,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 	[UpdateAfter(typeof(NavigationGraphBuildSystem))]
 	public partial class NavigationValidationSystem : SystemBase
 		{
-		private EntityQuery _navNodeQuery;
 		private EntityQuery _navigationGraphQuery;
+		private EntityQuery _navNodeQuery;
 
 		protected override void OnCreate()
 			{
@@ -91,7 +92,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			profiles[1] = new AgentCapabilities(Polarity.None, Ability.AllMovement, 0.8f, "MovementAgent");
 
 			// Environmental specialist
-			profiles[2] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f, "EnvironmentalAgent");
+			profiles[2] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f,
+				"EnvironmentalAgent");
 
 			// Polarity master
 			profiles[3] = new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1.0f, "PolarityAgent");
@@ -108,12 +110,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 			var nodeIds = new NativeList<uint>(256, Allocator.Temp);
 
 			Entities.WithAll<NavNode>().ForEach((in NavNode navNode) =>
-			{
+				{
 				if (navNode.IsActive)
 					{
 					nodeIds.Add(navNode.NodeId);
 					}
-			}).WithoutBurst().Run();
+				}).WithoutBurst().Run();
 
 			var reachability = new NativeArray<bool>(nodeIds.Length, Allocator.Temp);
 
@@ -157,7 +159,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 					continue;
 					}
 
-				DynamicBuffer<NavLinkBufferElement> linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(currentEntity);
+				DynamicBuffer<NavLinkBufferElement> linkBuffer =
+					SystemAPI.GetBuffer<NavLinkBufferElement>(currentEntity);
 
 				for (int i = 0; i < linkBuffer.Length; i++)
 					{
@@ -187,12 +190,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 			Entity foundEntity = Entity.Null;
 
 			Entities.WithAll<NodeId>().ForEach((Entity entity, in NodeId id) =>
-			{
+				{
 				if (id._value == nodeId)
 					{
 					foundEntity = entity;
 					}
-			}).WithoutBurst().Run();
+				}).WithoutBurst().Run();
 
 			return foundEntity;
 			}
@@ -250,8 +253,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 		public FixedString128Bytes Description;
 
 		public NavigationIssue(NavigationIssueType type, uint nodeId, FixedString128Bytes description,
-							  uint relatedNodeId = 0, Polarity requiredPolarity = Polarity.None,
-							  Ability requiredAbilities = Ability.None)
+			uint relatedNodeId = 0, Polarity requiredPolarity = Polarity.None,
+			Ability requiredAbilities = Ability.None)
 			{
 			Type = type;
 			NodeId = nodeId;
@@ -301,7 +304,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			var report = new NavigationValidationReport(navGraph.NodeCount, navGraph.LinkCount);
 
 			// Perform comprehensive validation using the system's analysis results
-			EntityQuery nodeQuery = em.CreateEntityQuery(ComponentType.ReadOnly<NavNode>(), ComponentType.ReadOnly<NavLinkBufferElement>());
+			EntityQuery nodeQuery = em.CreateEntityQuery(ComponentType.ReadOnly<NavNode>(),
+				ComponentType.ReadOnly<NavLinkBufferElement>());
 
 			// Collect all navigation nodes for analysis
 			NativeArray<Entity> allNodes = nodeQuery.ToEntityArray(Allocator.Temp);
@@ -363,7 +367,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Performs reachability analysis from a starting node with given agent capabilities
 		/// Returns a set of reachable node IDs
 		/// </summary>
-		private static NativeHashSet<uint> PerformReachabilityAnalysis(World world, AgentCapabilities capabilities, NativeArray<Entity> allNodes)
+		private static NativeHashSet<uint> PerformReachabilityAnalysis(World world, AgentCapabilities capabilities,
+			NativeArray<Entity> allNodes)
 			{
 			var reachableNodes = new NativeHashSet<uint>(allNodes.Length, Allocator.Temp);
 			EntityManager entityManager = world.EntityManager;
@@ -407,7 +412,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 					continue;
 					}
 
-				DynamicBuffer<NavLinkBufferElement> linkBuffer = entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
+				DynamicBuffer<NavLinkBufferElement> linkBuffer =
+					entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
 
 				for (int i = 0; i < linkBuffer.Length; i++)
 					{
@@ -474,7 +480,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			profiles[1] = new AgentCapabilities(Polarity.None, Ability.AllMovement, 0.8f, "MovementAgent");
 
 			// Environmental specialist
-			profiles[2] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f, "EnvironmentalAgent");
+			profiles[2] = new AgentCapabilities(Polarity.HeatCold | Polarity.EarthWind, Ability.AllEnvironmental, 0.6f,
+				"EnvironmentalAgent");
 
 			// Polarity master
 			profiles[3] = new AgentCapabilities(Polarity.Any, Ability.AllPolarity, 1.0f, "PolarityAgent");
@@ -549,7 +556,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 						continue;
 						}
 
-					DynamicBuffer<NavLinkBufferElement> linkBuffer = entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
+					DynamicBuffer<NavLinkBufferElement> linkBuffer =
+						entityManager.GetBuffer<NavLinkBufferElement>(currentEntity);
 
 					for (int i = 0; i < linkBuffer.Length; i++)
 						{

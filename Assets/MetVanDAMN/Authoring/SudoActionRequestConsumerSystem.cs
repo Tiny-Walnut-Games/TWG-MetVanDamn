@@ -1,3 +1,4 @@
+#nullable enable
 // Define METVD_SAMPLES_GO_CONSUMER to enable this sample GameObject-based consumer.
 #if METVD_SAMPLES_GO_CONSUMER
 using Unity.Burst;
@@ -85,7 +86,8 @@ namespace TinyWalnutGames.MetVD.Authoring
             return true;
             }
 
-        private static void SpawnPrimitiveMarker(in SudoActionRequest req, PrimitiveType type, Color color, Vector3? scale = null)
+        private static void SpawnPrimitiveMarker(in SudoActionRequest req, PrimitiveType type, Color color, Vector3? scale
+ = null)
             {
             var go = GameObject.CreatePrimitive(type);
             go.name = $"SudoAction_{req.ActionKey.ToString()}";

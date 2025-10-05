@@ -13,78 +13,23 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 	{
 	public class ConsoleCommentaryWindow : EditorWindow
 		{
-		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Diagnostics/Console Commentary Window", priority = 200)]
-		private static void ShowWindow()
-			{
-			ConsoleCommentaryWindow window = GetWindow<ConsoleCommentaryWindow>("Console Commentary");
-			window.titleContent = new GUIContent("🗨️ Console Commentary", "Add developer annotations to Unity console logs");
-			window.Show();
-			}
-
-		private Vector2 _scrollPosition;
-		private Vector2 _logsScrollPosition;
-		private string _newComment = "";
-		private string _selectedLogEntry = "";
-		private LogType _selectedLogType = LogType.Log;
+		private bool _autoScrollLogs = true;
+		private List<LogEntry> _capturedLogs = new();
 		private List<CommentaryEntry> _commentaries = new();
 		private string _commentaryFilePath;
-		private List<LogEntry> _capturedLogs = new();
 		private bool _isCapturing = true;
+		private Vector2 _logsScrollPosition;
+		private string _newComment = "";
+
+		private Vector2 _scrollPosition;
+		private string _selectedLogEntry = "";
 		private int _selectedLogIndex = -1;
+		private LogType _selectedLogType = LogType.Log;
 		private string _sessionName = "";
-		private bool _autoScrollLogs = true;
+		private int _snapshotLinesAfter = 10;
 
 		// Jerry's BRILLIANT adjustable range system
 		private int _snapshotLinesBefore = 10;
-		private int _snapshotLinesAfter = 10;
-
-		[Serializable]
-		private class LogEntry
-			{
-			public string message;
-			public LogType type;
-			public string stackTrace;
-			public string timestamp;
-			public bool isCommentaryLog; // Flag to prevent infinite recursion
-
-			public LogEntry(string msg, LogType logType, string stack)
-				{
-				message = msg;
-				type = logType;
-				stackTrace = stack;
-				timestamp = DateTime.Now.ToString("HH:mm:ss");
-				isCommentaryLog = msg.StartsWith("💬 Commentary added") ||
-								msg.StartsWith("📜 Console commentary") ||
-								msg.StartsWith("🧹 Console commentary") ||
-								msg.StartsWith("📂 Raw console logs") ||
-								msg.StartsWith("📡 Console Commentary:");
-				}
-			}
-
-		[Serializable]
-		private class CommentaryEntry
-			{
-			public string timestamp;
-			public string logMessage;
-			public LogType logType;
-			public string developerComment;
-			public string context;
-			public string tags;
-			public string stackTrace;
-			public int logIndex; // Reference to which log this commentary is about
-
-			public CommentaryEntry(string log, LogType type, string comment, string ctx = "", string tagList = "", string stack = "", int logIdx = -1)
-				{
-				timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-				logMessage = log;
-				logType = type;
-				developerComment = comment;
-				context = ctx;
-				tags = tagList;
-				stackTrace = stack;
-				logIndex = logIdx;
-				}
-			}
 
 		private void OnEnable()
 			{
@@ -108,6 +53,284 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 			{
 			Application.logMessageReceived -= OnLogMessageReceived;
 			SaveCommentaries();
+			}
+
+		private void OnGUI()
+			{
+			GUILayout.Label("🗨️ Console Commentary System", EditorStyles.boldLabel);
+
+			// Session info and controls
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("Session:", GUILayout.Width(60));
+			_sessionName = EditorGUILayout.TextField(_sessionName, GUILayout.Width(150));
+
+			GUILayout.FlexibleSpace();
+
+			bool newCapturing = EditorGUILayout.Toggle("📡 Capture", _isCapturing, GUILayout.Width(80));
+			if (newCapturing != _isCapturing)
+				{
+				_isCapturing = newCapturing;
+				}
+
+			_autoScrollLogs = EditorGUILayout.Toggle("📜 Auto-scroll", _autoScrollLogs, GUILayout.Width(90));
+
+			// Manual refresh button - only show when auto-capture is disabled
+			if (!_isCapturing)
+				{
+				if (GUILayout.Button("🔄 Refresh", GUILayout.Width(70)))
+					{
+					RefreshConsoleCapture();
+					}
+				}
+
+			if (GUILayout.Button("🧹 Clear", GUILayout.Width(60)))
+				{
+				_capturedLogs.Clear();
+				_selectedLogIndex = -1;
+				_selectedLogEntry = "";
+				}
+
+			EditorGUILayout.EndHorizontal();
+
+			GUILayout.Space(5);
+
+			// Recent logs section with scrollview
+			EditorGUILayout.LabelField($"📝 Console Logs ({_capturedLogs.Count}):", EditorStyles.boldLabel);
+
+			// Logs scrollview
+			_logsScrollPosition = EditorGUILayout.BeginScrollView(_logsScrollPosition, GUILayout.Height(200));
+
+			if (_capturedLogs.Count > 0)
+				{
+				for (int i = _capturedLogs.Count - 1; i >= 0; i--) // Show newest first
+					{
+					LogEntry logEntry = _capturedLogs[i];
+
+					EditorGUILayout.BeginHorizontal();
+
+					// Selection button
+					bool isSelected = _selectedLogIndex == i;
+					if (GUILayout.Button(isSelected ? "✅" : "⭕", GUILayout.Width(25)))
+						{
+						_selectedLogIndex = i;
+						UpdateSelectedLogFromIndex();
+						}
+
+					// Log type icon
+					string typeIcon = logEntry.type switch
+						{
+						LogType.Error => "❌",
+						LogType.Warning => "⚠️",
+						LogType.Log => "📝",
+						LogType.Exception => "💥",
+						_ => "🔸"
+						};
+
+					GUILayout.Label(typeIcon, GUILayout.Width(20));
+					GUILayout.Label($"[{logEntry.timestamp}]", EditorStyles.miniLabel, GUILayout.Width(60));
+
+					// Check if this log has commentary
+					bool hasCommentary = _commentaries.Any(c => c.logIndex == i);
+					if (hasCommentary)
+						{
+						GUILayout.Label("💬", GUILayout.Width(20));
+						}
+					else
+						{
+						GUILayout.Space(20);
+						}
+
+					// Truncated message
+					string truncated = logEntry.message.Length > 60
+						? logEntry.message[..60] + "..."
+						: logEntry.message;
+
+					GUIStyle style = hasCommentary ? EditorStyles.boldLabel : EditorStyles.miniLabel;
+					GUILayout.Label(truncated, style);
+					EditorGUILayout.EndHorizontal();
+					}
+				}
+			else
+				{
+				EditorGUILayout.HelpBox("No logs captured yet. Enable capture and trigger some Unity console output.",
+					MessageType.Info);
+				}
+
+			EditorGUILayout.EndScrollView();
+
+			GUILayout.Space(10);
+
+			// Commentary section
+			EditorGUILayout.LabelField("💬 Add Commentary:", EditorStyles.boldLabel);
+
+			EditorGUILayout.LabelField("Selected Log Entry:", EditorStyles.label);
+			EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+			_selectedLogEntry = EditorGUILayout.TextArea(_selectedLogEntry, GUILayout.Height(60));
+			EditorGUILayout.EndVertical();
+
+			_selectedLogType = (LogType)EditorGUILayout.EnumPopup("Log Type:", _selectedLogType);
+
+			EditorGUILayout.LabelField("Your Commentary:", EditorStyles.label);
+			_newComment = EditorGUILayout.TextArea(_newComment, GUILayout.Height(80));
+
+			EditorGUILayout.BeginHorizontal();
+
+			if (GUILayout.Button("💬 Add Commentary", GUILayout.Height(30)))
+				{
+				AddCommentary();
+				}
+
+			if (GUILayout.Button("🏷️ Tag as 'FUCK Moment'", GUILayout.Height(30)))
+				{
+				AddCommentary("FUCK-Moment,Learning-Opportunity");
+				}
+
+			if (GUILayout.Button("✅ Tag as 'Achievement'", GUILayout.Height(30)))
+				{
+				AddCommentary("Achievement,Success");
+				}
+
+			EditorGUILayout.EndHorizontal();
+
+			GUILayout.Space(15);
+
+			// Export section
+			EditorGUILayout.LabelField("📊 Export Session:", EditorStyles.boldLabel);
+
+			EditorGUILayout.BeginHorizontal();
+			if (GUILayout.Button("📂 Export Raw Logs", GUILayout.Height(25)))
+				{
+				ExportRawLogs();
+				}
+
+			if (GUILayout.Button("📜 Complete TLDL Session", GUILayout.Height(25)))
+				{
+				CompleteTLDLSession();
+				}
+
+			EditorGUILayout.EndHorizontal();
+
+			GUILayout.Space(5);
+
+			// Code snapshot section - Jerry's BRILLIANT idea!
+			EditorGUILayout.LabelField("📸 Code Snapshot Tools:", EditorStyles.boldLabel);
+
+			// Jerry's GENIUS adjustable range controls
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField("Snapshot Range:", GUILayout.Width(100));
+			_snapshotLinesBefore =
+				EditorGUILayout.IntSlider("Before", _snapshotLinesBefore, 1, 50, GUILayout.Width(120));
+			_snapshotLinesAfter = EditorGUILayout.IntSlider("After", _snapshotLinesAfter, 1, 50, GUILayout.Width(120));
+
+			// Quick presets for common scenarios
+			if (GUILayout.Button("📏 Tight (3)", GUILayout.Width(80)))
+				{
+				_snapshotLinesBefore = _snapshotLinesAfter = 3;
+				}
+
+			if (GUILayout.Button("📐 Standard (10)", GUILayout.Width(90)))
+				{
+				_snapshotLinesBefore = _snapshotLinesAfter = 10;
+				}
+
+			if (GUILayout.Button("📊 Wide (25)", GUILayout.Width(80)))
+				{
+				_snapshotLinesBefore = _snapshotLinesAfter = 25;
+				}
+
+			EditorGUILayout.EndHorizontal();
+
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField($"Total capture: {_snapshotLinesBefore + 1 + _snapshotLinesAfter} lines",
+				EditorStyles.miniLabel);
+			GUILayout.FlexibleSpace();
+
+			if (GUILayout.Button("🎯 Capture Current Editor Line", GUILayout.Height(25)))
+				{
+				CaptureCurrentEditorLine();
+				}
+
+			if (GUILayout.Button("📸 Snapshot Script + Line", GUILayout.Height(25)))
+				{
+				ShowScriptLineSnapshotDialog();
+				}
+
+			EditorGUILayout.EndHorizontal();
+
+			GUILayout.Space(10);
+
+			// Commentary history section (condensed)
+			EditorGUILayout.LabelField($"📚 Session Commentary ({_commentaries.Count}):", EditorStyles.boldLabel);
+
+			if (GUILayout.Button("🧹 Clear Session Commentary"))
+				{
+				ClearCommentaries();
+				}
+
+			GUILayout.Space(5);
+
+			// Commentary list (condensed view)
+			_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(150));
+
+			for (int i = _commentaries.Count - 1; i >= 0; i--) // Show newest first
+				{
+				CommentaryEntry entry = _commentaries[i];
+
+				EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+				// Header with timestamp and type
+				EditorGUILayout.BeginHorizontal();
+				GUILayout.Label($"🕒 {entry.timestamp[11..]}", EditorStyles.miniLabel,
+					GUILayout.Width(60)); // Show only time
+
+				string typeIcon = entry.logType switch
+					{
+					LogType.Error => "❌",
+					LogType.Warning => "⚠️",
+					LogType.Log => "📝",
+					LogType.Exception => "💥",
+					_ => "🔸"
+					};
+
+				GUILayout.Label($"{typeIcon}", GUILayout.Width(20));
+
+				// Tags
+				if (!string.IsNullOrEmpty(entry.tags))
+					{
+					GUILayout.Label($"🏷️{entry.tags}", EditorStyles.miniLabel, GUILayout.Width(100));
+					}
+
+				GUILayout.FlexibleSpace();
+
+				if (GUILayout.Button("🗑️", GUILayout.Width(25)))
+					{
+					_commentaries.RemoveAt(i);
+					SaveCommentaries();
+					continue;
+					}
+
+				EditorGUILayout.EndHorizontal();
+
+				// Commentary (single line)
+				string truncatedComment = entry.developerComment.Length > 80
+					? entry.developerComment[..80] + "..."
+					: entry.developerComment;
+				EditorGUILayout.LabelField(truncatedComment, EditorStyles.wordWrappedMiniLabel);
+
+				EditorGUILayout.EndVertical();
+				GUILayout.Space(2);
+				}
+
+			EditorGUILayout.EndScrollView();
+			}
+
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Diagnostics/Console Commentary Window", priority = 200)]
+		private static void ShowWindow()
+			{
+			ConsoleCommentaryWindow window = GetWindow<ConsoleCommentaryWindow>("Console Commentary");
+			window.titleContent =
+				new GUIContent("🗨️ Console Commentary", "Add developer annotations to Unity console logs");
+			window.Show();
 			}
 
 		private void LoadExistingConsoleLogs()
@@ -171,267 +394,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				}
 			}
 
-		private void OnGUI()
-			{
-			GUILayout.Label("🗨️ Console Commentary System", EditorStyles.boldLabel);
-
-			// Session info and controls
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Session:", GUILayout.Width(60));
-			_sessionName = EditorGUILayout.TextField(_sessionName, GUILayout.Width(150));
-
-			GUILayout.FlexibleSpace();
-
-			bool newCapturing = EditorGUILayout.Toggle("📡 Capture", _isCapturing, GUILayout.Width(80));
-			if (newCapturing != _isCapturing)
-				{
-				_isCapturing = newCapturing;
-				}
-
-			_autoScrollLogs = EditorGUILayout.Toggle("📜 Auto-scroll", _autoScrollLogs, GUILayout.Width(90));
-
-			// Manual refresh button - only show when auto-capture is disabled
-			if (!_isCapturing)
-				{
-				if (GUILayout.Button("🔄 Refresh", GUILayout.Width(70)))
-					{
-					RefreshConsoleCapture();
-					}
-				}
-
-			if (GUILayout.Button("🧹 Clear", GUILayout.Width(60)))
-				{
-				_capturedLogs.Clear();
-				_selectedLogIndex = -1;
-				_selectedLogEntry = "";
-				}
-			EditorGUILayout.EndHorizontal();
-
-			GUILayout.Space(5);
-
-			// Recent logs section with scrollview
-			EditorGUILayout.LabelField($"📝 Console Logs ({_capturedLogs.Count}):", EditorStyles.boldLabel);
-
-			// Logs scrollview
-			_logsScrollPosition = EditorGUILayout.BeginScrollView(_logsScrollPosition, GUILayout.Height(200));
-
-			if (_capturedLogs.Count > 0)
-				{
-				for (int i = _capturedLogs.Count - 1; i >= 0; i--) // Show newest first
-					{
-					LogEntry logEntry = _capturedLogs[i];
-
-					EditorGUILayout.BeginHorizontal();
-
-					// Selection button
-					bool isSelected = _selectedLogIndex == i;
-					if (GUILayout.Button(isSelected ? "✅" : "⭕", GUILayout.Width(25)))
-						{
-						_selectedLogIndex = i;
-						UpdateSelectedLogFromIndex();
-						}
-
-					// Log type icon
-					string typeIcon = logEntry.type switch
-						{
-							LogType.Error => "❌",
-							LogType.Warning => "⚠️",
-							LogType.Log => "📝",
-							LogType.Exception => "💥",
-							_ => "🔸"
-							};
-
-					GUILayout.Label(typeIcon, GUILayout.Width(20));
-					GUILayout.Label($"[{logEntry.timestamp}]", EditorStyles.miniLabel, GUILayout.Width(60));
-
-					// Check if this log has commentary
-					bool hasCommentary = _commentaries.Any(c => c.logIndex == i);
-					if (hasCommentary)
-						{
-						GUILayout.Label("💬", GUILayout.Width(20));
-						}
-					else
-						{
-						GUILayout.Space(20);
-						}
-
-					// Truncated message
-					string truncated = logEntry.message.Length > 60
-						? logEntry.message[..60] + "..."
-						: logEntry.message;
-
-					GUIStyle style = hasCommentary ? EditorStyles.boldLabel : EditorStyles.miniLabel;
-					GUILayout.Label(truncated, style);
-					EditorGUILayout.EndHorizontal();
-					}
-				}
-			else
-				{
-				EditorGUILayout.HelpBox("No logs captured yet. Enable capture and trigger some Unity console output.", MessageType.Info);
-				}
-
-			EditorGUILayout.EndScrollView();
-
-			GUILayout.Space(10);
-
-			// Commentary section
-			EditorGUILayout.LabelField("💬 Add Commentary:", EditorStyles.boldLabel);
-
-			EditorGUILayout.LabelField("Selected Log Entry:", EditorStyles.label);
-			EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-			_selectedLogEntry = EditorGUILayout.TextArea(_selectedLogEntry, GUILayout.Height(60));
-			EditorGUILayout.EndVertical();
-
-			_selectedLogType = (LogType)EditorGUILayout.EnumPopup("Log Type:", _selectedLogType);
-
-			EditorGUILayout.LabelField("Your Commentary:", EditorStyles.label);
-			_newComment = EditorGUILayout.TextArea(_newComment, GUILayout.Height(80));
-
-			EditorGUILayout.BeginHorizontal();
-
-			if (GUILayout.Button("💬 Add Commentary", GUILayout.Height(30)))
-				{
-				AddCommentary();
-				}
-
-			if (GUILayout.Button("🏷️ Tag as 'FUCK Moment'", GUILayout.Height(30)))
-				{
-				AddCommentary("FUCK-Moment,Learning-Opportunity");
-				}
-
-			if (GUILayout.Button("✅ Tag as 'Achievement'", GUILayout.Height(30)))
-				{
-				AddCommentary("Achievement,Success");
-				}
-
-			EditorGUILayout.EndHorizontal();
-
-			GUILayout.Space(15);
-
-			// Export section
-			EditorGUILayout.LabelField("📊 Export Session:", EditorStyles.boldLabel);
-
-			EditorGUILayout.BeginHorizontal();
-			if (GUILayout.Button("📂 Export Raw Logs", GUILayout.Height(25)))
-				{
-				ExportRawLogs();
-				}
-			if (GUILayout.Button("📜 Complete TLDL Session", GUILayout.Height(25)))
-				{
-				CompleteTLDLSession();
-				}
-			EditorGUILayout.EndHorizontal();
-
-			GUILayout.Space(5);
-
-			// Code snapshot section - Jerry's BRILLIANT idea!
-			EditorGUILayout.LabelField("📸 Code Snapshot Tools:", EditorStyles.boldLabel);
-
-			// Jerry's GENIUS adjustable range controls
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField("Snapshot Range:", GUILayout.Width(100));
-			_snapshotLinesBefore = EditorGUILayout.IntSlider("Before", _snapshotLinesBefore, 1, 50, GUILayout.Width(120));
-			_snapshotLinesAfter = EditorGUILayout.IntSlider("After", _snapshotLinesAfter, 1, 50, GUILayout.Width(120));
-
-			// Quick presets for common scenarios
-			if (GUILayout.Button("📏 Tight (3)", GUILayout.Width(80)))
-				{
-				_snapshotLinesBefore = _snapshotLinesAfter = 3;
-				}
-			if (GUILayout.Button("📐 Standard (10)", GUILayout.Width(90)))
-				{
-				_snapshotLinesBefore = _snapshotLinesAfter = 10;
-				}
-			if (GUILayout.Button("📊 Wide (25)", GUILayout.Width(80)))
-				{
-				_snapshotLinesBefore = _snapshotLinesAfter = 25;
-				}
-			EditorGUILayout.EndHorizontal();
-
-			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.LabelField($"Total capture: {_snapshotLinesBefore + 1 + _snapshotLinesAfter} lines", EditorStyles.miniLabel);
-			GUILayout.FlexibleSpace();
-
-			if (GUILayout.Button("🎯 Capture Current Editor Line", GUILayout.Height(25)))
-				{
-				CaptureCurrentEditorLine();
-				}
-			if (GUILayout.Button("📸 Snapshot Script + Line", GUILayout.Height(25)))
-				{
-				ShowScriptLineSnapshotDialog();
-				}
-			EditorGUILayout.EndHorizontal();
-
-			GUILayout.Space(10);
-
-			// Commentary history section (condensed)
-			EditorGUILayout.LabelField($"📚 Session Commentary ({_commentaries.Count}):", EditorStyles.boldLabel);
-
-			if (GUILayout.Button("🧹 Clear Session Commentary"))
-				{
-				ClearCommentaries();
-				}
-
-			GUILayout.Space(5);
-
-			// Commentary list (condensed view)
-			_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(150));
-
-			for (int i = _commentaries.Count - 1; i >= 0; i--) // Show newest first
-				{
-				CommentaryEntry entry = _commentaries[i];
-
-				EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-
-				// Header with timestamp and type
-				EditorGUILayout.BeginHorizontal();
-				GUILayout.Label($"🕒 {entry.timestamp[11..]}", EditorStyles.miniLabel, GUILayout.Width(60)); // Show only time
-
-				string typeIcon = entry.logType switch
-					{
-						LogType.Error => "❌",
-						LogType.Warning => "⚠️",
-						LogType.Log => "📝",
-						LogType.Exception => "💥",
-						_ => "🔸"
-						};
-
-				GUILayout.Label($"{typeIcon}", GUILayout.Width(20));
-
-				// Tags
-				if (!string.IsNullOrEmpty(entry.tags))
-					{
-					GUILayout.Label($"🏷️{entry.tags}", EditorStyles.miniLabel, GUILayout.Width(100));
-					}
-
-				GUILayout.FlexibleSpace();
-
-				if (GUILayout.Button("🗑️", GUILayout.Width(25)))
-					{
-					_commentaries.RemoveAt(i);
-					SaveCommentaries();
-					continue;
-					}
-				EditorGUILayout.EndHorizontal();
-
-				// Commentary (single line)
-				string truncatedComment = entry.developerComment.Length > 80
-					? entry.developerComment[..80] + "..."
-					: entry.developerComment;
-				EditorGUILayout.LabelField(truncatedComment, EditorStyles.wordWrappedMiniLabel);
-
-				EditorGUILayout.EndVertical();
-				GUILayout.Space(2);
-				}
-
-			EditorGUILayout.EndScrollView();
-			}
-
 		private void AddCommentary(string tags = "")
 			{
 			if (string.IsNullOrWhiteSpace(_selectedLogEntry) || string.IsNullOrWhiteSpace(_newComment))
 				{
-				EditorUtility.DisplayDialog("Invalid Input", "Please select a log entry and add your commentary.", "OK");
+				EditorUtility.DisplayDialog("Invalid Input", "Please select a log entry and add your commentary.",
+					"OK");
 				return;
 				}
 
@@ -442,7 +410,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				stackTrace = _capturedLogs[_selectedLogIndex].stackTrace;
 				}
 
-			var entry = new CommentaryEntry(_selectedLogEntry, _selectedLogType, _newComment, "", tags, stackTrace, _selectedLogIndex);
+			var entry = new CommentaryEntry(_selectedLogEntry, _selectedLogType, _newComment, "", tags, stackTrace,
+				_selectedLogIndex);
 			_commentaries.Add(entry);
 
 			SaveCommentaries();
@@ -458,7 +427,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 			{
 			try
 				{
-				string logPath = Path.Combine(Application.dataPath, "debug", $"unity-console-logs-{_sessionName}-{DateTime.Now:yyyy-MM-dd-HHmmss}.txt");
+				string logPath = Path.Combine(Application.dataPath, "debug",
+					$"unity-console-logs-{_sessionName}-{DateTime.Now:yyyy-MM-dd-HHmmss}.txt");
 				Directory.CreateDirectory(Path.GetDirectoryName(logPath));
 
 				string content = $"Unity Console Log Export - {_sessionName}\n";
@@ -473,6 +443,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 						{
 						content += $"Stack Trace:\n{log.stackTrace}\n";
 						}
+
 					content += new string('-', 30) + "\n";
 					}
 
@@ -494,21 +465,24 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				string tldlDir = Path.Combine(Application.dataPath, "..", "docs", "tldl-sessions");
 				Directory.CreateDirectory(tldlDir);
 
-				string tldlPath = Path.Combine(tldlDir, $"TLDL-{DateTime.Now:yyyy-MM-dd}-{_sessionName}-ConsoleCommentary.md");
+				string tldlPath = Path.Combine(tldlDir,
+					$"TLDL-{DateTime.Now:yyyy-MM-dd}-{_sessionName}-ConsoleCommentary.md");
 
 				string content = GenerateCompleteTLDLContent();
 
 				File.WriteAllText(tldlPath, content);
 
 				// Also export raw logs as supporting artifact
-				string logPath = Path.Combine(Path.GetDirectoryName(tldlPath), $"console-logs-{_sessionName}-{DateTime.Now:yyyy-MM-dd-HHmmss}.txt");
+				string logPath = Path.Combine(Path.GetDirectoryName(tldlPath),
+					$"console-logs-{_sessionName}-{DateTime.Now:yyyy-MM-dd-HHmmss}.txt");
 				ExportRawLogsToPath(logPath);
 
 				EditorUtility.DisplayDialog("TLDL Session Complete",
 					$"Session documentation exported to:\n{tldlPath}\n\nRaw logs saved to:\n{logPath}", "OK");
 
 				// Clear session after export
-				if (EditorUtility.DisplayDialog("Clear Session", "Session exported successfully. Clear current session to start fresh?", "Clear", "Keep"))
+				if (EditorUtility.DisplayDialog("Clear Session",
+					    "Session exported successfully. Clear current session to start fresh?", "Clear", "Keep"))
 					{
 					_capturedLogs.Clear();
 					_commentaries.Clear();
@@ -538,6 +512,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 					{
 					content += $"Stack Trace:\n{log.stackTrace}\n";
 					}
+
 				content += new string('-', 30) + "\n";
 				}
 
@@ -584,7 +559,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 			content += $"**Author:** Jerry Meyer (Console Commentary System)  \n";
 			content += $"**Session ID:** {_sessionName}  \n";
 			content += $"**Context:** MetVanDAMN Development Session  \n";
-			content += $"**Summary:** Debug session with {_commentaries.Count} annotated console events from {_capturedLogs.Count} total logs\n\n";
+			content +=
+				$"**Summary:** Debug session with {_commentaries.Count} annotated console events from {_capturedLogs.Count} total logs\n\n";
 
 			// Generate summary statistics
 			int errorCount = _commentaries.Count(c => c.logType == LogType.Error);
@@ -610,14 +586,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				{
 				string icon = kvp.Key switch
 					{
-						LogType.Error => "❌",
-						LogType.Warning => "⚠️",
-						LogType.Log => "📝",
-						LogType.Exception => "💥",
-						_ => "🔸"
-						};
+					LogType.Error => "❌",
+					LogType.Warning => "⚠️",
+					LogType.Log => "📝",
+					LogType.Exception => "💥",
+					_ => "🔸"
+					};
 				content += $"- {icon} **{kvp.Key}:** {kvp.Value} entries\n";
 				}
+
 			content += "\n";
 
 			if (_commentaries.Count > 0)
@@ -658,15 +635,18 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 				if (fuckMoments > 0)
 					{
-					content += $"**{fuckMoments} FUCK Moment(s) Documented:** These represent learning opportunities and debugging challenges that provide valuable context for future development.\n\n";
+					content +=
+						$"**{fuckMoments} FUCK Moment(s) Documented:** These represent learning opportunities and debugging challenges that provide valuable context for future development.\n\n";
 					}
 
 				if (achievements > 0)
 					{
-					content += $"**{achievements} Achievement(s) Celebrated:** Successful implementations and breakthroughs worth preserving as reference material.\n\n";
+					content +=
+						$"**{achievements} Achievement(s) Celebrated:** Successful implementations and breakthroughs worth preserving as reference material.\n\n";
 					}
 
-				content += "**Next Steps:** Review commentary for patterns, document solutions, and preserve insights for future debugging sessions.\n\n";
+				content +=
+					"**Next Steps:** Review commentary for patterns, document solutions, and preserve insights for future debugging sessions.\n\n";
 				}
 
 			return content;
@@ -674,7 +654,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 		private void ClearCommentaries()
 			{
-			if (EditorUtility.DisplayDialog("Clear Session Commentary", "Are you sure you want to clear all commentary entries for this session?", "Clear", "Cancel"))
+			if (EditorUtility.DisplayDialog("Clear Session Commentary",
+				    "Are you sure you want to clear all commentary entries for this session?", "Clear", "Cancel"))
 				{
 				_commentaries.Clear();
 				SaveCommentaries();
@@ -690,8 +671,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				if (editorWindow != null && editorWindow.GetType().Name == "ScriptEditorWindow")
 					{
 					// Use reflection to get current script and line
-					FieldInfo scriptField = editorWindow.GetType().GetField("m_CurrentScript", BindingFlags.NonPublic | BindingFlags.Instance);
-					FieldInfo lineField = editorWindow.GetType().GetField("m_CurrentLine", BindingFlags.NonPublic | BindingFlags.Instance);
+					FieldInfo scriptField = editorWindow.GetType()
+						.GetField("m_CurrentScript", BindingFlags.NonPublic | BindingFlags.Instance);
+					FieldInfo lineField = editorWindow.GetType()
+						.GetField("m_CurrentLine", BindingFlags.NonPublic | BindingFlags.Instance);
 
 					if (scriptField != null && lineField != null)
 						{
@@ -711,7 +694,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 				// Fallback: Show manual input dialog
 				ShowScriptLineSnapshotDialog();
-
 				}
 			catch (Exception ex)
 				{
@@ -736,7 +718,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				int lineNumber = 1;
 
 				// For now, just use line 1 - this could be enhanced with a proper input field later
-				CaptureCodeSnapshot(scriptPath, lineNumber, "Manual script selection - line 1 (enhance this dialog for custom line input)");
+				CaptureCodeSnapshot(scriptPath, lineNumber,
+					"Manual script selection - line 1 (enhance this dialog for custom line input)");
 				}
 			}
 
@@ -754,7 +737,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 				if (targetLine < 1 || targetLine > allLines.Length)
 					{
-					Debug.LogError($"📸 Code Snapshot: Line {targetLine} out of range (1-{allLines.Length}) in {Path.GetFileName(scriptPath)}");
+					Debug.LogError(
+						$"📸 Code Snapshot: Line {targetLine} out of range (1-{allLines.Length}) in {Path.GetFileName(scriptPath)}");
 					return;
 					}
 
@@ -768,8 +752,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				snapshot.AppendLine($"📸 **Code Snapshot: {Path.GetFileName(scriptPath)}:{targetLine}**");
 				snapshot.AppendLine($"**Context:** {context}");
 				snapshot.AppendLine($"**Captured:** {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-				snapshot.AppendLine($"**Range:** Lines {startLine}-{endLine} (showing {totalLines} of {allLines.Length} total)");
-				snapshot.AppendLine($"**Window:** {_snapshotLinesBefore} before + target + {_snapshotLinesAfter} after");
+				snapshot.AppendLine(
+					$"**Range:** Lines {startLine}-{endLine} (showing {totalLines} of {allLines.Length} total)");
+				snapshot.AppendLine(
+					$"**Window:** {_snapshotLinesBefore} before + target + {_snapshotLinesAfter} after");
 				snapshot.AppendLine();
 				snapshot.AppendLine("```csharp");
 
@@ -784,11 +770,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 				snapshot.AppendLine("```");
 				snapshot.AppendLine();
-				snapshot.AppendLine($"**Target Line {targetLine}:** `{(targetLine <= allLines.Length ? allLines[targetLine - 1].Trim() : "")}`");
+				snapshot.AppendLine(
+					$"**Target Line {targetLine}:** `{(targetLine <= allLines.Length ? allLines[targetLine - 1].Trim() : "")}`");
 
 				// Add configuration details for future reference
 				snapshot.AppendLine();
-				snapshot.AppendLine($"**Capture Settings:** {_snapshotLinesBefore} lines before, {_snapshotLinesAfter} lines after (total window: {totalLines} lines)");
+				snapshot.AppendLine(
+					$"**Capture Settings:** {_snapshotLinesBefore} lines before, {_snapshotLinesAfter} lines after (total window: {totalLines} lines)");
 
 				// Add to commentary as a special code snapshot entry
 				var snapshotEntry = new CommentaryEntry(
@@ -804,9 +792,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				_commentaries.Add(snapshotEntry);
 				SaveCommentaries();
 
-				Debug.Log($"📸 Code Snapshot captured: {Path.GetFileName(scriptPath)} line {targetLine} ({totalLines} lines: {_snapshotLinesBefore}+1+{_snapshotLinesAfter})");
+				Debug.Log(
+					$"📸 Code Snapshot captured: {Path.GetFileName(scriptPath)} line {targetLine} ({totalLines} lines: {_snapshotLinesBefore}+1+{_snapshotLinesAfter})");
 				Repaint();
-
 				}
 			catch (Exception ex)
 				{
@@ -827,8 +815,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 					if (logEntriesType != null)
 						{
 						// Try to get count and entries
-						MethodInfo getCountMethod = logEntriesType.GetMethod("GetCount", BindingFlags.Static | BindingFlags.Public);
-						MethodInfo getEntryMethod = logEntriesType.GetMethod("GetEntryInternal", BindingFlags.Static | BindingFlags.NonPublic);
+						MethodInfo getCountMethod =
+							logEntriesType.GetMethod("GetCount", BindingFlags.Static | BindingFlags.Public);
+						MethodInfo getEntryMethod = logEntriesType.GetMethod("GetEntryInternal",
+							BindingFlags.Static | BindingFlags.NonPublic);
 
 						if (getCountMethod != null && getEntryMethod != null)
 							{
@@ -844,25 +834,27 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 								for (int i = startIndex; i < logCount; i++)
 									{
-									if (getEntryMethod.Invoke(null, new object[] { i, logEntry }) is bool success && success)
+									if (getEntryMethod.Invoke(null, new object[] { i, logEntry }) is bool success &&
+									    success)
 										{
 										if (messageField?.GetValue(logEntry) is string message &&
-											modeField?.GetValue(logEntry) is int mode)
+										    modeField?.GetValue(logEntry) is int mode)
 											{
 											LogType logType = mode switch
 												{
-													0 => LogType.Error,
-													1 => LogType.Assert,
-													2 => LogType.Warning,
-													3 => LogType.Log,
-													4 => LogType.Exception,
-													_ => LogType.Log
-													};
+												0 => LogType.Error,
+												1 => LogType.Assert,
+												2 => LogType.Warning,
+												3 => LogType.Log,
+												4 => LogType.Exception,
+												_ => LogType.Log
+												};
 
 											var newLogEntry = new LogEntry(message, logType, "");
 
 											// Only add if not already captured and not our own commentary
-											if (!newLogEntry.isCommentaryLog && !_capturedLogs.Any(l => l.message == message && l.type == logType))
+											if (!newLogEntry.isCommentaryLog &&
+											    !_capturedLogs.Any(l => l.message == message && l.type == logType))
 												{
 												_capturedLogs.Add(newLogEntry);
 												}
@@ -884,7 +876,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 									UpdateSelectedLogFromIndex();
 									}
 
-								Debug.Log($"🔄 Console Commentary: Refreshed {_capturedLogs.Count} log entries from Unity console");
+								Debug.Log(
+									$"🔄 Console Commentary: Refreshed {_capturedLogs.Count} log entries from Unity console");
 								Repaint();
 								return;
 								}
@@ -893,19 +886,69 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 					}
 
 				// Fallback: Show friendly message that manual refresh attempted
-				Debug.Log("🔄 Console Commentary: Manual refresh attempted - Unity console API access limited. Enable auto-capture for real-time monitoring.");
-
+				Debug.Log(
+					"🔄 Console Commentary: Manual refresh attempted - Unity console API access limited. Enable auto-capture for real-time monitoring.");
 				}
 			catch (Exception ex)
 				{
-				Debug.LogWarning($"🔄 Console Commentary: Manual refresh failed - {ex.Message}. Unity console reflection API may have changed.");
+				Debug.LogWarning(
+					$"🔄 Console Commentary: Manual refresh failed - {ex.Message}. Unity console reflection API may have changed.");
+				}
+			}
+
+		[Serializable]
+		private class LogEntry
+			{
+			public string message;
+			public LogType type;
+			public string stackTrace;
+			public string timestamp;
+			public bool isCommentaryLog; // Flag to prevent infinite recursion
+
+			public LogEntry(string msg, LogType logType, string stack)
+				{
+				message = msg;
+				type = logType;
+				stackTrace = stack;
+				timestamp = DateTime.Now.ToString("HH:mm:ss");
+				isCommentaryLog = msg.StartsWith("💬 Commentary added") ||
+				                  msg.StartsWith("📜 Console commentary") ||
+				                  msg.StartsWith("🧹 Console commentary") ||
+				                  msg.StartsWith("📂 Raw console logs") ||
+				                  msg.StartsWith("📡 Console Commentary:");
+				}
+			}
+
+		[Serializable]
+		private class CommentaryEntry
+			{
+			public string timestamp;
+			public string logMessage;
+			public LogType logType;
+			public string developerComment;
+			public string context;
+			public string tags;
+			public string stackTrace;
+			public int logIndex; // Reference to which log this commentary is about
+
+			public CommentaryEntry(string log, LogType type, string comment, string ctx = "", string tagList = "",
+				string stack = "", int logIdx = -1)
+				{
+				timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+				logMessage = log;
+				logType = type;
+				developerComment = comment;
+				context = ctx;
+				tags = tagList;
+				stackTrace = stack;
+				logIndex = logIdx;
 				}
 			}
 
 		[Serializable]
 		private class CommentaryWrapper
 			{
-			public List<CommentaryEntry> commentaries;
+			public List<CommentaryEntry>? commentaries;
 			}
 		}
 	}

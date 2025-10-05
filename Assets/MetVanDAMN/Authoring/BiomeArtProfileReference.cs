@@ -1,3 +1,4 @@
+#nullable enable
 using Unity.Entities;
 
 namespace TinyWalnutGames.MetVD.Authoring

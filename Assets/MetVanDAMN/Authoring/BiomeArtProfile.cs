@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -9,12 +10,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 	/// </summary>
 	public enum PropPlacementStrategy
 		{
-		Random,          // Random scatter (good for generic decoration)
-		Clustered,       // Form natural clusters (good for vegetation, rocks)
-		Sparse,          // Sparse but meaningful placement (good for special items)
-		Linear,          // Follow lines or edges (good for fence posts, paths)
-		Radial,          // Radiate from center points (good for settlements, clearings)
-		Terrain          // Follow terrain features (good for water plants, cliff vegetation)
+		Random, // Random scatter (good for generic decoration)
+		Clustered, // Form natural clusters (good for vegetation, rocks)
+		Sparse, // Sparse but meaningful placement (good for special items)
+		Linear, // Follow lines or edges (good for fence posts, paths)
+		Radial, // Radiate from center points (good for settlements, clearings)
+		Terrain // Follow terrain features (good for water plants, cliff vegetation)
 		}
 
 	/// <summary>
@@ -67,22 +68,19 @@ namespace TinyWalnutGames.MetVD.Authoring
 	[System.Serializable]
 	public class VariationSettings
 		{
-		[Header("Size Variation")]
-		[Range(0.5f, 2f), Tooltip("Minimum scale multiplier")]
+		[Header("Size Variation")] [Range(0.5f, 2f), Tooltip("Minimum scale multiplier")]
 		public float minScale = 0.8f;
 
 		[Range(0.5f, 2f), Tooltip("Maximum scale multiplier")]
 		public float maxScale = 1.2f;
 
-		[Header("Rotation Variation")]
-		[Tooltip("Allow random Y-axis rotation")]
+		[Header("Rotation Variation")] [Tooltip("Allow random Y-axis rotation")]
 		public bool randomRotation = true;
 
 		[Range(0f, 360f), Tooltip("Maximum rotation angle in degrees")]
 		public float maxRotationAngle = 360f;
 
-		[Header("Position Variation")]
-		[Range(0f, 1f), Tooltip("Random offset within tile bounds")]
+		[Header("Position Variation")] [Range(0f, 1f), Tooltip("Random offset within tile bounds")]
 		public float positionJitter = 0.3f;
 		}
 
@@ -107,8 +105,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Tooltip("Enable coordinate-based pattern warping for organic appearance")]
 		public bool enableCoordinateWarping = true;
 
-		[Header("Animation & Dynamics")]
-		[Range(0f, 1f), Tooltip("Animation speed for polarity-based material effects")]
+		[Header("Animation & Dynamics")] [Range(0f, 1f), Tooltip("Animation speed for polarity-based material effects")]
 		public float polarityAnimationSpeed = 0.2f;
 
 		[Range(0.5f, 3f), Tooltip("Multiplier for complexity-based visual enhancements")]
@@ -198,19 +195,16 @@ namespace TinyWalnutGames.MetVD.Authoring
 	[System.Serializable]
 	public class PropPlacementSettings
 		{
-		[Header("Basic Settings")]
-		[Tooltip("Prefabs to spawn as props in this biome")]
-		public GameObject [ ] propPrefabs = new GameObject [ 0 ];
+		[Header("Basic Settings")] [Tooltip("Prefabs to spawn as props in this biome")]
+		public GameObject[] propPrefabs = new GameObject[0];
 
 		[Tooltip("Names of tilemap layers where props can be placed")]
 		public List<string> allowedPropLayers = new();
 
-		[Header("Placement Strategy")]
-		[Tooltip("How props should be distributed in this biome")]
+		[Header("Placement Strategy")] [Tooltip("How props should be distributed in this biome")]
 		public PropPlacementStrategy strategy = PropPlacementStrategy.Random;
 
-		[Header("Density Control")]
-		[Range(0f, 1f), Tooltip("Base spawn probability per eligible tile")]
+		[Header("Density Control")] [Range(0f, 1f), Tooltip("Base spawn probability per eligible tile")]
 		public float baseDensity = 0.1f;
 
 		[Tooltip("Density curve based on distance from biome center (0=edge, 1=center)")]
@@ -219,13 +213,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Range(0f, 2f), Tooltip("Multiplier for overall prop density")]
 		public float densityMultiplier = 1f;
 
-		[Header("Advanced Placement")]
-		public ClusteringSettings clustering = new();
+		[Header("Advanced Placement")] public ClusteringSettings clustering = new();
+
 		public AvoidanceSettings avoidance = new();
 		public VariationSettings variation = new();
 
-		[Header("Performance")]
-		[Range(10, 1000), Tooltip("Maximum props to place per biome instance")]
+		[Header("Performance")] [Range(10, 1000), Tooltip("Maximum props to place per biome instance")]
 		public int maxPropsPerBiome = 100;
 
 		[Tooltip("Use spatial optimization for large biomes")]
@@ -238,12 +231,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 		order = 0)]
 	public class BiomeArtProfile : ScriptableObject
 		{
-		[Header("Biome Identity")]
-		public string biomeName;
+		[Header("Biome Identity")] public string biomeName;
+
 		public Color debugColor = Color.white;
 
-		[Header("Tilemap Art")]
-		[Tooltip("Floor tile (preferably RuleTile from Unity 2D Tilemap Extras)")]
+		[Header("Tilemap Art")] [Tooltip("Floor tile (preferably RuleTile from Unity 2D Tilemap Extras)")]
 		public TileBase floorTile;
 
 		[Tooltip("Wall tile (preferably RuleTile from Unity 2D Tilemap Extras)")]
@@ -253,10 +245,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 		public TileBase backgroundTile;
 
 		[Tooltip("Optional tiles for biome-to-biome transitions.")]
-		public TileBase [ ] transitionTiles;
+		public TileBase[] transitionTiles;
 
 		[Header("Explicit Transition Mapping")]
-		[Tooltip("Optional explicit tile to use as the source (From) transition tile. If null, floorTile is used as fallback.")]
+		[Tooltip(
+			"Optional explicit tile to use as the source (From) transition tile. If null, floorTile is used as fallback.")]
 		public TileBase transitionFromTile;
 
 		[Tooltip("Optional explicit tile for the first blend band (BlendA).")]
@@ -265,24 +258,22 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Tooltip("Optional explicit tile for the second blend band (BlendB).")]
 		public TileBase transitionBlendB;
 
-		[Tooltip("Optional explicit tile to use as the destination (To) transition tile. If null, last entry of transitionTiles or floorTile is used.")]
+		[Tooltip(
+			"Optional explicit tile to use as the destination (To) transition tile. If null, last entry of transitionTiles or floorTile is used.")]
 		public TileBase transitionToTile;
 
 		[Header("Transition Settings")]
 		[Range(0f, 0.5f), Tooltip("Half-width of the central blend band as a normalized value (0..0.5).\n" +
-		    "Lower values make a sharp cut between biomes; higher values broaden the blended area.")]
+		                          "Lower values make a sharp cut between biomes; higher values broaden the blended area.")]
 		public float transitionDeadzone = 0.1f;
 
-		[Header("Props")]
-		[Tooltip("Advanced prop placement configuration for this biome.")]
+		[Header("Props")] [Tooltip("Advanced prop placement configuration for this biome.")]
 		public PropPlacementSettings propSettings;
 
-		[Header("Debug Visualization")]
-		[Tooltip("Checkered material override settings for coordinate-aware debugging")]
+		[Header("Debug Visualization")] [Tooltip("Checkered material override settings for coordinate-aware debugging")]
 		public CheckeredMaterialSettings checkerSettings = new();
 
-		[Header("Advanced")]
-		[Tooltip("Optional sorting layer override for biome visuals.")]
+		[Header("Advanced")] [Tooltip("Optional sorting layer override for biome visuals.")]
 		public string sortingLayerOverride;
 
 		[Tooltip("Optional material override for biome visuals.")]
@@ -292,12 +283,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// <summary>
 		/// Convenient access to prop prefabs for backward compatibility
 		/// </summary>
-		public GameObject [ ] PropPrefabs => propSettings?.propPrefabs ?? new GameObject [ 0 ];
+		public GameObject[] PropPrefabs => propSettings?.propPrefabs ?? new GameObject[0];
 
 		/// <summary>
 		/// Convenient access to all tiles for backward compatibility
 		/// </summary>
-		public TileBase [ ] Tiles
+		public TileBase[] Tiles
 			{
 			get
 				{
@@ -335,7 +326,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			if (checkerSettings?.enableCheckerOverride == true && tilemap != null)
 				{
-				BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = checkerSettings.ToComplexitySettings();
+				BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings =
+					checkerSettings.ToComplexitySettings();
 				BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome, nodeId, complexitySettings);
 				}
 			}

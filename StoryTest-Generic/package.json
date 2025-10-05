@@ -1,0 +1,32 @@
+{
+    "name": "com.storytest.generic",
+    "version": "1.0.0",
+    "displayName": "Story Test - Generic Validation Framework",
+    "description": "A comprehensive validation framework for Unity 6+ C#9+ projects that ensures code quality and validates system integration through Story Tests.",
+    "unity": "6000.2.0",
+    "unityRelease": "0f1",
+    "documentationUrl": "https://github.com/your-repo/story-test",
+    "changelogUrl": "https://github.com/your-repo/story-test/CHANGELOG.md",
+    "licensesUrl": "https://github.com/your-repo/story-test/LICENSE",
+    "keywords": [
+        "unity",
+        "testing",
+        "validation",
+        "code-quality",
+        "story-test",
+        "integration-testing"
+    ],
+    "author": {
+        "name": "Story Test Framework",
+        "email": "storytest@example.com",
+        "url": "https://github.com/your-repo"
+    },
+    "dependencies": {},
+    "samples": [
+        {
+            "displayName": "Example Game Story Test",
+            "description": "A complete example showing how to implement Story Tests for a game project",
+            "path": "Samples~/ExampleGameStoryTest"
+        }
+    ]
+}

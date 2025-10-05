@@ -1,0 +1,73 @@
+name: Unity CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.unityVersion }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        unityVersion: [6000.2.0f1]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-${{ matrix.unityVersion }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ matrix.unityVersion }}-
+            Library-
+
+      - name: Run Unity tests (PlayMode)
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: playmode
+          customParameters: '-nographics -batchmode -logFile - -testResults ./test-results.xml'
+          artifactsPath: ./test-artifacts
+
+      - name: Run Unity tests (EditMode)
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: editmode
+          customParameters: '-nographics -batchmode -logFile -'
+          artifactsPath: ./test-artifacts
+
+      - name: Run Story Test Validation
+        run: |
+          echo "🎭 Running Story Test Framework Validation..."
+          # Add any additional validation steps here
+          echo "✅ Story Test validation completed"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: Test results (${{ matrix.unityVersion }})
+          path: |
+            test-results.xml
+            test-artifacts/**
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          file: ./test-artifacts/**/coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false

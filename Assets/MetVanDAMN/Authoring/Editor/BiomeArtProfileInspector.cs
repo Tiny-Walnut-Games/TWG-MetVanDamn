@@ -93,8 +93,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			if (AssetDatabase.LoadAssetAtPath<BiomeArtProfile>(assetPath) != null)
 				{
 				if (!EditorUtility.DisplayDialog("Asset Exists",
-					$"A BiomeArtProfile already exists at {assetPath}. Overwrite it?",
-					"Overwrite", "Cancel"))
+					    $"A BiomeArtProfile already exists at {assetPath}. Overwrite it?",
+					    "Overwrite", "Cancel"))
 					{
 					return;
 					}
@@ -119,17 +119,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	[CustomEditor(typeof(BiomeArtProfile))]
 	public class BiomeArtProfileInspector : UnityEditor.Editor
 		{
-		private BiomeArtProfile profile;
+		// Live scene preview helpers (editor-only)
+		private const string PreviewGONamePrefix = "BiomeTransitionPreview_";
+		private BiomeType previewTargetBiome = BiomeType.SolarPlains;
+		private BiomeArtProfile? profile;
 		private bool showAdvancedSettings = true;
 		private bool showPreviewStats = true;
 
 		// Transition preview state
 		private bool showTransitionPreview = true;
-		private BiomeType previewTargetBiome = BiomeType.SolarPlains;
 
 		public override void OnInspectorGUI()
 			{
 			profile = (BiomeArtProfile)target;
+			if (profile == null) return;
 
 			// Header with biome information
 			EditorGUILayout.Space();
@@ -149,16 +152,51 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.Space();
 
 			// Advanced settings section
-			showAdvancedSettings = EditorGUILayout.Foldout(showAdvancedSettings, "Advanced Prop Placement Analysis", true);
-			if (showAdvancedSettings && profile.propSettings != null)
+			showAdvancedSettings =
+				EditorGUILayout.Foldout(showAdvancedSettings, "Advanced Prop Placement Analysis", true);
+			if (showAdvancedSettings)
 				{
+				if (profile.propSettings == null)
+					{
+					profile.propSettings = new PropPlacementSettings
+						{
+						strategy = PropPlacementStrategy.Clustered,
+						baseDensity = 0.1f,
+						densityMultiplier = 1f,
+						densityCurve = AnimationCurve.Linear(0f, 0.5f, 1f, 1f),
+						clustering = new ClusteringSettings(),
+						avoidance = new AvoidanceSettings(),
+						variation = new VariationSettings(),
+						maxPropsPerBiome = 100,
+						useSpatialOptimization = true
+						};
+					EditorUtility.SetDirty(profile);
+					}
+
 				DrawAdvancedSettings();
 				}
 
 			// Preview statistics
 			showPreviewStats = EditorGUILayout.Foldout(showPreviewStats, "Placement Preview Statistics", true);
-			if (showPreviewStats && profile.propSettings != null)
+			if (showPreviewStats)
 				{
+				if (profile.propSettings == null)
+					{
+					profile.propSettings = new PropPlacementSettings
+						{
+						strategy = PropPlacementStrategy.Clustered,
+						baseDensity = 0.1f,
+						densityMultiplier = 1f,
+						densityCurve = AnimationCurve.Linear(0f, 0.5f, 1f, 1f),
+						clustering = new ClusteringSettings(),
+						avoidance = new AvoidanceSettings(),
+						variation = new VariationSettings(),
+						maxPropsPerBiome = 100,
+						useSpatialOptimization = true
+						};
+					EditorUtility.SetDirty(profile);
+					}
+
 				DrawPreviewStats();
 				}
 
@@ -175,16 +213,36 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				ApplyLivePreviewToScene();
 				}
+
 			if (GUILayout.Button("Clear Live Preview"))
 				{
 				ClearLivePreviewFromScene();
 				}
+
 			EditorGUILayout.EndHorizontal();
 			}
 
 		private void DrawAdvancedSettings()
 			{
+			if (profile == null) return; // Added null check for robustness
 			EditorGUI.indentLevel++;
+
+			if (profile.propSettings == null)
+				{
+				profile.propSettings = new PropPlacementSettings
+					{
+					strategy = PropPlacementStrategy.Clustered,
+					baseDensity = 0.1f,
+					densityMultiplier = 1f,
+					densityCurve = AnimationCurve.Linear(0f, 0.5f, 1f, 1f),
+					clustering = new ClusteringSettings(),
+					avoidance = new AvoidanceSettings(),
+					variation = new VariationSettings(),
+					maxPropsPerBiome = 100,
+					useSpatialOptimization = true
+					};
+				EditorUtility.SetDirty(profile);
+				}
 
 			PropPlacementSettings settings = profile.propSettings;
 
@@ -201,7 +259,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			if (effectiveDensity < 0.05f)
 				{
-				EditorGUILayout.HelpBox("Very sparse placement - good for landmarks or special items", MessageType.Info);
+				EditorGUILayout.HelpBox("Very sparse placement - good for landmarks or special items",
+					MessageType.Info);
 				}
 			else if (effectiveDensity < 0.15f)
 				{
@@ -222,12 +281,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			if (settings.maxPropsPerBiome > 200)
 				{
-				EditorGUILayout.HelpBox("High prop count may impact performance on lower-end devices", MessageType.Warning);
+				EditorGUILayout.HelpBox("High prop count may impact performance on lower-end devices",
+					MessageType.Warning);
 				}
 
 			if (!settings.useSpatialOptimization && settings.maxPropsPerBiome > 100)
 				{
-				EditorGUILayout.HelpBox("Consider enabling spatial optimization for better performance", MessageType.Info);
+				EditorGUILayout.HelpBox("Consider enabling spatial optimization for better performance",
+					MessageType.Info);
 				}
 
 			EditorGUI.indentLevel--;
@@ -235,7 +296,25 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void DrawPreviewStats()
 			{
+			if (profile == null) return; // Added null check for robustness
 			EditorGUI.indentLevel++;
+
+			if (profile.propSettings == null)
+				{
+				profile.propSettings = new PropPlacementSettings
+					{
+					strategy = PropPlacementStrategy.Clustered,
+					baseDensity = 0.1f,
+					densityMultiplier = 1f,
+					densityCurve = AnimationCurve.Linear(0f, 0.5f, 1f, 1f),
+					clustering = new ClusteringSettings(),
+					avoidance = new AvoidanceSettings(),
+					variation = new VariationSettings(),
+					maxPropsPerBiome = 100,
+					useSpatialOptimization = true
+					};
+				EditorUtility.SetDirty(profile);
+				}
 
 			PropPlacementSettings settings = profile.propSettings;
 
@@ -256,7 +335,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				EditorGUILayout.LabelField("Clustering Statistics", EditorStyles.boldLabel);
 
 				int estimatedClusters = Mathf.RoundToInt(settings.baseDensity * settings.densityMultiplier * 10);
-				int propsPerCluster = Mathf.RoundToInt(settings.clustering.clusterSize * settings.clustering.clusterDensity);
+				int propsPerCluster =
+					Mathf.RoundToInt(settings.clustering.clusterSize * settings.clustering.clusterDensity);
 
 				EditorGUILayout.LabelField($"Estimated Clusters: {estimatedClusters}");
 				EditorGUILayout.LabelField($"Props per Cluster: {propsPerCluster}");
@@ -274,6 +354,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void DrawQuickActions()
 			{
+			if (profile == null) return; // Added null check for robustness
 			EditorGUILayout.LabelField("Quick Actions", EditorStyles.boldLabel);
 
 			EditorGUILayout.BeginHorizontal();
@@ -286,8 +367,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			if (GUILayout.Button("Reset to Defaults"))
 				{
 				if (EditorUtility.DisplayDialog("Reset Profile",
-					"This will reset the prop placement settings to default values. Continue?",
-					"Reset", "Cancel"))
+					    "This will reset the prop placement settings to default values. Continue?",
+					    "Reset", "Cancel"))
 					{
 					ResetToDefaults();
 					}
@@ -323,7 +404,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				float t = (float)i / (steps - 1);
 				var c = Color.Lerp(colorA, colorB, Mathf.Clamp01((t * 0.5f) + (profile.transitionDeadzone * 0.5f)));
-				var r = new Rect(rect.x + (rect.width * i / (float)steps), rect.y, rect.width / (float)steps, rect.height);
+				var r = new Rect(rect.x + (rect.width * i / (float)steps), rect.y, rect.width / (float)steps,
+					rect.height);
 				EditorGUI.DrawRect(r, c);
 				}
 
@@ -333,7 +415,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUI.DrawRect(new Rect(lx - 1, rect.y, 2, rect.height), Color.black);
 			EditorGUI.DrawRect(new Rect(ux - 1, rect.y, 2, rect.height), Color.black);
 
-			EditorGUILayout.LabelField($"Deadzone: {profile.transitionDeadzone:F2}  (lower: {lower:F2}, upper: {upper:F2})");
+			EditorGUILayout.LabelField(
+				$"Deadzone: {profile.transitionDeadzone:F2}  (lower: {lower:F2}, upper: {upper:F2})");
 
 			EditorGUI.indentLevel--;
 			}
@@ -343,13 +426,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			{
 			switch (type)
 				{
-				case BiomeType.SolarPlains: return new Color(1f, 0.8f, 0.2f, 1f);
-				case BiomeType.VolcanicCore: return new Color(1f, 0.3f, 0.1f, 1f);
-				case BiomeType.CrystalCaverns: return new Color(0.8f, 0.4f, 1f, 1f);
-				case BiomeType.SkyGardens: return new Color(0.4f, 0.8f, 0.6f, 1f);
-				case BiomeType.Forest: return new Color(0.2f, 0.6f, 0.2f, 1f);
-				case BiomeType.Ocean: return new Color(0.2f, 0.5f, 0.8f, 1f);
-				default: return Color.gray;
+					case BiomeType.SolarPlains: return new Color(1f, 0.8f, 0.2f, 1f);
+					case BiomeType.VolcanicCore: return new Color(1f, 0.3f, 0.1f, 1f);
+					case BiomeType.CrystalCaverns: return new Color(0.8f, 0.4f, 1f, 1f);
+					case BiomeType.SkyGardens: return new Color(0.4f, 0.8f, 0.6f, 1f);
+					case BiomeType.Forest: return new Color(0.2f, 0.6f, 0.2f, 1f);
+					case BiomeType.Ocean: return new Color(0.2f, 0.5f, 0.8f, 1f);
+					default: return Color.gray;
 				}
 			}
 
@@ -357,14 +440,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			{
 			return strategy switch
 				{
-					PropPlacementStrategy.Random => "Random scatter distribution. Good for general decoration and ambient props.",
-					PropPlacementStrategy.Clustered => "Natural clustering behavior. Excellent for vegetation, rocks, and organic features.",
-					PropPlacementStrategy.Sparse => "High-quality selective placement. Perfect for landmarks, special items, and focal points.",
-					PropPlacementStrategy.Linear => "Edge-following placement. Ideal for fences, paths, shorelines, and boundaries.",
-					PropPlacementStrategy.Radial => "Center-outward distribution. Great for settlements, clearings, and oasis effects.",
-					PropPlacementStrategy.Terrain => "Terrain-aware intelligent placement. Best for realistic environmental distribution.",
-					_ => "Unknown strategy"
-					};
+				PropPlacementStrategy.Random =>
+					"Random scatter distribution. Good for general decoration and ambient props.",
+				PropPlacementStrategy.Clustered =>
+					"Natural clustering behavior. Excellent for vegetation, rocks, and organic features.",
+				PropPlacementStrategy.Sparse =>
+					"High-quality selective placement. Perfect for landmarks, special items, and focal points.",
+				PropPlacementStrategy.Linear =>
+					"Edge-following placement. Ideal for fences, paths, shorelines, and boundaries.",
+				PropPlacementStrategy.Radial =>
+					"Center-outward distribution. Great for settlements, clearings, and oasis effects.",
+				PropPlacementStrategy.Terrain =>
+					"Terrain-aware intelligent placement. Best for realistic environmental distribution.",
+				_ => "Unknown strategy"
+				};
 			}
 
 		private string CalculateQualityRating(PropPlacementSettings settings)
@@ -375,7 +464,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				score += 2;
 				}
-			else if (settings.strategy == PropPlacementStrategy.Clustered || settings.strategy == PropPlacementStrategy.Radial)
+			else if (settings.strategy == PropPlacementStrategy.Clustered ||
+			         settings.strategy == PropPlacementStrategy.Radial)
 				{
 				score += 1;
 				}
@@ -416,20 +506,22 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			return score switch
 				{
-					8 => "A+ (Exceptional)",
-					7 => "A (Excellent)",
-					6 => "A- (Very Good)",
-					5 => "B+ (Good)",
-					4 => "B (Above Average)",
-					3 => "B- (Average)",
-					2 => "C+ (Below Average)",
-					1 => "C (Standard)",
-					_ => "C- (Limited)"
-					};
+				8 => "A+ (Exceptional)",
+				7 => "A (Excellent)",
+				6 => "A- (Very Good)",
+				5 => "B+ (Good)",
+				4 => "B (Above Average)",
+				3 => "B- (Average)",
+				2 => "C+ (Below Average)",
+				1 => "C (Standard)",
+				_ => "C- (Limited)"
+				};
 			}
 
 		private void ValidateProfile()
 			{
+			if (profile == null) return; // Added null check for robustness
+
 			var issues = new System.Collections.Generic.List<string>();
 
 			if (string.IsNullOrEmpty(profile.biomeName))
@@ -461,17 +553,21 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			if (issues.Count == 0)
 				{
-				EditorUtility.DisplayDialog("Validation Passed", "BiomeArtProfile validation completed successfully. No issues found.", "OK");
+				EditorUtility.DisplayDialog("Validation Passed",
+					"BiomeArtProfile validation completed successfully. No issues found.", "OK");
 				}
 			else
 				{
 				string issueList = string.Join("\n• ", issues);
-				EditorUtility.DisplayDialog("Validation Issues", $"The following issues were found:\n• {issueList}", "OK");
+				EditorUtility.DisplayDialog("Validation Issues", $"The following issues were found:\n• {issueList}",
+					"OK");
 				}
 			}
 
 		private void ResetToDefaults()
 			{
+			if (profile == null) return; // Added null check for robustness
+
 			profile.propSettings = new PropPlacementSettings
 				{
 				strategy = PropPlacementStrategy.Clustered,
@@ -488,12 +584,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorUtility.SetDirty(profile);
 			}
 
-		// Live scene preview helpers (editor-only)
-		private const string PreviewGONamePrefix = "BiomeTransitionPreview_";
-
 		private void ApplyLivePreviewToScene()
 			{
-			if (profile == null) return;
+			if (profile == null) return; // Added null check for robustness
 
 			string goName = PreviewGONamePrefix + profile.name;
 			var previewRoot = GameObject.Find(goName);
@@ -527,7 +620,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// Choose a tile instance to paint if needed
 			TileBase paintTile = profile.transitionFromTile ?? profile.floorTile;
-			Tile tempTile = null;
+			Tile? tempTile = null;
 			if (paintTile == null)
 				{
 				tempTile = ScriptableObject.CreateInstance<Tile>();
@@ -567,7 +660,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void ClearLivePreviewFromScene()
 			{
-			if (profile == null) return;
+			if (profile == null) return; // Added null check for robustness
 			string goName = PreviewGONamePrefix + profile.name;
 			var previewRoot = GameObject.Find(goName);
 			if (previewRoot != null)

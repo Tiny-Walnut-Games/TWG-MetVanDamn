@@ -1,413 +1,417 @@
+#nullable enable
 using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
+using System.Reflection;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring
-    {
-    /// <summary>
-    /// Complete player setup component that integrates all upgrade systems.
-    /// Automatically configures the player with progression, combat, movement, and UI systems.
-    /// </summary>
-    public class CompletePlayerSetup : MonoBehaviour
-        {
-        [Header("Player Configuration")]
-        [SerializeField] private bool autoSetupOnStart = true;
-        [SerializeField] private bool enableLevelUpUI = true;
-        [SerializeField] private bool enableDebugControls = true;
+	{
+	/// <summary>
+	/// Complete player setup component that integrates all upgrade systems.
+	/// Automatically configures the player with progression, combat, movement, and UI systems.
+	/// </summary>
+	public class CompletePlayerSetup : MonoBehaviour
+		{
+		[Header("Player Configuration")] [SerializeField]
+		private bool autoSetupOnStart = true;
 
-        [Header("Starting Configuration")]
-        [SerializeField] private int startingLevel = 1;
-        [SerializeField] private int startingXP = 0;
-        [SerializeField] private Ability startingAbilities = Ability.Jump;
+		[SerializeField] private bool enableLevelUpUI = true;
+		[SerializeField] private bool enableDebugControls = true;
 
-        [Header("Component References")]
-        [SerializeField] private PlayerLevelProgression levelProgression;
-        [SerializeField] private LevelUpChoiceSystem choiceSystem;
-        [SerializeField] private UpgradeEffectApplicator effectApplicator;
-        [SerializeField] private LevelUpChoiceUI choiceUI;
-        [SerializeField] private DemoPlayerMovement playerMovement;
-        [SerializeField] private DemoPlayerCombat playerCombat;
-        [SerializeField] private DemoPlayerInventory playerInventory;
+		[Header("Starting Configuration")] [SerializeField]
+		private int startingLevel = 1;
 
-        [Header("Debug")]
-        [SerializeField] private bool enableDebugLogging = true;
+		[SerializeField] private int startingXP = 0;
+		[SerializeField] private Ability startingAbilities = Ability.Jump;
 
-        private void Start()
-            {
-            if (autoSetupOnStart)
-                {
-                SetupPlayer();
-                }
-            }
+		[Header("Component References")] [SerializeField]
+		private PlayerLevelProgression levelProgression;
 
-        /// <summary>
-        /// Setup the complete player with all upgrade systems
-        /// </summary>
-        [ContextMenu("Setup Player")]
-        public void SetupPlayer()
-            {
-            if (enableDebugLogging)
-                {
-                Debug.Log("🎮 Setting up complete player with upgrade systems...");
-                }
+		[SerializeField] private LevelUpChoiceSystem choiceSystem;
+		[SerializeField] private UpgradeEffectApplicator effectApplicator;
+		[SerializeField] private LevelUpChoiceUI choiceUI;
+		[SerializeField] private DemoPlayerMovement playerMovement;
+		[SerializeField] private DemoPlayerCombat playerCombat;
+		[SerializeField] private DemoPlayerInventory playerInventory;
 
-            // Get or create core components
-            EnsureCoreComponents();
+		[Header("Debug")] [SerializeField] private bool enableDebugLogging = true;
 
-            // Setup upgrade database
-            EnsureUpgradeDatabase();
+		private void Start()
+			{
+			if (autoSetupOnStart)
+				{
+				SetupPlayer();
+				}
+			}
 
-            // Configure starting state
-            ConfigureStartingState();
+		private void OnValidate()
+			{
+			// Ensure starting level is at least 1
+			if (startingLevel < 1) startingLevel = 1;
 
-            // Setup UI
-            if (enableLevelUpUI)
-                {
-                SetupUI();
-                }
+			// Ensure starting XP is not negative
+			if (startingXP < 0) startingXP = 0;
+			}
 
-            // Connect events
-            ConnectEvents();
+		/// <summary>
+		/// Setup the complete player with all upgrade systems
+		/// </summary>
+		[ContextMenu("Setup Player")]
+		public void SetupPlayer()
+			{
+			if (enableDebugLogging)
+				{
+				Debug.Log("🎮 Setting up complete player with upgrade systems...");
+				}
 
-            if (enableDebugLogging)
-                {
-                Debug.Log("✅ Complete player setup finished!");
-                LogPlayerStats();
-                }
-            }
+			// Get or create core components
+			EnsureCoreComponents();
 
-        private void EnsureCoreComponents()
-            {
-            // PlayerLevelProgression
-            if (levelProgression == null)
-                {
-                levelProgression = GetComponent<PlayerLevelProgression>();
-                if (levelProgression == null)
-                    {
-                    levelProgression = gameObject.AddComponent<PlayerLevelProgression>();
-                    }
-                }
+			// Setup upgrade database
+			EnsureUpgradeDatabase();
 
-            // LevelUpChoiceSystem
-            if (choiceSystem == null)
-                {
-                choiceSystem = GetComponent<LevelUpChoiceSystem>();
-                if (choiceSystem == null)
-                    {
-                    choiceSystem = gameObject.AddComponent<LevelUpChoiceSystem>();
-                    }
-                }
+			// Configure starting state
+			ConfigureStartingState();
 
-            // UpgradeEffectApplicator
-            if (effectApplicator == null)
-                {
-                effectApplicator = GetComponent<UpgradeEffectApplicator>();
-                if (effectApplicator == null)
-                    {
-                    effectApplicator = gameObject.AddComponent<UpgradeEffectApplicator>();
-                    }
-                }
+			// Setup UI
+			if (enableLevelUpUI)
+				{
+				SetupUI();
+				}
 
-            // Player components
-            if (playerMovement == null)
-                {
-                playerMovement = GetComponent<DemoPlayerMovement>();
-                if (playerMovement == null)
-                    {
-                    playerMovement = gameObject.AddComponent<DemoPlayerMovement>();
-                    }
-                }
+			// Connect events
+			ConnectEvents();
 
-            if (playerCombat == null)
-                {
-                playerCombat = GetComponent<DemoPlayerCombat>();
-                if (playerCombat == null)
-                    {
-                    playerCombat = gameObject.AddComponent<DemoPlayerCombat>();
-                    }
-                }
+			if (enableDebugLogging)
+				{
+				Debug.Log("✅ Complete player setup finished!");
+				LogPlayerStats();
+				}
+			}
 
-            if (playerInventory == null)
-                {
-                playerInventory = GetComponent<DemoPlayerInventory>();
-                if (playerInventory == null)
-                    {
-                    playerInventory = gameObject.AddComponent<DemoPlayerInventory>();
-                    }
-                }
+		private void EnsureCoreComponents()
+			{
+			// PlayerLevelProgression
+			if (levelProgression == null)
+				{
+				levelProgression = GetComponent<PlayerLevelProgression>();
+				if (levelProgression == null)
+					{
+					levelProgression = gameObject.AddComponent<PlayerLevelProgression>();
+					}
+				}
 
-            // Ensure Rigidbody
-            if (GetComponent<Rigidbody2D>() == null && GetComponent<Rigidbody>() == null)
-                {
-                gameObject.AddComponent<Rigidbody2D>();
-                }
+			// LevelUpChoiceSystem
+			if (choiceSystem == null)
+				{
+				choiceSystem = GetComponent<LevelUpChoiceSystem>();
+				if (choiceSystem == null)
+					{
+					choiceSystem = gameObject.AddComponent<LevelUpChoiceSystem>();
+					}
+				}
 
-            // Ensure Collider
-            if (GetComponent<Collider2D>() == null && GetComponent<Collider>() == null)
-                {
-                var collider = gameObject.AddComponent<BoxCollider2D>();
-                collider.size = new Vector2(0.8f, 1.8f);
-                }
-            }
+			// UpgradeEffectApplicator
+			if (effectApplicator == null)
+				{
+				effectApplicator = GetComponent<UpgradeEffectApplicator>();
+				if (effectApplicator == null)
+					{
+					effectApplicator = gameObject.AddComponent<UpgradeEffectApplicator>();
+					}
+				}
 
-        private void EnsureUpgradeDatabase()
-            {
-            // Find or create upgrade database manager
-            var databaseManager = FindFirstObjectByType<UpgradeDatabaseManager>();
-            if (databaseManager == null)
-                {
-                var dbObj = new GameObject("UpgradeDatabaseManager");
-                databaseManager = dbObj.AddComponent<UpgradeDatabaseManager>();
+			// Player components
+			if (playerMovement == null)
+				{
+				playerMovement = GetComponent<DemoPlayerMovement>();
+				if (playerMovement == null)
+					{
+					playerMovement = gameObject.AddComponent<DemoPlayerMovement>();
+					}
+				}
 
-                if (enableDebugLogging)
-                    {
-                    Debug.Log("📚 Created UpgradeDatabaseManager");
-                    }
-                }
-            }
+			if (playerCombat == null)
+				{
+				playerCombat = GetComponent<DemoPlayerCombat>();
+				if (playerCombat == null)
+					{
+					playerCombat = gameObject.AddComponent<DemoPlayerCombat>();
+					}
+				}
 
-        private void ConfigureStartingState()
-            {
-            if (levelProgression != null)
-                {
-                // Configure starting values through public API methods
-                // Since we can't modify serialized fields at runtime, we use the component's public interface
+			if (playerInventory == null)
+				{
+				playerInventory = GetComponent<DemoPlayerInventory>();
+				if (playerInventory == null)
+					{
+					playerInventory = gameObject.AddComponent<DemoPlayerInventory>();
+					}
+				}
 
-                // Set starting abilities if different from default
-                if (startingAbilities != Ability.Jump)
-                    {
-                    // Force the starting abilities by creating a temporary upgrade
-                    var startingUpgrade = ScriptableObject.CreateInstance<UpgradeDefinition>();
-                    SetStartingUpgradeData(startingUpgrade, startingAbilities);
-                    levelProgression.ApplyUpgrade(startingUpgrade);
-                    }
+			// Ensure Rigidbody
+			if (GetComponent<Rigidbody2D>() == null && GetComponent<Rigidbody>() == null)
+				{
+				gameObject.AddComponent<Rigidbody2D>();
+				}
 
-                // Grant starting XP if specified
-                if (startingXP > 0)
-                    {
-                    levelProgression.GainXP(startingXP);
-                    }
+			// Ensure Collider
+			if (GetComponent<Collider2D>() == null && GetComponent<Collider>() == null)
+				{
+				BoxCollider2D collider = gameObject.AddComponent<BoxCollider2D>();
+				collider.size = new Vector2(0.8f, 1.8f);
+				}
+			}
 
-                // Force level to starting level if higher than 1
-                if (startingLevel > 1)
-                    {
-                    int targetXP = levelProgression.CalculateXPRequiredForLevel(startingLevel);
-                    int currentXP = levelProgression.CurrentXP;
-                    if (targetXP > currentXP)
-                        {
-                        levelProgression.GainXP(targetXP - currentXP);
-                        }
-                    }
+		private void EnsureUpgradeDatabase()
+			{
+			// Find or create upgrade database manager
+			UpgradeDatabaseManager databaseManager = FindFirstObjectByType<UpgradeDatabaseManager>();
+			if (databaseManager == null)
+				{
+				var dbObj = new GameObject("UpgradeDatabaseManager");
+				databaseManager = dbObj.AddComponent<UpgradeDatabaseManager>();
 
-                if (enableDebugLogging)
-                    {
-                    Debug.Log($"🎯 Configured starting state: Level {levelProgression.CurrentLevel}, " +
-                             $"XP {levelProgression.CurrentXP}, Abilities: {levelProgression.CurrentAbilities}");
-                    }
-                }
-            }
+				if (enableDebugLogging)
+					{
+					Debug.Log("📚 Created UpgradeDatabaseManager");
+					}
+				}
+			}
 
-        /// <summary>
-        /// Helper method to create a starting abilities upgrade for configuration
-        /// </summary>
-        private void SetStartingUpgradeData(UpgradeDefinition upgrade, Ability abilities)
-            {
-            // Use reflection to set the granted abilities for starting configuration
-            var abilitiesField = typeof(UpgradeDefinition).GetField("grantsAbilities",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var nameField = typeof(UpgradeDefinition).GetField("upgradeName",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            var modifierTypeField = typeof(UpgradeDefinition).GetField("modifierType",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+		private void ConfigureStartingState()
+			{
+			if (levelProgression != null)
+				{
+				// Configure starting values through public API methods
+				// Since we can't modify serialized fields at runtime, we use the component's public interface
 
-            abilitiesField?.SetValue(upgrade, abilities);
-            nameField?.SetValue(upgrade, "Starting Configuration");
-            modifierTypeField?.SetValue(upgrade, ModifierType.NewAbility);
-            }
+				// Set starting abilities if different from default
+				if (startingAbilities != Ability.Jump)
+					{
+					// Force the starting abilities by creating a temporary upgrade
+					UpgradeDefinition startingUpgrade = ScriptableObject.CreateInstance<UpgradeDefinition>();
+					SetStartingUpgradeData(startingUpgrade, startingAbilities);
+					levelProgression.ApplyUpgrade(startingUpgrade);
+					}
 
-        private void SetupUI()
-            {
-            // Find or create choice UI
-            if (choiceUI == null)
-                {
-                choiceUI = FindFirstObjectByType<LevelUpChoiceUI>();
-                if (choiceUI == null)
-                    {
-                    var uiObj = new GameObject("LevelUpChoiceUI");
-                    choiceUI = uiObj.AddComponent<LevelUpChoiceUI>();
+				// Grant starting XP if specified
+				if (startingXP > 0)
+					{
+					levelProgression.GainXP(startingXP);
+					}
 
-                    if (enableDebugLogging)
-                        {
-                        Debug.Log("🎨 Created LevelUpChoiceUI");
-                        }
-                    }
-                }
-            }
+				// Force level to starting level if higher than 1
+				if (startingLevel > 1)
+					{
+					int targetXP = levelProgression.CalculateXPRequiredForLevel(startingLevel);
+					int currentXP = levelProgression.CurrentXP;
+					if (targetXP > currentXP)
+						{
+						levelProgression.GainXP(targetXP - currentXP);
+						}
+					}
 
-        private void ConnectEvents()
-            {
-            // Connect level progression to choice system
-            if (levelProgression != null && choiceSystem != null)
-                {
-                levelProgression.OnLevelUp += (level) => choiceSystem.GenerateUpgradeChoices();
-                }
+				if (enableDebugLogging)
+					{
+					Debug.Log($"🎯 Configured starting state: Level {levelProgression.CurrentLevel}, " +
+					          $"XP {levelProgression.CurrentXP}, Abilities: {levelProgression.CurrentAbilities}");
+					}
+				}
+			}
 
-            // Connect choice system to effect application
-            if (choiceSystem != null && levelProgression != null)
-                {
-                choiceSystem.OnUpgradeChosen += (upgrade) => levelProgression.ApplyUpgrade(upgrade);
-                }
+		/// <summary>
+		/// Helper method to create a starting abilities upgrade for configuration
+		/// </summary>
+		private void SetStartingUpgradeData(UpgradeDefinition upgrade, Ability abilities)
+			{
+			// Use reflection to set the granted abilities for starting configuration
+			FieldInfo abilitiesField = typeof(UpgradeDefinition).GetField("grantsAbilities",
+				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+			FieldInfo nameField = typeof(UpgradeDefinition).GetField("upgradeName",
+				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+			FieldInfo modifierTypeField = typeof(UpgradeDefinition).GetField("modifierType",
+				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 
-            // Connect UI events
-            if (choiceUI != null && choiceSystem != null)
-                {
-                choiceUI.OnUpgradeSelected += (upgrade) => choiceSystem.ChooseUpgrade(upgrade);
-                }
-            }
+			abilitiesField?.SetValue(upgrade, abilities);
+			nameField?.SetValue(upgrade, "Starting Configuration");
+			modifierTypeField?.SetValue(upgrade, ModifierType.NewAbility);
+			}
 
-        private void LogPlayerStats()
-            {
-            if (levelProgression == null) return;
+		private void SetupUI()
+			{
+			// Find or create choice UI
+			if (choiceUI == null)
+				{
+				choiceUI = FindFirstObjectByType<LevelUpChoiceUI>();
+				if (choiceUI == null)
+					{
+					var uiObj = new GameObject("LevelUpChoiceUI");
+					choiceUI = uiObj.AddComponent<LevelUpChoiceUI>();
 
-            Debug.Log("=== PLAYER SETUP COMPLETE ===");
-            Debug.Log($"Level: {levelProgression.CurrentLevel}");
-            Debug.Log($"XP: {levelProgression.CurrentXP}/{levelProgression.XPRequiredForNextLevel}");
-            Debug.Log($"Abilities: {levelProgression.CurrentAbilities}");
-            Debug.Log($"Upgrades Applied: {levelProgression.AppliedUpgrades.Length}");
-            }
+					if (enableDebugLogging)
+						{
+						Debug.Log("🎨 Created LevelUpChoiceUI");
+						}
+					}
+				}
+			}
 
-        #region Debug Controls
+		private void ConnectEvents()
+			{
+			// Connect level progression to choice system
+			if (levelProgression != null && choiceSystem != null)
+				{
+				levelProgression.OnLevelUp += (level) => choiceSystem.GenerateUpgradeChoices();
+				}
 
-        private void Update()
-            {
-            if (!enableDebugControls) return;
+			// Connect choice system to effect application
+			if (choiceSystem != null && levelProgression != null)
+				{
+				choiceSystem.OnUpgradeChosen += (upgrade) => levelProgression.ApplyUpgrade(upgrade);
+				}
 
-            // Debug controls for testing
-            if (Input.GetKeyDown(KeyCode.F1))
-                {
-                GainXP(50);
-                }
+			// Connect UI events
+			if (choiceUI != null && choiceSystem != null)
+				{
+				choiceUI.OnUpgradeSelected += (upgrade) => choiceSystem.ChooseUpgrade(upgrade);
+				}
+			}
 
-            if (Input.GetKeyDown(KeyCode.F2))
-                {
-                ForceLevelUp();
-                }
+		private void LogPlayerStats()
+			{
+			if (levelProgression == null) return;
 
-            if (Input.GetKeyDown(KeyCode.F3))
-                {
-                ForceShowChoices();
-                }
+			Debug.Log("=== PLAYER SETUP COMPLETE ===");
+			Debug.Log($"Level: {levelProgression.CurrentLevel}");
+			Debug.Log($"XP: {levelProgression.CurrentXP}/{levelProgression.XPRequiredForNextLevel}");
+			Debug.Log($"Abilities: {levelProgression.CurrentAbilities}");
+			Debug.Log($"Upgrades Applied: {levelProgression.AppliedUpgrades.Length}");
+			}
 
-            if (Input.GetKeyDown(KeyCode.F4))
-                {
-                ResetProgression();
-                }
-            }
+		#region Debug Controls
 
-        [ContextMenu("Gain 50 XP")]
-        private void GainXP(int amount = 50)
-            {
-            if (levelProgression != null)
-                {
-                levelProgression.GainXP(amount);
-                Debug.Log($"🌟 Gained {amount} XP");
-                }
-            }
+		private void Update()
+			{
+			if (!enableDebugControls) return;
 
-        [ContextMenu("Force Level Up")]
-        private void ForceLevelUp()
-            {
-            if (levelProgression != null)
-                {
-                int xpNeeded = levelProgression.XPRequiredForNextLevel - levelProgression.CurrentXP;
-                levelProgression.GainXP(xpNeeded);
-                Debug.Log("⬆️ Forced level up");
-                }
-            }
+			// Debug controls for testing
+			if (Input.GetKeyDown(KeyCode.F1))
+				{
+				GainXP(50);
+				}
 
-        [ContextMenu("Force Show Choices")]
-        private void ForceShowChoices()
-            {
-            if (choiceSystem != null)
-                {
-                choiceSystem.GenerateUpgradeChoices();
-                Debug.Log("🎯 Forced upgrade choice generation");
-                }
-            }
+			if (Input.GetKeyDown(KeyCode.F2))
+				{
+				ForceLevelUp();
+				}
 
-        [ContextMenu("Reset Progression")]
-        private void ResetProgression()
-            {
-            if (levelProgression != null)
-                {
-                // Reset to starting state
-                var method = levelProgression.GetType().GetMethod("ResetProgression",
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                method?.Invoke(levelProgression, null);
+			if (Input.GetKeyDown(KeyCode.F3))
+				{
+				ForceShowChoices();
+				}
 
-                Debug.Log("🔄 Reset player progression");
-                }
-            }
+			if (Input.GetKeyDown(KeyCode.F4))
+				{
+				ResetProgression();
+				}
+			}
 
-        #endregion
+		[ContextMenu("Gain 50 XP")]
+		private void GainXP(int amount = 50)
+			{
+			if (levelProgression != null)
+				{
+				levelProgression.GainXP(amount);
+				Debug.Log($"🌟 Gained {amount} XP");
+				}
+			}
 
-        #region Public API
+		[ContextMenu("Force Level Up")]
+		private void ForceLevelUp()
+			{
+			if (levelProgression != null)
+				{
+				int xpNeeded = levelProgression.XPRequiredForNextLevel - levelProgression.CurrentXP;
+				levelProgression.GainXP(xpNeeded);
+				Debug.Log("⬆️ Forced level up");
+				}
+			}
 
-        /// <summary>
-        /// Get the player's current progression data
-        /// </summary>
-        public (int level, int xp, Ability abilities, int upgradeCount) GetProgressionData()
-            {
-            if (levelProgression == null)
-                return (1, 0, Ability.Jump, 0);
+		[ContextMenu("Force Show Choices")]
+		private void ForceShowChoices()
+			{
+			if (choiceSystem != null)
+				{
+				choiceSystem.GenerateUpgradeChoices();
+				Debug.Log("🎯 Forced upgrade choice generation");
+				}
+			}
 
-            return (
-                levelProgression.CurrentLevel,
-                levelProgression.CurrentXP,
-                levelProgression.CurrentAbilities,
-                levelProgression.AppliedUpgrades.Length
-            );
-            }
+		[ContextMenu("Reset Progression")]
+		private void ResetProgression()
+			{
+			if (levelProgression != null)
+				{
+				// Reset to starting state
+				MethodInfo method = levelProgression.GetType().GetMethod("ResetProgression",
+					System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+				method?.Invoke(levelProgression, null);
 
-        /// <summary>
-        /// Check if the player can level up
-        /// </summary>
-        public bool CanLevelUp()
-            {
-            if (levelProgression == null) return false;
-            return levelProgression.CurrentXP >= levelProgression.XPRequiredForNextLevel;
-            }
+				Debug.Log("🔄 Reset player progression");
+				}
+			}
 
-        /// <summary>
-        /// Get upgrade choices without leveling up (for preview)
-        /// </summary>
-        public void PreviewUpgradeChoices()
-            {
-            if (choiceSystem != null)
-                {
-                choiceSystem.GenerateUpgradeChoices();
-                }
-            }
+		#endregion
 
-        /// <summary>
-        /// Apply an upgrade directly (for testing)
-        /// </summary>
-        public void ApplyUpgradeDirectly(UpgradeDefinition upgrade)
-            {
-            if (levelProgression != null && upgrade != null)
-                {
-                levelProgression.ApplyUpgrade(upgrade);
-                }
-            }
+		#region Public API
 
-        #endregion
+		/// <summary>
+		/// Get the player's current progression data
+		/// </summary>
+		public (int level, int xp, Ability abilities, int upgradeCount) GetProgressionData()
+			{
+			if (levelProgression == null)
+				return (1, 0, Ability.Jump, 0);
 
-        private void OnValidate()
-            {
-            // Ensure starting level is at least 1
-            if (startingLevel < 1) startingLevel = 1;
+			return (
+				levelProgression.CurrentLevel,
+				levelProgression.CurrentXP,
+				levelProgression.CurrentAbilities,
+				levelProgression.AppliedUpgrades.Length
+			);
+			}
 
-            // Ensure starting XP is not negative
-            if (startingXP < 0) startingXP = 0;
-            }
-        }
-    }
+		/// <summary>
+		/// Check if the player can level up
+		/// </summary>
+		public bool CanLevelUp()
+			{
+			if (levelProgression == null) return false;
+			return levelProgression.CurrentXP >= levelProgression.XPRequiredForNextLevel;
+			}
+
+		/// <summary>
+		/// Get upgrade choices without leveling up (for preview)
+		/// </summary>
+		public void PreviewUpgradeChoices()
+			{
+			if (choiceSystem != null)
+				{
+				choiceSystem.GenerateUpgradeChoices();
+				}
+			}
+
+		/// <summary>
+		/// Apply an upgrade directly (for testing)
+		/// </summary>
+		public void ApplyUpgradeDirectly(UpgradeDefinition upgrade)
+			{
+			if (levelProgression != null && upgrade != null)
+				{
+				levelProgression.ApplyUpgrade(upgrade);
+				}
+			}
+
+		#endregion
+		}
+	}

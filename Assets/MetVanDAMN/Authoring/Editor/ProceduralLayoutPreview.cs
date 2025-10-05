@@ -15,18 +15,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	/// </summary>
 	public class ProceduralLayoutPreview : EditorWindow
 		{
-		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/World Layout Preview")]
-		public static void ShowWindow()
-			{
-			GetWindow<ProceduralLayoutPreview>("Layout Preview");
-			}
-
-		private WorldConfigurationAuthoring _worldConfig;
-		private DistrictAuthoring[] _districts;
+		private DistrictAuthoring[]? _districts;
 		private int _previewDistrictCount = 5;
-		private int2 _previewWorldSize = new(32, 32);
 		private RandomizationMode _previewMode = RandomizationMode.Partial;
 		private uint _previewSeed = 12345;
+		private int2 _previewWorldSize = new(32, 32);
+
+		private WorldConfigurationAuthoring? _worldConfig;
 
 		private void OnGUI()
 			{
@@ -97,6 +92,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				MessageType.Info);
 			}
 
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/World Layout Preview")]
+		public static void ShowWindow()
+			{
+			GetWindow<ProceduralLayoutPreview>("Layout Preview");
+			}
+
 		private void PreviewLayoutAlgorithm()
 			{
 			Debug.Log($"🔮 Previewing Layout Algorithm");
@@ -107,9 +108,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// Simulate the district placement algorithm
 			var random = new Unity.Mathematics.Random(_previewSeed);
-			DistrictPlacementStrategy strategy = _previewDistrictCount > 16 ?
-				DistrictPlacementStrategy.JitteredGrid :
-				DistrictPlacementStrategy.PoissonDisc;
+			DistrictPlacementStrategy strategy = _previewDistrictCount > 16
+				? DistrictPlacementStrategy.JitteredGrid
+				: DistrictPlacementStrategy.PoissonDisc;
 
 			Debug.Log($"   Strategy: {strategy}");
 
@@ -212,35 +213,35 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			switch (_previewMode)
 				{
-				case RandomizationMode.None:
-					Debug.Log("   Biome Polarities: Sun|Moon|Heat|Cold (curated)");
-					Debug.Log("   Upgrades: Jump|DoubleJump|Dash|WallJump (curated)");
-					break;
+					case RandomizationMode.None:
+						Debug.Log("   Biome Polarities: Sun|Moon|Heat|Cold (curated)");
+						Debug.Log("   Upgrades: Jump|DoubleJump|Dash|WallJump (curated)");
+						break;
 
-				case RandomizationMode.Partial:
-					Polarity polarities = GenerateRandomPolarities(ref random, false);
-					Debug.Log($"   Biome Polarities: {polarities} (randomized)");
-					Debug.Log("   Upgrades: Jump|DoubleJump|Dash|WallJump (curated)");
-					break;
+					case RandomizationMode.Partial:
+						Polarity polarities = GenerateRandomPolarities(ref random, false);
+						Debug.Log($"   Biome Polarities: {polarities} (randomized)");
+						Debug.Log("   Upgrades: Jump|DoubleJump|Dash|WallJump (curated)");
+						break;
 
-				case RandomizationMode.Full:
-					Polarity fullPolarities = GenerateRandomPolarities(ref random, true);
-					uint upgrades = GenerateRandomUpgrades(ref random);
-					Debug.Log($"   Biome Polarities: {fullPolarities} (randomized)");
-					Debug.Log($"   Upgrades: 0x{upgrades:X} (randomized, always includes Jump)");
-					break;
-				default:
-					break;
+					case RandomizationMode.Full:
+						Polarity fullPolarities = GenerateRandomPolarities(ref random, true);
+						uint upgrades = GenerateRandomUpgrades(ref random);
+						Debug.Log($"   Biome Polarities: {fullPolarities} (randomized)");
+						Debug.Log($"   Upgrades: 0x{upgrades:X} (randomized, always includes Jump)");
+						break;
+					default:
+						break;
 				}
 			}
 
 		private Polarity GenerateRandomPolarities(ref Unity.Mathematics.Random random, bool allowMore)
 			{
 			Polarity[] availablePolarities = new[]
-			{
+				{
 				Polarity.Sun, Polarity.Moon, Polarity.Heat, Polarity.Cold,
 				Polarity.Earth, Polarity.Wind, Polarity.Life, Polarity.Tech
-			};
+				};
 
 			Polarity result = Polarity.None;
 			int count = allowMore ? random.NextInt(2, 6) : random.NextInt(2, 4);
@@ -304,7 +305,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				districtAuthoring.nodeId = (uint)(1000 + i); // Preview node IDs start from 1000
 				districtAuthoring.districtType = GetRandomDistrictType();
 				districtAuthoring.biomeType = GetRandomBiomeType();
-				districtAuthoring.size = new float2(UnityEngine.Random.Range(50f, 150f), UnityEngine.Random.Range(50f, 150f));
+				districtAuthoring.size =
+					new float2(UnityEngine.Random.Range(50f, 150f), UnityEngine.Random.Range(50f, 150f));
 
 				// Add visual indicator for preview
 				var visualIndicator = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -355,7 +357,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			var random = new Unity.Mathematics.Random(_previewSeed);
 
 			// Calculate grid-based positions with some randomization
-			int gridSize = Mathf.CeilToInt(Mathf.Sqrt(_previewWorldSize.x * _previewWorldSize.y / 10000f)); // Rough district count
+			int gridSize =
+				Mathf.CeilToInt(Mathf.Sqrt(_previewWorldSize.x * _previewWorldSize.y / 10000f)); // Rough district count
 			float spacingX = _previewWorldSize.x / gridSize;
 			float spacingY = _previewWorldSize.y / gridSize;
 
@@ -373,28 +376,28 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					Vector3 randomOffset = Vector3.zero;
 					switch (_previewMode)
 						{
-						case RandomizationMode.Partial:
-							randomOffset = new Vector3(
-								random.NextFloat(-spacingX * 0.25f, spacingX * 0.25f),
-								0f,
-								random.NextFloat(-spacingY * 0.25f, spacingY * 0.25f)
-							);
-							break;
-						case RandomizationMode.Full:
-							randomOffset = new Vector3(
-								random.NextFloat(-spacingX * 0.4f, spacingX * 0.4f),
-								0f,
-								random.NextFloat(-spacingY * 0.4f, spacingY * 0.4f)
-							);
-							break;
-						case RandomizationMode.None:
-						default:
-							randomOffset = new Vector3(
-								random.NextFloat(-spacingX * 0.1f, spacingX * 0.1f),
-								0f,
-								random.NextFloat(-spacingY * 0.1f, spacingY * 0.1f)
-							);
-							break;
+							case RandomizationMode.Partial:
+								randomOffset = new Vector3(
+									random.NextFloat(-spacingX * 0.25f, spacingX * 0.25f),
+									0f,
+									random.NextFloat(-spacingY * 0.25f, spacingY * 0.25f)
+								);
+								break;
+							case RandomizationMode.Full:
+								randomOffset = new Vector3(
+									random.NextFloat(-spacingX * 0.4f, spacingX * 0.4f),
+									0f,
+									random.NextFloat(-spacingY * 0.4f, spacingY * 0.4f)
+								);
+								break;
+							case RandomizationMode.None:
+							default:
+								randomOffset = new Vector3(
+									random.NextFloat(-spacingX * 0.1f, spacingX * 0.1f),
+									0f,
+									random.NextFloat(-spacingY * 0.1f, spacingY * 0.1f)
+								);
+								break;
 						}
 
 					positions.Add(basePosition + randomOffset);
@@ -423,17 +426,17 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Assign colors based on biome type
 			Color biomeColor = biomeType switch
 				{
-					BiomeType.Forest => Color.green,
-					BiomeType.Desert => Color.yellow,
-					BiomeType.Mountains => Color.gray,
-					BiomeType.Ocean => Color.blue,
-					BiomeType.Tundra => Color.cyan,
-					BiomeType.Volcanic => Color.red,
-					BiomeType.Crystal => Color.magenta,
-					BiomeType.Ruins => new Color(0.5f, 0.3f, 0.1f), // Brown
-					BiomeType.Cosmic => new Color(0.1f, 0.1f, 0.3f), // Dark blue
-					_ => Color.white
-					};
+				BiomeType.Forest => Color.green,
+				BiomeType.Desert => Color.yellow,
+				BiomeType.Mountains => Color.gray,
+				BiomeType.Ocean => Color.blue,
+				BiomeType.Tundra => Color.cyan,
+				BiomeType.Volcanic => Color.red,
+				BiomeType.Crystal => Color.magenta,
+				BiomeType.Ruins => new Color(0.5f, 0.3f, 0.1f), // Brown
+				BiomeType.Cosmic => new Color(0.1f, 0.1f, 0.3f), // Dark blue
+				_ => Color.white
+				};
 
 			material.color = biomeColor;
 			material.SetFloat("_Metallic", 0.0f);
@@ -457,6 +460,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private void ShowDistrictInfo()
 			{
+			if (_districts == null)
+				{
+				Debug.Log("📋 No district information available");
+				return;
+				}
+
 			Debug.Log($"📋 District Information ({_districts.Length} districts):");
 
 			int unplacedCount = 0;
@@ -475,9 +484,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					}
 
 				Debug.Log($"   District {district.nodeId}: " +
-						 $"Pos({district.gridCoordinates.x}, {district.gridCoordinates.y}), " +
-						 $"Level {district.level}, " +
-						 $"Status: {(isUnplaced ? "UNPLACED" : "PLACED")}");
+				          $"Pos({district.gridCoordinates.x}, {district.gridCoordinates.y}), " +
+				          $"Level {district.level}, " +
+				          $"Status: {(isUnplaced ? "UNPLACED" : "PLACED")}");
 				}
 
 			Debug.Log($"   Summary: {placedCount} placed, {unplacedCount} unplaced");

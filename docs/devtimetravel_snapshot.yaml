@@ -1,111 +1,251 @@
-project_info:
-  name: "Living Dev Agent Project"
+# DevTimeTravel Snapshot Configuration
+# Jerry's legendary development context capture system
+
+project:
+  name: "TEMPLATE_PROJECT_NAME"
+  description: "Living Dev Agent Template Project"
   version: "1.0.0"
-  description: "Template for Living Dev Agent workflow with TLDL and DevTimeTravel integration"
-  repository_url: "https://github.com/username/repo-name"
   
-snapshot_config:
-  # When to capture snapshots
-  frequency: "on_commit"  # Options: daily, on_commit, manual, ci_only
+capture_settings:
+  # Snapshot frequency
+  auto_snapshot_enabled: true
+  snapshot_interval_minutes: 30
+  max_snapshots_per_day: 48
   
-  # What to include in snapshots
+  # Context depth
+  context_depth: "comprehensive"  # Options: minimal, standard, comprehensive
+  include_git_context: true
+  include_file_changes: true
+  include_environment_state: true
+  
+  # File inclusion patterns
   include_patterns:
-    - "src/**/*"
-    - "docs/**/*"
-    - "scripts/**/*"
-    - "*.md"
+    - "src/**/*.py"
+    - "scripts/**/*.sh"
+    - "docs/**/*.md"
+    - "TLDL/**/*.md"
     - "*.yaml"
-    - "*.yml"
     - "*.json"
-    - ".editorconfig"
-    - ".gitignore"
-    
-  # What to exclude from snapshots  
+    - "*.md"
+  
   exclude_patterns:
-    - "node_modules/**"
-    - "*.tmp"
-    - "*.log"
     - ".git/**"
-    - "build/**"
-    - "dist/**"
+    - "node_modules/**" 
     - "__pycache__/**"
     - "*.pyc"
-    - ".env*"
-    - "*.lock"
-    
-context_capture:
-  # Metadata to capture with each snapshot
-  git_metadata: true          # Branch, commit hash, author, message
-  file_checksums: true        # SHA256 hashes of included files
-  dependency_graph: true      # Project dependencies and their versions
-  build_artifacts: false     # Compiled outputs (usually too large)
-  environment_vars: false    # Environment variables (security risk)
+    - ".DS_Store"
+    - "Thumbs.db"
+
+# Decision tracking
+decisions:
+  # Automatically capture decision points
+  auto_capture_decisions: true
+  decision_triggers:
+    - "architecture changes"
+    - "dependency updates"
+    - "configuration modifications"
+    - "workflow changes"
+    - "major refactoring"
   
-  # Development context
-  active_branch: true         # Current git branch
-  uncommitted_changes: true   # Working directory status
-  recent_commits: 5          # Number of recent commits to include
+  # Decision metadata
+  require_rationale: true
+  require_alternatives_considered: true
+  require_impact_assessment: true
+
+# Jerry's Code Snapshot Integration
+code_snapshots:
+  # Integration with Jerry's adjustable snapshot system
+  integration_enabled: true
+  snapshot_presets:
+    - name: "tight"
+      before_lines: 3
+      after_lines: 3
+      use_case: "Syntax errors and focused debugging"
+    - name: "standard" 
+      before_lines: 10
+      after_lines: 10
+      use_case: "Function-level context and logic flow"
+    - name: "wide"
+      before_lines: 25
+      after_lines: 25
+      use_case: "Architecture investigation and comprehensive analysis"
   
-snapshot_storage:
-  # Where to store snapshots
-  local_path: ".devtimetravel/snapshots"
+  # Automatic snapshot triggers
+  auto_snapshot_on:
+    - "compilation errors"
+    - "test failures"
+    - "validation failures"
+    - "merge conflicts"
+    - "deployment issues"
+
+# TLDL Integration
+tldl_integration:
+  # Link snapshots to TLDL entries
+  auto_link_to_tldl: true
+  create_tldl_for_major_snapshots: true
   
-  # Compression and retention
-  compress: true              # Gzip compression for snapshots
-  max_snapshots: 50          # Keep last N snapshots
-  cleanup_after_days: 30     # Auto-delete snapshots older than N days
+  # Snapshot metadata in TLDL
+  include_snapshot_metadata: true
+  include_context_summary: true
+  include_decision_rationale: true
+
+# Console Commentary Integration
+console_commentary:
+  # Link debugging sessions to snapshots
+  auto_capture_debug_sessions: true
+  include_fuck_moments: true
+  include_achievements: true
+  include_session_metadata: true
+
+# Performance and Storage
+storage:
+  # Retention policy
+  retention_days: 90
+  max_storage_mb: 1000
+  compress_old_snapshots: true
   
-  # Optional remote storage
-  remote_storage:
-    enabled: false
-    provider: "s3"            # s3, gcs, azure, github
-    bucket: "your-bucket-name"
-    prefix: "devtimetravel/"
-    
-integration:
-  # CI/CD integration
-  ci_enabled: true
-  ci_on_pr: true              # Capture snapshot on PR creation/update
-  ci_on_merge: true           # Capture snapshot on merge to main
+  # Performance settings
+  background_processing: true
+  async_capture: true
+  batch_operations: true
+
+# Security and Privacy
+security:
+  # Sensitive data handling
+  exclude_sensitive_files: true
+  sanitize_credentials: true
+  mask_api_keys: true
   
-  # Development tools integration
-  pre_commit_hook: true       # Capture snapshot before commit
-  post_commit_hook: false     # Capture snapshot after commit
+  # Access control
+  require_authentication: false
+  allowed_users: []
   
-  # IDE integration
-  vscode_extension: true      # Enable VS Code extension
-  jetbrains_plugin: true     # Enable JetBrains plugin
+  # Audit trail
+  enable_audit_log: true
+  log_access_attempts: true
+
+# Export and Sharing
+export:
+  # Export formats
+  supported_formats:
+    - "json"
+    - "markdown"
+    - "html"
+    - "pdf"
   
-# Advanced settings
-advanced:
-  # Performance tuning
-  max_file_size_mb: 10        # Skip files larger than this
-  parallel_processing: true   # Use multiple threads for snapshot creation
+  # Export templates
+  include_timeline: true
+  include_decision_tree: true
+  include_context_graphs: true
   
-  # Security
-  sanitize_secrets: true      # Remove potential secrets from snapshots
-  encryption_enabled: false  # Encrypt snapshots (requires key management)
+  # Sharing options
+  enable_team_sharing: false
+  enable_public_sharing: false
   
-  # DevTimeTravel-specific features
-  timeline_view: true         # Enable timeline visualization
-  diff_tracking: true         # Track file differences between snapshots
-  code_evolution: true        # Track code evolution patterns
+# Visualization
+visualization:
+  # Timeline views
+  enable_timeline_view: true
+  timeline_granularity: "hour"  # Options: minute, hour, day
   
-# Custom snapshot triggers
-triggers:
-  custom_commands:
-    - name: "feature_complete"
-      description: "Capture snapshot when feature is complete"
-      command: "scripts/devtimetravel_snapshot.sh --tag feature_complete"
-      
-    - name: "before_refactor"
-      description: "Capture snapshot before major refactoring"
-      command: "scripts/devtimetravel_snapshot.sh --tag pre_refactor"
-      
-  file_patterns:
-    # Trigger snapshot when these files change
-    - pattern: "src/**/*.py"
-      description: "Python source code changes"
-      
-    - pattern: "docs/TLDL*.md"
-      description: "TLDL entry additions"
+  # Context maps
+  enable_context_maps: true
+  show_file_relationships: true
+  show_decision_dependencies: true
+  
+  # Statistics
+  enable_statistics: true
+  track_productivity_metrics: true
+  track_debugging_efficiency: true
+
+# Integration with External Tools
+integrations:
+  # Version control
+  git:
+    capture_commit_context: true
+    capture_branch_context: true
+    capture_merge_context: true
+  
+  # Issue tracking
+  github:
+    link_to_issues: true
+    auto_create_snapshots_for_issues: false
+  
+  # Development tools
+  vscode:
+    capture_workspace_state: true
+    capture_debug_configurations: true
+  
+  # CI/CD
+  ci_cd:
+    capture_build_context: true
+    capture_deployment_context: true
+    capture_test_results: true
+
+# Notifications and Alerts
+notifications:
+  # Snapshot notifications
+  notify_on_auto_snapshot: false
+  notify_on_critical_decisions: true
+  notify_on_context_changes: false
+  
+  # Alert conditions
+  alert_on_rapid_changes: true
+  alert_on_unusual_patterns: true
+  alert_threshold_changes_per_hour: 10
+
+# Analytics and Insights
+analytics:
+  # Pattern recognition
+  enable_pattern_analysis: true
+  identify_recurring_issues: true
+  suggest_optimization_opportunities: true
+  
+  # Productivity insights
+  track_development_velocity: true
+  analyze_debugging_patterns: true
+  measure_decision_quality: true
+  
+  # Reporting
+  generate_weekly_reports: false
+  generate_monthly_summaries: true
+  include_trend_analysis: true
+
+# Experimental Features
+experimental:
+  # AI-powered features
+  enable_ai_insights: false
+  enable_predictive_analysis: false
+  enable_automated_categorization: false
+  
+  # Advanced analytics
+  enable_code_quality_tracking: false
+  enable_technical_debt_analysis: false
+  enable_collaboration_analytics: false
+
+# Template Configuration
+template:
+  # Template-specific settings
+  is_template_project: true
+  template_version: "2.0.0"
+  created_from: "Mudiversity AI integration innovations"
+  
+  # Customization for new projects
+  auto_update_project_name: true
+  preserve_template_history: false
+  include_example_snapshots: true
+
+# Metadata
+metadata:
+  config_version: "2.0.0"
+  created_by: "Jerry Meyer (Living Dev Agent Template)"
+  last_modified: "2025-01-15T22:00:00Z"
+  compatible_versions:
+    - "DevTimeTravel >= 2.0.0"
+    - "Living Dev Agent >= 2.0.0"
+  
+  # Attribution
+  credits:
+    original_concept: "Jerry Meyer (@jmeyer1980)"
+    template_implementation: "GitHub Copilot (Bootstrap Sentinel)"
+    based_on: "Mudiversity development workflows"

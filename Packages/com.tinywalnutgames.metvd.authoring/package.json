@@ -1,0 +1,28 @@
+﻿{
+  "name": "com.tinywalnutgames.metvd.authoring",
+  "displayName": "MetVanDAMN Authoring",
+  "version": "0.1.0",
+  "description": "Scene authoring components, bakers, and editor utilities for MetVanDAMN.",
+  "unity": "6000.2",
+  "dependencies": {
+    "com.tinywalnutgames.metvd.core": "0.1.0",
+    "com.tinywalnutgames.metvd.graph": "0.1.0",
+    "com.tinywalnutgames.metvd.quadrig": "1.0.0",
+    "com.tinywalnutgames.metvd.shared": "1.0.0",
+    "com.unity.entities": "1.2.0",
+    "com.unity.collections": "1.2.4",
+    "com.unity.mathematics": "1.2.6"
+  },
+  "keywords": [
+    "authoring",
+    "bakers",
+    "editor",
+    "ecs",
+    "metroidvania",
+    "metvandamn"
+  ],
+  "author": {
+    "name": "Tiny Walnut Games",
+    "url": "https://github.com/jmeyer1980/TWG-MetVanDamn"
+  }
+}

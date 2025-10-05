@@ -1,3 +1,4 @@
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using TinyWalnutGames.MetVD.Graph;
 using UnityEngine;
@@ -10,8 +11,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 	/// </summary>
 	public class WfcTilePrototypeAuthoring : MonoBehaviour
 		{
-		[Header("Tile Identity")]
-		[Tooltip("Unique identifier for this tile prototype")]
+		[Header("Tile Identity")] [Tooltip("Unique identifier for this tile prototype")]
 		public uint tileId = 1;
 
 		[Header("Generation Rules")]
@@ -25,18 +25,34 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Tooltip("Primary polarity of this tile")]
 		public Polarity primaryPolarity = Polarity.None;
 
-		[Header("Connection Constraints")]
-		[Range(0, 4)]
-		[Tooltip("Minimum number of connections this tile must have")]
+		[Header("Connection Constraints")] [Range(0, 4)] [Tooltip("Minimum number of connections this tile must have")]
 		public byte minConnections = 1;
 
-		[Range(1, 4)]
-		[Tooltip("Maximum number of connections this tile can have")]
+		[Range(1, 4)] [Tooltip("Maximum number of connections this tile can have")]
 		public byte maxConnections = 4;
 
-		[Header("Socket Configuration")]
-		[Tooltip("Socket definitions for this tile (up to 4 sockets for N/E/S/W)")]
-		public WfcSocketConfig [ ] sockets = new WfcSocketConfig [ 0 ];
+		[Header("Socket Configuration")] [Tooltip("Socket definitions for this tile (up to 4 sockets for N/E/S/W)")]
+		public WfcSocketConfig[] sockets = new WfcSocketConfig[0];
+
+		private void Reset()
+			{
+			// Provide sensible defaults when component is first added
+			tileId = (uint)(GetInstanceID() & 0x7FFFFFFF); // Unique but positive ID
+			weight = 1.0f;
+			biomeType = BiomeType.Unknown;
+			primaryPolarity = Polarity.None;
+			minConnections = 1;
+			maxConnections = 4;
+
+			// Default socket configuration: basic open sockets in all directions
+			sockets = new WfcSocketConfig[]
+				{
+				new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+				new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+				new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
+				new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
+				};
+			}
 
 		private void OnValidate()
 			{
@@ -63,26 +79,6 @@ namespace TinyWalnutGames.MetVD.Authoring
 				Debug.LogWarning($"WfcTilePrototypeAuthoring: Socket array truncated to 4 elements on {name}", this);
 				}
 			}
-
-		private void Reset()
-			{
-			// Provide sensible defaults when component is first added
-			tileId = (uint)(GetInstanceID() & 0x7FFFFFFF); // Unique but positive ID
-			weight = 1.0f;
-			biomeType = BiomeType.Unknown;
-			primaryPolarity = Polarity.None;
-			minConnections = 1;
-			maxConnections = 4;
-
-			// Default socket configuration: basic open sockets in all directions
-			sockets = new WfcSocketConfig [ ]
-			{
-				new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-				new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-				new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
-				new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
-			};
-			}
 		}
 
 	/// <summary>
@@ -94,8 +90,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 		[Tooltip("Socket ID for matching compatible tiles")]
 		public uint socketId;
 
-		[Range(0, 3)]
-		[Tooltip("Direction this socket faces (0=North, 1=East, 2=South, 3=West)")]
+		[Range(0, 3)] [Tooltip("Direction this socket faces (0=North, 1=East, 2=South, 3=West)")]
 		public byte direction;
 
 		[Tooltip("Required polarity for this socket connection")]

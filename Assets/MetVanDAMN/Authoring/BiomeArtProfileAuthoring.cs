@@ -1,3 +1,4 @@
+#nullable enable
 using TinyWalnutGames.MetVD.Core; // Provides BiomeType, Polarity, Biome struct
 using Unity.Entities;
 using UnityEngine;
@@ -14,15 +15,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 	/// </summary>
 	public class BiomeArtProfileAuthoring : MonoBehaviour
 		{
-		[Header("Biome Art Configuration")]
-		[Tooltip("The BiomeArtProfile asset to use for this biome")]
+		[Header("Biome Art Configuration")] [Tooltip("The BiomeArtProfile asset to use for this biome")]
 		public BiomeArtProfile artProfile;
 
 		[Tooltip("Projection type for tilemap generation")]
 		public ProjectionType projectionType = ProjectionType.TopDown;
 
-		[Header("Auto-Configuration")]
-		[Tooltip("Automatically configure biome type based on art profile name")]
+		[Header("Auto-Configuration")] [Tooltip("Automatically configure biome type based on art profile name")]
 		public bool autoConfigureBiomeType = true;
 
 		[Tooltip("Override biome type (if auto-configuration is disabled)")]
@@ -237,8 +236,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return lowerName.Contains("water") && !lowerName.Contains("deep") && !lowerName.Contains("underwater")
 				? BiomeType.Ocean
 				: lowerName.Contains("tech") || lowerName.Contains("machine") || lowerName.Contains("robot")
-				? BiomeType.PowerPlant
-				: BiomeType.Unknown;
+					? BiomeType.PowerPlant
+					: BiomeType.Unknown;
 			}
 		}
 	}

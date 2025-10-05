@@ -69,23 +69,21 @@ Write-Host "Project Path:  $projectPath" -ForegroundColor Cyan
 $resultsDir = Join-Path $projectPath 'debug'
 New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
 $ts = Get-Date -Format 'yyyyMMdd_HHmmss'
-$testResults = Join-Path $resultsDir "TestResults_$ts.xml"
 $logPath = Join-Path $resultsDir "unity_powershell_test_$ts.log"
 
-$testPlatform = if ($env:UNITY_TEST_PLATFORM) { $env:UNITY_TEST_PLATFORM } else { 'PlayMode' }
+$testPlatform = if ($env:UNITY_TEST_PLATFORM) { $env:UNITY_TEST_PLATFORM } else { 'EditMode' }
 $testFilter = $env:UNITY_TEST_FILTER
 $extraArgs = $env:UNITY_EXTRA_ARGS
 
 Write-Host "Running Unity tests..." -ForegroundColor Yellow
-Write-Host "Results: $testResults" -ForegroundColor Cyan
 Write-Host "Log:     $logPath" -ForegroundColor Cyan
+Write-Host "Platform: $testPlatform" -ForegroundColor Cyan
+if ($testFilter) { Write-Host "Filter:   $testFilter" -ForegroundColor Cyan }
 
 $argsList = @(
     '-batchmode', '-nographics',
     '-projectPath', $projectPath,
-    '-runTests',
-    '-testPlatform', $testPlatform,
-    '-testResults', $testResults,
+    '-executeMethod', 'TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunEditMode',
     '-logFile', $logPath,
     '-quit'
 )
@@ -98,13 +96,39 @@ $argsList = $argsList | ForEach-Object { [string]$_ }
 # Remember start time for fallback scans
 $runStart = Get-Date
 
-# Launch Unity and wait; capture reliable exit code
-$proc = Start-Process -FilePath $unityPath -ArgumentList $argsList -NoNewWindow -PassThru -Wait
+# Launch Unity with timeout to prevent hanging
+$timeoutMinutes = 10  # 10 minute timeout for test runs
+Write-Host "Launching Unity (timeout: ${timeoutMinutes} minutes)..." -ForegroundColor Cyan
+
+$proc = Start-Process -FilePath $unityPath -ArgumentList $argsList -NoNewWindow -PassThru
+$timedOut = $false
+
+# Wait for process to exit with timeout
+try {
+    $proc | Wait-Process -Timeout ($timeoutMinutes * 60) -ErrorAction Stop
+}
+catch {
+    $timedOut = $true
+    Write-Host "Unity process timed out after ${timeoutMinutes} minutes - terminating..." -ForegroundColor Red
+    try { $proc.Kill() } catch { }
+}
+
 $exit = $proc.ExitCode
-if ($null -eq $exit) { $exit = 1 }
+if ($null -eq $exit) {
+    if ($timedOut) {
+        $exit = 999  # Custom exit code for timeout
+    }
+    else {
+        $exit = 1
+    }
+}
 
 if ($exit -eq 0) {
-    Write-Host "Unity exited with code 0" -ForegroundColor Green
+    Write-Host "Unity exited with code 0 (success)" -ForegroundColor Green
+}
+elseif ($exit -eq 999) {
+    Write-Host "Unity timed out and was terminated" -ForegroundColor Red
+    Write-Host "This usually indicates a test hang or compilation issue" -ForegroundColor Yellow
 }
 else {
     Write-Host "Unity exited with code $exit" -ForegroundColor Yellow
@@ -113,39 +137,36 @@ else {
 if (Test-Path $logPath) {
     Write-Host "\nLog tail:" -ForegroundColor DarkCyan
     Get-Content -LiteralPath $logPath -Tail 60 | ForEach-Object { Write-Host $_ }
+
+    # Check for compilation errors that would prevent tests from running
+    $compilationErrors = Get-Content -LiteralPath $logPath | Select-String -Pattern "error CS\d+:" | Measure-Object
+    if ($compilationErrors.Count -gt 0) {
+        Write-Host "`n❌ Compilation errors detected ($($compilationErrors.Count) errors)" -ForegroundColor Red
+        Write-Host "Tests cannot run due to compilation failures" -ForegroundColor Yellow
+        exit 1
+    }
 }
 
-# Patiently wait for the results file to appear (some environments flush late)
-$maxWaitSec = 60
-for ($i = 0; $i -lt $maxWaitSec -and -not (Test-Path $testResults); $i += 2) {
-    Start-Sleep -Seconds 2
-}
+# Patiently wait for test execution to complete (look for completion messages in log)
+$maxWaitSec = 120  # 2 minutes for test execution
+$testCompleted = $false
 
-# Fallback: parse log for an alternate results path Unity may have used
-if (-not (Test-Path $testResults) -and (Test-Path $logPath)) {
-    try {
-        $logLines = Get-Content -LiteralPath $logPath
-        $prefixes = @(
-            'Saving results to:',
-            'Results saved to:',
-            'Test results written to:',
-            'Generated report (full):'
-        )
-        $altLine = $logLines | Where-Object { $line = $_; $prefixes | Where-Object { $line -like "*$_*" } } | Select-Object -First 1
-        if ($altLine) {
-            foreach ($p in $prefixes) {
-                $idx = $altLine.IndexOf($p)
-                if ($idx -ge 0) {
-                    $candidate = $altLine.Substring($idx + $p.Length).Trim().Trim('"')
-                    if (Test-Path $candidate) {
-                        try { Copy-Item -LiteralPath $candidate -Destination $testResults -Force } catch {}
-                    }
-                    break
-                }
-            }
+Write-Host "Waiting for test execution to complete..." -ForegroundColor Cyan
+for ($i = 0; $i -lt $maxWaitSec -and -not $testCompleted; $i += 5) {
+    Start-Sleep -Seconds 5
+
+    if (Test-Path $logPath) {
+        $logContent = Get-Content -LiteralPath $logPath -Tail 20
+        if ($logContent -match "Test execution completed" -or $logContent -match "All tests finished") {
+            $testCompleted = $true
+            Write-Host "✅ Test execution completed" -ForegroundColor Green
+            break
         }
     }
-    catch {}
+}
+
+if (-not $testCompleted) {
+    Write-Host "⚠️ Test execution may still be running or completed without clear completion message" -ForegroundColor Yellow
 }
 
 # Fallback 2: scan common directories for any TestResults_*.xml created around run start
@@ -234,14 +255,14 @@ else {
     $ts3 = Get-Date -Format 'yyyyMMdd_HHmmss'
     $testResults3 = Join-Path $resultsDir "TestResults_$ts3.xml"
     $logPath3 = Join-Path $resultsDir "unity_powershell_test_${ts3}_enhanced.log"
-    
+
     # Try the enhanced methods based on test platform
     $enhancedMethod = switch ($testPlatform) {
         "EditMode" { "TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunEditMode" }
         "PlayMode" { "TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunPlayMode" }
         default { "TinyWalnutGames.Tools.Editor.HeadlessTestRunner.RunAll" }
     }
-    
+
     Write-Host "Trying enhanced method: $enhancedMethod" -ForegroundColor Cyan
     $argsList3 = @(
         '-batchmode', '-nographics',
@@ -258,14 +279,14 @@ else {
     $proc3 = Start-Process -FilePath $unityPath -ArgumentList $argsList3 -NoNewWindow -PassThru -Wait
     $exit3 = $proc3.ExitCode; if ($null -eq $exit3) { $exit3 = 1 }
     if ($exit3 -ne 0) { Write-Host "Unity enhanced method exited with code $exit3" -ForegroundColor Yellow }
-    
+
     # Use the enhanced results
     $testResults = $testResults3
     if (-not (Test-Path $testResults)) {
         $found3 = Get-ChildItem -LiteralPath $resultsDir -Filter 'TestResults_*.xml' -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
         if ($found3) { $testResults = $found3.FullName }
     }
-    
+
     if (Test-Path $testResults) {
         try {
             [xml]$xml = Get-Content -LiteralPath $testResults

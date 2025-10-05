@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using UnityEngine;
 using TinyWalnutGames.MetVD.Core;
@@ -13,31 +14,14 @@ namespace TinyWalnutGames.MetVD.Authoring
 	[CreateAssetMenu(fileName = "BiomeArtProfileLibrary", menuName = "MetVanDAMN/Biome Art Profile Library")]
 	public class BiomeArtProfileLibrary : ScriptableObject
 		{
-		[Serializable]
-		public class BiomeTypeBucket
-			{
-			public BiomeType type;
-			[Tooltip("Profiles available for this biome type.")]
-			public BiomeArtProfile[] profiles = Array.Empty<BiomeArtProfile>();
-			}
-
-		[Serializable]
-		public class BiomeTypeElevationBucket
-			{
-			public BiomeType type;
-			[Tooltip("Allowed elevation layers for this bucket (multi-select mask).")]
-			public BiomeElevation elevations = BiomeElevation.Any;
-			[Tooltip("Profiles available for this biome type at the specified elevations.")]
-			public BiomeArtProfile[] profiles = Array.Empty<BiomeArtProfile>();
-			}
-
 		[Tooltip("Profiles available for auto-assignment; selection is deterministic by biome type/seed.")]
 		public BiomeArtProfile[] profiles = Array.Empty<BiomeArtProfile>(); // global fallback pool
 
 		[Tooltip("Optional per-type profile buckets; preferred over the global pool when present.")]
 		public BiomeTypeBucket[] perTypeBuckets = Array.Empty<BiomeTypeBucket>();
 
-		[Tooltip("Optional per-type + elevation buckets with multi-select elevation mask; preferred over type-only buckets.")]
+		[Tooltip(
+			"Optional per-type + elevation buckets with multi-select elevation mask; preferred over type-only buckets.")]
 		public BiomeTypeElevationBucket[] perTypeElevationBuckets = Array.Empty<BiomeTypeElevationBucket>();
 
 		public BiomeArtProfile[] GetProfiles(BiomeType type, BiomeElevation elevation)
@@ -69,6 +53,27 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			// 3) Global fallback
 			return profiles;
+			}
+
+		[Serializable]
+		public class BiomeTypeBucket
+			{
+			public BiomeType type;
+
+			[Tooltip("Profiles available for this biome type.")]
+			public BiomeArtProfile[] profiles = Array.Empty<BiomeArtProfile>();
+			}
+
+		[Serializable]
+		public class BiomeTypeElevationBucket
+			{
+			public BiomeType type;
+
+			[Tooltip("Allowed elevation layers for this bucket (multi-select mask).")]
+			public BiomeElevation elevations = BiomeElevation.Any;
+
+			[Tooltip("Profiles available for this biome type at the specified elevations.")]
+			public BiomeArtProfile[] profiles = Array.Empty<BiomeArtProfile>();
 			}
 		}
 	}

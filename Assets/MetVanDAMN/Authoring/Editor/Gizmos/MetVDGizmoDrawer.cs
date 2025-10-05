@@ -7,23 +7,25 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	[InitializeOnLoad]
 	public static class MetVDGizmoDrawer
 		{
-		private static readonly MetVDGizmoSettings _settings;
 		private const string SettingsAssetName = "MetVDGizmoSettings";
+		private static readonly MetVDGizmoSettings? _settings;
 
 		static MetVDGizmoDrawer()
 			{
 			// Auto-load settings (first asset found)
-			string [ ] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
+			string[] guids = AssetDatabase.FindAssets("t:MetVDGizmoSettings");
 			if (guids.Length > 0)
 				{
-				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids [ 0 ]));
+				_settings = AssetDatabase.LoadAssetAtPath<MetVDGizmoSettings>(AssetDatabase.GUIDToAssetPath(guids[0]));
 				}
 			// SceneView.duringSceneGui += OnSceneGUI;
 			}
 
 		public static void SnapAllDistrictsToGrid()
 			{
-			DistrictAuthoring [ ] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
+			if (_settings == null) return;
+
+			DistrictAuthoring[] districts = Object.FindObjectsByType<DistrictAuthoring>(FindObjectsSortMode.None);
 			Undo.RecordObjects(districts, "Snap Districts To Grid");
 			foreach (DistrictAuthoring d in districts)
 				{
@@ -40,6 +42,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					_settings.districtSize = new Vector2(_settings.gridCellSize, _settings.gridCellSize);
 					}
 				}
+
 			EditorUtility.SetDirty(_settings);
 			}
 
@@ -51,7 +54,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 
 			Unity.Mathematics.int2 coord = district.gridCoordinates; // int2 authoring field
-			return new Vector3(coord.x * _settings.gridCellSize, district.transform.position.y, coord.y * _settings.gridCellSize) + _settings.gridOriginOffset;
+			return new Vector3(coord.x * _settings.gridCellSize, district.transform.position.y,
+				coord.y * _settings.gridCellSize) + _settings.gridOriginOffset;
 			}
 
 		[DrawGizmo(GizmoType.NonSelected | GizmoType.Selected | GizmoType.Pickable)]
@@ -99,17 +103,19 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// 🔧 FIX: Calculate rectangle corners safely
 			Vector3 halfX = new Vector3(size.x * 0.5f, 0, 0);
 			Vector3 halfZ = new Vector3(0, 0, size.y * 0.5f);
-			Vector3 [ ] corners = {
+			Vector3[] corners =
+				{
 				pos - halfX - halfZ,
 				pos - halfX + halfZ,
 				pos + halfX + halfZ,
 				pos + halfX - halfZ
-			};
+				};
 
 			// 🔧 FIX: Validate all corners before drawing
 			foreach (Vector3 corner in corners)
 				{
-				if (corner.magnitude > 10000f || float.IsNaN(corner.x) || float.IsNaN(corner.y) || float.IsNaN(corner.z))
+				if (corner.magnitude > 10000f || float.IsNaN(corner.x) || float.IsNaN(corner.y) ||
+				    float.IsNaN(corner.z))
 					{
 					Handles.color = prev; // Restore color
 					return; // Don't draw if any corner is extreme
@@ -155,7 +161,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			Vector3 a = GridPositionFromAuthoring(connection.from);
 			Vector3 b = GridPositionFromAuthoring(connection.to);
-			Color lineColor = connection.type == Core.ConnectionType.Bidirectional ? _settings.connectionColor : _settings.oneWayColor;
+			Color lineColor = connection.type == Core.ConnectionType.Bidirectional
+				? _settings.connectionColor
+				: _settings.oneWayColor;
 			Handles.color = lineColor;
 			Handles.DrawAAPolyLine(_settings.connectionWidth, a, b);
 
@@ -185,12 +193,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			if (field.secondaryBiome != Core.BiomeType.Unknown)
 				{
 				Handles.color = _settings.biomeSecondary;
-				Handles.DrawWireDisc(field.transform.position, Vector3.up, _settings.biomeRadius * (field.gradient + 0.1f));
+				Handles.DrawWireDisc(field.transform.position, Vector3.up,
+					_settings.biomeRadius * (field.gradient + 0.1f));
 				}
 			}
 
 		private static void DrawArrow(Vector3 from, Vector3 to, Color c)
 			{
+			if (_settings == null) return;
 			Vector3 dir = (to - from);
 			float len = dir.magnitude;
 			if (len < 0.01f)
@@ -212,6 +222,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 		private static bool ShouldDraw()
 			{
+			if (_settings == null) return false;
+
 			bool playing = Application.isPlaying;
 			return (playing && _settings.drawInPlayMode) || (!playing && _settings.drawInEditMode);
 			}

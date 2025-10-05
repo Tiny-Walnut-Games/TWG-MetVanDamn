@@ -81,120 +81,6 @@ jobs:
         run: |
           echo "🔍 Analyzing commit for Sacred Symbols..."
           
-          # Create AI collaboration detector if it doesn't exist
-          cat > scripts/ai-collaboration-detector.py << 'EOF'
-          #!/usr/bin/env python3
-          """
-          Sacred AI Collaboration Detection System
-          Analyzes commits for AI assistance and assesses TLDL worthiness
-          """
-          import json
-          import re
-          import sys
-          import os
-          from pathlib import Path
-          
-          def detect_ai_collaboration_markers(commit_message, changed_files):
-              """Detect AI collaboration markers in commit and files"""
-              ai_markers = [
-                  '🧙‍♂️', 'AI:', 'Copilot:', 'Co-authored-by:', 
-                  'Sacred Symbol', 'boss encounter', 'achievement',
-                  'dungeon crawl', 'quest complete', 'lore update'
-              ]
-              
-              collaboration_score = 0
-              detected_markers = []
-              
-              # Check commit message
-              for marker in ai_markers:
-                  if marker.lower() in commit_message.lower():
-                      collaboration_score += 10
-                      detected_markers.append(marker)
-              
-              return collaboration_score, detected_markers
-          
-          def assess_technical_significance(changed_files, diff_stats):
-              """Assess technical significance of changes"""
-              significance_indicators = {
-                  'new_feature': 25,      # New .cs files or major additions
-                  'architecture': 30,     # System-level changes
-                  'integration': 20,      # Multiple package changes
-                  'documentation': 15,    # Significant doc updates
-                  'testing': 10,          # Test additions
-                  'bugfix': 5             # Bug fixes
-              }
-              
-              score = 0
-              detected_types = []
-              
-              # Analyze file patterns
-              cs_files = [f for f in changed_files if f.endswith('.cs')]
-              md_files = [f for f in changed_files if f.endswith('.md')]
-              test_files = [f for f in changed_files if 'test' in f.lower()]
-              
-              if len(cs_files) > 3:
-                  score += significance_indicators['integration']
-                  detected_types.append('integration')
-              
-              if any('system' in f.lower() for f in cs_files):
-                  score += significance_indicators['architecture']
-                  detected_types.append('architecture')
-              
-              if len(md_files) > 1:
-                  score += significance_indicators['documentation']
-                  detected_types.append('documentation')
-              
-              if test_files:
-                  score += significance_indicators['testing']
-                  detected_types.append('testing')
-              
-              return score, detected_types
-          
-          def calculate_tldl_worthiness(ai_score, tech_score, file_count):
-              """Calculate if changes warrant TLDL creation"""
-              total_score = ai_score + tech_score
-              
-              # Bonus for substantial changes
-              if file_count > 5:
-                  total_score += 10
-              
-              # TLDL worthy if score > 30 OR forced
-              is_worthy = total_score > 30 or os.getenv('FORCE_TLDL') == 'true'
-              
-              return total_score, is_worthy
-          
-          if __name__ == "__main__":
-              # Get commit info from environment
-              commit_message = os.getenv('COMMIT_MESSAGE', '')
-              changed_files = os.getenv('CHANGED_FILES', '').split('\n')
-              file_count = len([f for f in changed_files if f.strip()])
-              
-              # Detect collaboration and significance
-              ai_score, ai_markers = detect_ai_collaboration_markers(commit_message, changed_files)
-              tech_score, tech_types = assess_technical_significance(changed_files, {})
-              total_score, is_worthy = calculate_tldl_worthiness(ai_score, tech_score, file_count)
-              
-              # Output results
-              result = {
-                  'ai_collaboration_score': ai_score,
-                  'technical_significance_score': tech_score,
-                  'total_significance_score': total_score,
-                  'tldl_worthy': is_worthy,
-                  'detected_ai_markers': ai_markers,
-                  'detected_tech_types': tech_types,
-                  'file_count': file_count
-              }
-              
-              print(json.dumps(result, indent=2))
-              
-              # Set GitHub outputs
-              print(f"::set-output name=score::{total_score}")
-              print(f"::set-output name=worthy::{is_worthy}")
-              print(f"::set-output name=ai_markers::{','.join(ai_markers)}")
-          EOF
-          
-          chmod +x scripts/ai-collaboration-detector.py
-          
           # Get commit and file information
           COMMIT_MESSAGE="${{ github.event.head_commit.message || github.event.pull_request.title }}"
           CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD || echo "")
@@ -218,124 +104,6 @@ jobs:
         run: |
           echo "📜 Generating Sacred TLDL Entry..."
           
-          # Create TLDL auto-generator
-          cat > scripts/auto-tldl-generator.py << 'EOF'
-          #!/usr/bin/env python3
-          """
-          Sacred Auto-TLDL Generator
-          Creates TLDL entries from AI collaboration context
-          """
-          import json
-          import os
-          import datetime
-          from pathlib import Path
-          
-          def generate_tldl_content(significance_data, commit_info):
-              """Generate TLDL content from analysis"""
-              timestamp = datetime.datetime.now().strftime("%Y-%m-%d")
-              
-              # Extract key information
-              ai_markers = significance_data.get('detected_ai_markers', [])
-              tech_types = significance_data.get('detected_tech_types', [])
-              total_score = significance_data.get('total_significance_score', 0)
-              
-              # Generate title
-              if 'architecture' in tech_types:
-                  title_type = "ArchitecturalEvolution"
-              elif 'integration' in tech_types:
-                  title_type = "IntegrationQuest"
-              elif 'new_feature' in tech_types:
-                  title_type = "FeatureForge"
-              else:
-                  title_type = "CollaborationChronicle"
-              
-              tldl_title = f"TLDL-{timestamp}-{title_type}-AIAssisted"
-              
-              # Generate content
-              content = f"""# {tldl_title}
-
-## 🎯 Achievement Unlocked: AI-Assisted Development
-
-**Entry ID**: MVD-{tldl_title}  
-**Author**: AI Collaboration Detector + Human Developer  
-**Context**: Automated TLDL generation from detected AI assistance  
-**Significance Score**: {total_score}/100  
-
-## 🧙‍♂️ The Sacred Collaboration
-
-### AI Markers Detected
-{chr(10).join(f"- {marker}" for marker in ai_markers)}
-
-### Technical Categories
-{chr(10).join(f"- {category.title()}" for category in tech_types)}
-
-## 📊 Change Analysis
-
-**Commit Message**: {commit_info.get('message', 'N/A')}  
-**Files Modified**: {commit_info.get('file_count', 0)}  
-**Collaboration Type**: AI-Assisted Development  
-
-## 🔮 Sacred Lore
-
-This entry was automatically generated by the Sacred AI Collaboration Detection System. 
-The changes were deemed significant enough (score: {total_score}) to warrant preservation 
-in the Living Dev Log for future adventurers.
-
-### 🧰 Technical Context
-- **Repository State**: {commit_info.get('sha', 'Unknown')[:8]}
-- **Branch**: {commit_info.get('branch', 'main')}
-- **Trigger**: {commit_info.get('trigger', 'push')}
-
-## 🛡️ Cheek Preservation Notes
-
-Auto-generated entries preserve the sacred knowledge of AI collaboration sessions 
-that might otherwise be lost to the void of unrecorded development history.
-
-## 🎭 Next Quests
-
-Future developers reviewing this entry should:
-1. Examine the associated commit for context
-2. Consider how the AI assistance pattern can be replicated
-3. Update this entry with additional insights if needed
-
----
-
-*Generated by the Sacred AI Collaboration Detection System*  
-*"No Sacred Symbol shall be left unpreserved!"* 🧙‍♂️⚔️✨
-"""
-              
-              return tldl_title, content
-          
-          if __name__ == "__main__":
-              # Load significance data
-              with open('significance_result.json', 'r') as f:
-                  significance_data = json.load(f)
-              
-              # Get commit info from environment
-              commit_info = {
-                  'message': os.getenv('COMMIT_MESSAGE', ''),
-                  'sha': os.getenv('GITHUB_SHA', ''),
-                  'branch': os.getenv('GITHUB_REF_NAME', ''),
-                  'trigger': os.getenv('GITHUB_EVENT_NAME', ''),
-                  'file_count': significance_data.get('file_count', 0)
-              }
-              
-              # Generate TLDL
-              title, content = generate_tldl_content(significance_data, commit_info)
-              
-              # Write TLDL file
-              tldl_path = f"docs/{title}.md"
-              with open(tldl_path, 'w') as f:
-                  f.write(content)
-              
-              print(f"✅ Generated TLDL: {tldl_path}")
-              print(f"::set-output name=created::true")
-              print(f"::set-output name=path::{tldl_path}")
-              print(f"::set-output name=title::{title}")
-          EOF
-          
-          chmod +x scripts/auto-tldl-generator.py
-          
           # Set environment for generator
           export COMMIT_MESSAGE="${{ github.event.head_commit.message || github.event.pull_request.title }}"
           export GITHUB_SHA="${{ github.sha }}"
@@ -350,82 +118,6 @@ Future developers reviewing this entry should:
         if: steps.tldl_generation.outputs.created == 'true'
         run: |
           echo "🔮 Invoking Sacred Oracle for Future Predictions..."
-          
-          # Create Oracle prediction system
-          cat > scripts/oracle-predictor.py << 'EOF'
-          #!/usr/bin/env python3
-          """
-          Sacred Oracle Prediction System
-          Generates future impact predictions for significant changes
-          """
-          import json
-          import random
-          import datetime
-          
-          def generate_oracle_prediction(significance_data, tldl_title):
-              """Generate Oracle wisdom about future impact"""
-              
-              # Oracle prediction categories
-              predictions = {
-                  'architecture': [
-                      "The architectural changes will inspire 3 follow-up refactoring quests within 2 months",
-                      "Future developers will reference this pattern 7 times in the next 6 months",
-                      "This architecture will become the foundation for 2 major features"
-                  ],
-                  'integration': [
-                      "Integration patterns established here will save 15+ hours in future development",
-                      "This integration approach will be replicated across 4 similar components",
-                      "The collaboration pattern will become a template for future AI-assisted work"
-                  ],
-                  'documentation': [
-                      "This documentation will be referenced in 12+ future TLDL entries",
-                      "The Sacred Lore established here will guide 5 new contributors",
-                      "Documentation patterns will be adopted by 3 related projects"
-                  ]
-              }
-              
-              # Select prediction based on detected types
-              tech_types = significance_data.get('detected_tech_types', ['integration'])
-              prediction_category = tech_types[0] if tech_types else 'integration'
-              
-              selected_predictions = predictions.get(prediction_category, predictions['integration'])
-              oracle_wisdom = random.choice(selected_predictions)
-              
-              # Generate timeframe (1-6 months)
-              timeframe_months = random.randint(1, 6)
-              prediction_date = datetime.datetime.now() + datetime.timedelta(days=30 * timeframe_months)
-              
-              return {
-                  'prediction_id': f"ORACLE-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}",
-                  'wisdom': oracle_wisdom,
-                  'category': prediction_category,
-                  'timeframe_months': timeframe_months,
-                  'prediction_date': prediction_date.strftime('%Y-%m-%d'),
-                  'confidence': random.randint(65, 85),
-                  'tldl_entry': tldl_title
-              }
-          
-          if __name__ == "__main__":
-              # Load data
-              with open('significance_result.json', 'r') as f:
-                  significance_data = json.load(f)
-              
-              tldl_title = "${{ steps.tldl_generation.outputs.title }}"
-              
-              # Generate prediction
-              prediction = generate_oracle_prediction(significance_data, tldl_title)
-              
-              # Save prediction
-              with open('oracle_prediction.json', 'w') as f:
-                  json.dump(prediction, f, indent=2)
-              
-              print(f"🔮 Oracle Wisdom: {prediction['wisdom']}")
-              print(f"📅 Prediction Date: {prediction['prediction_date']}")
-              print(f"🎯 Confidence: {prediction['confidence']}%")
-              
-              print(f"::set-output name=prediction_id::{prediction['prediction_id']}")
-              print(f"::set-output name=wisdom::{prediction['wisdom']}")
-          EOF
           
           chmod +x scripts/oracle-predictor.py
           python3 scripts/oracle-predictor.py
@@ -482,13 +174,14 @@ Future developers reviewing this entry should:
             echo "📭 No sacred artifacts to commit"
           else
             # Commit with Sacred Symbols
-            git commit -m "📜 Sacred Auto-Documentation: ${{ steps.tldl_generation.outputs.title }}
-
-🧙‍♂️ Auto-generated TLDL from AI collaboration detection
-🔮 Oracle prediction: ${{ steps.oracle_invocation.outputs.prediction_id }}
-⚡ Significance score: ${{ steps.significance_assessment.outputs.score }}/100
-
-Generated by Sacred AI Collaboration Detection System"
+            git commit -m |
+              📜 Sacred Auto-Documentation: ${{ steps.tldl_generation.outputs.title }}
+              
+              🧙‍♂️ Auto-generated TLDL from AI collaboration detection
+              🔮 Oracle prediction: ${{ steps.oracle_invocation.outputs.prediction_id }}
+              ⚡ Significance score: ${{ steps.significance_assessment.outputs.score }}/100
+              
+              Generated by Sacred AI Collaboration Detection System
             
             # Push changes
             git push origin ${{ github.ref_name }} || echo "⚠️ Push failed - will be handled by subsequent workflow"

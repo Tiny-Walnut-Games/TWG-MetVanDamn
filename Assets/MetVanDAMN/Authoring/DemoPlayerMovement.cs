@@ -1,3 +1,4 @@
+#nullable enable
 using UnityEngine;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring
@@ -302,7 +303,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
             {
             if (interactPressed && interactableTarget != _interactablePlaceholder)
                 {
-                if (interactableTarget.TryGetComponent<IDemoInteractable>(out var interactable))
+                if (interactableTarget.TryGetComponent<IDemoInteractable>(out IDemoInteractable? interactable))
                     {
                     interactable.Interact(this);
                     }

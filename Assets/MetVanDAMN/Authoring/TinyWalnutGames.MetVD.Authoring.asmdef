@@ -14,7 +14,8 @@
         "TinyWalnutGames.MetVD.Shared",
         "TinyWalnutGames.MetVD.Graph",
         "TinyWalnutGames.MetVD.Biome",
-        "TinyWalnutGames.GridLayerEditor"
+		"TinyWalnutGames.GridLayerEditor",
+		"TinyWalnutGames.StoryTest.Editor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
