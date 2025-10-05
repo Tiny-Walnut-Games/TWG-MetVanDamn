@@ -38,6 +38,19 @@
         "com.unity.mathematics": "1.2.6"
       }
     },
+    "com.tinywalnutgames.metvd.quadrig": {
+      "version": "file:com.tinywalnutgames.metvd.quadrig",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.entities": "1.2.0",
+        "com.unity.burst": "1.8.0",
+        "com.unity.collections": "2.4.0",
+        "com.unity.mathematics": "1.3.1",
+        "com.tinywalnutgames.metvd.core": "1.0.0",
+        "com.tinywalnutgames.metvd.shared": "1.0.0"
+      }
+    },
     "com.tinywalnutgames.metvd.samples": {
       "version": "file:com.tinywalnutgames.metvd.samples",
       "depth": 0,

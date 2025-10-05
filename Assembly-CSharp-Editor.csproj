@@ -1643,7 +1643,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj" />
     <ProjectReference Include="Assembly-CSharp.csproj" />
     <ProjectReference Include="Assembly-CSharp-Editor-firstpass.csproj" />
     <ProjectReference Include="TinyWalnutGames.GridLayerEditor.csproj" />
@@ -1653,11 +1652,13 @@
     <ProjectReference Include="TinyWalnutGames.MetVD.Biome.csproj" />
     <ProjectReference Include="LivingDevAgent.Editor.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Shared.csproj" />
+    <ProjectReference Include="TinyWalnutGames.MetVD.QuadRig.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Authoring.Editor.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Graph.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Authoring.Tests.csproj" />
     <ProjectReference Include="TinyWalnutGames.Tools.Editor.csproj" />
     <ProjectReference Include="TinyWalnutGames.MetVD.Samples.csproj" />
+    <ProjectReference Include="TinyWalnutGames.MetVD.QuadRig.Authoring.csproj" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>

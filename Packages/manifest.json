@@ -3,6 +3,7 @@
     "com.tinywalnutgames.metvd.biome": "file:../Packages/com.tinywalnutgames.metvd.biome",
     "com.tinywalnutgames.metvd.core": "file:../Packages/com.tinywalnutgames.metvd.core",
     "com.tinywalnutgames.metvd.graph": "file:../Packages/com.tinywalnutgames.metvd.graph",
+    "com.tinywalnutgames.metvd.quadrig": "file:../Packages/com.tinywalnutgames.metvd.quadrig",
     "com.tinywalnutgames.metvd.samples": "file:../Packages/com.tinywalnutgames.metvd.samples",
     "com.tinywalnutgames.metvd.shared": "file:../Packages/com.tinywalnutgames.metvd.shared",
     "com.unity.2d.animation": "12.0.2",
@@ -72,6 +73,7 @@
   "testables": [
     "com.tinywalnutgames.metvd.core",
     "com.tinywalnutgames.metvd.graph",
+    "com.tinywalnutgames.metvd.quadrig",
     "com.tinywalnutgames.metvd.utility"
   ]
 }

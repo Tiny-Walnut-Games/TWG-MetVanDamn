@@ -1,0 +1,28 @@
+{
+    "name": "TinyWalnutGames.MetVD.QuadRig.Tests",
+    "rootNamespace": "TinyWalnutGames.MetVD.QuadRig.Tests",
+    "references": [
+        "Unity.Collections",
+        "Unity.Burst",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Mathematics",
+        "Unity.Transforms",
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner",
+        "TinyWalnutGames.MetVD.QuadRig"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
