@@ -1,0 +1,17 @@
+{
+    "name": "StoryTest.Editor",
+    "rootNamespace": "StoryTest.Editor",
+    "references": [
+        "StoryTest.Runtime",
+        "UnityEditor.CoreModule"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

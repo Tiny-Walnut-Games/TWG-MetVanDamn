@@ -9,20 +9,21 @@
         "Unity.Mathematics",
         "Unity.Collections",
         "Unity.Burst",
+		"UnityEditor.TestRunner",
+		"UnityEngine.TestRunner",
         "Unity.Cinemachine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
+	"overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll"
     ],
-    "autoReferenced": true,
-    "optionalUnityReferences": [
-        "TestAssemblies"
+	"autoReferenced": false,
+	"defineConstraints": [
+		"UNITY_INCLUDE_TESTS"
     ],
-    "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
 }

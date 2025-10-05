@@ -37,7 +37,7 @@ namespace LivingDevAgent.Core.Validation
         [Header("Debug Overlay Validation")]
         [SerializeField] private bool runOnStart = true;
         [SerializeField] private bool showDetailedLogs = true;
-        
+
         void Start()
         {
             if (runOnStart)
@@ -45,7 +45,7 @@ namespace LivingDevAgent.Core.Validation
                 ValidateDebugOverlaySystem();
             }
         }
-        
+
         /// <summary>
         /// Comprehensive validation of debug overlay system display flags functionality
         /// </summary>
@@ -53,10 +53,10 @@ namespace LivingDevAgent.Core.Validation
         public void ValidateDebugOverlaySystem()
         {
             LogInfo("=== Debug Overlay System Validation Starting ===");
-            
+
             int testsRun = 0;
             int testsPassed = 0;
-            
+
             // Create generic debug system interface for testing
             var debugSystem = GetDebugSystem();
             if (debugSystem == null)
@@ -64,7 +64,7 @@ namespace LivingDevAgent.Core.Validation
                 LogWarning("No debug system implementation found - tests will use mock validation");
                 debugSystem = new MockDebugSystem();
             }
-            
+
             // Test 1: DisableAllDebugDisplays
             testsRun++;
             debugSystem.DisableAllDebugDisplays();
@@ -77,7 +77,7 @@ namespace LivingDevAgent.Core.Validation
             {
                 LogError("✗ DisableAllDebugDisplays failed - Expected None, got: " + debugSystem.DisplayFlags);
             }
-            
+
             // Test 2: EnableDebugDisplay for specific flags
             testsRun++;
             debugSystem.EnableDebugDisplay(DebugDisplayFlags.SystemInfo);
@@ -90,7 +90,7 @@ namespace LivingDevAgent.Core.Validation
             {
                 LogError("✗ EnableDebugDisplay for SystemInfo failed");
             }
-            
+
             // Test 3: EnableDebugDisplay multiple flags
             testsRun++;
             debugSystem.EnableDebugDisplay(DebugDisplayFlags.PerformanceMetrics);
@@ -104,13 +104,13 @@ namespace LivingDevAgent.Core.Validation
             {
                 LogError("✗ EnableDebugDisplay for multiple flags failed - Expected: " + expectedFlags + ", got: " + debugSystem.DisplayFlags);
             }
-            
+
             // Test 4: ToggleDebugDisplay 
             testsRun++;
             var flagsBeforeToggle = debugSystem.DisplayFlags;
             debugSystem.ToggleDebugDisplay(DebugDisplayFlags.RenderingInfo);
             var flagsAfterToggle = debugSystem.DisplayFlags;
-            if ((flagsAfterToggle & DebugDisplayFlags.RenderingInfo) != 0 && 
+            if ((flagsAfterToggle & DebugDisplayFlags.RenderingInfo) != 0 &&
                 (flagsBeforeToggle & DebugDisplayFlags.RenderingInfo) == 0)
             {
                 testsPassed++;
@@ -118,9 +118,9 @@ namespace LivingDevAgent.Core.Validation
             }
             else
             {
-                LogError("✗ ToggleDebugDisplay failed");
+                Debug.LogError("✗ ToggleDebugDisplay failed");
             }
-            
+
             // Test 5: Toggle again to disable
             testsRun++;
             debugSystem.ToggleDebugDisplay(DebugDisplayFlags.RenderingInfo);
@@ -131,9 +131,9 @@ namespace LivingDevAgent.Core.Validation
             }
             else
             {
-                LogError("✗ ToggleDebugDisplay disable failed");
+                Debug.LogError("✗ ToggleDebugDisplay disable failed");
             }
-            
+
             // Test 6: EnableAllDebugDisplays
             testsRun++;
             debugSystem.EnableAllDebugDisplays();
@@ -144,9 +144,9 @@ namespace LivingDevAgent.Core.Validation
             }
             else
             {
-                LogError("✗ EnableAllDebugDisplays failed - Expected All, got: " + debugSystem.DisplayFlags);
+                Debug.LogError("✗ EnableAllDebugDisplays failed - Expected All, got: " + debugSystem.DisplayFlags);
             }
-            
+
             // Test 7: DisableDebugDisplay for specific flags
             testsRun++;
             debugSystem.DisableDebugDisplay(DebugDisplayFlags.SystemInfo);
@@ -157,9 +157,9 @@ namespace LivingDevAgent.Core.Validation
             }
             else
             {
-                LogError("✗ DisableDebugDisplay for specific flags failed");
+                Debug.LogError("✗ DisableDebugDisplay for specific flags failed");
             }
-            
+
             // Test 8: Verify system can check for world existence without errors
             testsRun++;
             try
@@ -176,22 +176,22 @@ namespace LivingDevAgent.Core.Validation
             }
             catch (System.Exception e)
             {
-                LogError($"✗ System integration check failed: {e.Message}");
+                Debug.LogError($"✗ System integration check failed: {e.Message}");
             }
-            
+
             // Final results
             LogInfo($"=== Validation Complete: {testsPassed}/{testsRun} tests passed ===");
-            
+
             if (testsPassed == testsRun)
             {
                 LogSuccess("🎉 All display flags logic tests passed! Debug overlay system is active and testable.");
             }
             else
             {
-                LogError($"❌ {testsRun - testsPassed} test(s) failed. Debug overlay system needs attention.");
+                Debug.LogError($"❌ {testsRun - testsPassed} test(s) failed. Debug overlay system needs attention.");
             }
         }
-        
+
         /// <summary>
         /// Get debug system implementation - abstract to allow for different engines/systems
         /// </summary>
@@ -202,29 +202,29 @@ namespace LivingDevAgent.Core.Validation
             var existing = FindObjectOfType<MonoBehaviour>() as IDebugOverlaySystem;
             return existing ?? new MockDebugSystem();
         }
-        
+
         private void LogInfo(string message)
         {
             if (showDetailedLogs)
                 Debug.Log($"[DebugValidation] {message}");
         }
-        
+
         private void LogSuccess(string message)
         {
             Debug.Log($"[DebugValidation] {message}");
         }
-        
+
         private void LogError(string message)
         {
             Debug.LogError($"[DebugValidation] {message}");
         }
-        
+
         private void LogWarning(string message)
         {
             Debug.LogWarning($"[DebugValidation] {message}");
         }
     }
-    
+
     /// <summary>
     /// Generic debug display flags enum for pipeline-agnostic validation
     /// </summary>
@@ -238,7 +238,7 @@ namespace LivingDevAgent.Core.Validation
         MemoryUsage = 1 << 3,
         All = SystemInfo | PerformanceMetrics | RenderingInfo | MemoryUsage
     }
-    
+
     /// <summary>
     /// Interface for debug overlay systems - allows for different implementations
     /// </summary>
@@ -251,34 +251,34 @@ namespace LivingDevAgent.Core.Validation
         void EnableAllDebugDisplays();
         void DisableAllDebugDisplays();
     }
-    
+
     /// <summary>
     /// Mock debug system implementation for testing when no real system is available
     /// </summary>
     public class MockDebugSystem : IDebugOverlaySystem
     {
         public DebugDisplayFlags DisplayFlags { get; private set; } = DebugDisplayFlags.None;
-        
+
         public void EnableDebugDisplay(DebugDisplayFlags flags)
         {
             DisplayFlags |= flags;
         }
-        
+
         public void DisableDebugDisplay(DebugDisplayFlags flags)
         {
             DisplayFlags &= ~flags;
         }
-        
+
         public void ToggleDebugDisplay(DebugDisplayFlags flags)
         {
             DisplayFlags ^= flags;
         }
-        
+
         public void EnableAllDebugDisplays()
         {
             DisplayFlags = DebugDisplayFlags.All;
         }
-        
+
         public void DisableAllDebugDisplays()
         {
             DisplayFlags = DebugDisplayFlags.None;

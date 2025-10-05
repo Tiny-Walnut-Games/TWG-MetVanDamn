@@ -1,317 +1,322 @@
+#nullable enable
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring
-    {
-    /// <summary>
-    /// Centralized database manager for all upgrade definitions and collections.
-    /// Provides lookup services for the progression system.
-    /// </summary>
-    public class UpgradeDatabaseManager : MonoBehaviour
-        {
-        [Header("Database")]
-        [SerializeField] private UpgradeCollection[] allCollections = new UpgradeCollection[0];
-        [SerializeField] private bool autoFindCollections = true;
+	{
+	/// <summary>
+	/// Centralized database manager for all upgrade definitions and collections.
+	/// Provides lookup services for the progression system.
+	/// </summary>
+	public class UpgradeDatabaseManager : MonoBehaviour
+		{
+		// Singleton pattern for easy access
+		private static UpgradeDatabaseManager instance;
 
-        [Header("Debug")]
-        [SerializeField] private bool enableDebugLogging = true;
+		[Header("Database")] [SerializeField] private UpgradeCollection[] allCollections = new UpgradeCollection[0];
 
-        // Runtime database
-        private Dictionary<string, UpgradeDefinition> upgradeDatabase = new();
-        private Dictionary<UpgradeCategory, List<UpgradeDefinition>> categoryDatabase = new();
+		[SerializeField] private bool autoFindCollections = true;
 
-        // Singleton pattern for easy access
-        private static UpgradeDatabaseManager instance;
-        public static UpgradeDatabaseManager Instance => instance;
+		[Header("Debug")] [SerializeField] private bool enableDebugLogging = true;
 
-        private void Awake()
-            {
-            // Singleton setup
-            if (instance != null && instance != this)
-                {
-                Destroy(gameObject);
-                return;
-                }
-            instance = this;
-            DontDestroyOnLoad(gameObject);
+		private Dictionary<UpgradeCategory, List<UpgradeDefinition>> categoryDatabase = new();
 
-            BuildDatabase();
-            }
+		// Runtime database
+		private Dictionary<string, UpgradeDefinition> upgradeDatabase = new();
+		public static UpgradeDatabaseManager Instance => instance;
 
-        private void BuildDatabase()
-            {
-            upgradeDatabase.Clear();
-            categoryDatabase.Clear();
+		private void Awake()
+			{
+			// Singleton setup
+			if (instance != null && instance != this)
+				{
+				Destroy(gameObject);
+				return;
+				}
 
-            // Auto-find collections if enabled
-            if (autoFindCollections)
-                {
-                var foundCollections = Resources.FindObjectsOfTypeAll<UpgradeCollection>().ToList();
-                if (foundCollections.Count > 0)
-                    {
-                    allCollections = foundCollections.ToArray();
-                    if (enableDebugLogging)
-                        {
-                        Debug.Log($"🔍 Auto-found {foundCollections.Count} upgrade collections");
-                        }
-                    }
-                }
+			instance = this;
+			DontDestroyOnLoad(gameObject);
 
-            // Initialize category lists
-            foreach (UpgradeCategory category in System.Enum.GetValues(typeof(UpgradeCategory)))
-                {
-                categoryDatabase[category] = new List<UpgradeDefinition>();
-                }
+			BuildDatabase();
+			}
 
-            // Process all collections
-            int totalUpgrades = 0;
-            foreach (var collection in allCollections)
-                {
-                if (collection == null) continue;
+		private void OnValidate()
+			{
+			// Validate collections array
+			if (allCollections != null)
+				{
+				for (int i = 0; i < allCollections.Length; i++)
+					{
+					if (allCollections[i] == null)
+						{
+						Debug.LogWarning($"Null collection found at index {i}");
+						}
+					}
+				}
+			}
 
-                foreach (var upgrade in collection.Upgrades)
-                    {
-                    if (upgrade == null) continue;
+		private void BuildDatabase()
+			{
+			upgradeDatabase.Clear();
+			categoryDatabase.Clear();
 
-                    // Add to main database
-                    if (!upgradeDatabase.ContainsKey(upgrade.Id))
-                        {
-                        upgradeDatabase[upgrade.Id] = upgrade;
-                        categoryDatabase[upgrade.Category].Add(upgrade);
-                        totalUpgrades++;
-                        }
-                    else if (enableDebugLogging)
-                        {
-                        Debug.LogWarning($"Duplicate upgrade ID found: {upgrade.Id}");
-                        }
-                    }
-                }
+			// Auto-find collections if enabled
+			if (autoFindCollections)
+				{
+				List<UpgradeCollection> foundCollections = Resources.FindObjectsOfTypeAll<UpgradeCollection>().ToList();
+				if (foundCollections.Count > 0)
+					{
+					allCollections = foundCollections.ToArray();
+					if (enableDebugLogging)
+						{
+						Debug.Log($"🔍 Auto-found {foundCollections.Count} upgrade collections");
+						}
+					}
+				}
 
-            if (enableDebugLogging)
-                {
-                Debug.Log($"📚 Upgrade database built: {totalUpgrades} total upgrades across {allCollections.Length} collections");
-                foreach (var kvp in categoryDatabase)
-                    {
-                    Debug.Log($"  • {kvp.Key}: {kvp.Value.Count} upgrades");
-                    }
-                }
-            }
+			// Initialize category lists
+			foreach (UpgradeCategory category in System.Enum.GetValues(typeof(UpgradeCategory)))
+				{
+				categoryDatabase[category] = new List<UpgradeDefinition>();
+				}
 
-        /// <summary>
-        /// Get an upgrade by its ID
-        /// </summary>
-        public UpgradeDefinition GetUpgradeById(string id)
-            {
-            upgradeDatabase.TryGetValue(id, out var upgrade);
-            return upgrade;
-            }
+			// Process all collections
+			int totalUpgrades = 0;
+			foreach (UpgradeCollection collection in allCollections)
+				{
+				if (collection == null) continue;
 
-        /// <summary>
-        /// Get all upgrades in a category
-        /// </summary>
-        public List<UpgradeDefinition> GetUpgradesByCategory(UpgradeCategory category)
-            {
-            categoryDatabase.TryGetValue(category, out var upgrades);
-            return upgrades ?? new List<UpgradeDefinition>();
-            }
+				foreach (UpgradeDefinition upgrade in collection.Upgrades)
+					{
+					if (upgrade == null) continue;
 
-        /// <summary>
-        /// Get all upgrade IDs
-        /// </summary>
-        public string[] GetAllUpgradeIds()
-            {
-            return upgradeDatabase.Keys.ToArray();
-            }
+					// Add to main database
+					if (!upgradeDatabase.ContainsKey(upgrade.Id))
+						{
+						upgradeDatabase[upgrade.Id] = upgrade;
+						categoryDatabase[upgrade.Category].Add(upgrade);
+						totalUpgrades++;
+						}
+					else if (enableDebugLogging)
+						{
+						Debug.LogWarning($"Duplicate upgrade ID found: {upgrade.Id}");
+						}
+					}
+				}
 
-        /// <summary>
-        /// Get upgrade statistics
-        /// </summary>
-        public (int total, int byCategory, int unique) GetStats(UpgradeCategory? filterCategory = null)
-            {
-            if (filterCategory.HasValue)
-                {
-                var categoryUpgrades = GetUpgradesByCategory(filterCategory.Value);
-                int unique = categoryUpgrades.Count(u => u.IsUnique);
-                return (categoryUpgrades.Count, categoryUpgrades.Count, unique);
-                }
-            else
-                {
-                int total = upgradeDatabase.Count;
-                int unique = upgradeDatabase.Values.Count(u => u.IsUnique);
-                return (total, total, unique);
-                }
-            }
+			if (enableDebugLogging)
+				{
+				Debug.Log(
+					$"📚 Upgrade database built: {totalUpgrades} total upgrades across {allCollections.Length} collections");
+				foreach (KeyValuePair<UpgradeCategory, List<UpgradeDefinition>> kvp in categoryDatabase)
+					{
+					Debug.Log($"  • {kvp.Key}: {kvp.Value.Count} upgrades");
+					}
+				}
+			}
 
-        /// <summary>
-        /// Search upgrades by name or description
-        /// </summary>
-        public List<UpgradeDefinition> SearchUpgrades(string searchTerm)
-            {
-            if (string.IsNullOrEmpty(searchTerm))
-                return upgradeDatabase.Values.ToList();
+		/// <summary>
+		/// Get an upgrade by its ID
+		/// </summary>
+		public UpgradeDefinition GetUpgradeById(string id)
+			{
+			upgradeDatabase.TryGetValue(id, out UpgradeDefinition? upgrade);
+			return upgrade;
+			}
 
-            var results = new List<UpgradeDefinition>();
-            string lowerSearchTerm = searchTerm.ToLower();
+		/// <summary>
+		/// Get all upgrades in a category
+		/// </summary>
+		public List<UpgradeDefinition> GetUpgradesByCategory(UpgradeCategory category)
+			{
+			categoryDatabase.TryGetValue(category, out List<UpgradeDefinition>? upgrades);
+			return upgrades ?? new List<UpgradeDefinition>();
+			}
 
-            foreach (var upgrade in upgradeDatabase.Values)
-                {
-                if (upgrade.UpgradeName.ToLower().Contains(lowerSearchTerm) ||
-                    upgrade.Description.ToLower().Contains(lowerSearchTerm) ||
-                    upgrade.Category.ToString().ToLower().Contains(lowerSearchTerm))
-                    {
-                    results.Add(upgrade);
-                    }
-                }
+		/// <summary>
+		/// Get all upgrade IDs
+		/// </summary>
+		public string[] GetAllUpgradeIds()
+			{
+			return upgradeDatabase.Keys.ToArray();
+			}
 
-            return results;
-            }
+		/// <summary>
+		/// Get upgrade statistics
+		/// </summary>
+		public (int total, int byCategory, int unique) GetStats(UpgradeCategory? filterCategory = null)
+			{
+			if (filterCategory.HasValue)
+				{
+				List<UpgradeDefinition> categoryUpgrades = GetUpgradesByCategory(filterCategory.Value);
+				int unique = categoryUpgrades.Count(u => u.IsUnique);
+				return (categoryUpgrades.Count, categoryUpgrades.Count, unique);
+				}
+			else
+				{
+				int total = upgradeDatabase.Count;
+				int unique = upgradeDatabase.Values.Count(u => u.IsUnique);
+				return (total, total, unique);
+				}
+			}
 
-        /// <summary>
-        /// Get upgrades that grant specific abilities
-        /// </summary>
-        public List<UpgradeDefinition> GetUpgradesByGrantedAbility(TinyWalnutGames.MetVD.Core.Ability ability)
-            {
-            return upgradeDatabase.Values
-                .Where(u => (u.GrantsAbilities & ability) != TinyWalnutGames.MetVD.Core.Ability.None)
-                .ToList();
-            }
+		/// <summary>
+		/// Search upgrades by name or description
+		/// </summary>
+		public List<UpgradeDefinition> SearchUpgrades(string searchTerm)
+			{
+			if (string.IsNullOrEmpty(searchTerm))
+				return upgradeDatabase.Values.ToList();
 
-        /// <summary>
-        /// Get upgrades that require specific abilities
-        /// </summary>
-        public List<UpgradeDefinition> GetUpgradesByRequiredAbility(TinyWalnutGames.MetVD.Core.Ability ability)
-            {
-            return upgradeDatabase.Values
-                .Where(u => (u.RequiredAbilities & ability) != TinyWalnutGames.MetVD.Core.Ability.None)
-                .ToList();
-            }
+			var results = new List<UpgradeDefinition>();
+			string lowerSearchTerm = searchTerm.ToLower();
 
-        /// <summary>
-        /// Validate the database for common issues
-        /// </summary>
-        [ContextMenu("Validate Database")]
-        public void ValidateDatabase()
-            {
-            var issues = new List<string>();
+			foreach (UpgradeDefinition upgrade in upgradeDatabase.Values)
+				{
+				if (upgrade.UpgradeName.ToLower().Contains(lowerSearchTerm) ||
+				    upgrade.Description.ToLower().Contains(lowerSearchTerm) ||
+				    upgrade.Category.ToString().ToLower().Contains(lowerSearchTerm))
+					{
+					results.Add(upgrade);
+					}
+				}
 
-            // Check for missing collections in categories
-            foreach (UpgradeCategory category in System.Enum.GetValues(typeof(UpgradeCategory)))
-                {
-                if (!categoryDatabase.ContainsKey(category) || categoryDatabase[category].Count == 0)
-                    {
-                    issues.Add($"No upgrades found for category: {category}");
-                    }
-                }
+			return results;
+			}
 
-            // Check for upgrades with missing data
-            foreach (var upgrade in upgradeDatabase.Values)
-                {
-                if (string.IsNullOrEmpty(upgrade.UpgradeName))
-                    issues.Add($"Upgrade {upgrade.Id} has no name");
+		/// <summary>
+		/// Get upgrades that grant specific abilities
+		/// </summary>
+		public List<UpgradeDefinition> GetUpgradesByGrantedAbility(TinyWalnutGames.MetVD.Core.Ability ability)
+			{
+			return upgradeDatabase.Values
+				.Where(u => (u.GrantsAbilities & ability) != TinyWalnutGames.MetVD.Core.Ability.None)
+				.ToList();
+			}
 
-                if (string.IsNullOrEmpty(upgrade.Description))
-                    issues.Add($"Upgrade {upgrade.Id} has no description");
+		/// <summary>
+		/// Get upgrades that require specific abilities
+		/// </summary>
+		public List<UpgradeDefinition> GetUpgradesByRequiredAbility(TinyWalnutGames.MetVD.Core.Ability ability)
+			{
+			return upgradeDatabase.Values
+				.Where(u => (u.RequiredAbilities & ability) != TinyWalnutGames.MetVD.Core.Ability.None)
+				.ToList();
+			}
 
-                if (upgrade.Icon == null)
-                    issues.Add($"Upgrade {upgrade.Id} has no icon");
+		/// <summary>
+		/// Validate the database for common issues
+		/// </summary>
+		[ContextMenu("Validate Database")]
+		public void ValidateDatabase()
+			{
+			var issues = new List<string>();
 
-                if (upgrade.BaseWeight <= 0)
-                    issues.Add($"Upgrade {upgrade.Id} has invalid base weight: {upgrade.BaseWeight}");
-                }
+			// Check for missing collections in categories
+			foreach (UpgradeCategory category in System.Enum.GetValues(typeof(UpgradeCategory)))
+				{
+				if (!categoryDatabase.ContainsKey(category) || categoryDatabase[category].Count == 0)
+					{
+					issues.Add($"No upgrades found for category: {category}");
+					}
+				}
 
-            // Check for circular dependencies
-            foreach (var upgrade in upgradeDatabase.Values)
-                {
-                if (HasCircularDependency(upgrade.Id, new HashSet<string>()))
-                    {
-                    issues.Add($"Circular dependency detected for upgrade: {upgrade.Id}");
-                    }
-                }
+			// Check for upgrades with missing data
+			foreach (UpgradeDefinition upgrade in upgradeDatabase.Values)
+				{
+				if (string.IsNullOrEmpty(upgrade.UpgradeName))
+					issues.Add($"Upgrade {upgrade.Id} has no name");
 
-            // Report results
-            if (issues.Count == 0)
-                {
-                Debug.Log("✅ Database validation passed - no issues found");
-                }
-            else
-                {
-                Debug.LogWarning($"⚠️ Database validation found {issues.Count} issues:");
-                foreach (var issue in issues)
-                    {
-                    Debug.LogWarning($"  • {issue}");
-                    }
-                }
-            }
+				if (string.IsNullOrEmpty(upgrade.Description))
+					issues.Add($"Upgrade {upgrade.Id} has no description");
 
-        private bool HasCircularDependency(string upgradeId, HashSet<string> visited)
-            {
-            if (visited.Contains(upgradeId))
-                return true;
+				if (upgrade.Icon == null)
+					issues.Add($"Upgrade {upgrade.Id} has no icon");
 
-            var upgrade = GetUpgradeById(upgradeId);
-            if (upgrade == null)
-                return false;
+				if (upgrade.BaseWeight <= 0)
+					issues.Add($"Upgrade {upgrade.Id} has invalid base weight: {upgrade.BaseWeight}");
+				}
 
-            visited.Add(upgradeId);
+			// Check for circular dependencies
+			foreach (UpgradeDefinition upgrade in upgradeDatabase.Values)
+				{
+				if (HasCircularDependency(upgrade.Id, new HashSet<string>()))
+					{
+					issues.Add($"Circular dependency detected for upgrade: {upgrade.Id}");
+					}
+				}
 
-            foreach (var requiredId in upgrade.RequiredUpgradeIds)
-                {
-                if (HasCircularDependency(requiredId, new HashSet<string>(visited)))
-                    return true;
-                }
+			// Report results
+			if (issues.Count == 0)
+				{
+				Debug.Log("✅ Database validation passed - no issues found");
+				}
+			else
+				{
+				Debug.LogWarning($"⚠️ Database validation found {issues.Count} issues:");
+				foreach (string issue in issues)
+					{
+					Debug.LogWarning($"  • {issue}");
+					}
+				}
+			}
 
-            return false;
-            }
+		private bool HasCircularDependency(string upgradeId, HashSet<string> visited)
+			{
+			if (visited.Contains(upgradeId))
+				return true;
 
-        /// <summary>
-        /// Rebuild database (useful during development)
-        /// </summary>
-        [ContextMenu("Rebuild Database")]
-        public void RebuildDatabase()
-            {
-            BuildDatabase();
-            }
+			UpgradeDefinition upgrade = GetUpgradeById(upgradeId);
+			if (upgrade == null)
+				return false;
 
-        /// <summary>
-        /// Get collection by category
-        /// </summary>
-        public UpgradeCollection GetCollectionByCategory(UpgradeCategory category)
-            {
-            return allCollections.FirstOrDefault(c => c != null && c.Category == category);
-            }
+			visited.Add(upgradeId);
 
-        /// <summary>
-        /// Log database statistics
-        /// </summary>
-        [ContextMenu("Log Database Stats")]
-        public void LogDatabaseStats()
-            {
-            Debug.Log("=== UPGRADE DATABASE STATISTICS ===");
-            Debug.Log($"Total Collections: {allCollections.Length}");
-            Debug.Log($"Total Upgrades: {upgradeDatabase.Count}");
+			foreach (string requiredId in upgrade.RequiredUpgradeIds)
+				{
+				if (HasCircularDependency(requiredId, new HashSet<string>(visited)))
+					return true;
+				}
 
-            foreach (UpgradeCategory category in System.Enum.GetValues(typeof(UpgradeCategory)))
-                {
-                var count = categoryDatabase.ContainsKey(category) ? categoryDatabase[category].Count : 0;
-                var unique = categoryDatabase.ContainsKey(category) ? categoryDatabase[category].Count(u => u.IsUnique) : 0;
-                Debug.Log($"  {category}: {count} total, {unique} unique");
-                }
-            }
+			return false;
+			}
 
-        private void OnValidate()
-            {
-            // Validate collections array
-            if (allCollections != null)
-                {
-                for (int i = 0; i < allCollections.Length; i++)
-                    {
-                    if (allCollections[i] == null)
-                        {
-                        Debug.LogWarning($"Null collection found at index {i}");
-                        }
-                    }
-                }
-            }
-        }
-    }
+		/// <summary>
+		/// Rebuild database (useful during development)
+		/// </summary>
+		[ContextMenu("Rebuild Database")]
+		public void RebuildDatabase()
+			{
+			BuildDatabase();
+			}
+
+		/// <summary>
+		/// Get collection by category
+		/// </summary>
+		public UpgradeCollection GetCollectionByCategory(UpgradeCategory category)
+			{
+			return allCollections.FirstOrDefault(c => c != null && c.Category == category);
+			}
+
+		/// <summary>
+		/// Log database statistics
+		/// </summary>
+		[ContextMenu("Log Database Stats")]
+		public void LogDatabaseStats()
+			{
+			Debug.Log("=== UPGRADE DATABASE STATISTICS ===");
+			Debug.Log($"Total Collections: {allCollections.Length}");
+			Debug.Log($"Total Upgrades: {upgradeDatabase.Count}");
+
+			foreach (UpgradeCategory category in System.Enum.GetValues(typeof(UpgradeCategory)))
+				{
+				int count = categoryDatabase.ContainsKey(category) ? categoryDatabase[category].Count : 0;
+				int unique = categoryDatabase.ContainsKey(category)
+					? categoryDatabase[category].Count(u => u.IsUnique)
+					: 0;
+				Debug.Log($"  {category}: {count} total, {unique} unique");
+				}
+			}
+		}
+	}

@@ -1,4 +1,4 @@
-{
+﻿{
     "name": "TinyWalnutGames.Tools.Editor.Tests",
     "rootNamespace": "TinyWalnutGames.Tools.Editor.Tests",
     "isTestAssembly": true,
@@ -10,7 +10,10 @@
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
+	"overrideReferences": true,
+	"precompiledReferences": [
+		"nunit.framework.dll"
+	],
     "autoReferenced": true,
     "defineConstraints": [],
     "optionalUnityReferences": [

@@ -22,7 +22,7 @@ Always reference these instructions first and fallback to search or bash command
 - **Create new project from template**:
   - `scripts/clone-and-clean.sh /path/to/new/project` -- takes ~53ms. NEVER CANCEL.
   - Automatically creates Git repository and initial commit
-  - **CRITICAL**: Must have git config set: `git config --global user.email "email@example.com"` and `git config --global user.name "Name"`
+  - **CRITICAL**: Must have git config set: `git config --global user.email "jmeyer1980@gmail.com"` and `git config --global user.name "jmeyer1980"`
   - **STRENGTHEN**: Always empower your project foundation with proper template initialization
 
 ### TLDL (The Living Dev Log) Workflow

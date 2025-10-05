@@ -2,239 +2,201 @@
   "mcpServers": {
     "living-dev-agent": {
       "command": "python",
-      "args": ["-m", "scripts.mcp_server"],
+      "args": ["-m", "src.mcp_server"],
+      "cwd": ".",
       "env": {
-        "PYTHONPATH": "."
+        "PYTHONPATH": ".",
+        "LDA_WORKSPACE": ".",
+        "LDA_LOG_LEVEL": "INFO"
+      },
+      "capabilities": {
+        "tools": [
+          "create_tldl_entry",
+          "capture_code_snapshot", 
+          "start_console_commentary",
+          "run_validation_suite",
+          "create_task",
+          "start_time_tracking",
+          "generate_timesheet",
+          "export_session_data"
+        ],
+        "resources": [
+          "tldl://entries/*",
+          "snapshots://code/*",
+          "commentary://sessions/*",
+          "tasks://epics/*",
+          "time://tracking/*"
+        ],
+        "prompts": [
+          "create_epic_quest",
+          "debug_session_setup",
+          "architecture_review",
+          "documentation_sprint"
+        ]
+      },
+      "settings": {
+        "auto_validate": true,
+        "preserve_sessions": true,
+        "enable_epic_narration": true,
+        "cheek_preservation_mode": "aggressive"
+      }
+    },
+    
+    "validation-server": {
+      "command": "python", 
+      "args": ["-m", "src.validation_mcp_server"],
+      "cwd": ".",
+      "env": {
+        "PYTHONPATH": ".",
+        "VALIDATION_TIMEOUT": "300"
+      },
+      "capabilities": {
+        "tools": [
+          "validate_tldl_docs",
+          "run_symbolic_linting",
+          "check_debug_overlay_health",
+          "analyze_system_architecture",
+          "generate_health_report"
+        ]
+      },
+      "settings": {
+        "auto_fix_enabled": false,
+        "report_format": "markdown",
+        "health_threshold": 70
+      }
+    },
+    
+    "taskmaster-server": {
+      "command": "python",
+      "args": ["-m", "src.taskmaster_mcp_server"], 
+      "cwd": ".",
+      "env": {
+        "PYTHONPATH": ".",
+        "TASKMASTER_WORKSPACE": "."
+      },
+      "capabilities": {
+        "tools": [
+          "create_epic_task",
+          "update_task_status",
+          "start_timer",
+          "stop_timer", 
+          "generate_epic_report",
+          "export_task_to_tldl"
+        ],
+        "resources": [
+          "tasks://epics/*",
+          "tasks://individual/*",
+          "time://sessions/*"
+        ]
+      },
+      "settings": {
+        "epic_mode": true,
+        "auto_tldl_generation": true,
+        "time_tracking_integration": true
       }
     }
   },
-  "mcpConfig": {
-    "version": "1.0.0",
-    "description": "MCP server configuration for Living Dev Agent template",
-    "capabilities": {
-      "tools": [
-        {
-          "name": "validate_tldl",
-          "description": "Validate TLDL entries for completeness and format",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "path": {
-                "type": "string",
-                "description": "Path to TLDL file or directory"
-              },
-              "strict": {
-                "type": "boolean",
-                "description": "Enable strict validation mode",
-                "default": false
-              }
-            },
-            "required": ["path"]
-          }
-        },
-        {
-          "name": "create_tldl_entry",
-          "description": "Create a new TLDL entry from template",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "title": {
-                "type": "string",
-                "description": "Title for the TLDL entry"
-              },
-              "context": {
-                "type": "string",
-                "description": "Context or issue reference"
-              },
-              "author": {
-                "type": "string",
-                "description": "Author name",
-                "default": "@copilot"
-              }
-            },
-            "required": ["title"]
-          }
-        },
-        {
-          "name": "capture_devtimetravel_snapshot",
-          "description": "Capture a DevTimeTravel snapshot",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "message": {
-                "type": "string",
-                "description": "Snapshot description"
-              },
-              "tag": {
-                "type": "string",
-                "description": "Optional tag for categorization"
-              },
-              "include_uncommitted": {
-                "type": "boolean",
-                "description": "Include uncommitted changes",
-                "default": true
-              }
-            },
-            "required": ["message"]
-          }
-        },
-        {
-          "name": "run_linters",
-          "description": "Run all configured linters",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "path": {
-                "type": "string",
-                "description": "Path to analyze",
-                "default": "src/"
-              },
-              "linter_type": {
-                "type": "string",
-                "enum": ["all", "symbolic", "ecs", "docs", "debug"],
-                "description": "Type of linter to run",
-                "default": "all"
-              },
-              "output_format": {
-                "type": "string",
-                "enum": ["text", "json"],
-                "description": "Output format",
-                "default": "text"
-              }
-            }
-          }
-        },
-        {
-          "name": "validate_debug_overlay",
-          "description": "Validate debug overlay systems",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "path": {
-                "type": "string",
-                "description": "Path to debug overlay validation directory",
-                "default": "src/DebugOverlayValidation/"
-              }
-            }
-          }
-        },
-        {
-          "name": "get_project_health",
-          "description": "Get overall project health metrics",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "include_details": {
-                "type": "boolean",
-                "description": "Include detailed breakdown",
-                "default": false
-              }
-            }
-          }
-        }
-      ],
-      "resources": [
-        {
-          "name": "tldl_entries",
-          "description": "Access to TLDL entries",
-          "uri": "file://docs/TLDL-*.md"
-        },
-        {
-          "name": "devtimetravel_config",
-          "description": "DevTimeTravel configuration",
-          "uri": "file://docs/devtimetravel_snapshot.yaml"
-        },
-        {
-          "name": "copilot_config",
-          "description": "Copilot agent configuration",
-          "uri": "file://TWG-Copilot-Agent.yaml"
-        }
-      ]
-    }
-  },
-  "serverConfig": {
-    "host": "localhost",
-    "port": 8000,
+  
+  "clientConfig": {
     "timeout": 30000,
-    "maxRetries": 3,
-    "hardFailOnExhaustion": true,
-    "connectionProfiling": true,
-    "startupTimeoutBuffer": 15000,
-    "logging": {
-      "level": "INFO",
-      "format": "json",
-      "output": "logs/mcp-server.log"
-    }
+    "retries": 3,
+    "logLevel": "info"
   },
-  "security": {
-    "allowedOrigins": [
-      "https://github.com",
-      "https://vscode.dev",
-      "https://github.dev",
-      "http://localhost:8000",
-      "http://127.0.0.1:8000"
-    ],
-    "localhostRestrictions": {
-      "enabled": true,
-      "allowedPorts": [8000, 8080, 3000],
-      "comment": "Allow specific development ports for MCP server and common dev servers"
-    },
-    "rateLimiting": {
-      "enabled": true,
-      "requestsPerMinute": 60,
-      "burstLimit": 10
-    },
-    "tokenValidation": {
-      "enabled": true,
-      "requiredScopes": ["repo", "workflow"],
-      "rotationWarningDays": 90
-    }
+  
+  "featureFlags": {
+    "enableConsoleCommentary": true,
+    "enableCodeSnapshots": true,
+    "enableTaskmaster": true,
+    "enableChronas": true,
+    "enableValidationSuite": true,
+    "enableEpicNarration": true,
+    "enableCheekPreservation": true
   },
-  "development": {
-    "debugMode": false,
-    "mockResponses": false,
-    "verboseLogging": false,
-    "dependencyValidation": {
-      "enabled": true,
-      "pinnedVersions": {
-        "@playwright/mcp": "0.0.34"
-      },
-      "allowDynamicInstalls": false
-    }
+  
+  "workspaceSettings": {
+    "defaultTldlPath": "TLDL/entries",
+    "defaultSnapshotPath": "debug/snapshots", 
+    "defaultTaskPath": "tasks",
+    "defaultTimePath": "time_tracking",
+    "autoCreateDirectories": true
   },
+  
   "integrations": {
     "github": {
       "enabled": true,
-      "webhooks": {
-        "push": true,
-        "pull_request": true,
-        "issues": true
-      }
+      "autoCreateIssues": false,
+      "autoUpdatePRs": false
+    },
+    "vscode": {
+      "enabled": true,
+      "extensionRecommendations": [
+        "ms-python.python",
+        "ms-vscode.vscode-json",
+        "yzhang.markdown-all-in-one"
+      ]
     },
     "copilot": {
       "enabled": true,
-      "features": {
-        "auto_tldl": true,
-        "context_enhancement": true,
-        "validation_integration": true
-      }
+      "personalityProfile": "bootstrap_sentinel",
+      "adventureMode": true,
+      "cheekPreservationProtocol": true
     }
   },
-  "toolAllowListAudit": {
-    "enabled": true,
-    "strictMode": true,
-    "auditLog": "logs/mcp-tool-audit.log",
-    "allowedTools": [
-      "validate_tldl",
-      "create_tldl_entry", 
-      "capture_devtimetravel_snapshot",
-      "run_linters",
-      "validate_debug_overlay",
-      "get_project_health"
+  
+  "debugSettings": {
+    "enableVerboseLogging": false,
+    "enableStackTraces": true,
+    "enablePerformanceMonitoring": true,
+    "maxLogRetention": "7d"
+  },
+  
+  "securitySettings": {
+    "enableSecureMode": true,
+    "restrictFileAccess": true,
+    "allowedPaths": [
+      "TLDL/**",
+      "docs/**", 
+      "src/**",
+      "scripts/**",
+      "tasks/**",
+      "time_tracking/**",
+      "debug/**"
     ],
-    "blockedTools": [
-      "search_repository_with_agent"
-    ],
-    "warningTools": []
+    "blockedCommands": [
+      "rm -rf",
+      "sudo",
+      "su",
+      "chmod 777"
+    ]
+  },
+  
+  "performanceSettings": {
+    "maxConcurrentOperations": 5,
+    "operationTimeoutMs": 30000,
+    "cacheEnabled": true,
+    "cacheTtlMinutes": 60
+  },
+  
+  "notificationSettings": {
+    "enableAchievementNotifications": true,
+    "enableErrorNotifications": true,
+    "enableValidationNotifications": true,
+    "enableTimerNotifications": true,
+    "notificationLevel": "info"
+  },
+  
+  "experimentalFeatures": {
+    "aiPoweredInsights": false,
+    "automaticDocumentation": false,
+    "predictiveDebugging": false,
+    "collaborativeEditing": false
+  },
+  
+  "metadata": {
+    "configVersion": "2.0.0",
+    "templateVersion": "2.0.0",
+    "createdBy": "Living Dev Agent Template",
+    "lastModified": "2025-01-15T22:00:00Z",
+    "compatibleMcpVersion": ">=0.4.0"
   }
 }

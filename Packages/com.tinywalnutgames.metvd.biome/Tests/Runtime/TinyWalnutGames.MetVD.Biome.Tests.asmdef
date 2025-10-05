@@ -1,0 +1,29 @@
+{
+	"name": "TinyWalnutGames.MetVD.Biome.Tests",
+	"rootNamespace": "TinyWalnutGames.MetVD.Biome.Tests",
+	"references": [
+		"Unity.Burst",
+		"Unity.Collections",
+		"Unity.Entities",
+		"Unity.Mathematics",
+		"Unity.Transforms",
+		"UnityEditor.TestRunner",
+		"UnityEngine.TestRunner",
+		"TinyWalnutGames.MetVD.Core",
+		"TinyWalnutGames.MetVD.Utility",
+		"TinyWalnutGames.MetVD.Biome"
+	],
+	"includePlatforms": [],
+	"excludePlatforms": [],
+	"allowUnsafeCode": false,
+	"overrideReferences": true,
+	"precompiledReferences": [
+		"nunit.framework.dll"
+	],
+	"autoReferenced": false,
+	"defineConstraints": [
+		"UNITY_INCLUDE_TESTS"
+	],
+	"versionDefines": [],
+	"noEngineReferences": false
+}

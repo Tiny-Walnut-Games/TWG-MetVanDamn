@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1ad4a57489ad7e49879b0c990e28ab3, type: 3}
+  m_Name: UtilityUpgrades
+  m_EditorClassIdentifier: TinyWalnutGames.MetVD.Authoring::TinyWalnutGames.MetVanDAMN.Authoring.UpgradeCollection
+  category: 3
+  collectionName: Utility Upgrades
+  description: Quality of life upgrades including auto-loot, inventory expansion,
+    and map reveals
+  upgrades: []
+  baseWeight: 1
+  biomeWeights:
+  - biomeType: 1
+    weightMultiplier: 1
+  - biomeType: 2
+    weightMultiplier: 1.1
+  - biomeType: 4
+    weightMultiplier: 1.1
+  - biomeType: 8
+    weightMultiplier: 1
+  - biomeType: 16
+    weightMultiplier: 1
+  - biomeType: 32
+    weightMultiplier: 1.2
+  - biomeType: 64
+    weightMultiplier: 1
+  - biomeType: 128
+    weightMultiplier: 1.4

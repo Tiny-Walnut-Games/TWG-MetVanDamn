@@ -1,0 +1,102 @@
+name: Warbler Log Condenser
+
+on:
+  schedule:
+    # Run on the 2nd of each month at 03:10 UTC to avoid overlap with TLDL archive
+    - cron: '10 3 2 * *'
+  workflow_dispatch:
+    inputs:
+      cutoff:
+        description: 'Cutoff date (YYYY-MM-DD). Files older than this are archived.'
+        required: false
+        type: string
+        default: '2025-09-17'
+      package_only:
+        description: 'Skip moving and only (re)package existing archives'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  condense:
+    runs-on: ubuntu-latest
+    name: Warbler Condense Legacy Logs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Make condenser executable
+        run: |
+          chmod +x scripts/warbler_condense_logs.sh
+
+      - name: Run condenser (Bash-only)
+        id: run
+        env:
+          CUTOFF: ${{ github.event.inputs.cutoff || '2025-09-17' }}
+        run: |
+          if [ "${{ github.event.inputs.package_only || 'false' }}" = "true" ]; then
+            echo "[Warbler] Package-only mode"
+            # Move nothing, just package existing monthly dirs
+            scripts/warbler_condense_logs.sh "$CUTOFF" . || true
+          else
+            scripts/warbler_condense_logs.sh "$CUTOFF" .
+          fi
+
+          echo "cutoff=$CUTOFF" >> $GITHUB_OUTPUT
+
+      - name: Upload Warbler report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: warbler-condense-report-${{ github.run_number }}
+          path: warbler_condense_report.json
+          retention-days: 60
+
+      - name: Upload packaged archives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: warbler-archives-${{ github.run_number }}
+          path: |
+            debug/archives/packages/*.tar.gz
+            Logs/archives/packages/*.tar.gz
+          if-no-files-found: ignore
+          retention-days: 60
+
+      - name: Commit moved files and archive structure
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config --local user.email "action@github.com"
+            git config --local user.name "Warbler Condenser"
+            git add debug/archives/ || true
+            git add Logs/archives/ || true
+            git add warbler_condense_report.json || true
+            git commit -m "
+          🗃️ Warbler Log Condenser
+
+          - Archived logs older than ${{ steps.run.outputs.cutoff }} into monthly folders
+          - Packaged archives under archives/packages
+          - Bash-only execution on CI
+          "
+            git push
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: Add workflow summary
+        if: always()
+        run: |
+          echo "## 🗃️ Warbler Log Condenser" >> $GITHUB_STEP_SUMMARY
+          echo "**Cutoff**: ${{ steps.run.outputs.cutoff }}" >> $GITHUB_STEP_SUMMARY
+          if [ -f warbler_condense_report.json ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Report:" >> $GITHUB_STEP_SUMMARY
+            echo "\n\n\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            cat warbler_condense_report.json >> $GITHUB_STEP_SUMMARY
+            echo "\n\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi

@@ -1,150 +1,147 @@
 # TLDL Entry Template
-# Copy this file and rename to: TLDL-YYYY-MM-DD-DescriptiveTitle.md
 
 **Entry ID:** TLDL-YYYY-MM-DD-DescriptiveTitle  
-**Author:** Your Name or @copilot  
-**Context:** Issue #XX, Feature Description, or Bug Investigation  
-**Summary:** One-line summary of what was accomplished or discovered  
+**Author:** [Your Name]  
+**Context:** [Brief context description]  
+**Summary:** [One-line summary of what this entry documents]
 
 ---
 
-> 📜 *"[Insert inspirational quote from Secret Art of the Living Dev using: `python3 src/ScrollQuoteEngine/quote_engine.py --context documentation --format markdown`]*"
+## 🎯 Objective
 
----
+[What are you trying to accomplish? What problem are you solving?]
 
-## Discoveries
+## 🔍 Discovery
 
-### [Discovery Category 1]
-- **Key Finding**: Describe what you learned or discovered
-- **Impact**: Why this discovery matters for the project
-- **Evidence**: Links to code, documentation, discussions, or external resources
-- **Root Cause**: If applicable, what caused the issue or led to this discovery
+[What did you learn or discover during this work? Include unexpected findings.]
 
-### [Discovery Category 2]
-- **Key Finding**: Another significant discovery
-- **Impact**: Business or technical impact
-- **Evidence**: Supporting information or references
-- **Pattern Recognition**: If this relates to recurring themes or patterns
+## ⚡ Actions Taken
 
-## Actions Taken
-
-1. **[Action Name]**
-   - **What**: Specific action performed
-   - **Why**: Rationale behind the decision
-   - **How**: Implementation approach or method used
-   - **Result**: Outcome or current status
-   - **Files Changed**: List of modified files (if applicable)
-
-2. **[Another Action]**
-   - **What**: Description of the action
-   - **Why**: Reasoning and context
-   - **How**: Approach taken
-   - **Result**: What happened as a result
-   - **Validation**: How the result was verified
-
-## Technical Details
+[What specific steps did you take? Be detailed enough for future reference.]
 
 ### Code Changes
-```diff
-// Example of code changes made
-- Old implementation
-+ New implementation
-```
+- [List any code modifications with file paths]
+- [Include key logic changes or architectural decisions]
+- [Note any refactoring or cleanup performed]
 
 ### Configuration Updates
-```yaml
-# Example configuration changes
-old_setting: false
-new_setting: true
-```
+- [Any config file changes]
+- [Environment or build configuration changes]
+- [Tool or dependency updates]
 
-### Dependencies
-- **Added**: List any new dependencies
-- **Removed**: List any removed dependencies  
-- **Updated**: List any updated dependencies with versions
+### Documentation Updates
+- [New documentation created]
+- [Existing documentation updated]
+- [Comments added to code]
 
-## Lessons Learned
+## 🧠 Key Insights
 
-### What Worked Well
-- Effective approaches or techniques used
-- Tools or methods that proved valuable
-- Successful collaboration patterns
+[Important insights or lessons learned that others should know]
 
-### What Could Be Improved
-- Areas for optimization in future similar work
-- Process improvements identified
-- Tools or techniques to explore
+### Technical Learnings
+- [Technical discoveries or gotchas]
+- [Architecture decisions and rationale]
+- [Performance considerations]
+- [Security implications]
 
-### Knowledge Gaps Identified
-- Areas where more research is needed
-- Missing documentation or resources
-- Training or skill development opportunities
+### Process Improvements
+- [Workflow improvements discovered]
+- [Tooling discoveries or optimizations]
+- [Team communication improvements]
 
-## Next Steps
+## 🚧 Challenges Encountered
 
-### Immediate Actions (High Priority)
-- [ ] Specific next step with clear owner assignment
-- [ ] Another immediate action item
-- [ ] Validation or testing to be completed
+[What obstacles did you face and how did you overcome them?]
 
-### Medium-term Actions (Medium Priority)
-- [ ] Follow-up work to be scheduled
-- [ ] Documentation updates needed
-- [ ] Process improvements to implement
+### Problems Solved
+- [Specific issues encountered]
+- [Root cause analysis]
+- [Solution approaches tried]
+- [Final solution implemented]
 
-### Long-term Considerations (Low Priority)
-- [ ] Strategic improvements or optimizations
-- [ ] Research and exploration items
-- [ ] Community or ecosystem contributions
+### Known Issues
+- [Any remaining issues or limitations]
+- [Workarounds in place]
+- [Technical debt created]
 
-## References
+## 📋 Next Steps
 
-### Internal Links
-- Related TLDL entries: [TLDL-YYYY-MM-DD-RelatedTopic](./TLDL-YYYY-MM-DD-RelatedTopic.md)
-- Project documentation: [Link to relevant docs]
-- Related issues or PRs: #XX, #YY
+- [ ] [Immediate next action items]
+- [ ] [Future considerations or improvements]
+- [ ] [Follow-up tasks or validation needed]
+- [ ] [Documentation or testing to complete]
 
-### External Resources
-- Documentation: [Link to external docs]
-- Research papers or articles: [Academic or industry resources]
-- Community discussions: [Forum posts, Stack Overflow, etc.]
-- Tools and utilities: [Links to useful tools discovered]
+## 🔗 Related Links
 
-## DevTimeTravel Context
-
-### Snapshot Information
-- **Snapshot ID**: DT-YYYY-MM-DD-HHMMSS-ShortDesc
-- **Branch**: feature/branch-name or main
-- **Commit Hash**: abc123def (if applicable)
-- **Environment**: development, staging, production
-
-### File State
-- **Modified Files**: List of files changed during this work
-- **New Files**: List of files created
-- **Deleted Files**: List of files removed (if any)
-
-### Dependencies Snapshot
-```json
-{
-  "python": "3.11.x",
-  "node": "18.x",
-  "frameworks": ["list", "of", "key", "dependencies"]
-}
-```
+- [Link to relevant GitHub issues]
+- [Link to pull requests]
+- [Link to external documentation or references]
+- [Link to related TLDL entries]
 
 ---
 
 ## TLDL Metadata
-
-**Tags**: #feature #bugfix #investigation #optimization #documentation  
-**Complexity**: Low | Medium | High  
-**Impact**: Low | Medium | High | Critical  
-**Team Members**: @username1, @username2  
-**Duration**: X hours/days  
-**Related Epics**: Epic Name or ID  
+**Tags**: #tag1 #tag2 #tag3 #category  
+**Complexity**: [Low/Medium/High]  
+**Impact**: [Low/Medium/High/Critical]  
+**Team Members**: @username1 @username2  
+**Duration**: [Time spent on this work]  
+**Related Epic**: [Epic name if applicable]  
 
 ---
 
 **Created**: YYYY-MM-DD HH:MM:SS UTC  
 **Last Updated**: YYYY-MM-DD HH:MM:SS UTC  
-**Status**: Draft | In Progress | Complete | Archived
+**Status**: [In Progress/Complete/Blocked/Deprecated]  
+
+---
+
+## Template Instructions
+
+### How to Use This Template
+
+1. **Copy this template** to create a new TLDL entry
+2. **Name the file** using the pattern: `TLDL-YYYY-MM-DD-DescriptiveTitle.md`
+3. **Fill in all sections** with relevant information
+4. **Use descriptive titles** that explain the work at a glance
+5. **Include context** about why the work was needed
+6. **Document both successes and challenges** for learning
+
+### Section Guidelines
+
+- **Objective**: Clear statement of goals and success criteria
+- **Discovery**: What you learned, including unexpected findings
+- **Actions Taken**: Step-by-step record of what was done
+- **Key Insights**: Important learnings for future reference
+- **Challenges**: Problems encountered and solutions found
+- **Next Steps**: Actionable items for follow-up work
+
+#### Section Header Flexibility
+
+The TLDL validator supports multiple header formats for maximum compatibility:
+
+- **Objective**: Also accepts "Purpose", "Goals", "Executive Summary", "Faculty Consultation Results", "DevTimeTravel Context"
+- **Discovery**: Also accepts "Discoveries" (plural)
+- **Key Insights**: Also accepts "Lessons Learned", "Implementation Insights", "Learning Outcomes"
+- **Actions Taken**: Accepts exact match
+- **Next Steps**: Accepts exact match
+
+This flexibility preserves scroll integrity while enabling validation accuracy across different entry styles.
+
+### Tagging Guidelines
+
+Use relevant tags to make entries discoverable:
+- **Technology tags**: #python #javascript #unity #react
+- **Type tags**: #bugfix #feature #refactor #documentation
+- **Domain tags**: #frontend #backend #database #security
+- **Process tags**: #debugging #testing #deployment #optimization
+
+### Writing Tips
+
+- **Write for your future self** - include enough detail to understand later
+- **Write for your team** - include context that helps others learn
+- **Include code snippets** when they help explain the work
+- **Link to related resources** for additional context
+- **Update status** as work progresses
+
+*This TLDL entry template is part of Jerry's legendary Living Dev Agent system.* 🧙‍♂️⚡📜

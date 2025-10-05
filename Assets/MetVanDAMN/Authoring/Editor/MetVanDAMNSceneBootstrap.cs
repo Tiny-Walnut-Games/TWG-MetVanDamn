@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 #if METVD_FULL_DOTS // #1
 using TinyWalnutGames.MetVD.Samples; // SmokeTestSceneSetup
-using Unity.Scenes;                  // SubScene
+using Unity.Scenes; // SubScene
 using TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport; // Faculty-grade ritual utilities
 #endif // #1
 
@@ -20,11 +20,16 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	public static class MetVanDAMNSceneBootstrap
 		{
 		private const string RootSceneName = "MetVanDAMN_Baseline";
-		private static readonly string[] SubSceneNames = { "WorldGen_Terrain", "WorldGen_Dungeon", "NPC_Interactions", "UI_HUD" };
+
+		private static readonly string[] SubSceneNames =
+				{ "WorldGen_Terrain", "WorldGen_Dungeon", "NPC_Interactions", "UI_HUD" };
+
 		private const string ScenesRootFolder = "Assets/Scenes";
 		private const string SubScenesFolder = "Assets/Scenes/SubScenes";
 		private static bool _fallbackTriggeredThisRun = false; // track if fallback unloaded baseline
-		private static string _currentRootScenePath = string.Empty;           // track path for reopening after fallback (initialized non-null)
+
+		private static string
+			_currentRootScenePath = string.Empty; // track path for reopening after fallback (initialized non-null)
 
 #if !METVD_FULL_DOTS // #2
         [AddComponentMenu("")]
@@ -39,9 +44,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// 🔄 ENHANCED: Use EditorApplication.delayCall for proper timing after scene creation
 			EditorApplication.delayCall += () =>
 				{
-					Debug.Log("🔄 Performing final hierarchy refresh after scene creation...");
-					TurnThemOffAndOnAgain();
-					Debug.Log("🎉 Baseline scene creation and hierarchy refresh complete!");
+				Debug.Log("🔄 Performing final hierarchy refresh after scene creation...");
+				TurnThemOffAndOnAgain();
+				Debug.Log("🎉 Baseline scene creation and hierarchy refresh complete!");
 				};
 			}
 
@@ -70,7 +75,9 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Prevent prefab isolation issues
 			if (PrefabStageUtility.GetCurrentPrefabStage() != null)
 				{
-				if (!EditorUtility.DisplayDialog("Exit Prefab Stage?", "You are editing a prefab which blocks additive scene creation. Exit and continue?", "Yes", "Cancel"))
+				if (!EditorUtility.DisplayDialog("Exit Prefab Stage?",
+					    "You are editing a prefab which blocks additive scene creation. Exit and continue?", "Yes",
+					    "Cancel"))
 					{
 					return;
 					}
@@ -196,7 +203,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// 🧙‍♂️ TIMING FIX: Ensure Unity has fully processed the scene structure
 			EditorApplication.delayCall += () =>
-			{
+				{
 				Debug.Log("🔗 Phase 8 DELAYED: Starting SceneAsset reference assignment...");
 
 				// Double-check that root scene is still active
@@ -234,24 +241,30 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				AssetDatabase.SaveAssets();
 				AssetDatabase.Refresh();
 
-				Debug.Log($"✅ SubScene reference assignment completed: {successCount}/{SubSceneNames.Length} successful");
-				string note = _fallbackTriggeredThisRun ? " (one or more sub‑scenes created via fallback)" : string.Empty;
-				Debug.Log("✅ MetVanDAMN baseline scene + " + SubSceneNames.Length + " sub‑scenes created at " + rootPath + note);
+				Debug.Log(
+					$"✅ SubScene reference assignment completed: {successCount}/{SubSceneNames.Length} successful");
+				string note = _fallbackTriggeredThisRun
+					? " (one or more sub‑scenes created via fallback)"
+					: string.Empty;
+				Debug.Log("✅ MetVanDAMN baseline scene + " + SubSceneNames.Length + " sub‑scenes created at " +
+				          rootPath + note);
 
 				if (successCount < SubSceneNames.Length)
 					{
-					Debug.LogWarning($"⚠️ {SubSceneNames.Length - successCount} SubScene reference assignments failed. Check console for details.");
+					Debug.LogWarning(
+						$"⚠️ {SubSceneNames.Length - successCount} SubScene reference assignments failed. Check console for details.");
 					Debug.LogWarning("💡 Try manually assigning the missing scene references in the Inspector.");
 					Debug.LogWarning("📁 SubScene files are located in: Assets/Scenes/SubScenes/");
 					}
 
 				if (_fallbackTriggeredThisRun)
 					{
-					Debug.LogWarning("Some sub‑scenes were created using fallback (Single) mode because additive creation was unavailable. Re-run the bootstrap later if you need to refresh links.");
+					Debug.LogWarning(
+						"Some sub‑scenes were created using fallback (Single) mode because additive creation was unavailable. Re-run the bootstrap later if you need to refresh links.");
 					}
 
 				Debug.Log("   Next: Open the scene and press Play for immediate worldgen smoke validation.");
-			};
+				};
 
 			// 🔗 CRITICAL: Remove conflicting code - all validation moved to delayCall
 			// The delayCall above handles all scene validation and reference assignment
@@ -273,6 +286,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					EditorSceneManager.OpenScene(_currentRootScenePath, OpenSceneMode.Additive);
 					}
 				}
+
 			// Ensure the root scene remains active (helps SubScene authoring context)
 			Scene ensuredRoot = SceneManager.GetSceneByPath(_currentRootScenePath);
 			if (ensuredRoot.IsValid())
@@ -309,6 +323,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					y.intValue = 50;
 					}
 				}
+
 			SerializedProperty sectorsProp = so.FindProperty("targetSectorCount");
 			if (sectorsProp != null)
 				{
@@ -451,7 +466,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
             {
                 // At minimum, add a text component with instructions
                 TextMesh instructionText = go.AddComponent<TextMesh>();
-                instructionText.text = "BOOTSTRAP PLACEHOLDER\n\nAdd SmokeTestSceneSetup\ncomponent manually\n\nSeed: 42\nSize: (50,50)\nSectors: 5";
+                instructionText.text =
+ "BOOTSTRAP PLACEHOLDER\n\nAdd SmokeTestSceneSetup\ncomponent manually\n\nSeed: 42\nSize: (50,50)\nSectors: 5";
                 instructionText.fontSize = 8;
                 instructionText.color = Color.red;
                 instructionText.anchor = TextAnchor.MiddleCenter;
@@ -525,7 +541,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				if (attempts >= 20)
 					{
-					Debug.LogWarning($"⚠️ GUID validation timeout for scene: {sceneName}. SubScene references may be unstable.");
+					Debug.LogWarning(
+						$"⚠️ GUID validation timeout for scene: {sceneName}. SubScene references may be unstable.");
 					}
 
 				return true;
@@ -556,6 +573,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						Debug.Log($"🔍 Fallback scene GUID verified: {sceneName} -> {guid}");
 						break;
 						}
+
 					// ⏳ Removed blocking Thread.Sleep(500); fallback GUID validation loop tightened
 					attempts++;
 					}
@@ -586,7 +604,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
         /// In METVD_FULL_DOTS mode, use CreateSubSceneGameObject() + AssignSubSceneReference() instead
         /// 🧙‍♂️ Sacred Symbol Preservation: Conditionally compiled but IDE warning suppressors are weak magic
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051:Remove unused private members", Justification = "Used in reflection mode (!METVD_FULL_DOTS) - conditional compilation confuses IDE analysis")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0051:Remove unused private members", Justification
+ = "Used in reflection mode (!METVD_FULL_DOTS) - conditional compilation confuses IDE analysis")]
         private static void TryCreateAndLinkSubScene(string subName, Transform parent)
         {
             string scenePath = Path.Combine(SubScenesFolder, subName + ".unity").Replace("\\", "/");
@@ -656,6 +675,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				light.intensity = 1.2f;
 				light.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
 				}
+
 			if (UnityEngine.Object.FindFirstObjectByType<Camera>() == null)
 				{
 				GameObject camGO = new("Main Camera") { tag = "MainCamera" };
@@ -696,6 +716,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					{
 					AssetDatabase.CreateFolder(current, segments[i]);
 					}
+
 				current = next;
 				}
 			}
@@ -713,6 +734,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				go = new GameObject(subName);
 				}
+
 			go.transform.SetParent(parent, false);
 
 			SubScene subSceneComp = go.GetComponent<SubScene>();
@@ -771,7 +793,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			var go = GameObject.Find(subName);
 			if (go == null)
 				{
-				Debug.LogError($"❌ SubScene GameObject '{subName}' not found! Available GameObjects: {string.Join(", ", UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsSortMode.InstanceID).Select(obj => obj.name))}");
+				Debug.LogError(
+					$"❌ SubScene GameObject '{subName}' not found! Available GameObjects: {string.Join(", ", UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsSortMode.InstanceID).Select(obj => obj.name))}");
 				return false;
 				}
 
@@ -781,7 +804,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// 🔍 VALIDATION: Check if SubScene component exists
 			if (!go.TryGetComponent(out SubScene subSceneComp))
 				{
-				Debug.LogError($"❌ SubScene component not found on '{subName}'! Components: {string.Join(", ", go.GetComponents<Component>().Select(c => c.GetType().Name))}");
+				Debug.LogError(
+					$"❌ SubScene component not found on '{subName}'! Components: {string.Join(", ", go.GetComponents<Component>().Select(c => c.GetType().Name))}");
 				return false;
 				}
 
@@ -818,8 +842,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					do
 						{
 						availableProperties.Add(iterator.propertyPath);
-						}
-					while (iterator.NextVisible(false));
+						} while (iterator.NextVisible(false));
 					}
 
 				Debug.Log($"🔍 Available properties on {subName}: {string.Join(", ", availableProperties)}");
@@ -839,7 +862,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					}
 				else
 					{
-					Debug.LogWarning($"⚠️ SceneAsset property not found on {subName} - available properties: {string.Join(", ", availableProperties)}");
+					Debug.LogWarning(
+						$"⚠️ SceneAsset property not found on {subName} - available properties: {string.Join(", ", availableProperties)}");
 					}
 
 				// 🔕 DISABLE GUID ASSIGNMENT LOGIC FOR NOW
@@ -948,12 +972,14 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				bool assignmentSuccess = validateScene != null && validateScene.objectReferenceValue != null;
 
-				Debug.Log($"✅ SubScene reference assignment {(assignmentSuccess ? "SUCCESSFUL" : "FAILED")} for '{subName}' -> {scenePath}");
+				Debug.Log(
+					$"✅ SubScene reference assignment {(assignmentSuccess ? "SUCCESSFUL" : "FAILED")} for '{subName}' -> {scenePath}");
 				return assignmentSuccess;
 				}
 			catch (System.Exception ex)
 				{
-				Debug.LogError($"❌ Exception during SubScene assignment for {subName}: {ex.Message}\nStackTrace: {ex.StackTrace}");
+				Debug.LogError(
+					$"❌ Exception during SubScene assignment for {subName}: {ex.Message}\nStackTrace: {ex.StackTrace}");
 				return false;
 				}
 #else // #7
@@ -1057,7 +1083,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 			// Find all SubScene components in the current scene
 #if METVD_FULL_DOTS // #8
-			SubScene[] allSubScenes = UnityEngine.Object.FindObjectsByType<Unity.Scenes.SubScene>(FindObjectsSortMode.None);
+			SubScene[] allSubScenes =
+				UnityEngine.Object.FindObjectsByType<Unity.Scenes.SubScene>(FindObjectsSortMode.None);
 
 			foreach (SubScene subScene in allSubScenes)
 				{
@@ -1073,13 +1100,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				// Try to find matching scene file based on GameObject name
 				string[] potentialPaths = new string[]
-				{
+					{
 					$"Assets/Scenes/SubScenes/{objectName}.unity",
 					$"Assets/Scenes/{objectName}.unity",
 					$"Assets/{objectName}.unity"
-				};
+					};
 
-				SceneAsset foundAsset = null;
+				SceneAsset? foundAsset = null;
 				string usedPath = "";
 
 				foreach (string path in potentialPaths)
@@ -1100,7 +1127,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 					// Try to find the correct property name
 					SerializedProperty sceneProp = null;
-					string[] propertyNames = { "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
+					string[] propertyNames =
+							{ "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
 
 					foreach (string propName in propertyNames)
 						{
@@ -1123,7 +1151,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					}
 				else
 					{
-					Debug.LogWarning($"⚠️ No scene file found for SubScene '{objectName}'. Tried: {string.Join(", ", potentialPaths)}");
+					Debug.LogWarning(
+						$"⚠️ No scene file found for SubScene '{objectName}'. Tried: {string.Join(", ", potentialPaths)}");
 					}
 				}
 #else // #8
@@ -1145,7 +1174,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 						// Try to find the correct property name
 						SerializedProperty sceneProp = null;
-						string[] propertyNames = { "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
+						string[] propertyNames =
+ { "m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene" };
 
 						foreach (string propName in propertyNames)
 						{
@@ -1204,8 +1234,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				Debug.Log($"📅 Ritual lock held by '{RitualLock.Owner}' - scheduling hierarchy refresh for later...");
 				EditorApplication.delayCall += () =>
 					{
-						// Try again after current operation completes
-						TurnThemOffAndOnAgain();
+					// Try again after current operation completes
+					TurnThemOffAndOnAgain();
 					};
 				return;
 				}

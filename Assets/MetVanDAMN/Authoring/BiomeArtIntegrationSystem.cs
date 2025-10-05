@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 #nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using TinyWalnutGames.MetVD.Core;
 using Unity.Burst;
@@ -90,7 +90,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 				if (totalBiomes > 100)
 					{
 					// High biome count requires performance optimization
-					Debug.Log($"BiomeArtIntegration: High biome count ({totalBiomes}) detected - enabling performance optimizations");
+					Debug.Log(
+						$"BiomeArtIntegration: High biome count ({totalBiomes}) detected - enabling performance optimizations");
 					}
 				}
 
@@ -140,7 +141,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 		// [BurstCompile] - REMOVED: Job accesses Unity managed objects via ProfileRef.Value
 		public void Execute(Entity entity, ref BiomeArtIntegrationSystem.BiomeArtOptimizationTag optimizationTag)
 			{
-			if (!artProfileLookup.TryGetComponent(entity, out BiomeArtProfileReference artProfileRef) || !artProfileRef.ProfileRef.IsValid())
+			if (!artProfileLookup.TryGetComponent(entity, out BiomeArtProfileReference artProfileRef) ||
+			    !artProfileRef.ProfileRef.IsValid())
 				{
 				return;
 				}
@@ -177,26 +179,26 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Strategy complexity multipliers
 			switch (settings.strategy)
 				{
-				case PropPlacementStrategy.Random:
-					score *= 1f;
-					break;
-				case PropPlacementStrategy.Clustered:
-					score *= 1.5f;
-					break;
-				case PropPlacementStrategy.Sparse:
-					score *= 1.2f;
-					break;
-				case PropPlacementStrategy.Linear:
-					score *= 1.3f;
-					break;
-				case PropPlacementStrategy.Radial:
-					score *= 1.4f;
-					break;
-				case PropPlacementStrategy.Terrain:
-					score *= 2f; // Most complex
-					break;
-				default:
-					break;
+					case PropPlacementStrategy.Random:
+						score *= 1f;
+						break;
+					case PropPlacementStrategy.Clustered:
+						score *= 1.5f;
+						break;
+					case PropPlacementStrategy.Sparse:
+						score *= 1.2f;
+						break;
+					case PropPlacementStrategy.Linear:
+						score *= 1.3f;
+						break;
+					case PropPlacementStrategy.Radial:
+						score *= 1.4f;
+						break;
+					case PropPlacementStrategy.Terrain:
+						score *= 2f; // Most complex
+						break;
+					default:
+						break;
 				}
 
 			// Avoidance settings add complexity
@@ -204,6 +206,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				score *= 1.2f;
 				}
+
 			// Replaced nonexistent avoidance.avoidHazards with avoidance.avoidTransitions flag
 			if (settings.avoidance.avoidTransitions)
 				{
@@ -240,7 +243,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			return score;
 			}
 
-		private static BiomeArtIntegrationSystem.BiomeArtPriority DeterminePriority(float estimatedPropCount, float complexityScore)
+		private static BiomeArtIntegrationSystem.BiomeArtPriority DeterminePriority(float estimatedPropCount,
+			float complexityScore)
 			{
 			float totalComplexity = estimatedPropCount * complexityScore;
 
@@ -252,7 +256,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				return totalComplexity > 200f
 					? BiomeArtIntegrationSystem.BiomeArtPriority.High
-					: totalComplexity > 50f ? BiomeArtIntegrationSystem.BiomeArtPriority.Normal : BiomeArtIntegrationSystem.BiomeArtPriority.Low;
+					: totalComplexity > 50f
+						? BiomeArtIntegrationSystem.BiomeArtPriority.Normal
+						: BiomeArtIntegrationSystem.BiomeArtPriority.Low;
 				}
 			}
 		}
@@ -281,12 +287,15 @@ namespace TinyWalnutGames.MetVD.Authoring
 			if (coherenceScore < 0.3f && optimizationTag.priority > BiomeArtIntegrationSystem.BiomeArtPriority.Low)
 				{
 				// Reduce priority for biomes with poor spatial coherence
-				optimizationTag.priority = (BiomeArtIntegrationSystem.BiomeArtPriority)((int)optimizationTag.priority - 1);
+				optimizationTag.priority =
+					(BiomeArtIntegrationSystem.BiomeArtPriority)((int)optimizationTag.priority - 1);
 				}
-			else if (coherenceScore > 0.8f && optimizationTag.priority < BiomeArtIntegrationSystem.BiomeArtPriority.Critical)
+			else if (coherenceScore > 0.8f &&
+			         optimizationTag.priority < BiomeArtIntegrationSystem.BiomeArtPriority.Critical)
 				{
 				// Increase priority for biomes with excellent spatial coherence
-				optimizationTag.priority = (BiomeArtIntegrationSystem.BiomeArtPriority)((int)optimizationTag.priority + 1);
+				optimizationTag.priority =
+					(BiomeArtIntegrationSystem.BiomeArtPriority)((int)optimizationTag.priority + 1);
 				}
 			}
 
@@ -468,7 +477,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 
 			float simpleCoefficient = connectivityData.Length > 0 ? totalConnections / connectivityData.Length : 0f;
-			float weightedCoefficient = connectivityData.Length > 0 ? weightedConnections / (connectivityData.Length * 1.1f) : 0f;
+			float weightedCoefficient =
+				connectivityData.Length > 0 ? weightedConnections / (connectivityData.Length * 1.1f) : 0f;
 
 			// Combine simple and weighted coefficients for enhanced spatial analysis
 			float enhancedCoefficient = simpleCoefficient * 0.7f + weightedCoefficient * 0.3f;
@@ -598,7 +608,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 		protected override void OnUpdate()
 			{
 			// Get EntityCommandBuffer for structural changes
-			BeginInitializationEntityCommandBufferSystem.Singleton ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+			BeginInitializationEntityCommandBufferSystem.Singleton ecbSingleton =
+				SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
 			EntityCommandBuffer ecb = ecbSingleton.CreateCommandBuffer(World.Unmanaged);
 
 			// Process biome art profiles that need tilemap creation
@@ -606,8 +617,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			Entities
 				.WithoutBurst() // Required for GameObject creation
-				.ForEach((Entity entity, ref BiomeArtProfileReference artProfileRef, in CoreBiome biome, in NodeId nodeId) =>
-				{
+				.ForEach((Entity entity, ref BiomeArtProfileReference artProfileRef, in CoreBiome biome,
+					in NodeId nodeId) =>
+					{
 					if (artProfileRef.IsApplied)
 						{
 						return;
@@ -656,8 +668,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 							ecb.SetComponent(entity, transition);
 							}
 						}
-
-				}).Run();
+					}).Run();
 			}
 
 		/// <summary>
@@ -679,6 +690,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					.OrderByDescending(g => g.GetInstanceID())
 					.FirstOrDefault();
 				}
+
 			if (grid == null)
 				{
 				return;
@@ -689,7 +701,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			var rng = new System.Random(nodeId.Coordinates.GetHashCode());
 
 			// Calculate coordinate-aware prop count
-			float distanceFromCenter = Vector2.Distance(Vector2.zero, new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y));
+			float distanceFromCenter =
+				Vector2.Distance(Vector2.zero, new Vector2(nodeId.Coordinates.x, nodeId.Coordinates.y));
 			float normalizedDistance = Mathf.Clamp01(distanceFromCenter / 20f);
 			float densityFactor = settings.densityCurve.Evaluate(1f - normalizedDistance);
 			int propCount = Mathf.RoundToInt(settings.baseDensity * settings.densityMultiplier * 50 * densityFactor);
@@ -747,7 +760,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private Grid? CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+		private Grid? CreateBiomeSpecificTilemap(ProjectionType projectionType, BiomeArtProfile artProfile,
+			CoreBiome biome, NodeId nodeId)
 			{
 			// Get appropriate layer configuration based on projection type
 			string[] layerNames = GetLayerNamesForProjection(projectionType);
@@ -802,7 +816,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 					foreach (TilemapRenderer r in createdGrid.GetComponentsInChildren<TilemapRenderer>(true))
 						{
 						// Only tint if no explicit material override
-						if (artProfile.materialOverride == null && r.sharedMaterial != null && r.sharedMaterial.HasProperty("_Color"))
+						if (artProfile.materialOverride == null && r.sharedMaterial != null &&
+						    r.sharedMaterial.HasProperty("_Color"))
 							{
 							// Duplicate material instance to avoid editing shared asset at runtime
 							Material instMat = Object.Instantiate(r.sharedMaterial);
@@ -825,12 +840,29 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Define layer configurations directly instead of using Editor-only enums
 			return projectionType switch
 				{
-					ProjectionType.Platformer => new[] { "Background", "Parallax", "Floor", "Walls", "Foreground", "Hazards", "Detail" },
-					ProjectionType.TopDown => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-					ProjectionType.Isometric => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-					ProjectionType.Hexagonal => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" },
-					_ => new[] { "DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps", "OverheadProps", "RoomMasking", "Blending" }
-					};
+				ProjectionType.Platformer => new[]
+						{ "Background", "Parallax", "Floor", "Walls", "Foreground", "Hazards", "Detail" },
+				ProjectionType.TopDown => new[]
+					{
+					"DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps",
+					"OverheadProps", "RoomMasking", "Blending"
+					},
+				ProjectionType.Isometric => new[]
+					{
+					"DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps",
+					"OverheadProps", "RoomMasking", "Blending"
+					},
+				ProjectionType.Hexagonal => new[]
+					{
+					"DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps",
+					"OverheadProps", "RoomMasking", "Blending"
+					},
+				_ => new[]
+					{
+					"DeepOcean", "Ocean", "ShallowWater", "Floor", "FloorProps", "WalkableGround", "WalkableProps",
+					"OverheadProps", "RoomMasking", "Blending"
+					}
+				};
 			}
 
 		private void InvokeProjectionCreation(ProjectionType projectionType)
@@ -841,31 +873,31 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			switch (projectionType)
 				{
-				case ProjectionType.Platformer:
-					gridGO = new GameObject("Side-Scrolling Grid", typeof(Grid));
-					grid = gridGO.GetComponent<Grid>();
-					grid.cellLayout = GridLayout.CellLayout.Rectangle;
-					break;
-				case ProjectionType.TopDown:
-					gridGO = new GameObject("Top-Down Grid", typeof(Grid));
-					grid = gridGO.GetComponent<Grid>();
-					grid.cellLayout = GridLayout.CellLayout.Rectangle;
-					break;
-				case ProjectionType.Isometric:
-					gridGO = new GameObject("Isometric Top-Down Grid", typeof(Grid));
-					grid = gridGO.GetComponent<Grid>();
-					grid.cellLayout = GridLayout.CellLayout.Isometric;
-					break;
-				case ProjectionType.Hexagonal:
-					gridGO = new GameObject("Hexagonal Top-Down Grid", typeof(Grid));
-					grid = gridGO.GetComponent<Grid>();
-					grid.cellLayout = GridLayout.CellLayout.Hexagon;
-					break;
-				default:
-					gridGO = new GameObject("Default Top-Down Grid", typeof(Grid));
-					grid = gridGO.GetComponent<Grid>();
-					grid.cellLayout = GridLayout.CellLayout.Rectangle;
-					break;
+					case ProjectionType.Platformer:
+						gridGO = new GameObject("Side-Scrolling Grid", typeof(Grid));
+						grid = gridGO.GetComponent<Grid>();
+						grid.cellLayout = GridLayout.CellLayout.Rectangle;
+						break;
+					case ProjectionType.TopDown:
+						gridGO = new GameObject("Top-Down Grid", typeof(Grid));
+						grid = gridGO.GetComponent<Grid>();
+						grid.cellLayout = GridLayout.CellLayout.Rectangle;
+						break;
+					case ProjectionType.Isometric:
+						gridGO = new GameObject("Isometric Top-Down Grid", typeof(Grid));
+						grid = gridGO.GetComponent<Grid>();
+						grid.cellLayout = GridLayout.CellLayout.Isometric;
+						break;
+					case ProjectionType.Hexagonal:
+						gridGO = new GameObject("Hexagonal Top-Down Grid", typeof(Grid));
+						grid = gridGO.GetComponent<Grid>();
+						grid.cellLayout = GridLayout.CellLayout.Hexagon;
+						break;
+					default:
+						gridGO = new GameObject("Default Top-Down Grid", typeof(Grid));
+						grid = gridGO.GetComponent<Grid>();
+						grid.cellLayout = GridLayout.CellLayout.Rectangle;
+						break;
 				}
 
 			gridGO.transform.position = Vector3.zero;
@@ -891,6 +923,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				Debug.LogWarning($"Sorting Layer '{layerName}' not found. Renderer will use default sorting layer.");
 				}
+
 			renderer.sortingOrder = 0;
 			}
 
@@ -922,7 +955,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 				}
 			}
 
-		private void ApplyTileToLayer(Tilemap tilemap, TilemapRenderer renderer, string layerName, BiomeArtProfile artProfile)
+		private void ApplyTileToLayer(Tilemap tilemap, TilemapRenderer renderer, string layerName,
+			BiomeArtProfile artProfile)
 			{
 			TileBase? tileToApply = null; // explicit nullable
 
@@ -964,19 +998,21 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Never edits Unity's internal materials - creates new instances for safe debugging
 		/// Now used by ApplyBiomeTilesToLayers for comprehensive layer-by-layer debugging
 		/// </summary>
-		private void ApplyCheckerOverrideIfEnabled(Tilemap tilemap, BiomeArtProfile artProfile, CoreBiome biome, NodeId nodeId)
+		private void ApplyCheckerOverrideIfEnabled(Tilemap tilemap, BiomeArtProfile artProfile, CoreBiome biome,
+			NodeId nodeId)
 			{
 			if (artProfile.checkerSettings?.enableCheckerOverride != true || tilemap == null)
 				{
 				return;
 				}
 
-			BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = artProfile.checkerSettings.ToComplexitySettings();
+			BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings =
+				artProfile.checkerSettings.ToComplexitySettings();
 			BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome.Type, nodeId, complexitySettings);
 
 			// Log coordinate-aware debug information for development
 			Debug.Log($"Applied checker override to tilemap '{tilemap.name}' at coordinates {nodeId.Coordinates} " +
-					  $"for biome {biome.Type} with complexity influence {complexitySettings.coordinateInfluenceStrength:F2}");
+			          $"for biome {biome.Type} with complexity influence {complexitySettings.coordinateInfluenceStrength:F2}");
 			}
 
 		/// <summary>
@@ -991,7 +1027,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 				return;
 				}
 
-			BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings = artProfile.checkerSettings.ToComplexitySettings();
+			BiomeCheckerMaterialOverride.CheckerComplexitySettings complexitySettings =
+				artProfile.checkerSettings.ToComplexitySettings();
 
 			// Apply checkered override to all tilemap layers in the grid
 			Tilemap[] tilemaps = grid.GetComponentsInChildren<Tilemap>(includeInactive: true);
@@ -999,14 +1036,16 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				// Each tilemap layer gets coordinate-aware material based on its purpose
 				string layerName = tilemap.name;
-				BiomeCheckerMaterialOverride.CheckerComplexitySettings layerAdjustedSettings = AdjustComplexitySettingsForLayer(complexitySettings, layerName);
+				BiomeCheckerMaterialOverride.CheckerComplexitySettings layerAdjustedSettings =
+					AdjustComplexitySettingsForLayer(complexitySettings, layerName);
 
 				// Use ApplyCheckerOverrideIfEnabled for individual tilemap processing
 				// This integrates the previously unused method into the workflow
 				ApplyCheckerOverrideIfEnabled(tilemap, artProfile, biome, nodeId);
 
 				// Also apply the advanced grid-wide settings
-				BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome.Type, nodeId, layerAdjustedSettings);
+				BiomeCheckerMaterialOverride.ApplyCheckerOverrideToTilemap(tilemap, biome.Type, nodeId,
+					layerAdjustedSettings);
 				}
 			}
 
@@ -1092,22 +1131,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private static readonly Dictionary<BiomeType, Material> _cachedBiomeMaterials = new();
 		private static readonly Dictionary<int, Texture2D> _cachedCheckerTextures = new();
 
-		// Coordinate-aware material enhancement settings
-		public struct CheckerComplexitySettings
-			{
-			public float coordinateInfluenceStrength;  // How much world position affects checker pattern
-			public float distanceScalingFactor;       // Distance from origin influences checker size
-			public float polarityAnimationSpeed;      // Animation speed based on biome polarity
-			public bool enableCoordinateWarping;      // Use coordinates to warp checker pattern
-			public float complexityTierMultiplier;    // Multiplier based on biome complexity tier
-			}
-
 		/// <summary>
 		/// Creates or retrieves a biome-specific checkered material with coordinate intelligence
 		/// Uses world coordinates to influence checker pattern complexity and animation
 		/// Never edits Unity's internal materials - always creates new instances
 		/// </summary>
-		public static Material GetOrCreateBiomeCheckerMaterial(BiomeType biome, NodeId nodeId, CheckerComplexitySettings complexitySettings)
+		public static Material GetOrCreateBiomeCheckerMaterial(BiomeType biome, NodeId nodeId,
+			CheckerComplexitySettings complexitySettings)
 			{
 			// Create unique cache key that includes coordinate complexity
 			int coordinateHash = GetCoordinateComplexityHash(nodeId.Coordinates, complexitySettings);
@@ -1120,7 +1150,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				// Validate material consistency using materialKey for cache integrity
 				bool materialConsistent = existingMaterial.name.GetHashCode() == materialKey ||
-										existingMaterial.name.Contains($"_{materialKey:X8}");
+				                          existingMaterial.name.Contains($"_{materialKey:X8}");
 
 				if (!materialConsistent)
 					{
@@ -1157,7 +1187,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 		/// Creates a checkered texture that adapts to world coordinates and biome complexity
 		/// Pattern size, rotation, and animation all respond to spatial position
 		/// </summary>
-		private static Texture2D CreateCoordinateAwareCheckerTexture(BiomeType biome, NodeId nodeId, CheckerComplexitySettings settings)
+		private static Texture2D CreateCoordinateAwareCheckerTexture(BiomeType biome, NodeId nodeId,
+			CheckerComplexitySettings settings)
 			{
 			// Calculate coordinate-based complexity factors
 			int2 coords = nodeId.Coordinates;
@@ -1166,7 +1197,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			// Determine texture size based on coordinate complexity
 			int baseSize = 64;
-			int complexityAdjustedSize = Mathf.RoundToInt(baseSize * (1f + normalizedDistance * settings.complexityTierMultiplier));
+			int complexityAdjustedSize =
+				Mathf.RoundToInt(baseSize * (1f + normalizedDistance * settings.complexityTierMultiplier));
 			complexityAdjustedSize = Mathf.NextPowerOfTwo(Mathf.Clamp(complexityAdjustedSize, 32, 256));
 
 			// Calculate checker size based on distance and complexity tier
@@ -1175,7 +1207,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Create cache key for texture reuse
 			int textureKey = CombineHashCodes((int)biome, coords.x, coords.y, baseCheckerSize, complexityAdjustedSize);
 
-			if (_cachedCheckerTextures.TryGetValue(textureKey, out Texture2D existingTexture) && existingTexture != null)
+			if (_cachedCheckerTextures.TryGetValue(textureKey, out Texture2D existingTexture) &&
+			    existingTexture != null)
 				{
 				return existingTexture;
 				}
@@ -1190,7 +1223,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			Color secondaryColor = GetSecondaryBiomeColor(biome, primaryColor, coords, settings);
 
 			// Generate coordinate-aware checker pattern
-			GenerateCoordinateInfluencedCheckerPattern(texture, primaryColor, secondaryColor, baseCheckerSize, coords, settings);
+			GenerateCoordinateInfluencedCheckerPattern(texture, primaryColor, secondaryColor, baseCheckerSize, coords,
+				settings);
 
 			texture.Apply();
 			_cachedCheckerTextures[textureKey] = texture;
@@ -1204,7 +1238,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 		private static int CalculateCoordinateBasedCheckerSize(int2 coordinates, CheckerComplexitySettings settings)
 			{
 			float distanceFromOrigin = math.length(coordinates);
-			float distanceComplexity = math.clamp(distanceFromOrigin * settings.distanceScalingFactor / 20f, 0.5f, 2.0f);
+			float distanceComplexity =
+				math.clamp(distanceFromOrigin * settings.distanceScalingFactor / 20f, 0.5f, 2.0f);
 
 			// Base checker size decreases with distance (more detail in complex areas)
 			int baseSize = 8;
@@ -1280,7 +1315,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			float patternInfluence = CalculateCoordinatePatternInfluence(coordinates);
 
 			// Combine influences with settings weighting
-			float totalInfluence = (distanceInfluence * 0.7f + patternInfluence * 0.3f) * settings.complexityTierMultiplier;
+			float totalInfluence = (distanceInfluence * 0.7f + patternInfluence * 0.3f) *
+			                       settings.complexityTierMultiplier;
 
 			return math.clamp(totalInfluence, 0f, 1f);
 			}
@@ -1299,9 +1335,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			// Combine patterns with different weights for rich variation
 			float combinedPattern = primePattern * 0.3f +
-								  fibonacciPattern * 0.25f +
-								  symmetryPattern * 0.25f +
-								  spiralPattern * 0.2f;
+			                        fibonacciPattern * 0.25f +
+			                        symmetryPattern * 0.25f +
+			                        spiralPattern * 0.2f;
 
 			return math.clamp(combinedPattern, 0f, 1f);
 			}
@@ -1439,6 +1475,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					return false;
 					}
 				}
+
 			return true;
 			}
 
@@ -1616,34 +1653,34 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			return biome switch
 				{
-					BiomeType.VolcanicCore => new Color(1.0f, 0.3f, 0.1f, 1.0f),      // Lava red
-					BiomeType.FrozenWastes => new Color(0.7f, 0.9f, 1.0f, 1.0f),     // Ice blue
-					BiomeType.SolarPlains => new Color(1.0f, 0.8f, 0.2f, 1.0f),      // Solar yellow
-					BiomeType.CrystalCaverns => new Color(0.8f, 0.4f, 1.0f, 1.0f),   // Crystal purple
-					BiomeType.SkyGardens => new Color(0.4f, 0.8f, 0.6f, 1.0f),       // Garden green
-					BiomeType.ShadowRealms => new Color(0.3f, 0.2f, 0.4f, 1.0f),     // Shadow dark purple
-					BiomeType.DeepUnderwater => new Color(0.2f, 0.4f, 0.8f, 1.0f),   // Deep blue
-					BiomeType.VoidChambers => new Color(0.1f, 0.1f, 0.2f, 1.0f),     // Void dark
-					BiomeType.PowerPlant => new Color(0.9f, 0.9f, 0.3f, 1.0f),       // Electric yellow
-					BiomeType.PlasmaFields => new Color(1.0f, 0.5f, 0.8f, 1.0f),     // Plasma pink
-					BiomeType.IceCatacombs => new Color(0.6f, 0.8f, 0.9f, 1.0f),     // Catacomb blue
-					BiomeType.CryogenicLabs => new Color(0.8f, 0.9f, 1.0f, 1.0f),    // Lab white-blue
-					BiomeType.IcyCanyon => new Color(0.5f, 0.7f, 0.8f, 1.0f),        // Canyon blue
-					BiomeType.Tundra => new Color(0.7f, 0.8f, 0.7f, 1.0f),           // Tundra gray-green
-					BiomeType.Forest => new Color(0.2f, 0.6f, 0.2f, 1.0f),           // Forest green
-					BiomeType.Mountains => new Color(0.5f, 0.4f, 0.3f, 1.0f),        // Mountain brown
-					BiomeType.Desert => new Color(0.8f, 0.6f, 0.3f, 1.0f),           // Desert tan
-					BiomeType.Ocean => new Color(0.2f, 0.5f, 0.8f, 1.0f),            // Ocean blue
-					BiomeType.Cosmic => new Color(0.4f, 0.2f, 0.8f, 1.0f),           // Cosmic purple
-					BiomeType.Crystal => new Color(0.9f, 0.7f, 0.9f, 1.0f),          // Crystal light purple
-					BiomeType.Ruins => new Color(0.6f, 0.5f, 0.4f, 1.0f),            // Ruins brown
-					BiomeType.AncientRuins => new Color(0.5f, 0.4f, 0.3f, 1.0f),     // Ancient brown
-					BiomeType.Volcanic => new Color(0.8f, 0.2f, 0.1f, 1.0f),         // Volcanic red
-					BiomeType.Hell => new Color(0.7f, 0.1f, 0.1f, 1.0f),             // Hell dark red
-					BiomeType.HubArea => new Color(0.6f, 0.6f, 0.6f, 1.0f),          // Hub neutral gray
-					BiomeType.TransitionZone => new Color(0.5f, 0.5f, 0.5f, 1.0f),   // Transition gray
-					_ => new Color(0.5f, 0.5f, 0.5f, 1.0f)                          // Unknown gray
-					};
+				BiomeType.VolcanicCore => new Color(1.0f, 0.3f, 0.1f, 1.0f), // Lava red
+				BiomeType.FrozenWastes => new Color(0.7f, 0.9f, 1.0f, 1.0f), // Ice blue
+				BiomeType.SolarPlains => new Color(1.0f, 0.8f, 0.2f, 1.0f), // Solar yellow
+				BiomeType.CrystalCaverns => new Color(0.8f, 0.4f, 1.0f, 1.0f), // Crystal purple
+				BiomeType.SkyGardens => new Color(0.4f, 0.8f, 0.6f, 1.0f), // Garden green
+				BiomeType.ShadowRealms => new Color(0.3f, 0.2f, 0.4f, 1.0f), // Shadow dark purple
+				BiomeType.DeepUnderwater => new Color(0.2f, 0.4f, 0.8f, 1.0f), // Deep blue
+				BiomeType.VoidChambers => new Color(0.1f, 0.1f, 0.2f, 1.0f), // Void dark
+				BiomeType.PowerPlant => new Color(0.9f, 0.9f, 0.3f, 1.0f), // Electric yellow
+				BiomeType.PlasmaFields => new Color(1.0f, 0.5f, 0.8f, 1.0f), // Plasma pink
+				BiomeType.IceCatacombs => new Color(0.6f, 0.8f, 0.9f, 1.0f), // Catacomb blue
+				BiomeType.CryogenicLabs => new Color(0.8f, 0.9f, 1.0f, 1.0f), // Lab white-blue
+				BiomeType.IcyCanyon => new Color(0.5f, 0.7f, 0.8f, 1.0f), // Canyon blue
+				BiomeType.Tundra => new Color(0.7f, 0.8f, 0.7f, 1.0f), // Tundra gray-green
+				BiomeType.Forest => new Color(0.2f, 0.6f, 0.2f, 1.0f), // Forest green
+				BiomeType.Mountains => new Color(0.5f, 0.4f, 0.3f, 1.0f), // Mountain brown
+				BiomeType.Desert => new Color(0.8f, 0.6f, 0.3f, 1.0f), // Desert tan
+				BiomeType.Ocean => new Color(0.2f, 0.5f, 0.8f, 1.0f), // Ocean blue
+				BiomeType.Cosmic => new Color(0.4f, 0.2f, 0.8f, 1.0f), // Cosmic purple
+				BiomeType.Crystal => new Color(0.9f, 0.7f, 0.9f, 1.0f), // Crystal light purple
+				BiomeType.Ruins => new Color(0.6f, 0.5f, 0.4f, 1.0f), // Ruins brown
+				BiomeType.AncientRuins => new Color(0.5f, 0.4f, 0.3f, 1.0f), // Ancient brown
+				BiomeType.Volcanic => new Color(0.8f, 0.2f, 0.1f, 1.0f), // Volcanic red
+				BiomeType.Hell => new Color(0.7f, 0.1f, 0.1f, 1.0f), // Hell dark red
+				BiomeType.HubArea => new Color(0.6f, 0.6f, 0.6f, 1.0f), // Hub neutral gray
+				BiomeType.TransitionZone => new Color(0.5f, 0.5f, 0.5f, 1.0f), // Transition gray
+				_ => new Color(0.5f, 0.5f, 0.5f, 1.0f) // Unknown gray
+				};
 			}
 
 		/// <summary>
@@ -1654,34 +1691,34 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			return biome switch
 				{
-					BiomeType.VolcanicCore => 0.08f,      // Red to orange
-					BiomeType.FrozenWastes => 0.17f,      // Blue to cyan
-					BiomeType.SolarPlains => -0.08f,      // Yellow to orange
-					BiomeType.CrystalCaverns => 0.25f,    // Purple to blue
-					BiomeType.SkyGardens => 0.33f,        // Green to blue
-					BiomeType.ShadowRealms => 0.5f,       // Dark purple to complementary
-					BiomeType.DeepUnderwater => 0.17f,    // Blue to cyan
-					BiomeType.VoidChambers => 0.83f,      // Dark to light (high contrast)
-					BiomeType.PowerPlant => 0.17f,        // Yellow to green
-					BiomeType.PlasmaFields => -0.17f,     // Pink to purple
-					BiomeType.IceCatacombs => 0.08f,      // Blue to blue-green
-					BiomeType.CryogenicLabs => 0.25f,     // White-blue to purple
-					BiomeType.IcyCanyon => 0.17f,         // Blue to cyan
-					BiomeType.Tundra => 0.08f,            // Gray-green to green
-					BiomeType.Forest => 0.08f,            // Green to yellow-green
-					BiomeType.Mountains => 0.17f,         // Brown to orange
-					BiomeType.Desert => -0.08f,           // Tan to yellow
-					BiomeType.Ocean => 0.25f,             // Blue to purple
-					BiomeType.Cosmic => 0.33f,            // Purple to blue
-					BiomeType.Crystal => -0.08f,          // Light purple to pink
-					BiomeType.Ruins => 0.08f,             // Brown to orange
-					BiomeType.AncientRuins => 0.17f,      // Brown to red
-					BiomeType.Volcanic => 0.08f,          // Red to orange
-					BiomeType.Hell => -0.08f,             // Dark red to red
-					BiomeType.HubArea => 0.5f,            // Gray to complementary
-					BiomeType.TransitionZone => 0.25f,    // Gray to varied
-					_ => 0.33f                           // Default complementary
-					};
+				BiomeType.VolcanicCore => 0.08f, // Red to orange
+				BiomeType.FrozenWastes => 0.17f, // Blue to cyan
+				BiomeType.SolarPlains => -0.08f, // Yellow to orange
+				BiomeType.CrystalCaverns => 0.25f, // Purple to blue
+				BiomeType.SkyGardens => 0.33f, // Green to blue
+				BiomeType.ShadowRealms => 0.5f, // Dark purple to complementary
+				BiomeType.DeepUnderwater => 0.17f, // Blue to cyan
+				BiomeType.VoidChambers => 0.83f, // Dark to light (high contrast)
+				BiomeType.PowerPlant => 0.17f, // Yellow to green
+				BiomeType.PlasmaFields => -0.17f, // Pink to purple
+				BiomeType.IceCatacombs => 0.08f, // Blue to blue-green
+				BiomeType.CryogenicLabs => 0.25f, // White-blue to purple
+				BiomeType.IcyCanyon => 0.17f, // Blue to cyan
+				BiomeType.Tundra => 0.08f, // Gray-green to green
+				BiomeType.Forest => 0.08f, // Green to yellow-green
+				BiomeType.Mountains => 0.17f, // Brown to orange
+				BiomeType.Desert => -0.08f, // Tan to yellow
+				BiomeType.Ocean => 0.25f, // Blue to purple
+				BiomeType.Cosmic => 0.33f, // Purple to blue
+				BiomeType.Crystal => -0.08f, // Light purple to pink
+				BiomeType.Ruins => 0.08f, // Brown to orange
+				BiomeType.AncientRuins => 0.17f, // Brown to red
+				BiomeType.Volcanic => 0.08f, // Red to orange
+				BiomeType.Hell => -0.08f, // Dark red to red
+				BiomeType.HubArea => 0.5f, // Gray to complementary
+				BiomeType.TransitionZone => 0.25f, // Gray to varied
+				_ => 0.33f // Default complementary
+				};
 			}
 
 		/// <summary>
@@ -1756,7 +1793,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			if (material.HasProperty("_EmissionColor"))
 				{
 				// Emission based on coordinate patterns for visual interest
-				float emissionStrength = CalculateCoordinatePatternInfluence(coords) * settings.complexityTierMultiplier;
+				float emissionStrength =
+					CalculateCoordinatePatternInfluence(coords) * settings.complexityTierMultiplier;
 				Color emissionColor = GetBaseBiomeColor(GetBiomeTypeFromMaterialName(material.name));
 				material.SetColor("_EmissionColor", emissionColor * emissionStrength * 0.2f);
 				}
@@ -1791,7 +1829,9 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 			// Parse biome type from material name (format: "BiomeChecker_{BiomeType}_{x}_{y}")
 			string[] parts = materialName.Split('_');
-			return parts.Length >= 2 && System.Enum.TryParse(parts[1], out BiomeType biomeType) ? biomeType : BiomeType.Unknown;
+			return parts.Length >= 2 && System.Enum.TryParse(parts[1], out BiomeType biomeType)
+				? biomeType
+				: BiomeType.Unknown;
 			}
 
 		/// <summary>
@@ -1810,6 +1850,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 						hash = hash * 31 + value.GetHashCode();
 						}
 					}
+
 				return hash;
 				}
 			}
@@ -1868,11 +1909,11 @@ namespace TinyWalnutGames.MetVD.Authoring
 			{
 			return new CheckerComplexitySettings
 				{
-				coordinateInfluenceStrength = 0.7f,    // Moderate coordinate influence
-				distanceScalingFactor = 1.0f,          // Standard distance scaling
-				polarityAnimationSpeed = 0.2f,         // Gentle animation
-				enableCoordinateWarping = true,        // Enable pattern warping
-				complexityTierMultiplier = 1.2f        // Boost complexity effects
+				coordinateInfluenceStrength = 0.7f, // Moderate coordinate influence
+				distanceScalingFactor = 1.0f, // Standard distance scaling
+				polarityAnimationSpeed = 0.2f, // Gentle animation
+				enableCoordinateWarping = true, // Enable pattern warping
+				complexityTierMultiplier = 1.2f // Boost complexity effects
 				};
 			}
 
@@ -1906,6 +1947,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 					Object.DestroyImmediate(material);
 					}
 				}
+
 			_cachedBiomeMaterials.Clear();
 
 			// Clean up cached textures
@@ -1916,7 +1958,18 @@ namespace TinyWalnutGames.MetVD.Authoring
 					Object.DestroyImmediate(texture);
 					}
 				}
+
 			_cachedCheckerTextures.Clear();
+			}
+
+		// Coordinate-aware material enhancement settings
+		public struct CheckerComplexitySettings
+			{
+			public float coordinateInfluenceStrength; // How much world position affects checker pattern
+			public float distanceScalingFactor; // Distance from origin influences checker size
+			public float polarityAnimationSpeed; // Animation speed based on biome polarity
+			public bool enableCoordinateWarping; // Use coordinates to warp checker pattern
+			public float complexityTierMultiplier; // Multiplier based on biome complexity tier
 			}
 		}
 	}

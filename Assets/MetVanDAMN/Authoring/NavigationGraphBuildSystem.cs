@@ -1,3 +1,4 @@
+#nullable enable
 using TinyWalnutGames.MetVD.Core;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -13,13 +14,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 	[UpdateAfter(typeof(BuildConnectionBuffersSystem))]
 	public partial class NavigationGraphBuildSystem : SystemBase
 		{
-		private EntityQuery _districtQuery;
 		private EntityQuery _connectionQuery;
-		private EntityQuery _gateQuery;
-		private EntityQuery _navigationGraphQuery;
+		private EntityQuery _districtQuery;
 
 		// 🔥 ACTUAL ECB SYSTEM REFERENCE - NOT JUST COMMENTS
 		private EndInitializationEntityCommandBufferSystem _endInitEcbSystem = null!; // set in OnCreate
+		private EntityQuery _gateQuery;
+		private EntityQuery _navigationGraphQuery;
 
 		protected override void OnCreate()
 			{
@@ -106,7 +107,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			Entities
 				.WithNone<NavNode>()
 				.ForEach((Entity entity, in LocalTransform transform, in NodeId nodeId) =>
-				{
+					{
 					float3 worldPosition = transform.Position;
 					uint districtNodeId = nodeId._value;
 
@@ -132,7 +133,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 						}
 
 					nodeCount++;
-				})
+					})
 				.WithoutBurst() // Required for ECB and SystemAPI usage
 				.Run();
 
@@ -149,7 +150,7 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Process all connections to create navigation links
 			Entities
 				.ForEach((Entity entity, in Connection connection) =>
-				{
+					{
 					Connection conn = connection;
 
 					// Find source and destination entities
@@ -170,7 +171,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 					// Add link to source entity's buffer
 					if (SystemAPI.HasBuffer<NavLinkBufferElement>(sourceEntity))
 						{
-						DynamicBuffer<NavLinkBufferElement> linkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(sourceEntity);
+						DynamicBuffer<NavLinkBufferElement> linkBuffer =
+							SystemAPI.GetBuffer<NavLinkBufferElement>(sourceEntity);
 						linkBuffer.Add(navLink);
 						linkCount++;
 						}
@@ -184,12 +186,13 @@ namespace TinyWalnutGames.MetVD.Authoring
 
 						if (SystemAPI.HasBuffer<NavLinkBufferElement>(destEntity))
 							{
-							DynamicBuffer<NavLinkBufferElement> reverseLinkBuffer = SystemAPI.GetBuffer<NavLinkBufferElement>(destEntity);
+							DynamicBuffer<NavLinkBufferElement> reverseLinkBuffer =
+								SystemAPI.GetBuffer<NavLinkBufferElement>(destEntity);
 							reverseLinkBuffer.Add(reverseLink);
 							linkCount++;
 							}
 						}
-				})
+					})
 				.WithoutBurst()
 				.Run();
 
@@ -201,12 +204,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 			Entity foundEntity = Entity.Null;
 
 			Entities.ForEach((Entity entity, in NodeId id) =>
-			{
+				{
 				if (id._value == nodeId)
 					{
 					foundEntity = entity;
 					}
-			}).WithoutBurst().Run();
+				}).WithoutBurst().Run();
 
 			return foundEntity;
 			}
@@ -218,7 +221,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Collect gate conditions from source entity
 			if (SystemAPI.HasBuffer<GateConditionBufferElement>(sourceEntity))
 				{
-				DynamicBuffer<GateConditionBufferElement> sourceGates = SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
+				DynamicBuffer<GateConditionBufferElement> sourceGates =
+					SystemAPI.GetBuffer<GateConditionBufferElement>(sourceEntity);
 				for (int i = 0; i < sourceGates.Length && i < 4; i++) // Limit to 4 conditions
 					{
 					gateConditions.Add(sourceGates[i].Value);
@@ -228,7 +232,8 @@ namespace TinyWalnutGames.MetVD.Authoring
 			// Collect gate conditions from destination entity
 			if (SystemAPI.HasBuffer<GateConditionBufferElement>(destEntity))
 				{
-				DynamicBuffer<GateConditionBufferElement> destGates = SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
+				DynamicBuffer<GateConditionBufferElement> destGates =
+					SystemAPI.GetBuffer<GateConditionBufferElement>(destEntity);
 				for (int i = 0; i < destGates.Length && i < (4 - gateConditions.Count); i++)
 					{
 					gateConditions.Add(destGates[i].Value);
@@ -260,19 +265,20 @@ namespace TinyWalnutGames.MetVD.Authoring
 				// Increase cost for stricter gates
 				float gateCostMultiplier = (int)gate.Softness switch
 					{
-						0 => 5.0f,  // Hard
-						1 => 4.0f,  // VeryDifficult
-						2 => 3.0f,  // Difficult
-						3 => 2.0f,  // Moderate
-						4 => 1.5f,  // Easy
-						5 => 1.1f,  // Trivial
-						_ => 1.0f
-						};
+					0 => 5.0f, // Hard
+					1 => 4.0f, // VeryDifficult
+					2 => 3.0f, // Difficult
+					3 => 2.0f, // Moderate
+					4 => 1.5f, // Easy
+					5 => 1.1f, // Trivial
+					_ => 1.0f
+					};
 				maxTraversalCost = math.max(maxTraversalCost, connection.TraversalCost * gateCostMultiplier);
 				}
 
 			// Override connection polarity with gate requirements if more restrictive
-			Polarity effectivePolarity = combinedPolarity != Polarity.None ? combinedPolarity : connection.RequiredPolarity;
+			Polarity effectivePolarity =
+				combinedPolarity != Polarity.None ? combinedPolarity : connection.RequiredPolarity;
 
 			return new NavLink(
 				connection.FromNodeId,
@@ -303,13 +309,14 @@ namespace TinyWalnutGames.MetVD.Authoring
 				{
 				switch (Count)
 					{
-					case 0: _gate0 = gate; break;
-					case 1: _gate1 = gate; break;
-					case 2: _gate2 = gate; break;
-					case 3: _gate3 = gate; break;
-					default:
-						break;
+						case 0: _gate0 = gate; break;
+						case 1: _gate1 = gate; break;
+						case 2: _gate2 = gate; break;
+						case 3: _gate3 = gate; break;
+						default:
+							break;
 					}
+
 				if (Count < 4)
 					{
 					Count++;
@@ -322,12 +329,12 @@ namespace TinyWalnutGames.MetVD.Authoring
 					{
 					return index switch
 						{
-							0 => _gate0,
-							1 => _gate1,
-							2 => _gate2,
-							3 => _gate3,
-							_ => default
-							};
+						0 => _gate0,
+						1 => _gate1,
+						2 => _gate2,
+						3 => _gate3,
+						_ => default
+						};
 					}
 				}
 			}

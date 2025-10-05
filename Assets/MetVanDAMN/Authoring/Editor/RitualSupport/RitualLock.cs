@@ -10,7 +10,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 	internal static class RitualLock
 		{
 		private static bool _locked;
-		private static string _owner;
+		private static string? _owner;
+
+		public static bool IsHeld => _locked;
+		public static string? Owner => _owner;
 
 		public static bool TryAcquire(string owner)
 			{
@@ -19,6 +22,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				Debug.LogWarning($"🔒 Ritual lock held by '{_owner}', cannot acquire for '{owner}'");
 				return false;
 				}
+
 			_locked = true;
 			_owner = owner;
 			Debug.Log($"🔓 Ritual lock acquired by: {owner}");
@@ -38,9 +42,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				Debug.LogWarning($"⚠️ Cannot release lock held by '{_owner}' (requested by '{owner}')");
 				}
 			}
-
-		public static bool IsHeld => _locked;
-		public static string Owner => _owner;
 		}
 	}
 #endif

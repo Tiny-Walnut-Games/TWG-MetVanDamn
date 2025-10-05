@@ -1,3 +1,4 @@
+#nullable enable
 using Unity.Entities;
 using Unity.Collections;
 using UnityEngine;
@@ -11,23 +12,122 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 	/// </summary>
 	public class EnemyNamingAuthoring : MonoBehaviour
 		{
-		[Header("Enemy Profile")]
-		[SerializeField] private RarityType rarity = RarityType.Common;
+		[Header("Enemy Profile")] [SerializeField]
+		private RarityType rarity = RarityType.Common;
+
 		[SerializeField] private string baseType = "Enemy";
 		[SerializeField] private uint generationSeed = 12345;
 
-		[Header("Affix Assignment")]
-		[SerializeField] private bool useRandomAffixes = true;
+		[Header("Affix Assignment")] [SerializeField]
+		private bool useRandomAffixes = true;
+
 		[SerializeField] private string[] specificAffixIds = new string[0];
 
 
+		[Header("Display Configuration")] [SerializeField]
+		private bool overrideGlobalDisplayMode = false;
 
-		[Header("Display Configuration")]
-		[SerializeField] private bool overrideGlobalDisplayMode = false;
 		[SerializeField] private AffixDisplayMode displayModeOverride = AffixDisplayMode.NamesAndIcons;
 
-		[Header("Auto-Generation")]
-		[SerializeField] private bool generateNameOnBake = true;
+		[Header("Auto-Generation")] [SerializeField]
+		private bool generateNameOnBake = true;
+
+#if UNITY_EDITOR
+		/// <summary>
+		/// Validate configuration in the inspector
+		/// </summary>
+		private void OnValidate()
+			{
+			// Ensure base type is not empty
+			if (string.IsNullOrEmpty(baseType))
+				{
+				baseType = "Enemy";
+				}
+
+			// Validate affix IDs if using specific assignment
+			if (!useRandomAffixes && specificAffixIds != null)
+				{
+				for (int i = 0; i < specificAffixIds.Length; i++)
+					{
+					if (string.IsNullOrEmpty(specificAffixIds[i]))
+						{
+						specificAffixIds[i] = "";
+						}
+					}
+				}
+			}
+#endif
+
+		/// <summary>
+		/// Preview the generated name in the inspector (Editor only)
+		/// </summary>
+		[ContextMenu("Preview Generated Name")]
+		private void PreviewGeneratedName()
+			{
+#if UNITY_EDITOR
+			Debug.Log($"Enemy Profile Preview:\n" +
+			          $"Rarity: {rarity}\n" +
+			          $"Base Type: {baseType}\n" +
+			          $"Seed: {generationSeed}\n" +
+			          $"Expected Behavior: {GetExpectedBehavior()}");
+#endif
+			}
+
+		/// <summary>
+		/// Get expected behavior description for this configuration
+		/// </summary>
+		private string GetExpectedBehavior()
+			{
+			string behavior = "";
+
+			// Name display behavior
+			switch (rarity)
+				{
+					case RarityType.Common:
+					case RarityType.Uncommon:
+						behavior += $"Will show '{baseType}' + affix icons";
+						break;
+					case RarityType.Rare:
+					case RarityType.Unique:
+						behavior += $"Will show full name like 'Adjective {baseType} of Trait' + icons";
+						break;
+					case RarityType.MiniBoss:
+					case RarityType.Boss:
+					case RarityType.FinalBoss:
+						behavior += "Will show procedural name from affix syllables + icons";
+						break;
+				}
+
+			// Affix count
+			int expectedAffixCount = GetExpectedAffixCount(rarity);
+			behavior += $"\nExpected {expectedAffixCount} affix(es)";
+
+			// Display mode
+			if (overrideGlobalDisplayMode)
+				{
+				behavior += $"\nDisplay mode override: {displayModeOverride}";
+				}
+
+			return behavior;
+			}
+
+		/// <summary>
+		/// Get expected number of affixes for a rarity
+		/// </summary>
+		private static int GetExpectedAffixCount(RarityType rarity)
+			{
+			return rarity switch
+				{
+				RarityType.Common => 1,
+				RarityType.Uncommon => 2,
+				RarityType.Rare => 2,
+				RarityType.Unique => 3,
+				RarityType.MiniBoss => 2,
+				RarityType.Boss => 3,
+				RarityType.FinalBoss => 4,
+				_ => 1
+				};
+			}
 
 		/// <summary>
 		/// Baker for converting authoring component to ECS data
@@ -75,12 +175,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 					AddComponent<NeedsSpecificAffixAssignment>(entity);
 
 					// Store the affix IDs for later resolution
-					DynamicBuffer<AuthoringPendingAffixIdElement> affixIdBuffer = AddBuffer<AuthoringPendingAffixIdElement>(entity);
+					DynamicBuffer<AuthoringPendingAffixIdElement> affixIdBuffer =
+						AddBuffer<AuthoringPendingAffixIdElement>(entity);
 					foreach (string affixId in authoring.specificAffixIds)
 						{
 						if (!string.IsNullOrEmpty(affixId))
 							{
-							affixIdBuffer.Add(new AuthoringPendingAffixIdElement { AffixId = new FixedString64Bytes(affixId) });
+							affixIdBuffer.Add(new AuthoringPendingAffixIdElement
+									{ AffixId = new FixedString64Bytes(affixId) });
 							}
 						}
 					}
@@ -93,15 +195,15 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				{
 				return rarity switch
 					{
-						RarityType.Common => false,
-						RarityType.Uncommon => false,
-						RarityType.Rare => true,
-						RarityType.Unique => true,
-						RarityType.MiniBoss => true,
-						RarityType.Boss => true,
-						RarityType.FinalBoss => true,
-						_ => false
-						};
+					RarityType.Common => false,
+					RarityType.Uncommon => false,
+					RarityType.Rare => true,
+					RarityType.Unique => true,
+					RarityType.MiniBoss => true,
+					RarityType.Boss => true,
+					RarityType.FinalBoss => true,
+					_ => false
+					};
 				}
 
 			/// <summary>
@@ -112,114 +214,21 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				return mode != AffixDisplayMode.NamesOnly;
 				}
 			}
-
-		/// <summary>
-		/// Preview the generated name in the inspector (Editor only)
-		/// </summary>
-		[ContextMenu("Preview Generated Name")]
-		private void PreviewGeneratedName()
-			{
-#if UNITY_EDITOR
-			Debug.Log($"Enemy Profile Preview:\n" +
-					 $"Rarity: {rarity}\n" +
-					 $"Base Type: {baseType}\n" +
-					 $"Seed: {generationSeed}\n" +
-					 $"Expected Behavior: {GetExpectedBehavior()}");
-#endif
-			}
-
-		/// <summary>
-		/// Get expected behavior description for this configuration
-		/// </summary>
-		private string GetExpectedBehavior()
-			{
-			string behavior = "";
-
-			// Name display behavior
-			switch (rarity)
-				{
-				case RarityType.Common:
-				case RarityType.Uncommon:
-					behavior += $"Will show '{baseType}' + affix icons";
-					break;
-				case RarityType.Rare:
-				case RarityType.Unique:
-					behavior += $"Will show full name like 'Adjective {baseType} of Trait' + icons";
-					break;
-				case RarityType.MiniBoss:
-				case RarityType.Boss:
-				case RarityType.FinalBoss:
-					behavior += "Will show procedural name from affix syllables + icons";
-					break;
-				}
-
-			// Affix count
-			int expectedAffixCount = GetExpectedAffixCount(rarity);
-			behavior += $"\nExpected {expectedAffixCount} affix(es)";
-
-			// Display mode
-			if (overrideGlobalDisplayMode)
-				{
-				behavior += $"\nDisplay mode override: {displayModeOverride}";
-				}
-
-			return behavior;
-			}
-
-		/// <summary>
-		/// Get expected number of affixes for a rarity
-		/// </summary>
-		private static int GetExpectedAffixCount(RarityType rarity)
-			{
-			return rarity switch
-				{
-					RarityType.Common => 1,
-					RarityType.Uncommon => 2,
-					RarityType.Rare => 2,
-					RarityType.Unique => 3,
-					RarityType.MiniBoss => 2,
-					RarityType.Boss => 3,
-					RarityType.FinalBoss => 4,
-					_ => 1
-					};
-			}
-
-#if UNITY_EDITOR
-		/// <summary>
-		/// Validate configuration in the inspector
-		/// </summary>
-		private void OnValidate()
-			{
-			// Ensure base type is not empty
-			if (string.IsNullOrEmpty(baseType))
-				{
-				baseType = "Enemy";
-				}
-
-			// Validate affix IDs if using specific assignment
-			if (!useRandomAffixes && specificAffixIds != null)
-				{
-				for (int i = 0; i < specificAffixIds.Length; i++)
-					{
-					if (string.IsNullOrEmpty(specificAffixIds[i]))
-						{
-						specificAffixIds[i] = "";
-						}
-					}
-				}
-			}
-#endif
 		}
 
 	/// <summary>
 	/// Tag component indicating entity needs random affix assignment
 	/// </summary>
-	public struct NeedsRandomAffixAssignment : IComponentData { }
+	public struct NeedsRandomAffixAssignment : IComponentData
+		{
+		}
 
 	/// <summary>
 	/// Tag component indicating entity needs specific affix assignment
 	/// </summary>
-	public struct NeedsSpecificAffixAssignment : IComponentData { }
+	public struct NeedsSpecificAffixAssignment : IComponentData
+		{
+		}
 
 	/// <summary>
 	/// Authoring-only buffer element used to carry requested affix IDs during bake.
@@ -248,10 +257,11 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 			{
 			// Process random affix assignments
 			foreach ((RefRO<EnemyProfile> profile, Entity entity) in SystemAPI.Query<RefRO<EnemyProfile>>()
-				.WithAll<NeedsRandomAffixAssignment>()
-				.WithEntityAccess())
+				         .WithAll<NeedsRandomAffixAssignment>()
+				         .WithEntityAccess())
 				{
-				EnemyAffixDatabase.AssignRandomAffixes(state.EntityManager, entity, profile.ValueRO.Rarity, profile.ValueRO.GenerationSeed);
+				EnemyAffixDatabase.AssignRandomAffixes(state.EntityManager, entity, profile.ValueRO.Rarity,
+					profile.ValueRO.GenerationSeed);
 				state.EntityManager.RemoveComponent<NeedsRandomAffixAssignment>(entity);
 
 				// Mark for name generation if not already marked
@@ -262,9 +272,11 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				}
 
 			// Process specific affix assignments
-			foreach ((RefRO<EnemyProfile> profile, DynamicBuffer<AuthoringPendingAffixIdElement> pendingAffixBuffer, Entity entity) in SystemAPI.Query<RefRO<EnemyProfile>, DynamicBuffer<AuthoringPendingAffixIdElement>>()
-				.WithAll<NeedsSpecificAffixAssignment>()
-				.WithEntityAccess())
+			foreach ((RefRO<EnemyProfile> profile, DynamicBuffer<AuthoringPendingAffixIdElement> pendingAffixBuffer,
+				         Entity entity) in SystemAPI
+				         .Query<RefRO<EnemyProfile>, DynamicBuffer<AuthoringPendingAffixIdElement>>()
+				         .WithAll<NeedsSpecificAffixAssignment>()
+				         .WithEntityAccess())
 				{
 				AssignSpecificAffixes(ref state, entity, pendingAffixBuffer);
 				state.EntityManager.RemoveComponent<NeedsSpecificAffixAssignment>(entity);
@@ -281,7 +293,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 		/// <summary>
 		/// Assign specific affixes based on IDs
 		/// </summary>
-		private static void AssignSpecificAffixes(ref SystemState state, Entity entity, DynamicBuffer<AuthoringPendingAffixIdElement> pendingIds)
+		private static void AssignSpecificAffixes(ref SystemState state, Entity entity,
+			DynamicBuffer<AuthoringPendingAffixIdElement> pendingIds)
 			{
 			if (pendingIds.Length == 0)
 				{
@@ -289,7 +302,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				}
 
 			// Get all available affixes
-			EntityQuery affixQuery = state.EntityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
+			EntityQuery affixQuery =
+				state.EntityManager.CreateEntityQuery(typeof(EnemyAffix), typeof(AffixDatabaseTag));
 			NativeArray<Entity> affixEntities = affixQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
 			if (affixEntities.Length == 0)
@@ -299,7 +313,8 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
 				}
 
 			// Create affix buffer on enemy
-			DynamicBuffer<EnemyAffixBufferElement> affixBuffer = state.EntityManager.AddBuffer<EnemyAffixBufferElement>(entity);
+			DynamicBuffer<EnemyAffixBufferElement> affixBuffer =
+				state.EntityManager.AddBuffer<EnemyAffixBufferElement>(entity);
 
 			// Find and assign requested affixes
 			foreach (AuthoringPendingAffixIdElement pendingId in pendingIds)

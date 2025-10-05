@@ -16,38 +16,13 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 	/// </summary>
 	public class BiomeColorLegendWindow : EditorWindow
 		{
-		private Vector2 scrollPosition;
-		private bool autoRefresh = true;
-		private float refreshInterval = 1f;
-		private double lastRefreshTime;
-
-		private readonly List<BiomeInfo> biomeInfos = new();
 		private readonly Dictionary<BiomeType, Color> biomeColors = new();
 
-		[System.Serializable]
-		private class BiomeInfo
-			{
-			public BiomeType type;
-			public Color color;
-			public Color currentColor; // Runtime color (may differ from design-time)
-			public string name;
-			public int instanceCount;
-			public Vector3 averagePosition;
-			public BiomeArtProfile artProfile;
-			public bool isVisible = true;
-			public bool isRuntimeActive = false; // True if found in ECS systems during play mode
-			public bool hasColorOverride = false; // True if runtime color differs from design color
-			public string colorSource = ""; // Source of current color (e.g., "TilemapRenderer", "ECS", "Design")
-			public uint nodeId = 0; // NodeId for better tracking
-			}
-
-		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Biome Color Legend")]
-		public static void ShowWindow()
-			{
-			BiomeColorLegendWindow window = GetWindow<BiomeColorLegendWindow>("Biome Legend");
-			window.minSize = new Vector2(300, 200);
-			window.RefreshBiomeData();
-			}
+		private readonly List<BiomeInfo> biomeInfos = new();
+		private bool autoRefresh = true;
+		private double lastRefreshTime;
+		private float refreshInterval = 1f;
+		private Vector2 scrollPosition;
 
 		private void OnEnable()
 			{
@@ -59,6 +34,43 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private void OnDisable()
 			{
 			EditorApplication.update -= OnEditorUpdate;
+			}
+
+		private void OnGUI()
+			{
+			EditorGUILayout.Space(5);
+
+			// Header controls
+			DrawHeaderControls();
+
+			EditorGUILayout.Space(10);
+
+			// Biome legend content
+			scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+
+			if (biomeInfos.Count == 0)
+				{
+				DrawEmptyState();
+				}
+			else
+				{
+				DrawBiomeLegend();
+				}
+
+			EditorGUILayout.EndScrollView();
+
+			EditorGUILayout.Space(5);
+
+			// Footer stats
+			DrawFooterStats();
+			}
+
+		[MenuItem("Tiny Walnut Games/MetVanDAMN!/Debug/Gizmos/Biome Color Legend")]
+		public static void ShowWindow()
+			{
+			BiomeColorLegendWindow window = GetWindow<BiomeColorLegendWindow>("Biome Legend");
+			window.minSize = new Vector2(300, 200);
+			window.RefreshBiomeData();
 			}
 
 		private void OnEditorUpdate()
@@ -166,35 +178,6 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 						}
 					}
 				}
-			}
-
-		private void OnGUI()
-			{
-			EditorGUILayout.Space(5);
-
-			// Header controls
-			DrawHeaderControls();
-
-			EditorGUILayout.Space(10);
-
-			// Biome legend content
-			scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-
-			if (biomeInfos.Count == 0)
-				{
-				DrawEmptyState();
-				}
-			else
-				{
-				DrawBiomeLegend();
-				}
-
-			EditorGUILayout.EndScrollView();
-
-			EditorGUILayout.Space(5);
-
-			// Footer stats
-			DrawFooterStats();
 			}
 
 		private void DrawHeaderControls()
@@ -315,6 +298,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				{
 				EditorGUILayout.LabelField("Profile: None", EditorStyles.miniLabel);
 				}
+
 			EditorGUILayout.EndHorizontal();
 
 			if (biomeInfo.instanceCount > 1)
@@ -334,8 +318,10 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			EditorGUILayout.BeginHorizontal(GUI.skin.box);
 
 			EditorGUILayout.LabelField($"Total Biomes: {biomeInfos.Count}", EditorStyles.miniLabel);
-			EditorGUILayout.LabelField($"Total Instances: {biomeInfos.Sum(b => b.instanceCount)}", EditorStyles.miniLabel);
-			EditorGUILayout.LabelField($"Unique Types: {biomeInfos.Select(b => b.type).Distinct().Count()}", EditorStyles.miniLabel);
+			EditorGUILayout.LabelField($"Total Instances: {biomeInfos.Sum(b => b.instanceCount)}",
+				EditorStyles.miniLabel);
+			EditorGUILayout.LabelField($"Unique Types: {biomeInfos.Select(b => b.type).Distinct().Count()}",
+				EditorStyles.miniLabel);
 
 			EditorGUILayout.EndHorizontal();
 			}
@@ -377,7 +363,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				Color biomeColor = GetBiomeColor(type, instances);
 				Vector3 averagePosition = CalculateAveragePosition(instances);
-				BiomeArtProfile artProfile = GetMostCommonArtProfile(instances);
+				BiomeArtProfile? artProfile = GetMostCommonArtProfile(instances);
 
 				var biomeInfo = new BiomeInfo
 					{
@@ -411,8 +397,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					return;
 					}
 
-				foreach (BiomeFieldAuthoring biome in biomesByType.
-					SelectMany(kvp => kvp.Value))
+				foreach (BiomeFieldAuthoring biome in biomesByType.SelectMany(kvp => kvp.Value))
 					{
 					if (biome == null)
 						{
@@ -449,7 +434,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 
 				using NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
 				using NativeArray<Core.Biome> biomeComponents = query.ToComponentDataArray<Core.Biome>(Allocator.Temp);
-				using NativeArray<BiomeArtProfileReference> artProfileRefs = query.ToComponentDataArray<BiomeArtProfileReference>(Allocator.Temp);
+				using NativeArray<BiomeArtProfileReference> artProfileRefs =
+					query.ToComponentDataArray<BiomeArtProfileReference>(Allocator.Temp);
 
 				// for each biome type in biomesByTypeList, find matching ECS entities
 				for (int j = 0; j < biomesByTypeList.Count; j++)
@@ -471,6 +457,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 								}
 							}
 						}
+
 					BiomeType biomeType = biomesByTypeList[j];
 					}
 
@@ -519,7 +506,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				if (renderer.material != null && renderer.material.HasProperty("_Color"))
 					{
 					// Check if this tilemap is associated with any biome
-					BiomeFieldAuthoring associatedBiome = FindBiomeForTilemap(renderer, biomesByType);
+					BiomeFieldAuthoring? associatedBiome = FindBiomeForTilemap(renderer, biomesByType);
 					if (associatedBiome != null)
 						{
 						// Update color from runtime material
@@ -533,7 +520,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				}
 			}
 
-		private BiomeFieldAuthoring FindBiomeForTilemap(TilemapRenderer renderer, Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
+		private BiomeFieldAuthoring? FindBiomeForTilemap(TilemapRenderer renderer,
+			Dictionary<BiomeType, List<BiomeFieldAuthoring>> biomesByType)
 			{
 			// Find biome by proximity to tilemap or by name matching
 			foreach (KeyValuePair<BiomeType, List<BiomeFieldAuthoring>> kvp in biomesByType)
@@ -553,7 +541,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 					renderer.name.ToLowerInvariant();
 					// Try to match by name patterns first
 					if (renderer.name.ToLowerInvariant().Contains(biome.biomeType.ToString().ToLowerInvariant()) ||
-						renderer.name.ToLowerInvariant().Contains(biome.nodeId.ToString().ToLowerInvariant()))
+					    renderer.name.ToLowerInvariant().Contains(biome.nodeId.ToString().ToLowerInvariant()))
 						{
 						return biome;
 						}
@@ -588,7 +576,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private Color? TryGetLibraryColorForType(BiomeType type)
 			{
 			// Look for a library in the scene
-			BiomeArtProfileLibraryAuthoring libAuth = Object.FindFirstObjectByType<BiomeArtProfileLibraryAuthoring>(FindObjectsInactive.Include);
+			BiomeArtProfileLibraryAuthoring libAuth =
+				Object.FindFirstObjectByType<BiomeArtProfileLibraryAuthoring>(FindObjectsInactive.Include);
 			if (libAuth == null || libAuth.library == null)
 				return null;
 
@@ -616,7 +605,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				foreach (BiomeArtProfile p in lib.profiles)
 					{
 					if (p == null || string.IsNullOrEmpty(p.biomeName)) continue;
-					if (p.biomeName.IndexOf(typeName, System.StringComparison.OrdinalIgnoreCase) >= 0 && p.debugColor.a > 0f)
+					if (p.biomeName.IndexOf(typeName, System.StringComparison.OrdinalIgnoreCase) >= 0 &&
+					    p.debugColor.a > 0f)
 						{
 						return p.debugColor;
 						}
@@ -637,60 +627,60 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// 🔥 FIXED: Complete color mapping for all 27 biome types
 			return type switch
 				{
-					// Light-aligned biomes
-					BiomeType.SolarPlains => new Color(1f, 0.9f, 0.4f, 1f),       // Bright golden
-					BiomeType.CrystalCaverns => new Color(0.6f, 0.8f, 1f, 1f),    // Crystal blue
-					BiomeType.SkyGardens => new Color(0.4f, 0.7f, 0.9f, 1f),      // Sky blue
+				// Light-aligned biomes
+				BiomeType.SolarPlains => new Color(1f, 0.9f, 0.4f, 1f), // Bright golden
+				BiomeType.CrystalCaverns => new Color(0.6f, 0.8f, 1f, 1f), // Crystal blue
+				BiomeType.SkyGardens => new Color(0.4f, 0.7f, 0.9f, 1f), // Sky blue
 
-					// Dark-aligned biomes
-					BiomeType.ShadowRealms => new Color(0.2f, 0.1f, 0.3f, 1f),    // Dark purple
-					BiomeType.DeepUnderwater => new Color(0.1f, 0.3f, 0.6f, 1f),  // Deep blue
-					BiomeType.VoidChambers => new Color(0.1f, 0.1f, 0.1f, 1f),    // Near black
+				// Dark-aligned biomes
+				BiomeType.ShadowRealms => new Color(0.2f, 0.1f, 0.3f, 1f), // Dark purple
+				BiomeType.DeepUnderwater => new Color(0.1f, 0.3f, 0.6f, 1f), // Deep blue
+				BiomeType.VoidChambers => new Color(0.1f, 0.1f, 0.1f, 1f), // Near black
 
-					// Hazard/Energy biomes
-					BiomeType.VolcanicCore => new Color(1f, 0.3f, 0.1f, 1f),       // Lava red
-					BiomeType.PowerPlant => new Color(0.2f, 0.8f, 0.3f, 1f),      // Electric green
-					BiomeType.PlasmaFields => new Color(0.9f, 0.2f, 0.9f, 1f),    // Plasma purple
+				// Hazard/Energy biomes
+				BiomeType.VolcanicCore => new Color(1f, 0.3f, 0.1f, 1f), // Lava red
+				BiomeType.PowerPlant => new Color(0.2f, 0.8f, 0.3f, 1f), // Electric green
+				BiomeType.PlasmaFields => new Color(0.9f, 0.2f, 0.9f, 1f), // Plasma purple
 
-					// Ice/Crystal biomes
-					BiomeType.FrozenWastes => new Color(0.9f, 0.95f, 1f, 1f),     // Ice white
-					BiomeType.IceCatacombs => new Color(0.7f, 0.85f, 0.95f, 1f),  // Ice blue
-					BiomeType.CryogenicLabs => new Color(0.6f, 0.9f, 1f, 1f),     // Cryo blue
-					BiomeType.IcyCanyon => new Color(0.8f, 0.9f, 0.95f, 1f),      // Canyon ice
-					BiomeType.Tundra => new Color(0.8f, 0.9f, 1f, 1f),            // Tundra blue
+				// Ice/Crystal biomes
+				BiomeType.FrozenWastes => new Color(0.9f, 0.95f, 1f, 1f), // Ice white
+				BiomeType.IceCatacombs => new Color(0.7f, 0.85f, 0.95f, 1f), // Ice blue
+				BiomeType.CryogenicLabs => new Color(0.6f, 0.9f, 1f, 1f), // Cryo blue
+				BiomeType.IcyCanyon => new Color(0.8f, 0.9f, 0.95f, 1f), // Canyon ice
+				BiomeType.Tundra => new Color(0.8f, 0.9f, 1f, 1f), // Tundra blue
 
-					// Earth/Nature biomes
-					BiomeType.Forest => new Color(0.2f, 0.6f, 0.2f, 1f),          // Forest green
-					BiomeType.Mountains => new Color(0.5f, 0.5f, 0.5f, 1f),       // Mountain gray
-					BiomeType.Desert => new Color(0.9f, 0.8f, 0.3f, 1f),          // Desert tan
+				// Earth/Nature biomes
+				BiomeType.Forest => new Color(0.2f, 0.6f, 0.2f, 1f), // Forest green
+				BiomeType.Mountains => new Color(0.5f, 0.5f, 0.5f, 1f), // Mountain gray
+				BiomeType.Desert => new Color(0.9f, 0.8f, 0.3f, 1f), // Desert tan
 
-					// Water biomes
-					BiomeType.Ocean => new Color(0.2f, 0.4f, 0.8f, 1f),           // Ocean blue
+				// Water biomes
+				BiomeType.Ocean => new Color(0.2f, 0.4f, 0.8f, 1f), // Ocean blue
 
-					// Space biomes
-					BiomeType.Cosmic => new Color(0.3f, 0.1f, 0.6f, 1f),          // Cosmic purple
+				// Space biomes
+				BiomeType.Cosmic => new Color(0.3f, 0.1f, 0.6f, 1f), // Cosmic purple
 
-					// Crystal biomes
-					BiomeType.Crystal => new Color(0.8f, 0.5f, 1f, 1f),           // Crystal violet
+				// Crystal biomes
+				BiomeType.Crystal => new Color(0.8f, 0.5f, 1f, 1f), // Crystal violet
 
-					// Ruins/Ancient biomes
-					BiomeType.Ruins => new Color(0.6f, 0.5f, 0.4f, 1f),           // Ancient stone
-					BiomeType.AncientRuins => new Color(0.7f, 0.6f, 0.3f, 1f),    // Weathered gold
+				// Ruins/Ancient biomes
+				BiomeType.Ruins => new Color(0.6f, 0.5f, 0.4f, 1f), // Ancient stone
+				BiomeType.AncientRuins => new Color(0.7f, 0.6f, 0.3f, 1f), // Weathered gold
 
-					// Volcanic/Fire biomes
-					BiomeType.Volcanic => new Color(0.8f, 0.2f, 0.1f, 1f),        // Volcanic red
-					BiomeType.Hell => new Color(1f, 0.1f, 0f, 1f),                // Hell fire red
+				// Volcanic/Fire biomes
+				BiomeType.Volcanic => new Color(0.8f, 0.2f, 0.1f, 1f), // Volcanic red
+				BiomeType.Hell => new Color(1f, 0.1f, 0f, 1f), // Hell fire red
 
-					// Neutral/Mixed biomes
-					BiomeType.HubArea => new Color(0.7f, 0.7f, 0.7f, 1f),         // Neutral gray
-					BiomeType.TransitionZone => new Color(0.6f, 0.6f, 0.8f, 1f),  // Transition purple
+				// Neutral/Mixed biomes
+				BiomeType.HubArea => new Color(0.7f, 0.7f, 0.7f, 1f), // Neutral gray
+				BiomeType.TransitionZone => new Color(0.6f, 0.6f, 0.8f, 1f), // Transition purple
 
-					// Unknown/fallback
-					BiomeType.Unknown => new Color(0.5f, 0.5f, 0.5f, 1f),         // Unknown gray
+				// Unknown/fallback
+				BiomeType.Unknown => new Color(0.5f, 0.5f, 0.5f, 1f), // Unknown gray
 
-					// Default hash-based fallback for any future additions
-					_ => GenerateHashBasedColor(type)
-					};
+				// Default hash-based fallback for any future additions
+				_ => GenerateHashBasedColor(type)
+				};
 			}
 
 		private static Color GenerateHashBasedColor(BiomeType type)
@@ -719,10 +709,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return sum / instances.Count;
 			}
 
-		private BiomeArtProfile GetMostCommonArtProfile(List<BiomeFieldAuthoring> instances)
+		private BiomeArtProfile? GetMostCommonArtProfile(List<BiomeFieldAuthoring> instances)
 			{
 			// Without direct art references on fields, infer from library by biome type prevalence.
-			BiomeArtProfileLibraryAuthoring libAuth = Object.FindFirstObjectByType<BiomeArtProfileLibraryAuthoring>(FindObjectsInactive.Include);
+			BiomeArtProfileLibraryAuthoring libAuth =
+				Object.FindFirstObjectByType<BiomeArtProfileLibraryAuthoring>(FindObjectsInactive.Include);
 			if (libAuth == null || libAuth.library == null)
 				return null;
 
@@ -741,7 +732,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 				for (int i = 0; i < lib.perTypeBuckets.Length; i++)
 					{
 					BiomeArtProfileLibrary.BiomeTypeBucket bucket = lib.perTypeBuckets[i];
-					if (bucket == null || bucket.type != topType || bucket.profiles == null || bucket.profiles.Length == 0) continue;
+					if (bucket == null || bucket.type != topType || bucket.profiles == null ||
+					    bucket.profiles.Length == 0) continue;
 					// choose first defined profile
 					for (int j = 0; j < bucket.profiles.Length; j++)
 						{
@@ -765,9 +757,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			return null;
 			}
 
-		private string GetBiomeDisplayName(BiomeType type, BiomeArtProfile artProfile)
+		private string GetBiomeDisplayName(BiomeType type, BiomeArtProfile? artProfile)
 			{
-			return artProfile != null && !string.IsNullOrEmpty(artProfile.biomeName) ? artProfile.biomeName : type.ToString();
+			return artProfile != null && !string.IsNullOrEmpty(artProfile.biomeName)
+				? artProfile.biomeName
+				: type.ToString();
 			}
 
 		private void FocusBiome(BiomeInfo biomeInfo)
@@ -836,8 +830,26 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		public static Dictionary<BiomeType, Color> GetBiomeColorMapping()
 			{
 			// Use modern EditorWindow finding approach for Unity 6000.2.2f1
-			BiomeColorLegendWindow window = HasOpenInstances<BiomeColorLegendWindow>() ? GetWindow<BiomeColorLegendWindow>() : null;
+			BiomeColorLegendWindow? window =
+				HasOpenInstances<BiomeColorLegendWindow>() ? GetWindow<BiomeColorLegendWindow>() : null;
 			return window != null ? window.biomeColors : new Dictionary<BiomeType, Color>();
+			}
+
+		[System.Serializable]
+		private class BiomeInfo
+			{
+			public BiomeType type;
+			public Color color;
+			public Color currentColor; // Runtime color (may differ from design-time)
+			public string? name;
+			public int instanceCount;
+			public Vector3 averagePosition;
+			public BiomeArtProfile? artProfile;
+			public bool isVisible = true;
+			public bool isRuntimeActive = false; // True if found in ECS systems during play mode
+			public bool hasColorOverride = false; // True if runtime color differs from design color
+			public string colorSource = ""; // Source of current color (e.g., "TilemapRenderer", "ECS", "Design")
+			public uint nodeId = 0; // NodeId for better tracking
 			}
 		}
 	}

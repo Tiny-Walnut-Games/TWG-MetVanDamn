@@ -10,20 +10,20 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 	{
 	internal static class SubScenePropertyHelper
 		{
-		private static readonly string [ ] SceneAssetPropertyNames =
-		{
+		private static readonly string[] SceneAssetPropertyNames =
+			{
 			"m_SceneAsset", "_SceneAsset", "sceneAsset", "SceneAsset", "m_Scene", "_Scene"
-		};
+			};
 
-		private static readonly string [ ] AutoLoadPropertyNames =
-		{
+		private static readonly string[] AutoLoadPropertyNames =
+			{
 			"m_AutoLoadScene", "_AutoLoadScene", "autoLoadScene", "AutoLoadScene"
-		};
+			};
 
 		/// <summary>
 		/// Faculty-grade SceneAsset property discovery with reflection fallback
 		/// </summary>
-		public static SerializedProperty FindSceneAssetProperty(SerializedObject so)
+		public static SerializedProperty? FindSceneAssetProperty(SerializedObject so)
 			{
 			// Try SerializedProperty discovery first
 			foreach (string name in SceneAssetPropertyNames)
@@ -36,14 +36,15 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 					}
 				}
 
-			Debug.LogWarning("⚠️ SceneAsset property not found via SerializedProperty - this may indicate Unity version differences");
+			Debug.LogWarning(
+				"⚠️ SceneAsset property not found via SerializedProperty - this may indicate Unity version differences");
 			return null;
 			}
 
 		/// <summary>
 		/// Faculty-grade AutoLoad property discovery
 		/// </summary>
-		public static SerializedProperty FindAutoLoadProperty(SerializedObject so)
+		public static SerializedProperty? FindAutoLoadProperty(SerializedObject so)
 			{
 			foreach (string name in AutoLoadPropertyNames)
 				{
@@ -75,11 +76,12 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 				var so = new SerializedObject(subScene);
 
 				// Find and assign SceneAsset
-				SerializedProperty sceneProp = FindSceneAssetProperty(so);
+				SerializedProperty? sceneProp = FindSceneAssetProperty(so);
 				if (sceneProp != null)
 					{
 					sceneProp.objectReferenceValue = sceneAsset;
-					Debug.Log($"✅ Set SceneAsset reference for {subSceneName} using property: {sceneProp.propertyPath}");
+					Debug.Log(
+						$"✅ Set SceneAsset reference for {subSceneName} using property: {sceneProp.propertyPath}");
 					}
 				else
 					{
@@ -88,7 +90,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 					}
 
 				// Find and assign AutoLoad
-				SerializedProperty autoLoadProp = FindAutoLoadProperty(so);
+				SerializedProperty? autoLoadProp = FindAutoLoadProperty(so);
 				if (autoLoadProp != null)
 					{
 					autoLoadProp.boolValue = true;
@@ -108,10 +110,11 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 
 				// Final validation
 				var validation = new SerializedObject(subScene);
-				SerializedProperty validateScene = FindSceneAssetProperty(validation);
+				SerializedProperty? validateScene = FindSceneAssetProperty(validation);
 				bool success = validateScene != null && validateScene.objectReferenceValue != null;
 
-				Debug.Log($"✅ SubScene reference assignment {(success ? "SUCCESSFUL" : "FAILED")} for '{subSceneName}'");
+				Debug.Log(
+					$"✅ SubScene reference assignment {(success ? "SUCCESSFUL" : "FAILED")} for '{subSceneName}'");
 				return success;
 				}
 			catch (System.Exception ex)
@@ -137,8 +140,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor.RitualSupport
 					do
 						{
 						properties.Add(iterator.propertyPath);
-						}
-					while (iterator.NextVisible(false));
+						} while (iterator.NextVisible(false));
 					}
 
 				Debug.Log($"🔍 Available properties on {subSceneName}: {string.Join(", ", properties)}");

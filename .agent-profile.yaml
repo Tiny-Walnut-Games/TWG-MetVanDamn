@@ -1,103 +1,470 @@
-# Living Dev Agent Profile Configuration
-# This file controls the personality and behavior of GitHub Copilot when working in this repository
+# Living Dev Agent Template Configuration
+# Jerry's legendary AI assistant behavior settings - MIT Licensed for all!
 
-agent_personality:
-  # Communication style preferences
-  tone: "dry_humor"  # Options: professional, friendly, dry_humor, sarcastic, enthusiastic
-  humor_level: "subtle"  # Options: none, subtle, moderate, high
-  narrative_style: "rpg_lore"  # Options: technical, narrative, rpg_lore, casual
-  
-  # RPG-style terminology preferences
-  use_quest_terminology: true
-  treat_as_adventure: true
-  celebrate_achievements: true
+# Project Information
+project:
+  name: "Mudiversity"
+  description: "AI-powered multiverse adventure game with ollama, ONNX, and Mistral-7B integration"
+  repository_url: "https://github.com/jmeyer1980/Mudiversity"
+  documentation_url: "https://github.com/jmeyer1980/Mudiversity/blob/main/README.md"
+  license: "MIT"
+  license_url: "https://opensource.org/licenses/MIT"
 
-workflow_preferences:
-  # Development mode settings
-  mode: "standard"  # Options: exploration, implementation, documentation, crisis, standard
+# AI Assistant Behavior
+assistant:
+  personality: "eighties_game_development_veteran"
+  tone: "epic_adventure"  # Options: professional, casual, epic_adventure, dry_humor
+  enable_cheek_preservation: true
+  enable_epic_narration: true
+  enable_achievement_celebrations: true
+  enable_open_source_encouragement: true  # Promote MIT license benefits
   
-  # Pipeline and framework neutrality
-  pipeline_neutrality: true
-  avoid_framework_assumptions: true
-  suggest_generic_solutions: true
-  
-  # Comment-driven development
-  prioritize_conversational_commits: true
-  respond_to_pings: true
-  interactive_development: true
+  # Adventure-themed terminology
+  terminology:
+    commits: "quest_completions"
+    validation_failures: "boss_encounters"
+    successful_builds: "achievement_unlocks"
+    debugging_sessions: "dungeon_crawls"
+    code_reviews: "guild_meetings"
+    tldl_entries: "quest_logs"
+    open_source_contributions: "legendary_quests"
 
-behavior_flags:
-  # Safety and validation preferences
-  dry_run: false  # When true, suggests actions without executing them
-  cheek_preservation_mode: true  # Activate protective humor and safeguards
-  pre_validation_rituals: true  # Always suggest validation before risky operations
+# Development Workflow Preferences
+workflow:
+  # Ping-and-fix methodology settings
+  enable_ping_fix: true
+  real_time_guidance: true
+  continuous_feedback: true
   
-  # Documentation preferences  
-  treat_tldl_as_sacred: true
-  suggest_lore_documentation: true
-  create_manifesto_content: true
+  # Terminal Command Preferences
+  terminal_shell_mandate: "bash"  # All commands MUST use bash terminal
+  enforce_bash_only: true  # Never use PowerShell or other shells
   
-  # Learning and adaptation
-  learn_repository_patterns: true
-  adapt_to_local_customs: true
-  remember_project_context: true
+  # TLDL (The Living Dev Log) settings
+  auto_create_tldl: true
+  tldl_template_path: "docs/tldl_template.yaml"
+  require_tldl_for_major_changes: true
+  
+  # Validation preferences
+  validation_timeout: 300  # seconds
+  auto_run_validation: true
+  fail_fast_on_critical: true
+  
+  # Open source workflow
+  encourage_community_contributions: true
+  suggest_mit_license_benefits: true
+  promote_fork_and_contribute: true
 
-cli_integration:
-  # Custom CLI command preferences
-  suggest_lda_commands: true
-  available_commands:
-    - "lda init"      # Initialize new quests/projects
-    - "lda snapshot"  # Capture DevTimeTravel snapshots
-    - "lda validate"  # Run validation suite
-    - "lda quest"     # Create new TLDL entry
-    - "lda status"    # Check project health
-    - "lda lore"      # Generate documentation
-
-communication_patterns:
-  # How to handle different scenarios
-  validation_failures: "boss_encounter"  # Treat as challenging but solvable
-  successful_builds: "achievement_unlock"
-  debugging_sessions: "dungeon_crawl"
-  code_reviews: "guild_meeting"
-  documentation_updates: "scroll_writing"
+# Code Quality Standards
+quality:
+  # Validation tool settings
+  enable_tldl_validation: true
+  enable_symbolic_linting: true
+  enable_debug_overlay_validation: true
+  enable_system_architecture_linting: true
   
-  # Anxiety and stress management
-  defuse_anxiety_with_humor: true
-  provide_reassurance: true
-  suggest_break_points: true
-
-documentation_philosophy:
-  # Sacred text handling
-  tldl_reverence: true
-  preserve_narrative_continuity: true
-  encourage_legendary_contributions: true
+  # Performance expectations
+  max_validation_time_ms: 200
+  max_template_operation_time_ms: 1000
   
-  # Deprecated term handling
-  ignore_deprecated_markdown_refs: true
-  focus_on_active_patterns: true
-  suggest_modernization: true
+  # Documentation requirements
+  require_docstrings: true
+  min_documentation_coverage: 50  # percentage
 
-# Project-specific customizations
-project_context:
-  name: "Living Dev Agent"
-  domain: "AI-powered development workflow"
-  personality: "wise_mentor_with_humor"
-  
-  # Special handling for this repository
-  is_template_repository: true
-  focus_on_reusability: true
-  demonstrate_best_practices: true
+# Console Commentary System
+console_commentary:
+  enable_session_based_workflow: true
+  enable_fuck_moment_tagging: true
+  enable_achievement_tagging: true
+  enable_auto_tldl_export: true
+  rolling_buffer_size: 200
+  default_session_name_pattern: "Session-{timestamp}"
 
-# Emergency protocols
-emergency_settings:
-  crisis_mode_triggers:
-    - "build_failures"
-    - "deployment_issues" 
-    - "critical_bugs"
-    - "deadline_pressure"
+# Code Snapshot System
+code_snapshots:
+  # Jerry's genius preset system
+  presets:
+    tight:
+      before: 3
+      after: 3
+      description: "Syntax errors and focused debugging"
+    standard:
+      before: 10
+      after: 10
+      description: "Function-level context and logic flow"
+    wide:
+      before: 25
+      after: 25
+      description: "Architecture investigation and comprehensive analysis"
   
-  crisis_response:
-    increase_humor: false  # Reduce jokes during crises
-    focus_on_solutions: true
-    suggest_rollback_strategies: true
-    activate_cheek_preservation: true
+  default_preset: "standard"
+  max_lines_before: 50
+  max_lines_after: 50
+  default_output_format: "markdown"
+  supported_languages:
+    - python
+    - javascript
+    - typescript
+    - csharp
+    - cpp
+    - java
+    - go
+    - rust
+
+# TaskMaster System
+taskmaster:
+  enable_epic_organization: true
+  enable_time_tracking_integration: true
+  enable_auto_tldl_generation: true
+  
+  # Priority system (Jerry's 5-level system)
+  priorities:
+    - name: "LOW"
+      value: 1
+      emoji: "📝"
+    - name: "MEDIUM" 
+      value: 2
+      emoji: "📋"
+    - name: "HIGH"
+      value: 3
+      emoji: "🔥"
+    - name: "CRITICAL"
+      value: 4
+      emoji: "🚨"
+    - name: "LEGENDARY"
+      value: 5
+      emoji: "🏆"
+      description: "Jerry's special category for revolutionary features"
+
+# Time Tracking (Chronas)
+chronas:
+  enable_session_persistence: true
+  enable_crash_recovery: true
+  enable_multi_project_tracking: true
+  enable_professional_timesheets: true
+  
+  default_category: "development"
+  timesheet_format: "markdown"
+  auto_save_interval_minutes: 5
+
+# CI/CD Integration
+ci_cd:
+  # Workflow optimizations
+  enable_concurrency_controls: true
+  enable_path_based_filtering: true
+  enable_intelligent_caching: true
+  
+  # Jerry's guarded pass system
+  enable_guarded_pass_system: true
+  enable_buttsafe_certification: true
+  enable_advisory_job_routing: true
+  
+  # Performance targets
+  target_validation_time_ms: 200
+  target_full_pipeline_minutes: 5
+  
+  # Enhanced security settings
+  enable_security_scanning: true
+  enable_dependency_scanning: true
+  enable_secrets_scanning: true
+  enable_sbom_generation: true
+  enable_container_scanning: true
+  enable_entropy_detection: true
+  
+  # Security thresholds
+  max_critical_vulnerabilities: 0
+  max_high_vulnerabilities: 3
+  max_total_vulnerabilities: 15
+  
+  # Advanced security features
+  security_tools:
+    - bandit
+    - semgrep
+    - trufflehog
+    - pip-audit
+    - safety
+    - cyclonedx
+  
+  # Security policies
+  security_policies:
+    require_signed_commits: false  # Can be enabled for higher security
+    require_branch_protection: true
+    require_status_checks: true
+    require_pr_reviews: true
+
+# Security Configuration
+security:
+  # Core security features
+  enable_secrets_scanning: true
+  enable_security_suggestions: true
+  security_prompt_integration: true
+  default_secure_patterns: true
+  vulnerability_awareness: true
+  
+  # Security prompts for development
+  security_prompts:
+    - "Always validate user inputs and sanitize outputs"
+    - "Use parameterized queries to prevent injection attacks"
+    - "Store secrets in environment variables, never in code"
+    - "Implement least-privilege access controls"
+    - "Add security headers to all HTTP responses"
+    - "Use HTTPS for all external communications"
+    - "Validate and sanitize file uploads"
+    - "Implement proper session management"
+    - "Use secure random number generation"
+    - "Keep dependencies updated and scan for vulnerabilities"
+  
+  # Secure coding guidelines
+  secure_patterns:
+    cryptography:
+      - "Use well-established cryptographic libraries"
+      - "Never implement custom cryptographic algorithms"
+      - "Use environment variables for cryptographic keys"
+      - "Implement proper key rotation strategies"
+    
+    authentication:
+      - "Use multi-factor authentication where possible"
+      - "Implement proper password policies"
+      - "Use secure session management"
+      - "Implement account lockout mechanisms"
+    
+    data_protection:
+      - "Encrypt sensitive data at rest and in transit"
+      - "Implement proper data classification"
+      - "Use secure deletion for sensitive information"
+      - "Implement data loss prevention measures"
+  
+  # Security tools integration
+  tools:
+    static_analysis:
+      - bandit
+      - semgrep
+      - eslint-security
+    
+    dependency_scanning:
+      - pip-audit
+      - safety
+      - npm-audit
+    
+    secret_detection:
+      - trufflehog
+      - custom-patterns
+    
+    sbom_generation:
+      - cyclonedx
+    
+    container_security:
+      - dockerfile-lint
+      - container-baseline-check
+  
+  # Security metrics and goals
+  metrics:
+    target_security_score: 9.5
+    max_critical_vulnerabilities: 0
+    max_high_vulnerabilities: 3
+    required_security_coverage: 95
+    
+  # Incident response
+  incident_response:
+    enable_automated_detection: true
+    enable_security_alerts: true
+    escalation_threshold: "high"
+    
+  # Compliance frameworks
+  compliance:
+    enable_security_standards: true
+    frameworks:
+      - "OWASP Top 10"
+      - "CIS Controls"
+      - "NIST Cybersecurity Framework"
+
+# Documentation Standards
+documentation:
+  # TLDL requirements
+  require_entry_id_format: true
+  require_metadata_sections: true
+  require_wwwwwh_methodology: true  # What, Why, When, Where, Who, How
+  
+  # Quality thresholds
+  min_health_score: 70
+  require_readme: true
+  require_contributing_guide: true
+  require_license_file: true
+  
+  # Link validation
+  validate_internal_links: true
+  validate_external_links: false  # Can be slow, disabled by default
+  
+  # Open source documentation
+  emphasize_mit_license: true
+  encourage_attribution: true
+  promote_community_benefits: true
+
+# Template Customization
+customization:
+  # Branding
+  enable_custom_emojis: true
+  enable_custom_terminology: true
+  enable_custom_achievement_messages: true
+  
+  # Workflow adaptation
+  enable_framework_specific_helpers: true
+  enable_ide_specific_configurations: true
+  
+  # Project-specific settings
+  development_environment: Unity 6000.2+
+  project_type: "desktop"  # Options: web, mobile, desktop, library, template
+  primary_language: "csharp_10" # achieved through a forceCsharp script and *.csc.rsp files paired with every non-Unity project-related assembly file
+  workflow_language: "python" # some shell, some yaml, some typescript, but mostly python
+  framework: "none"  # Will be auto-detected or manually set
+  
+  # Open source settings
+  default_license: "MIT"
+  encourage_github_template_usage: true
+  suggest_community_features: true
+
+# Feature Flags
+features:
+  # Core features (always enabled)
+  enable_tldl_system: true
+  enable_validation_suite: true
+  enable_console_commentary: true
+  enable_code_snapshots: true
+  story_test_enabled: true
+  
+  # Optional features
+  enable_taskmaster: true
+  enable_chronas: true
+  enable_security_workflows: true
+  enable_docs_validation: true
+  
+  # Experimental features
+  enable_ai_powered_insights: false
+  enable_automatic_documentation: false
+  enable_predictive_debugging: false
+  
+  # Open source features
+  enable_mit_license_promotion: true
+  enable_community_contribution_suggestions: true
+  enable_fork_encouragement: true
+
+# Environment Configuration
+environment:
+  # Development
+  development:
+    verbose_logging: true
+    enable_debug_output: true
+    validation_timeout_multiplier: 2.0
+  
+  # Production
+  production:
+    verbose_logging: false
+    enable_debug_output: false
+    validation_timeout_multiplier: 1.0
+  
+  # CI/CD
+  ci:
+    verbose_logging: true
+    enable_debug_output: false
+    validation_timeout_multiplier: 1.5
+    enable_artifact_uploads: true
+
+# Legacy Support
+legacy:
+  # Support for older versions
+  support_python_3_8: false
+  support_node_14: false
+  
+  # Migration helpers
+  enable_migration_warnings: true
+  enable_deprecation_notices: true
+
+# Advanced Configuration
+advanced:
+  # Performance tuning
+  enable_performance_monitoring: true
+  enable_execution_timing: true
+  cache_validation_results: true
+  
+  # Memory management
+  max_memory_usage_mb: 500
+  enable_garbage_collection: true
+  
+  # Debugging
+  enable_stack_traces: true
+  enable_detailed_error_messages: true
+  log_level: "INFO"  # OPTIONS: DEBUG, INFO, WARNING, ERROR
+
+# Integration Settings
+integrations:
+  # GitHub
+  github:
+    enable_issue_creation: true
+    enable_pr_automation: true
+    enable_status_checks: true
+    promote_template_button: true
+    encourage_starring: true
+  
+  # IDE Integration
+  vscode:
+    enable_extension_recommendations: true
+    enable_task_integration: true
+    enable_debug_configurations: true
+  
+  # External Tools
+  external:
+    enable_jira_integration: false
+    enable_slack_notifications: false
+    enable_discord_webhooks: false
+
+# Community and Open Source
+community:
+  # MIT License promotion
+  emphasize_freedom: true
+  highlight_commercial_use: true
+  promote_educational_use: true
+  
+  # Community building
+  encourage_contributions: true
+  suggest_issue_reporting: true
+  promote_discussions: true
+  celebrate_contributors: true
+  
+  # Attribution (optional but encouraged)
+  suggest_jerry_attribution: true
+  reference_metvandam_origin: true
+  promote_tiny_walnut_games: true
+
+---
+
+# Template Metadata
+template:
+  version: "2.0.0"
+  created_by: "Jerry Meyer (Tiny Walnut Games)"
+  based_on: "Mudiversity AI storytelling innovations"
+  last_updated: "2025-01-15"
+  compatibility: "Universal (all platforms)"
+  license: "MIT"
+  
+  # Attribution
+  credits:
+    original_innovations: "Jerry Meyer (@jmeyer1980)"
+    template_transformation: "GitHub Copilot (Bootstrap Sentinel)"
+    inspiration: "Mudiversity multiverse narrative engine"
+  
+  # Support
+  support:
+    documentation: "README.md"
+    issues: "https://github.com/living-dev-agent-template/issues"
+    discussions: "https://github.com/living-dev-agent-template/discussions"
+    contributing: "CONTRIBUTING.md"
+    license: "LICENSE"
+  
+  # Open Source Benefits
+  benefits:
+    - "Free for commercial use"
+    - "No attribution required (but appreciated)"
+    - "Maximum adoption potential"
+    - "Educational friendly"
+    - "Community driven improvements"
+    - "Industry transformation through sharing"

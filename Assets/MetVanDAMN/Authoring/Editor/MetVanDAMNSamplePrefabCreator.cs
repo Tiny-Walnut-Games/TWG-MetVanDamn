@@ -144,7 +144,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			CreateWfcTilePrototype("Specialist", 4, 0.4f, BiomeType.VolcanicCore, Polarity.Heat, 1, 2);
 			}
 
-		private static void CreateWfcTilePrototype(string name, uint tileId, float weight, BiomeType biomeType, Polarity polarity, byte minConn, byte maxConn)
+		private static void CreateWfcTilePrototype(string name, uint tileId, float weight, BiomeType biomeType,
+			Polarity polarity, byte minConn, byte maxConn)
 			{
 			var go = new GameObject($"WfcTilePrototype_{name}");
 
@@ -160,66 +161,66 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			// Configure sockets based on tile type
 			switch (name)
 				{
-				case "Hub":
-					wfcTile.sockets = new WfcSocketConfig[]
-					{
-						new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-						new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-						new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
-						new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
-					};
-					break;
-				case "Corridor":
-					wfcTile.sockets = new WfcSocketConfig[]
-					{
-						new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
-						new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
-					};
-					break;
-				case "Chamber":
-					wfcTile.sockets = new WfcSocketConfig[]
-					{
-						new() { socketId = 2, direction = 0, requiredPolarity = Polarity.Sun, isOpen = true },
-						new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
-						new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
-					};
-					break;
-				case "Specialist":
-					wfcTile.sockets = new WfcSocketConfig[]
-					{
-						new() { socketId = 3, direction = 1, requiredPolarity = Polarity.Heat, isOpen = true },
-						new() { socketId = 2, direction = 3, requiredPolarity = Polarity.Heat, isOpen = true }
-					};
-					break;
-				default:
-					break;
+					case "Hub":
+						wfcTile.sockets = new WfcSocketConfig[]
+							{
+							new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+							new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+							new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true },
+							new() { socketId = 1, direction = 3, requiredPolarity = Polarity.None, isOpen = true }
+							};
+						break;
+					case "Corridor":
+						wfcTile.sockets = new WfcSocketConfig[]
+							{
+							new() { socketId = 1, direction = 0, requiredPolarity = Polarity.None, isOpen = true },
+							new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
+							};
+						break;
+					case "Chamber":
+						wfcTile.sockets = new WfcSocketConfig[]
+							{
+							new() { socketId = 2, direction = 0, requiredPolarity = Polarity.Sun, isOpen = true },
+							new() { socketId = 1, direction = 1, requiredPolarity = Polarity.None, isOpen = true },
+							new() { socketId = 1, direction = 2, requiredPolarity = Polarity.None, isOpen = true }
+							};
+						break;
+					case "Specialist":
+						wfcTile.sockets = new WfcSocketConfig[]
+							{
+							new() { socketId = 3, direction = 1, requiredPolarity = Polarity.Heat, isOpen = true },
+							new() { socketId = 2, direction = 3, requiredPolarity = Polarity.Heat, isOpen = true }
+							};
+						break;
+					default:
+						break;
 				}
 
 			// 📝 Learning Opportunity: Fixed Material Leak Pattern 📝
 			// @copilot - Create visual with proper material management - no leaks!
-			GameObject visual = null;
+			GameObject? visual = null;
 			Color visualColor = Color.white; // Define color first
 
 			switch (name)
 				{
-				case "Hub":
-					visual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-					visualColor = Color.blue;
-					break;
-				case "Corridor":
-					visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-					visualColor = Color.gray;
-					break;
-				case "Chamber":
-					visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
-					visualColor = Color.yellow;
-					break;
-				case "Specialist":
-					visual = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-					visualColor = Color.red;
-					break;
-				default:
-					break;
+					case "Hub":
+						visual = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+						visualColor = Color.blue;
+						break;
+					case "Corridor":
+						visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+						visualColor = Color.gray;
+						break;
+					case "Chamber":
+						visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
+						visualColor = Color.yellow;
+						break;
+					case "Specialist":
+						visual = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+						visualColor = Color.red;
+						break;
+					default:
+						break;
 				}
 
 			if (visual != null)

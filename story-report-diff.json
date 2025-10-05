@@ -1,0 +1,13 @@
+{
+    "newPhantomProps": [],
+    "resolvedPhantomProps": [],
+    "newColdPublicMethods": [],
+    "resolvedColdPublicMethods": [],
+    "newHollowEnums": [],
+    "resolvedHollowEnums": [],
+    "newPrematureCelebrations": [],
+    "resolvedPrematureCelebrations": [],
+    "previousVersion": "0.6.0",
+    "currentVersion": "0.6.0",
+    "generatedUtc": "2025-09-18T19:10:56.1093065Z"
+}
