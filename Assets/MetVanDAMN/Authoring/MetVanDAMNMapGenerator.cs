@@ -9,7 +9,6 @@ using TinyWalnutGames.MetVD.Graph;
 using TinyWalnutGames.MetVD.Shared;
 using System.Collections.Generic;
 using System;
-using TinyWalnutGames.StoryTest.Editor;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring
     {
@@ -98,7 +97,6 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         // Player tracking
         private Transform playerTransform = null!; // Assigned if discovered; else remains placeholderTransform
         private Vector2 playerMapPosition;
-        private uint currentDistrictId;
         private bool[] exploredDistricts = System.Array.Empty<bool>();
         private int _exploredDistrictCount; // number of districts flagged explored (cache to avoid recount loops for metrics)
         private float _lastExplorationPercentBucket = -1f; // last bucket threshold announced
@@ -160,8 +158,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring
         /// <summary>
         /// Main entry point for generating the complete world map
         /// </summary>
-        [StoryIgnore("Warning is legitimately positioned after readiness flags are set - StoryTest static analysis cannot detect control flow")]
-        public void GenerateWorldMap()
+      		public void GenerateWorldMap()
             {
             // Validate ECS world availability
             if (defaultWorld == null || !defaultWorld.IsCreated)

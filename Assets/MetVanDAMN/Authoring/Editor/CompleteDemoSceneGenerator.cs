@@ -158,20 +158,20 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 				collider2D.size = new Vector2(1f, 2f);
 				}
 
-			// Player movement controller
-			var movementController = playerGO.AddComponent<DemoPlayerMovement>();
+			// Player movement/controller components (non-null by construction)
+			playerGO.AddComponent<DemoPlayerMovement>();
 
 			// Player combat controller
-			var combatController = playerGO.AddComponent<DemoPlayerCombat>();
+			playerGO.AddComponent<DemoPlayerCombat>();
 
 			// Player inventory controller
-			var inventoryController = playerGO.AddComponent<DemoPlayerInventory>();
+			playerGO.AddComponent<DemoPlayerInventory>();
 
 			// 🎯 UPGRADE SYSTEM INTEGRATION - Complete procedural leveling perk system
 			SetupUpgradeSystem(playerGO);
 
 			// Visual representation
-			GameObject visualChild = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+			var visualChild = GameObject.CreatePrimitive(PrimitiveType.Capsule);
 			visualChild.name = "Visual";
 			visualChild.transform.SetParent(playerGO.transform);
 			visualChild.transform.localPosition = Vector3.zero;
@@ -186,8 +186,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 				UnityEngine.Object.DestroyImmediate(visualChild.GetComponent<Collider2D>());
 				}
 
-			// Set player color
+			// Set player color (ensure a renderer exists)
 			var renderer = visualChild.GetComponent<Renderer>();
+			if (renderer == null)
+				{
+				renderer = visualChild.AddComponent<MeshRenderer>();
+				}
 			renderer.material.color = Color.cyan;
 
 			// Position player at spawn point
@@ -201,14 +205,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		/// </summary>
 		private static void SetupCameraSystem(GameObject player, SceneProjection projection)
 			{
-			GameObject cameraRig = new GameObject("Camera Rig");
+			var cameraRig = new GameObject("Camera Rig");
 
 			// Main camera setup
 			Camera mainCamera;
 			if (projection == SceneProjection.ThreeD)
 				{
 				// 3D camera setup
-				GameObject cameraGO = new GameObject("Main Camera");
+				var cameraGO = new GameObject("Main Camera");
 				cameraGO.transform.SetParent(cameraRig.transform);
 				cameraGO.tag = "MainCamera";
 
@@ -222,7 +226,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			else
 				{
 				// 2D camera setup
-				GameObject cameraGO = new GameObject("Main Camera");
+				var cameraGO = new GameObject("Main Camera");
 				cameraGO.transform.SetParent(cameraRig.transform);
 				cameraGO.tag = "MainCamera";
 
@@ -331,12 +335,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var combatSystemGO = new GameObject("Combat System");
 
 			// Demo combat manager (to be implemented)
-			var combatManager = combatSystemGO.AddComponent<DemoCombatManager>();
+			DemoCombatManager? combatManager = combatSystemGO.AddComponent<DemoCombatManager>();
 
 			// Weapon spawner for demo
 			var weaponSpawnerGO = new GameObject("Weapon Spawner");
 			weaponSpawnerGO.transform.SetParent(combatSystemGO.transform);
-			var weaponSpawner = weaponSpawnerGO.AddComponent<DemoWeaponSpawner>();
+			DemoWeaponSpawner? weaponSpawner = weaponSpawnerGO.AddComponent<DemoWeaponSpawner>();
 			}
 
 		/// <summary>
@@ -347,12 +351,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var aiSystemGO = new GameObject("AI System");
 
 			// Demo AI manager (to be implemented)
-			var aiManager = aiSystemGO.AddComponent<DemoAIManager>();
+			DemoAIManager? aiManager = aiSystemGO.AddComponent<DemoAIManager>();
 
 			// Enemy spawner for demo
 			var enemySpawnerGO = new GameObject("Enemy Spawner");
 			enemySpawnerGO.transform.SetParent(aiSystemGO.transform);
-			var enemySpawner = enemySpawnerGO.AddComponent<DemoEnemySpawner>();
+			DemoEnemySpawner? enemySpawner = enemySpawnerGO.AddComponent<DemoEnemySpawner>();
 			}
 
 		/// <summary>
@@ -363,12 +367,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var inventorySystemGO = new GameObject("Inventory System");
 
 			// Demo inventory manager (to be implemented)
-			var inventoryManager = inventorySystemGO.AddComponent<DemoInventoryManager>();
+			DemoInventoryManager? inventoryManager = inventorySystemGO.AddComponent<DemoInventoryManager>();
 
 			// Inventory UI spawner
 			var inventoryUIGO = new GameObject("Inventory UI");
 			inventoryUIGO.transform.SetParent(inventorySystemGO.transform);
-			var inventoryUI = inventoryUIGO.AddComponent<DemoInventoryUI>();
+			DemoInventoryUI? inventoryUI = inventoryUIGO.AddComponent<DemoInventoryUI>();
 			}
 
 		/// <summary>
@@ -379,12 +383,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var lootSystemGO = new GameObject("Loot System");
 
 			// Demo loot manager (to be implemented)
-			var lootManager = lootSystemGO.AddComponent<DemoLootManager>();
+			DemoLootManager? lootManager = lootSystemGO.AddComponent<DemoLootManager>();
 
 			// Treasure spawner for demo
 			var treasureSpawnerGO = new GameObject("Treasure Spawner");
 			treasureSpawnerGO.transform.SetParent(lootSystemGO.transform);
-			var treasureSpawner = treasureSpawnerGO.AddComponent<DemoTreasureSpawner>();
+			DemoTreasureSpawner? treasureSpawner = treasureSpawnerGO.AddComponent<DemoTreasureSpawner>();
 			}
 
 		/// <summary>
@@ -395,10 +399,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var biomeArtGO = new GameObject("Biome Art System");
 
 			// Enhanced biome art profile
-			var biomeArtProfile = biomeArtGO.AddComponent<BiomeArtProfileAuthoring>();
+			BiomeArtProfileAuthoring? biomeArtProfile = biomeArtGO.AddComponent<BiomeArtProfileAuthoring>();
 
 			// Demo art applicator (to be implemented)
-			var artApplicator = biomeArtGO.AddComponent<DemoBiomeArtApplicator>();
+			DemoBiomeArtApplicator? artApplicator = biomeArtGO.AddComponent<DemoBiomeArtApplicator>();
 			}
 
 		/// <summary>
@@ -409,12 +413,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var maskingSystemGO = new GameObject("Room Masking System");
 
 			// Demo room masking manager (to be implemented)
-			var maskingManager = maskingSystemGO.AddComponent<DemoRoomMaskingManager>();
+			DemoRoomMaskingManager? maskingManager = maskingSystemGO.AddComponent<DemoRoomMaskingManager>();
 
 			// Room transition detector
 			var transitionGO = new GameObject("Room Transition Detector");
 			transitionGO.transform.SetParent(maskingSystemGO.transform);
-			var transitionDetector = transitionGO.AddComponent<DemoRoomTransitionDetector>();
+			DemoRoomTransitionDetector? transitionDetector = transitionGO.AddComponent<DemoRoomTransitionDetector>();
 			}
 
 		/// <summary>
@@ -425,7 +429,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var mapSystemGO = new GameObject("Map Generation System");
 
 			// Add the MetVanDAMN map generator
-			var mapGenerator = mapSystemGO.AddComponent<MetVanDAMNMapGenerator>();
+			MetVanDAMNMapGenerator? mapGenerator = mapSystemGO.AddComponent<MetVanDAMNMapGenerator>();
 
 			// Configure map settings for optimal demo experience
 			mapGenerator.autoGenerateOnWorldSetup = true;
@@ -446,10 +450,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var validationGO = new GameObject("Demo Validation");
 
 			// Demo scene validator (to be implemented)
-			var validator = validationGO.AddComponent<DemoSceneValidator>();
+			DemoSceneValidator? validator = validationGO.AddComponent<DemoSceneValidator>();
 
 			// Set validation parameters
-			var validationSettings = validationGO.AddComponent<DemoValidationSettings>();
+			DemoValidationSettings? validationSettings = validationGO.AddComponent<DemoValidationSettings>();
 			// Configure based on projection and requirements
 			}
 
@@ -459,7 +463,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		private static void SetupSceneForProjection(SceneProjection projection)
 			{
 			// Create appropriate lighting setup
-			GameObject lightGO = new GameObject("Directional Light");
+			var lightGO = new GameObject("Directional Light");
 			Light light = lightGO.AddComponent<Light>();
 			light.type = LightType.Directional;
 
@@ -510,7 +514,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		private static void SetupUpgradeSystem(GameObject playerGO)
 			{
 			// Add the complete player setup component - this handles everything
-			var completeSetup = playerGO.AddComponent<CompletePlayerSetup>();
+			CompletePlayerSetup? completeSetup = playerGO.AddComponent<CompletePlayerSetup>();
 
 			// Configure for auto-setup
 			var setupSO = new SerializedObject(completeSetup);
@@ -524,7 +528,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 			// Create upgrade database manager in scene
 			var dbManagerGO = new GameObject("UpgradeDatabaseManager");
-			var dbManager = dbManagerGO.AddComponent<UpgradeDatabaseManager>();
+			UpgradeDatabaseManager? dbManager = dbManagerGO.AddComponent<UpgradeDatabaseManager>();
 
 			// Configure database manager
 			var dbSO = new SerializedObject(dbManager);
@@ -537,7 +541,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 			// Create level-up UI GameObject
 			var uiGO = new GameObject("LevelUpChoiceUI");
-			var choiceUI = uiGO.AddComponent<LevelUpChoiceUI>();
+			LevelUpChoiceUI? choiceUI = uiGO.AddComponent<LevelUpChoiceUI>();
 
 			// Configure UI
 			var uiSO = new SerializedObject(choiceUI);
@@ -565,7 +569,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			CreateSpecialUpgradeCollection(collectionsPath);
 
 			// Verify all collections exist and are properly configured
-			var collections = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
+			string[]? collections = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
 			Debug.Log($"📚 Verified {collections.Length} upgrade collections for complete demo setup");
 
 			// Load and configure biome weights for existing collections
@@ -580,7 +584,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			string assetPath = $"{basePath}/DefenseUpgrades.asset";
 			if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
 
-			var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+			UpgradeCollection? collection = ScriptableObject.CreateInstance<UpgradeCollection>();
 			collection.name = "DefenseUpgrades";
 			// Configure via SerializedObject to access private fields safely
 			ApplyUpgradeCollectionBasics(
@@ -612,7 +616,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			string assetPath = $"{basePath}/UtilityUpgrades.asset";
 			if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
 
-			var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+			UpgradeCollection? collection = ScriptableObject.CreateInstance<UpgradeCollection>();
 			collection.name = "UtilityUpgrades";
 			ApplyUpgradeCollectionBasics(
 				collection,
@@ -643,7 +647,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			string assetPath = $"{basePath}/SpecialUpgrades.asset";
 			if (AssetDatabase.LoadAssetAtPath<UpgradeCollection>(assetPath) != null) return;
 
-			var collection = ScriptableObject.CreateInstance<UpgradeCollection>();
+			UpgradeCollection? collection = ScriptableObject.CreateInstance<UpgradeCollection>();
 			collection.name = "SpecialUpgrades";
 			ApplyUpgradeCollectionBasics(
 				collection,
@@ -671,29 +675,29 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		/// </summary>
 		private static void ConfigureBiomeWeightsForAllCollections(string collectionsPath)
 			{
-			var collectionGUIDs = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
+			string[]? collectionGUIDs = AssetDatabase.FindAssets("t:UpgradeCollection", new[] { collectionsPath });
 			int configuredCount = 0;
 
 			foreach (string guid in collectionGUIDs)
 				{
 				string path = AssetDatabase.GUIDToAssetPath(guid);
-				var collection = AssetDatabase.LoadAssetAtPath<UpgradeCollection>(path);
+				UpgradeCollection? collection = AssetDatabase.LoadAssetAtPath<UpgradeCollection>(path);
 
 				if (collection != null)
 					{
 					// Ensure biome weights are configured if missing via SerializedObject
 					var so = new SerializedObject(collection);
-					var weightsProp = so.FindProperty("biomeWeights");
+					SerializedProperty? weightsProp = so.FindProperty("biomeWeights");
 					if (weightsProp != null && weightsProp.arraySize == 0)
 						{
-						var catProp = so.FindProperty("category");
+						SerializedProperty? catProp = so.FindProperty("category");
 						var category = (UpgradeCategory)catProp.enumValueIndex;
-						var defaults = GetDefaultPolarityWeights(category);
+						(Polarity biome, float weight)[] defaults = GetDefaultPolarityWeights(category);
 
 						weightsProp.arraySize = defaults.Length;
 						for (int i = 0; i < defaults.Length; i++)
 							{
-							var elem = weightsProp.GetArrayElementAtIndex(i);
+							SerializedProperty? elem = weightsProp.GetArrayElementAtIndex(i);
 							elem.FindPropertyRelative("biomeType").intValue = (int)defaults[i].biome;
 							elem.FindPropertyRelative("weightMultiplier").floatValue = defaults[i].weight;
 							}
@@ -763,7 +767,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			UpgradeCategory category,
 			string description,
 			(Polarity biome, float weight)[] weights,
-			string? collectionName = null)
+			string collectionName = "")
 			{
 			var so = new SerializedObject(collection);
 			var catProp = so.FindProperty("category");

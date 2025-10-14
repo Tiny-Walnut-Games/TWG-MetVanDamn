@@ -101,8 +101,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			Handles.color = _settings.districtColor;
 
 			// 🔧 FIX: Calculate rectangle corners safely
-			Vector3 halfX = new Vector3(size.x * 0.5f, 0, 0);
-			Vector3 halfZ = new Vector3(0, 0, size.y * 0.5f);
+			var halfX = new Vector3(size.x * 0.5f, 0, 0);
+			var halfZ = new Vector3(0, 0, size.y * 0.5f);
 			Vector3[] corners =
 				{
 				pos - halfX - halfZ,

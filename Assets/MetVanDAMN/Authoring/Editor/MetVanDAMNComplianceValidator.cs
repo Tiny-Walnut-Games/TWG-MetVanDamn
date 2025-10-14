@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 	{
@@ -112,7 +113,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			Debug.Log("📚 Validating documentation mandate...");
 
 			// Check if all docs are in single location
-			var docsPath = "Assets/docs/MetVanDAMN";
+			string docsPath = "Assets/docs/MetVanDAMN";
 			if (!Directory.Exists(docsPath))
 				{
 				lastReport?.failedChecks.Add("Documentation not consolidated in single location (docs/MetVanDAMN)");
@@ -124,9 +125,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 			// Check GitBook structure
 			string[] requiredFolders = { "setup", "gameplay", "development", "tutorials", "reference" };
-			foreach (var folder in requiredFolders)
+			foreach (string folder in requiredFolders)
 				{
-				var folderPath = Path.Combine(docsPath, folder);
+				string folderPath = Path.Combine(docsPath, folder);
 				if (!Directory.Exists(folderPath))
 					{
 					lastReport?.failedChecks.Add($"Missing required documentation folder: {folder}");
@@ -138,14 +139,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 				}
 
 			// Check for complete setup guide
-			var setupGuidePath = Path.Combine(docsPath, "setup", "complete-setup-guide.md");
+			string setupGuidePath = Path.Combine(docsPath, "setup", "complete-setup-guide.md");
 			if (!File.Exists(setupGuidePath))
 				{
 				lastReport?.failedChecks.Add("Missing complete setup guide");
 				}
 			else
 				{
-				var content = File.ReadAllText(setupGuidePath);
+				string content = File.ReadAllText(setupGuidePath);
 				if (content.Contains("smoke_test_scenes") && content.Contains("press_play_ready"))
 					{
 					lastReport?.passedChecks.Add("✓ Setup guide meets full demo requirements");
@@ -162,7 +163,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			Debug.Log("🎮 Validating gameplay mechanics mandate...");
 
 			// Check for demo scene generator
-			var generatorScript = "Assets/MetVanDAMN/Authoring/Editor/CompleteDemoSceneGenerator.cs";
+			string generatorScript = "Assets/MetVanDAMN/Authoring/Editor/CompleteDemoSceneGenerator.cs";
 			if (!File.Exists(generatorScript))
 				{
 				lastReport?.failedChecks.Add("Missing demo scene generator");
@@ -184,9 +185,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 				"DemoTreasureChest"
 				};
 
-			foreach (var component in requiredComponents)
+			foreach (string component in requiredComponents)
 				{
-				var scriptPath = $"Assets/MetVanDAMN/Authoring/{component}.cs";
+				string scriptPath = $"Assets/MetVanDAMN/Authoring/{component}.cs";
 				if (!File.Exists(scriptPath))
 					{
 					lastReport?.failedChecks.Add($"Missing required component: {component}");
@@ -215,13 +216,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void ValidateMovementSystem()
 			{
-			var movementPath = "Assets/MetVanDAMN/Authoring/DemoPlayerMovement.cs";
+			string movementPath = "Assets/MetVanDAMN/Authoring/DemoPlayerMovement.cs";
 			if (File.Exists(movementPath))
 				{
-				var content = File.ReadAllText(movementPath);
+				string content = File.ReadAllText(movementPath);
 
 				string[] requiredCapabilities = { "walk", "run", "jump", "coyote", "dash", "ledge" };
-				foreach (var capability in requiredCapabilities)
+				foreach (string capability in requiredCapabilities)
 					{
 					if (content.ToLower().Contains(capability))
 						{
@@ -237,15 +238,15 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void ValidateCombatSystem()
 			{
-			var combatPath = "Assets/MetVanDAMN/Authoring/DemoPlayerCombat.cs";
+			string combatPath = "Assets/MetVanDAMN/Authoring/DemoPlayerCombat.cs";
 			if (File.Exists(combatPath))
 				{
-				var content = File.ReadAllText(combatPath);
+				string content = File.ReadAllText(combatPath);
 
 				string[] requiredWeapons = { "melee", "ranged", "aoe" };
 				string[] requiredAttacks = { "light", "heavy", "charged", "combo", "special" };
 
-				foreach (var weapon in requiredWeapons)
+				foreach (string weapon in requiredWeapons)
 					{
 					if (content.ToLower().Contains(weapon))
 						{
@@ -257,7 +258,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 						}
 					}
 
-				foreach (var attack in requiredAttacks)
+				foreach (string attack in requiredAttacks)
 					{
 					if (content.ToLower().Contains(attack))
 						{
@@ -273,13 +274,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void ValidateAISystem()
 			{
-			var aiPath = "Assets/MetVanDAMN/Authoring/DemoEnemyAI.cs";
+			string aiPath = "Assets/MetVanDAMN/Authoring/DemoEnemyAI.cs";
 			if (File.Exists(aiPath))
 				{
-				var content = File.ReadAllText(aiPath);
+				string content = File.ReadAllText(aiPath);
 
 				string[] requiredAITypes = { "patrol", "chase", "ranged", "kite", "melee", "brute", "caster" };
-				foreach (var aiType in requiredAITypes)
+				foreach (string aiType in requiredAITypes)
 					{
 					if (content.ToLower().Contains(aiType))
 						{
@@ -292,13 +293,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 					}
 				}
 
-			var bossPath = "Assets/MetVanDAMN/Authoring/DemoBossAI.cs";
+			string bossPath = "Assets/MetVanDAMN/Authoring/DemoBossAI.cs";
 			if (File.Exists(bossPath))
 				{
-				var content = File.ReadAllText(bossPath);
+				string content = File.ReadAllText(bossPath);
 
 				string[] requiredBossFeatures = { "phase", "telegraph", "summon", "arena" };
-				foreach (var feature in requiredBossFeatures)
+				foreach (string feature in requiredBossFeatures)
 					{
 					if (content.ToLower().Contains(feature))
 						{
@@ -314,13 +315,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void ValidateInventorySystem()
 			{
-			var inventoryPath = "Assets/MetVanDAMN/Authoring/DemoPlayerInventory.cs";
+			string inventoryPath = "Assets/MetVanDAMN/Authoring/DemoPlayerInventory.cs";
 			if (File.Exists(inventoryPath))
 				{
-				var content = File.ReadAllText(inventoryPath);
+				string content = File.ReadAllText(inventoryPath);
 
 				string[] requiredSlots = { "weapon", "offhand", "armor", "trinket" };
-				foreach (var slot in requiredSlots)
+				foreach (string slot in requiredSlots)
 					{
 					if (content.ToLower().Contains(slot))
 						{
@@ -339,7 +340,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			Debug.Log("🎬 Validating demo scenes...");
 
 			// Check for demo scene creation menu
-			var menuItems = TypeCache.GetMethodsWithAttribute<MenuItem>()
+			IEnumerable<MethodInfo> menuItems = TypeCache.GetMethodsWithAttribute<MenuItem>()
 				.Where(m => m.GetCustomAttributes(typeof(MenuItem), false)
 					.Cast<MenuItem>()
 					.Any(attr => attr.menuItem.Contains("Create Base DEMO Scene")));
@@ -356,9 +357,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			// Check for existing demo scenes
 			string[] sceneNames =
 					{ "MetVanDAMN_Complete2DPlatformer", "MetVanDAMN_CompleteTopDown", "MetVanDAMN_Complete3D" };
-			foreach (var sceneName in sceneNames)
+			foreach (string sceneName in sceneNames)
 				{
-				var scenePath = $"Assets/Scenes/{sceneName}.unity";
+				string scenePath = $"Assets/Scenes/{sceneName}.unity";
 				if (File.Exists(scenePath))
 					{
 					lastReport?.passedChecks.Add($"✓ Demo scene exists: {sceneName}");
@@ -372,13 +373,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void ValidateMapGenerationSystem()
 			{
-			var mapSystemPath = "Assets/MetVanDAMN/Authoring/MetVanDAMNMapGenerator.cs";
+			string mapSystemPath = "Assets/MetVanDAMN/Authoring/MetVanDAMNMapGenerator.cs";
 			if (File.Exists(mapSystemPath))
 				{
-				var content = File.ReadAllText(mapSystemPath);
+				string content = File.ReadAllText(mapSystemPath);
 
 				string[] requiredFeatures = { "minimap", "detailed", "export", "biome", "district", "room" };
-				foreach (var feature in requiredFeatures)
+				foreach (string feature in requiredFeatures)
 					{
 					if (content.ToLower().Contains(feature))
 						{
@@ -401,17 +402,17 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			Debug.Log("📖 Validating narrative test compliance...");
 
 			// Check documentation for narrative coherence
-			var docsPath = "Assets/docs/MetVanDAMN";
+			string docsPath = "Assets/docs/MetVanDAMN";
 			if (Directory.Exists(docsPath))
 				{
-				var markdownFiles = Directory.GetFiles(docsPath, "*.md", SearchOption.AllDirectories);
+				string[] markdownFiles = Directory.GetFiles(docsPath, "*.md", SearchOption.AllDirectories);
 
 				int narrativeScore = 0;
 				int totalFiles = markdownFiles.Length;
 
-				foreach (var file in markdownFiles)
+				foreach (string file in markdownFiles)
 					{
-					var content = File.ReadAllText(file);
+					string content = File.ReadAllText(file);
 
 					// Check for narrative elements
 					if (content.Contains("story") || content.Contains("narrative") ||
@@ -441,13 +442,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void ValidateCodeNarrative()
 			{
-			var sourceFiles = Directory.GetFiles("Assets/MetVanDAMN", "*.cs", SearchOption.AllDirectories);
+			string[] sourceFiles = Directory.GetFiles("Assets/MetVanDAMN", "*.cs", SearchOption.AllDirectories);
 
 			int wellDocumentedFiles = 0;
 
-			foreach (var file in sourceFiles)
+			foreach (string file in sourceFiles)
 				{
-				var content = File.ReadAllText(file);
+				string content = File.ReadAllText(file);
 
 				// Check for meaningful documentation
 				int summaryCount = content.Split("/// <summary>").Length - 1;
@@ -496,7 +497,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			if (lastReport.passedChecks.Count > 0)
 				{
 				EditorGUILayout.LabelField($"Passed Checks ({lastReport.passedChecks.Count})", EditorStyles.boldLabel);
-				foreach (var check in lastReport.passedChecks)
+				foreach (string? check in lastReport.passedChecks)
 					{
 					EditorGUILayout.LabelField(check, EditorStyles.helpBox);
 					}
@@ -508,7 +509,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			if (lastReport.warningChecks.Count > 0)
 				{
 				EditorGUILayout.LabelField($"Warnings ({lastReport.warningChecks.Count})", EditorStyles.boldLabel);
-				foreach (var check in lastReport.warningChecks)
+				foreach (string? check in lastReport.warningChecks)
 					{
 					EditorGUILayout.HelpBox(check, MessageType.Warning);
 					}
@@ -520,7 +521,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			if (lastReport.failedChecks.Count > 0)
 				{
 				EditorGUILayout.LabelField($"Failed Checks ({lastReport.failedChecks.Count})", EditorStyles.boldLabel);
-				foreach (var check in lastReport.failedChecks)
+				foreach (string? check in lastReport.failedChecks)
 					{
 					EditorGUILayout.HelpBox(check, MessageType.Error);
 					}
@@ -584,7 +585,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			Debug.Log("🎬 Validating demo scene compliance...");
 
 			bool allPassed = true;
-			List<string> issues = new List<string>();
+			var issues = new List<string>();
 
 			// Check for required player components
 			if (requirePlayerMovement && !FindFirstObjectByType<DemoPlayerMovement>())
@@ -647,13 +648,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		// Public API for external validation
 		public static bool ValidateCurrentScene()
 			{
-			var validator = FindFirstObjectByType<DemoSceneValidator>();
+			DemoSceneValidator? validator = FindFirstObjectByType<DemoSceneValidator>();
 			return validator ? validator.ValidateScene() : false;
 			}
 
 		private static bool HasComponentByName(string typeName)
 			{
-			var behaviours =
+			MonoBehaviour[]? behaviours =
 				UnityEngine.Object.FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include,
 					FindObjectsSortMode.None);
 			for (int i = 0; i < behaviours.Length; i++)

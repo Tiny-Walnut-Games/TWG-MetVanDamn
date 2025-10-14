@@ -1,0 +1,23 @@
+﻿version: "1.0"
+
+linter: jetbrains/qodana-dotnet:latest
+ide: QDNET
+
+profile:
+  name: qodana.starter
+
+bootstrap: sh ./scripts/storytest-validate.sh
+
+exclude:
+  - name: All
+    paths:
+      - ".git/**"
+      - ".idea/**"
+      - ".qodana/**"
+      - "Library/**"
+      - "Logs/**"
+      - "Temp/**"
+      - "UserSettings/**"
+      - "Build/**"
+      - "**/bin/**"
+      - "**/obj/**"

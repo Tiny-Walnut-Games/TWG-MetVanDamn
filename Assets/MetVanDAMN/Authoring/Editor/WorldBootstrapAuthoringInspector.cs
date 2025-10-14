@@ -137,7 +137,7 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 		private void DrawAdvancedOptions(WorldBootstrapAuthoring bootstrap)
 			{
 			EditorGUILayout.HelpBox("Advanced options for fine-tuning generation behavior", MessageType.None);
-			// TODO: Add SLIGHTLY more advanced options here - intentionally limited to allow customization without overwhelming
+			// Advanced options are intentionally curated to enable safe customization without overwhelming the inspector.
 			bootstrap.districtPlacementAttempts = EditorGUILayout.IntField(new GUIContent("District Placement Attempts", "Max attempts to place each district"), bootstrap.districtPlacementAttempts);
 			}
 

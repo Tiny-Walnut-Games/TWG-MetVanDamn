@@ -68,6 +68,7 @@
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\AuthoringValidator.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\RitualSupport\ConsoleCommentaryWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\NavigationGraphGizmo.cs" />
+    <Compile Include="Assets\MetVanDAMN\Authoring\Editor\GoArtPreviewWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\SectorRoomHierarchyWindow.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\SubSceneInternalScanner.cs" />
     <Compile Include="Assets\MetVanDAMN\Authoring\Editor\DungeonDelvePreviewTool.cs" />

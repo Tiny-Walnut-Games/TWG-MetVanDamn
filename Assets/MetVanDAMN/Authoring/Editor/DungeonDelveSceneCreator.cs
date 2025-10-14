@@ -8,6 +8,7 @@ using TinyWalnutGames.MetVD.Authoring;
 using TinyWalnutGames.MetVanDAMN.Authoring;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 	{
@@ -51,18 +52,18 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			{
 			// Main Dungeon Delve Mode component
 			var dungeonGO = new GameObject("Dungeon Delve Mode");
-			var dungeonMode = dungeonGO.AddComponent<DungeonDelveMode>();
+			DungeonDelveMode? dungeonMode = dungeonGO.AddComponent<DungeonDelveMode>();
 
 			// Set initial configuration
 			SetDungeonModeDefaults(dungeonMode);
 
 			// Main Menu system
 			var menuGO = new GameObject("Dungeon Delve Main Menu");
-			var mainMenu = menuGO.AddComponent<DungeonDelveMainMenu>();
+			DungeonDelveMainMenu? mainMenu = menuGO.AddComponent<DungeonDelveMainMenu>();
 
 			// Validator system
 			var validatorGO = new GameObject("Dungeon Delve Validator");
-			var validator = validatorGO.AddComponent<DungeonDelveValidator>();
+			DungeonDelveValidator? validator = validatorGO.AddComponent<DungeonDelveValidator>();
 
 			Debug.Log("🏰 Dungeon Delve core systems created");
 			}
@@ -70,14 +71,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		private static void SetDungeonModeDefaults(DungeonDelveMode dungeonMode)
 			{
 			// Use reflection to set private fields with good defaults
-			var seedField = typeof(DungeonDelveMode).GetField("dungeonSeed",
+			FieldInfo? seedField = typeof(DungeonDelveMode).GetField("dungeonSeed",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 			if (seedField != null)
 				{
 				seedField.SetValue(dungeonMode, (uint)42); // Classic seed
 				}
 
-			var floorsField = typeof(DungeonDelveMode).GetField("floorsCount",
+			FieldInfo? floorsField = typeof(DungeonDelveMode).GetField("floorsCount",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 			if (floorsField != null)
 				{
@@ -92,23 +93,23 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			playerGO.transform.position = Vector3.zero;
 
 			// Add player components
-			var playerMovement = playerGO.AddComponent<DemoPlayerMovement>();
-			var playerCombat = playerGO.AddComponent<DemoPlayerCombat>();
-			var playerInventory = playerGO.AddComponent<DemoPlayerInventory>();
+			DemoPlayerMovement? playerMovement = playerGO.AddComponent<DemoPlayerMovement>();
+			DemoPlayerCombat? playerCombat = playerGO.AddComponent<DemoPlayerCombat>();
+			DemoPlayerInventory? playerInventory = playerGO.AddComponent<DemoPlayerInventory>();
 
 			// Add visual representation
-			var renderer = playerGO.AddComponent<MeshRenderer>();
-			var meshFilter = playerGO.AddComponent<MeshFilter>();
+			MeshRenderer? renderer = playerGO.AddComponent<MeshRenderer>();
+			MeshFilter? meshFilter = playerGO.AddComponent<MeshFilter>();
 			meshFilter.mesh = CreatePlayerMesh();
 			renderer.material = CreatePlayerMaterial();
 
 			// Add collider for interaction
-			var collider = playerGO.AddComponent<CapsuleCollider>();
+			CapsuleCollider? collider = playerGO.AddComponent<CapsuleCollider>();
 			collider.height = 2f;
 			collider.radius = 0.5f;
 
 			// Add rigidbody for physics
-			var rigidbody = playerGO.AddComponent<Rigidbody>();
+			Rigidbody? rigidbody = playerGO.AddComponent<Rigidbody>();
 			rigidbody.freezeRotation = true;
 
 			Debug.Log("👤 Player system created");
@@ -117,7 +118,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		private static void CreateCameraSystem()
 			{
 			// Find main camera or create one
-			var mainCamera = Camera.main;
+			Camera? mainCamera = Camera.main;
 			if (mainCamera == null)
 				{
 				var cameraGO = new GameObject("Main Camera");
@@ -131,7 +132,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			mainCamera.transform.rotation = Quaternion.Euler(30, 0, 0);
 
 			// Add camera controller for dungeon exploration
-			var cameraController = mainCamera.gameObject.AddComponent<DungeonCameraController>();
+			DungeonCameraController? cameraController = mainCamera.gameObject.AddComponent<DungeonCameraController>();
 
 			Debug.Log("📷 Camera system created");
 			}
@@ -147,7 +148,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 				canvas.sortingOrder = 100;
 
-				var canvasScaler = canvasGO.AddComponent<CanvasScaler>();
+				CanvasScaler? canvasScaler = canvasGO.AddComponent<CanvasScaler>();
 				canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
 				canvasScaler.referenceResolution = new Vector2(1920, 1080);
 
@@ -164,7 +165,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			// Add additional validation helpers if needed
 
 			var validationGO = new GameObject("Validation Helpers");
-			var validationHelper = validationGO.AddComponent<DungeonValidationHelper>();
+			DungeonValidationHelper? validationHelper = validationGO.AddComponent<DungeonValidationHelper>();
 
 			Debug.Log("✅ Validation system created");
 			}
@@ -173,27 +174,27 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			{
 			// SmokeTestSceneSetup for immediate world generation
 			var worldGenGO = new GameObject("World Generation");
-			var smokeTest = worldGenGO.AddComponent<SmokeTestSceneSetup>();
+			SmokeTestSceneSetup? smokeTest = worldGenGO.AddComponent<SmokeTestSceneSetup>();
 
 			// Configure for dungeon delve mode
 			ConfigureSmokeTestForDungeon(smokeTest);
 
 			// Add ECS Prefab Registry
 			var registryGO = new GameObject("ECS Prefab Registry");
-			var registry = registryGO.AddComponent<EcsPrefabRegistryAuthoring>();
+			EcsPrefabRegistryAuthoring? registry = registryGO.AddComponent<EcsPrefabRegistryAuthoring>();
 			ConfigurePrefabRegistry(registry);
 
 			// Add AI Manager
 			var aiGO = new GameObject("AI Manager");
-			var aiManager = aiGO.AddComponent<DemoAIManager>();
+			DemoAIManager? aiManager = aiGO.AddComponent<DemoAIManager>();
 
 			// Add Loot Manager
 			var lootGO = new GameObject("Loot Manager");
-			var lootManager = lootGO.AddComponent<DemoLootManager>();
+			DemoLootManager? lootManager = lootGO.AddComponent<DemoLootManager>();
 
 			// Add Map Generator
 			var mapGO = new GameObject("Map Generator");
-			var mapGenerator = mapGO.AddComponent<MetVanDAMNMapGenerator>();
+			MetVanDAMNMapGenerator? mapGenerator = mapGO.AddComponent<MetVanDAMNMapGenerator>();
 
 			Debug.Log("🗺️ World generation system created");
 			}
@@ -201,28 +202,28 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		private static void ConfigureSmokeTestForDungeon(SmokeTestSceneSetup smokeTest)
 			{
 			// Use reflection to configure smoke test for dungeon mode
-			var seedField = typeof(SmokeTestSceneSetup).GetField("worldSeed",
+			FieldInfo? seedField = typeof(SmokeTestSceneSetup).GetField("worldSeed",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 			if (seedField != null)
 				{
 				seedField.SetValue(smokeTest, (uint)42);
 				}
 
-			var sizeField = typeof(SmokeTestSceneSetup).GetField("worldSize",
+			FieldInfo? sizeField = typeof(SmokeTestSceneSetup).GetField("worldSize",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 			if (sizeField != null)
 				{
 				sizeField.SetValue(smokeTest, new Unity.Mathematics.int2(50, 50));
 				}
 
-			var sectorsField = typeof(SmokeTestSceneSetup).GetField("targetSectorCount",
+			FieldInfo? sectorsField = typeof(SmokeTestSceneSetup).GetField("targetSectorCount",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 			if (sectorsField != null)
 				{
 				sectorsField.SetValue(smokeTest, 5);
 				}
 
-			var debugField = typeof(SmokeTestSceneSetup).GetField("enableDebugVisualization",
+			FieldInfo? debugField = typeof(SmokeTestSceneSetup).GetField("enableDebugVisualization",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 			if (debugField != null)
 				{
@@ -367,7 +368,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			cameraComponent = GetComponent<Camera>();
 
 			// Find player
-			var playerMovement = FindFirstObjectByType<DemoPlayerMovement>();
+			DemoPlayerMovement? playerMovement = FindFirstObjectByType<DemoPlayerMovement>();
 			if (playerMovement)
 				{
 				playerTransform = playerMovement.transform;
@@ -386,7 +387,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			Vector3 lookDirection = playerTransform.position - transform.position;
 			if (lookDirection != Vector3.zero)
 				{
-				Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+				var targetRotation = Quaternion.LookRotation(lookDirection);
 				transform.rotation =
 					Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 				}

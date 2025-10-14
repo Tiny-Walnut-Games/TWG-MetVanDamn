@@ -1,0 +1,64 @@
+﻿storytest-guidelines:
+  version: 1.0
+  philosophy:
+    narrative_completeness: >
+      Every class is an actor, every method a line of dialogue,
+      every system a scene. Nothing unsealed, nothing placeholder,
+      no TODOs. Code must be production-ready as written.
+    constraints:
+      - born from 50-hour game jam discipline
+      - zero technical debt tolerance
+      - immediate production readiness
+  validation_categories:
+    narrative_integrity:
+      rules:
+        - no_unsealed_symbols: "All abstract/virtual/interface contracts must be fully implemented"
+        - no_placeholders: "No NotImplementedException, empty bodies, or dummy returns"
+        - no_dev_artifacts: "No TODO/FIXME/HACK/TEMP markers, no debug-only code in production"
+    architectural_integrity:
+      rules:
+        - dots_ecs_compliance: "MonoBehaviours only at boundaries, no GameObject refs in systems"
+        - webgl_compatibility: "No threads beyond Job System, no unsafe code, no unsupported APIs"
+        - performance_standards: "No reflection in hot paths, no GC allocs in Update, no string concat in loops"
+    production_readiness:
+      rules:
+        - resource_management: "All assets loadable, no missing refs, proper cleanup"
+        - error_handling: "Graceful degradation, no unhandled exceptions"
+        - configuration: "No hardcoded values, ScriptableObjects configured, automated scene setup"
+  metrics:
+    story_integrity_score:
+      target: ">=95%"
+      formula: "(validated_symbols / total_symbols) * 100"
+    violation_density:
+      target: "0 per 1000 LOC"
+      formula: "total_violations / (lines_of_code / 1000)"
+    production_readiness_score:
+      target: ">=95%"
+      formula: "composite across all validation phases"
+    time_to_ready:
+      target: "<=1 week from first commit"
+  workflow_integration:
+    development_cycle:
+      pre_dev: ["story planning", "architecture design", "validation setup", "team alignment"]
+      dev: ["story-driven coding", "continuous validation", "immediate violation resolution", "peer review"]
+      pre_prod: ["comprehensive validation", "performance validation", "compatibility testing", "final strengthening"]
+    tooling:
+      ide_integration: ["pre-build validation targets", "compile-time quick checks"]
+      unity_editor: ["auto-validation on compile", "playmode gatekeeping", "dashboard window"]
+      git_hooks:
+        pre_commit: "run story integrity validation"
+        pre_push: "run full production excellence pipeline"
+      ci_cd: "full validation pipeline with artifact reports"
+  strengthening_system:
+    philosophy: "Continuous strengthening against narrative violations"
+    metrics: ["integrity score", "coverage score", "readiness score", "composite lore health index"]
+    realtime_monitoring: "optional continuous validation with live metrics"
+  adoption:
+    training: ["intro workshop", "hands-on practice", "ongoing mentorship"]
+    culture: ["narrative first", "no compromise", "immediate resolution", "collective responsibility"]
+    recognition: ["story champions", "zero violation milestones", "production ready awards"]
+    change_management: ["pilot project", "gradual expansion", "org-wide adoption"]
+  case_studies:
+    jam_origin: "Proof under extreme constraints"
+    production_scale: "Proof in commercial projects"
+    legacy_transformation: "Proof in rescuing existing codebases"

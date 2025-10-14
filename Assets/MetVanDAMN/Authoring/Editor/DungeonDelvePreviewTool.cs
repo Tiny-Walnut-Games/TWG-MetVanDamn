@@ -15,8 +15,12 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 	/// Allows designers to test and validate dungeon layouts before player experience.
 	/// Fully compliant with MetVanDAMN mandate: complete tooling for development workflow.
 	/// </summary>
-	public class DungeonDelvePreviewTool : EditorWindow
+	public sealed class DungeonDelvePreviewTool : EditorWindow
 		{
+		private const int DefaultFloorCount = 3;
+		private const float DefaultPreviewHeight = 300f;
+		private const float BossRectSize = 16f;
+		private const float FloorBorderThickness = 2f;
 		[Header("Preview Configuration")] [SerializeField]
 		private uint previewSeed = 42;
 
@@ -49,9 +53,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		private readonly Color secretColor = new(1f, 1f, 0f, 0.8f);
 
 		// Preview data
-		private DungeonPreviewData? currentPreview;
-		private GUIStyle headerStyle;
-		private GUIStyle labelStyle;
+		private DungeonPreviewData currentPreview = new DungeonPreviewData();
+		private GUIStyle headerStyle = new GUIStyle();
+		private GUIStyle labelStyle = new GUIStyle();
 		private bool needsRefresh = true;
 		private Vector2 scrollPosition;
 
@@ -64,6 +68,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		private void OnGUI()
 			{
 			DrawHeader();
+			scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 			DrawControlPanel();
 
 			if (needsRefresh && autoRefresh)
@@ -73,6 +78,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 			DrawPreviewArea();
 			DrawStatistics();
+			EditorGUILayout.EndScrollView();
 
 			if (needsRefresh)
 				{
@@ -185,14 +191,14 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Dungeon Layout Preview", EditorStyles.boldLabel);
 
-			if (currentPreview == null)
+			if (currentPreview.floors.Count == 0)
 				{
 				EditorGUILayout.HelpBox("No preview data available. Click 'Refresh Preview' to generate.",
 					MessageType.Info);
 				return;
 				}
 
-			var rect = GUILayoutUtility.GetRect(position.width - 20, 300);
+			var rect = GUILayoutUtility.GetRect(position.width - 20, DefaultPreviewHeight);
 
 			GUI.BeginGroup(rect);
 
@@ -237,7 +243,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void DrawFloors(Rect rect)
 			{
-			if (currentPreview?.floors == null) return;
+			if (currentPreview.floors.Count == 0) return;
 
 			for (int i = 0; i < currentPreview.floors.Count; i++)
 				{
@@ -254,7 +260,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 					}
 
 				// Floor border
-				DrawRectOutline(floorRect, Color.white, 2);
+				DrawRectOutline(floorRect, Color.white, FloorBorderThickness);
 
 				// Floor label
 				if (showLabels)
@@ -267,12 +273,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void DrawBosses(Rect rect)
 			{
-			if (currentPreview?.bosses == null) return;
+			if (currentPreview.bosses.Count == 0) return;
 
 			foreach (var boss in currentPreview.bosses)
 				{
 				var pos = WorldToScreenPosition(boss.position, rect);
-				var bossRect = new Rect(pos.x - 8, pos.y - 8, 16, 16);
+				var half = BossRectSize * 0.5f;
+				var bossRect = new Rect(pos.x - half, pos.y - half, BossRectSize, BossRectSize);
 
 				EditorGUI.DrawRect(bossRect, bossColor);
 				DrawRectOutline(bossRect, Color.white, 1);
@@ -287,7 +294,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void DrawProgressionLocks(Rect rect)
 			{
-			if (currentPreview?.progressionLocks == null) return;
+			if (currentPreview.progressionLocks.Count == 0) return;
 
 			foreach (var lockData in currentPreview.progressionLocks)
 				{
@@ -307,7 +314,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void DrawSecrets(Rect rect)
 			{
-			if (currentPreview?.secrets == null) return;
+			if (currentPreview.secrets.Count == 0) return;
 
 			foreach (var secret in currentPreview.secrets)
 				{
@@ -327,7 +334,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void DrawPickups(Rect rect)
 			{
-			if (currentPreview?.pickups == null) return;
+			if (currentPreview.pickups.Count == 0) return;
 
 			foreach (var pickup in currentPreview.pickups)
 				{
@@ -347,7 +354,6 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 		private void DrawStatistics()
 			{
-			if (currentPreview == null) return;
 
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Generation Statistics", EditorStyles.boldLabel);
@@ -355,23 +361,20 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			EditorGUILayout.BeginVertical("box");
 
 			EditorGUILayout.LabelField($"🎲 Seed: {previewSeed}");
-			EditorGUILayout.LabelField($"🏢 Floors: {currentPreview.floors?.Count ?? 0}");
-			EditorGUILayout.LabelField($"👹 Bosses: {currentPreview.bosses?.Count ?? 0}");
-			EditorGUILayout.LabelField($"🔒 Progression Locks: {currentPreview.progressionLocks?.Count ?? 0}");
-			EditorGUILayout.LabelField($"🔍 Secrets: {currentPreview.secrets?.Count ?? 0}");
-			EditorGUILayout.LabelField($"💎 Pickups: {currentPreview.pickups?.Count ?? 0}");
+			EditorGUILayout.LabelField($"🏢 Floors: {currentPreview.floors.Count}");
+			EditorGUILayout.LabelField($"👹 Bosses: {currentPreview.bosses.Count}");
+			EditorGUILayout.LabelField($"🔒 Progression Locks: {currentPreview.progressionLocks.Count}");
+			EditorGUILayout.LabelField($"🔍 Secrets: {currentPreview.secrets.Count}");
+			EditorGUILayout.LabelField($"💎 Pickups: {currentPreview.pickups.Count}");
 
 			EditorGUILayout.Space();
 
-			if (currentPreview.floors != null)
+			EditorGUILayout.LabelField("Floor Details:", EditorStyles.boldLabel);
+			for (int i = 0; i < currentPreview.floors.Count; i++)
 				{
-				EditorGUILayout.LabelField("Floor Details:", EditorStyles.boldLabel);
-				for (int i = 0; i < currentPreview.floors.Count; i++)
-					{
-					var floor = currentPreview.floors[i];
-					EditorGUILayout.LabelField(
-						$"  Floor {i + 1}: {floor.biomeName} ({floor.roomCount} rooms, {floor.secretCount} secrets)");
-					}
+				var floor = currentPreview.floors[i];
+				EditorGUILayout.LabelField(
+					$"  Floor {i + 1}: {floor.biomeName} ({floor.roomCount} rooms, {floor.secretCount} secrets)");
 				}
 
 			EditorGUILayout.EndVertical();
@@ -387,11 +390,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 			EditorGUILayout.BeginVertical("box");
 
-			bool hasThreeFloors = currentPreview?.floors?.Count == 3;
-			bool hasCorrectBossCount = currentPreview?.bosses?.Count == 3;
-			bool hasCorrectLockCount = currentPreview?.progressionLocks?.Count == 3;
-			bool hasMinimumSecrets = (currentPreview?.secrets?.Count
-			                          ?? 0) >= 3;
+			bool hasThreeFloors = currentPreview.floors.Count == DefaultFloorCount;
+			bool hasCorrectBossCount = currentPreview.bosses.Count == DefaultFloorCount;
+			bool hasCorrectLockCount = currentPreview.progressionLocks.Count == DefaultFloorCount;
+			bool hasMinimumSecrets = currentPreview.secrets.Count >= DefaultFloorCount;
 
 			DrawValidationItem("✓ Three floors generated", hasThreeFloors);
 			DrawValidationItem("✓ Correct boss count (3)", hasCorrectBossCount);
@@ -441,7 +443,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			catch (System.Exception e)
 				{
 				Debug.LogError($"❌ Failed to generate preview: {e.Message}");
-				currentPreview = null;
+				currentPreview = new DungeonPreviewData();
 				}
 			}
 
@@ -451,10 +453,10 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 			var random = new Unity.Mathematics.Random(seed);
 
 			// Generate floors
-			preview.floors = new List<FloorPreviewData>();
+			preview.floors.Clear();
 			string[] biomeNames = { "Crystal Caverns", "Molten Depths", "Void Sanctum" };
 
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < DefaultFloorCount; i++)
 				{
 				var floor = new FloorPreviewData
 					{
@@ -470,28 +472,28 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 				}
 
 			// Generate bosses
-			preview.bosses = new List<BossPreviewData>();
+			preview.bosses.Clear();
 			string[] miniBossNames = { "Crystal Guardian", "Magma Serpent" };
 			string finalBossName = "Void Overlord";
 
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < DefaultFloorCount; i++)
 				{
 				var boss = new BossPreviewData
 					{
 					floorIndex = i,
-					name = i < 2 ? miniBossNames[i] : finalBossName,
+					name = i < DefaultFloorCount - 1 ? miniBossNames[i] : finalBossName,
 					position = GetBossPositionForFloor(i),
-					isFinalBoss = i == 2
+					isFinalBoss = i == DefaultFloorCount - 1
 					};
 
 				preview.bosses.Add(boss);
 				}
 
 			// Generate progression locks
-			preview.progressionLocks = new List<ProgressionLockPreviewData>();
+			preview.progressionLocks.Clear();
 			string[] lockNames = { "Crystal Key", "Flame Essence", "Void Core" };
 
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < DefaultFloorCount; i++)
 				{
 				var lockData = new ProgressionLockPreviewData
 					{
@@ -504,9 +506,9 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 				}
 
 			// Generate secrets
-			preview.secrets = new List<SecretPreviewData>();
+			preview.secrets.Clear();
 
-			for (int floorIndex = 0; floorIndex < 3; floorIndex++)
+			for (int floorIndex = 0; floorIndex < DefaultFloorCount; floorIndex++)
 				{
 				int secretsForFloor = 1 + floorIndex;
 				for (int secretIndex = 0; secretIndex < secretsForFloor; secretIndex++)
@@ -523,13 +525,13 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 				}
 
 			// Generate pickups
-			preview.pickups = new List<PickupPreviewData>();
+			preview.pickups.Clear();
 			var pickupTypes = new[]
 				{
 				PickupType.Health, PickupType.Mana, PickupType.Currency, PickupType.Equipment, PickupType.Consumable
 				};
 
-			for (int floorIndex = 0; floorIndex < 3; floorIndex++)
+			for (int floorIndex = 0; floorIndex < DefaultFloorCount; floorIndex++)
 				{
 				for (int pickupIndex = 0; pickupIndex < 15; pickupIndex++) // 15 pickups per floor
 					{
@@ -620,20 +622,20 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 
 	// Data structures for preview
 	[System.Serializable]
-	public class DungeonPreviewData
+	public sealed class DungeonPreviewData
 		{
-		public List<FloorPreviewData>? floors;
-		public List<BossPreviewData>? bosses;
-		public List<ProgressionLockPreviewData>? progressionLocks;
-		public List<SecretPreviewData>? secrets;
-		public List<PickupPreviewData>? pickups;
+		public List<FloorPreviewData> floors = new List<FloorPreviewData>();
+		public List<BossPreviewData> bosses = new List<BossPreviewData>();
+		public List<ProgressionLockPreviewData> progressionLocks = new List<ProgressionLockPreviewData>();
+		public List<SecretPreviewData> secrets = new List<SecretPreviewData>();
+		public List<PickupPreviewData> pickups = new List<PickupPreviewData>();
 		}
 
 	[System.Serializable]
-	public class FloorPreviewData
+	public sealed class FloorPreviewData
 		{
 		public int floorIndex;
-		public string? biomeName;
+		public string biomeName = string.Empty;
 		public Color biomeColor;
 		public int roomCount;
 		public int secretCount;
@@ -641,24 +643,24 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		}
 
 	[System.Serializable]
-	public class BossPreviewData
+	public sealed class BossPreviewData
 		{
 		public int floorIndex;
-		public string? name;
+		public string name = string.Empty;
 		public Vector3 position;
 		public bool isFinalBoss;
 		}
 
 	[System.Serializable]
-	public class ProgressionLockPreviewData
+	public sealed class ProgressionLockPreviewData
 		{
 		public int floorIndex;
-		public string? name;
+		public string name = string.Empty;
 		public Vector3 position;
 		}
 
 	[System.Serializable]
-	public class SecretPreviewData
+	public sealed class SecretPreviewData
 		{
 		public int floorIndex;
 		public int secretIndex;
@@ -666,7 +668,7 @@ namespace TinyWalnutGames.MetVanDAMN.Authoring.Editor
 		}
 
 	[System.Serializable]
-	public class PickupPreviewData
+	public sealed class PickupPreviewData
 		{
 		public int floorIndex;
 		public PickupType type;

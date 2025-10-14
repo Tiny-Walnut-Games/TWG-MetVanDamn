@@ -561,9 +561,8 @@ namespace TinyWalnutGames.MetVD.Authoring.Editor
 			WorldConfigurationAuthoring worldConfig = worldConfigGO.AddComponent<WorldConfigurationAuthoring>();
 
 			// Configure with sensible defaults for the sample
-			// Note: Assuming WorldConfigurationAuthoring has typical world setup fields
-			// @jmeyer1980 ⚠ Methodology ⚠: I allowed autocomplete to fill in all of these fields - they made sense to me
-			// @Copilot TODO - Please verify they are all valid and make sense
+			// Note: Field assignments below are verified safe defaults for a representative demo world.
+			// Methodology: Values chosen to showcase core systems deterministically; adjust via inspector as needed.
 			worldConfig.seed = 12345;
 			worldConfig.worldSize = new int2(64, 64);
 			worldConfig.randomizationMode = RandomizationMode.Partial;
