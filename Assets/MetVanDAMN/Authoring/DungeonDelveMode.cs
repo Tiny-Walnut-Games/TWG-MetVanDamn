@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using UnityEngine;
 using Unity.Entities;
 using Unity.Collections;

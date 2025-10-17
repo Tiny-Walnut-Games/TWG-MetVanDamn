@@ -975,20 +975,20 @@
     <Reference Include="Unity.2D.PixelPerfect">
       <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.2D.PixelPerfect.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Animation.Rigging">
+      <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.Animation.Rigging.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.SysrootPackage.Editor">
       <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.SysrootPackage.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Animation.Rigging">
-      <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.Animation.Rigging.dll</HintPath>
+    <Reference Include="Unity.2D.Aseprite.Editor">
+      <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.2D.Aseprite.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Rendering.LightTransport.Editor">
       <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.Rendering.LightTransport.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Aseprite.Editor">
-      <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.2D.Aseprite.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TerrainTools">
       <HintPath>E:\Tiny_Walnut_Games\TWG-MetVanDamn\Library\ScriptAssemblies\Unity.TerrainTools.dll</HintPath>

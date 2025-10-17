@@ -102,10 +102,10 @@ namespace TinyWalnutGames.MetVD.QuadRig
             // Calculate direction to camera (Y-axis constrained)
             float3 characterPosition = transform.Position;
             float3 directionToCamera = CameraPosition - characterPosition;
-            
+
             // Constrain to Y-axis rotation only (flatten to XZ plane)
             directionToCamera.y = 0;
-            
+
             // Skip if too close to camera (avoid singularity)
             float distanceSquared = math.lengthsq(directionToCamera);
             if (distanceSquared < 0.01f)
@@ -118,7 +118,7 @@ namespace TinyWalnutGames.MetVD.QuadRig
             // Apply smooth rotation
             quaternion currentRotation = transform.Rotation;
             quaternion newRotation = math.slerp(currentRotation, targetRotation, billboard.RotationSpeed * DeltaTime);
-            
+
             // Update transform
             transform.Rotation = newRotation;
         }
@@ -145,10 +145,10 @@ namespace TinyWalnutGames.MetVD.QuadRig
         {
             float3 direction = to - from;
             direction.y = 0; // Constrain to Y-axis
-            
+
             if (math.lengthsq(direction) < 0.001f)
                 return quaternion.identity;
-                
+
             float3 forward = math.normalize(direction);
             return quaternion.LookRotationSafe(forward, math.up());
         }
@@ -156,12 +156,19 @@ namespace TinyWalnutGames.MetVD.QuadRig
         /// <summary>
         /// Validates billboard configuration for proper Y-axis constraint
         /// </summary>
-        public static bool ValidateBillboardConfig(in BillboardData billboard)
-        {
-            // Check that constraint axis is normalized Y-axis
-            float3 expectedAxis = math.up();
-            float dotProduct = math.dot(billboard.ConstraintAxis, expectedAxis);
-            return math.abs(dotProduct - 1.0f) < 0.01f;
-        }
+      		public static bool ValidateBillboardConfig(in BillboardData billboard)
+      		{
+      			// Active billboard required and rotation speed must be above minimum
+      			if (!billboard.IsActive) return false;
+      			if (billboard.RotationSpeed < 0.1f) return false;
+
+      			// Normalize axis to tolerate minor precision differences and validate components
+      			float3 axis = math.normalize(billboard.ConstraintAxis);
+      			if (!math.all(math.isfinite(axis))) return false;
+
+      			// Must align closely with Y-axis
+      			float dotProduct = math.dot(axis, math.up());
+      			return dotProduct > 0.99f;
+      		}
     }
 }

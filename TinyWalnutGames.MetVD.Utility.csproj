@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\MetVanDAMN\Utility\AggregatorSystem.cs" />
+    <Compile Include="Assets\MetVanDAMN\Utility\AggregatorSystem.Registration.cs" />
     <None Include="Assets\MetVanDAMN\Utility\TinyWalnutGames.MetVD.Utility.csc.rsp" />
     <None Include="Assets\MetVanDAMN\Utility\TinyWalnutGames.MetVD.Utility.asmdef" />
     <Reference Include="UnityEngine">
