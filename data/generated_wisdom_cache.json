@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-09-28T06:29:34.173018",
+  "last_updated": "2025-10-19T06:30:47.906266",
   "quotes": [
     {
       "text": "In the mystical realm of testing, the Debug Paladin stands between ergonomic harmony and documentation destruction.",
@@ -191,6 +191,76 @@
       ],
       "buttsafe_certified": true,
       "generation_date": "2025-09-28T06:29:34.173015",
+      "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "— **The Great Validator**, Codex of Comfortable Coding, Chapter 4, Verse 7",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-10-19T06:30:47.906199",
+      "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "Documentation is not what you write for others; it's what you write for the you of six months from now.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "documentation",
+        "philosophy",
+        "truth"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-10-19T06:30:47.906217",
+      "template_id": "documentation_philosophy"
+    },
+    {
+      "text": "— **Architecture Mystic**, Wisdom of the Terminal, Vol. II",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-10-19T06:30:47.906238",
+      "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "— **Refactoring Monk**, Scrolls of Cheekdom, Chapter 4, Verse 7",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-10-19T06:30:47.906252",
+      "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "— **Merge Conflict Mediator**, Mystical Methods of Development, Book of Beginnings",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-10-19T06:30:47.906264",
       "template_id": "scroll_attribution_template"
     }
   ]
