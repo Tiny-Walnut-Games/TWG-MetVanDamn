@@ -1,5 +1,5 @@
 {
-  "last_updated": "2025-12-07T06:32:13.587061",
+  "last_updated": "2025-12-14T06:34:10.841976",
   "quotes": [
     {
       "text": "In the mystical realm of testing, the Debug Paladin stands between ergonomic harmony and documentation destruction.",
@@ -780,6 +780,79 @@
       "buttsafe_certified": true,
       "generation_date": "2025-12-07T06:32:13.587058",
       "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "— **Deployment Shaman**, Sacred Scrolls, Book of Beginnings",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-12-14T06:34:10.841890",
+      "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "— **Merge Conflict Mediator**, Chronicles of Code Clarity, Chapter 2, Verse 3",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-12-14T06:34:10.841917",
+      "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "The bug you can't isolate is like the shadow under the staircase—real, but only when no one's looking.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-12-14T06:34:10.841941",
+      "template_id": "debugging_proverb_template"
+    },
+    {
+      "text": "The null pointer you can't debug is like the phantom under the basement—there, but only during production.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-12-14T06:34:10.841959",
+      "template_id": "debugging_proverb_template"
+    },
+    {
+      "text": "Every developer's back is sacred. Honor it with ergonomic wisdom.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "buttsafe",
+        "ergonomic",
+        "sacred",
+        "protection"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2025-12-14T06:34:10.841973",
+      "template_id": "buttsafe_wisdom"
     }
   ]
 }
