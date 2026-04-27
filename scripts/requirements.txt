@@ -2,7 +2,7 @@
 # Jerry's legendary Python dependencies for ultimate development power
 
 # Core dependencies for validation and linting
-PyYAML>=6.0
+PyYAML>=6.0.3
 argparse>=1.4.0
 
 # Optional but recommended for enhanced functionality
