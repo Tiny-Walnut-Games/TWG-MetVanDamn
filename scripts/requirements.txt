@@ -18,7 +18,7 @@ pathlib2>=2.3.0; python_version<"3.4"
 colorama>=0.4.0
 
 # For JSON schema validation (if needed for configuration files)
-jsonschema>=4.0.0
+jsonschema>=4.26.0
 
 # For markdown processing and validation
 markdown>=3.0.0
