@@ -9,7 +9,7 @@ argparse>=1.4.0
 # (These are typically pre-installed but listed for completeness)
 
 # For improved YAML processing
-ruamel.yaml>=0.17.0
+ruamel.yaml>=0.19.1
 
 # For advanced file operations and path handling
 pathlib2>=2.3.0; python_version<"3.4"
