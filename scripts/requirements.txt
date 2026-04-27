@@ -24,7 +24,7 @@ jsonschema>=4.0.0
 markdown>=3.0.0
 
 # For regular expression utilities
-regex>=2022.0.0
+regex>=2026.4.4
 
 # Note: Most of these dependencies are optional and the template will work
 # with just PyYAML and argparse, which are typically pre-installed.
