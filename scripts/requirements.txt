@@ -15,7 +15,7 @@ ruamel.yaml>=0.17.0
 pathlib2>=2.3.0; python_version<"3.4"
 
 # For colored terminal output (used in validation scripts)
-colorama>=0.4.0
+colorama>=0.4.6
 
 # For JSON schema validation (if needed for configuration files)
 jsonschema>=4.0.0
