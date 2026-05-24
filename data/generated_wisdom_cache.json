@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-17T08:24:42.413834",
+  "last_updated": "2026-05-24T08:32:57.067076",
   "quotes": [
     {
       "text": "In the mystical realm of testing, the Debug Paladin stands between ergonomic harmony and documentation destruction.",
@@ -2472,6 +2472,79 @@
       "buttsafe_certified": true,
       "generation_date": "2026-05-17T08:24:42.413831",
       "template_id": "wisdom_development_insight"
+    },
+    {
+      "text": "In the kingdom of documentation, the Debug Paladin stands between ergonomic harmony and comfort corruption.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "lore",
+        "cheekdom",
+        "epic",
+        "guardian"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-24T08:32:57.066995",
+      "template_id": "cheekdom_lore_template"
+    },
+    {
+      "text": "— **Code Whisperer**, Codex of Comfortable Coding, Vol. III",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-24T08:32:57.067025",
+      "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "The memory leak you can't capture is like the whisper under the closet—real, but only when no one's looking.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-24T08:32:57.067047",
+      "template_id": "debugging_proverb_template"
+    },
+    {
+      "text": "Documentation is not waste of time; it's what you write for the you of six months from now.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "documentation",
+        "philosophy",
+        "truth"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-24T08:32:57.067056",
+      "template_id": "documentation_philosophy"
+    },
+    {
+      "text": "The bug you can't reproduce is like the shadow under the staircase—real, but only when no one's looking.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-24T08:32:57.067073",
+      "template_id": "debugging_proverb_template"
     }
   ]
 }
