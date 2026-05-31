@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-24T08:32:57.067076",
+  "last_updated": "2026-05-31T08:50:23.793622",
   "quotes": [
     {
       "text": "In the mystical realm of testing, the Debug Paladin stands between ergonomic harmony and documentation destruction.",
@@ -2545,6 +2545,80 @@
       "buttsafe_certified": true,
       "generation_date": "2026-05-24T08:32:57.067073",
       "template_id": "debugging_proverb_template"
+    },
+    {
+      "text": "The memory leak you can't trace is like the specter under the basement—real, but only when no one's looking.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-31T08:50:23.793538",
+      "template_id": "debugging_proverb_template"
+    },
+    {
+      "text": "The null pointer you can't capture is like the shadow under the bed—there, but only during production.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-31T08:50:23.793574",
+      "template_id": "debugging_proverb_template"
+    },
+    {
+      "text": "Documentation is not what you write for others; it's a love letter to future maintainers.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "documentation",
+        "philosophy",
+        "truth"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-31T08:50:23.793586",
+      "template_id": "documentation_philosophy"
+    },
+    {
+      "text": "The race condition you can't debug is like the phantom under the staircase—there, but only during production.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-31T08:50:23.793603",
+      "template_id": "debugging_proverb_template"
+    },
+    {
+      "text": "In the kingdom of algorithms, the Code Guardian stands between comfortable development and runtime catastrophe.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "lore",
+        "cheekdom",
+        "epic",
+        "guardian"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-05-31T08:50:23.793620",
+      "template_id": "cheekdom_lore_template"
     }
   ]
 }
