@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-21T09:54:12.660548",
+  "last_updated": "2026-06-28T08:56:29.580206",
   "quotes": [
     {
       "text": "In the mystical realm of testing, the Debug Paladin stands between ergonomic harmony and documentation destruction.",
@@ -2839,6 +2839,78 @@
       "buttsafe_certified": true,
       "generation_date": "2026-06-21T09:54:12.660545",
       "template_id": "documentation_philosophy"
+    },
+    {
+      "text": "In the sacred lands of deployment, the Debug Paladin stands between peaceful coding and comfort corruption.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "lore",
+        "cheekdom",
+        "epic",
+        "guardian"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-06-28T08:56:29.580131",
+      "template_id": "cheekdom_lore_template"
+    },
+    {
+      "text": "Documentation is not a necessary evil; it's what you write for the you of six months from now.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "documentation",
+        "philosophy",
+        "truth"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-06-28T08:56:29.580156",
+      "template_id": "documentation_philosophy"
+    },
+    {
+      "text": "Documentation is not a necessary evil; it's a love letter to future maintainers.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "documentation",
+        "philosophy",
+        "truth"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-06-28T08:56:29.580169",
+      "template_id": "documentation_philosophy"
+    },
+    {
+      "text": "— **Debug Oracle**, Digital Development Sutras, Vol. IV",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "attribution",
+        "source",
+        "mystical"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-06-28T08:56:29.580183",
+      "template_id": "scroll_attribution_template"
+    },
+    {
+      "text": "The infinite loop you can't reproduce is like the monster under the staircase—real, but only when no one's looking.",
+      "author": "Oracle of Generated Wisdom",
+      "source": "Living Scroll Synthesis",
+      "volume": "Generated Series I",
+      "tags": [
+        "debugging",
+        "humor",
+        "proverb",
+        "mystery"
+      ],
+      "buttsafe_certified": true,
+      "generation_date": "2026-06-28T08:56:29.580203",
+      "template_id": "debugging_proverb_template"
     }
   ]
 }
